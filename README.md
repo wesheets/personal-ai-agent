@@ -1,6 +1,6 @@
 # Enhanced AI Agent System
 
-A personal AI agent system with vector memory, multi-model support, configurable agent personalities, and tool integration.
+A personal AI agent system with vector memory, multi-model support, configurable agent personalities, tool integration, and agent reflection capabilities.
 
 ## Features
 
@@ -13,6 +13,15 @@ A personal AI agent system with vector memory, multi-model support, configurable
 - **Agent Specialization**: Builder, Ops, Research, Memory agents with configurable personalities
 - **Fallback Mechanisms**: Automatic fallback between models if one fails
 - **Priority Flagging**: Flag important memories for faster retrieval
+- **Agent Reflection**: Rationale logging, self-evaluation, and memory context review
+- **Task Tagging**: Categorization and next step suggestions for future orchestration
+
+## New in Phase 2.1: Agent Reflection & Reasoning
+
+- **Rationale Logging**: Agents explain their reasoning, assumptions, and suggest improvements
+- **Self-Evaluation**: Agents assess their confidence and identify potential failure points
+- **Memory Context Review**: Agents analyze how past memories connect to current tasks
+- **Task Tagging Metadata**: Categorization and next step suggestions for future orchestration
 
 ## Tech Stack
 
@@ -82,7 +91,9 @@ docker-compose up --build
 ### Agent Endpoints
 
 - **POST /agent/{agent_name}**: Process a request using the specified agent
+  - Now includes reflection data in the response
 - **GET /agent/{agent_name}/history**: Get history of agent interactions
+- **GET /agent/{agent_name}/rationale**: Get rationale logs for an agent
 
 ### Memory Endpoints
 
@@ -97,6 +108,41 @@ docker-compose up --build
 
 - **GET /system/models**: Get available models
 - **GET /system/tools**: Get available tools
+
+## Agent Reflection & Reasoning
+
+### Rationale Logging
+
+After each agent completes a task, it generates answers to:
+- "What was your rationale for this response?"
+- "What assumptions did you make?"
+- "What could improve this next time?"
+
+These reflections are stored in the `rationale_logs/` directory as JSON files, one per interaction.
+
+### Self-Evaluation
+
+Agents now reflect on their outputs with:
+- "How confident are you in this output?"
+- "What are possible failure points?"
+
+This self-evaluation is stored alongside the rationale in the same log file.
+
+### Memory Context Review
+
+When retrieving memories, agents now analyze:
+- "Here are previous related memories. How do they connect to the current task?"
+
+This helps agents connect dots over time and build on past interactions.
+
+### Task Tagging Metadata
+
+Execution logs now include:
+- `task_category` (e.g., code, strategy, research)
+- `suggested_next_step` (optional field for future actions)
+- `tags` (relevant keywords for the task)
+
+This prepares the system for future orchestration and workflow automation.
 
 ## Creating New Agents
 
@@ -135,6 +181,7 @@ You can create new agents without modifying any code:
 2. Restart the server, and the new agent will be automatically available at:
    - **POST /agent/{agent_name}**
    - **GET /agent/{agent_name}/history**
+   - **GET /agent/{agent_name}/rationale**
 
 No code changes required! The system dynamically registers routes for all prompt files found in the `app/prompts` directory.
 
@@ -183,9 +230,24 @@ The system includes comprehensive logging of all agent interactions:
    - Model used
    - Input/output summaries
    - Tools used
+   - Task category and suggested next steps
    - Additional metadata
 
 2. Logs are stored as individual JSON files in the `execution_logs/` directory
+
+## Rationale Logging
+
+The system now includes comprehensive logging of agent rationale and self-evaluation:
+
+1. Each agent reflection is logged with:
+   - Rationale for the response
+   - Assumptions made
+   - Improvement suggestions
+   - Confidence level
+   - Potential failure points
+   - Task category and suggested next steps
+
+2. Logs are stored as individual JSON files in the `rationale_logs/` directory
 
 ## Model Selection
 
@@ -232,6 +294,7 @@ Run the test suite:
 python -m tests.test_memory_integration
 python -m tests.test_multi_model_support
 python -m tests.test_claude_integration
+python -m tests.test_reflection_capabilities
 ```
 
 ## Postman Collection

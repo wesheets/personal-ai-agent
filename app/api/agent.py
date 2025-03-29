@@ -9,6 +9,10 @@ from app.core.memory_manager import MemoryManager
 from app.core.vector_memory import VectorMemorySystem
 from app.core.shared_memory import get_shared_memory
 from app.core.execution_logger import get_execution_logger
+from app.core.rationale_logger import get_rationale_logger
+from app.core.self_evaluation import SelfEvaluationPrompt
+from app.core.memory_context_reviewer import get_memory_context_reviewer
+from app.core.task_tagger import get_task_tagger, TaskMetadata
 from app.providers import process_with_model
 from app.db.database import get_database
 from app.db.supabase_manager import get_supabase_client
@@ -21,6 +25,9 @@ memory_manager = MemoryManager()
 vector_memory = VectorMemorySystem()
 shared_memory = get_shared_memory()
 execution_logger = get_execution_logger()
+rationale_logger = get_rationale_logger()
+memory_context_reviewer = get_memory_context_reviewer()
+task_tagger = get_task_tagger()
 tool_manager = get_tool_manager()
 
 class AgentRequest(BaseModel):
@@ -29,10 +36,12 @@ class AgentRequest(BaseModel):
     save_to_memory: Optional[bool] = True
     model: Optional[str] = None  # Allow model override via API parameter
     tools_to_use: Optional[List[str]] = None  # Allow tool override via API parameter
+    skip_reflection: Optional[bool] = False  # Option to skip reflection for faster responses
 
 class AgentResponse(BaseModel):
     output: str
     metadata: Dict[str, Any]
+    reflection: Optional[Dict[str, Any]] = None  # Include reflection data if available
 
 async def save_interaction_to_memory(
     agent_type: str, 
@@ -64,6 +73,11 @@ async def save_interaction_to_memory(
     if agent_type not in topics:
         topics.append(agent_type)
     
+    # Add task category as a topic if available
+    task_category = metadata.get("task_category")
+    if task_category and task_category not in topics:
+        topics.append(task_category)
+    
     await shared_memory.store_memory(
         content=combined_text,
         metadata=metadata,
@@ -73,45 +87,21 @@ async def save_interaction_to_memory(
         agent_name=agent_type
     )
 
-async def retrieve_relevant_memories(
+async def retrieve_and_analyze_memories(
     input_text: str, 
     agent_type: str,
-    limit: int = 3
-) -> str:
-    """Retrieve relevant memories for the input text"""
-    try:
-        # Search shared memory for similar past interactions
-        agent_memories = await shared_memory.search_memories(
-            query=input_text,
-            limit=limit,
-            scope="agent",
-            agent_name=agent_type
-        )
-        
-        global_memories = await shared_memory.search_memories(
-            query=input_text,
-            limit=limit,
-            scope="global"
-        )
-        
-        # Combine and deduplicate memories
-        memory_ids = set()
-        combined_memories = []
-        
-        for memory in agent_memories + global_memories:
-            if memory["id"] not in memory_ids:
-                memory_ids.add(memory["id"])
-                combined_memories.append(memory)
-        
-        # Sort by similarity
-        combined_memories.sort(key=lambda x: x.get("similarity", 0), reverse=True)
-        
-        # Format memories as context
-        memory_context = await shared_memory.format_memories_as_context(combined_memories[:limit])
-        return memory_context
-    except Exception as e:
-        print(f"Error retrieving memories: {str(e)}")
-        return ""
+    model: str,
+    context: Optional[Dict[str, Any]] = None,
+    limit: int = 5
+) -> Dict[str, Any]:
+    """Retrieve relevant memories and analyze their connection to the current task"""
+    return await memory_context_reviewer.retrieve_and_analyze_memories(
+        model=model,
+        agent_type=agent_type,
+        input_text=input_text,
+        limit=limit,
+        context=context
+    )
 
 async def execute_tools(
     tools_to_use: List[str],
@@ -219,13 +209,28 @@ async def process_agent_request(
             tool_execution_results = tool_execution.get("results", {})
             tools_used = tool_execution.get("tools_used", [])
         
-        # Retrieve relevant memories
-        memory_context = await retrieve_relevant_memories(request.input, agent_type)
+        # Determine which model to use
+        model = request.model if request.model else prompt_chain.get("model", "gpt-4")
         
-        # If we have memory context, prepend it to the system prompt
+        # Retrieve and analyze relevant memories
+        memory_analysis = await retrieve_and_analyze_memories(
+            input_text=request.input,
+            agent_type=agent_type,
+            model=model,
+            context=request.context
+        )
+        
+        memory_context = memory_analysis.get("memory_context", "")
+        memory_analysis_text = memory_analysis.get("analysis", "")
+        
+        # Prepare the system prompt with memory context and analysis
+        system_prompt = prompt_chain.get("system", "")
+        
         if memory_context:
-            original_system = prompt_chain.get("system", "")
-            prompt_chain["system"] = f"{memory_context}\n\n{original_system}"
+            system_prompt = f"{memory_context}\n\n{system_prompt}"
+        
+        if memory_analysis_text:
+            system_prompt += f"\n\nMemory Analysis:\n{memory_analysis_text}"
         
         # If we have tool results, add them to the context
         if tool_execution_results:
@@ -235,17 +240,27 @@ async def process_agent_request(
                 tool_context += f"```json\n{json.dumps(result, indent=2)}\n```\n\n"
             
             # Add tool context to system prompt
-            prompt_chain["system"] = prompt_chain["system"] + "\n\n" + tool_context
+            system_prompt += "\n\n" + tool_context
         
-        # Override model if specified in request
-        if request.model:
-            prompt_chain["model"] = request.model
+        # Update the prompt chain with the enhanced system prompt
+        prompt_chain["system"] = system_prompt
         
         # Process the input through the prompt chain
         result = await process_with_model(
-            model=prompt_chain.get("model", "gpt-4"),
+            model=model,
             prompt_chain=prompt_chain,
             user_input=request.input,
+            context=request.context
+        )
+        
+        # Get the output content
+        output_text = result.get("content", "")
+        
+        # Categorize the task
+        task_metadata = await task_tagger.categorize_task(
+            input_text=request.input,
+            output_text=output_text,
+            model=model,
             context=request.context
         )
         
@@ -254,10 +269,13 @@ async def process_agent_request(
             "agent": agent_type,
             "tokens_used": result.get("usage", {}).get("total_tokens", 0),
             "timestamp": result.get("timestamp"),
-            "model": result.get("model", prompt_chain.get("model", "gpt-4")),
+            "model": result.get("model", model),
             "provider": result.get("provider", "unknown"),
-            "priority": request.context.get("priority", False) if request.context else False,
-            "tools_used": tools_used
+            "priority": task_metadata.priority,
+            "tools_used": tools_used,
+            "task_category": task_metadata.task_category,
+            "suggested_next_step": task_metadata.suggested_next_step,
+            "tags": task_metadata.tags
         }
         
         # Log the execution
@@ -265,7 +283,7 @@ async def process_agent_request(
             agent_name=agent_type,
             model=metadata["model"],
             input_text=request.input,
-            output_text=result["content"],
+            output_text=output_text,
             metadata=metadata,
             tools_used=tools_used
         )
@@ -277,15 +295,68 @@ async def process_agent_request(
                 save_interaction_to_memory,
                 agent_type,
                 request.input,
-                result["content"],
+                output_text,
                 metadata,
                 "agent"  # Default scope
             )
         
-        # Return the processed result
+        # Skip reflection if requested
+        if request.skip_reflection:
+            return AgentResponse(
+                output=output_text,
+                metadata=metadata
+            )
+        
+        # Generate rationale
+        rationale_data = await SelfEvaluationPrompt.generate_rationale(
+            model=model,
+            agent_type=agent_type,
+            input_text=request.input,
+            output_text=output_text,
+            context=request.context
+        )
+        
+        # Generate self-evaluation
+        evaluation_data = await SelfEvaluationPrompt.generate_self_evaluation(
+            model=model,
+            agent_type=agent_type,
+            input_text=request.input,
+            output_text=output_text,
+            context=request.context
+        )
+        
+        # Log the rationale and self-evaluation
+        rationale_log_id = await rationale_logger.log_rationale(
+            agent_name=agent_type,
+            input_text=request.input,
+            output_text=output_text,
+            rationale=rationale_data.get("rationale", ""),
+            assumptions=rationale_data.get("assumptions", ""),
+            improvement_suggestions=rationale_data.get("improvement_suggestions", ""),
+            confidence_level=evaluation_data.get("confidence_level", ""),
+            failure_points=evaluation_data.get("failure_points", ""),
+            task_category=metadata.get("task_category"),
+            suggested_next_step=metadata.get("suggested_next_step"),
+            metadata=metadata,
+            execution_log_id=log_id
+        )
+        
+        # Add reflection data to metadata
+        reflection_data = {
+            "rationale": rationale_data.get("rationale", ""),
+            "assumptions": rationale_data.get("assumptions", ""),
+            "improvement_suggestions": rationale_data.get("improvement_suggestions", ""),
+            "confidence_level": evaluation_data.get("confidence_level", ""),
+            "failure_points": evaluation_data.get("failure_points", ""),
+            "memory_analysis": memory_analysis_text,
+            "rationale_log_id": rationale_log_id
+        }
+        
+        # Return the processed result with reflection data
         return AgentResponse(
-            output=result["content"],
-            metadata=metadata
+            output=output_text,
+            metadata=metadata,
+            reflection=reflection_data
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing {agent_type} request: {str(e)}")
@@ -354,6 +425,19 @@ def register_agent_routes():
                 agent_type=agent_type,
                 limit=limit,
                 db=db
+            )
+        
+        # Register the rationale logs endpoint
+        @router.get(f"/{agent_type}/rationale", response_model=List[Dict[str, Any]])
+        async def get_rationale_logs(
+            limit: int = 10,
+            offset: int = 0,
+            agent_type=agent_type
+        ):
+            return await rationale_logger.get_rationale_logs(
+                agent_name=agent_type,
+                limit=limit,
+                offset=offset
             )
         
         print(f"Registered agent routes for: {agent_type}")
