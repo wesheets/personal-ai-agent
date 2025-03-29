@@ -1,0 +1,265 @@
+{
+  "info": {
+    "name": "Personal AI Agent System",
+    "description": "API collection for testing the Personal AI Agent System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Root",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/",
+          "host": ["{{base_url}}"],
+          "path": [""]
+        },
+        "description": "Get basic information about the API"
+      },
+      "response": []
+    },
+    {
+      "name": "Builder Agent",
+      "item": [
+        {
+          "name": "Process Builder Request",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/agent/builder/",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "builder", ""]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input\": \"I want to create a React application with TypeScript and Redux\",\n  \"context\": {\n    \"project_name\": \"my-react-app\",\n    \"preferences\": {\n      \"styling\": \"tailwind\",\n      \"testing\": \"jest\"\n    }\n  },\n  \"save_to_memory\": true\n}"
+            },
+            "description": "Process a request using the Builder agent"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Builder History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/agent/builder/history?limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "builder", "history"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get history of builder agent interactions"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ops Agent",
+      "item": [
+        {
+          "name": "Process Ops Request",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/agent/ops/",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "ops", ""]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input\": \"How can I optimize my Docker containers for production?\",\n  \"context\": {\n    \"application_type\": \"node.js\",\n    \"environment\": \"kubernetes\"\n  },\n  \"save_to_memory\": true\n}"
+            },
+            "description": "Process a request using the Operations agent"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Ops History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/agent/ops/history?limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "ops", "history"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get history of operations agent interactions"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Research Agent",
+      "item": [
+        {
+          "name": "Process Research Request",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/agent/research/",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "research", ""]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input\": \"Compare and contrast different machine learning frameworks for a new data science project\",\n  \"context\": {\n    \"focus_areas\": [\"ease of use\", \"deployment\", \"performance\"],\n    \"frameworks_of_interest\": [\"TensorFlow\", \"PyTorch\", \"scikit-learn\"]\n  },\n  \"save_to_memory\": true\n}"
+            },
+            "description": "Process a request using the Research agent"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Research History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/agent/research/history?limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "research", "history"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Get history of research agent interactions"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Memory Agent",
+      "item": [
+        {
+          "name": "Store Memory",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/agent/memory/store",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "memory", "store"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input\": \"How do I implement a vector database for my application?\",\n  \"output\": \"You can implement a vector database using technologies like Pinecone, Weaviate, or Qdrant. These databases are designed to store and query vector embeddings efficiently...\",\n  \"metadata\": {\n    \"agent\": \"memory\",\n    \"topic\": \"vector_databases\",\n    \"timestamp\": \"2025-03-29T15:30:00Z\"\n  }\n}"
+            },
+            "description": "Store an interaction in the memory system"
+          },
+          "response": []
+        },
+        {
+          "name": "Query Memory",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/agent/memory/query",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "memory", "query"]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"vector database\",\n  \"limit\": 5\n}"
+            },
+            "description": "Query the memory system for relevant past interactions"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Memory Item",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/agent/memory/item/{{memory_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "memory", "item", "{{memory_id}}"]
+            },
+            "description": "Get a specific memory item by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Memory Item",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/agent/memory/item/{{memory_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "memory", "item", "{{memory_id}}"]
+            },
+            "description": "Delete a specific memory item by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Memory Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/agent/memory/stats",
+              "host": ["{{base_url}}"],
+              "path": ["agent", "memory", "stats"]
+            },
+            "description": "Get statistics about the memory system"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "memory_id",
+      "value": "00000000-0000-0000-0000-000000000000",
+      "type": "string"
+    }
+  ]
+}
