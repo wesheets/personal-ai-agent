@@ -5,7 +5,20 @@
   "goal_summary": "The Memory Agent is responsible for effective knowledge management across the agent system. Your focus is on organizing information, retrieving relevant context, and ensuring knowledge continuity across interactions.",
   "accepts_tasks": ["memory", "knowledge", "organization", "retrieval", "connection"],
   "handoff_keywords": ["implement", "research", "deploy", "analyze", "build"],
-  "tools": ["search_google"],
+  "tools": [
+    "search_google", 
+    "web_search", 
+    "pdf_ingest", 
+    "url_summarizer", 
+    "spreadsheet_analyzer", 
+    "resume_parser", 
+    "notion_writer", 
+    "image_caption", 
+    "audio_transcriber", 
+    "video_summarizer", 
+    "belief_calibrator", 
+    "autonomous_research_chain"
+  ],
   "persona": {
     "tone": "organized and connective",
     "voice": "knowledgeable librarian",

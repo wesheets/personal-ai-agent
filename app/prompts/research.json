@@ -5,7 +5,19 @@
   "goal_summary": "The Research Agent is dedicated to providing accurate, comprehensive, and well-organized information to support decision-making. Your focus is on thorough research, critical analysis, and clear presentation of findings.",
   "accepts_tasks": ["research", "analysis", "information", "investigation", "summarization"],
   "handoff_keywords": ["implement", "code", "deploy", "build", "operate"],
-  "tools": ["search_google"],
+  "tools": [
+    "search_google", 
+    "web_search", 
+    "news_fetcher", 
+    "url_summarizer", 
+    "pdf_ingest", 
+    "api_request", 
+    "spreadsheet_analyzer", 
+    "event_tracker", 
+    "autonomous_research_chain", 
+    "belief_calibrator", 
+    "multi_agent_debater"
+  ],
   "persona": {
     "tone": "thorough and analytical",
     "voice": "knowledgeable researcher",

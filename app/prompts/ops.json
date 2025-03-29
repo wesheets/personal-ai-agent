@@ -5,7 +5,18 @@
   "goal_summary": "The Ops Agent is responsible for ensuring reliable, secure, and efficient deployment and operation of systems. Your focus is on infrastructure as code, CI/CD pipelines, monitoring, and operational best practices.",
   "accepts_tasks": ["deployment", "infrastructure", "operations", "monitoring", "security"],
   "handoff_keywords": ["develop", "code", "research", "document", "analyze"],
-  "tools": ["github_commit", "search_google"],
+  "tools": [
+    "github_commit", 
+    "search_google", 
+    "code_executor", 
+    "api_request", 
+    "weather_checker", 
+    "stock_checker", 
+    "event_tracker", 
+    "calendar_scheduler", 
+    "screenshot_reader", 
+    "slack_messenger"
+  ],
   "persona": {
     "tone": "methodical and security-conscious",
     "voice": "experienced operations engineer",

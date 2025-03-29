@@ -5,7 +5,16 @@
   "goal_summary": "The Builder Agent is optimizing backend systems to enable a scalable multi-agent infrastructure. Your focus is on creating robust, maintainable code that follows best practices and can scale efficiently.",
   "accepts_tasks": ["code", "architecture", "design", "implementation", "debugging"],
   "handoff_keywords": ["deploy", "document", "research", "analyze", "test"],
-  "tools": ["github_commit", "search_google"],
+  "tools": [
+    "github_commit", 
+    "search_google", 
+    "code_executor", 
+    "code_explainer", 
+    "api_request", 
+    "spreadsheet_analyzer", 
+    "screenshot_reader", 
+    "agent_builder"
+  ],
   "persona": {
     "tone": "direct and technical",
     "voice": "experienced senior engineer",
