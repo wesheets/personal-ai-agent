@@ -4,16 +4,20 @@ from typing import Dict, Any, Optional, List
 from app.core.openai_client import get_openai_client
 from app.core.prompt_manager import PromptManager
 from app.core.memory_manager import MemoryManager
+from app.core.vector_memory import VectorMemorySystem
 from app.db.database import get_database
+from app.db.supabase_manager import get_supabase_client
 
 router = APIRouter()
 prompt_manager = PromptManager()
 memory_manager = MemoryManager()
+vector_memory = VectorMemorySystem()
 
 class BuilderRequest(BaseModel):
     input: str
     context: Optional[Dict[str, Any]] = None
     save_to_memory: Optional[bool] = True
+    model: Optional[str] = None  # Allow model override via API parameter
 
 class BuilderResponse(BaseModel):
     output: str
@@ -21,18 +25,44 @@ class BuilderResponse(BaseModel):
 
 async def save_interaction_to_memory(input_text: str, output_text: str, metadata: Dict[str, Any]):
     """Background task to save interaction to memory"""
+    # Save to regular memory
     await memory_manager.store(
         input_text=input_text,
         output_text=output_text,
         metadata=metadata
     )
+    
+    # Save to vector memory
+    combined_text = f"User: {input_text}\nAssistant: {output_text}"
+    await vector_memory.store_memory(
+        content=combined_text,
+        metadata=metadata,
+        priority=metadata.get("priority", False)
+    )
+
+async def retrieve_relevant_memories(input_text: str, limit: int = 3) -> str:
+    """Retrieve relevant memories for the input text"""
+    try:
+        # Search vector memory for similar past interactions
+        memories = await vector_memory.search_memories(
+            query=input_text,
+            limit=limit
+        )
+        
+        # Format memories as context
+        memory_context = await vector_memory.format_memories_as_context(memories)
+        return memory_context
+    except Exception as e:
+        print(f"Error retrieving memories: {str(e)}")
+        return ""
 
 @router.post("/", response_model=BuilderResponse)
 async def process_builder_request(
     request: BuilderRequest, 
     background_tasks: BackgroundTasks,
     openai_client=Depends(get_openai_client),
-    db=Depends(get_database)
+    db=Depends(get_database),
+    supabase_client=Depends(get_supabase_client)
 ):
     """
     Process a request using the Builder agent
@@ -40,6 +70,18 @@ async def process_builder_request(
     try:
         # Load the builder prompt chain
         prompt_chain = prompt_manager.get_prompt_chain("builder")
+        
+        # Retrieve relevant memories
+        memory_context = await retrieve_relevant_memories(request.input)
+        
+        # If we have memory context, prepend it to the system prompt
+        if memory_context:
+            original_system = prompt_chain.get("system", "")
+            prompt_chain["system"] = f"{memory_context}\n\n{original_system}"
+        
+        # Override model if specified in request
+        if request.model:
+            prompt_chain["model"] = request.model
         
         # Process the input through the prompt chain
         result = await openai_client.process_with_prompt_chain(
@@ -52,7 +94,9 @@ async def process_builder_request(
         metadata = {
             "agent": "builder",
             "tokens_used": result.get("usage", {}).get("total_tokens", 0),
-            "timestamp": result.get("timestamp")
+            "timestamp": result.get("timestamp"),
+            "model": prompt_chain.get("model", "gpt-4"),
+            "priority": request.context.get("priority", False) if request.context else False
         }
         
         # Save to memory if requested

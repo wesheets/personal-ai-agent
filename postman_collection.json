@@ -1,23 +1,10 @@
 {
   "info": {
-    "name": "Personal AI Agent System",
-    "description": "API collection for testing the Personal AI Agent System",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "name": "Enhanced AI Agent System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12345678"
   },
   "item": [
-    {
-      "name": "Root",
-      "request": {
-        "method": "GET",
-        "url": {
-          "raw": "{{base_url}}/",
-          "host": ["{{base_url}}"],
-          "path": [""]
-        },
-        "description": "Get basic information about the API"
-      },
-      "response": []
-    },
     {
       "name": "Builder Agent",
       "item": [
@@ -25,11 +12,6 @@
           "name": "Process Builder Request",
           "request": {
             "method": "POST",
-            "url": {
-              "raw": "{{base_url}}/agent/builder/",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "builder", ""]
-            },
             "header": [
               {
                 "key": "Content-Type",
@@ -38,9 +20,19 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"input\": \"I want to create a React application with TypeScript and Redux\",\n  \"context\": {\n    \"project_name\": \"my-react-app\",\n    \"preferences\": {\n      \"styling\": \"tailwind\",\n      \"testing\": \"jest\"\n    }\n  },\n  \"save_to_memory\": true\n}"
+              "raw": "{\n    \"input\": \"I need to create a REST API for a blog with users, posts, and comments.\",\n    \"context\": {\n        \"project_type\": \"web\",\n        \"priority\": false\n    },\n    \"save_to_memory\": true,\n    \"model\": \"gpt-4\"\n}"
             },
-            "description": "Process a request using the Builder agent"
+            "url": {
+              "raw": "{{base_url}}/agent/builder",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "agent",
+                "builder"
+              ]
+            },
+            "description": "Process a request using the Builder agent with memory retrieval and model selection"
           },
           "response": []
         },
@@ -48,14 +40,21 @@
           "name": "Get Builder History",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/agent/builder/history?limit=5",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "builder", "history"],
+              "raw": "{{base_url}}/agent/builder/history?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "agent",
+                "builder",
+                "history"
+              ],
               "query": [
                 {
                   "key": "limit",
-                  "value": "5"
+                  "value": "10"
                 }
               ]
             },
@@ -63,7 +62,8 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Builder agent endpoints for creating and structuring projects"
     },
     {
       "name": "Ops Agent",
@@ -72,11 +72,6 @@
           "name": "Process Ops Request",
           "request": {
             "method": "POST",
-            "url": {
-              "raw": "{{base_url}}/agent/ops/",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "ops", ""]
-            },
             "header": [
               {
                 "key": "Content-Type",
@@ -85,32 +80,24 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"input\": \"How can I optimize my Docker containers for production?\",\n  \"context\": {\n    \"application_type\": \"node.js\",\n    \"environment\": \"kubernetes\"\n  },\n  \"save_to_memory\": true\n}"
+              "raw": "{\n    \"input\": \"How can I optimize my Docker containers for production?\",\n    \"context\": {\n        \"environment\": \"production\",\n        \"priority\": false\n    },\n    \"save_to_memory\": true,\n    \"model\": \"claude-3-sonnet\"\n}"
             },
-            "description": "Process a request using the Operations agent"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Ops History",
-          "request": {
-            "method": "GET",
             "url": {
-              "raw": "{{base_url}}/agent/ops/history?limit=5",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "ops", "history"],
-              "query": [
-                {
-                  "key": "limit",
-                  "value": "5"
-                }
+              "raw": "{{base_url}}/agent/ops",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "agent",
+                "ops"
               ]
             },
-            "description": "Get history of operations agent interactions"
+            "description": "Process a request using the Ops agent with memory retrieval and model selection"
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Operations agent endpoints for system management and optimization"
     },
     {
       "name": "Research Agent",
@@ -119,11 +106,6 @@
           "name": "Process Research Request",
           "request": {
             "method": "POST",
-            "url": {
-              "raw": "{{base_url}}/agent/research/",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "research", ""]
-            },
             "header": [
               {
                 "key": "Content-Type",
@@ -132,45 +114,32 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"input\": \"Compare and contrast different machine learning frameworks for a new data science project\",\n  \"context\": {\n    \"focus_areas\": [\"ease of use\", \"deployment\", \"performance\"],\n    \"frameworks_of_interest\": [\"TensorFlow\", \"PyTorch\", \"scikit-learn\"]\n  },\n  \"save_to_memory\": true\n}"
+              "raw": "{\n    \"input\": \"Research the current state of quantum computing and its potential applications.\",\n    \"context\": {\n        \"depth\": \"comprehensive\",\n        \"priority\": true\n    },\n    \"save_to_memory\": true,\n    \"model\": \"claude-3-opus\"\n}"
             },
-            "description": "Process a request using the Research agent"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Research History",
-          "request": {
-            "method": "GET",
             "url": {
-              "raw": "{{base_url}}/agent/research/history?limit=5",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "research", "history"],
-              "query": [
-                {
-                  "key": "limit",
-                  "value": "5"
-                }
+              "raw": "{{base_url}}/agent/research",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "agent",
+                "research"
               ]
             },
-            "description": "Get history of research agent interactions"
+            "description": "Process a request using the Research agent with memory retrieval and model selection"
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Research agent endpoints for information gathering and analysis"
     },
     {
       "name": "Memory Agent",
       "item": [
         {
-          "name": "Store Memory",
+          "name": "Process Memory Request",
           "request": {
             "method": "POST",
-            "url": {
-              "raw": "{{base_url}}/agent/memory/store",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "memory", "store"]
-            },
             "header": [
               {
                 "key": "Content-Type",
@@ -179,75 +148,219 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"input\": \"How do I implement a vector database for my application?\",\n  \"output\": \"You can implement a vector database using technologies like Pinecone, Weaviate, or Qdrant. These databases are designed to store and query vector embeddings efficiently...\",\n  \"metadata\": {\n    \"agent\": \"memory\",\n    \"topic\": \"vector_databases\",\n    \"timestamp\": \"2025-03-29T15:30:00Z\"\n  }\n}"
+              "raw": "{\n    \"input\": \"What do you remember about my API project?\",\n    \"context\": {\n        \"topic\": \"project\",\n        \"priority\": false\n    },\n    \"save_to_memory\": true,\n    \"model\": \"gpt-4\"\n}"
             },
-            "description": "Store an interaction in the memory system"
-          },
-          "response": []
-        },
-        {
-          "name": "Query Memory",
-          "request": {
-            "method": "POST",
             "url": {
-              "raw": "{{base_url}}/agent/memory/query",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "memory", "query"]
+              "raw": "{{base_url}}/agent/memory",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "agent",
+                "memory"
+              ]
             },
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"vector database\",\n  \"limit\": 5\n}"
-            },
-            "description": "Query the memory system for relevant past interactions"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Memory Item",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/agent/memory/item/{{memory_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "memory", "item", "{{memory_id}}"]
-            },
-            "description": "Get a specific memory item by ID"
-          },
-          "response": []
-        },
-        {
-          "name": "Delete Memory Item",
-          "request": {
-            "method": "DELETE",
-            "url": {
-              "raw": "{{base_url}}/agent/memory/item/{{memory_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "memory", "item", "{{memory_id}}"]
-            },
-            "description": "Delete a specific memory item by ID"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Memory Stats",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/agent/memory/stats",
-              "host": ["{{base_url}}"],
-              "path": ["agent", "memory", "stats"]
-            },
-            "description": "Get statistics about the memory system"
+            "description": "Process a request using the Memory agent with memory retrieval and model selection"
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Memory agent endpoints for knowledge management"
+    },
+    {
+      "name": "Vector Memory",
+      "item": [
+        {
+          "name": "Add Memory",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"The user is working on a personal AI agent system with FastAPI, Docker, and OpenAI integration.\",\n    \"metadata\": {\n        \"topic\": \"project\",\n        \"agent\": \"builder\",\n        \"timestamp\": \"2025-03-29T15:45:18Z\"\n    },\n    \"priority\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/memory/add",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memory",
+                "add"
+              ]
+            },
+            "description": "Add a new memory to the vector memory system"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Memories",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"query\": \"AI agent system\",\n    \"limit\": 5,\n    \"priority_only\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/memory/search",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memory",
+                "search"
+              ]
+            },
+            "description": "Search for memories similar to the query"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Memory by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/memory/get/{{memory_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memory",
+                "get",
+                "{{memory_id}}"
+              ]
+            },
+            "description": "Get a specific memory by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Memory Priority",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"priority\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/memory/priority/{{memory_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memory",
+                "priority",
+                "{{memory_id}}"
+              ]
+            },
+            "description": "Update the priority flag of a memory"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Memory",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/memory/delete/{{memory_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memory",
+                "delete",
+                "{{memory_id}}"
+              ]
+            },
+            "description": "Delete a memory by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Memory Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/memory/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "memory",
+                "status"
+              ]
+            },
+            "description": "Get status information about the memory system"
+          },
+          "response": []
+        }
+      ],
+      "description": "Vector memory system endpoints for storing and retrieving memories"
+    },
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Get Available Models",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/system/models",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "system",
+                "models"
+              ]
+            },
+            "description": "Get all available models grouped by provider"
+          },
+          "response": []
+        }
+      ],
+      "description": "System-level endpoints for configuration and status"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
     }
   ],
   "variable": [

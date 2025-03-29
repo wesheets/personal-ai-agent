@@ -1,235 +1,160 @@
-# Personal AI Agent System
+# Enhanced AI Agent System
 
-A modular AI agent system modeled after Manus, built with FastAPI, Docker, and OpenAI integration.
+A personal AI agent system with vector memory, multi-model support, and configurable agent personalities.
 
-## Overview
+## Features
 
-This project implements a personal AI agent system with multiple specialized agents:
-
-- **Builder Agent**: Helps with planning, organizing, and implementing software architectures
-- **Ops Agent**: Assists with troubleshooting, automation, and process improvement
-- **Research Agent**: Gathers and analyzes information, providing comprehensive reports
-- **Memory Agent**: Stores and retrieves information from past interactions
-
-The system is designed to be modular, extensible, and easy to deploy using Docker.
+- **Vector Memory System**: Store and retrieve memories using Supabase with pgvector
+- **Multi-Model Support**: Pluggable architecture supporting both OpenAI and Claude models
+- **Agent Specialization**: Builder, Ops, Research, and Memory agents with configurable personalities
+- **Fallback Mechanisms**: Automatic fallback between models if one fails
+- **Priority Flagging**: Flag important memories for faster retrieval
 
 ## Tech Stack
 
 - **Backend**: FastAPI
 - **Containerization**: Docker
-- **AI**: OpenAI GPT-4 via API
-- **Memory**: Local file-based storage (with Supabase integration option)
-
-## Features
-
-- Modular agent routes with specialized capabilities
-- Dynamic prompt chain loading from JSON/YAML files
-- Memory system for storing and retrieving past interactions
-- Comprehensive API documentation with Swagger UI
-- Docker containerization for easy deployment
+- **AI Models**: OpenAI GPT-4 and Anthropic Claude 3
+- **Vector Database**: Supabase with pgvector
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.9+
-- Docker and Docker Compose
+- Python 3.10+
+- Docker and Docker Compose (optional)
 - OpenAI API key
+- Claude API key (optional)
+- Supabase account and project
 
 ### Environment Setup
 
 1. Clone the repository:
-   ```bash
+   ```
    git clone https://github.com/wesheets/personal-ai-agent.git
    cd personal-ai-agent
    ```
 
-2. Create a `.env` file in the project root with the following variables:
+2. Create a `.env` file with your API keys:
    ```
    OPENAI_API_KEY=your_openai_api_key
-   DB_TYPE=local  # Use "supabase" for Supabase integration
-   
-   # Only needed if using Supabase
-   # SUPABASE_URL=your_supabase_url
-   # SUPABASE_KEY=your_supabase_key
+   CLAUDE_API_KEY=your_claude_api_key
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_KEY=your_supabase_key
    ```
 
-### Running Locally
-
-1. Install dependencies:
-   ```bash
+3. Install dependencies:
+   ```
    pip install -r requirements.txt
    ```
 
-2. Run the FastAPI application:
-   ```bash
-   uvicorn app.main:app --reload
+### Supabase Setup
+
+1. Create a new Supabase project
+2. Enable the pgvector extension in the SQL editor:
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS vector;
+   ```
+3. Run the SQL setup script from `app/db/supabase_setup.sql` in the Supabase SQL editor
+
+### Running Locally
+
+Start the FastAPI server:
+```
+uvicorn app.main:app --reload
+```
+
+The API will be available at http://localhost:8000
+
+### Docker Deployment
+
+Build and run with Docker Compose:
+```
+docker-compose up --build
+```
+
+## API Endpoints
+
+### Agent Endpoints
+
+- **POST /agent/builder**: Process a request using the Builder agent
+- **POST /agent/ops**: Process a request using the Ops agent
+- **POST /agent/research**: Process a request using the Research agent
+- **POST /agent/memory**: Process a request using the Memory agent
+
+### Memory Endpoints
+
+- **POST /memory/add**: Add a new memory
+- **POST /memory/search**: Search for memories
+- **GET /memory/get/{memory_id}**: Get a specific memory
+- **PATCH /memory/priority/{memory_id}**: Update memory priority
+- **DELETE /memory/delete/{memory_id}**: Delete a memory
+- **GET /memory/status**: Get memory system status
+
+### System Endpoints
+
+- **GET /system/models**: Get available models
+
+## Agent Personalities
+
+Each agent has a configurable personality defined in its prompt file:
+
+- **Builder**: Blunt, precise senior backend engineer who pushes back on bad architecture
+- **Ops**: Methodical and practical systems reliability engineer
+- **Research**: Analytical and thorough research analyst
+- **Memory**: Helpful and precise knowledge manager
+
+## Model Selection
+
+You can specify which model to use in two ways:
+
+1. In the agent's prompt configuration file (`app/prompts/{agent}.json`)
+2. By passing a `model` parameter in the API request:
+   ```json
+   {
+     "input": "Your query here",
+     "model": "claude-3-sonnet"
+   }
    ```
 
-3. Access the API documentation at http://localhost:8000/docs
+## Obtaining API Keys
 
-### Running with Docker
+### OpenAI API Key
 
-1. Build and start the Docker container:
-   ```bash
-   docker-compose up --build
-   ```
+1. Go to [OpenAI's platform](https://platform.openai.com/)
+2. Sign up or log in
+3. Navigate to the API keys section
+4. Create a new secret key
+5. Add to your `.env` file as `OPENAI_API_KEY`
 
-2. Access the API documentation at http://localhost:8000/docs
+### Claude API Key
 
-## API Usage
+1. Go to [Anthropic's console](https://console.anthropic.com/)
+2. Sign up or log in
+3. Navigate to the API keys section
+4. Create a new API key
+5. Add to your `.env` file as `CLAUDE_API_KEY`
 
-The system provides several endpoints for interacting with different agent types:
+## Security Considerations
 
-### Builder Agent
+- Never commit your `.env` file to version control
+- Consider using a secrets manager for production deployments
+- Rotate API keys regularly
+- Set appropriate rate limits and budgets on your API keys
 
-```bash
-# Process a request with the Builder agent
-curl -X POST http://localhost:8000/agent/builder/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": "I want to create a React application with TypeScript",
-    "context": {
-      "project_name": "my-react-app"
-    }
-  }'
+## Testing
 
-# Get history of Builder agent interactions
-curl -X GET http://localhost:8000/agent/builder/history?limit=5
+Run the test suite:
+```
+python -m tests.test_memory_integration
+python -m tests.test_multi_model_support
+python -m tests.test_claude_integration
 ```
 
-### Ops Agent
+## Postman Collection
 
-```bash
-# Process a request with the Ops agent
-curl -X POST http://localhost:8000/agent/ops/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": "How can I optimize my Docker containers?",
-    "context": {
-      "application_type": "node.js"
-    }
-  }'
-
-# Get history of Ops agent interactions
-curl -X GET http://localhost:8000/agent/ops/history?limit=5
-```
-
-### Research Agent
-
-```bash
-# Process a request with the Research agent
-curl -X POST http://localhost:8000/agent/research/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": "Compare different machine learning frameworks",
-    "context": {
-      "focus_areas": ["ease of use", "deployment"]
-    }
-  }'
-
-# Get history of Research agent interactions
-curl -X GET http://localhost:8000/agent/research/history?limit=5
-```
-
-### Memory Agent
-
-```bash
-# Store a memory
-curl -X POST http://localhost:8000/agent/memory/store \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": "How do I implement a vector database?",
-    "output": "You can use technologies like Pinecone or Weaviate...",
-    "metadata": {
-      "topic": "vector_databases"
-    }
-  }'
-
-# Query memories
-curl -X POST http://localhost:8000/agent/memory/query \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "vector database",
-    "limit": 5
-  }'
-
-# Get memory statistics
-curl -X GET http://localhost:8000/agent/memory/stats
-```
-
-## Customizing Prompt Chains
-
-Prompt chains are stored as JSON files in the `app/prompts` directory. Each agent type has its own prompt chain file:
-
-- `builder.json`: Prompt chain for the Builder agent
-- `ops.json`: Prompt chain for the Ops agent
-- `research.json`: Prompt chain for the Research agent
-- `memory.json`: Prompt chain for the Memory agent
-
-You can customize these files to change the behavior of the agents. Each prompt chain file has the following structure:
-
-```json
-{
-  "model": "gpt-4",
-  "system": "System prompt that defines the agent's role and capabilities",
-  "temperature": 0.7,
-  "max_tokens": 1500,
-  "examples": [
-    {
-      "user": "Example user input",
-      "assistant": "Example assistant response"
-    }
-  ]
-}
-```
-
-## Testing with Postman
-
-A Postman collection is included in the repository for testing the API endpoints. To use it:
-
-1. Import the `postman_collection.json` file into Postman
-2. Set the `base_url` variable to your API endpoint (default: `http://localhost:8000`)
-3. Use the collection to test the various endpoints
-
-## Project Structure
-
-```
-personal-ai-agent/
-├── app/
-│   ├── api/
-│   │   └── agent/
-│   │       ├── builder.py
-│   │       ├── ops.py
-│   │       ├── research.py
-│   │       └── memory.py
-│   ├── core/
-│   │   ├── openai_client.py
-│   │   ├── prompt_manager.py
-│   │   └── memory_manager.py
-│   ├── db/
-│   │   └── database.py
-│   ├── models/
-│   ├── utils/
-│   ├── prompts/
-│   │   ├── builder.json
-│   │   ├── ops.json
-│   │   ├── research.json
-│   │   └── memory.json
-│   └── main.py
-├── logs/
-├── tests/
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-├── postman_collection.json
-└── README.md
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+A Postman collection is included for testing the API endpoints. Import `postman_collection.json` into Postman to get started.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT
