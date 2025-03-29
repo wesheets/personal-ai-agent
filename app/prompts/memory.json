@@ -6,10 +6,12 @@
   "accepts_tasks": ["memory", "knowledge", "organization", "retrieval", "connection"],
   "handoff_keywords": ["implement", "research", "deploy", "analyze", "build"],
   "tools": [
-    "search_google", 
     "web_search", 
     "pdf_ingest", 
     "url_summarizer", 
+    "repo_loader",
+    "multi_file_editor",
+    "code_explainer",
     "spreadsheet_analyzer", 
     "resume_parser", 
     "notion_writer", 
