@@ -11,47 +11,52 @@ A modular, extensible AI agent system inspired by Manus, featuring multiple spec
 - **Agent Reflection & Reasoning**: Self-evaluation, rationale logging, and memory context review
 - **Multi-Agent Workflow Orchestration**: Automatic task routing between specialized agents
 - **Nudging, Looping, and Task Persistence**: Retry logic, user nudging, and task management
+- **Behavior Shaping & Escalation Logic**: Adaptive behavior, escalation protocols, and goal awareness
 - **Comprehensive Logging**: Execution logs, rationale logs, and execution chain logs
 - **Tool Integration**: Pluggable tool system for external integrations
 - **Docker Containerization**: Easy deployment with Docker
 
-## Phase 2.3: Nudging, Looping, and Task Persistence
+## Phase 2.4: Behavior Shaping & Escalation Logic
 
-The latest update (Phase 2.3) adds several powerful features to enhance agent intelligence:
+The latest update (Phase 2.4) adds several powerful features to enhance agent intelligence:
 
-### 1. Confidence-Based Retry Loop
+### 1. Escalation Protocol
 
-When an agent's self-evaluation indicates low confidence, the system automatically triggers a retry with revised instructions. This helps improve response quality without user intervention.
+When an agent encounters difficulties, it can now automatically escalate the issue:
 
-- Configurable confidence threshold
-- Automatic retry with context from the original attempt
-- Comparison of original and retry confidence levels
-- Option to enable/disable via `enable_retry_loop` parameter
+- Triggers escalation when retry count exceeds threshold (2+ retries)
+- Detects patterns like "I'm stuck", "need help", or "escalating" in agent reflections
+- Logs comprehensive escalation events in `/escalation_logs/`
+- Supports forwarding escalations to different agents
+- Includes agent name, task description, escalation reason, and reflection data
 
-### 2. Nudging Logic
+### 2. Behavior Feedback Loop
 
-The system now detects when agents are uncertain or blocked and generates appropriate nudge messages to request user input.
+Agents can now adapt their behavior based on feedback:
 
-- Pattern detection for uncertainty indicators
-- Contextual nudge message generation
-- Comprehensive logging in `/nudge_logs/`
-- Integration with orchestration to pause workflows when user input is needed
+- Records success/failure status for each task
+- Supports optional user notes for qualitative feedback
+- Stores feedback in `/behavior_logs/` organized by agent
+- Injects recent feedback context into future prompts
+- Enables agents to learn from past successes and failures
 
-### 3. Suggested Task Persistence
+### 3. Goal Awareness Scaffold
 
-When `auto_orchestrate` is disabled but an agent suggests a next step, the system now stores this as a pending task that can be executed later.
+Each agent now has a persistent mission that guides its actions:
 
-- Persistent storage in `/pending_tasks/`
-- Task metadata including origin agent, suggested agent, priority, etc.
-- New endpoints for listing and executing pending tasks
-- Integration with the existing orchestration system
+- Goal summaries defined in agent configuration files
+- Goals injected into prompt context before task execution
+- Helps agents align with business objectives
+- Provides consistent purpose across different tasks
 
-### 4. API Parameter Controls
+### 4. Performance Summary Endpoint
 
-New API parameters provide fine-grained control over the system's behavior:
+New endpoints for monitoring agent performance:
 
-- `enable_retry_loop: true/false` - Controls whether confidence-based retry is active
-- `auto_orchestrate: true/false` - Controls whether suggested next steps are automatically executed
+- `/agent/{name}/performance` - Returns metrics including total tasks, average confidence, escalation count, and success rates
+- `/agent/{name}/feedback` - Allows submitting and retrieving feedback
+- `/escalations` - Provides access to escalation events
+- Supports optional human rating entries
 
 ## Getting Started
 
@@ -112,25 +117,36 @@ POST /agent/builder
 }
 ```
 
-#### Viewing Pending Tasks
+#### Viewing Agent Performance
 
 ```
-GET /tasks/pending
+GET /agent/builder/performance
 ```
 
-#### Executing a Pending Task
+#### Submitting Feedback
 
 ```json
-POST /tasks/execute
+POST /agent/builder/feedback
 {
-  "task_id": "task-uuid-here"
+  "task_id": "task-uuid-here",
+  "was_successful": true,
+  "user_notes": "Great job on the API design!"
 }
 ```
 
-#### Viewing Nudge Logs
+#### Viewing Escalations
 
 ```
-GET /nudges
+GET /escalations
+```
+
+#### Forwarding an Escalation
+
+```json
+POST /escalations/{escalation_id}/forward
+{
+  "target_agent": "ops"
+}
 ```
 
 ## Creating Custom Agents
@@ -141,9 +157,21 @@ GET /nudges
      "name": "My Custom Agent",
      "model": "gpt-4",
      "system": "You are a specialized agent that...",
+     "goal_summary": "The Custom Agent is responsible for...",
      "accepts_tasks": ["category1", "category2"],
      "handoff_keywords": ["keyword1", "keyword2"],
-     "tools": ["tool1", "tool2"]
+     "tools": ["tool1", "tool2"],
+     "persona": {
+       "tone": "professional and concise",
+       "voice": "experienced specialist",
+       "traits": ["analytical", "thorough", "precise"]
+     },
+     "role": "Handle specialized tasks in domain X",
+     "rules": [
+       "Always verify inputs before processing",
+       "Provide clear explanations for decisions",
+       "Focus on accuracy over speed"
+     ]
    }
    ```
 
@@ -155,9 +183,12 @@ GET /nudges
 app/
 ├── api/
 │   ├── agent.py          # Main agent API routes
-│   └── memory.py         # Memory API routes
+│   ├── memory.py         # Memory API routes
+│   └── performance.py    # Performance and feedback API routes
 ├── core/
+│   ├── behavior_manager.py     # Behavior feedback management
 │   ├── confidence_retry.py     # Confidence-based retry logic
+│   ├── escalation_manager.py   # Escalation protocol management
 │   ├── execution_chain_logger.py # Execution chain logging
 │   ├── execution_logger.py     # Execution logging
 │   ├── memory_context_reviewer.py # Memory context review
@@ -200,69 +231,85 @@ The system maintains several types of logs:
 - **Execution Chain Logs**: Multi-agent workflow records
 - **Nudge Logs**: Records of when agents needed user input
 - **Pending Tasks**: Suggested but unexecuted tasks
+- **Escalation Logs**: Records of when agents needed escalation
+- **Behavior Logs**: Feedback on agent performance
 
 ## Advanced Usage
 
-### Confidence-Based Retry
+### Escalation Protocol
 
-The system automatically retries when agent confidence is low:
-
-```json
-POST /agent/builder
-{
-  "input": "Create a complex architecture for a distributed system",
-  "enable_retry_loop": true
-}
-```
-
-Response will include both original and retry data if triggered:
+When an agent encounters difficulties, it can escalate the issue:
 
 ```json
 {
-  "output": "Improved response after retry...",
+  "output": "I've attempted to implement the solution...",
   "metadata": { ... },
   "reflection": { ... },
-  "retry_data": {
-    "original_confidence": "Medium confidence (6/10)",
-    "retry_confidence": "High confidence (8/10)",
-    "retry_response": "Improved response...",
-    "retry_timestamp": "2025-03-29T19:10:00.000Z"
+  "escalation": {
+    "escalation_needed": true,
+    "escalation_id": "esc-uuid-here",
+    "escalation_reason": "Exceeded retry limit",
+    "timestamp": "2025-03-29T19:10:00.000Z"
   }
 }
 ```
 
-### Handling Nudges
-
-When an agent is uncertain or blocked, it will generate a nudge:
+You can forward escalations to other agents:
 
 ```json
+POST /escalations/esc-uuid-here/forward
 {
-  "output": "I've analyzed the requirements...",
-  "metadata": { ... },
-  "reflection": { ... },
-  "nudge": {
-    "nudge_needed": true,
-    "nudge_message": "I need additional information about the database schema. Could you provide more details?",
-    "nudge_reason": "needs_information",
-    "nudge_id": "nudge-uuid-here"
-  }
+  "target_agent": "ops"
 }
 ```
 
-### Task Persistence
+### Behavior Feedback
 
-View and execute pending tasks:
-
-```
-GET /tasks/pending?origin_agent=builder&status=pending
-```
+Submit feedback on agent performance:
 
 ```json
-POST /tasks/execute
+POST /agent/builder/feedback
 {
-  "task_id": "task-uuid-here"
+  "task_id": "task-uuid-here",
+  "was_successful": true,
+  "user_notes": "Great job on the API design!"
 }
 ```
+
+View agent performance metrics:
+
+```
+GET /agent/builder/performance
+```
+
+Response:
+
+```json
+{
+  "agent_name": "builder",
+  "total_tasks": 42,
+  "avg_confidence": 0.85,
+  "escalation_count": 3,
+  "recent_success_rate": 0.9,
+  "success_rate": 0.85,
+  "total_feedback_count": 42,
+  "recent_feedback_count": 10,
+  "timestamp": "2025-03-29T19:10:00.000Z"
+}
+```
+
+### Goal Awareness
+
+Agent goals are defined in their configuration files:
+
+```json
+{
+  "name": "Builder Agent",
+  "goal_summary": "The Builder Agent is optimizing backend systems to enable a scalable multi-agent infrastructure. Your focus is on creating robust, maintainable code that follows best practices and can scale efficiently."
+}
+```
+
+These goals are automatically injected into the agent's prompt context before task execution, helping them align with business objectives.
 
 ## Contributing
 
