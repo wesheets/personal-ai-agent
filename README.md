@@ -1,12 +1,15 @@
 # Enhanced AI Agent System
 
-A personal AI agent system with vector memory, multi-model support, and configurable agent personalities.
+A personal AI agent system with vector memory, multi-model support, configurable agent personalities, and tool integration.
 
 ## Features
 
 - **Vector Memory System**: Store and retrieve memories using Supabase with pgvector
+- **Shared Memory Layer**: Global and agent-specific memory scopes with topic filtering
 - **Multi-Model Support**: Pluggable architecture supporting both OpenAI and Claude models
 - **Unlimited Agent Creation**: Add new agents by simply creating prompt configuration files
+- **Tool Integration**: Extensible tool system with support for custom tools
+- **Execution Logging**: Comprehensive audit trail of all agent interactions
 - **Agent Specialization**: Builder, Ops, Research, Memory agents with configurable personalities
 - **Fallback Mechanisms**: Automatic fallback between models if one fails
 - **Priority Flagging**: Flag important memories for faster retrieval
@@ -93,6 +96,7 @@ docker-compose up --build
 ### System Endpoints
 
 - **GET /system/models**: Get available models
+- **GET /system/tools**: Get available tools
 
 ## Creating New Agents
 
@@ -115,6 +119,10 @@ You can create new agents without modifying any code:
       "Rule 3"
     ]
   },
+  "tools": [
+    "search_google",
+    "github_commit"
+  ],
   "examples": [
     {
       "user": "Example user input",
@@ -138,6 +146,46 @@ Each agent has a configurable personality defined in its prompt file:
 - **Ops**: Methodical and practical systems reliability engineer
 - **Research**: Analytical and thorough research analyst
 - **Memory**: Helpful and precise knowledge manager
+
+## Tool System
+
+The system includes a tool framework that allows agents to use external tools:
+
+1. Tools are defined in the `app/tools/` directory
+2. Each agent can specify which tools it can use in its prompt configuration
+3. Tools can be overridden in the API request using the `tools_to_use` parameter
+
+Available tools:
+- **search_google**: Search Google for information
+- **github_commit**: Commit changes to a GitHub repository
+
+To add a new tool:
+1. Create a new Python file in `app/tools/`
+2. Implement the tool class with an `execute()` method
+3. Add a getter function that returns a singleton instance
+4. The tool will be automatically loaded and available to agents
+
+## Shared Memory Layer
+
+The system includes a shared memory layer that allows agents to share information:
+
+1. Memories can be scoped as "global" or "agent-specific"
+2. Memories can be tagged with topics for semantic filtering
+3. Agents can retrieve relevant memories from both their own scope and the global scope
+
+## Execution Logging
+
+The system includes comprehensive logging of all agent interactions:
+
+1. Each agent execution is logged with:
+   - Agent name
+   - Timestamp
+   - Model used
+   - Input/output summaries
+   - Tools used
+   - Additional metadata
+
+2. Logs are stored as individual JSON files in the `execution_logs/` directory
 
 ## Model Selection
 
