@@ -1,6 +1,6 @@
 # Enhanced AI Agent System
 
-A personal AI agent system with vector memory, multi-model support, configurable agent personalities, tool integration, and agent reflection capabilities.
+A personal AI agent system with vector memory, multi-model support, configurable agent personalities, tool integration, agent reflection capabilities, and multi-agent workflow orchestration.
 
 ## Features
 
@@ -15,13 +15,15 @@ A personal AI agent system with vector memory, multi-model support, configurable
 - **Priority Flagging**: Flag important memories for faster retrieval
 - **Agent Reflection**: Rationale logging, self-evaluation, and memory context review
 - **Task Tagging**: Categorization and next step suggestions for future orchestration
+- **Multi-Agent Workflow Orchestration**: Agents can pass work between each other based on suggested next steps
 
-## New in Phase 2.1: Agent Reflection & Reasoning
+## New in Phase 2.2: Multi-Agent Workflow Orchestration
 
-- **Rationale Logging**: Agents explain their reasoning, assumptions, and suggest improvements
-- **Self-Evaluation**: Agents assess their confidence and identify potential failure points
-- **Memory Context Review**: Agents analyze how past memories connect to current tasks
-- **Task Tagging Metadata**: Categorization and next step suggestions for future orchestration
+- **Orchestrator Module**: Automatically routes tasks between agents based on suggested next steps
+- **Agent Routing Config**: Each agent defines what tasks it accepts and what keywords trigger handoffs
+- **Execution Chain Logging**: Comprehensive logging of multi-agent workflows
+- **Control Parameters**: Optional auto_orchestrate parameter to enable automatic handoffs
+- **Structured Output**: Array of step responses when multiple agents are called in sequence
 
 ## Tech Stack
 
@@ -92,8 +94,17 @@ docker-compose up --build
 
 - **POST /agent/{agent_name}**: Process a request using the specified agent
   - Now includes reflection data in the response
+  - Supports auto_orchestrate parameter for multi-agent workflows
 - **GET /agent/{agent_name}/history**: Get history of agent interactions
 - **GET /agent/{agent_name}/rationale**: Get rationale logs for an agent
+
+### Orchestration Endpoints
+
+- **POST /agent/orchestrate**: Orchestrate a multi-agent workflow
+  - Requires agent_type parameter to specify the initial agent
+- **GET /agent/chains**: Get all execution chains
+- **GET /agent/chains/{chain_id}**: Get a specific execution chain
+- **GET /agent/chains/{chain_id}/steps/{step_number}**: Get a specific step in an execution chain
 
 ### Memory Endpoints
 
@@ -108,6 +119,56 @@ docker-compose up --build
 
 - **GET /system/models**: Get available models
 - **GET /system/tools**: Get available tools
+
+## Multi-Agent Workflow Orchestration
+
+### How It Works
+
+1. A user sends a request to an agent with `auto_orchestrate: true`
+2. The agent processes the request and generates a response with a `suggested_next_step`
+3. The orchestrator determines which agent should handle the next step based on:
+   - Task category matching (via `accepts_tasks` in agent config)
+   - Keyword matching (via `handoff_keywords` in agent config)
+   - Direct agent mentions in the suggested next step
+4. The next agent receives the previous agent's output and the suggested next step
+5. This process continues until there are no more suggested next steps or the maximum number of steps is reached
+6. The entire workflow is logged in the execution chain logs
+
+### Agent Routing Configuration
+
+Each agent has a routing configuration in its prompt file:
+
+```json
+{
+  "accepts_tasks": ["code", "architecture", "design"],
+  "handoff_keywords": ["build", "implement", "code", "develop"]
+}
+```
+
+- `accepts_tasks`: Categories of tasks this agent can handle
+- `handoff_keywords`: Keywords that trigger a handoff to this agent
+
+### Example Workflow Request
+
+```json
+{
+  "input": "I need to create a REST API for a blog and deploy it to production",
+  "auto_orchestrate": true
+}
+```
+
+This might trigger a workflow like:
+1. Builder agent creates the API design and code
+2. Ops agent handles the deployment configuration
+3. Memory agent summarizes the entire process
+
+### Execution Chain Logging
+
+Each workflow execution is logged in the `execution_chain_logs` directory:
+- One directory per chain, named with the chain ID
+- `chain.json` contains the overall chain metadata
+- `step_1.json`, `step_2.json`, etc. contain individual step details
+- Links to related execution logs and rationale logs
 
 ## Agent Reflection & Reasoning
 
@@ -168,6 +229,14 @@ You can create new agents without modifying any code:
   "tools": [
     "search_google",
     "github_commit"
+  ],
+  "accepts_tasks": [
+    "category1",
+    "category2"
+  ],
+  "handoff_keywords": [
+    "keyword1",
+    "keyword2"
   ],
   "examples": [
     {
@@ -237,7 +306,7 @@ The system includes comprehensive logging of all agent interactions:
 
 ## Rationale Logging
 
-The system now includes comprehensive logging of agent rationale and self-evaluation:
+The system includes comprehensive logging of agent rationale and self-evaluation:
 
 1. Each agent reflection is logged with:
    - Rationale for the response
@@ -295,6 +364,7 @@ python -m tests.test_memory_integration
 python -m tests.test_multi_model_support
 python -m tests.test_claude_integration
 python -m tests.test_reflection_capabilities
+python -m tests.test_multi_agent_workflow
 ```
 
 ## Postman Collection

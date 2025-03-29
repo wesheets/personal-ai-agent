@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel
-from typing import Dict, Any, Optional, List, Set
+from typing import Dict, Any, Optional, List, Union
 import os
 import json
 import glob
@@ -13,6 +13,8 @@ from app.core.rationale_logger import get_rationale_logger
 from app.core.self_evaluation import SelfEvaluationPrompt
 from app.core.memory_context_reviewer import get_memory_context_reviewer
 from app.core.task_tagger import get_task_tagger, TaskMetadata
+from app.core.orchestrator import get_orchestrator, OrchestratorChain, OrchestratorStep
+from app.core.execution_chain_logger import get_execution_chain_logger
 from app.providers import process_with_model
 from app.db.database import get_database
 from app.db.supabase_manager import get_supabase_client
@@ -29,6 +31,8 @@ rationale_logger = get_rationale_logger()
 memory_context_reviewer = get_memory_context_reviewer()
 task_tagger = get_task_tagger()
 tool_manager = get_tool_manager()
+orchestrator = get_orchestrator()
+execution_chain_logger = get_execution_chain_logger()
 
 class AgentRequest(BaseModel):
     input: str
@@ -37,11 +41,18 @@ class AgentRequest(BaseModel):
     model: Optional[str] = None  # Allow model override via API parameter
     tools_to_use: Optional[List[str]] = None  # Allow tool override via API parameter
     skip_reflection: Optional[bool] = False  # Option to skip reflection for faster responses
+    auto_orchestrate: Optional[bool] = False  # Option to enable automatic orchestration
 
 class AgentResponse(BaseModel):
     output: str
     metadata: Dict[str, Any]
     reflection: Optional[Dict[str, Any]] = None  # Include reflection data if available
+
+class OrchestrationResponse(BaseModel):
+    steps: List[Dict[str, Any]]
+    chain_id: str
+    status: str
+    metadata: Dict[str, Any]
 
 async def save_interaction_to_memory(
     agent_type: str, 
@@ -361,6 +372,66 @@ async def process_agent_request(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing {agent_type} request: {str(e)}")
 
+async def orchestrate_workflow(
+    agent_type: str,
+    request: AgentRequest,
+    background_tasks: BackgroundTasks,
+    db=None,
+    supabase_client=None
+):
+    """
+    Orchestrate a multi-agent workflow
+    
+    Args:
+        agent_type: The type of the initial agent
+        request: The agent request
+        background_tasks: FastAPI background tasks
+        db: Database connection
+        supabase_client: Supabase client
+        
+    Returns:
+        The orchestration result
+    """
+    try:
+        # Use the orchestrator to handle the workflow
+        chain = await orchestrator.orchestrate(
+            initial_agent=agent_type,
+            initial_input=request.input,
+            context=request.context,
+            auto_orchestrate=request.auto_orchestrate,
+            max_steps=5,  # Limit to 5 steps to prevent infinite loops
+            background_tasks=background_tasks,
+            db=db,
+            supabase_client=supabase_client
+        )
+        
+        # Convert the chain to a response format
+        steps = []
+        for step in chain.steps:
+            step_dict = {
+                "step_number": step.step_number,
+                "agent_name": step.agent_name,
+                "input": step.input_text,
+                "output": step.output_text,
+                "metadata": step.metadata,
+                "reflection": step.reflection
+            }
+            steps.append(step_dict)
+        
+        # Return the orchestration result
+        return OrchestrationResponse(
+            steps=steps,
+            chain_id=chain.chain_id,
+            status=chain.status,
+            metadata={
+                "created_at": chain.created_at,
+                "updated_at": chain.updated_at,
+                "step_count": len(chain.steps)
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error orchestrating workflow: {str(e)}")
+
 async def get_agent_history(agent_type: str, limit: int = 10, db=None):
     """
     Get history of agent interactions
@@ -398,7 +469,7 @@ def register_agent_routes():
         agent_type = os.path.splitext(os.path.basename(prompt_file))[0]
         
         # Register the main agent endpoint
-        @router.post(f"/{agent_type}", response_model=AgentResponse)
+        @router.post(f"/{agent_type}", response_model=Union[AgentResponse, OrchestrationResponse])
         async def process_request(
             request: AgentRequest,
             background_tasks: BackgroundTasks,
@@ -406,13 +477,24 @@ def register_agent_routes():
             supabase_client=Depends(get_supabase_client),
             agent_type=agent_type
         ):
-            return await process_agent_request(
-                agent_type=agent_type,
-                request=request,
-                background_tasks=background_tasks,
-                db=db,
-                supabase_client=supabase_client
-            )
+            # If auto_orchestrate is enabled, use the orchestrator
+            if request.auto_orchestrate:
+                return await orchestrate_workflow(
+                    agent_type=agent_type,
+                    request=request,
+                    background_tasks=background_tasks,
+                    db=db,
+                    supabase_client=supabase_client
+                )
+            else:
+                # Otherwise, just process the request with a single agent
+                return await process_agent_request(
+                    agent_type=agent_type,
+                    request=request,
+                    background_tasks=background_tasks,
+                    db=db,
+                    supabase_client=supabase_client
+                )
         
         # Register the history endpoint
         @router.get(f"/{agent_type}/history", response_model=List[Dict[str, Any]])
@@ -444,3 +526,67 @@ def register_agent_routes():
 
 # Register all agent routes
 register_agent_routes()
+
+# Register orchestration routes
+@router.post("/orchestrate", response_model=OrchestrationResponse)
+async def orchestrate(
+    request: AgentRequest,
+    agent_type: str,
+    background_tasks: BackgroundTasks,
+    db=Depends(get_database),
+    supabase_client=Depends(get_supabase_client)
+):
+    """
+    Orchestrate a multi-agent workflow starting with the specified agent
+    """
+    # Force auto_orchestrate to True for this endpoint
+    request.auto_orchestrate = True
+    
+    return await orchestrate_workflow(
+        agent_type=agent_type,
+        request=request,
+        background_tasks=background_tasks,
+        db=db,
+        supabase_client=supabase_client
+    )
+
+@router.get("/chains", response_model=List[Dict[str, Any]])
+async def get_chains(
+    limit: int = 10,
+    offset: int = 0,
+    status: Optional[str] = None
+):
+    """
+    Get execution chains with optional filtering
+    """
+    chains = await execution_chain_logger.get_chains(
+        limit=limit,
+        offset=offset,
+        status=status
+    )
+    
+    return [chain.dict() for chain in chains]
+
+@router.get("/chains/{chain_id}", response_model=Dict[str, Any])
+async def get_chain(chain_id: str):
+    """
+    Get an execution chain by ID
+    """
+    chain = await execution_chain_logger.get_chain(chain_id)
+    
+    if not chain:
+        raise HTTPException(status_code=404, detail=f"Chain not found: {chain_id}")
+    
+    return chain.dict()
+
+@router.get("/chains/{chain_id}/steps/{step_number}", response_model=Dict[str, Any])
+async def get_chain_step(chain_id: str, step_number: int):
+    """
+    Get a step in an execution chain
+    """
+    step = await execution_chain_logger.get_step(chain_id, step_number)
+    
+    if not step:
+        raise HTTPException(status_code=404, detail=f"Step not found: {chain_id}/{step_number}")
+    
+    return step.dict()
