@@ -322,3 +322,134 @@ These goals are automatically injected into the agent's prompt context before ta
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+
+# Agent Control Schema + Guardian Enforcement System
+
+## Overview
+The Agent Control Schema + Guardian Enforcement System provides a centralized control system to enforce runtime permissions, execution limits, and memory restrictions for AI agents. This system is designed to be extensible, file-based, and integrated into the agent execution pipeline.
+
+## Components
+
+### 1. Control Schema
+The `phase-control-schema.json` file defines a reusable JSON schema that can be inherited or overridden by each agent config. It includes:
+- Tool access permissions
+- Code execution permissions
+- Memory scope restrictions
+- Rate limits and retry caps
+- Agent lifecycle parameters
+- Violation handling rules
+
+### 2. Control Enforcer
+The `control_enforcer.py` module serves as middleware that:
+- Loads the phase-control-schema.json
+- Checks every agent action against its schema
+- Rejects unauthorized actions with safe error handling
+- Auto-escalates or logs when violations occur
+- Enforces rate limits and retry caps
+
+### 3. Violation Logging
+The system logs any blocked action or escalation event to `control_violations.json`, including:
+- Agent name
+- Timestamp
+- Blocked action
+- Reason
+- Suggested override
+
+### 4. Guardian Agent
+The `guardian.json` config defines a lightweight agent that:
+- Monitors execution logs for failure loops, unsafe tool use, or excessive memory consumption
+- Has access to specialized tools: monitor_logs, disable_agent, memory_inspector
+- Can trigger alerts or auto-disable agents if certain thresholds are hit
+
+## Usage
+
+### Adding Control Schema to Agent Configs
+Each agent config can reference the control schema in one of two ways:
+
+1. Reference the default schema:
+```json
+"control_schema": "default"
+```
+
+2. Override specific permissions:
+```json
+"control_schema": {
+  "permissions": {
+    "tools": ["specific_tool_1", "specific_tool_2"],
+    "code_execution": true,
+    "memory_scope": ["specific_scope"]
+  }
+}
+```
+
+### Middleware Integration
+To integrate the control enforcer middleware with FastAPI:
+
+```python
+from core.control_enforcer import control_enforcer_middleware
+
+app.add_middleware(control_enforcer_middleware)
+```
+
+### Violation Handling
+Violations are automatically logged to `/app/logs/control_violations.json` and can be monitored by the Guardian Agent.
+
+## Schema Structure
+
+The control schema includes:
+
+```json
+{
+  "permissions": {
+    "tools": ["read_only", "code_executor", "github_commit"],
+    "code_execution": true,
+    "memory_scope": ["project_lifetree", "public_docs"],
+    "write_to_memory": true,
+    "max_retries": 2,
+    "escalate_on_confidence_below": 0.4,
+    "rate_limit_per_minute": 3,
+    "allow_github_commits": false,
+    "agent_lifecycle": {
+      "max_run_time_sec": 300,
+      "expire_after_completion": true
+    }
+  },
+  "schema_version": "1.0.0",
+  "schema_id": "default-control-schema",
+  "override_rules": {
+    "allow_permission_elevation": false,
+    "require_guardian_approval": true,
+    "log_all_overrides": true
+  },
+  "violation_handling": {
+    "action_on_violation": "block",
+    "notify_guardian": true,
+    "notify_human": false,
+    "violation_threshold": 3,
+    "severe_action": "terminate"
+  }
+}
+```
+
+## Testing
+A comprehensive test script (`test_control_system.py`) is provided to validate:
+- Schema loading
+- Permission enforcement
+- Rate limiting
+- Violation logging
+- Lifecycle management
+- Confidence-based escalation
+
+## Guardian Agent Configuration
+The Guardian Agent is configured with special permissions to monitor and enforce security policies:
+- Access to all system logs
+- Ability to disable agents that violate critical security policies
+- Alert functionality for serious security concerns
+
+## Future Enhancements
+Potential future enhancements include:
+- Dynamic permission adjustment based on agent behavior
+- Integration with external security monitoring systems
+- Multi-level approval workflows for high-risk operations
+- Detailed audit trails for compliance purposes

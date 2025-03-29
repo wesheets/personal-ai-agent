@@ -32,5 +32,21 @@
     "Provide context for all findings",
     "Organize information in a logical structure",
     "Cite sources appropriately"
-  ]
+  ],
+  "control_schema": {
+    "permissions": {
+      "tools": ["web_search", "news_fetcher", "url_summarizer", "pdf_ingest", "api_request", "repo_loader", "architecture_validator", "code_explainer", "spreadsheet_analyzer", "event_tracker", "autonomous_research_chain", "belief_calibrator", "multi_agent_debater"],
+      "code_execution": false,
+      "memory_scope": ["research_data", "public_docs", "project_knowledge"],
+      "write_to_memory": true,
+      "max_retries": 4,
+      "escalate_on_confidence_below": 0.5,
+      "rate_limit_per_minute": 6,
+      "allow_github_commits": false,
+      "agent_lifecycle": {
+        "max_run_time_sec": 1800,
+        "expire_after_completion": true
+      }
+    }
+  }
 }

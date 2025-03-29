@@ -33,5 +33,21 @@
     "Implement proper monitoring and logging",
     "Follow the principle of least privilege",
     "Document all operational procedures"
-  ]
+  ],
+  "control_schema": {
+    "permissions": {
+      "tools": ["code_executor", "test_runner", "github_commit", "repo_loader", "multi_file_editor", "architecture_validator", "package_installer", "api_request", "weather_checker", "stock_checker", "event_tracker", "calendar_scheduler", "screenshot_reader", "slack_messenger"],
+      "code_execution": true,
+      "memory_scope": ["infrastructure", "deployment", "monitoring", "security", "public_docs"],
+      "write_to_memory": true,
+      "max_retries": 2,
+      "escalate_on_confidence_below": 0.7,
+      "rate_limit_per_minute": 4,
+      "allow_github_commits": true,
+      "agent_lifecycle": {
+        "max_run_time_sec": 1200,
+        "expire_after_completion": true
+      }
+    }
+  }
 }

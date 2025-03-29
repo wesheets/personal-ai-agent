@@ -33,5 +33,21 @@
     "Maintain context across multiple interactions",
     "Organize information in accessible structures",
     "Distinguish between facts, inferences, and speculations"
-  ]
+  ],
+  "control_schema": {
+    "permissions": {
+      "tools": ["web_search", "pdf_ingest", "url_summarizer", "repo_loader", "multi_file_editor", "code_explainer", "spreadsheet_analyzer", "resume_parser", "notion_writer", "image_caption", "audio_transcriber", "video_summarizer", "belief_calibrator", "autonomous_research_chain"],
+      "code_execution": false,
+      "memory_scope": ["all_agents", "project_knowledge", "public_docs", "user_data"],
+      "write_to_memory": true,
+      "max_retries": 3,
+      "escalate_on_confidence_below": 0.6,
+      "rate_limit_per_minute": 8,
+      "allow_github_commits": false,
+      "agent_lifecycle": {
+        "max_run_time_sec": 900,
+        "expire_after_completion": true
+      }
+    }
+  }
 }

@@ -1,0 +1,182 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Control Schema",
+  "description": "Centralized control schema to enforce runtime permissions, execution limits, and memory restrictions for AI agents",
+  "type": "object",
+  "properties": {
+    "permissions": {
+      "type": "object",
+      "description": "Permission controls for agent execution",
+      "properties": {
+        "tools": {
+          "type": "array",
+          "description": "List of tools the agent is allowed to use",
+          "items": {
+            "type": "string"
+          },
+          "examples": [["read_only", "code_executor", "github_commit"]]
+        },
+        "code_execution": {
+          "type": "boolean",
+          "description": "Whether the agent is allowed to execute code",
+          "default": false
+        },
+        "memory_scope": {
+          "type": "array",
+          "description": "Memory scopes the agent is allowed to access",
+          "items": {
+            "type": "string"
+          },
+          "examples": [["project_lifetree", "public_docs"]]
+        },
+        "write_to_memory": {
+          "type": "boolean",
+          "description": "Whether the agent is allowed to write to memory",
+          "default": false
+        },
+        "max_retries": {
+          "type": "integer",
+          "description": "Maximum number of retries allowed for failed actions",
+          "minimum": 0,
+          "default": 2
+        },
+        "escalate_on_confidence_below": {
+          "type": "number",
+          "description": "Confidence threshold below which to escalate to human or guardian",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.4
+        },
+        "rate_limit_per_minute": {
+          "type": "integer",
+          "description": "Maximum number of actions allowed per minute",
+          "minimum": 1,
+          "default": 3
+        },
+        "allow_github_commits": {
+          "type": "boolean",
+          "description": "Whether the agent is allowed to commit to GitHub",
+          "default": false
+        },
+        "agent_lifecycle": {
+          "type": "object",
+          "description": "Controls for agent lifecycle",
+          "properties": {
+            "max_run_time_sec": {
+              "type": "integer",
+              "description": "Maximum runtime in seconds before forced termination",
+              "minimum": 1,
+              "default": 300
+            },
+            "expire_after_completion": {
+              "type": "boolean",
+              "description": "Whether to terminate the agent after task completion",
+              "default": true
+            }
+          },
+          "required": ["max_run_time_sec", "expire_after_completion"]
+        }
+      },
+      "required": ["tools", "code_execution", "memory_scope", "write_to_memory", "max_retries", "rate_limit_per_minute", "agent_lifecycle"]
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Version of the control schema",
+      "default": "1.0.0"
+    },
+    "schema_id": {
+      "type": "string",
+      "description": "Unique identifier for this schema instance",
+      "default": "default-control-schema"
+    },
+    "override_rules": {
+      "type": "object",
+      "description": "Rules for how schema overrides should be handled",
+      "properties": {
+        "allow_permission_elevation": {
+          "type": "boolean",
+          "description": "Whether agents can elevate their permissions through overrides",
+          "default": false
+        },
+        "require_guardian_approval": {
+          "type": "boolean",
+          "description": "Whether guardian approval is required for permission changes",
+          "default": true
+        },
+        "log_all_overrides": {
+          "type": "boolean",
+          "description": "Whether to log all permission overrides",
+          "default": true
+        }
+      }
+    },
+    "violation_handling": {
+      "type": "object",
+      "description": "Configuration for handling permission violations",
+      "properties": {
+        "action_on_violation": {
+          "type": "string",
+          "description": "Action to take when a violation occurs",
+          "enum": ["log", "warn", "block", "terminate"],
+          "default": "block"
+        },
+        "notify_guardian": {
+          "type": "boolean",
+          "description": "Whether to notify the guardian agent on violations",
+          "default": true
+        },
+        "notify_human": {
+          "type": "boolean",
+          "description": "Whether to notify a human operator on violations",
+          "default": false
+        },
+        "violation_threshold": {
+          "type": "integer",
+          "description": "Number of violations before taking more severe action",
+          "minimum": 1,
+          "default": 3
+        },
+        "severe_action": {
+          "type": "string",
+          "description": "Action to take when violation threshold is reached",
+          "enum": ["warn", "block", "terminate", "disable_agent"],
+          "default": "terminate"
+        }
+      }
+    }
+  },
+  "required": ["permissions", "schema_version", "schema_id"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "permissions": {
+        "tools": ["read_only", "code_executor", "github_commit"],
+        "code_execution": true,
+        "memory_scope": ["project_lifetree", "public_docs"],
+        "write_to_memory": true,
+        "max_retries": 2,
+        "escalate_on_confidence_below": 0.4,
+        "rate_limit_per_minute": 3,
+        "allow_github_commits": false,
+        "agent_lifecycle": {
+          "max_run_time_sec": 300,
+          "expire_after_completion": true
+        }
+      },
+      "schema_version": "1.0.0",
+      "schema_id": "default-control-schema",
+      "override_rules": {
+        "allow_permission_elevation": false,
+        "require_guardian_approval": true,
+        "log_all_overrides": true
+      },
+      "violation_handling": {
+        "action_on_violation": "block",
+        "notify_guardian": true,
+        "notify_human": false,
+        "violation_threshold": 3,
+        "severe_action": "terminate"
+      }
+    }
+  ]
+}

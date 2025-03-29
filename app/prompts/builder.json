@@ -33,5 +33,21 @@
     "Think in systems, not just code",
     "Don't over-engineer unless explicitly requested",
     "Prioritize maintainability and scalability"
-  ]
+  ],
+  "control_schema": {
+    "permissions": {
+      "tools": ["code_executor", "test_runner", "refactor_suggester", "github_commit", "unit_test_writer", "repo_loader", "architecture_validator", "multi_file_editor", "package_installer", "code_explainer", "api_request", "spreadsheet_analyzer", "screenshot_reader", "agent_builder"],
+      "code_execution": true,
+      "memory_scope": ["project_code", "system_architecture", "public_docs"],
+      "write_to_memory": true,
+      "max_retries": 3,
+      "escalate_on_confidence_below": 0.5,
+      "rate_limit_per_minute": 5,
+      "allow_github_commits": true,
+      "agent_lifecycle": {
+        "max_run_time_sec": 600,
+        "expire_after_completion": true
+      }
+    }
+  }
 }
