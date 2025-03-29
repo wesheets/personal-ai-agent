@@ -1,28 +1,27 @@
 import os
 import json
 import uuid
-import asyncio
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 from pydantic import BaseModel, Field
-
-from app.core.prompt_manager import PromptManager
-from app.core.execution_logger import get_execution_logger
-from app.core.rationale_logger import get_rationale_logger
-from app.api.agent import process_agent_request, AgentRequest
-from fastapi import BackgroundTasks
+from app.core.confidence_retry import get_confidence_retry_manager
+from app.core.nudge_manager import get_nudge_manager
+from app.core.task_persistence import get_task_persistence_manager
 
 class OrchestratorStep(BaseModel):
-    """Model for a step in an orchestrated workflow"""
+    """Model for a step in an orchestration chain"""
     step_number: int
     agent_name: str
     input_text: str
     output_text: str
-    metadata: Dict[str, Any]
+    metadata: Dict[str, Any] = Field(default_factory=dict)
     reflection: Optional[Dict[str, Any]] = None
-    
+    retry_data: Optional[Dict[str, Any]] = None
+    nudge_data: Optional[Dict[str, Any]] = None
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
 class OrchestratorChain(BaseModel):
-    """Model for an orchestrated workflow chain"""
+    """Model for an orchestration chain"""
     chain_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     steps: List[OrchestratorStep] = Field(default_factory=list)
     status: str = "in_progress"  # in_progress, completed, failed
@@ -33,172 +32,158 @@ class Orchestrator:
     """
     Orchestrator for multi-agent workflows
     
-    This module handles routing tasks between agents based on suggested_next_step
-    and agent routing configurations.
+    This class handles routing tasks between agents based on suggested next steps,
+    task categories, and agent configurations.
     """
     
     def __init__(self):
+        """Initialize the Orchestrator"""
+        from app.core.prompt_manager import PromptManager
+        from app.core.execution_chain_logger import get_execution_chain_logger
+        
         self.prompt_manager = PromptManager()
-        self.execution_logger = get_execution_logger()
-        self.rationale_logger = get_rationale_logger()
-        self.log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "execution_chain_logs")
-        os.makedirs(self.log_dir, exist_ok=True)
+        self.execution_chain_logger = get_execution_chain_logger()
+        self.confidence_retry_manager = get_confidence_retry_manager()
+        self.nudge_manager = get_nudge_manager()
+        self.task_persistence_manager = get_task_persistence_manager()
     
     async def orchestrate(
         self,
         initial_agent: str,
         initial_input: str,
         context: Optional[Dict[str, Any]] = None,
-        auto_orchestrate: bool = False,
+        auto_orchestrate: bool = True,
         max_steps: int = 5,
-        background_tasks: Optional[BackgroundTasks] = None,
+        background_tasks=None,
         db=None,
-        supabase_client=None
+        supabase_client=None,
+        enable_retry_loop: bool = True
     ) -> OrchestratorChain:
         """
         Orchestrate a multi-agent workflow
         
         Args:
-            initial_agent: Name of the first agent to call
-            initial_input: Input text for the first agent
-            context: Additional context for the agents
-            auto_orchestrate: Whether to automatically orchestrate based on suggested_next_step
+            initial_agent: The initial agent to use
+            initial_input: The initial input
+            context: Additional context for the request
+            auto_orchestrate: Whether to automatically orchestrate the workflow
             max_steps: Maximum number of steps in the workflow
             background_tasks: FastAPI background tasks
             db: Database connection
             supabase_client: Supabase client
+            enable_retry_loop: Whether to enable confidence-based retry loop
             
         Returns:
-            OrchestratorChain with all steps in the workflow
+            The orchestration chain
         """
-        # Initialize the chain
+        # Create a new chain
         chain = OrchestratorChain()
         
-        # Process the initial request
+        # Log the chain
+        await self.execution_chain_logger.log_chain(chain)
+        
+        # Process the initial agent
+        from app.api.agent import AgentRequest, process_agent_request
+        
         current_agent = initial_agent
         current_input = initial_input
         current_context = context or {}
-        
-        # Keep track of steps
         step_number = 1
         
-        try:
-            while step_number <= max_steps:
-                # Create the agent request
-                request = AgentRequest(
-                    input=current_input,
-                    context=current_context,
-                    save_to_memory=True
-                )
-                
-                # Process the request
-                response = await process_agent_request(
-                    agent_type=current_agent,
-                    request=request,
-                    background_tasks=background_tasks,
-                    db=db,
-                    supabase_client=supabase_client
-                )
-                
-                # Create a step from the response
-                step = OrchestratorStep(
-                    step_number=step_number,
-                    agent_name=current_agent,
-                    input_text=current_input,
-                    output_text=response.output,
-                    metadata=response.metadata,
-                    reflection=response.reflection
-                )
-                
-                # Add the step to the chain
-                chain.steps.append(step)
-                
-                # Log the step
-                await self._log_chain_step(chain, step)
-                
-                # Check if we should continue orchestrating
-                if not auto_orchestrate:
-                    # If auto_orchestrate is False, stop after the first step
-                    break
-                
-                # Get the suggested next step
-                suggested_next_step = response.metadata.get("suggested_next_step")
-                
-                if not suggested_next_step:
-                    # If there's no suggested next step, stop
-                    break
-                
-                # Determine the next agent
-                next_agent = await self._determine_next_agent(
-                    current_agent=current_agent,
-                    suggested_next_step=suggested_next_step,
-                    task_category=response.metadata.get("task_category"),
-                    tags=response.metadata.get("tags", [])
-                )
-                
-                if not next_agent or next_agent == current_agent:
-                    # If there's no next agent or it's the same agent, stop
-                    break
-                
-                # Update for the next step
-                current_agent = next_agent
-                current_input = f"""
-Continue this task based on the previous agent's output.
-
-Previous agent: {step.agent_name}
-Previous output: {step.output_text}
-
-Suggested next step: {suggested_next_step}
-
-Please handle this next step: {suggested_next_step}
-"""
-                
-                # Update the context with the previous step's information
-                current_context = {
-                    "previous_agent": step.agent_name,
-                    "previous_output": step.output_text,
-                    "previous_reflection": step.reflection,
-                    "suggested_next_step": suggested_next_step,
-                    "task_category": response.metadata.get("task_category"),
-                    "tags": response.metadata.get("tags", []),
-                    "chain_id": chain.chain_id,
-                    "step_number": step_number + 1
-                }
-                
-                # Increment the step number
-                step_number += 1
+        while step_number <= max_steps:
+            # Create a request for the current agent
+            request = AgentRequest(
+                input=current_input,
+                context=current_context,
+                save_to_memory=True,
+                auto_orchestrate=False,  # We handle orchestration here
+                enable_retry_loop=enable_retry_loop  # Pass through the retry loop setting
+            )
             
-            # Mark the chain as completed
-            chain.status = "completed"
-            chain.updated_at = datetime.now().isoformat()
+            # Process the request
+            response = await process_agent_request(
+                agent_type=current_agent,
+                request=request,
+                background_tasks=background_tasks,
+                db=db,
+                supabase_client=supabase_client
+            )
             
-            # Log the final chain
-            await self._log_chain(chain)
-            
-            return chain
-            
-        except Exception as e:
-            # Mark the chain as failed
-            chain.status = "failed"
-            chain.updated_at = datetime.now().isoformat()
-            
-            # Add error information
-            error_step = OrchestratorStep(
+            # Create a step for this agent
+            step = OrchestratorStep(
                 step_number=step_number,
                 agent_name=current_agent,
                 input_text=current_input,
-                output_text=f"Error: {str(e)}",
-                metadata={"error": str(e)},
-                reflection=None
+                output_text=response.output,
+                metadata=response.metadata,
+                reflection=response.reflection,
+                retry_data=response.retry_data,
+                nudge_data=response.nudge
             )
             
-            chain.steps.append(error_step)
+            # Add the step to the chain
+            chain.steps.append(step)
             
-            # Log the failed chain
-            await self._log_chain(chain)
+            # Log the step
+            await self.execution_chain_logger.log_step(chain.chain_id, step)
             
-            # Re-raise the exception
-            raise
+            # Update the chain
+            chain.updated_at = datetime.now().isoformat()
+            await self.execution_chain_logger.update_chain(chain)
+            
+            # Check if we should continue orchestration
+            if not auto_orchestrate:
+                # If auto_orchestrate is disabled, we're done after the first step
+                chain.status = "completed"
+                await self.execution_chain_logger.update_chain(chain)
+                return chain
+            
+            # Check if there's a nudge that requires user input
+            if response.nudge and response.nudge.get("nudge_needed", False):
+                # If there's a nudge, we need to pause for user input
+                chain.status = "needs_input"
+                await self.execution_chain_logger.update_chain(chain)
+                return chain
+            
+            # Check if there's a suggested next step
+            suggested_next_step = response.metadata.get("suggested_next_step")
+            if not suggested_next_step:
+                # If there's no suggested next step, we're done
+                chain.status = "completed"
+                await self.execution_chain_logger.update_chain(chain)
+                return chain
+            
+            # Determine the next agent
+            next_agent = await self._determine_next_agent(
+                current_agent=current_agent,
+                suggested_next_step=suggested_next_step,
+                task_category=response.metadata.get("task_category"),
+                tags=response.metadata.get("tags", [])
+            )
+            
+            if not next_agent:
+                # If we can't determine the next agent, we're done
+                chain.status = "completed"
+                await self.execution_chain_logger.update_chain(chain)
+                return chain
+            
+            # Update for the next iteration
+            current_agent = next_agent
+            current_input = suggested_next_step
+            current_context = {
+                "previous_agent": step.agent_name,
+                "previous_output": step.output_text,
+                "previous_reflection": step.reflection,
+                "chain_id": chain.chain_id,
+                "step_number": step_number,
+                **(current_context or {})
+            }
+            step_number += 1
+        
+        # If we've reached the maximum number of steps, we're done
+        chain.status = "max_steps_reached"
+        await self.execution_chain_logger.update_chain(chain)
+        return chain
     
     async def _determine_next_agent(
         self,
@@ -208,119 +193,66 @@ Please handle this next step: {suggested_next_step}
         tags: Optional[List[str]] = None
     ) -> Optional[str]:
         """
-        Determine the next agent based on the suggested next step
+        Determine the next agent based on the suggested next step and task category
         
         Args:
-            current_agent: Current agent name
-            suggested_next_step: Suggested next step
-            task_category: Category of the task
-            tags: Tags for the task
+            current_agent: The current agent
+            suggested_next_step: The suggested next step
+            task_category: The task category
+            tags: The tags
             
         Returns:
-            Name of the next agent or None if no suitable agent is found
+            The next agent, or None if no suitable agent is found
         """
-        # Get all agent configs
+        # Get all agent prompt chains
         agent_configs = {}
-        prompts_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "prompts")
+        for agent_type in self.prompt_manager.get_available_agents():
+            agent_configs[agent_type] = self.prompt_manager.get_prompt_chain(agent_type)
         
-        for filename in os.listdir(prompts_dir):
-            if filename.endswith(".json"):
-                agent_name = os.path.splitext(filename)[0]
-                config_path = os.path.join(prompts_dir, filename)
-                
-                with open(config_path, "r") as f:
-                    config = json.load(f)
-                    agent_configs[agent_name] = config
-        
-        # Initialize scores for each agent
-        agent_scores = {agent: 0 for agent in agent_configs.keys()}
-        
-        # Don't consider the current agent
-        if current_agent in agent_scores:
-            del agent_scores[current_agent]
-        
-        # Score each agent based on routing config
-        for agent_name, config in agent_configs.items():
-            if agent_name == current_agent:
+        # Check for direct handoff keywords in each agent config
+        for agent_type, config in agent_configs.items():
+            # Skip the current agent
+            if agent_type == current_agent:
                 continue
             
-            # Check accepts_tasks
+            # Check if this agent accepts the task category
             accepts_tasks = config.get("accepts_tasks", [])
-            if task_category and task_category in accepts_tasks:
-                agent_scores[agent_name] += 2
-            
-            # Check handoff_keywords
-            handoff_keywords = config.get("handoff_keywords", [])
-            for keyword in handoff_keywords:
-                if keyword.lower() in suggested_next_step.lower():
-                    agent_scores[agent_name] += 3
-            
-            # Check if the agent is mentioned by name
-            if agent_name.lower() in suggested_next_step.lower():
-                agent_scores[agent_name] += 5
+            if task_category and accepts_tasks and task_category in accepts_tasks:
+                # Check if any handoff keywords match
+                handoff_keywords = config.get("handoff_keywords", [])
+                if handoff_keywords:
+                    for keyword in handoff_keywords:
+                        if keyword.lower() in suggested_next_step.lower():
+                            return agent_type
         
-        # Get the agent with the highest score
-        if not agent_scores:
-            return None
+        # If no direct match, try to match based on task category
+        if task_category:
+            for agent_type, config in agent_configs.items():
+                # Skip the current agent
+                if agent_type == current_agent:
+                    continue
+                
+                # Check if this agent accepts the task category
+                accepts_tasks = config.get("accepts_tasks", [])
+                if accepts_tasks and task_category in accepts_tasks:
+                    return agent_type
         
-        max_score = max(agent_scores.values())
+        # If no match based on task category, try to match based on tags
+        if tags:
+            for agent_type, config in agent_configs.items():
+                # Skip the current agent
+                if agent_type == current_agent:
+                    continue
+                
+                # Check if this agent accepts any of the tags
+                accepts_tasks = config.get("accepts_tasks", [])
+                if accepts_tasks:
+                    for tag in tags:
+                        if tag in accepts_tasks:
+                            return agent_type
         
-        # If no agent has a score above 0, return None
-        if max_score == 0:
-            return None
-        
-        # Get all agents with the max score
-        best_agents = [agent for agent, score in agent_scores.items() if score == max_score]
-        
-        # Return the first one (could implement more sophisticated selection)
-        return best_agents[0] if best_agents else None
-    
-    async def _log_chain_step(self, chain: OrchestratorChain, step: OrchestratorStep) -> None:
-        """
-        Log a step in an orchestrated workflow chain
-        
-        Args:
-            chain: The orchestrator chain
-            step: The step to log
-        """
-        # Create the log directory if it doesn't exist
-        chain_dir = os.path.join(self.log_dir, chain.chain_id)
-        os.makedirs(chain_dir, exist_ok=True)
-        
-        # Create the step log file
-        step_file = os.path.join(chain_dir, f"step_{step.step_number}.json")
-        
-        # Prepare the step data
-        step_data = step.dict()
-        
-        # Add links to related logs
-        if "log_id" in step.metadata:
-            step_data["execution_log_link"] = step.metadata["log_id"]
-        
-        if step.reflection and "rationale_log_id" in step.reflection:
-            step_data["rationale_log_link"] = step.reflection["rationale_log_id"]
-        
-        # Write the step log
-        with open(step_file, "w") as f:
-            json.dump(step_data, f, indent=2)
-    
-    async def _log_chain(self, chain: OrchestratorChain) -> None:
-        """
-        Log an orchestrated workflow chain
-        
-        Args:
-            chain: The orchestrator chain to log
-        """
-        # Create the log directory if it doesn't exist
-        chain_dir = os.path.join(self.log_dir, chain.chain_id)
-        os.makedirs(chain_dir, exist_ok=True)
-        
-        # Create the chain log file
-        chain_file = os.path.join(chain_dir, "chain.json")
-        
-        # Write the chain log
-        with open(chain_file, "w") as f:
-            json.dump(chain.dict(), f, indent=2)
+        # If no match, return None
+        return None
 
 # Singleton instance
 _orchestrator = None

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Query
 from pydantic import BaseModel
 from typing import Dict, Any, Optional, List, Union
 import os
@@ -15,6 +15,10 @@ from app.core.memory_context_reviewer import get_memory_context_reviewer
 from app.core.task_tagger import get_task_tagger, TaskMetadata
 from app.core.orchestrator import get_orchestrator, OrchestratorChain, OrchestratorStep
 from app.core.execution_chain_logger import get_execution_chain_logger
+from app.core.confidence_retry import get_confidence_retry_manager
+from app.core.nudge_manager import get_nudge_manager
+from app.core.task_persistence import get_task_persistence_manager, PendingTask
+from app.models.workflow import WorkflowResponse, AgentStep
 from app.providers import process_with_model
 from app.db.database import get_database
 from app.db.supabase_manager import get_supabase_client
@@ -33,6 +37,9 @@ task_tagger = get_task_tagger()
 tool_manager = get_tool_manager()
 orchestrator = get_orchestrator()
 execution_chain_logger = get_execution_chain_logger()
+confidence_retry_manager = get_confidence_retry_manager()
+nudge_manager = get_nudge_manager()
+task_persistence_manager = get_task_persistence_manager()
 
 class AgentRequest(BaseModel):
     input: str
@@ -42,17 +49,29 @@ class AgentRequest(BaseModel):
     tools_to_use: Optional[List[str]] = None  # Allow tool override via API parameter
     skip_reflection: Optional[bool] = False  # Option to skip reflection for faster responses
     auto_orchestrate: Optional[bool] = False  # Option to enable automatic orchestration
+    enable_retry_loop: Optional[bool] = True  # Option to enable confidence-based retry loop
 
 class AgentResponse(BaseModel):
     output: str
     metadata: Dict[str, Any]
     reflection: Optional[Dict[str, Any]] = None  # Include reflection data if available
+    retry_data: Optional[Dict[str, Any]] = None  # Include retry data if retry was triggered
+    nudge: Optional[Dict[str, Any]] = None  # Include nudge data if nudge was triggered
 
 class OrchestrationResponse(BaseModel):
     steps: List[Dict[str, Any]]
     chain_id: str
     status: str
     metadata: Dict[str, Any]
+
+class ExecuteTaskRequest(BaseModel):
+    task_id: str
+
+class TaskListResponse(BaseModel):
+    tasks: List[Dict[str, Any]]
+    total: int
+    page: int
+    limit: int
 
 async def save_interaction_to_memory(
     agent_type: str, 
@@ -363,12 +382,74 @@ async def process_agent_request(
             "rationale_log_id": rationale_log_id
         }
         
-        # Return the processed result with reflection data
-        return AgentResponse(
+        # Initialize response
+        response = AgentResponse(
             output=output_text,
             metadata=metadata,
             reflection=reflection_data
         )
+        
+        # Check if we should trigger a retry based on confidence
+        retry_data = {}
+        if request.enable_retry_loop:
+            retry_data = await confidence_retry_manager.check_confidence(
+                confidence_level=evaluation_data.get("confidence_level", ""),
+                agent_type=agent_type,
+                model=model,
+                input_text=request.input,
+                output_text=output_text,
+                reflection_data=reflection_data
+            )
+            
+            if retry_data.get("retry_triggered", False):
+                response.retry_data = retry_data
+                # Update the output with the retry response if confidence improved
+                original_confidence = confidence_retry_manager._parse_confidence(evaluation_data.get("confidence_level", ""))
+                retry_confidence = confidence_retry_manager._parse_confidence(retry_data.get("retry_confidence", ""))
+                
+                if retry_confidence > original_confidence:
+                    response.output = retry_data.get("retry_response", output_text)
+        
+        # Check if we should generate a nudge
+        nudge_data = await nudge_manager.check_for_nudge(
+            agent_name=agent_type,
+            input_text=request.input,
+            output_text=output_text,
+            reflection_data=reflection_data
+        )
+        
+        if nudge_data.get("nudge_needed", False):
+            response.nudge = nudge_data
+        
+        # If auto_orchestrate is false but there's a suggested next step, store it as a pending task
+        if not request.auto_orchestrate and metadata.get("suggested_next_step"):
+            # Determine the suggested agent based on the task category and suggested next step
+            suggested_agent = await orchestrator._determine_next_agent(
+                current_agent=agent_type,
+                suggested_next_step=metadata.get("suggested_next_step", ""),
+                task_category=metadata.get("task_category"),
+                tags=metadata.get("tags", [])
+            )
+            
+            if suggested_agent:
+                # Store the pending task
+                await task_persistence_manager.store_pending_task(
+                    task_description=metadata.get("suggested_next_step", ""),
+                    origin_agent=agent_type,
+                    suggested_agent=suggested_agent,
+                    priority=metadata.get("priority", False),
+                    metadata={
+                        "task_category": metadata.get("task_category"),
+                        "tags": metadata.get("tags", []),
+                        "log_id": log_id,
+                        "rationale_log_id": rationale_log_id
+                    },
+                    original_input=request.input,
+                    original_output=output_text
+                )
+        
+        # Return the processed result
+        return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing {agent_type} request: {str(e)}")
 
@@ -590,3 +671,99 @@ async def get_chain_step(chain_id: str, step_number: int):
         raise HTTPException(status_code=404, detail=f"Step not found: {chain_id}/{step_number}")
     
     return step.dict()
+
+# Register nudge routes
+@router.get("/nudges", response_model=List[Dict[str, Any]])
+async def get_nudges(
+    limit: int = 10,
+    offset: int = 0,
+    agent_name: Optional[str] = None
+):
+    """
+    Get nudge logs with optional filtering
+    """
+    nudges = await nudge_manager.get_nudge_logs(
+        limit=limit,
+        offset=offset,
+        agent_name=agent_name
+    )
+    
+    return nudges
+
+# Register pending tasks routes
+@router.get("/tasks/pending", response_model=TaskListResponse)
+async def get_pending_tasks(
+    limit: int = 10,
+    offset: int = 0,
+    origin_agent: Optional[str] = None,
+    suggested_agent: Optional[str] = None,
+    status: str = "pending"
+):
+    """
+    Get pending tasks with optional filtering
+    """
+    tasks = await task_persistence_manager.get_pending_tasks(
+        limit=limit,
+        offset=offset,
+        origin_agent=origin_agent,
+        suggested_agent=suggested_agent,
+        status=status
+    )
+    
+    return TaskListResponse(
+        tasks=[task.dict() for task in tasks],
+        total=len(tasks),
+        page=offset // limit + 1 if limit > 0 else 1,
+        limit=limit
+    )
+
+@router.get("/tasks/{task_id}", response_model=Dict[str, Any])
+async def get_task(task_id: str):
+    """
+    Get a specific pending task by ID
+    """
+    task = await task_persistence_manager.get_task(task_id)
+    
+    if not task:
+        raise HTTPException(status_code=404, detail=f"Task not found: {task_id}")
+    
+    return task.dict()
+
+@router.post("/tasks/execute", response_model=Dict[str, Any])
+async def execute_task(
+    request: ExecuteTaskRequest,
+    background_tasks: BackgroundTasks,
+    db=Depends(get_database),
+    supabase_client=Depends(get_supabase_client)
+):
+    """
+    Execute a pending task
+    """
+    result = await task_persistence_manager.execute_task(
+        task_id=request.task_id,
+        background_tasks=background_tasks,
+        db=db,
+        supabase_client=supabase_client
+    )
+    
+    return result
+
+@router.patch("/tasks/{task_id}/status", response_model=Dict[str, Any])
+async def update_task_status(
+    task_id: str,
+    status: str,
+    metadata: Optional[Dict[str, Any]] = None
+):
+    """
+    Update the status of a pending task
+    """
+    task = await task_persistence_manager.update_task_status(
+        task_id=task_id,
+        status=status,
+        metadata=metadata
+    )
+    
+    if not task:
+        raise HTTPException(status_code=404, detail=f"Task not found: {task_id}")
+    
+    return task.dict()
