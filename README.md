@@ -6,7 +6,8 @@ A personal AI agent system with vector memory, multi-model support, and configur
 
 - **Vector Memory System**: Store and retrieve memories using Supabase with pgvector
 - **Multi-Model Support**: Pluggable architecture supporting both OpenAI and Claude models
-- **Agent Specialization**: Builder, Ops, Research, and Memory agents with configurable personalities
+- **Unlimited Agent Creation**: Add new agents by simply creating prompt configuration files
+- **Agent Specialization**: Builder, Ops, Research, Memory agents with configurable personalities
 - **Fallback Mechanisms**: Automatic fallback between models if one fails
 - **Priority Flagging**: Flag important memories for faster retrieval
 
@@ -77,10 +78,8 @@ docker-compose up --build
 
 ### Agent Endpoints
 
-- **POST /agent/builder**: Process a request using the Builder agent
-- **POST /agent/ops**: Process a request using the Ops agent
-- **POST /agent/research**: Process a request using the Research agent
-- **POST /agent/memory**: Process a request using the Memory agent
+- **POST /agent/{agent_name}**: Process a request using the specified agent
+- **GET /agent/{agent_name}/history**: Get history of agent interactions
 
 ### Memory Endpoints
 
@@ -95,6 +94,42 @@ docker-compose up --build
 
 - **GET /system/models**: Get available models
 
+## Creating New Agents
+
+You can create new agents without modifying any code:
+
+1. Create a new prompt configuration file in `app/prompts/{agent_name}.json`:
+
+```json
+{
+  "model": "gpt-4",
+  "system": "You are a helpful {agent_name} agent that specializes in...",
+  "temperature": 0.7,
+  "max_tokens": 1500,
+  "persona": {
+    "tone": "helpful and precise",
+    "role": "specialized assistant",
+    "rules": [
+      "Rule 1",
+      "Rule 2",
+      "Rule 3"
+    ]
+  },
+  "examples": [
+    {
+      "user": "Example user input",
+      "assistant": "Example assistant response"
+    }
+  ]
+}
+```
+
+2. Restart the server, and the new agent will be automatically available at:
+   - **POST /agent/{agent_name}**
+   - **GET /agent/{agent_name}/history**
+
+No code changes required! The system dynamically registers routes for all prompt files found in the `app/prompts` directory.
+
 ## Agent Personalities
 
 Each agent has a configurable personality defined in its prompt file:
@@ -108,7 +143,7 @@ Each agent has a configurable personality defined in its prompt file:
 
 You can specify which model to use in two ways:
 
-1. In the agent's prompt configuration file (`app/prompts/{agent}.json`)
+1. In the agent's prompt configuration file (`app/prompts/{agent_name}.json`)
 2. By passing a `model` parameter in the API request:
    ```json
    {
