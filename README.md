@@ -322,3 +322,131 @@ These goals are automatically injected into the agent's prompt context before ta
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+
+# Autonomous Goal Decomposer + Planner Agent
+
+## Overview
+The Autonomous Goal Decomposer + Planner Agent serves as the "conductor" for orchestrating multi-agent, multi-step workflows. It receives high-level goals, decomposes them into executable subtasks, assigns the subtasks to relevant agents, sequences their execution, and tracks results across memory.
+
+## Components
+
+### 1. Planner Agent Configuration
+The `planner.json` file defines the Planner Agent with:
+- A strategic, precise personality modeled after a senior project manager
+- Tools for research, routing, memory writing, and status tracking
+- Rules for goal decomposition, agent assignment, and escalation
+- Control schema permissions for memory access and tool usage
+
+### 2. Agent Router Tool
+The `agent_router.py` tool:
+- Routes subtasks to the correct agents via internal API
+- Waits for responses or handles failures
+- Implements retry logic and error handling
+- Logs all routing events
+- Finds the best agent for a given task based on its description and type
+
+### 3. Planner Orchestrator
+The `planner_orchestrator.py` module serves as the execution core that:
+- Receives high-level goals
+- Breaks them into subtasks using various decomposition strategies
+- Assigns subtasks to appropriate agents
+- Sequences execution based on dependencies using topological sorting
+- Stores progress in vector memory
+- Escalates issues to the Guardian Agent or human when necessary
+- Provides goal status, resumption, and history replay capabilities
+
+### 4. Logging and Memory Integration
+The system includes comprehensive logging and memory integration:
+- All goal progress is logged to `/app/logs/planner_execution_log.json`
+- Each goal and subtask is stored in vector memory with appropriate metadata
+- Memory entries include goal ID, task ID, agent, status, result summary, and timestamp
+- The system can retrieve goal status and history from memory
+
+### 5. Goal Replay and Continuation
+The system supports:
+- Resuming partially completed goals on system restart
+- Replaying goal history from memory
+- Tracking the state of active goals
+
+## Usage
+
+### Processing a Goal
+To process a high-level goal:
+
+```python
+from app.core.planner_orchestrator import process_goal
+
+goal = {
+    "id": "goal-123",  # Optional, will be generated if not provided
+    "description": "Build a weather API",
+    "type": "development",
+    "context": {
+        "priority": "high",
+        "deadline": "2025-04-15"
+    },
+    "decomposition_strategy": "sequential_breakdown"  # Optional
+}
+
+result = process_goal(goal)
+```
+
+### Getting Goal Status
+To check the status of a goal:
+
+```python
+from app.core.planner_orchestrator import get_goal_status
+
+status = get_goal_status("goal-123")
+```
+
+### Resuming a Goal
+To resume a partially completed goal:
+
+```python
+from app.core.planner_orchestrator import resume_goal
+
+result = resume_goal("goal-123")
+```
+
+### Replaying Goal History
+To replay the history of a goal:
+
+```python
+from app.core.planner_orchestrator import replay_goal_history
+
+history = replay_goal_history("goal-123")
+```
+
+## Decomposition Strategies
+The system supports multiple decomposition strategies:
+
+1. **sequential_breakdown**: Breaks the goal into sequential steps with dependencies
+2. **parallel_tasks**: Creates parallel tasks with minimal dependencies
+3. **dependency_mapping**: Maps complex dependencies between subtasks
+4. **iterative_refinement**: Starts with a basic solution and refines it
+5. **research_first**: Prioritizes research before implementation
+
+## Agent Assignment
+Subtasks are assigned to agents based on:
+
+1. Task type matching (e.g., "code" → builder agent)
+2. Keyword analysis in the task description
+3. Agent capability mapping from the planner configuration
+
+## Testing
+A comprehensive test script (`test_planner_system.py`) is provided to validate:
+- Agent router functionality
+- Goal decomposition
+- Subtask sequencing
+- Memory integration
+- Goal continuation
+- End-to-end goal processing
+
+## Future Enhancements
+Potential future enhancements include:
+- More sophisticated goal decomposition using LLM-based planning
+- Dynamic adjustment of decomposition strategies based on goal type
+- Parallel execution of independent subtasks
+- Learning from past goal executions to improve future planning
+- Integration with external project management tools
