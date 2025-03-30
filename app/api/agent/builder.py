@@ -56,6 +56,78 @@ async def retrieve_relevant_memories(input_text: str, limit: int = 3) -> str:
         print(f"Error retrieving memories: {str(e)}")
         return ""
 
+async def execute(
+    input_text: str,
+    context: Optional[Dict[str, Any]] = None,
+    save_to_memory: bool = True,
+    model: Optional[str] = None,
+    openai_client = None,
+    db = None,
+    supabase_client = None
+) -> Dict[str, Any]:
+    """
+    Execute the Builder agent with the given input
+    
+    Args:
+        input_text: The user input text
+        context: Optional context information
+        save_to_memory: Whether to save the interaction to memory
+        model: Optional model override
+        openai_client: OpenAI client instance
+        db: Database connection
+        supabase_client: Supabase client instance
+        
+    Returns:
+        Dict containing output text and metadata
+    """
+    try:
+        # Load the builder prompt chain
+        prompt_chain = prompt_manager.get_prompt_chain("builder")
+        
+        # Retrieve relevant memories
+        memory_context = await retrieve_relevant_memories(input_text)
+        
+        # If we have memory context, prepend it to the system prompt
+        if memory_context:
+            original_system = prompt_chain.get("system_prompt", "")
+            prompt_chain["system_prompt"] = f"{memory_context}\n\n{original_system}"
+        
+        # Override model if specified
+        if model:
+            prompt_chain["model"] = model
+        
+        # Process the input through the prompt chain
+        result = await openai_client.process_with_prompt_chain(
+            prompt_chain=prompt_chain,
+            user_input=input_text,
+            context=context
+        )
+        
+        # Prepare metadata
+        metadata = {
+            "agent": "builder",
+            "tokens_used": result.get("usage", {}).get("total_tokens", 0),
+            "timestamp": result.get("timestamp"),
+            "model": prompt_chain.get("model", "gpt-4"),
+            "priority": context.get("priority", False) if context else False
+        }
+        
+        # Save to memory if requested
+        if save_to_memory:
+            await save_interaction_to_memory(
+                input_text,
+                result["content"],
+                metadata
+            )
+        
+        # Return the processed result
+        return {
+            "output": result["content"],
+            "metadata": metadata
+        }
+    except Exception as e:
+        raise Exception(f"Error executing builder agent: {str(e)}")
+
 @router.post("/", response_model=BuilderResponse)
 async def process_builder_request(
     request: BuilderRequest, 
@@ -68,50 +140,20 @@ async def process_builder_request(
     Process a request using the Builder agent
     """
     try:
-        # Load the builder prompt chain
-        prompt_chain = prompt_manager.get_prompt_chain("builder")
-        
-        # Retrieve relevant memories
-        memory_context = await retrieve_relevant_memories(request.input)
-        
-        # If we have memory context, prepend it to the system prompt
-        if memory_context:
-            original_system = prompt_chain.get("system", "")
-            prompt_chain["system"] = f"{memory_context}\n\n{original_system}"
-        
-        # Override model if specified in request
-        if request.model:
-            prompt_chain["model"] = request.model
-        
-        # Process the input through the prompt chain
-        result = await openai_client.process_with_prompt_chain(
-            prompt_chain=prompt_chain,
-            user_input=request.input,
-            context=request.context
+        # Call the execute function
+        result = await execute(
+            input_text=request.input,
+            context=request.context,
+            save_to_memory=request.save_to_memory,
+            model=request.model,
+            openai_client=openai_client,
+            db=db,
+            supabase_client=supabase_client
         )
         
-        # Prepare metadata
-        metadata = {
-            "agent": "builder",
-            "tokens_used": result.get("usage", {}).get("total_tokens", 0),
-            "timestamp": result.get("timestamp"),
-            "model": prompt_chain.get("model", "gpt-4"),
-            "priority": request.context.get("priority", False) if request.context else False
-        }
-        
-        # Save to memory if requested
-        if request.save_to_memory:
-            background_tasks.add_task(
-                save_interaction_to_memory,
-                request.input,
-                result["content"],
-                metadata
-            )
-        
-        # Return the processed result
         return BuilderResponse(
-            output=result["content"],
-            metadata=metadata
+            output=result["output"],
+            metadata=result["metadata"]
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing builder request: {str(e)}")

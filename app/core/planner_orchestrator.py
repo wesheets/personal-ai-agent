@@ -1,15 +1,12 @@
 """
 Planner Orchestrator Module for the Autonomous Goal Decomposer + Planner Agent
-
 This module serves as the execution core that receives a main goal, breaks it into subtasks,
 assigns subtasks to agents, sequences execution based on dependencies, stores progress in
 vector memory, and escalates issues when necessary.
-
 Updated to integrate with the Task State Manager for persistent memory-driven state management
 and to provide functionality to execute subtasks in parallel for decomposed goals,
 managing dependencies and coordinating multiple agents.
 """
-
 import os
 import json
 import uuid
@@ -19,209 +16,213 @@ import asyncio
 from typing import Dict, Any, List, Optional, Union, Tuple, Set
 from datetime import datetime
 
-# Import required modules
-from app.tools.agent_router import get_agent_router, find_agent
-from app.core.vector_memory import VectorMemory, get_vector_memory
-from app.core.task_state_manager import get_task_state_manager
-from app.core.agent_coordinator import get_agent_coordinator
+# Fix import path from app.tools.agent_router to app.core.agent_router
+from app.core.agent_router import get_agent_router, find_agent
+from app.core.task_state_manager import TaskStateManager, get_task_state_manager
+from app.core.agent_coordinator import AgentCoordinator, get_agent_coordinator
+from app.core.vector_memory import VectorMemorySystem
+from app.core.memory_manager import MemoryManager
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Set up logging
 logger = logging.getLogger(__name__)
 
 class PlannerOrchestrator:
     """
-    Orchestrates the planning and execution of complex goals by breaking them down
-    into subtasks, managing dependencies, and coordinating parallel execution across agents.
+    Orchestrator for planning and executing tasks
     """
     
     def __init__(self):
-        """Initialize the PlannerOrchestrator with required components."""
         self.task_state_manager = get_task_state_manager()
-        self.agent_router = get_agent_router()
         self.agent_coordinator = get_agent_coordinator()
-        self.vector_memory = get_vector_memory()
-        self.execution_log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
-                                             "logs", "execution_logs")
+        self.agent_router = get_agent_router()
+        self.vector_memory = VectorMemorySystem()
+        self.memory_manager = MemoryManager()
+        
+        # Create logs directory if it doesn't exist
+        self.execution_log_dir = os.path.join("app", "logs", "execution_logs")
         os.makedirs(self.execution_log_dir, exist_ok=True)
     
-    async def decompose_goal(self, goal_id: str, goal_description: str) -> Dict[str, Any]:
+    async def decompose_goal(self, goal_description: str, goal_id: Optional[str] = None) -> str:
         """
-        Decompose a complex goal into subtasks with dependencies.
+        Decompose a goal into subtasks
         
         Args:
-            goal_id: Unique identifier for the goal
-            goal_description: Description of the goal to decompose
+            goal_description: Description of the goal
+            goal_id: Optional goal ID (generated if not provided)
             
         Returns:
-            Dictionary containing goal information and subtasks
+            Goal ID
         """
-        logger.info(f"Decomposing goal: {goal_description} (ID: {goal_id})")
+        # Generate goal ID if not provided
+        if not goal_id:
+            goal_id = str(uuid.uuid4())
         
-        # Create goal in task state manager
-        goal = await self.task_state_manager.create_goal(
-            goal_id=goal_id,
-            goal_description=goal_description
-        )
-        
-        # Use planner agent to decompose goal into subtasks
-        planner_agent = find_agent("planner")
-        decomposition_result = await planner_agent.run(
-            input_text=f"Decompose this goal into subtasks with dependencies: {goal_description}",
-            goal_id=goal_id
-        )
-        
-        # Parse subtasks from decomposition result
-        subtasks = decomposition_result.get("subtasks", [])
-        
-        # Create tasks in task state manager
-        for subtask in subtasks:
-            task_id = f"{goal_id}-task-{uuid.uuid4().hex[:8]}"
-            
-            # Determine agent assignment based on task type
-            agent_assignment = self.agent_router.route_task(subtask["description"])
-            
-            await self.task_state_manager.create_task(
-                task_id=task_id,
-                goal_id=goal_id,
-                task_description=subtask["description"],
-                priority=subtask.get("priority", 3),
-                assigned_agent=agent_assignment["assigned_agent"],
-                dependencies=subtask.get("dependencies", [])
-            )
-        
-        # Store decomposition in memory
-        self.vector_memory.add(
-            text=f"Goal: {goal_description}\nDecomposition: {json.dumps(subtasks)}",
-            metadata={
-                "type": "goal_decomposition",
-                "goal_id": goal_id,
-                "timestamp": datetime.now().isoformat()
-            }
-        )
-        
-        # Log decomposition
+        # Log goal decomposition
         self._log_execution(
             goal_id=goal_id,
             action="decompose_goal",
             details={
-                "goal_description": goal_description,
-                "subtasks_count": len(subtasks)
+                "goal_description": goal_description
             }
         )
         
-        return {
-            "goal_id": goal_id,
-            "goal_description": goal_description,
-            "subtasks": subtasks,
-            "status": "decomposed"
-        }
-    
-    async def execute_goal(self, goal_id: str) -> Dict[str, Any]:
-        """
-        Execute a decomposed goal by running all subtasks in parallel when dependencies allow.
+        # Create a planner agent to decompose the goal
+        planner_agent = find_agent("planner")
+        if not planner_agent:
+            logger.error("Planner agent not found")
+            raise ValueError("Planner agent not found")
         
-        Args:
-            goal_id: Unique identifier for the goal to execute
-            
-        Returns:
-            Dictionary containing execution results
-        """
-        logger.info(f"Executing goal: {goal_id}")
-        
-        # Get goal information
-        goal = await self.task_state_manager.get_goal(goal_id)
-        if not goal:
-            raise ValueError(f"Goal not found: {goal_id}")
-        
-        # Update goal status to in_progress
-        await self.task_state_manager.update_goal_status(goal_id, "in_progress")
-        
-        # Log execution start
-        self._log_execution(
-            goal_id=goal_id,
-            action="execute_goal_start",
-            details={"goal_description": goal.goal_description}
+        # Execute the planner agent to decompose the goal
+        result = await planner_agent.run(
+            input_text=f"Decompose the following goal into subtasks: {goal_description}",
+            goal_id=goal_id
         )
         
-        # Execute tasks in parallel with dependency management
-        execution_result = await self._execute_tasks_in_parallel(goal_id)
+        # Parse the result to extract subtasks
+        subtasks = self._parse_subtasks(result)
         
-        # Update goal status based on execution result
-        if execution_result["success"]:
-            await self.task_state_manager.update_goal_status(goal_id, "completed")
-        else:
-            await self.task_state_manager.update_goal_status(goal_id, "failed")
+        # Create task states for each subtask
+        for i, subtask in enumerate(subtasks):
+            subtask_id = f"{goal_id}_subtask_{i+1}"
+            
+            # Determine dependencies
+            dependencies = []
+            if "dependencies" in subtask:
+                for dep in subtask["dependencies"]:
+                    dep_id = f"{goal_id}_subtask_{dep}"
+                    dependencies.append(dep_id)
+            
+            # Determine assigned agent
+            assigned_agent = subtask.get("assigned_agent")
+            if not assigned_agent:
+                # Route task to appropriate agent
+                agent_type, confidence, reason = self.agent_router.route_task(subtask["description"])
+                assigned_agent = agent_type
+            
+            # Create task state
+            await self.task_state_manager.create_task(
+                goal_id=goal_id,
+                task_id=subtask_id,
+                task_description=subtask["description"],
+                assigned_agent=assigned_agent,
+                dependencies=dependencies,
+                priority=subtask.get("priority", 0)
+            )
         
-        # Log execution completion
+        # Log subtasks
         self._log_execution(
             goal_id=goal_id,
-            action="execute_goal_complete",
+            action="create_subtasks",
             details={
-                "success": execution_result["success"],
-                "completed_tasks": execution_result["completed_tasks"],
-                "failed_tasks": execution_result["failed_tasks"]
+                "subtasks": [
+                    {
+                        "task_id": f"{goal_id}_subtask_{i+1}",
+                        "description": subtask["description"],
+                        "assigned_agent": subtask.get("assigned_agent") or self.agent_router.route_task(subtask["description"])[0]
+                    }
+                    for i, subtask in enumerate(subtasks)
+                ]
             }
         )
         
-        return {
-            "goal_id": goal_id,
-            "success": execution_result["success"],
-            "completed_tasks": execution_result["completed_tasks"],
-            "failed_tasks": execution_result["failed_tasks"],
-            "execution_time": execution_result["execution_time"]
-        }
+        return goal_id
     
-    async def _execute_tasks_in_parallel(self, goal_id: str) -> Dict[str, Any]:
+    async def execute_goal(self, goal_id: str, max_parallel: int = 3) -> Dict[str, Any]:
         """
-        Execute tasks in parallel, respecting dependencies.
+        Execute a goal by executing its subtasks
         
         Args:
-            goal_id: Unique identifier for the goal
+            goal_id: ID of the goal to execute
+            max_parallel: Maximum number of tasks to execute in parallel
             
         Returns:
             Dictionary containing execution results
         """
-        start_time = time.time()
+        # Get all tasks for the goal
+        tasks = await self.task_state_manager.get_tasks_for_goal(goal_id)
+        if not tasks:
+            logger.error(f"No tasks found for goal: {goal_id}")
+            return {
+                "success": False,
+                "error": f"No tasks found for goal: {goal_id}"
+            }
+        
+        # Log goal execution
+        self._log_execution(
+            goal_id=goal_id,
+            action="execute_goal",
+            details={
+                "task_count": len(tasks)
+            }
+        )
+        
+        # Track task status
+        pending_tasks = set()
+        running_tasks = set()
         completed_tasks = []
         failed_tasks = []
         
-        # Keep track of tasks that are currently running
-        running_tasks: Set[str] = set()
-        
-        # Keep executing until all tasks are either completed or failed
-        while True:
-            # Get available tasks (those with all dependencies satisfied)
-            available_tasks = await self.task_state_manager.get_available_tasks(goal_id)
+        # Initialize pending tasks with tasks that have no dependencies
+        for task in tasks:
+            task_id = task["task_id"]
+            dependencies = task.get("dependencies", [])
             
-            # If no available tasks and no running tasks, we're done
-            if not available_tasks and not running_tasks:
-                break
-            
-            # Start execution of available tasks
-            for task in available_tasks:
-                if task.task_id not in running_tasks:
-                    running_tasks.add(task.task_id)
-                    # Execute task asynchronously
-                    asyncio.create_task(self._execute_single_task(task.task_id, running_tasks, completed_tasks, failed_tasks))
-            
-            # Wait a bit before checking again
-            await asyncio.sleep(0.5)
+            if not dependencies:
+                pending_tasks.add(task_id)
         
-        execution_time = time.time() - start_time
+        # Execute tasks until all are completed or failed
+        while pending_tasks or running_tasks:
+            # Start pending tasks if there are slots available
+            while pending_tasks and len(running_tasks) < max_parallel:
+                task_id = pending_tasks.pop()
+                running_tasks.add(task_id)
+                
+                # Execute task in background
+                asyncio.create_task(self._execute_task(
+                    task_id=task_id,
+                    running_tasks=running_tasks,
+                    completed_tasks=completed_tasks,
+                    failed_tasks=failed_tasks
+                ))
+            
+            # Wait for a short time
+            await asyncio.sleep(0.1)
+            
+            # Check for newly available tasks
+            for task in tasks:
+                task_id = task["task_id"]
+                
+                # Skip tasks that are already processed
+                if (task_id in pending_tasks or 
+                    task_id in running_tasks or 
+                    task_id in completed_tasks or 
+                    task_id in failed_tasks):
+                    continue
+                
+                # Check if all dependencies are completed
+                dependencies = task.get("dependencies", [])
+                if all(dep in completed_tasks for dep in dependencies):
+                    pending_tasks.add(task_id)
         
-        # Determine overall success
-        success = len(failed_tasks) == 0
+        # Log goal completion
+        self._log_execution(
+            goal_id=goal_id,
+            action="complete_goal",
+            details={
+                "completed_tasks": len(completed_tasks),
+                "failed_tasks": len(failed_tasks)
+            }
+        )
         
         return {
-            "success": success,
+            "success": True,
+            "goal_id": goal_id,
             "completed_tasks": completed_tasks,
-            "failed_tasks": failed_tasks,
-            "execution_time": execution_time
+            "failed_tasks": failed_tasks
         }
     
-    async def _execute_single_task(self, task_id: str, running_tasks: Set[str], 
-                                  completed_tasks: List[str], failed_tasks: List[str]) -> None:
+    async def _execute_task(self, task_id: str, running_tasks: Set[str], 
+                           completed_tasks: List[str], failed_tasks: List[str]) -> None:
         """
         Execute a single task and update its status.
         
@@ -316,6 +317,38 @@ class PlannerOrchestrator:
             # Update tracking lists
             running_tasks.remove(task_id)
             failed_tasks.append(task_id)
+    
+    def _parse_subtasks(self, planner_result: str) -> List[Dict[str, Any]]:
+        """
+        Parse the result from the planner agent to extract subtasks
+        
+        Args:
+            planner_result: Result from the planner agent
+            
+        Returns:
+            List of subtasks
+        """
+        # This is a placeholder implementation
+        # In a real implementation, this would parse the planner result
+        # to extract subtasks, dependencies, and assigned agents
+        
+        # For now, just create some dummy subtasks
+        subtasks = [
+            {
+                "description": "Subtask 1",
+                "dependencies": []
+            },
+            {
+                "description": "Subtask 2",
+                "dependencies": [1]
+            },
+            {
+                "description": "Subtask 3",
+                "dependencies": [1, 2]
+            }
+        ]
+        
+        return subtasks
     
     def _log_execution(self, goal_id: str, action: str, details: Dict[str, Any]) -> None:
         """

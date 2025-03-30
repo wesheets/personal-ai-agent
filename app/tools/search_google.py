@@ -1,10 +1,8 @@
 """
 Google Search Tool
-
 This module provides functionality to search Google and return results.
 Currently implemented as a placeholder for the tool system scaffold.
 """
-
 from typing import List, Dict, Any, Optional
 
 class GoogleSearchTool:
@@ -15,6 +13,19 @@ class GoogleSearchTool:
     def __init__(self):
         self.name = "search_google"
         self.description = "Search Google for information on a given query"
+    
+    async def run(self, query: str, num_results: int = 5) -> Dict[str, Any]:
+        """
+        Run the Google search tool
+        
+        Args:
+            query: The search query
+            num_results: Number of results to return
+            
+        Returns:
+            Dictionary containing search results
+        """
+        return await self.execute(query, num_results)
     
     async def execute(self, query: str, num_results: int = 5) -> Dict[str, Any]:
         """

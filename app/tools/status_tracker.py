@@ -1,43 +1,89 @@
 """
-Status Tracker Tool for agents to update task status.
-
-This tool allows Builder, Memory, Research, Ops, and other agents to update
-the status of their assigned tasks, report completion, request retries,
-or indicate they are blocked.
+Status Tracker Tool
+This module provides functionality to track the status of tasks and goals.
+It integrates with the Task State Manager to provide persistent state tracking.
 """
-
 import os
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 from datetime import datetime
 
-from app.core.task_state_manager import get_task_state_manager
+from app.core.task_state_manager import TaskStateManager, get_task_state_manager
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Set up logging
 logger = logging.getLogger(__name__)
 
 class StatusTracker:
     """
-    Tool for agents to update task status and report progress.
-    
-    This class provides methods for agents to:
-    - Update task status (complete, failed, blocked)
-    - Report progress on ongoing tasks
-    - Request retries for failed tasks
-    - Indicate blocking issues
+    Tool for tracking the status of tasks and goals
     """
     
     def __init__(self):
-        """Initialize the status tracker."""
+        self.name = "status_tracker"
+        self.description = "Track the status of tasks and goals"
         self.task_state_manager = get_task_state_manager()
         
         # Create logs directory if it doesn't exist
-        os.makedirs(os.path.dirname("/app/logs/task_state_log.json"), exist_ok=True)
+        self.logs_dir = os.path.join("app", "logs", "status_logs")
+        os.makedirs(self.logs_dir, exist_ok=True)
     
-    def update_status(self, 
-                     subtask_id: str, 
+    async def run(self, action: str, subtask_id: str, **kwargs) -> Dict[str, Any]:
+        """
+        Run the status tracker tool with the specified action
+        
+        Args:
+            action: The action to perform (update_status, complete_task, fail_task, etc.)
+            subtask_id: ID of the subtask
+            **kwargs: Additional arguments specific to the action
+            
+        Returns:
+            Dictionary containing the result of the action
+        """
+        if action == "update_status":
+            status = kwargs.get("status", "")
+            output_summary = kwargs.get("output_summary", "")
+            error_message = kwargs.get("error_message", "")
+            return self.update_status(subtask_id, status, output_summary, error_message)
+        
+        elif action == "complete_task":
+            output_summary = kwargs.get("output_summary", "")
+            return self.complete_task(subtask_id, output_summary)
+        
+        elif action == "fail_task":
+            error_message = kwargs.get("error_message", "")
+            return self.fail_task(subtask_id, error_message)
+        
+        elif action == "block_task":
+            reason = kwargs.get("reason", "")
+            return self.block_task(subtask_id, reason)
+        
+        elif action == "start_task":
+            return self.start_task(subtask_id)
+        
+        elif action == "report_progress":
+            progress_percentage = kwargs.get("progress_percentage", 0)
+            progress_message = kwargs.get("progress_message", "")
+            return self.report_progress(subtask_id, progress_percentage, progress_message)
+        
+        elif action == "request_retry":
+            reason = kwargs.get("reason", "")
+            return self.request_retry(subtask_id, reason)
+        
+        elif action == "get_task_info":
+            return self.get_task_info(subtask_id)
+        
+        elif action == "get_goal_progress":
+            goal_id = subtask_id  # In this case, subtask_id is actually the goal_id
+            return self.get_goal_progress(goal_id)
+        
+        else:
+            return {
+                "success": False,
+                "error": f"Unknown action: {action}"
+            }
+    
+    def update_status(self, subtask_id: str, 
                      status: str, 
                      output_summary: str = "", 
                      error_message: str = "") -> Dict[str, Any]:
@@ -53,61 +99,44 @@ class StatusTracker:
         Returns:
             Updated task state
         """
-        # Validate status
-        valid_statuses = ["complete", "failed", "blocked", "in_progress"]
-        if status not in valid_statuses:
-            error_msg = f"Invalid status: {status}. Must be one of {valid_statuses}"
-            logger.error(error_msg)
+        try:
+            # Get the task state
+            task_state = self.task_state_manager.get_task_state(subtask_id)
+            if not task_state:
+                return {
+                    "success": False,
+                    "error": f"Task not found: {subtask_id}"
+                }
+            
+            # Update the task state
+            task_state["status"] = status
+            task_state["last_updated"] = datetime.now().isoformat()
+            
+            if output_summary:
+                task_state["output_summary"] = output_summary
+            
+            if error_message:
+                task_state["error_message"] = error_message
+            
+            # Save the updated task state
+            self.task_state_manager.update_task_state(subtask_id, task_state)
+            
+            # Log the status update
+            self._log_status_update(subtask_id, status, output_summary, error_message)
+            
             return {
-                "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
+                "success": True,
+                "task_id": subtask_id,
+                "status": status,
+                "task_state": task_state
             }
         
-        # Get the current task state
-        task_state = self.task_state_manager.get_task_state(subtask_id)
-        
-        if not task_state:
-            error_msg = f"Task state not found for subtask ID: {subtask_id}"
-            logger.error(error_msg)
+        except Exception as e:
+            logger.error(f"Error updating status for task {subtask_id}: {str(e)}")
             return {
                 "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
+                "error": str(e)
             }
-        
-        # Update the task status
-        updated_state = self.task_state_manager.update_task_status(
-            subtask_id=subtask_id,
-            status=status,
-            output_summary=output_summary,
-            error_message=error_message
-        )
-        
-        if not updated_state:
-            error_msg = f"Failed to update task status for subtask ID: {subtask_id}"
-            logger.error(error_msg)
-            return {
-                "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
-            }
-        
-        # Log the status update
-        self._log_status_update(
-            subtask_id=subtask_id,
-            status=status,
-            output_summary=output_summary,
-            error_message=error_message
-        )
-        
-        return {
-            "success": True,
-            "subtask_id": subtask_id,
-            "status": status,
-            "timestamp": datetime.now().isoformat(),
-            "task_state": updated_state
-        }
     
     def complete_task(self, subtask_id: str, output_summary: str) -> Dict[str, Any]:
         """
@@ -120,11 +149,7 @@ class StatusTracker:
         Returns:
             Updated task state
         """
-        return self.update_status(
-            subtask_id=subtask_id,
-            status="complete",
-            output_summary=output_summary
-        )
+        return self.update_status(subtask_id, "complete", output_summary)
     
     def fail_task(self, subtask_id: str, error_message: str) -> Dict[str, Any]:
         """
@@ -137,11 +162,7 @@ class StatusTracker:
         Returns:
             Updated task state
         """
-        return self.update_status(
-            subtask_id=subtask_id,
-            status="failed",
-            error_message=error_message
-        )
+        return self.update_status(subtask_id, "failed", error_message=error_message)
     
     def block_task(self, subtask_id: str, reason: str) -> Dict[str, Any]:
         """
@@ -154,11 +175,7 @@ class StatusTracker:
         Returns:
             Updated task state
         """
-        return self.update_status(
-            subtask_id=subtask_id,
-            status="blocked",
-            error_message=reason
-        )
+        return self.update_status(subtask_id, "blocked", error_message=reason)
     
     def start_task(self, subtask_id: str) -> Dict[str, Any]:
         """
@@ -170,13 +187,9 @@ class StatusTracker:
         Returns:
             Updated task state
         """
-        return self.update_status(
-            subtask_id=subtask_id,
-            status="in_progress"
-        )
+        return self.update_status(subtask_id, "in_progress")
     
-    def report_progress(self, 
-                       subtask_id: str, 
+    def report_progress(self, subtask_id: str, 
                        progress_percentage: float, 
                        progress_message: str) -> Dict[str, Any]:
         """
@@ -190,63 +203,45 @@ class StatusTracker:
         Returns:
             Updated task state
         """
-        # Get the current task state
-        task_state = self.task_state_manager.get_task_state(subtask_id)
-        
-        if not task_state:
-            error_msg = f"Task state not found for subtask ID: {subtask_id}"
-            logger.error(error_msg)
+        try:
+            # Get the task state
+            task_state = self.task_state_manager.get_task_state(subtask_id)
+            if not task_state:
+                return {
+                    "success": False,
+                    "error": f"Task not found: {subtask_id}"
+                }
+            
+            # Update the task state
+            task_state["status"] = "in_progress"
+            task_state["last_updated"] = datetime.now().isoformat()
+            task_state["progress_percentage"] = progress_percentage
+            task_state["progress_message"] = progress_message
+            
+            # Save the updated task state
+            self.task_state_manager.update_task_state(subtask_id, task_state)
+            
+            # Log the progress update
+            self._log_status_update(
+                subtask_id, 
+                "progress", 
+                f"Progress: {progress_percentage}% - {progress_message}"
+            )
+            
             return {
-                "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
+                "success": True,
+                "task_id": subtask_id,
+                "status": "in_progress",
+                "progress_percentage": progress_percentage,
+                "task_state": task_state
             }
         
-        # Validate progress percentage
-        if progress_percentage < 0 or progress_percentage > 100:
-            error_msg = f"Invalid progress percentage: {progress_percentage}. Must be between 0 and 100"
-            logger.error(error_msg)
+        except Exception as e:
+            logger.error(f"Error reporting progress for task {subtask_id}: {str(e)}")
             return {
                 "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
+                "error": str(e)
             }
-        
-        # Update the task state
-        updates = {
-            "progress_percentage": progress_percentage,
-            "progress_message": progress_message,
-            "status": "in_progress"  # Ensure the task is marked as in progress
-        }
-        
-        updated_state = self.task_state_manager.update_task_state(
-            subtask_id=subtask_id,
-            updates=updates
-        )
-        
-        if not updated_state:
-            error_msg = f"Failed to update task progress for subtask ID: {subtask_id}"
-            logger.error(error_msg)
-            return {
-                "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
-            }
-        
-        # Log the progress update
-        self._log_status_update(
-            subtask_id=subtask_id,
-            status="in_progress",
-            output_summary=f"Progress: {progress_percentage}% - {progress_message}"
-        )
-        
-        return {
-            "success": True,
-            "subtask_id": subtask_id,
-            "progress_percentage": progress_percentage,
-            "timestamp": datetime.now().isoformat(),
-            "task_state": updated_state
-        }
     
     def request_retry(self, subtask_id: str, reason: str) -> Dict[str, Any]:
         """
@@ -259,78 +254,48 @@ class StatusTracker:
         Returns:
             Updated task state
         """
-        # Get the current task state
-        task_state = self.task_state_manager.get_task_state(subtask_id)
-        
-        if not task_state:
-            error_msg = f"Task state not found for subtask ID: {subtask_id}"
-            logger.error(error_msg)
+        try:
+            # Get the task state
+            task_state = self.task_state_manager.get_task_state(subtask_id)
+            if not task_state:
+                return {
+                    "success": False,
+                    "error": f"Task not found: {subtask_id}"
+                }
+            
+            # Update the task state
+            task_state["status"] = "retry_requested"
+            task_state["last_updated"] = datetime.now().isoformat()
+            task_state["retry_reason"] = reason
+            
+            # Increment retry count
+            retry_count = task_state.get("retry_count", 0)
+            task_state["retry_count"] = retry_count + 1
+            
+            # Save the updated task state
+            self.task_state_manager.update_task_state(subtask_id, task_state)
+            
+            # Log the retry request
+            self._log_status_update(
+                subtask_id, 
+                "retry_requested", 
+                f"Retry requested: {reason}"
+            )
+            
             return {
-                "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
+                "success": True,
+                "task_id": subtask_id,
+                "status": "retry_requested",
+                "retry_count": task_state["retry_count"],
+                "task_state": task_state
             }
         
-        # Check if the task is failed
-        if task_state.get("status") != "failed":
-            error_msg = f"Cannot request retry for task with status: {task_state.get('status')}. Task must be failed"
-            logger.error(error_msg)
+        except Exception as e:
+            logger.error(f"Error requesting retry for task {subtask_id}: {str(e)}")
             return {
                 "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
+                "error": str(e)
             }
-        
-        # Check if the task has exceeded max retries
-        retry_count = task_state.get("retry_count", 0)
-        max_retries = 3  # TODO: Get from config
-        
-        if retry_count >= max_retries:
-            error_msg = f"Task has exceeded maximum retry count ({max_retries})"
-            logger.error(error_msg)
-            return {
-                "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
-            }
-        
-        # Update the task state to queued for retry
-        updates = {
-            "status": "queued",
-            "retry_requested": True,
-            "retry_reason": reason,
-            "last_retry_request": datetime.now().isoformat()
-        }
-        
-        updated_state = self.task_state_manager.update_task_state(
-            subtask_id=subtask_id,
-            updates=updates
-        )
-        
-        if not updated_state:
-            error_msg = f"Failed to request retry for subtask ID: {subtask_id}"
-            logger.error(error_msg)
-            return {
-                "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
-            }
-        
-        # Log the retry request
-        self._log_status_update(
-            subtask_id=subtask_id,
-            status="queued",
-            output_summary=f"Retry requested: {reason}"
-        )
-        
-        return {
-            "success": True,
-            "subtask_id": subtask_id,
-            "status": "queued",
-            "retry_count": retry_count,
-            "timestamp": datetime.now().isoformat(),
-            "task_state": updated_state
-        }
     
     def get_task_info(self, subtask_id: str) -> Dict[str, Any]:
         """
@@ -342,24 +307,27 @@ class StatusTracker:
         Returns:
             Task information
         """
-        # Get the task state
-        task_state = self.task_state_manager.get_task_state(subtask_id)
-        
-        if not task_state:
-            error_msg = f"Task state not found for subtask ID: {subtask_id}"
-            logger.error(error_msg)
+        try:
+            # Get the task state
+            task_state = self.task_state_manager.get_task_state(subtask_id)
+            if not task_state:
+                return {
+                    "success": False,
+                    "error": f"Task not found: {subtask_id}"
+                }
+            
             return {
-                "success": False,
-                "error": error_msg,
-                "timestamp": datetime.now().isoformat()
+                "success": True,
+                "task_id": subtask_id,
+                "task_state": task_state
             }
         
-        return {
-            "success": True,
-            "subtask_id": subtask_id,
-            "task_state": task_state,
-            "timestamp": datetime.now().isoformat()
-        }
+        except Exception as e:
+            logger.error(f"Error getting task info for {subtask_id}: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
     
     def get_goal_progress(self, goal_id: str) -> Dict[str, Any]:
         """
@@ -371,23 +339,49 @@ class StatusTracker:
         Returns:
             Goal progress information
         """
-        # Get goal progress from task state manager
-        goal_progress = self.task_state_manager.get_goal_progress(goal_id)
+        try:
+            # Get all tasks for the goal
+            tasks = self.task_state_manager.get_tasks_for_goal(goal_id)
+            
+            # Calculate progress statistics
+            total_tasks = len(tasks)
+            completed_tasks = sum(1 for task in tasks if task.get("status") == "complete")
+            failed_tasks = sum(1 for task in tasks if task.get("status") == "failed")
+            blocked_tasks = sum(1 for task in tasks if task.get("status") == "blocked")
+            in_progress_tasks = sum(1 for task in tasks if task.get("status") == "in_progress")
+            pending_tasks = total_tasks - completed_tasks - failed_tasks - blocked_tasks - in_progress_tasks
+            
+            # Calculate overall progress percentage
+            if total_tasks > 0:
+                progress_percentage = (completed_tasks / total_tasks) * 100
+            else:
+                progress_percentage = 0
+            
+            return {
+                "success": True,
+                "goal_id": goal_id,
+                "total_tasks": total_tasks,
+                "completed_tasks": completed_tasks,
+                "failed_tasks": failed_tasks,
+                "blocked_tasks": blocked_tasks,
+                "in_progress_tasks": in_progress_tasks,
+                "pending_tasks": pending_tasks,
+                "progress_percentage": progress_percentage,
+                "tasks": tasks
+            }
         
-        return {
-            "success": True,
-            "goal_id": goal_id,
-            "progress": goal_progress,
-            "timestamp": datetime.now().isoformat()
-        }
+        except Exception as e:
+            logger.error(f"Error getting goal progress for {goal_id}: {str(e)}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
     
-    def _log_status_update(self, 
-                          subtask_id: str, 
-                          status: str, 
+    def _log_status_update(self, subtask_id: str, status: str, 
                           output_summary: str = "", 
                           error_message: str = "") -> None:
         """
-        Log a status update to the task_state_log.json file.
+        Log a status update to a file.
         
         Args:
             subtask_id: ID of the subtask
@@ -395,43 +389,35 @@ class StatusTracker:
             output_summary: Optional summary of the output
             error_message: Optional error message
         """
-        # Get the task state
-        task_state = self.task_state_manager.get_task_state(subtask_id)
-        
-        if not task_state:
-            logger.error(f"Task state not found for subtask ID: {subtask_id}")
-            return
-        
-        log_entry = {
-            "timestamp": datetime.now().isoformat(),
-            "event_type": "status_update",
-            "subtask_id": subtask_id,
-            "goal_id": task_state.get("goal_id", ""),
-            "agent": task_state.get("assigned_agent", ""),
-            "old_status": task_state.get("status", ""),
-            "new_status": status,
-            "output_summary": output_summary,
-            "error_message": error_message
-        }
-        
         try:
-            # Read existing logs
-            logs = []
-            log_file = "/app/logs/task_state_log.json"
+            # Get the goal ID from the subtask ID
+            goal_id = subtask_id.split("_")[0] if "_" in subtask_id else "unknown_goal"
             
+            # Create the log entry
+            log_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "subtask_id": subtask_id,
+                "goal_id": goal_id,
+                "status": status
+            }
+            
+            if output_summary:
+                log_entry["output_summary"] = output_summary
+            
+            if error_message:
+                log_entry["error_message"] = error_message
+            
+            # Create the log file path
+            log_file = os.path.join(self.logs_dir, f"{goal_id}_status.json")
+            
+            # Append to existing log or create new log file
             if os.path.exists(log_file):
                 with open(log_file, "r") as f:
-                    try:
-                        logs = json.load(f)
-                        if not isinstance(logs, list):
-                            logs = []
-                    except json.JSONDecodeError:
-                        logs = []
-            
-            # Append new log entry
-            logs.append(log_entry)
-            
-            # Write back to file
+                    logs = json.load(f)
+                logs.append(log_entry)
+            else:
+                logs = [log_entry]
+                
             with open(log_file, "w") as f:
                 json.dump(logs, f, indent=2)
         
