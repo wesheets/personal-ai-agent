@@ -46,6 +46,7 @@ class Orchestrator:
         self.confidence_retry_manager = get_confidence_retry_manager()
         self.nudge_manager = get_nudge_manager()
         self.task_persistence_manager = get_task_persistence_manager()
+        self.execution_mode = "manual"  # Default execution mode
     
     async def orchestrate(
         self,
@@ -253,6 +254,16 @@ class Orchestrator:
         
         # If no match, return None
         return None
+    
+    # Add mock method for get_current_control_mode
+    def get_current_control_mode(self) -> Dict[str, str]:
+        """
+        Get the current control mode
+        
+        Returns:
+            Dictionary with the current control mode
+        """
+        return {"mode": self.execution_mode}
 
 # Singleton instance
 _orchestrator = None

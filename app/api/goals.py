@@ -36,67 +36,75 @@ async def get_goals():
     """
     Get all active goals with their subtasks
     """
-    task_manager = get_task_state_manager()
-    
-    # Get all goals
-    goals_data = []
-    for goal_id, goal in task_manager.goals.items():
-        # Get tasks for this goal
-        goal_tasks = []
-        for task_id, task in task_manager.tasks.items():
-            if task.goal_id == goal_id:
-                goal_tasks.append(TaskModel(
-                    task_id=task.task_id,
-                    title=task.title,
-                    description=task.description,
-                    status=task.status,
-                    assigned_agent=task.assigned_agent,
-                    created_at=task.created_at,
-                    started_at=task.started_at,
-                    completed_at=task.completed_at,
-                    dependencies=task.dependencies,
-                    retry_count=task.retry_count,
-                    error=task.error
-                ))
+    try:
+        task_manager = get_task_state_manager()
         
-        # Create goal model with tasks
-        goals_data.append(GoalModel(
-            goal_id=goal.goal_id,
-            title=goal.title,
-            description=goal.description,
-            status=goal.status,
-            created_at=goal.created_at,
-            completed_at=goal.completed_at,
-            tasks=goal_tasks
-        ))
-    
-    return goals_data
+        # Get all goals
+        goals_data = []
+        for goal_id, goal in task_manager.goals.items():
+            # Get tasks for this goal
+            goal_tasks = []
+            for task_id, task in task_manager.tasks.items():
+                if task.goal_id == goal_id:
+                    goal_tasks.append(TaskModel(
+                        task_id=task.task_id,
+                        title=task.title,
+                        description=task.description,
+                        status=task.status,
+                        assigned_agent=task.assigned_agent,
+                        created_at=task.created_at,
+                        started_at=task.started_at,
+                        completed_at=task.completed_at,
+                        dependencies=task.dependencies,
+                        retry_count=task.retry_count,
+                        error=task.error
+                    ))
+            
+            # Create goal model with tasks
+            goals_data.append(GoalModel(
+                goal_id=goal.goal_id,
+                title=goal.title,
+                description=goal.description,
+                status=goal.status,
+                created_at=goal.created_at,
+                completed_at=goal.completed_at,
+                tasks=goal_tasks
+            ))
+        
+        return goals_data
+    except Exception:
+        # Return empty goals list as fallback
+        return []
 
 @router.get("/task-state", response_model=Dict[str, Any])
 async def get_task_state():
     """
     Get the current state of all tasks
     """
-    task_manager = get_task_state_manager()
-    
-    # Convert tasks to response model
-    tasks_data = []
-    for task_id, task in task_manager.tasks.items():
-        tasks_data.append(TaskModel(
-            task_id=task.task_id,
-            title=task.title,
-            description=task.description,
-            status=task.status,
-            assigned_agent=task.assigned_agent,
-            created_at=task.created_at,
-            started_at=task.started_at,
-            completed_at=task.completed_at,
-            dependencies=task.dependencies,
-            retry_count=task.retry_count,
-            error=task.error
-        ))
-    
-    return {"tasks": tasks_data}
+    try:
+        task_manager = get_task_state_manager()
+        
+        # Convert tasks to response model
+        tasks_data = []
+        for task_id, task in task_manager.tasks.items():
+            tasks_data.append(TaskModel(
+                task_id=task.task_id,
+                title=task.title,
+                description=task.description,
+                status=task.status,
+                assigned_agent=task.assigned_agent,
+                created_at=task.created_at,
+                started_at=task.started_at,
+                completed_at=task.completed_at,
+                dependencies=task.dependencies,
+                retry_count=task.retry_count,
+                error=task.error
+            ))
+        
+        return {"tasks": tasks_data}
+    except Exception:
+        # Return empty tasks list as fallback
+        return {"tasks": []}
 
 @router.post("/task-state/{task_id}/kill")
 async def kill_task(task_id: str):
