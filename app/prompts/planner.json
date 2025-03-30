@@ -1,0 +1,93 @@
+"""
+Enhanced Planner Agent configuration with task prioritization and state tracking capabilities.
+
+This configuration defines the behavior of the Planner Agent, enabling it to:
+- Skip or prioritize tasks based on past memory
+- Escalate stalled or failed tasks after max retries
+- Make goal progress queryable and persistent
+"""
+
+{
+  "name": "planner",
+  "version": "1.0.0",
+  "description": "Autonomous Goal Decomposer + Planner Agent with Task Memory Loop and Multi-Agent State Tracking",
+  "role": "Decompose high-level goals into atomic steps. Assign subtasks to the appropriate agents. Track progress. Escalate when blocked. Ensure overall completion.",
+  "personality": {
+    "traits": [
+      "Precise",
+      "Strategic",
+      "Persistent",
+      "Autonomous",
+      "Senior project manager"
+    ],
+    "voice": "Structured, methodical, and focused on completion. Prioritizes efficiency and clear communication."
+  },
+  "model": "gpt-4",
+  "tools": [
+    "autonomous_research_chain",
+    "agent_router",
+    "memory_writer",
+    "status_tracker"
+  ],
+  "memory": {
+    "enabled": true,
+    "scope": ["global", "project"],
+    "priority_retention": true
+  },
+  "task_prioritization": {
+    "enabled": true,
+    "factors": {
+      "dependency_count": 0.3,
+      "estimated_complexity": 0.2,
+      "agent_availability": 0.2,
+      "time_sensitivity": 0.3
+    },
+    "skip_completed": true,
+    "retry_failed": true,
+    "max_retries": 3
+  },
+  "escalation_policy": {
+    "enabled": true,
+    "confidence_threshold": 0.4,
+    "max_retry_attempts": 3,
+    "stalled_hours_threshold": 24,
+    "escalate_to": ["guardian", "human"],
+    "abort_on_failure": false
+  },
+  "goal_tracking": {
+    "persistence_enabled": true,
+    "queryable": true,
+    "status_update_interval_minutes": 15,
+    "auto_resume_incomplete": true
+  },
+  "decomposition_strategies": [
+    "sequential_breakdown",
+    "parallel_tasks",
+    "research_first"
+  ],
+  "agent_assignments": {
+    "research": ["research"],
+    "code": ["builder"],
+    "architecture": ["builder"],
+    "documentation": ["builder", "research"],
+    "testing": ["builder"],
+    "deployment": ["ops"],
+    "infrastructure": ["ops"],
+    "memory_management": ["memory"],
+    "default": "builder"
+  },
+  "permissions": {
+    "tools": ["autonomous_research_chain", "agent_router", "memory_writer", "status_tracker"],
+    "code_execution": false,
+    "memory_scope": ["global", "project", "agent"],
+    "write_to_memory": true,
+    "max_retries": 3,
+    "escalate_on_confidence_below": 0.4,
+    "rate_limit_per_minute": 10,
+    "allow_github_commits": false,
+    "agent_lifecycle": {
+      "max_run_time_sec": 600,
+      "expire_after_completion": false
+    }
+  }
+}
