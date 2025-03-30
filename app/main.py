@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -17,8 +17,7 @@ load_dotenv()
 app = FastAPI(
     title="Enhanced AI Agent System",
     description="A personal AI agent system with vector memory, multi-model support, and configurable agent personalities",
-    version="1.0.0"
-)
+    version="1.0.0")
 
 # Add CORS middleware
 app.add_middleware(
@@ -49,6 +48,12 @@ app.include_router(system_router)
 app.include_router(goals_router, prefix="/api", tags=["Goals"])
 app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
 app.include_router(control_router, prefix="/api", tags=["Control"])
+
+# Health check endpoint for Railway
+@app.get("/health", tags=["Health"])
+async def health_check():
+    """Health check endpoint for Railway"""
+    return Response(content="OK", media_type="text/plain")
 
 # Serve frontend static files if they exist
 frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend/dist")
