@@ -1,8 +1,17 @@
 # Make the module importable
-# Create a router directly in the __init__.py file
 from fastapi import APIRouter
-from app.api.agent import router as agent_router_original
 
-# Create a new router that includes all routes from the original
+# Create a new router
 router = APIRouter()
-router.include_router(agent_router_original)
+
+# Import the routes after router is defined to avoid circular imports
+from app.api.agent.builder import router as builder_router
+from app.api.agent.ops import router as ops_router
+from app.api.agent.research import router as research_router
+from app.api.agent.memory import router as memory_router
+
+# Include all routes
+router.include_router(builder_router)
+router.include_router(ops_router)
+router.include_router(research_router)
+router.include_router(memory_router)
