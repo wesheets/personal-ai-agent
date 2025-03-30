@@ -16,10 +16,10 @@ app = FastAPI(
     title="Enhanced AI Agent System",
     description="A personal AI agent system with vector memory, multi-model support, and configurable agent personalities",
     version="1.0.0")
-# Add CORS middleware
+# Add CORS middleware with exact origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://*.up.railway.app", "https://compassionate-compassion-production.up.railway.app"],
+    allow_origins=["http://localhost:3000", "https://compassionate-compassion-production.up.railway.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
