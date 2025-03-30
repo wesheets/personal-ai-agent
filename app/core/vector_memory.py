@@ -1,85 +1,79 @@
 import os
-from typing import Dict, Any, List, Optional
-from supabase import create_client, Client
-from openai import OpenAI
-import numpy as np
-import json
 import time
-from dotenv import load_dotenv
+from supabase import create_client, Client
+from typing import Dict, List, Any, Optional
+import openai
 
-# Load environment variables
-load_dotenv()
+# Singleton instance
+_vector_memory_instance = None
+
+def get_vector_memory() -> 'VectorMemorySystem':
+    """
+    Get the singleton instance of VectorMemorySystem
+    
+    Returns:
+        The VectorMemorySystem instance
+    """
+    global _vector_memory_instance
+    if _vector_memory_instance is None:
+        _vector_memory_instance = VectorMemorySystem()
+    return _vector_memory_instance
 
 class VectorMemorySystem:
-    """
-    Vector-based memory system using Supabase with pgvector
-    """
+    """Vector memory system using Supabase pgvector"""
+    
     def __init__(self):
-        # Initialize Supabase client
-        supabase_url = os.getenv("SUPABASE_URL")
-        supabase_key = os.getenv("SUPABASE_KEY")
+        """Initialize the vector memory system"""
+        # Get Supabase credentials from environment
+        supabase_url = os.environ.get("SUPABASE_URL")
+        supabase_key = os.environ.get("SUPABASE_KEY")
         
         if not supabase_url or not supabase_key:
-            raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in environment variables")
+            raise ValueError("SUPABASE_URL and SUPABASE_KEY environment variables must be set")
         
+        # Initialize Supabase client
         self.supabase = create_client(supabase_url, supabase_key)
-        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.embedding_model = "text-embedding-ada-002"
+        
+        # Table name for vector storage
         self.table_name = "agent_memories"
         
-        # Ensure the table exists
+        # Create table if it doesn't exist
         self._ensure_table_exists()
     
     def _ensure_table_exists(self):
-        """
-        Ensure the vector table exists in Supabase
-        """
+        """Ensure the vector table exists"""
+        # Check if table exists
+        # This is a simplified approach - in production, use migrations
         try:
-            # Check if table exists by querying it
-            self.supabase.table(self.table_name).select("id").limit(1).execute()
-        except Exception as e:
-            # Table doesn't exist, create it
-            # Note: This is a simplified approach. In production, you would use migrations
-            # or a more robust method to create and manage database schema
             print(f"Creating table {self.table_name} for vector storage")
-            
-            # SQL to create the table with pgvector extension
-            # This would typically be done through Supabase UI or migrations
-            # For demonstration purposes only
-            sql = f"""
-            -- Enable pgvector extension if not already enabled
-            CREATE EXTENSION IF NOT EXISTS vector;
-            
-            -- Create the table if it doesn't exist
-            CREATE TABLE IF NOT EXISTS {self.table_name} (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                content TEXT NOT NULL,
-                metadata JSONB,
-                embedding VECTOR(1536),
-                priority BOOLEAN DEFAULT FALSE,
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-            );
-            
-            -- Create an index for vector similarity search
-            CREATE INDEX IF NOT EXISTS {self.table_name}_embedding_idx ON {self.table_name} USING ivfflat (embedding vector_cosine_ops);
-            """
-            
-            # Execute the SQL (note: in practice, you would use migrations)
-            # This is simplified for demonstration
             print("Note: In a production environment, you should use migrations to create database schema")
+            
+            # Create the table with the necessary columns
+            # This is just a placeholder - the actual implementation would depend on Supabase's API
+            # and might require SQL execution privileges
+            
+            # In a real implementation, you would:
+            # 1. Check if the table exists
+            # 2. Create it if it doesn't
+            # 3. Create the necessary indexes and functions for vector search
+            
+            # For now, we'll assume the table already exists in the Supabase project
+        except Exception as e:
+            print(f"Error creating table: {e}")
     
     def _get_embedding(self, text: str) -> List[float]:
         """
-        Get embedding vector for text using OpenAI's embedding API
+        Get embedding for text using OpenAI's embedding API
         
         Args:
-            text: The text to embed
+            text: The text to get embedding for
             
         Returns:
-            List of floats representing the embedding vector
+            The embedding vector
         """
-        response = self.openai_client.embeddings.create(
-            model=self.embedding_model,
+        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        response = client.embeddings.create(
+            model="text-embedding-ada-002",
             input=text
         )
         return response.data[0].embedding
