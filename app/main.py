@@ -16,14 +16,18 @@ app = FastAPI(
     title="Enhanced AI Agent System",
     description="A personal AI agent system with vector memory, multi-model support, and configurable agent personalities",
     version="1.0.0")
-# Add CORS middleware with exact origin
+
+# Add CORS middleware with comprehensive configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "https://compassionate-compassion-production.up.railway.app"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=86400,  # 24 hours in seconds
 )
+
 # Initialize model providers
 initialize_model_providers()
 # Create system router
@@ -45,6 +49,21 @@ app.include_router(control_router, prefix="/api", tags=["Control"])
 async def health_check():
     """Health check endpoint for Railway"""
     return Response(content="OK", media_type="text/plain")
+
+# Add CORS preflight OPTIONS handler for all routes
+@app.options("/{rest_of_path:path}")
+async def options_handler(rest_of_path: str):
+    return Response(
+        content="",
+        headers={
+            "Access-Control-Allow-Origin": "https://compassionate-compassion-production.up.railway.app",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Max-Age": "86400",  # 24 hours in seconds
+        }
+    )
+
 # Serve frontend static files if they exist
 frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend/dist")
 if os.path.exists(frontend_dir):
