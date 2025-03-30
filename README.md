@@ -1,324 +1,110 @@
-# Personal AI Agent System
+# Task Memory Loop + Multi-Agent State Tracking
 
-A modular, extensible AI agent system inspired by Manus, featuring multiple specialized agents, memory systems, and multi-model support.
+## Overview
+This system implements a persistent memory-driven state management system that allows the Planner Agent to track subtask status, recall task states across sessions, resume long-running goals, avoid repeating completed work, and enable agents to update task status and outcomes.
 
-## Features
+## Components
 
-- **Modular Agent Architecture**: Specialized agents for building, operations, research, and memory management
-- **Multi-Model Support**: Seamless integration with OpenAI GPT-4 and Anthropic Claude models
-- **Vector Memory System**: Persistent memory using Supabase with pgvector
-- **Dynamic Prompt Chains**: JSON/YAML-based prompt configurations for each agent
-- **Agent Reflection & Reasoning**: Self-evaluation, rationale logging, and memory context review
-- **Multi-Agent Workflow Orchestration**: Automatic task routing between specialized agents
-- **Nudging, Looping, and Task Persistence**: Retry logic, user nudging, and task management
-- **Behavior Shaping & Escalation Logic**: Adaptive behavior, escalation protocols, and goal awareness
-- **Comprehensive Logging**: Execution logs, rationale logs, and execution chain logs
-- **Tool Integration**: Pluggable tool system for external integrations
-- **Docker Containerization**: Easy deployment with Docker
+### 1. Task State Manager (`/app/core/task_state_manager.py`)
+The Task State Manager implements a task tracking model that stores:
+- Goal and subtask IDs
+- Subtask descriptions
+- Agent assignments
+- Status information (queued, in_progress, complete, failed)
+- Timestamps and updates
+- Output summaries and error messages
 
-## Phase 2.4: Behavior Shaping & Escalation Logic
+This component provides CRUD operations for task states, memory integration, and logging support.
 
-The latest update (Phase 2.4) adds several powerful features to enhance agent intelligence:
+### 2. Status Tracker Tool (`/app/tools/status_tracker.py`)
+The Status Tracker Tool allows agents to update task status with operations like:
+- Marking tasks as complete
+- Reporting failures
+- Indicating blocked status
+- Reporting progress
+- Requesting retries
 
-### 1. Escalation Protocol
+### 3. Planner Orchestrator (`/app/core/planner_orchestrator.py`)
+The Planner Orchestrator has been enhanced to:
+- Check task memory before assigning work
+- Update status on assignment, completion, or failure
+- Retry failed tasks when confidence is above threshold
+- Log updates to task state logs
+- Allow continuation of partially complete goals
 
-When an agent encounters difficulties, it can now automatically escalate the issue:
+### 4. Planner Agent Enhancer (`/app/core/planner_agent_enhancer.py`)
+The Planner Agent Enhancer provides:
+- Task prioritization based on memory
+- Escalation for stalled or failed tasks
+- Queryable goal progress
+- Persistence across sessions
 
-- Triggers escalation when retry count exceeds threshold (2+ retries)
-- Detects patterns like "I'm stuck", "need help", or "escalating" in agent reflections
-- Logs comprehensive escalation events in `/escalation_logs/`
-- Supports forwarding escalations to different agents
-- Includes agent name, task description, escalation reason, and reflection data
+### 5. Planner Agent Configuration (`/app/prompts/planner.json`)
+The Planner Agent configuration has been updated to support:
+- Task prioritization factors
+- Escalation policies
+- Goal tracking settings
+- Agent assignment rules
 
-### 2. Behavior Feedback Loop
+## Usage
 
-Agents can now adapt their behavior based on feedback:
+### Creating a Task
+```python
+from app.core.task_state_manager import get_task_state_manager
 
-- Records success/failure status for each task
-- Supports optional user notes for qualitative feedback
-- Stores feedback in `/behavior_logs/` organized by agent
-- Injects recent feedback context into future prompts
-- Enables agents to learn from past successes and failures
-
-### 3. Goal Awareness Scaffold
-
-Each agent now has a persistent mission that guides its actions:
-
-- Goal summaries defined in agent configuration files
-- Goals injected into prompt context before task execution
-- Helps agents align with business objectives
-- Provides consistent purpose across different tasks
-
-### 4. Performance Summary Endpoint
-
-New endpoints for monitoring agent performance:
-
-- `/agent/{name}/performance` - Returns metrics including total tasks, average confidence, escalation count, and success rates
-- `/agent/{name}/feedback` - Allows submitting and retrieving feedback
-- `/escalations` - Provides access to escalation events
-- Supports optional human rating entries
-
-## Getting Started
-
-### Prerequisites
-
-- Docker and Docker Compose
-- OpenAI API key
-- (Optional) Claude API key
-- (Optional) Supabase account for vector storage
-
-### Installation
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/wesheets/personal-ai-agent.git
-   cd personal-ai-agent
-   ```
-
-2. Create a `.env` file with your API keys:
-   ```
-   OPENAI_API_KEY=your_openai_api_key
-   CLAUDE_API_KEY=your_claude_api_key
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_KEY=your_supabase_key
-   ```
-
-3. Build and run with Docker:
-   ```
-   docker-compose up --build
-   ```
-
-4. Or run locally:
-   ```
-   pip install -r requirements.txt
-   uvicorn app.main:app --reload
-   ```
-
-### Using the API
-
-#### Basic Agent Request
-
-```json
-POST /agent/builder
-{
-  "input": "Create a FastAPI backend for a todo app",
-  "model": "gpt-4",
-  "enable_retry_loop": true
-}
+task_manager = get_task_state_manager()
+task_state = task_manager.create_task_state(
+    goal_id="goal_123",
+    subtask_id="goal_123_subtask_1",
+    subtask_description="Implement feature X",
+    assigned_agent="builder"
+)
 ```
 
-#### Multi-Agent Orchestration
+### Updating Task Status
+```python
+from app.tools.status_tracker import get_status_tracker
 
-```json
-POST /agent/builder
-{
-  "input": "Create a FastAPI backend for a todo app and deploy it",
-  "auto_orchestrate": true
-}
+status_tracker = get_status_tracker()
+result = status_tracker.complete_task(
+    subtask_id="goal_123_subtask_1",
+    output_summary="Feature X implemented successfully"
+)
 ```
 
-#### Viewing Agent Performance
+### Processing a Goal with Memory
+```python
+from app.core.planner_agent_enhancer import get_planner_agent_enhancer
 
-```
-GET /agent/builder/performance
-```
-
-#### Submitting Feedback
-
-```json
-POST /agent/builder/feedback
-{
-  "task_id": "task-uuid-here",
-  "was_successful": true,
-  "user_notes": "Great job on the API design!"
-}
+enhancer = get_planner_agent_enhancer()
+result = enhancer.process_goal_with_memory({
+    "id": "goal_123",
+    "description": "Implement new feature",
+    "type": "development"
+})
 ```
 
-#### Viewing Escalations
+### Checking Goal Progress
+```python
+from app.core.task_state_manager import get_task_state_manager
 
-```
-GET /escalations
-```
-
-#### Forwarding an Escalation
-
-```json
-POST /escalations/{escalation_id}/forward
-{
-  "target_agent": "ops"
-}
+task_manager = get_task_state_manager()
+progress = task_manager.get_goal_progress("goal_123")
+print(f"Completion: {progress['completion_percentage']}%")
 ```
 
-## Creating Custom Agents
+## Testing
+A comprehensive test suite is available in `test_task_memory_system.py` that validates:
+- Task state management
+- Status tracking
+- Goal continuation
+- Multi-agent coordination
+- Persistence across sessions
 
-1. Create a new prompt configuration file in `app/prompts/`:
-   ```json
-   {
-     "name": "My Custom Agent",
-     "model": "gpt-4",
-     "system": "You are a specialized agent that...",
-     "goal_summary": "The Custom Agent is responsible for...",
-     "accepts_tasks": ["category1", "category2"],
-     "handoff_keywords": ["keyword1", "keyword2"],
-     "tools": ["tool1", "tool2"],
-     "persona": {
-       "tone": "professional and concise",
-       "voice": "experienced specialist",
-       "traits": ["analytical", "thorough", "precise"]
-     },
-     "role": "Handle specialized tasks in domain X",
-     "rules": [
-       "Always verify inputs before processing",
-       "Provide clear explanations for decisions",
-       "Focus on accuracy over speed"
-     ]
-   }
-   ```
-
-2. The agent will be automatically available at `/agent/your_file_name`
-
-## Architecture
-
+Run the tests with:
 ```
-app/
-├── api/
-│   ├── agent.py          # Main agent API routes
-│   ├── memory.py         # Memory API routes
-│   └── performance.py    # Performance and feedback API routes
-├── core/
-│   ├── behavior_manager.py     # Behavior feedback management
-│   ├── confidence_retry.py     # Confidence-based retry logic
-│   ├── escalation_manager.py   # Escalation protocol management
-│   ├── execution_chain_logger.py # Execution chain logging
-│   ├── execution_logger.py     # Execution logging
-│   ├── memory_context_reviewer.py # Memory context review
-│   ├── memory_manager.py       # Memory management
-│   ├── nudge_manager.py        # Nudging logic
-│   ├── orchestrator.py         # Multi-agent orchestration
-│   ├── prompt_manager.py       # Prompt chain management
-│   ├── rationale_logger.py     # Rationale logging
-│   ├── self_evaluation.py      # Self-evaluation prompts
-│   ├── shared_memory.py        # Shared memory layer
-│   ├── task_persistence.py     # Task persistence system
-│   ├── task_tagger.py          # Task categorization
-│   └── vector_memory.py        # Vector memory system
-├── db/
-│   ├── database.py       # Database connection
-│   └── supabase_manager.py # Supabase integration
-├── models/
-│   └── workflow.py       # Workflow data models
-├── prompts/
-│   ├── builder.json      # Builder agent prompt
-│   ├── memory.json       # Memory agent prompt
-│   ├── ops.json          # Ops agent prompt
-│   └── research.json     # Research agent prompt
-├── providers/
-│   ├── claude_provider.py # Claude API integration
-│   ├── model_router.py   # Model routing logic
-│   └── openai_provider.py # OpenAI API integration
-├── tools/
-│   ├── github_commit.py  # GitHub integration tool
-│   └── search_google.py  # Google search tool
-└── main.py              # FastAPI application
+python test_task_memory_system.py
 ```
 
-## Logs and Persistence
-
-The system maintains several types of logs:
-
-- **Execution Logs**: Records of all agent executions
-- **Rationale Logs**: Agent reasoning and self-evaluation
-- **Execution Chain Logs**: Multi-agent workflow records
-- **Nudge Logs**: Records of when agents needed user input
-- **Pending Tasks**: Suggested but unexecuted tasks
-- **Escalation Logs**: Records of when agents needed escalation
-- **Behavior Logs**: Feedback on agent performance
-
-## Advanced Usage
-
-### Escalation Protocol
-
-When an agent encounters difficulties, it can escalate the issue:
-
-```json
-{
-  "output": "I've attempted to implement the solution...",
-  "metadata": { ... },
-  "reflection": { ... },
-  "escalation": {
-    "escalation_needed": true,
-    "escalation_id": "esc-uuid-here",
-    "escalation_reason": "Exceeded retry limit",
-    "timestamp": "2025-03-29T19:10:00.000Z"
-  }
-}
-```
-
-You can forward escalations to other agents:
-
-```json
-POST /escalations/esc-uuid-here/forward
-{
-  "target_agent": "ops"
-}
-```
-
-### Behavior Feedback
-
-Submit feedback on agent performance:
-
-```json
-POST /agent/builder/feedback
-{
-  "task_id": "task-uuid-here",
-  "was_successful": true,
-  "user_notes": "Great job on the API design!"
-}
-```
-
-View agent performance metrics:
-
-```
-GET /agent/builder/performance
-```
-
-Response:
-
-```json
-{
-  "agent_name": "builder",
-  "total_tasks": 42,
-  "avg_confidence": 0.85,
-  "escalation_count": 3,
-  "recent_success_rate": 0.9,
-  "success_rate": 0.85,
-  "total_feedback_count": 42,
-  "recent_feedback_count": 10,
-  "timestamp": "2025-03-29T19:10:00.000Z"
-}
-```
-
-### Goal Awareness
-
-Agent goals are defined in their configuration files:
-
-```json
-{
-  "name": "Builder Agent",
-  "goal_summary": "The Builder Agent is optimizing backend systems to enable a scalable multi-agent infrastructure. Your focus is on creating robust, maintainable code that follows best practices and can scale efficiently."
-}
-```
-
-These goals are automatically injected into the agent's prompt context before task execution, helping them align with business objectives.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit your changes: `git commit -m 'Add feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+## Integration with Existing System
+This system integrates with the existing Planner Agent and enhances its capabilities with persistent memory-driven state management. It builds on the existing agent architecture and extends it with robust task tracking and coordination features.
