@@ -21,9 +21,15 @@ class AgentStatusModel(BaseModel):
 class AgentStatusResponseModel(BaseModel):
     agents: List[AgentStatusModel]
 
+class TaskModel(BaseModel):
+    description: str
+    priority: str
+    agent_type: str
+
 class TaskDelegationModel(BaseModel):
     task_id: str
     target_agent: str
+    task: TaskModel
 
 class EditPromptModel(BaseModel):
     prompt: str
@@ -121,21 +127,35 @@ async def delegate_task(delegation: TaskDelegationModel):
     orchestrator = get_orchestrator()
     task_manager = orchestrator.task_state_manager
     
-    # Get task
-    task = await task_manager.get_task(delegation.task_id)
-    if not task:
-        raise HTTPException(status_code=404, detail=f"Task {delegation.task_id} not found")
-    
     # Validate target agent
     available_agents = orchestrator.prompt_manager.get_available_agents()
     if delegation.target_agent not in available_agents:
         raise HTTPException(status_code=400, detail=f"Invalid target agent: {delegation.target_agent}")
     
-    # Update task assignment
-    task.assigned_agent = delegation.target_agent
-    await task_manager._save_state_to_log()
+    # Import task persistence manager
+    from app.core.task_persistence import get_task_persistence_manager
+    task_persistence = get_task_persistence_manager()
     
-    return {"message": f"Task {delegation.task_id} delegated to {delegation.target_agent}"}
+    # Create a new task from the payload
+    try:
+        task_id = await task_persistence.store_pending_task(
+            task_description=delegation.task.description,
+            origin_agent="api",
+            suggested_agent=delegation.target_agent,
+            priority=delegation.task.priority == "high",
+            metadata={
+                "agent_type": delegation.task.agent_type,
+                "task_id": delegation.task_id
+            }
+        )
+        
+        # Return success message
+        return {"message": f"Task {delegation.task_id} delegated to {delegation.target_agent}"}
+    except Exception as e:
+        import logging
+        logger = logging.getLogger("api")
+        logger.error(f"Error delegating task: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error delegating task: {str(e)}")
 
 @router.post("/agent/goal/{task_id}/edit-prompt", response_model=Dict[str, str])
 async def edit_task_prompt(task_id: str, prompt_data: EditPromptModel):
