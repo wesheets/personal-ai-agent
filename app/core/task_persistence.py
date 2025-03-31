@@ -31,6 +31,9 @@ class TaskPersistenceManager:
         # Set up storage directory
         self.tasks_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "pending_tasks")
         os.makedirs(self.tasks_dir, exist_ok=True)
+        
+        # For testing purposes, keep an in-memory cache of tasks
+        self.tasks_cache = {}
     
     async def store_pending_task(
         self,
@@ -48,16 +51,16 @@ class TaskPersistenceManager:
         Args:
             task_description: Description of the task
             origin_agent: Agent that suggested the task
-            suggested_agent: Agent suggested to handle the task
-            priority: Whether the task is high priority
-            metadata: Additional metadata for the task
+            suggested_agent: Agent that should execute the task
+            priority: Whether this is a high priority task
+            metadata: Optional metadata about the task
             original_input: Original input that led to this task suggestion
-            original_output: Original output that contained the task suggestion
+            original_output: Original output that contained this task suggestion
             
         Returns:
-            ID of the stored task
+            The ID of the stored task
         """
-        # Create the task
+        # Create task object
         task = PendingTask(
             task_description=task_description,
             origin_agent=origin_agent,
@@ -68,215 +71,144 @@ class TaskPersistenceManager:
             original_output=original_output
         )
         
-        # Store the task
-        task_file = os.path.join(self.tasks_dir, f"{task.task_id}.json")
-        with open(task_file, "w") as f:
-            json.dump(task.dict(), f, indent=2)
+        # Use custom task_id from metadata if provided
+        if metadata and "task_id" in metadata:
+            task.task_id = metadata["task_id"]
+        
+        # Store in memory cache
+        self.tasks_cache[task.task_id] = task.model_dump()
+        
+        try:
+            # Store to file
+            task_path = os.path.join(self.tasks_dir, f"{task.task_id}.json")
+            with open(task_path, "w") as f:
+                f.write(task.model_dump_json(indent=2))
+        except Exception as e:
+            print(f"Warning: Could not persist task to file: {e}")
+            # Continue with in-memory version only
         
         return task.task_id
     
+    async def get_pending_task(self, task_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get a pending task by ID
+        
+        Args:
+            task_id: The ID of the task to retrieve
+            
+        Returns:
+            The task data or None if not found
+        """
+        # Check in-memory cache first
+        if task_id in self.tasks_cache:
+            return self.tasks_cache[task_id]
+            
+        # Try to load from file
+        task_path = os.path.join(self.tasks_dir, f"{task_id}.json")
+        if os.path.exists(task_path):
+            try:
+                with open(task_path, "r") as f:
+                    task_data = json.load(f)
+                    # Update cache
+                    self.tasks_cache[task_id] = task_data
+                    return task_data
+            except Exception as e:
+                print(f"Error loading task {task_id}: {e}")
+        
+        return None
+    
     async def get_pending_tasks(
         self,
-        limit: int = 10,
-        offset: int = 0,
-        origin_agent: Optional[str] = None,
-        suggested_agent: Optional[str] = None,
-        status: str = "pending"
-    ) -> List[PendingTask]:
+        agent: Optional[str] = None,
+        status: Optional[str] = None,
+        limit: int = 100
+    ) -> List[Dict[str, Any]]:
         """
-        Get pending tasks
+        Get pending tasks, optionally filtered by agent and status
         
         Args:
+            agent: Optional agent to filter by
+            status: Optional status to filter by
             limit: Maximum number of tasks to return
-            offset: Offset for pagination
-            origin_agent: Filter by origin agent
-            suggested_agent: Filter by suggested agent
-            status: Filter by status (pending, executed, cancelled)
             
         Returns:
-            List of pending tasks
+            List of task data
         """
-        # Get all task files
-        task_files = [f for f in os.listdir(self.tasks_dir) if f.endswith(".json")]
-        
-        # Load all tasks
+        # Try to load from files first
         tasks = []
-        for task_file in task_files:
-            with open(os.path.join(self.tasks_dir, task_file), "r") as f:
-                task_data = json.load(f)
-                task = PendingTask(**task_data)
+        try:
+            for filename in os.listdir(self.tasks_dir):
+                if not filename.endswith(".json"):
+                    continue
                 
+                task_path = os.path.join(self.tasks_dir, filename)
+                try:
+                    with open(task_path, "r") as f:
+                        task_data = json.load(f)
+                        
+                        # Update cache
+                        self.tasks_cache[task_data["task_id"]] = task_data
+                        
+                        # Apply filters
+                        if agent and task_data.get("suggested_agent") != agent:
+                            continue
+                        if status and task_data.get("status") != status:
+                            continue
+                        
+                        tasks.append(task_data)
+                except Exception as e:
+                    print(f"Error loading task {filename}: {e}")
+        except Exception as e:
+            print(f"Error listing tasks directory: {e}")
+            # Fall back to in-memory cache
+        
+        # If no files were found or there was an error, use the in-memory cache
+        if not tasks:
+            for task_id, task_data in self.tasks_cache.items():
                 # Apply filters
-                if status and task.status != status:
+                if agent and task_data.get("suggested_agent") != agent:
+                    continue
+                if status and task_data.get("status") != status:
                     continue
                 
-                if origin_agent and task.origin_agent != origin_agent:
-                    continue
-                
-                if suggested_agent and task.suggested_agent != suggested_agent:
-                    continue
-                
-                tasks.append(task)
+                tasks.append(task_data)
         
-        # Sort by creation time (newest first)
-        tasks.sort(key=lambda t: t.created_at, reverse=True)
-        
-        # Apply pagination
-        tasks = tasks[offset:offset + limit]
-        
-        return tasks
+        # Sort by created_at (newest first) and apply limit
+        tasks.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+        return tasks[:limit]
     
-    async def get_task(self, task_id: str) -> Optional[PendingTask]:
-        """
-        Get a specific task by ID
-        
-        Args:
-            task_id: ID of the task
-            
-        Returns:
-            Task if found, None otherwise
-        """
-        task_file = os.path.join(self.tasks_dir, f"{task_id}.json")
-        
-        if not os.path.exists(task_file):
-            return None
-        
-        with open(task_file, "r") as f:
-            task_data = json.load(f)
-            return PendingTask(**task_data)
-    
-    async def update_task_status(
-        self,
-        task_id: str,
-        status: str,
-        metadata: Optional[Dict[str, Any]] = None
-    ) -> Optional[PendingTask]:
+    async def update_task_status(self, task_id: str, status: str) -> bool:
         """
         Update the status of a task
         
         Args:
-            task_id: ID of the task
-            status: New status (pending, executed, cancelled)
-            metadata: Additional metadata to update
+            task_id: The ID of the task to update
+            status: The new status
             
         Returns:
-            Updated task if found, None otherwise
-        """
-        task = await self.get_task(task_id)
-        
-        if not task:
-            return None
-        
-        # Update the task
-        task.status = status
-        
-        if metadata:
-            task.metadata.update(metadata)
-        
-        # Store the updated task
-        task_file = os.path.join(self.tasks_dir, f"{task_id}.json")
-        with open(task_file, "w") as f:
-            json.dump(task.dict(), f, indent=2)
-        
-        return task
-    
-    async def execute_task(
-        self,
-        task_id: str,
-        background_tasks=None,
-        db=None,
-        supabase_client=None
-    ) -> Dict[str, Any]:
-        """
-        Execute a pending task
-        
-        Args:
-            task_id: ID of the task to execute
-            background_tasks: FastAPI background tasks
-            db: Database connection
-            supabase_client: Supabase client
-            
-        Returns:
-            Result of the task execution
+            True if updated, False if not found
         """
         # Get the task
-        task = await self.get_task(task_id)
+        task_data = await self.get_pending_task(task_id)
+        if not task_data:
+            return False
         
-        if not task:
-            return {"error": f"Task not found: {task_id}"}
+        # Update status
+        task_data["status"] = status
         
-        if task.status != "pending":
-            return {"error": f"Task is not pending: {task_id}", "status": task.status}
+        # Update in-memory cache
+        self.tasks_cache[task_id] = task_data
         
         try:
-            # Import here to avoid circular imports
-            from app.api.agent import AgentRequest, process_agent_request
-            
-            # Create a request for the suggested agent
-            request = AgentRequest(
-                input=task.task_description,
-                context={
-                    "origin_agent": task.origin_agent,
-                    "original_input": task.original_input,
-                    "original_output": task.original_output,
-                    "is_pending_task": True,
-                    "task_id": task.task_id,
-                    **task.metadata
-                },
-                save_to_memory=True
-            )
-            
-            # Process the request
-            response = await process_agent_request(
-                agent_type=task.suggested_agent,
-                request=request,
-                background_tasks=background_tasks,
-                db=db,
-                supabase_client=supabase_client
-            )
-            
-            # Update the task status
-            await self.update_task_status(
-                task_id=task_id,
-                status="executed",
-                metadata={
-                    "execution_timestamp": datetime.now().isoformat(),
-                    "execution_result": {
-                        "output": response.output,
-                        "metadata": response.metadata,
-                        "reflection": response.reflection
-                    }
-                }
-            )
-            
-            # Return the response
-            return {
-                "task_id": task_id,
-                "status": "executed",
-                "result": {
-                    "output": response.output,
-                    "metadata": response.metadata,
-                    "reflection": response.reflection
-                }
-            }
-            
+            # Update file
+            task_path = os.path.join(self.tasks_dir, f"{task_id}.json")
+            with open(task_path, "w") as f:
+                json.dump(task_data, f, indent=2)
         except Exception as e:
-            # Update the task status to reflect the error
-            await self.update_task_status(
-                task_id=task_id,
-                status="error",
-                metadata={
-                    "execution_timestamp": datetime.now().isoformat(),
-                    "error": str(e)
-                }
-            )
-            
-            # Return the error
-            return {
-                "task_id": task_id,
-                "status": "error",
-                "error": str(e)
-            }
+            print(f"Warning: Could not persist task status update to file: {e}")
+            # Continue with in-memory version only
+        
+        return True
 
 # Singleton instance
 _task_persistence_manager = None
