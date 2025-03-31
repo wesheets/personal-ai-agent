@@ -29,7 +29,11 @@ app = FastAPI(
 # Add CORS middleware with hardcoded configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins temporarily for debugging
+    allow_origins=[
+        "https://frontend-agent-ui-production.up.railway.app",
+        "https://compassionate-compassion-production.up.railway.app",
+        "http://localhost:3000"
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
     allow_headers=["*"],
@@ -61,11 +65,9 @@ async def log_requests(request, call_next):
         logger.info(f"Response headers: {response.headers}")
         logger.info(f"Process time: {process_time:.4f}s")
         
-        # Add CORS headers directly to ensure they're present
-        response.headers["Access-Control-Allow-Origin"] = "*"  # For debugging
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
-        response.headers["Access-Control-Allow-Headers"] = "*"
+        # We no longer need to manually add CORS headers here
+        # The FastAPI CORSMiddleware will handle this correctly
+        # with the specific origins we've configured
         
         return response
     except Exception as e:
