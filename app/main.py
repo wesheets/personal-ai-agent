@@ -26,11 +26,15 @@ app = FastAPI(
     description="A personal AI agent system with vector memory, multi-model support, and configurable agent personalities",
     version="1.0.0")
 
-# Add CORS middleware with configuration from environment variables
+# Add CORS middleware with hardcoded configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=cors_allow_credentials,
+    allow_origins=[
+        "https://frontend-agent-ui-production.up.railway.app",
+        "https://compassionate-compassion-production.up.railway.app",
+        "http://localhost:3000"
+    ],
+    allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
