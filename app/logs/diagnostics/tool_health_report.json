@@ -1,0 +1,288 @@
+{
+  "total_tools": 35,
+  "tools_with_run_method": 27,
+  "tools_with_import_errors": 1,
+  "tools_details": [
+    {
+      "name": "agent_builder",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/agent_builder.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(agent_name: str, agent_purpose: str, agent_capabilities: List[str] = None, agent_constraints: List[str] = None, agent_tools: List[str] = None, agent_personality: str = None, agent_knowledge_areas: List[str] = None, agent_model: str = 'gpt-4', agent_memory_enabled: bool = True, agent_reflection_enabled: bool = True, agent_template: str = None, save_agent: bool = True, test_agent: bool = False, test_prompt: str = None, store_memory: bool = True, memory_manager=None, memory_tags: List[str] = ['agent_builder', 'meta'], memory_scope: str = 'global') -> Dict[str, Any]"
+    },
+    {
+      "name": "api_request",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/api_request.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(url: str, method: str = 'GET', headers: Optional[Dict[str, str]] = None, params: Optional[Dict[str, Any]] = None, data: Union[Dict[str, Any], str, NoneType] = None, json_data: Optional[Dict[str, Any]] = None, timeout: int = 30, verify_ssl: bool = True, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['api_request', 'external_data'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "architecture_validator",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/architecture_validator.py",
+      "has_run_method": false,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": null
+    },
+    {
+      "name": "audio_transcriber",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/audio_transcriber.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(audio_path: str, language: str = 'en', speaker_diarization: bool = False, max_speakers: int = 2, include_timestamps: bool = True, include_confidence: bool = False, detect_topics: bool = False, detect_sentiment: bool = False, output_format: str = 'text', store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['audio', 'transcription', 'speech'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "autonomous_research_chain",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/autonomous_research_chain.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(research_question: str, depth: int = 2, max_sources: int = 5, max_steps: int = 10, focus_areas: List[str] = None, required_tools: List[str] = None, excluded_tools: List[str] = None, time_limit_minutes: int = 30, include_reasoning: bool = True, include_source_links: bool = True, format_output: str = 'markdown', store_memory: bool = True, memory_manager=None, memory_tags: List[str] = ['research', 'autonomous'], memory_scope: str = 'global') -> Dict[str, Any]"
+    },
+    {
+      "name": "belief_calibrator",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/belief_calibrator.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(statements: Union[str, List[str]], domain: str = None, confidence_threshold: float = 0.7, require_evidence: bool = True, check_recency: bool = True, check_consistency: bool = True, check_source_quality: bool = True, include_alternatives: bool = True, include_confidence_intervals: bool = False, include_reasoning: bool = True, format_output: str = 'detailed', store_memory: bool = True, memory_manager=None, memory_tags: List[str] = ['belief_calibration', 'meta'], memory_scope: str = 'global') -> Dict[str, Any]"
+    },
+    {
+      "name": "calendar_scheduler",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/calendar_scheduler.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(action: str = 'list', calendar_id: str = 'primary', event_id: Optional[str] = None, title: Optional[str] = None, description: Optional[str] = None, location: Optional[str] = None, start_time: Optional[str] = None, end_time: Optional[str] = None, attendees: Optional[List[str]] = None, recurrence: Optional[str] = None, date_range: Optional[str] = None, limit: int = 10, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['calendar', 'schedule'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "code_executor",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/code_executor.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(code: str, language: str = 'python', timeout: int = 30, input_data: Optional[str] = None, args: Optional[List[str]] = None, env_vars: Optional[Dict[str, str]] = None, working_dir: Optional[str] = None, save_output: bool = False, output_file: Optional[str] = None, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['code_execution', 'development'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "code_explainer",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/code_explainer.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(code: str, language: str = 'python', explanation_level: str = 'detailed', include_suggestions: bool = True, include_refactoring: bool = False, include_security_analysis: bool = False, include_performance_tips: bool = False, focus_areas: Optional[List[str]] = None, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['code_explanation', 'development'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "email_drafter",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/email_drafter.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(subject: str, purpose: str, recipient_type: str = 'professional', tone: str = 'formal', key_points: List[str] = None, sender_name: str = None, recipient_name: str = None, recipient_email: str = None, include_greeting: bool = True, include_signature: bool = True, signature_text: str = None, max_length: str = 'medium', include_call_to_action: bool = True, call_to_action: str = None, format_as_html: bool = False, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['email', 'communication'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "event_tracker",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/event_tracker.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(query_type: str = 'trending', category: Optional[str] = None, location: Optional[str] = None, date_range: Optional[str] = None, limit: int = 10, include_details: bool = True, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['events', 'current_events'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "github_commit",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/github_commit.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(repo_url: str, files: List[Dict[str, str]], commit_message: str, branch: str = 'main', token: Optional[str] = None, author_name: Optional[str] = None, author_email: Optional[str] = None, create_branch: bool = False, create_pr: bool = False, pr_title: Optional[str] = None, pr_body: Optional[str] = None, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['github', 'code_commit', 'development'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "image_caption",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/image_caption.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(image_path: str, detail_level: str = 'standard', include_objects: bool = True, include_colors: bool = True, include_style: bool = False, include_emotions: bool = False, max_caption_length: int = 100, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['image', 'caption', 'vision'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "multi_agent_debater",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/multi_agent_debater.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(topic: str, debate_question: str = None, perspectives: List[str] = None, num_agents: int = 3, debate_format: str = 'structured', debate_rounds: int = 3, allow_consensus: bool = True, require_evidence: bool = True, include_devil_advocate: bool = True, include_moderator: bool = True, include_fact_checker: bool = False, focus_areas: List[str] = None, time_limit_minutes: int = 10, format_output: str = 'markdown', store_memory: bool = True, memory_manager=None, memory_tags: List[str] = ['debate', 'multi_agent'], memory_scope: str = 'global') -> Dict[str, Any]"
+    },
+    {
+      "name": "multi_file_editor",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/multi_file_editor.py",
+      "has_run_method": false,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": null
+    },
+    {
+      "name": "news_fetcher",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/news_fetcher.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(query: str, max_results: int = 5, days_back: int = 7, sources: Optional[List[str]] = None, categories: Optional[List[str]] = None, language: str = 'en', store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['news', 'research'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "notion_writer",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/notion_writer.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(operation: str, content: Union[Dict[str, Any], str, NoneType] = None, page_id: Optional[str] = None, database_id: Optional[str] = None, parent_page_id: Optional[str] = None, title: Optional[str] = None, properties: Optional[Dict[str, Any]] = None, format: str = 'markdown', include_children: bool = False, archive: bool = False, token: Optional[str] = None, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['notion', 'document'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "package_installer",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/package_installer.py",
+      "has_run_method": false,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": null
+    },
+    {
+      "name": "pdf_ingest",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/pdf_ingest.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(pdf_path: str, extract_metadata: bool = True, extract_images: bool = False, extract_tables: bool = False, page_range: Optional[List[int]] = None, ocr_if_needed: bool = False, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['pdf', 'document'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "pitch_optimizer",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/pitch_optimizer.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(pitch_text: str, pitch_type: str = 'sales', target_audience: str = 'business', optimization_focus: List[str] = None, industry: str = None, product_stage: str = None, duration_minutes: int = None, include_hooks: bool = True, include_call_to_action: bool = True, include_objection_handling: bool = False, include_data_points: bool = True, formality_level: int = 3, enhancement_level: str = 'moderate', include_original: bool = False, include_structure_breakdown: bool = True, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['pitch', 'communication'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "refactor_suggester",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/refactor_suggester.py",
+      "has_run_method": false,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": null
+    },
+    {
+      "name": "repo_loader",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/repo_loader.py",
+      "has_run_method": false,
+      "import_status": "error",
+      "import_error": "No module named 'git'",
+      "run_method_signature": null
+    },
+    {
+      "name": "resume_parser",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/resume_parser.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(file_path: str, output_format: str = 'json', extract_contact_info: bool = True, extract_education: bool = True, extract_experience: bool = True, extract_skills: bool = True, extract_projects: bool = True, extract_certifications: bool = True, extract_languages: bool = True, extract_summary: bool = True, anonymize: bool = False, save_result: bool = False, output_path: Optional[str] = None, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['resume', 'document_parsing'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "screenshot_reader",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/screenshot_reader.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(image_path: str, extract_text: bool = True, extract_ui_elements: bool = False, detect_tables: bool = False, detect_charts: bool = False, language: str = 'en', output_format: str = 'text', store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['screenshot', 'ocr', 'vision'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "search_google",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/search_google.py",
+      "has_run_method": false,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": null
+    },
+    {
+      "name": "slack_messenger",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/slack_messenger.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(message: str, channel: str = None, user: str = None, thread_ts: str = None, blocks: List[Dict[str, Any]] = None, attachments: List[Dict[str, Any]] = None, emoji_reactions: List[str] = None, scheduled_time: str = None, message_type: str = 'text', formatting: str = 'default', include_mentions: List[str] = None, include_links: List[Dict[str, str]] = None, include_code_snippet: Dict[str, str] = None, dry_run: bool = False, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['slack', 'communication'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "spreadsheet_analyzer",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/spreadsheet_analyzer.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(file_path: str, operation: str = 'analyze', sheet_name: Optional[str] = None, range: Optional[str] = None, columns: Optional[List[str]] = None, filters: Optional[Dict[str, Any]] = None, groupby: Optional[List[str]] = None, aggregations: Optional[Dict[str, str]] = None, output_format: str = 'json', save_result: bool = False, output_path: Optional[str] = None, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['spreadsheet', 'data_analysis'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "stock_checker",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/stock_checker.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(symbol: str, query_type: str = 'quote', interval: str = '1d', period: str = '1mo', start_date: Optional[str] = None, end_date: Optional[str] = None, include_news: bool = False, include_fundamentals: bool = False, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['stock', 'finance'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "test_runner",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/test_runner.py",
+      "has_run_method": false,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": null
+    },
+    {
+      "name": "tone_converter",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/tone_converter.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(text: str, target_tone: str, preserve_formatting: bool = True, preserve_technical_terms: bool = True, maintain_length: bool = False, source_tone: str = None, audience: str = 'general', formality_level: int = None, enhancement_level: str = 'moderate', include_original: bool = False, include_comparison: bool = False, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['tone_conversion', 'writing'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "unit_test_writer",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/unit_test_writer.py",
+      "has_run_method": false,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": null
+    },
+    {
+      "name": "url_summarizer",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/url_summarizer.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(url: str, summary_length: str = 'medium', extract_links: bool = False, extract_images: bool = False, focus_keywords: Optional[List[str]] = None, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['url_summary', 'research'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "video_summarizer",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/video_summarizer.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(video_path: str, summary_type: str = 'comprehensive', include_timestamps: bool = True, extract_frames: bool = False, frames_output_dir: Optional[str] = None, frames_interval: int = 60, detect_scenes: bool = False, detect_faces: bool = False, detect_objects: bool = False, detect_text: bool = False, detect_topics: bool = True, transcribe_audio: bool = True, language: str = 'en', max_summary_length: int = 500, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['video', 'summary', 'multimedia'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "weather_checker",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/weather_checker.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(location: str, query_type: str = 'current', units: str = 'metric', days: int = 5, start_date: Optional[str] = None, end_date: Optional[str] = None, include_hourly: bool = False, include_alerts: bool = True, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['weather', 'location'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    },
+    {
+      "name": "web_search",
+      "file": "/home/ubuntu/personal-ai-agent/app/tools/web_search.py",
+      "has_run_method": true,
+      "import_status": "success",
+      "import_error": null,
+      "run_method_signature": "(query: str, num_results: int = 5, search_engine: str = 'google', filter_domains: Optional[List[str]] = None, safe_search: bool = True, store_memory: bool = False, memory_manager=None, memory_tags: List[str] = ['web_search', 'research'], memory_scope: str = 'agent') -> Dict[str, Any]"
+    }
+  ],
+  "success_rate": 77.14285714285715
+}

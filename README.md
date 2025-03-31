@@ -134,3 +134,11 @@ The application implements comprehensive error handling and defensive coding:
 - Implement real-time updates for activity feed
 - Add user authentication and profile management
 - Expand settings functionality
+
+## Backend Integration
+This frontend integrates with the Task Memory Loop + Multi-Agent State Tracking backend system, which provides:
+- Task state management
+- Status tracking
+- Goal continuation
+- Multi-agent coordination
+- Persistence across sessions

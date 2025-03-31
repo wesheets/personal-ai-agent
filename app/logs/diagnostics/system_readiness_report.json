@@ -1,0 +1,96 @@
+{
+  "timestamp": "2025-03-29T20:29:01.809573",
+  "system_name": "Personal AI Agent",
+  "diagnostic_summary": {
+    "total_checks": 7,
+    "passed_checks": 3,
+    "failed_checks": 4,
+    "success_rate": 42.857142857142854
+  },
+  "component_status": {
+    "tools": {
+      "status": "issues_detected",
+      "details": {
+        "diagnostic_file": "tool_health_report.json",
+        "timestamp": "unknown",
+        "status": "unknown",
+        "total_tools": 35,
+        "tools_with_run_method": 27,
+        "success_rate": 77.14285714285715
+      }
+    },
+    "agents": {
+      "status": "issues_detected",
+      "details": {
+        "diagnostic_file": "agent_execution_test.json",
+        "timestamp": "2025-03-29T20:25:11.134832",
+        "status": "unknown",
+        "total_agents": 5,
+        "successful_agents": 4,
+        "success_rate": 80.0
+      }
+    },
+    "control_system": {
+      "status": "operational",
+      "details": {
+        "diagnostic_file": "control_violation_simulation.json",
+        "timestamp": "2025-03-29T20:25:50.253640",
+        "status": "success"
+      }
+    },
+    "memory_system": {
+      "status": "operational",
+      "details": {
+        "diagnostic_file": "vector_memory_schema.json",
+        "timestamp": "2025-03-29T20:26:31.069099",
+        "status": "success"
+      }
+    },
+    "task_orchestration": {
+      "status": "operational",
+      "details": {
+        "diagnostic_file": "task_memory_loop_check.json",
+        "timestamp": "2025-03-29T20:28:15.581561",
+        "status": "success"
+      }
+    },
+    "logging_system": {
+      "status": "partially_operational",
+      "details": {
+        "execution_logs": "failure",
+        "control_violations": "success",
+        "task_state_log": "success",
+        "diagnostics": "success"
+      }
+    }
+  },
+  "logging_validation": {
+    "execution_logs": {
+      "exists": false,
+      "entries_found": 0,
+      "status": "failure"
+    },
+    "control_violations": {
+      "exists": true,
+      "entries_found": 1,
+      "status": "success"
+    },
+    "task_state_log": {
+      "exists": true,
+      "entries_found": 1,
+      "status": "success"
+    },
+    "diagnostics": {
+      "exists": true,
+      "entries_found": 5,
+      "status": "success"
+    }
+  },
+  "recommendations": [
+    "Create sample execution logs for testing",
+    "Fix issues with tools",
+    "Fix issues with agents",
+    "Fix issues with logging system"
+  ],
+  "overall_status": "not_ready"
+}
