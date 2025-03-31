@@ -29,17 +29,51 @@ app = FastAPI(
 # Add CORS middleware with hardcoded configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://frontend-agent-ui-production.up.railway.app",
-        "https://compassionate-compassion-production.up.railway.app",
-        "http://localhost:3000"
-    ],
+    allow_origins=["*"],  # Allow all origins temporarily for debugging
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
     max_age=86400,  # 24 hours in seconds
 )
+
+# Add middleware to log all requests and responses for debugging
+@app.middleware("http")
+async def log_requests(request, call_next):
+    import logging
+    import time
+    
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger("api")
+    
+    # Log request details
+    logger.info(f"Request: {request.method} {request.url}")
+    logger.info(f"Request headers: {request.headers}")
+    
+    # Process the request
+    start_time = time.time()
+    try:
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        
+        # Log response details
+        logger.info(f"Response status: {response.status_code}")
+        logger.info(f"Response headers: {response.headers}")
+        logger.info(f"Process time: {process_time:.4f}s")
+        
+        # Add CORS headers directly to ensure they're present
+        response.headers["Access-Control-Allow-Origin"] = "*"  # For debugging
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        
+        return response
+    except Exception as e:
+        # Log any exceptions
+        process_time = time.time() - start_time
+        logger.error(f"Error during request processing: {str(e)}")
+        logger.error(f"Process time: {process_time:.4f}s")
+        raise
 
 # Initialize model providers
 initialize_model_providers()
