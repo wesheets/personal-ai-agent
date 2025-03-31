@@ -5,7 +5,7 @@ from app.core.vector_memory import VectorMemorySystem
 from app.db.supabase_manager import get_supabase_client
 
 router = APIRouter()
-memory_system = VectorMemorySystem()
+memory_system = VectorMemorySystem()  # Initialize but will use dependency injection for clients
 
 class MemoryAddRequest(BaseModel):
     content: str

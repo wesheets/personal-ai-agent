@@ -8,6 +8,7 @@ from app.api.memory import router as memory_router
 from app.api.goals import goals_router
 from app.api.memory_viewer import memory_router as memory_viewer_router
 from app.api.control import control_router
+from app.api.logs import logs_router
 from app.providers import initialize_model_providers, get_available_models
 
 # Load environment variables
@@ -41,41 +42,51 @@ app.add_middleware(
     max_age=86400,  # 24 hours in seconds
 )
 
-# Add middleware to log all requests and responses for debugging
+# Add enhanced middleware to log all requests and responses with detailed information
 @app.middleware("http")
 async def log_requests(request, call_next):
     import logging
     import time
+    from app.core.logging_manager import get_logging_manager
     
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("api")
+    logging_manager = get_logging_manager()
     
-    # Log request details
+    # Log basic request details to console
     logger.info(f"Request: {request.method} {request.url}")
-    logger.info(f"Request headers: {request.headers}")
     
     # Process the request
     start_time = time.time()
+    error = None
     try:
         response = await call_next(request)
         process_time = time.time() - start_time
         
-        # Log response details
+        # Log basic response details to console
         logger.info(f"Response status: {response.status_code}")
-        logger.info(f"Response headers: {response.headers}")
         logger.info(f"Process time: {process_time:.4f}s")
-        
-        # We no longer need to manually add CORS headers here
-        # The FastAPI CORSMiddleware will handle this correctly
-        # with the specific origins we've configured
         
         return response
     except Exception as e:
         # Log any exceptions
+        error = e
         process_time = time.time() - start_time
         logger.error(f"Error during request processing: {str(e)}")
         logger.error(f"Process time: {process_time:.4f}s")
         raise
+    finally:
+        # Log detailed request/response to storage
+        try:
+            if 'response' in locals():
+                await logging_manager.log_request_response(
+                    request=request,
+                    response=response,
+                    process_time=process_time,
+                    error=error
+                )
+        except Exception as log_error:
+            logger.error(f"Error logging request/response: {str(log_error)}")
 
 # Initialize model providers
 initialize_model_providers()
@@ -97,6 +108,7 @@ app.include_router(system_router)
 app.include_router(goals_router, prefix="/api", tags=["Goals"])
 app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
 app.include_router(control_router, prefix="/api", tags=["Control"])
+app.include_router(logs_router, prefix="/api/logs", tags=["Logs"])
 
 # Health check endpoint for Railway
 @app.get("/health", tags=["Health"])
