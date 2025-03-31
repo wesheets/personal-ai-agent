@@ -96,12 +96,24 @@ async def get_agent_status():
                     logger.error(f"Error getting prompt chain for {agent_name}: {str(e)}")
                     agent_config = {"name": agent_name}
                 
+                # Get actual agent status from task state manager
+                try:
+                    # Check if agent has any active tasks
+                    agent_status = "idle"
+                    for task_key, task in orchestrator.task_state_manager.tasks.items():
+                        if task["agent"] == agent_name and task["state"] == "working":
+                            agent_status = "working"
+                            break
+                except Exception as e:
+                    logger.error(f"Error getting agent status: {str(e)}")
+                    agent_status = "idle"
+                
                 # Simplified agent status model
                 agents_data.append(AgentStatusModel(
                     id=agent_name,
                     name=agent_config.get("name", agent_name),
                     type=agent_name,
-                    status="idle",
+                    status=agent_status,
                     current_task=None,
                     completion_state="N/A",
                     errors=[],
@@ -147,6 +159,13 @@ async def delegate_task(delegation: TaskDelegationModel):
                 "agent_type": delegation.task.agent_type,
                 "task_id": delegation.task_id
             }
+        )
+        
+        # Update task state to mark agent as working on this task
+        await task_manager.update_task_state(
+            agent_name=delegation.target_agent,
+            task_id=delegation.task_id,
+            state="working"
         )
         
         # Return success message

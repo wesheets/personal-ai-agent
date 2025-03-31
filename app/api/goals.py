@@ -86,23 +86,21 @@ async def get_task_state():
         
         # Convert tasks to response model
         tasks_data = []
-        for task_id, task in task_manager.tasks.items():
-            tasks_data.append(TaskModel(
-                task_id=task.task_id,
-                title=task.title,
-                description=task.description,
-                status=task.status,
-                assigned_agent=task.assigned_agent,
-                created_at=task.created_at,
-                started_at=task.started_at,
-                completed_at=task.completed_at,
-                dependencies=task.dependencies,
-                retry_count=task.retry_count,
-                error=task.error
-            ))
+        for task_key, task in task_manager.tasks.items():
+            # The task is now a simple dictionary with agent, task_id, state, updated_at
+            tasks_data.append({
+                "task_id": task["task_id"],
+                "agent": task["agent"],
+                "state": task["state"],
+                "updated_at": task["updated_at"]
+            })
         
         return {"tasks": tasks_data}
-    except Exception:
+    except Exception as e:
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger("api")
+        logger.error(f"Error getting task state: {str(e)}")
         # Return empty tasks list as fallback
         return {"tasks": []}
 

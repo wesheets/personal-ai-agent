@@ -67,6 +67,12 @@ async def log_requests(request, call_next):
         logger.info(f"Response status: {response.status_code}")
         logger.info(f"Process time: {process_time:.4f}s")
         
+        # Store detailed log entry
+        try:
+            await logging_manager.log_request(request, response, process_time, error)
+        except Exception as log_error:
+            logger.error(f"Error logging request: {str(log_error)}")
+        
         return response
     except Exception as e:
         # Log any exceptions
@@ -74,6 +80,12 @@ async def log_requests(request, call_next):
         process_time = time.time() - start_time
         logger.error(f"Error during request processing: {str(e)}")
         logger.error(f"Process time: {process_time:.4f}s")
+        
+        # Store detailed log entry with error
+        try:
+            await logging_manager.log_request(request, None, process_time, error)
+        except Exception as log_error:
+            logger.error(f"Error logging request with error: {str(log_error)}")
         raise
     finally:
         # Log detailed request/response to storage
@@ -101,7 +113,7 @@ async def get_models():
 
 # Include routers
 app.include_router(agent_router, prefix="/agent", tags=["Agents"])
-app.include_router(memory_router, prefix="/memory", tags=["Memory"])
+app.include_router(memory_router, prefix="/api/memory", tags=["Memory"])
 app.include_router(system_router)
 
 # Include new routers for UI integration

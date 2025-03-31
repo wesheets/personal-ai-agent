@@ -36,7 +36,7 @@ async def get_latest_logs(
         logging_manager = get_logging_manager()
         
         # Get latest logs
-        logs = logging_manager.get_latest_logs(limit=limit)
+        logs = logging_manager.get_recent_logs(limit=limit)
         
         # Return response
         return LogsResponse(

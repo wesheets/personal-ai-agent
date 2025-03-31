@@ -61,18 +61,41 @@ class VectorMemorySystem:
         Returns:
             The embedding vector
         """
-        # Always use mock embeddings in test environment to avoid API calls
-        print("Using mock embeddings for testing.")
-        # Return a mock embedding vector for testing purposes
-        import hashlib
-        # Generate a deterministic mock embedding based on the text content
-        hash_object = hashlib.md5(text.encode())
-        hash_hex = hash_object.hexdigest()
-        # Create a 1536-dimensional vector (same as text-embedding-ada-002)
-        # Use the hash to seed the values, making them deterministic but unique per text
-        import random
-        random.seed(hash_hex)
-        return [random.uniform(-1, 1) for _ in range(1536)]
+        # Try to use OpenAI API if available
+        try:
+            # Check if OpenAI API key is set and valid
+            api_key = os.environ.get("OPENAI_API_KEY")
+            if not api_key or api_key == "sk-your-**********-key":
+                raise ValueError("Invalid or missing OpenAI API key")
+                
+            # Set the API key
+            openai.api_key = api_key
+            
+            # Get embedding from OpenAI
+            response = openai.Embedding.create(
+                model=self.embedding_model,
+                input=text
+            )
+            
+            # Return the embedding
+            return response["data"][0]["embedding"]
+            
+        except Exception as e:
+            # Log the error but continue with mock embeddings
+            import logging
+            logger = logging.getLogger("vector_memory")
+            logger.warning(f"Using mock embeddings due to OpenAI API error: {str(e)}")
+            
+            # Generate a deterministic mock embedding based on the text content
+            import hashlib
+            hash_object = hashlib.md5(text.encode())
+            hash_hex = hash_object.hexdigest()
+            
+            # Create a 1536-dimensional vector (same as text-embedding-ada-002)
+            # Use the hash to seed the values, making them deterministic but unique per text
+            import random
+            random.seed(hash_hex)
+            return [random.uniform(-1, 1) for _ in range(1536)]
     
     async def store_memory(self, content: str, metadata: Optional[Dict[str, Any]] = None, priority: bool = False, supabase_client = None) -> str:
         """

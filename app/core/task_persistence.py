@@ -87,6 +87,22 @@ class TaskPersistenceManager:
             print(f"Warning: Could not persist task to file: {e}")
             # Continue with in-memory version only
         
+        # Update task state in the global task state manager
+        # This ensures tasks appear in /api/task-state endpoint
+        from app.core.orchestrator import get_orchestrator
+        orchestrator = get_orchestrator()
+        task_state_manager = orchestrator.task_state_manager
+        
+        try:
+            # Add task to the global task state
+            await task_state_manager.update_task_state(
+                agent_name=suggested_agent,
+                task_id=task.task_id,
+                state="pending"
+            )
+        except Exception as e:
+            print(f"Warning: Could not update task state: {e}")
+        
         return task.task_id
     
     async def get_pending_task(self, task_id: str) -> Optional[Dict[str, Any]]:

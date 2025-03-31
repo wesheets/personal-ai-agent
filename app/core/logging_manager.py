@@ -64,6 +64,66 @@ class LoggingManager:
         self.recent_logs = []
         self.max_recent_logs = 100
     
+    def log_request(self, request, response, process_time):
+        """
+        Log an API request and response
+        
+        Args:
+            request: The FastAPI request object
+            response: The FastAPI response object
+            process_time: The time taken to process the request in seconds
+        """
+        try:
+            # Create log entry
+            log_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "method": request.method,
+                "url": str(request.url),
+                "status_code": response.status_code,
+                "process_time": process_time,
+                "client_ip": request.client.host if request.client else "unknown",
+                "user_agent": request.headers.get("user-agent", "unknown"),
+            }
+            
+            # Add request body if available
+            try:
+                body = request.body()
+                if body:
+                    try:
+                        body_json = json.loads(body)
+                        log_entry["request_body"] = self._redact_sensitive_data(body_json)
+                    except:
+                        # Not JSON, store as string with limited length
+                        log_entry["request_body"] = str(body)[:1000] + "..." if len(str(body)) > 1000 else str(body)
+            except:
+                log_entry["request_body"] = "Could not read request body"
+            
+            # Store log
+            self.recent_logs.append(log_entry)
+            if len(self.recent_logs) > self.max_recent_logs:
+                self.recent_logs.pop(0)
+                
+            # Write to file
+            log_file = os.path.join(self.logs_dir, f"api_log_{datetime.now().strftime('%Y%m%d')}.json")
+            with open(log_file, "a") as f:
+                f.write(json.dumps(log_entry) + "\n")
+                
+            return log_entry
+        except Exception as e:
+            import logging
+            logger = logging.getLogger("api")
+            logger.error(f"Error logging request: {str(e)}")
+            return None
+    
+    def get_recent_logs(self, limit=50):
+        """
+        Get recent logs
+        
+        Args:
+            limit: Maximum number of logs to return
+        """
+        return self.recent_logs[-limit:] if limit < len(self.recent_logs) else self.recent_logs
+    
     def _redact_sensitive_data(self, data: Any) -> Any:
         """
         Redact sensitive data from logs

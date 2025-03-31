@@ -47,7 +47,7 @@ class Orchestrator:
         self.confidence_retry_manager = get_confidence_retry_manager()
         self.nudge_manager = get_nudge_manager()
         self.task_persistence_manager = get_task_persistence_manager()
-        self.task_state_manager = get_task_state_manager()  # Add missing task_state_manager
+        self.task_state_manager = get_task_state_manager()  # Initialize task_state_manager
         self.execution_mode = "manual"  # Default execution mode
     
     async def execute_with_agent(
