@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import React, { useState } from 'react';
-
-// Import components (to be created)
-=======
 import React from 'react';
 import { 
   Grid, 
@@ -12,45 +7,10 @@ import {
   Flex,
   useColorModeValue
 } from '@chakra-ui/react';
->>>>>>> 3f081ad (Restore original UI components and implement missing ones with Chakra UI)
 import GoalLoopVisualization from './GoalLoopVisualization';
 import MemoryViewer from './MemoryViewer';
 import InterruptControl from './InterruptControl';
 import StatusFeedback from './StatusFeedback';
-<<<<<<< HEAD
-
-const Dashboard = () => {
-  return (
-    <div className="container">
-      <header className="header">
-        <h1>Personal AI Agent System</h1>
-      </header>
-      
-      <div className="grid">
-        <div className="card">
-          <h2>Goal Loop Visualization</h2>
-          <GoalLoopVisualization />
-        </div>
-        
-        <div className="card">
-          <h2>Memory Viewer</h2>
-          <MemoryViewer />
-        </div>
-      </div>
-      
-      <div className="grid">
-        <div className="card">
-          <h2>Interrupt Control</h2>
-          <InterruptControl />
-        </div>
-        
-        <div className="card">
-          <h2>Status Feedback</h2>
-          <StatusFeedback />
-        </div>
-      </div>
-    </div>
-=======
 import AgentPanel from './AgentPanel';
 import ActivityFeed from './ActivityFeed';
 
@@ -63,7 +23,7 @@ const Dashboard = () => {
       <Heading as="h1" size="lg" mb={6}>Dashboard</Heading>
       
       <Grid templateColumns="repeat(12, 1fr)" gap={6}>
-        {/* Left column - Agent Panel and Activity Feed */}
+        {/* Left column - Agent Panel and Goal Loop Visualization */}
         <GridItem colSpan={{ base: 12, md: 6, lg: 4 }}>
           <Flex direction="column" gap={6}>
             <AgentPanel />
@@ -129,7 +89,6 @@ const Dashboard = () => {
         </GridItem>
       </Grid>
     </Box>
->>>>>>> 3f081ad (Restore original UI components and implement missing ones with Chakra UI)
   );
 };
 

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
-=======
 import { 
   Box, 
   VStack, 
@@ -12,7 +10,6 @@ import {
   useColorModeValue,
   Heading
 } from '@chakra-ui/react';
->>>>>>> 3f081ad (Restore original UI components and implement missing ones with Chakra UI)
 import { goalsService } from '../services/api';
 
 // Component for visualizing the goal loop with subtasks and agent assignments
@@ -20,12 +17,9 @@ const GoalLoopVisualization = () => {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-<<<<<<< HEAD
-=======
-  
+
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
->>>>>>> 3f081ad (Restore original UI components and implement missing ones with Chakra UI)
 
   useEffect(() => {
     // Function to fetch goals data from the API
@@ -54,19 +48,6 @@ const GoalLoopVisualization = () => {
 
   // Function to determine status color
   const getStatusColor = (status) => {
-<<<<<<< HEAD
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return 'status-completed';
-      case 'in_progress':
-        return 'status-active';
-      case 'failed':
-        return 'status-error';
-      case 'pending':
-        return 'status-paused';
-      default:
-        return '';
-=======
     switch (status?.toLowerCase()) {
       case 'completed':
         return 'green';
@@ -78,92 +59,10 @@ const GoalLoopVisualization = () => {
         return 'yellow';
       default:
         return 'gray';
->>>>>>> 3f081ad (Restore original UI components and implement missing ones with Chakra UI)
     }
   };
 
   if (loading) {
-<<<<<<< HEAD
-    return <div className="loading">Loading goal data...</div>;
-  }
-
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
-
-  if (goals.length === 0) {
-    return <div className="empty-state">No active goals found</div>;
-  }
-
-  return (
-    <div className="goal-visualization">
-      {goals.map((goal) => (
-        <div key={goal.goal_id} className="goal-container">
-          <div className="goal-header">
-            <h3>
-              <span className={`status-indicator ${getStatusColor(goal.status)}`}></span>
-              {goal.title}
-            </h3>
-            <div className="goal-meta">
-              <span>Created: {new Date(goal.created_at).toLocaleString()}</span>
-              <span>Status: {goal.status}</span>
-            </div>
-          </div>
-          
-          <div className="goal-description">{goal.description}</div>
-          
-          {/* Subtasks visualization */}
-          <div className="subtasks">
-            <h4>Subtasks</h4>
-            {goal.tasks && goal.tasks.length > 0 ? (
-              <div className="subtask-tree">
-                {goal.tasks.map((task) => (
-                  <div key={task.task_id} className="subtask-item">
-                    <div className="subtask-header">
-                      <span className={`status-indicator ${getStatusColor(task.status)}`}></span>
-                      <span className="subtask-title">{task.title}</span>
-                      <span className="subtask-agent">Agent: {task.assigned_agent || 'Unassigned'}</span>
-                    </div>
-                    <div className="subtask-details">
-                      <div className="subtask-description">{task.description}</div>
-                      <div className="subtask-meta">
-                        <span>Status: {task.status}</span>
-                        {task.started_at && <span>Started: {new Date(task.started_at).toLocaleString()}</span>}
-                        {task.completed_at && <span>Completed: {new Date(task.completed_at).toLocaleString()}</span>}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state">No subtasks found</div>
-            )}
-          </div>
-          
-          {/* Timeline visualization */}
-          <div className="timeline">
-            <h4>Timeline</h4>
-            <div className="timeline-container">
-              {goal.tasks && goal.tasks
-                .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-                .map((task, index) => (
-                  <div key={`timeline-${task.task_id}`} className="timeline-item">
-                    <div className={`timeline-marker ${getStatusColor(task.status)}`}></div>
-                    <div className="timeline-content">
-                      <h5>{task.title}</h5>
-                      <div className="timeline-meta">
-                        <span>{task.status}</span>
-                        <span>{new Date(task.created_at).toLocaleString()}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-=======
     return (
       <Box textAlign="center" py={10}>
         <Spinner size="xl" />
@@ -237,9 +136,7 @@ const GoalLoopVisualization = () => {
                   >
                     <Flex justifyContent="space-between" alignItems="center" mb={1}>
                       <Text fontWeight="bold">{task.title}</Text>
-                      <Badge colorScheme={getStatusColor(task.status)}>
-                        {task.status}
-                      </Badge>
+                      <Badge colorScheme={getStatusColor(task.status)}>{task.status}</Badge>
                     </Flex>
                     
                     <Text fontSize="sm" mb={2}>{task.description}</Text>
@@ -321,7 +218,6 @@ const GoalLoopVisualization = () => {
         </Box>
       ))}
     </VStack>
->>>>>>> 3f081ad (Restore original UI components and implement missing ones with Chakra UI)
   );
 };
 
