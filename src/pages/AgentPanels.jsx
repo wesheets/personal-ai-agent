@@ -22,6 +22,7 @@ import {
   Spinner,
   useToast
 } from '@chakra-ui/react';
+import ApiService from '../api/ApiService';
 
 // Generic Agent Panel component that can be used for Builder, Ops, and Research agents
 const AgentPanel = ({ agentType, agentName, agentDescription }) => {
@@ -45,31 +46,21 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     setError(null);
     
     try {
-      // This will be replaced with actual API call
-      // const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/agent/delegate`;
+      // Use the ApiService to delegate the task
+      const result = await ApiService.delegateTask(agentType, taskName, taskGoal);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate response
-      const mockResponse = {
-        taskId: `task-${Date.now()}`,
-        status: 'delegated',
-        agent: agentType,
-        message: `Task "${taskName}" has been delegated to ${agentName}`
-      };
-      
-      setResponse(mockResponse);
+      // Set response from API
+      setResponse(result);
       
       // Add to history (keeping only last 3)
       setTaskHistory(prev => {
         const newHistory = [
           {
-            id: mockResponse.taskId,
+            id: result.task_id || `task-${Date.now()}`,
             name: taskName,
             goal: taskGoal,
             timestamp: new Date().toISOString(),
-            status: mockResponse.status
+            status: result.status || 'delegated'
           },
           ...prev
         ];
@@ -103,6 +94,7 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
         isClosable: true,
       });
     } finally {
+      // Always reset submission state to prevent infinite spinner
       setIsSubmitting(false);
     }
   };
@@ -146,7 +138,7 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
                 type="submit" 
                 colorScheme="blue" 
                 isLoading={isSubmitting}
-                loadingText="Delegating..."
+                loadingText="Submitting..."
                 width="full"
               >
                 Delegate to {agentName ?? `${agentType} Agent`}
@@ -167,7 +159,7 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
               <VStack align="start" spacing={1} width="full">
                 <AlertTitle>Task Delegated</AlertTitle>
                 <AlertDescription>
-                  <Text>Task ID: {response?.taskId ?? 'Unknown'}</Text>
+                  <Text>Task ID: {response?.task_id ?? 'Unknown'}</Text>
                   <Text>Status: {response?.status ?? 'Unknown'}</Text>
                   <Text>{response?.message ?? ''}</Text>
                 </AlertDescription>
