@@ -46,7 +46,7 @@ const InterruptControl = () => {
         const controlMode = await controlService.getControlMode();
         
         // Safe fallback logic for getTaskState
-        let taskState = [];
+        let taskState = { tasks: [] };
         
         if (typeof window !== "undefined" && window.or && typeof window.or.getTaskState === "function") {
           try {
