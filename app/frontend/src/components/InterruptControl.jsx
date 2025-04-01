@@ -44,17 +44,22 @@ const InterruptControl = () => {
         setLoading(true);
         const controlMode = await controlService.getControlMode();
 
-        // ✅ Safe fallback for getTaskState
+        // Strict guard for or.getTaskState fallback logic
         let taskState = { tasks: [] };
-        
-        if (typeof window !== "undefined" && window.or && typeof window.or.getTaskState === "function") {
-          try {
+
+        try {
+          if (
+            typeof window !== "undefined" &&
+            window.or &&
+            Object.prototype.hasOwnProperty.call(window.or, "getTaskState") &&
+            typeof window.or.getTaskState === "function"
+          ) {
             taskState = await window.or.getTaskState();
-          } catch (err) {
-            console.warn("getTaskState threw an error:", err);
+          } else {
+            console.warn("window.or.getTaskState is not defined or not a function. Using fallback.");
           }
-        } else {
-          console.warn("getTaskState not available – using fallback");
+        } catch (err) {
+          console.warn("Error while calling window.or.getTaskState:", err);
         }
 
         setSystemState(prevState => ({
