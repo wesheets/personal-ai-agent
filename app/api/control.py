@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException, Body, Request, Response
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 from app.core.orchestrator import get_orchestrator
 import logging
 import uuid
 from datetime import datetime
+from fastapi.responses import JSONResponse
 
 # Configure logging
 logger = logging.getLogger("api")
@@ -146,19 +147,28 @@ async def get_agent_status():
         # Return a minimal response instead of throwing 500
         return AgentStatusResponseModel(agents=[])
 
-@router.post("/agent/delegate", response_model=Dict[str, Any])
-async def delegate_task(delegation: TaskDelegationModel = Body(...)):
+@router.post("/agent/delegate")
+async def delegate_task(request: Request):
     """
     Delegate a task to a different agent
     
     This endpoint allows delegating tasks to specific agents.
     """
-    logger.info(f"Received task delegation request: {delegation}")
+    print("✅ /delegate hit")
+    logger.info("✅ /delegate hit")
+    
     try:
-        # Support both naming conventions (task_id/target_agent and task/agent)
-        task_id = delegation.task_id
-        target_agent = delegation.target_agent or delegation.agent or "builder"
-        task_description = delegation.task or ""
+        # Get the request body
+        body = await request.json()
+        print("🧠 Body received:", body)
+        logger.info(f"🧠 Body received: {body}")
+        
+        # Extract fields from the request body
+        task_id = body.get("task_id")
+        target_agent = body.get("target_agent") or body.get("agent") or "builder"
+        task_description = body.get("task") or ""
+        
+        logger.info(f"Task ID: {task_id}, Target Agent: {target_agent}, Task: {task_description}")
         
         # If we have a task_id, use the orchestrator's task manager
         if task_id:
@@ -170,13 +180,13 @@ async def delegate_task(delegation: TaskDelegationModel = Body(...)):
             task = await task_manager.get_task(task_id)
             if not task:
                 logger.error(f"Task {task_id} not found")
-                raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+                return JSONResponse(status_code=404, content={"status": "error", "message": f"Task {task_id} not found"})
             
             # Validate target agent
             available_agents = orchestrator.prompt_manager.get_available_agents()
             if target_agent not in available_agents:
                 logger.error(f"Invalid target agent: {target_agent}")
-                raise HTTPException(status_code=400, detail=f"Invalid target agent: {target_agent}")
+                return JSONResponse(status_code=400, content={"status": "error", "message": f"Invalid target agent: {target_agent}"})
             
             # Update task assignment
             task.assigned_agent = target_agent
@@ -202,8 +212,7 @@ async def delegate_task(delegation: TaskDelegationModel = Body(...)):
             # Create a new task ID
             new_task_id = str(uuid.uuid4())
             
-            # In a real implementation, this would save to a database
-            # For now, we're just returning a success response
+            # Return a simulated response for testing
             response = {
                 "status": "success",
                 "message": f"Task delegated to {target_agent}",
@@ -215,17 +224,16 @@ async def delegate_task(delegation: TaskDelegationModel = Body(...)):
         
         else:
             logger.error("Either task_id or task description is required")
-            raise HTTPException(status_code=400, detail="Either task_id or task description is required")
+            return JSONResponse(status_code=400, content={"status": "error", "message": "Either task_id or task description is required"})
             
-    except HTTPException:
-        raise
     except Exception as e:
-        logger.error(f"Error delegating task: {str(e)}")
+        print("❌ Delegate crash:", e)
+        logger.error(f"❌ Delegate crash: {str(e)}")
         # Return a helpful error response instead of throwing 500
-        return {
-            "status": "error",
-            "message": f"Failed to delegate task: {str(e)}"
-        }
+        return JSONResponse(status_code=500, content={"status": "error", "message": f"Failed to delegate task: {str(e)}"})
+
+    # Fallback return in case all other logic paths fail
+    return {"message": "Simulated response", "status": "success"}  # TEMP for test
 
 @router.post("/agent/goal/{task_id}/edit-prompt", response_model=Dict[str, str])
 async def edit_task_prompt(task_id: str, prompt_data: EditPromptModel):

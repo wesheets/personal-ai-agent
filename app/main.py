@@ -64,6 +64,7 @@ async def log_requests(request: Request, call_next):
     
     # Log request details
     logger.info(f"Request: {request.method} {request.url}")
+    print(f"Request: {request.method} {request.url}")
     logger.info(f"Request headers: {request.headers}")
     
     # Log request body for debugging task delegation issues
@@ -71,9 +72,14 @@ async def log_requests(request: Request, call_next):
         try:
             body = await request.body()
             if body:
-                logger.info(f"Request body: {body.decode()}")
+                body_str = body.decode()
+                logger.info(f"Request body: {body_str}")
+                print(f"Request body in middleware: {body_str}")
+                # Store body for later use (FastAPI consumes the body)
+                request._body = body
         except Exception as e:
             logger.error(f"Error reading request body: {str(e)}")
+            print(f"Error reading request body: {str(e)}")
     
     # Process the request
     start_time = time.time()
@@ -83,6 +89,7 @@ async def log_requests(request: Request, call_next):
         
         # Log response details
         logger.info(f"Response status: {response.status_code}")
+        print(f"Response status: {response.status_code}")
         logger.info(f"Response headers: {response.headers}")
         logger.info(f"Process time: {process_time:.4f}s")
         
@@ -91,6 +98,7 @@ async def log_requests(request: Request, call_next):
         # Log any exceptions
         process_time = time.time() - start_time
         logger.error(f"Error during request processing: {str(e)}")
+        print(f"❌ Error during request processing: {str(e)}")
         logger.error(f"Process time: {process_time:.4f}s")
         raise
 
@@ -156,6 +164,29 @@ app.include_router(control_router, prefix="/api", tags=["Control"])
 
 # Mount agent router again with /api prefix to fix routing issues
 app.include_router(agent_router, prefix="/api/agent", tags=["API Agents"])
+
+# Add a direct route for debugging delegate endpoint issues
+@app.post("/api/agent/delegate-debug")
+async def delegate_debug(request: Request):
+    print("✅ /delegate-debug direct route hit")
+    logger.info("✅ /delegate-debug direct route hit")
+    
+    try:
+        # Get the request body
+        body = await request.json()
+        print("🧠 Debug body received:", body)
+        logger.info(f"🧠 Debug body received: {body}")
+        
+        # Return a simulated response for testing
+        return {
+            "status": "success",
+            "message": "Debug delegate endpoint response",
+            "task_id": "debug-task-123"
+        }
+    except Exception as e:
+        print("❌ Delegate debug crash:", e)
+        logger.error(f"❌ Delegate debug crash: {str(e)}")
+        return {"status": "error", "message": f"Debug error: {str(e)}"}
 
 # Health check endpoint for Railway
 @app.get("/health", tags=["Health"])
