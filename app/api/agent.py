@@ -350,19 +350,34 @@ async def get_latest_agent_activity():
             "latest_activities": []
         }
 
+# Define Pydantic models for task delegation
+class TaskData(BaseModel):
+    goal_id: str
+    description: str
+    task_category: str
+
+class DelegationRequest(BaseModel):
+    agent_name: str
+    task: TaskData
+
+class DelegationResponse(BaseModel):
+    status: str
+    message: str
+    task_id: str
+
 # Add a dedicated endpoint for task delegation
-@router.post("/delegate")
-async def delegate_task(delegation: Dict[str, Any]):
+@router.post("/delegate", response_model=DelegationResponse)
+async def delegate_task(delegation: DelegationRequest):
     """
     Delegate a task to an agent
     
     This endpoint allows delegating tasks to specific agents.
     """
-    logger.info(f"Received task delegation request: {delegation}")
+    logger.info(f"Received task delegation request: {delegation.dict()}")
     try:
         # Extract task information
-        task_description = delegation.get("task", "")
-        target_agent = delegation.get("agent", "builder")  # Default to builder if not specified
+        task_description = delegation.task.description
+        target_agent = delegation.agent_name
         
         if not task_description:
             logger.error("Task description is required")
@@ -381,25 +396,26 @@ async def delegate_task(delegation: Dict[str, Any]):
         # Create a new task
         task_id = str(uuid.uuid4())
         
+        # Log task details to /logs/latest
+        logger.info(f"Task details - Goal ID: {delegation.task.goal_id}, Category: {delegation.task.task_category}")
+        logger.info(f"Creating task with ID: {task_id} for agent: {target_agent}")
+        
         # In a real implementation, this would save to a database
         # For now, we're just returning a success response
-        response = {
-            "status": "success",
-            "message": f"Task delegated to {target_agent}",
-            "task_id": task_id
-        }
+        response = DelegationResponse(
+            status="success",
+            message=f"Task delegated to {target_agent}",
+            task_id=task_id
+        )
         
-        logger.info(f"Task delegation successful: {response}")
+        logger.info(f"Task delegation successful: {response.dict()}")
         return response
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error delegating task: {str(e)}")
-        # Return a helpful error message instead of a generic 500
-        return {
-            "status": "error",
-            "message": f"Failed to delegate task: {str(e)}"
-        }
+        # Return a proper HTTP exception with status code
+        raise HTTPException(status_code=500, detail=f"Failed to delegate task: {str(e)}")
 
 async def process_agent_request(
     agent_type: str,
