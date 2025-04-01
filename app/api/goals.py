@@ -67,10 +67,11 @@ async def get_goals():
                     ))
             
             # Create goal model with tasks
+            # Use defensive programming to handle missing attributes
             goals_data.append(GoalModel(
                 goal_id=goal.goal_id,
-                title=goal.title,
-                description=goal.description,
+                title=getattr(goal, "title", getattr(goal, "goal_description", "Untitled Goal")),  # Fallback prevents crash
+                description=getattr(goal, "description", getattr(goal, "goal_description", "")),
                 status=goal.status,
                 created_at=goal.created_at,
                 completed_at=goal.completed_at,
