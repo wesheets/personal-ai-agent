@@ -46,10 +46,12 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
   const [renderCount, setRenderCount] = useState(0);
   const [useSimulatedResponse, setUseSimulatedResponse] = useState(false);
   const [debugLogs, setDebugLogs] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(new Date().toLocaleTimeString());
   
   // Track render count for debugging
   useEffect(() => {
     setRenderCount(prev => prev + 1);
+    setLastUpdated(new Date().toLocaleTimeString());
     
     // Cleanup function to track component unmounting
     return () => {
@@ -57,16 +59,32 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     };
   }, []);
   
+  // Failsafe timeout to force spinner reset after 8 seconds
+  useEffect(() => {
+    if (!isSubmitting) return;
+    
+    console.log('⏱️ Starting failsafe timeout for spinner reset');
+    const timeout = setTimeout(() => {
+      console.warn('⏱️ Failsafe triggered: Forcing spinner reset after 8s');
+      setIsSubmitting(false);
+      addDebugLog('⏱️ FAILSAFE: Forced spinner reset after 8s timeout');
+    }, 8000);
+    
+    return () => clearTimeout(timeout);
+  }, [isSubmitting]);
+  
   // Add debug log
   const addDebugLog = (message) => {
     const timestamp = new Date().toLocaleTimeString();
     setDebugLogs(prev => [...prev.slice(-9), `${timestamp}: ${message}`]);
     console.log(`[${timestamp}] ${message}`);
+    setLastUpdated(timestamp);
   };
   
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('🚀 Submitting task:', { taskName, agentType, taskGoal });
     addDebugLog("🌀 Submitting task...");
     addDebugLog(`Payload: ${JSON.stringify({ agentType, taskName, taskGoal })}`);
     
@@ -84,6 +102,7 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
         // Use the ApiService to delegate the task
         addDebugLog("📡 Calling ApiService.delegateTask()");
         result = await ApiService.delegateTask(agentType, taskName, taskGoal);
+        console.log('✅ Submission complete:', result);
       }
       
       addDebugLog(`✅ Delegate response: ${JSON.stringify(result)}`);
@@ -127,8 +146,8 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
         isClosable: true,
       });
     } catch (err) {
+      console.error('❌ Error delegating task:', err);
       addDebugLog(`❌ Error delegating task: ${err.message}`);
-      console.error('Error delegating task:', err);
       
       // Check if component is still mounted
       if (!mountedRef.current) {
@@ -148,12 +167,14 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
       });
     } finally {
       // Always reset submission state to prevent infinite spinner
+      console.log('🛑 Spinner reset triggered');
       addDebugLog("🛑 Spinner reset triggered");
       
       // Use setTimeout to ensure this runs after React's current execution cycle
       setTimeout(() => {
         if (mountedRef.current) {
           setIsSubmitting(false);
+          console.log('✅ Spinner reset completed');
           addDebugLog("✅ Spinner reset completed");
         } else {
           addDebugLog("⚠️ Component unmounted before spinner reset");
@@ -260,6 +281,17 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
               </VStack>
             </Alert>
           )}
+          
+          {/* Additional Debug Panel */}
+          <Box mt={4} p={2} borderTopWidth="1px" borderColor="gray.300">
+            <Heading size="xs" mb={2}>🛠️ Debug Panel</Heading>
+            <Text fontSize="sm"><strong>isSubmitting:</strong> {isSubmitting.toString()}</Text>
+            <Text fontSize="sm"><strong>taskName:</strong> {taskName}</Text>
+            <Text fontSize="sm"><strong>agentType:</strong> {agentType}</Text>
+            <Text fontSize="sm"><strong>last response:</strong> {response ? '✅ Received' : '❌ None'}</Text>
+            <Text fontSize="sm"><strong>last error:</strong> {error || 'None'}</Text>
+            <Text fontSize="sm"><strong>last updated:</strong> {lastUpdated}</Text>
+          </Box>
         </CardBody>
       </Card>
       
