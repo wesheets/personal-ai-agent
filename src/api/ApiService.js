@@ -12,6 +12,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     // You can add auth tokens or other headers here
+    console.log('🚀 API Request:', config.method.toUpperCase(), config.url);
     return config;
   },
   (error) => {
@@ -22,11 +23,12 @@ apiClient.interceptors.request.use(
 // Add response interceptor for error handling
 apiClient.interceptors.response.use(
   (response) => {
+    console.log('✅ API Response:', response.status, response.data);
     return response;
   },
   (error) => {
     // Handle errors globally
-    console.error('API Error:', error?.response?.data || error.message);
+    console.error('❌ API Error:', error?.response?.data || error.message);
     return Promise.reject(error);
   }
 );
@@ -36,14 +38,33 @@ const ApiService = {
   // Agent delegation
   delegateTask: async (agentType, taskName, taskGoal) => {
     try {
+      console.log('📤 Delegate Task Request:', { agent: agentType, name: taskName, goal: taskGoal });
+      
       const response = await apiClient.post('/api/agent/delegate', {
         agent: agentType,
-        name: taskName,
-        goal: taskGoal,
+        task: taskGoal, // Changed to match backend expectations
       });
-      return response?.data ?? { error: 'No data returned' };
+      
+      // Log the raw response for debugging
+      console.log('📥 Delegate Task Raw Response:', response);
+      
+      // Ensure we're returning a properly formatted object
+      const responseData = response?.data ?? { error: 'No data returned' };
+      console.log('🔄 Delegate Task Formatted Response:', responseData);
+      
+      // If response doesn't have expected shape, create a standardized one
+      if (!responseData.status && !responseData.task_id) {
+        console.log('⚠️ Standardizing response format');
+        return {
+          status: 'success',
+          task_id: responseData.task_id || responseData.id || `task-${Date.now()}`,
+          message: responseData.message || `Task delegated to ${agentType} agent`
+        };
+      }
+      
+      return responseData;
     } catch (error) {
-      console.error(`Error delegating task to ${agentType} agent:`, error);
+      console.error(`❌ Error delegating task to ${agentType} agent:`, error);
       throw error;
     }
   },

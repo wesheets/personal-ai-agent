@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Heading,
@@ -20,7 +20,9 @@ import {
   AlertTitle,
   AlertDescription,
   Spinner,
-  useToast
+  useToast,
+  Code,
+  Switch
 } from '@chakra-ui/react';
 import ApiService from '../api/ApiService';
 
@@ -28,6 +30,7 @@ import ApiService from '../api/ApiService';
 const AgentPanel = ({ agentType, agentName, agentDescription }) => {
   const { colorMode } = useColorMode();
   const toast = useToast();
+  const mountedRef = useRef(true);
   
   // State for form inputs
   const [taskName, setTaskName] = useState('');
@@ -39,15 +42,57 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
   // State for task history
   const [taskHistory, setTaskHistory] = useState([]);
   
+  // Debug state
+  const [renderCount, setRenderCount] = useState(0);
+  const [useSimulatedResponse, setUseSimulatedResponse] = useState(false);
+  const [debugLogs, setDebugLogs] = useState([]);
+  
+  // Track render count for debugging
+  useEffect(() => {
+    setRenderCount(prev => prev + 1);
+    
+    // Cleanup function to track component unmounting
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+  
+  // Add debug log
+  const addDebugLog = (message) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setDebugLogs(prev => [...prev.slice(-9), `${timestamp}: ${message}`]);
+    console.log(`[${timestamp}] ${message}`);
+  };
+  
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    addDebugLog("🌀 Submitting task...");
+    addDebugLog(`Payload: ${JSON.stringify({ agentType, taskName, taskGoal })}`);
+    
     setIsSubmitting(true);
     setError(null);
     
     try {
-      // Use the ApiService to delegate the task
-      const result = await ApiService.delegateTask(agentType, taskName, taskGoal);
+      let result;
+      
+      if (useSimulatedResponse) {
+        addDebugLog("🔄 Using simulated response");
+        await new Promise(resolve => setTimeout(resolve, 500));
+        result = { status: "success", message: "Fake success", task_id: `fake-${Date.now()}` };
+      } else {
+        // Use the ApiService to delegate the task
+        addDebugLog("📡 Calling ApiService.delegateTask()");
+        result = await ApiService.delegateTask(agentType, taskName, taskGoal);
+      }
+      
+      addDebugLog(`✅ Delegate response: ${JSON.stringify(result)}`);
+      
+      // Check if component is still mounted
+      if (!mountedRef.current) {
+        addDebugLog("⚠️ Component unmounted before state update");
+        return;
+      }
       
       // Set response from API
       setResponse(result);
@@ -69,7 +114,11 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
         return newHistory.slice(0, 3);
       });
       
-      // Show success toast
+      // Reset form
+      setTaskName('');
+      setTaskGoal('');
+      
+      // Show success toast - uncommented for testing
       toast({
         title: 'Task delegated',
         description: `Task "${taskName}" has been delegated to ${agentName}`,
@@ -77,25 +126,39 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
         duration: 5000,
         isClosable: true,
       });
-      
-      // Reset form
-      setTaskName('');
-      setTaskGoal('');
     } catch (err) {
+      addDebugLog(`❌ Error delegating task: ${err.message}`);
       console.error('Error delegating task:', err);
-      setError('Failed to delegate task. Please try again.');
       
-      // Show error toast
+      // Check if component is still mounted
+      if (!mountedRef.current) {
+        addDebugLog("⚠️ Component unmounted before error state update");
+        return;
+      }
+      
+      setError(`Failed to delegate task: ${err.message}`);
+      
+      // Show error toast - uncommented for testing
       toast({
         title: 'Error',
-        description: 'Failed to delegate task. Please try again.',
+        description: `Failed to delegate task: ${err.message}`,
         status: 'error',
         duration: 5000,
         isClosable: true,
       });
     } finally {
       // Always reset submission state to prevent infinite spinner
-      setIsSubmitting(false);
+      addDebugLog("🛑 Spinner reset triggered");
+      
+      // Use setTimeout to ensure this runs after React's current execution cycle
+      setTimeout(() => {
+        if (mountedRef.current) {
+          setIsSubmitting(false);
+          addDebugLog("✅ Spinner reset completed");
+        } else {
+          addDebugLog("⚠️ Component unmounted before spinner reset");
+        }
+      }, 0);
     }
   };
   
@@ -103,6 +166,37 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     <Box p={4}>
       <Heading mb={6} size="lg">{agentName ?? `${agentType} Agent`}</Heading>
       <Text mb={6} color="gray.500">{agentDescription ?? 'No description available'}</Text>
+      
+      {/* Debug State Display */}
+      <Card 
+        bg={colorMode === 'light' ? 'yellow.50' : 'yellow.900'} 
+        boxShadow="md" 
+        borderRadius="lg"
+        mb={4}
+        p={3}
+      >
+        <Heading size="sm" mb={2}>Debug State</Heading>
+        <HStack mb={2}>
+          <Text>Spinner State: <Code>{isSubmitting.toString()}</Code></Text>
+          <Text>Error State: <Code>{error ? "Error" : "null"}</Code></Text>
+          <Text>Response: <Code>{response ? "Present" : "null"}</Code></Text>
+          <Text>Render Count: <Code>{renderCount}</Code></Text>
+        </HStack>
+        <HStack mb={2}>
+          <Text>Use Simulated Response:</Text>
+          <Switch 
+            isChecked={useSimulatedResponse} 
+            onChange={() => setUseSimulatedResponse(!useSimulatedResponse)}
+            colorScheme="green"
+          />
+        </HStack>
+        <Box mt={2} maxH="150px" overflowY="auto" bg={colorMode === 'light' ? 'gray.50' : 'gray.700'} p={2} borderRadius="md">
+          <Heading size="xs" mb={1}>Debug Logs:</Heading>
+          {debugLogs.map((log, index) => (
+            <Text key={index} fontSize="xs" fontFamily="monospace">{log}</Text>
+          ))}
+        </Box>
+      </Card>
       
       <Card 
         bg={colorMode === 'light' ? 'white' : 'gray.700'} 
