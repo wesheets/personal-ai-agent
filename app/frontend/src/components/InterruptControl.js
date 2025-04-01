@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { controlService, goalsService } from '../services/api';
+import { Alert, AlertIcon } from '@chakra-ui/react';
 
 // Component for controlling agent execution with interrupt capabilities
 const InterruptControl = () => {
@@ -13,11 +14,35 @@ const InterruptControl = () => {
   const [taskPrompt, setTaskPrompt] = useState('');
   const [activeTasks, setActiveTasks] = useState([]);
   const [debugVisible, setDebugVisible] = useState(true);
+  const [interruptSystemOffline, setInterruptSystemOffline] = useState(false);
   const mountedRef = useRef(true);
 
   useEffect(() => {
     // Set up mounted ref for cleanup
     mountedRef.current = true;
+    
+    // Global failsafe for or.getTaskState
+    if (window.or && typeof window.or.getTaskState !== 'function') {
+      console.warn('⚠️ Adding mock getTaskState to window.or to prevent crashes');
+      window.or.getTaskState = async () => {
+        console.warn('⚠️ Mock getTaskState called');
+        return [];
+      };
+    }
+    
+    // Defensive wrapper for any potential or.getTaskState calls
+    try {
+      if (window.or && typeof window.or.getTaskState === 'function') {
+        console.log('✅ or.getTaskState exists and is a function');
+      } else if (window.or) {
+        console.warn('⚠️ getTaskState not available on or:', window.or);
+        setInterruptSystemOffline(true);
+      }
+    } catch (err) {
+      console.error('🔥 Error checking getTaskState:', err);
+      setInterruptSystemOffline(true);
+    }
+    
     return () => {
       mountedRef.current = false;
     };
@@ -30,6 +55,19 @@ const InterruptControl = () => {
       
       // Use mock data instead of real API calls
       try {
+        // Defensive wrapper for any potential or.getTaskState calls
+        try {
+          if (window.or && typeof window.or.getTaskState === 'function') {
+            await window.or.getTaskState();
+          } else {
+            console.warn('⚠️ getTaskState not available on or:', window.or);
+            setInterruptSystemOffline(true);
+          }
+        } catch (err) {
+          console.error('🔥 Error calling getTaskState:', err);
+          setInterruptSystemOffline(true);
+        }
+        
         // Set mock data for control mode
         const mockControlData = { 
           mode: 'auto', 
@@ -177,6 +215,14 @@ const InterruptControl = () => {
         <div className="loading">Loading control panel...</div>
       ) : (
         <>
+          {/* Fallback message if interrupt system is offline */}
+          {interruptSystemOffline && (
+            <Alert status="warning" variant="left-accent">
+              <AlertIcon />
+              Interrupt system is temporarily offline.
+            </Alert>
+          )}
+          
           {/* System execution mode controls */}
           <div className="control-panel">
             <h3>Execution Control</h3>
