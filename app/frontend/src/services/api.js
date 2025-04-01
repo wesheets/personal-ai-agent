@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Base API URL - can be configured based on environment
-const API_BASE_URL = '';
+// Base API URL - configured from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -69,6 +69,17 @@ export const memoryService = {
       console.error('Error fetching memory entries:', error);
       throw error;
     }
+  },
+  
+  // Create a new memory entry
+  createMemoryEntry: async (memoryData) => {
+    try {
+      const response = await apiClient.post('/api/memory', memoryData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating memory entry:', error);
+      throw error;
+    }
   }
 };
 
@@ -133,8 +144,23 @@ export const controlService = {
   }
 };
 
+// Logs API
+export const logsService = {
+  // Get latest logs
+  getLatestLogs: async () => {
+    try {
+      const response = await apiClient.get('/api/logs/latest');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching latest logs:', error);
+      throw error;
+    }
+  }
+};
+
 export default {
   goalsService,
   memoryService,
-  controlService
+  controlService,
+  logsService
 };
