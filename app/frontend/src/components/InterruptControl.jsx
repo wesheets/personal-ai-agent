@@ -84,7 +84,19 @@ const InterruptControl = () => {
       try {
         setLoading(true);
         const controlMode = await controlService.getControlMode();
-        const taskState = await controlService.getTaskState();
+        
+        // Safe fallback logic for getTaskState
+        let taskState = [];
+        
+        if (typeof window !== "undefined" && window.or && typeof window.or.getTaskState === "function") {
+          try {
+            taskState = await window.or.getTaskState();
+          } catch (err) {
+            console.warn("getTaskState threw an error:", err);
+          }
+        } else {
+          console.warn("getTaskState not available – using fallback");
+        }
         
         setSystemState(prevState => ({
           ...prevState,
