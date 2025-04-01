@@ -9,6 +9,7 @@ import MemoryAgentView from './pages/MemoryAgentView';
 import MemoryBrowser from './pages/MemoryBrowser';
 import MainActivityFeed from './pages/MainActivityFeed';
 import SettingsPage from './pages/SettingsPage';
+import AgentListPage from './pages/AgentListPage';
 import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
@@ -77,6 +78,11 @@ function App() {
                 <Route path="/settings" element={
                   <ErrorBoundary>
                     <SettingsPage />
+                  </ErrorBoundary>
+                } />
+                <Route path="/agents" element={
+                  <ErrorBoundary>
+                    <AgentListPage />
                   </ErrorBoundary>
                 } />
               </Routes>
