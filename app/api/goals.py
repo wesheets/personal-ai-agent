@@ -32,6 +32,7 @@ class GoalModel(BaseModel):
 router = APIRouter()
 
 @router.get("/goals", response_model=List[GoalModel])
+@router.post("/goals", response_model=List[GoalModel])
 async def get_goals():
     """
     Get all active goals with their subtasks

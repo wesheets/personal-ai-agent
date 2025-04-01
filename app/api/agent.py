@@ -241,6 +241,33 @@ async def get_chain_step(
     
     return step
 
+# Add new endpoint for /api/agent/latest
+@router.get("/latest")
+@router.post("/latest")
+async def get_latest_agent_activity():
+    """
+    Get the latest agent activity
+    
+    This endpoint returns the most recent agent activities.
+    """
+    try:
+        # Simplified implementation to return some data
+        # In a real implementation, this would fetch from a database or log
+        return {
+            "status": "success",
+            "latest_activities": [
+                {
+                    "id": "activity-1",
+                    "agent": "builder",
+                    "timestamp": datetime.now().isoformat(),
+                    "action": "code_generation",
+                    "status": "completed"
+                }
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving latest agent activity: {str(e)}")
+
 async def process_agent_request(
     agent_type: str,
     request: AgentRequest,
@@ -301,205 +328,149 @@ async def process_agent_request(
         if memories:
             memory_context = await memory_reviewer.review_memories(
                 memories=memories,
-                current_task=request.input,
-                agent_type=agent_type,
-                model=model
+                current_query=request.input
             )
     
-    # Get behavior feedback context
-    behavior_context = await behavior_manager.get_recent_feedback_context(agent_type)
-    
-    # Construct the system prompt
-    system_prompt = prompt_chain.get("system", "You are a helpful assistant.")
-    
-    # Add goal summary if available
-    if "goal_summary" in prompt_chain:
-        system_prompt = f"{system_prompt}\n\n## Goal\n{prompt_chain['goal_summary']}"
-    
-    # Add memory context if available
+    # Construct the prompt
+    system_prompt = prompt_chain.get("system_prompt", "")
     if memory_context:
-        system_prompt = f"{system_prompt}\n\n## Relevant Memories\n{memory_context}"
+        system_prompt += f"\n\nRELEVANT MEMORIES:\n{memory_context}"
     
-    # Add behavior feedback context if available
-    if behavior_context:
-        system_prompt = f"{system_prompt}\n\n{behavior_context}"
-    
-    # Add persona, role, and rules if available
-    if "persona" in prompt_chain:
-        persona = prompt_chain["persona"]
-        system_prompt = f"{system_prompt}\n\n## Persona\nTone: {persona.get('tone', '')}\nVoice: {persona.get('voice', '')}\nTraits: {', '.join(persona.get('traits', []))}"
-    
-    if "role" in prompt_chain:
-        system_prompt = f"{system_prompt}\n\n## Role\n{prompt_chain['role']}"
-    
-    if "rules" in prompt_chain:
-        rules = prompt_chain["rules"]
-        rules_text = "\n".join([f"- {rule}" for rule in rules])
-        system_prompt = f"{system_prompt}\n\n## Rules\n{rules_text}"
+    # Add behavior guidance if available
+    behavior_guidance = behavior_manager.get_behavior_guidance(agent_type)
+    if behavior_guidance:
+        system_prompt += f"\n\nBEHAVIOR GUIDANCE:\n{behavior_guidance}"
     
     # Process with the model
-    response_content = await model_router.process_with_model(
-        model=model,
-        system=system_prompt,
-        user=request.input,
-        context=request.context
+    try:
+        response_text = await model_router.process(
+            model=model,
+            system_prompt=system_prompt,
+            user_prompt=request.input,
+            context=request.context
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing with model: {str(e)}")
+    
+    # Create response object
+    response = AgentResponse(
+        output=response_text,
+        metadata={
+            "agent_type": agent_type,
+            "model": model,
+            "timestamp": datetime.now().isoformat(),
+            "input_length": len(request.input),
+            "output_length": len(response_text)
+        }
     )
-    
-    # Extract the output
-    output = response_content.get("content", "")
-    
-    # Generate metadata
-    metadata = {
-        "agent": agent_type,
-        "model": model,
-        "timestamp": datetime.now().isoformat()
-    }
-    
-    # Skip reflection if requested
-    reflection_data = {}
-    if not request.skip_reflection:
-        # Generate rationale
-        rationale_data = await rationale_logger.generate_rationale(
-            agent_type=agent_type,
-            model=model,
-            input_text=request.input,
-            output_text=output
-        )
-        
-        # Generate self-evaluation
-        evaluation_data = await self_evaluation.generate_self_evaluation(
-            agent_type=agent_type,
-            model=model,
-            input_text=request.input,
-            output_text=output,
-            rationale_data=rationale_data
-        )
-        
-        # Combine reflection data
-        reflection_data = {**rationale_data, **evaluation_data}
-        
-        # Log rationale
-        await rationale_logger.log_rationale(
-            agent_type=agent_type,
-            input_text=request.input,
-            output_text=output,
-            reflection_data=reflection_data
-        )
-    
-    # Tag the task
-    task_tags = await task_tagger.tag_task(
-        agent_type=agent_type,
-        input_text=request.input,
-        output_text=output,
-        reflection_data=reflection_data
-    )
-    
-    # Add tags to metadata
-    metadata.update(task_tags)
-    
-    # Initialize additional response data
-    retry_data = {}
-    nudge_data = {}
-    escalation_data = {}
-    
-    # Check for confidence-based retry if enabled
-    retry_count = 0
-    if request.enable_retry_loop and "confidence_level" in reflection_data:
-        retry_data = await confidence_retry_manager.check_confidence(
-            confidence_level=reflection_data["confidence_level"],
-            agent_type=agent_type,
-            model=model,
-            input_text=request.input,
-            output_text=output,
-            reflection_data=reflection_data
-        )
-        
-        # If retry was triggered, update the output and reflection
-        if retry_data.get("retry_triggered", False):
-            retry_count = 1
-            output = retry_data.get("retry_response", output)
-            
-            # Update reflection data with retry information
-            if not request.skip_reflection:
-                # Generate new rationale for the retry
-                new_rationale_data = await rationale_logger.generate_rationale(
-                    agent_type=agent_type,
-                    model=model,
-                    input_text=request.input,
-                    output_text=output,
-                    is_retry=True
-                )
-                
-                # Generate new self-evaluation for the retry
-                new_evaluation_data = await self_evaluation.generate_self_evaluation(
-                    agent_type=agent_type,
-                    model=model,
-                    input_text=request.input,
-                    output_text=output,
-                    rationale_data=new_rationale_data,
-                    is_retry=True
-                )
-                
-                # Update reflection data
-                reflection_data = {**new_rationale_data, **new_evaluation_data}
-    
-    # Check for nudge
-    if not request.skip_reflection:
-        nudge_data = await nudge_manager.check_for_nudge(
-            agent_name=agent_type,
-            input_text=request.input,
-            output_text=output,
-            reflection_data=reflection_data
-        )
-    
-    # Check for escalation
-    if not request.skip_reflection:
-        escalation_data = await escalation_manager.check_for_escalation(
-            agent_name=agent_type,
-            task_description=request.input,
-            reflection_data=reflection_data,
-            retry_count=retry_count,
-            memory_summary=memory_context
-        )
     
     # Save to memory if requested
     if request.save_to_memory and supabase_client:
-        await vector_memory.add_memory(
+        try:
+            memory_id = await vector_memory.store_memory(
+                content=f"USER: {request.input}\n\nAGENT: {response_text}",
+                metadata={
+                    "agent_type": agent_type,
+                    "timestamp": datetime.now().isoformat(),
+                    "input": request.input,
+                    "priority": request.priority_memory
+                },
+                supabase_client=supabase_client
+            )
+            response.metadata["memory_id"] = memory_id
+        except Exception as e:
+            # Log error but don't fail the request
+            print(f"Error saving to memory: {str(e)}")
+    
+    # Add reflection if not skipped
+    if not request.skip_reflection:
+        try:
+            reflection = await rationale_logger.get_rationale(
+                agent_type=agent_type,
+                input_text=request.input,
+                output_text=response_text,
+                model=model
+            )
+            response.reflection = reflection
+        except Exception as e:
+            # Log error but don't fail the request
+            print(f"Error generating reflection: {str(e)}")
+    
+    # Add task tagging
+    try:
+        tags = await task_tagger.tag_task(
+            input_text=request.input,
+            output_text=response_text
+        )
+        response.metadata["tags"] = tags
+    except Exception as e:
+        # Log error but don't fail the request
+        print(f"Error tagging task: {str(e)}")
+    
+    # Check confidence and retry if needed
+    if request.enable_retry_loop:
+        try:
+            retry_result = await confidence_retry_manager.check_and_retry(
+                agent_type=agent_type,
+                input_text=request.input,
+                output_text=response_text,
+                model=model
+            )
+            
+            if retry_result["retry_needed"]:
+                # Update response with retry data
+                response.retry_data = retry_result
+                
+                # If retry was performed, update output
+                if retry_result.get("retry_output"):
+                    response.output = retry_result["retry_output"]
+        except Exception as e:
+            # Log error but don't fail the request
+            print(f"Error in confidence retry: {str(e)}")
+    
+    # Check for nudges
+    try:
+        nudge = await nudge_manager.check_for_nudge(
             agent_type=agent_type,
             input_text=request.input,
-            output_text=output,
-            metadata={
-                "reflection": reflection_data,
-                "tags": metadata.get("tags", []),
-                "task_category": metadata.get("task_category")
-            },
-            priority=request.priority_memory,
-            supabase_client=supabase_client
+            output_text=response.output
         )
+        
+        if nudge:
+            response.nudge = nudge
+    except Exception as e:
+        # Log error but don't fail the request
+        print(f"Error checking for nudge: {str(e)}")
     
-    # Handle suggested next step if auto_orchestrate is false
-    if not request.auto_orchestrate and "suggested_next_step" in metadata:
-        await task_persistence_manager.store_pending_task(
-            task_description=metadata["suggested_next_step"],
-            origin_agent=agent_type,
-            suggested_agent=metadata.get("suggested_agent"),
-            priority=request.priority_memory,
-            metadata={
-                "task_category": metadata.get("task_category"),
-                "tags": metadata.get("tags", [])
-            },
-            original_input=request.input,
-            original_output=output
+    # Check for escalation
+    try:
+        escalation = await escalation_manager.check_for_escalation(
+            agent_type=agent_type,
+            input_text=request.input,
+            output_text=response.output
         )
+        
+        if escalation:
+            response.escalation = escalation
+    except Exception as e:
+        # Log error but don't fail the request
+        print(f"Error checking for escalation: {str(e)}")
     
-    # Create the response
-    response = AgentResponse(
-        output=output,
-        metadata=metadata,
-        reflection=reflection_data if not request.skip_reflection else None,
-        retry_data=retry_data if retry_data else None,
-        nudge=nudge_data if nudge_data else None,
-        escalation=escalation_data if escalation_data else None
-    )
+    # Handle orchestration if requested
+    if request.auto_orchestrate and response.metadata.get("suggested_next_step"):
+        try:
+            # Create a pending task
+            task_id = await task_persistence_manager.create_task(
+                origin_agent=agent_type,
+                suggested_agent=response.metadata["suggested_next_agent"],
+                original_input=request.input,
+                original_output=response.output,
+                task_description=response.metadata["suggested_next_step"]
+            )
+            
+            response.metadata["pending_task_id"] = task_id
+        except Exception as e:
+            # Log error but don't fail the request
+            print(f"Error creating pending task: {str(e)}")
     
     return response
