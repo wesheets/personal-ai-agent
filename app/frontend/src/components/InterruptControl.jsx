@@ -33,24 +33,34 @@ const InterruptControl = () => {
   const [taskPrompt, setTaskPrompt] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
 
   useEffect(() => {
-    // Function to fetch system control state
     const fetchControlState = async () => {
       try {
         setLoading(true);
         const controlMode = await controlService.getControlMode();
-        const taskState = await controlService.getTaskState();
-        
+
+        // ✅ Safe fallback for getTaskState
+        let taskState = [];
+        if (typeof window !== "undefined" && window.or && typeof window.or.getTaskState === "function") {
+          try {
+            taskState = await window.or.getTaskState();
+          } catch (err) {
+            console.warn("getTaskState threw an error:", err);
+          }
+        } else {
+          console.warn("getTaskState not available – using fallback");
+        }
+
         setSystemState(prevState => ({
           ...prevState,
           executionMode: controlMode.mode || 'auto'
         }));
-        
+
         setActiveTasks(taskState.tasks || []);
         setLoading(false);
       } catch (err) {
@@ -60,17 +70,11 @@ const InterruptControl = () => {
       }
     };
 
-    // Initial fetch
     fetchControlState();
-
-    // Set up polling for real-time updates (every 3 seconds)
     const intervalId = setInterval(fetchControlState, 3000);
-
-    // Clean up interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
-  // Handle execution mode change
   const handleModeChange = async (mode) => {
     try {
       await controlService.setControlMode(mode);
@@ -83,7 +87,6 @@ const InterruptControl = () => {
     }
   };
 
-  // Handle task actions (kill/restart)
   const handleTaskAction = async (taskId, action) => {
     try {
       if (action === 'kill') {
@@ -96,10 +99,8 @@ const InterruptControl = () => {
     }
   };
 
-  // Handle task redirection to another agent
   const handleTaskRedirect = async (taskId, targetAgent) => {
     if (!targetAgent) return;
-    
     try {
       await controlService.delegateTask(taskId, targetAgent);
     } catch (err) {
@@ -107,14 +108,12 @@ const InterruptControl = () => {
     }
   };
 
-  // Open prompt editor modal
   const openPromptEditor = (task) => {
     setSelectedTask(task);
     setTaskPrompt(task.prompt || '');
     onOpen();
   };
 
-  // Handle prompt edit submission
   const handlePromptEdit = async () => {
     try {
       await controlService.editTaskPrompt(selectedTask.task_id, taskPrompt);
@@ -145,15 +144,7 @@ const InterruptControl = () => {
 
   return (
     <Box>
-      {/* System execution mode controls */}
-      <Box 
-        mb={6} 
-        p={4} 
-        borderWidth="1px" 
-        borderRadius="lg" 
-        bg={bgColor} 
-        borderColor={borderColor}
-      >
+      <Box mb={6} p={4} borderWidth="1px" borderRadius="lg" bg={bgColor} borderColor={borderColor}>
         <Heading size="md" mb={4}>Execution Control</Heading>
         <Flex gap={3}>
           <Button 
@@ -163,7 +154,6 @@ const InterruptControl = () => {
           >
             Auto Mode
           </Button>
-          
           <Button 
             colorScheme={systemState.executionMode === 'manual' ? 'blue' : 'gray'}
             onClick={() => handleModeChange('manual')}
@@ -171,7 +161,6 @@ const InterruptControl = () => {
           >
             Manual Mode
           </Button>
-          
           <Button 
             colorScheme={systemState.executionMode === 'paused' ? 'yellow' : 'gray'}
             onClick={() => handleModeChange('paused')}
@@ -181,38 +170,23 @@ const InterruptControl = () => {
           </Button>
         </Flex>
       </Box>
-      
-      {/* Active tasks control */}
-      <Box 
-        p={4} 
-        borderWidth="1px" 
-        borderRadius="lg" 
-        bg={bgColor} 
-        borderColor={borderColor}
-      >
+
+      <Box p={4} borderWidth="1px" borderRadius="lg" bg={bgColor} borderColor={borderColor}>
         <Heading size="md" mb={4}>Active Tasks</Heading>
         {activeTasks.length > 0 ? (
           <VStack spacing={4} align="stretch" divider={<Divider />}>
             {activeTasks.map((task) => (
-              <Box 
-                key={task.task_id} 
-                p={3} 
-                borderWidth="1px" 
-                borderRadius="md"
-              >
+              <Box key={task.task_id} p={3} borderWidth="1px" borderRadius="md">
                 <Flex justifyContent="space-between" alignItems="center" mb={2}>
                   <Text fontWeight="bold">{task.title}</Text>
                   <Badge colorScheme={task.status === 'in_progress' ? 'blue' : 'yellow'}>
                     {task.status}
                   </Badge>
                 </Flex>
-                
                 <Text fontSize="sm" mb={3}>
                   Agent: {task.assigned_agent || 'Unassigned'}
                 </Text>
-                
                 <Flex gap={2} wrap="wrap">
-                  {/* Kill/restart task */}
                   <Button 
                     size="sm"
                     colorScheme="yellow"
@@ -221,8 +195,6 @@ const InterruptControl = () => {
                   >
                     {task.status === 'in_progress' ? 'Kill' : 'Restart'}
                   </Button>
-                  
-                  {/* Redirect task */}
                   <Select 
                     size="sm"
                     placeholder="Redirect to..."
@@ -234,8 +206,6 @@ const InterruptControl = () => {
                       <option key={agent} value={agent}>{agent}</option>
                     ))}
                   </Select>
-                  
-                  {/* Edit prompt (Manual Mode only) */}
                   {systemState.executionMode === 'manual' && (
                     <Button 
                       size="sm"
@@ -251,26 +221,17 @@ const InterruptControl = () => {
             ))}
           </VStack>
         ) : (
-          <Box 
-            textAlign="center" 
-            py={6} 
-            borderWidth="1px" 
-            borderRadius="md" 
-            borderStyle="dashed"
-            borderColor={borderColor}
-          >
+          <Box textAlign="center" py={6} borderWidth="1px" borderRadius="md" borderStyle="dashed" borderColor={borderColor}>
             <Text color="gray.500">No active tasks found</Text>
           </Box>
         )}
       </Box>
-      
-      {/* Prompt editor modal (Manual Mode only) */}
+
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Task Prompt</ModalHeader>
           <ModalCloseButton />
-          
           <ModalBody>
             {selectedTask && (
               <VStack spacing={4} align="stretch">
@@ -278,12 +239,10 @@ const InterruptControl = () => {
                   <Text fontWeight="bold">Task:</Text>
                   <Text>{selectedTask.title}</Text>
                 </Box>
-                
                 <Box>
                   <Text fontWeight="bold">ID:</Text>
                   <Text fontSize="sm">{selectedTask.task_id}</Text>
                 </Box>
-                
                 <Box>
                   <Text fontWeight="bold" mb={2}>Task Prompt:</Text>
                   <Textarea
@@ -295,14 +254,9 @@ const InterruptControl = () => {
               </VStack>
             )}
           </ModalBody>
-          
           <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue" onClick={handlePromptEdit}>
-              Save Changes
-            </Button>
+            <Button variant="ghost" mr={3} onClick={onClose}>Cancel</Button>
+            <Button colorScheme="blue" onClick={handlePromptEdit}>Save Changes</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
