@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, Alert, AlertIcon, Spinner } from '@chakra-ui/react';
+import { Box, Text, Alert, Spinner } from '@chakra-ui/react';
+import { AlertIcon } from '@chakra-ui/alert';
 
 export default function InterruptControl() {
   const [loading, setLoading] = useState(true);
