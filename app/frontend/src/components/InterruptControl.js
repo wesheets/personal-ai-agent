@@ -17,30 +17,43 @@ const InterruptControl = () => {
   const [interruptSystemOffline, setInterruptSystemOffline] = useState(false);
   const mountedRef = useRef(true);
 
+  // Top-level defensive guard for window.or.getTaskState
+  // This runs before any other code to ensure window.or is properly handled
   useEffect(() => {
     // Set up mounted ref for cleanup
     mountedRef.current = true;
     
-    // Global failsafe for or.getTaskState
-    if (window.or && typeof window.or.getTaskState !== 'function') {
-      console.warn('⚠️ Adding mock getTaskState to window.or to prevent crashes');
-      window.or.getTaskState = async () => {
-        console.warn('⚠️ Mock getTaskState called');
-        return [];
-      };
+    // Check if window.or exists at all
+    if (!window.or) {
+      console.warn("⚠️ window.or is not defined - creating empty object");
+      window.or = {};
+      setInterruptSystemOffline(true);
     }
     
-    // Defensive wrapper for any potential or.getTaskState calls
-    try {
-      if (window.or && typeof window.or.getTaskState === 'function') {
-        console.log('✅ or.getTaskState exists and is a function');
-      } else if (window.or) {
-        console.warn('⚠️ getTaskState not available on or:', window.or);
-        setInterruptSystemOffline(true);
-      }
-    } catch (err) {
-      console.error('🔥 Error checking getTaskState:', err);
+    // Top-level defensive guard for window.or.getTaskState
+    if (window.or && typeof window.or.getTaskState !== 'function') {
+      console.warn("⚠️ getTaskState not available – injecting failsafe");
       setInterruptSystemOffline(true);
+      
+      // Create mock implementation that returns empty task list
+      window.or.getTaskState = async () => {
+        console.warn("🛑 Mock getTaskState invoked – returning empty task list");
+        return [];
+      };
+    } else if (window.or && typeof window.or.getTaskState === 'function') {
+      console.log("✅ getTaskState exists");
+      
+      // Wrap the original function to add error handling
+      const originalGetTaskState = window.or.getTaskState;
+      window.or.getTaskState = async (...args) => {
+        try {
+          return await originalGetTaskState(...args);
+        } catch (err) {
+          console.error("🔥 Error invoking getTaskState:", err);
+          setInterruptSystemOffline(true);
+          return [];
+        }
+      };
     }
     
     return () => {
@@ -55,19 +68,6 @@ const InterruptControl = () => {
       
       // Use mock data instead of real API calls
       try {
-        // Defensive wrapper for any potential or.getTaskState calls
-        try {
-          if (window.or && typeof window.or.getTaskState === 'function') {
-            await window.or.getTaskState();
-          } else {
-            console.warn('⚠️ getTaskState not available on or:', window.or);
-            setInterruptSystemOffline(true);
-          }
-        } catch (err) {
-          console.error('🔥 Error calling getTaskState:', err);
-          setInterruptSystemOffline(true);
-        }
-        
         // Set mock data for control mode
         const mockControlData = { 
           mode: 'auto', 
@@ -217,9 +217,9 @@ const InterruptControl = () => {
         <>
           {/* Fallback message if interrupt system is offline */}
           {interruptSystemOffline && (
-            <Alert status="warning" variant="left-accent">
+            <Alert status="warning">
               <AlertIcon />
-              Interrupt system is temporarily offline.
+              Interrupt system offline – retrying soon.
             </Alert>
           )}
           
@@ -348,6 +348,7 @@ const InterruptControl = () => {
               <h4>Debug Info</h4>
               <p>InterruptControl.js - fetchSystemState disabled</p>
               <p>Using mock data for system state and tasks</p>
+              <p>Interrupt system status: {interruptSystemOffline ? 'Offline (using mock)' : 'Online'}</p>
               <p>Last updated: {new Date().toLocaleTimeString()}</p>
             </div>
           )}
