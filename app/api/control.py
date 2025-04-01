@@ -2,6 +2,10 @@ from fastapi import APIRouter, HTTPException, Body
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 from app.core.orchestrator import get_orchestrator
+import logging
+
+# Configure logging
+logger = logging.getLogger("api")
 
 # Define models for API requests and responses
 class ControlModeModel(BaseModel):
@@ -36,6 +40,7 @@ async def get_control_mode():
     """
     Get the current system control mode and active agents
     """
+    logger.info("Getting control mode")
     orchestrator = get_orchestrator()
     
     # Get current mode from orchestrator
@@ -44,37 +49,61 @@ async def get_control_mode():
     # Get list of active agents
     active_agents = orchestrator.prompt_manager.get_available_agents()
     
-    return {
+    response = {
         "mode": mode,
         "active_agents": active_agents
     }
+    logger.info(f"Control mode response: {response}")
+    return response
 
 @router.post("/system/control-mode", response_model=Dict[str, str])
 async def set_control_mode(mode_data: ControlModeModel):
     """
     Set the system control mode
     """
+    logger.info(f"Setting control mode to: {mode_data.mode}")
     orchestrator = get_orchestrator()
     
     # Validate mode
     if mode_data.mode not in ["auto", "manual", "paused"]:
+        logger.error(f"Invalid mode: {mode_data.mode}")
         raise HTTPException(status_code=400, detail=f"Invalid mode: {mode_data.mode}")
     
     # Set mode in orchestrator
     orchestrator.execution_mode = mode_data.mode
     
-    return {"message": f"Control mode set to {mode_data.mode}"}
+    response = {"message": f"Control mode set to {mode_data.mode}"}
+    logger.info(f"Control mode set response: {response}")
+    return response
+
+@router.get("/system/control", response_model=Dict[str, Any])
+async def get_system_control():
+    """
+    Get the system control state
+    
+    This endpoint returns the current system control state, including interrupt settings.
+    """
+    logger.info("Getting system control state")
+    try:
+        # Mock control state as specified in requirements
+        control_state = {
+            "interrupt_enabled": False
+        }
+        logger.info(f"System control state response: {control_state}")
+        return control_state
+    except Exception as e:
+        logger.error(f"Error getting system control state: {str(e)}")
+        # Return default state instead of throwing 500
+        return {"interrupt_enabled": False}
 
 @router.get("/agent/status", response_model=AgentStatusResponseModel)
 async def get_agent_status():
     """
     Get status of all active agents
     """
-    import logging
-    logger = logging.getLogger("api")
+    logger.info("Fetching agent status")
     
     try:
-        logger.info("Fetching agent status")
         orchestrator = get_orchestrator()
         
         # Get agent status from orchestrator
@@ -118,34 +147,41 @@ async def delegate_task(delegation: TaskDelegationModel):
     """
     Delegate a task to a different agent
     """
+    logger.info(f"Delegating task {delegation.task_id} to {delegation.target_agent}")
     orchestrator = get_orchestrator()
     task_manager = orchestrator.task_state_manager
     
     # Get task
     task = await task_manager.get_task(delegation.task_id)
     if not task:
+        logger.error(f"Task {delegation.task_id} not found")
         raise HTTPException(status_code=404, detail=f"Task {delegation.task_id} not found")
     
     # Validate target agent
     available_agents = orchestrator.prompt_manager.get_available_agents()
     if delegation.target_agent not in available_agents:
+        logger.error(f"Invalid target agent: {delegation.target_agent}")
         raise HTTPException(status_code=400, detail=f"Invalid target agent: {delegation.target_agent}")
     
     # Update task assignment
     task.assigned_agent = delegation.target_agent
     await task_manager._save_state_to_log()
     
-    return {"message": f"Task {delegation.task_id} delegated to {delegation.target_agent}"}
+    response = {"message": f"Task {delegation.task_id} delegated to {delegation.target_agent}"}
+    logger.info(f"Task delegation response: {response}")
+    return response
 
 @router.post("/agent/goal/{task_id}/edit-prompt", response_model=Dict[str, str])
 async def edit_task_prompt(task_id: str, prompt_data: EditPromptModel):
     """
     Edit the prompt for a task (Manual Mode only)
     """
+    logger.info(f"Editing prompt for task {task_id}")
     orchestrator = get_orchestrator()
     
     # Check if in manual mode
     if orchestrator.execution_mode != "manual":
+        logger.error("Prompt editing is only available in Manual Mode")
         raise HTTPException(status_code=400, detail="Prompt editing is only available in Manual Mode")
     
     task_manager = orchestrator.task_state_manager
@@ -153,13 +189,16 @@ async def edit_task_prompt(task_id: str, prompt_data: EditPromptModel):
     # Get task
     task = await task_manager.get_task(task_id)
     if not task:
+        logger.error(f"Task {task_id} not found")
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
     
     # Update task prompt
     task.prompt = prompt_data.prompt
     await task_manager._save_state_to_log()
     
-    return {"message": f"Prompt updated for task {task_id}"}
+    response = {"message": f"Prompt updated for task {task_id}"}
+    logger.info(f"Edit prompt response: {response}")
+    return response
 
 # Export router
 control_router = router

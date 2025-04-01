@@ -3,6 +3,10 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 from pydantic import BaseModel
 from app.core.task_state_manager import get_task_state_manager
+import logging
+
+# Configure logging
+logger = logging.getLogger("api")
 
 # Define models for API responses
 class TaskModel(BaseModel):
@@ -37,6 +41,7 @@ async def get_goals():
     """
     Get all active goals with their subtasks
     """
+    logger.info("Getting all active goals")
     try:
         task_manager = get_task_state_manager()
         
@@ -72,8 +77,10 @@ async def get_goals():
                 tasks=goal_tasks
             ))
         
+        logger.info(f"Found {len(goals_data)} goals with a total of {sum(len(goal.tasks) for goal in goals_data)} tasks")
         return goals_data
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error getting goals: {str(e)}")
         # Return empty goals list as fallback
         return []
 
@@ -82,6 +89,7 @@ async def get_task_state():
     """
     Get the current state of all tasks
     """
+    logger.info("Getting current task state")
     try:
         task_manager = get_task_state_manager()
         
@@ -102,8 +110,10 @@ async def get_task_state():
                 error=task.error
             ))
         
+        logger.info(f"Found {len(tasks_data)} tasks")
         return {"tasks": tasks_data}
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error getting task state: {str(e)}")
         # Return empty tasks list as fallback
         return {"tasks": []}
 
@@ -112,38 +122,60 @@ async def kill_task(task_id: str):
     """
     Kill a running task
     """
+    logger.info(f"Attempting to kill task {task_id}")
     task_manager = get_task_state_manager()
-    task = await task_manager.get_task(task_id)
     
-    if not task:
-        raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-    
-    if task.status != "in_progress":
-        raise HTTPException(status_code=400, detail=f"Task {task_id} is not in progress")
-    
-    # Update task status to killed
-    await task_manager.update_task_status(task_id, "killed", error="Task killed by user")
-    
-    return {"message": f"Task {task_id} killed successfully"}
+    try:
+        task = await task_manager.get_task(task_id)
+        
+        if not task:
+            logger.error(f"Task {task_id} not found")
+            raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+        
+        if task.status != "in_progress":
+            logger.error(f"Task {task_id} is not in progress, current status: {task.status}")
+            raise HTTPException(status_code=400, detail=f"Task {task_id} is not in progress")
+        
+        # Update task status to killed
+        await task_manager.update_task_status(task_id, "killed", error="Task killed by user")
+        
+        logger.info(f"Task {task_id} killed successfully")
+        return {"message": f"Task {task_id} killed successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error killing task {task_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error killing task: {str(e)}")
 
 @router.post("/task-state/{task_id}/restart")
 async def restart_task(task_id: str):
     """
     Restart a task
     """
+    logger.info(f"Attempting to restart task {task_id}")
     task_manager = get_task_state_manager()
-    task = await task_manager.get_task(task_id)
     
-    if not task:
-        raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-    
-    if task.status == "in_progress":
-        raise HTTPException(status_code=400, detail=f"Task {task_id} is already in progress")
-    
-    # Reset task status to pending
-    await task_manager.update_task_status(task_id, "pending")
-    
-    return {"message": f"Task {task_id} restarted successfully"}
+    try:
+        task = await task_manager.get_task(task_id)
+        
+        if not task:
+            logger.error(f"Task {task_id} not found")
+            raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+        
+        if task.status == "in_progress":
+            logger.error(f"Task {task_id} is already in progress")
+            raise HTTPException(status_code=400, detail=f"Task {task_id} is already in progress")
+        
+        # Reset task status to pending
+        await task_manager.update_task_status(task_id, "pending")
+        
+        logger.info(f"Task {task_id} restarted successfully")
+        return {"message": f"Task {task_id} restarted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error restarting task {task_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error restarting task: {str(e)}")
 
 # Export router
 goals_router = router

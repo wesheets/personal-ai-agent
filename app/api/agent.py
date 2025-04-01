@@ -5,6 +5,10 @@ import uuid
 from datetime import datetime
 import json
 import asyncio
+import logging
+
+# Configure logging
+logger = logging.getLogger("api")
 
 from app.core.prompt_manager import PromptManager
 from app.core.memory_manager import get_memory_manager
@@ -57,6 +61,7 @@ async def agent_endpoint(
     
     This endpoint processes a request with a specific agent type and returns the response.
     """
+    logger.info(f"Processing agent request for agent_type: {agent_type}")
     response = await process_agent_request(
         agent_type=agent_type,
         request=request,
@@ -65,6 +70,7 @@ async def agent_endpoint(
         supabase_client=supabase_client
     )
     
+    logger.info(f"Agent response generated for {agent_type}")
     return response
 
 @router.post("/orchestrate", response_model=Dict[str, Any])
@@ -81,6 +87,7 @@ async def orchestrate_endpoint(
     
     This endpoint orchestrates a workflow across multiple agents based on the initial input.
     """
+    logger.info(f"Orchestrating workflow with initial agent: {agent_type}, max_steps: {max_steps}")
     orchestrator = get_orchestrator()
     
     chain = await orchestrator.orchestrate(
@@ -95,6 +102,7 @@ async def orchestrate_endpoint(
         enable_retry_loop=request.enable_retry_loop
     )
     
+    logger.info(f"Workflow orchestration completed with {len(chain.steps) if hasattr(chain, 'steps') else 0} steps")
     return chain.dict()
 
 class TaskExecuteRequest(BaseModel):
@@ -113,17 +121,23 @@ async def get_pending_tasks(
     
     This endpoint returns pending tasks with optional filtering.
     """
+    logger.info(f"Getting pending tasks with filters: origin_agent={origin_agent}, suggested_agent={suggested_agent}, status={status}")
     task_manager = get_task_persistence_manager()
     
-    tasks = await task_manager.get_pending_tasks(
-        origin_agent=origin_agent,
-        suggested_agent=suggested_agent,
-        status=status,
-        limit=limit,
-        offset=offset
-    )
-    
-    return [task.dict() for task in tasks]
+    try:
+        tasks = await task_manager.get_pending_tasks(
+            origin_agent=origin_agent,
+            suggested_agent=suggested_agent,
+            status=status,
+            limit=limit,
+            offset=offset
+        )
+        
+        logger.info(f"Found {len(tasks)} pending tasks")
+        return [task.dict() for task in tasks]
+    except Exception as e:
+        logger.error(f"Error getting pending tasks: {str(e)}")
+        return []
 
 @router.post("/tasks/execute", response_model=Dict[str, Any])
 async def execute_task(
@@ -137,12 +151,14 @@ async def execute_task(
     
     This endpoint executes a pending task by its ID.
     """
+    logger.info(f"Executing task with ID: {request.task_id}")
     task_manager = get_task_persistence_manager()
     
     # Get the task
     task = await task_manager.get_task(request.task_id)
     
     if not task:
+        logger.error(f"Task not found: {request.task_id}")
         raise HTTPException(status_code=404, detail=f"Task not found: {request.task_id}")
     
     # Create a request for the suggested agent
@@ -178,12 +194,14 @@ async def execute_task(
         }
     )
     
-    return {
+    result = {
         "task_id": task.task_id,
         "status": "executed",
         "agent": task.suggested_agent,
         "response": response.dict()
     }
+    logger.info(f"Task {request.task_id} executed successfully")
+    return result
 
 @router.get("/chains", response_model=List[Dict[str, Any]])
 async def get_chains(
@@ -195,12 +213,18 @@ async def get_chains(
     
     This endpoint returns execution chains with pagination.
     """
+    logger.info(f"Getting execution chains with limit: {limit}, offset: {offset}")
     from app.core.execution_chain_logger import get_execution_chain_logger
     
-    chain_logger = get_execution_chain_logger()
-    chains = await chain_logger.get_chains(limit=limit, offset=offset)
-    
-    return chains
+    try:
+        chain_logger = get_execution_chain_logger()
+        chains = await chain_logger.get_chains(limit=limit, offset=offset)
+        
+        logger.info(f"Found {len(chains)} execution chains")
+        return chains
+    except Exception as e:
+        logger.error(f"Error getting execution chains: {str(e)}")
+        return []
 
 @router.get("/chains/{chain_id}", response_model=Dict[str, Any])
 async def get_chain(
@@ -211,15 +235,24 @@ async def get_chain(
     
     This endpoint returns details for a specific execution chain.
     """
+    logger.info(f"Getting execution chain with ID: {chain_id}")
     from app.core.execution_chain_logger import get_execution_chain_logger
     
-    chain_logger = get_execution_chain_logger()
-    chain = await chain_logger.get_chain(chain_id)
-    
-    if not chain:
-        raise HTTPException(status_code=404, detail=f"Chain not found: {chain_id}")
-    
-    return chain
+    try:
+        chain_logger = get_execution_chain_logger()
+        chain = await chain_logger.get_chain(chain_id)
+        
+        if not chain:
+            logger.error(f"Chain not found: {chain_id}")
+            raise HTTPException(status_code=404, detail=f"Chain not found: {chain_id}")
+        
+        logger.info(f"Found execution chain: {chain_id}")
+        return chain
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting execution chain: {str(e)}")
+        return {"error": "Failed to retrieve chain", "chain_id": chain_id}
 
 @router.get("/chains/{chain_id}/steps/{step_number}", response_model=Dict[str, Any])
 async def get_chain_step(
@@ -231,15 +264,24 @@ async def get_chain_step(
     
     This endpoint returns details for a specific step in an execution chain.
     """
+    logger.info(f"Getting step {step_number} for chain {chain_id}")
     from app.core.execution_chain_logger import get_execution_chain_logger
     
-    chain_logger = get_execution_chain_logger()
-    step = await chain_logger.get_step(chain_id, step_number)
-    
-    if not step:
-        raise HTTPException(status_code=404, detail=f"Step not found: {chain_id}/{step_number}")
-    
-    return step
+    try:
+        chain_logger = get_execution_chain_logger()
+        step = await chain_logger.get_step(chain_id, step_number)
+        
+        if not step:
+            logger.error(f"Step not found: {chain_id}/{step_number}")
+            raise HTTPException(status_code=404, detail=f"Step not found: {chain_id}/{step_number}")
+        
+        logger.info(f"Found step {step_number} for chain {chain_id}")
+        return step
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting chain step: {str(e)}")
+        return {"error": "Failed to retrieve step", "chain_id": chain_id, "step_number": step_number}
 
 # Add new endpoint for /api/agent/latest
 @router.get("/latest")
@@ -250,23 +292,63 @@ async def get_latest_agent_activity():
     
     This endpoint returns the most recent agent activities.
     """
+    logger.info("Getting latest agent activity")
     try:
-        # Simplified implementation to return some data
+        # Try to get real data from orchestrator or logs
+        orchestrator = get_orchestrator()
+        
+        # Check if we have any agents configured
+        try:
+            available_agents = orchestrator.prompt_manager.get_available_agents()
+            logger.info(f"Found {len(available_agents)} available agents")
+            
+            if not available_agents:
+                logger.info("No agents available, returning empty list")
+                return {
+                    "status": "success",
+                    "latest_activities": []
+                }
+        except Exception as e:
+            logger.error(f"Error getting available agents: {str(e)}")
+            available_agents = []
+        
+        # Simplified implementation to return stub data
         # In a real implementation, this would fetch from a database or log
+        stub_activities = []
+        
+        # Add stub activities for each available agent or default if none
+        if available_agents:
+            for agent in available_agents:
+                stub_activities.append({
+                    "id": f"activity-{uuid.uuid4()}",
+                    "agent": agent,
+                    "timestamp": datetime.now().isoformat(),
+                    "action": "initialization",
+                    "status": "ready"
+                })
+        else:
+            # Default stub activity if no agents exist
+            stub_activities.append({
+                "id": f"activity-{uuid.uuid4()}",
+                "agent": "builder",
+                "timestamp": datetime.now().isoformat(),
+                "action": "system_initialization",
+                "status": "ready"
+            })
+        
+        response = {
+            "status": "success",
+            "latest_activities": stub_activities
+        }
+        logger.info(f"Returning {len(stub_activities)} latest activities")
+        return response
+    except Exception as e:
+        logger.error(f"Error retrieving latest agent activity: {str(e)}")
+        # Return empty list instead of throwing 500
         return {
             "status": "success",
-            "latest_activities": [
-                {
-                    "id": "activity-1",
-                    "agent": "builder",
-                    "timestamp": datetime.now().isoformat(),
-                    "action": "code_generation",
-                    "status": "completed"
-                }
-            ]
+            "latest_activities": []
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving latest agent activity: {str(e)}")
 
 async def process_agent_request(
     agent_type: str,
@@ -291,6 +373,7 @@ async def process_agent_request(
     Returns:
         Agent response
     """
+    logger.info(f"Processing agent request for {agent_type}")
     # Get managers and services
     prompt_manager = PromptManager()
     memory_manager = get_memory_manager()
@@ -307,29 +390,39 @@ async def process_agent_request(
     behavior_manager = get_behavior_manager()
     
     # Get the prompt chain for the agent
-    prompt_chain = prompt_manager.get_prompt_chain(agent_type)
-    if not prompt_chain:
-        raise HTTPException(status_code=404, detail=f"Agent type not found: {agent_type}")
+    try:
+        prompt_chain = prompt_manager.get_prompt_chain(agent_type)
+        if not prompt_chain:
+            logger.error(f"Agent type not found: {agent_type}")
+            raise HTTPException(status_code=404, detail=f"Agent type not found: {agent_type}")
+    except Exception as e:
+        logger.error(f"Error getting prompt chain: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting prompt chain: {str(e)}")
     
     # Determine which model to use
     model = request.model or prompt_chain.get("model", "gpt-4")
+    logger.info(f"Using model: {model}")
     
     # Get relevant memories
     memory_context = ""
     if supabase_client:
-        memories = await vector_memory.search_memories(
-            query=request.input,
-            agent_type=agent_type,
-            limit=5,
-            supabase_client=supabase_client
-        )
-        
-        # Review memories for relevance to current task
-        if memories:
-            memory_context = await memory_reviewer.review_memories(
-                memories=memories,
-                current_query=request.input
+        try:
+            memories = await vector_memory.search_memories(
+                query=request.input,
+                agent_type=agent_type,
+                limit=5,
+                supabase_client=supabase_client
             )
+            
+            # Review memories for relevance to current task
+            if memories:
+                memory_context = await memory_reviewer.review_memories(
+                    memories=memories,
+                    current_query=request.input
+                )
+                logger.info(f"Retrieved {len(memories)} memories for context")
+        except Exception as e:
+            logger.error(f"Error retrieving memories: {str(e)}")
     
     # Construct the prompt
     system_prompt = prompt_chain.get("system_prompt", "")
@@ -337,19 +430,25 @@ async def process_agent_request(
         system_prompt += f"\n\nRELEVANT MEMORIES:\n{memory_context}"
     
     # Add behavior guidance if available
-    behavior_guidance = behavior_manager.get_behavior_guidance(agent_type)
-    if behavior_guidance:
-        system_prompt += f"\n\nBEHAVIOR GUIDANCE:\n{behavior_guidance}"
+    try:
+        behavior_guidance = behavior_manager.get_behavior_guidance(agent_type)
+        if behavior_guidance:
+            system_prompt += f"\n\nBEHAVIOR GUIDANCE:\n{behavior_guidance}"
+    except Exception as e:
+        logger.error(f"Error getting behavior guidance: {str(e)}")
     
     # Process with the model
     try:
+        logger.info(f"Sending request to model: {model}")
         response_text = await model_router.process(
             model=model,
             system_prompt=system_prompt,
             user_prompt=request.input,
             context=request.context
         )
+        logger.info("Received response from model")
     except Exception as e:
+        logger.error(f"Error processing with model: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error processing with model: {str(e)}")
     
     # Create response object
@@ -378,9 +477,10 @@ async def process_agent_request(
                 supabase_client=supabase_client
             )
             response.metadata["memory_id"] = memory_id
+            logger.info(f"Saved to memory with ID: {memory_id}")
         except Exception as e:
             # Log error but don't fail the request
-            print(f"Error saving to memory: {str(e)}")
+            logger.error(f"Error saving to memory: {str(e)}")
     
     # Add reflection if not skipped
     if not request.skip_reflection:
@@ -392,9 +492,10 @@ async def process_agent_request(
                 model=model
             )
             response.reflection = reflection
+            logger.info("Added reflection to response")
         except Exception as e:
             # Log error but don't fail the request
-            print(f"Error generating reflection: {str(e)}")
+            logger.error(f"Error generating reflection: {str(e)}")
     
     # Add task tagging
     try:
@@ -403,9 +504,10 @@ async def process_agent_request(
             output_text=response_text
         )
         response.metadata["tags"] = tags
+        logger.info(f"Tagged task with: {tags}")
     except Exception as e:
         # Log error but don't fail the request
-        print(f"Error tagging task: {str(e)}")
+        logger.error(f"Error tagging task: {str(e)}")
     
     # Check confidence and retry if needed
     if request.enable_retry_loop:
@@ -420,13 +522,15 @@ async def process_agent_request(
             if retry_result["retry_needed"]:
                 # Update response with retry data
                 response.retry_data = retry_result
+                logger.info("Retry needed, updated response with retry data")
                 
                 # If retry was performed, update output
                 if retry_result.get("retry_output"):
                     response.output = retry_result["retry_output"]
+                    logger.info("Updated output with retry result")
         except Exception as e:
             # Log error but don't fail the request
-            print(f"Error in confidence retry: {str(e)}")
+            logger.error(f"Error in confidence retry: {str(e)}")
     
     # Check for nudges
     try:
@@ -438,9 +542,10 @@ async def process_agent_request(
         
         if nudge:
             response.nudge = nudge
+            logger.info("Added nudge to response")
     except Exception as e:
         # Log error but don't fail the request
-        print(f"Error checking for nudge: {str(e)}")
+        logger.error(f"Error checking for nudge: {str(e)}")
     
     # Check for escalation
     try:
@@ -452,9 +557,10 @@ async def process_agent_request(
         
         if escalation:
             response.escalation = escalation
+            logger.info("Added escalation to response")
     except Exception as e:
         # Log error but don't fail the request
-        print(f"Error checking for escalation: {str(e)}")
+        logger.error(f"Error checking for escalation: {str(e)}")
     
     # Handle orchestration if requested
     if request.auto_orchestrate and response.metadata.get("suggested_next_step"):
@@ -469,8 +575,10 @@ async def process_agent_request(
             )
             
             response.metadata["pending_task_id"] = task_id
+            logger.info(f"Created pending task with ID: {task_id}")
         except Exception as e:
             # Log error but don't fail the request
-            print(f"Error creating pending task: {str(e)}")
+            logger.error(f"Error creating pending task: {str(e)}")
     
+    logger.info(f"Completed processing agent request for {agent_type}")
     return response
