@@ -66,6 +66,15 @@ async def log_requests(request: Request, call_next):
     logger.info(f"Request: {request.method} {request.url}")
     logger.info(f"Request headers: {request.headers}")
     
+    # Log request body for debugging task delegation issues
+    if "delegate" in str(request.url) or "latest" in str(request.url) or "goals" in str(request.url):
+        try:
+            body = await request.body()
+            if body:
+                logger.info(f"Request body: {body.decode()}")
+        except Exception as e:
+            logger.error(f"Error reading request body: {str(e)}")
+    
     # Process the request
     start_time = time.time()
     try:
@@ -76,10 +85,6 @@ async def log_requests(request: Request, call_next):
         logger.info(f"Response status: {response.status_code}")
         logger.info(f"Response headers: {response.headers}")
         logger.info(f"Process time: {process_time:.4f}s")
-        
-        # We no longer need to manually add CORS headers here
-        # The FastAPI CORSMiddleware will handle this correctly
-        # with the specific origins we've configured
         
         return response
     except Exception as e:
@@ -148,6 +153,9 @@ app.include_router(system_router)
 app.include_router(goals_router, prefix="/api", tags=["Goals"])
 app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
 app.include_router(control_router, prefix="/api", tags=["Control"])
+
+# Mount agent router again with /api prefix to fix routing issues
+app.include_router(agent_router, prefix="/api/agent", tags=["API Agents"])
 
 # Health check endpoint for Railway
 @app.get("/health", tags=["Health"])

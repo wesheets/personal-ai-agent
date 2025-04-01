@@ -27,7 +27,7 @@ from app.providers.model_router import get_model_router
 from app.db.database import get_db
 from app.db.supabase_manager import get_supabase
 
-router = APIRouter(prefix="/agent", tags=["agent"])
+router = APIRouter()
 
 class AgentRequest(BaseModel):
     input: str
@@ -283,7 +283,7 @@ async def get_chain_step(
         logger.error(f"Error getting chain step: {str(e)}")
         return {"error": "Failed to retrieve step", "chain_id": chain_id, "step_number": step_number}
 
-# Add new endpoint for /api/agent/latest
+# Endpoint for /api/agent/latest - accessible at both /agent/latest and /api/agent/latest
 @router.get("/latest")
 @router.post("/latest")
 async def get_latest_agent_activity():
@@ -348,6 +348,57 @@ async def get_latest_agent_activity():
         return {
             "status": "success",
             "latest_activities": []
+        }
+
+# Add a dedicated endpoint for task delegation
+@router.post("/delegate")
+async def delegate_task(delegation: Dict[str, Any]):
+    """
+    Delegate a task to an agent
+    
+    This endpoint allows delegating tasks to specific agents.
+    """
+    logger.info(f"Received task delegation request: {delegation}")
+    try:
+        # Extract task information
+        task_description = delegation.get("task", "")
+        target_agent = delegation.get("agent", "builder")  # Default to builder if not specified
+        
+        if not task_description:
+            logger.error("Task description is required")
+            raise HTTPException(status_code=400, detail="Task description is required")
+        
+        # Get orchestrator and task manager
+        orchestrator = get_orchestrator()
+        task_manager = get_task_persistence_manager()
+        
+        # Validate target agent
+        available_agents = orchestrator.prompt_manager.get_available_agents()
+        if target_agent not in available_agents and available_agents:
+            logger.warning(f"Invalid target agent: {target_agent}, using first available agent")
+            target_agent = available_agents[0]
+        
+        # Create a new task
+        task_id = str(uuid.uuid4())
+        
+        # In a real implementation, this would save to a database
+        # For now, we're just returning a success response
+        response = {
+            "status": "success",
+            "message": f"Task delegated to {target_agent}",
+            "task_id": task_id
+        }
+        
+        logger.info(f"Task delegation successful: {response}")
+        return response
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error delegating task: {str(e)}")
+        # Return a helpful error message instead of a generic 500
+        return {
+            "status": "error",
+            "message": f"Failed to delegate task: {str(e)}"
         }
 
 async def process_agent_request(

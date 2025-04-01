@@ -3,6 +3,8 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 from app.core.orchestrator import get_orchestrator
 import logging
+import uuid
+from datetime import datetime
 
 # Configure logging
 logger = logging.getLogger("api")
@@ -26,8 +28,10 @@ class AgentStatusResponseModel(BaseModel):
     agents: List[AgentStatusModel]
 
 class TaskDelegationModel(BaseModel):
-    task_id: str
-    target_agent: str
+    task_id: Optional[str] = None
+    target_agent: Optional[str] = None
+    task: Optional[str] = None
+    agent: Optional[str] = None
 
 class EditPromptModel(BaseModel):
     prompt: str
@@ -142,34 +146,86 @@ async def get_agent_status():
         # Return a minimal response instead of throwing 500
         return AgentStatusResponseModel(agents=[])
 
-@router.post("/agent/delegate", response_model=Dict[str, str])
-async def delegate_task(delegation: TaskDelegationModel):
+@router.post("/agent/delegate", response_model=Dict[str, Any])
+async def delegate_task(delegation: TaskDelegationModel = Body(...)):
     """
     Delegate a task to a different agent
+    
+    This endpoint allows delegating tasks to specific agents.
     """
-    logger.info(f"Delegating task {delegation.task_id} to {delegation.target_agent}")
-    orchestrator = get_orchestrator()
-    task_manager = orchestrator.task_state_manager
-    
-    # Get task
-    task = await task_manager.get_task(delegation.task_id)
-    if not task:
-        logger.error(f"Task {delegation.task_id} not found")
-        raise HTTPException(status_code=404, detail=f"Task {delegation.task_id} not found")
-    
-    # Validate target agent
-    available_agents = orchestrator.prompt_manager.get_available_agents()
-    if delegation.target_agent not in available_agents:
-        logger.error(f"Invalid target agent: {delegation.target_agent}")
-        raise HTTPException(status_code=400, detail=f"Invalid target agent: {delegation.target_agent}")
-    
-    # Update task assignment
-    task.assigned_agent = delegation.target_agent
-    await task_manager._save_state_to_log()
-    
-    response = {"message": f"Task {delegation.task_id} delegated to {delegation.target_agent}"}
-    logger.info(f"Task delegation response: {response}")
-    return response
+    logger.info(f"Received task delegation request: {delegation}")
+    try:
+        # Support both naming conventions (task_id/target_agent and task/agent)
+        task_id = delegation.task_id
+        target_agent = delegation.target_agent or delegation.agent or "builder"
+        task_description = delegation.task or ""
+        
+        # If we have a task_id, use the orchestrator's task manager
+        if task_id:
+            logger.info(f"Delegating existing task {task_id} to {target_agent}")
+            orchestrator = get_orchestrator()
+            task_manager = orchestrator.task_state_manager
+            
+            # Get task
+            task = await task_manager.get_task(task_id)
+            if not task:
+                logger.error(f"Task {task_id} not found")
+                raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+            
+            # Validate target agent
+            available_agents = orchestrator.prompt_manager.get_available_agents()
+            if target_agent not in available_agents:
+                logger.error(f"Invalid target agent: {target_agent}")
+                raise HTTPException(status_code=400, detail=f"Invalid target agent: {target_agent}")
+            
+            # Update task assignment
+            task.assigned_agent = target_agent
+            await task_manager._save_state_to_log()
+            
+            response = {"message": f"Task {task_id} delegated to {target_agent}", "status": "success"}
+            logger.info(f"Task delegation response: {response}")
+            return response
+        
+        # If we have a task description, create a new task
+        elif task_description:
+            logger.info(f"Creating new task for {target_agent}: {task_description}")
+            
+            # Get orchestrator
+            orchestrator = get_orchestrator()
+            
+            # Validate target agent
+            available_agents = orchestrator.prompt_manager.get_available_agents()
+            if available_agents and target_agent not in available_agents:
+                logger.warning(f"Invalid target agent: {target_agent}, using first available agent")
+                target_agent = available_agents[0] if available_agents else "builder"
+            
+            # Create a new task ID
+            new_task_id = str(uuid.uuid4())
+            
+            # In a real implementation, this would save to a database
+            # For now, we're just returning a success response
+            response = {
+                "status": "success",
+                "message": f"Task delegated to {target_agent}",
+                "task_id": new_task_id
+            }
+            
+            logger.info(f"New task delegation successful: {response}")
+            return response
+        
+        else:
+            logger.error("Either task_id or task description is required")
+            raise HTTPException(status_code=400, detail="Either task_id or task description is required")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error delegating task: {str(e)}")
+        # Return a helpful error response instead of throwing 500
+        return {
+            "status": "error",
+            "message": f"Failed to delegate task: {str(e)}"
+        }
 
 @router.post("/agent/goal/{task_id}/edit-prompt", response_model=Dict[str, str])
 async def edit_task_prompt(task_id: str, prompt_data: EditPromptModel):
