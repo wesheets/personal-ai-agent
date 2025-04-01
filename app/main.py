@@ -26,19 +26,16 @@ app = FastAPI(
     description="A personal AI agent system with vector memory, multi-model support, and configurable agent personalities",
     version="1.0.0")
 
-# Add CORS middleware with hardcoded configuration
+# Add CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://frontend-agent-ui-production.up.railway.app",
-        "https://compassionate-compassion-production.up.railway.app",
-        "http://localhost:3000"
+        "http://localhost:5173",
+        "https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app"
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-    max_age=86400,  # 24 hours in seconds
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 # Add middleware to log all requests and responses for debugging
