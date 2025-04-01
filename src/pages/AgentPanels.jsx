@@ -243,6 +243,9 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Debug logging - added for spinner debugging
+    console.log("✅ Submission started");
+    
     // Reset submission tracking
     submissionStartTimeRef.current = new Date();
     
@@ -273,7 +276,17 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
         // Use the ApiService to delegate the task
         addDebugLog("📡 Calling ApiService.delegateTask()");
         updateLifecycleState('apiCallStart', new Date());
-        result = await ApiService.delegateTask(agentType, taskName, taskGoal);
+        console.log("🟡 Calling delegateTask");
+        
+        // TEMPORARY TEST: Replace actual API call with dummy Promise to isolate the issue
+        // Comment out the actual API call and use a dummy Promise instead
+        // result = await ApiService.delegateTask(agentType, taskName, taskGoal);
+        
+        // Dummy Promise that resolves immediately with a success status
+        result = await Promise.resolve({ status: "ok", task_id: `test-${Date.now()}` });
+        
+        console.log("🟢 API call resolved");
+        console.log("✅ API call result:", result);
         updateLifecycleState('apiResponse', new Date());
         console.log('✅ Submission complete:', result);
       }
@@ -359,33 +372,37 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
       // Update submission lifecycle
       updateLifecycleState('spinnerResetCall', new Date());
       
-      // Use setTimeout to ensure this runs after React's current execution cycle
+      // ENHANCED: Ensure spinner reset happens reliably
+      if (mountedRef.current) {
+        setIsSubmitting(false);
+        console.log("✅ Spinner reset");
+        updateLifecycleState('spinnerResetComplete', new Date());
+        addDebugLog("✅ Spinner reset completed immediately");
+        
+        // Reset submission start time
+        submissionStartTimeRef.current = null;
+      } else {
+        console.log("⚠️ Component unmounted before spinner reset");
+      }
+      
+      // Use setTimeout as a backup to ensure this runs after React's current execution cycle
       setTimeout(() => {
-        if (mountedRef.current) {
-          // Double-check we're still mounted
+        if (mountedRef.current && isSubmitting) {
+          // Double-check we're still mounted and spinner is still active
           console.log('✅ Spinner should now stop (setTimeout callback)');
           setIsSubmitting(false);
           
           // Update submission lifecycle
           updateLifecycleState('spinnerResetComplete', new Date());
           
-          console.log('✅ Spinner reset completed');
-          addDebugLog("✅ Spinner reset completed");
-          
-          // Reset submission start time
-          submissionStartTimeRef.current = null;
+          console.log('✅ Spinner reset completed in setTimeout');
+          addDebugLog("✅ Backup spinner reset completed in setTimeout");
+        } else if (mountedRef.current) {
+          console.log("✓ Spinner already reset before setTimeout executed");
         } else {
           console.log("⚠️ Component unmounted before spinner reset in setTimeout");
         }
       }, 0);
-      
-      // Backup direct reset without setTimeout as a failsafe
-      if (mountedRef.current && isSubmitting) {
-        console.log('✅ Spinner should now stop (direct backup reset)');
-        console.log('🔄 Backup direct spinner reset');
-        setIsSubmitting(false);
-        addDebugLog("🔄 Backup direct spinner reset applied");
-      }
     }
   };
   
