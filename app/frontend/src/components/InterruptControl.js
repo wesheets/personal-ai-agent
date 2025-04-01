@@ -20,10 +20,27 @@ const InterruptControl = () => {
         setLoading(true);
         
         // Fetch system control mode
-        const controlModeData = await controlService.getControlMode();
+        let controlModeData = { mode: 'auto', active_agents: [] };
+        try {
+          controlModeData = await controlService.getControlMode();
+        } catch (controlErr) {
+          console.error('Error fetching control mode:', controlErr);
+          // Continue with default values
+        }
         
-        // Fetch active tasks
-        const tasksData = await goalsService.getTaskState();
+        // Fetch active tasks with null checks and error handling
+        let tasksData = { tasks: [] };
+        try {
+          // Check if goalsService exists and has getTaskState method
+          if (goalsService && typeof goalsService.getTaskState === 'function') {
+            tasksData = await goalsService.getTaskState();
+          } else {
+            console.error('goalsService.getTaskState is not available');
+          }
+        } catch (taskErr) {
+          console.error('Error fetching task state:', taskErr);
+          // Continue with empty tasks array
+        }
         
         setSystemState({
           executionMode: controlModeData.mode,
