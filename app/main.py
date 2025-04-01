@@ -9,6 +9,7 @@ from app.api.memory import router as memory_router
 from app.api.goals import goals_router
 from app.api.memory_viewer import memory_router as memory_viewer_router
 from app.api.control import control_router
+from app.api.logs import logs_router
 from app.providers import initialize_model_providers, get_available_models
 from app.core.seeding import get_seeding_manager
 from app.core.prompt_manager import PromptManager
@@ -161,6 +162,7 @@ app.include_router(system_router)
 app.include_router(goals_router, prefix="/api", tags=["Goals"])
 app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
 app.include_router(control_router, prefix="/api", tags=["Control"])
+app.include_router(logs_router, prefix="/api", tags=["Logs"])
 
 # Mount agent router again with /api prefix to fix routing issues
 app.include_router(agent_router, prefix="/api/agent", tags=["API Agents"])
@@ -235,6 +237,7 @@ async def root():
             "task_state": "/api/task-state",
             "memory": "/api/memory",
             "control_mode": "/api/system/control-mode",
-            "agent_status": "/api/agent/status"
+            "agent_status": "/api/agent/status",
+            "logs": "/api/logs/latest"
         }
     }

@@ -194,6 +194,7 @@ async def delegate_task(request: Request):
             
             response = {"message": f"Task {task_id} delegated to {target_agent}", "status": "success"}
             logger.info(f"Task delegation response: {response}")
+            print("✅ Delegate task submitted")
             return response
         
         # If we have a task description, create a new task
@@ -220,6 +221,7 @@ async def delegate_task(request: Request):
             }
             
             logger.info(f"New task delegation successful: {response}")
+            print("✅ Delegate task submitted")
             return response
         
         else:
@@ -233,6 +235,7 @@ async def delegate_task(request: Request):
         return JSONResponse(status_code=500, content={"status": "error", "message": f"Failed to delegate task: {str(e)}"})
 
     # Fallback return in case all other logic paths fail
+    print("✅ Delegate task submitted (fallback)")
     return {"message": "Simulated response", "status": "success"}  # TEMP for test
 
 @router.post("/agent/goal/{task_id}/edit-prompt", response_model=Dict[str, str])
