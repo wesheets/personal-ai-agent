@@ -28,6 +28,7 @@ import {
   Tooltip
 } from '@chakra-ui/react';
 import ApiService from '../api/ApiService';
+import { AgentDebugFeedback } from '../components';
 
 // Generic Agent Panel component that can be used for Builder, Ops, and Research agents
 const AgentPanel = ({ agentType, agentName, agentDescription }) => {
@@ -252,152 +253,120 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     // Update submission lifecycle
     updateLifecycleState('submitClick', submissionStartTimeRef.current);
     
-    console.log('🚀 Submitting task:', { taskName, agentType, taskGoal });
-    addDebugLog("🌀 Submitting task...");
-    addDebugLog(`Payload: ${JSON.stringify({ agentType, taskName, taskGoal })}`);
+    // Reset previous response and error
+    setResponse(null);
+    setError(null);
     
-    // Reset failsafe trigger flag
-    failsafeTriggeredRef.current = false;
+    // Validate inputs
+    if (!taskName.trim() || !taskGoal.trim()) {
+      setError('Please fill in all required fields');
+      return;
+    }
     
     // Set submitting state
     setIsSubmitting(true);
-    setError(null);
+    addDebugLog('🚀 Form submission started');
     
     try {
-      let result;
+      // Update submission lifecycle
+      updateLifecycleState('apiCallStart', new Date());
       
+      // Use simulated response for testing if enabled
       if (useSimulatedResponse) {
-        addDebugLog("🔄 Using simulated response");
-        updateLifecycleState('apiCallStart', new Date());
-        await new Promise(resolve => setTimeout(resolve, 500));
-        result = { status: "success", message: "Fake success", task_id: `fake-${Date.now()}` };
+        addDebugLog('🧪 Using simulated response (3s delay)');
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        
+        // Simulate API response
+        const simulatedResponse = {
+          success: true,
+          message: 'Task submitted successfully (SIMULATED)',
+          taskId: `sim-${Date.now()}`,
+          status: 'pending'
+        };
+        
+        // Update submission lifecycle
         updateLifecycleState('apiResponse', new Date());
-      } else {
-        // Use the ApiService to delegate the task
-        addDebugLog("📡 Calling ApiService.delegateTask()");
-        updateLifecycleState('apiCallStart', new Date());
-        console.log("🟡 Calling delegateTask");
         
-        // TEMPORARY TEST: Replace actual API call with dummy Promise to isolate the issue
-        // Comment out the actual API call and use a dummy Promise instead
-        // result = await ApiService.delegateTask(agentType, taskName, taskGoal);
+        // Update state with simulated response
+        setResponse(simulatedResponse);
+        addDebugLog('✅ Simulated response received');
         
-        // Dummy Promise that resolves immediately with a success status
-        result = await Promise.resolve({ status: "ok", task_id: `test-${Date.now()}` });
-        
-        console.log("🟢 API call resolved");
-        console.log("✅ API call result:", result);
-        updateLifecycleState('apiResponse', new Date());
-        console.log('✅ Submission complete:', result);
-      }
-      
-      addDebugLog(`✅ Delegate response: ${JSON.stringify(result)}`);
-      
-      // Check if component is still mounted
-      if (!mountedRef.current) {
-        addDebugLog("⚠️ Component unmounted before state update");
-        return;
-      }
-      
-      // Check if failsafe was already triggered
-      if (failsafeTriggeredRef.current) {
-        addDebugLog("⚠️ Failsafe already triggered, skipping success state updates");
-        return;
-      }
-      
-      // Set response from API
-      setResponse(result);
-      
-      // Add to history (keeping only last 3)
-      setTaskHistory(prev => {
-        const newHistory = [
+        // Add to task history
+        setTaskHistory(prev => [
           {
-            id: result.task_id || `task-${Date.now()}`,
+            id: simulatedResponse.taskId,
             name: taskName,
             goal: taskGoal,
-            timestamp: new Date().toISOString(),
-            status: result.status || 'delegated'
+            status: 'pending',
+            timestamp: new Date()
           },
           ...prev
-        ];
+        ]);
         
-        // Keep only last 3
-        return newHistory.slice(0, 3);
-      });
-      
-      // Reset form
-      setTaskName('');
-      setTaskGoal('');
-      
-      // Show success toast - uncommented for testing
-      toast({
-        title: 'Task delegated',
-        description: `Task "${taskName}" has been delegated to ${agentName}`,
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
+        // Reset form
+        setTaskName('');
+        setTaskGoal('');
+      } else {
+        // Make actual API call
+        addDebugLog('📡 Sending API request');
+        
+        const apiResponse = await ApiService.submitTask({
+          agentType,
+          taskName,
+          taskGoal
+        });
+        
+        // Update submission lifecycle
+        updateLifecycleState('apiResponse', new Date());
+        
+        // Update state with API response
+        setResponse(apiResponse);
+        addDebugLog('✅ API response received');
+        
+        // Add to task history if successful
+        if (apiResponse.success) {
+          setTaskHistory(prev => [
+            {
+              id: apiResponse.taskId,
+              name: taskName,
+              goal: taskGoal,
+              status: apiResponse.status || 'pending',
+              timestamp: new Date()
+            },
+            ...prev
+          ]);
+          
+          // Reset form on success
+          setTaskName('');
+          setTaskGoal('');
+        }
+      }
     } catch (err) {
-      console.error('❌ Error delegating task:', err);
-      addDebugLog(`❌ Error delegating task: ${err.message}`);
-      
-      // Check if component is still mounted
-      if (!mountedRef.current) {
-        addDebugLog("⚠️ Component unmounted before error state update");
-        return;
-      }
-      
-      // Check if failsafe was already triggered
-      if (failsafeTriggeredRef.current) {
-        addDebugLog("⚠️ Failsafe already triggered, skipping error state updates");
-        return;
-      }
-      
-      setError(`Failed to delegate task: ${err.message}`);
-      
-      // Show error toast - uncommented for testing
-      toast({
-        title: 'Error',
-        description: `Failed to delegate task: ${err.message}`,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      // Always reset submission state to prevent infinite spinner
-      console.log('✅ Spinner should now stop (finally block)');
-      console.log('🛑 Spinner reset triggered in finally block');
-      addDebugLog("🛑 Spinner reset triggered in finally block");
+      console.error('Error submitting task:', err);
       
       // Update submission lifecycle
-      updateLifecycleState('spinnerResetCall', new Date());
+      updateLifecycleState('apiResponse', new Date());
       
-      // ENHANCED: Ensure spinner reset happens reliably
-      if (mountedRef.current) {
-        setIsSubmitting(false);
-        console.log("✅ Spinner reset");
-        updateLifecycleState('spinnerResetComplete', new Date());
-        addDebugLog("✅ Spinner reset completed immediately");
-        
-        // Reset submission start time
-        submissionStartTimeRef.current = null;
-      } else {
-        console.log("⚠️ Component unmounted before spinner reset");
-      }
-      
-      // Use setTimeout as a backup to ensure this runs after React's current execution cycle
+      // Set error state
+      setError(err.message || 'An error occurred while submitting the task');
+      addDebugLog('❌ Error: ' + (err.message || 'Unknown error'));
+    } finally {
+      // Use setTimeout to ensure state updates don't conflict
       setTimeout(() => {
-        if (mountedRef.current && isSubmitting) {
-          // Double-check we're still mounted and spinner is still active
-          console.log('✅ Spinner should now stop (setTimeout callback)');
+        // Only update state if component is still mounted
+        if (mountedRef.current) {
+          // Reset submitting state
           setIsSubmitting(false);
+          addDebugLog('✅ Form submission completed');
+          console.log("✓ Spinner should now stop (normal flow)");
+          console.log("✓ Spinner reset in finally block");
           
           // Update submission lifecycle
+          updateLifecycleState('spinnerResetCall', new Date());
           updateLifecycleState('spinnerResetComplete', new Date());
-          
-          console.log('✅ Spinner reset completed in setTimeout');
-          addDebugLog("✅ Backup spinner reset completed in setTimeout");
-        } else if (mountedRef.current) {
+        } else if (failsafeTriggeredRef.current) {
           console.log("✓ Spinner already reset before setTimeout executed");
         } else {
           console.log("⚠️ Component unmounted before spinner reset in setTimeout");
@@ -433,277 +402,163 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
           </Alert>
         )}
         
-        {/* Debug State Display - Force visible */}
-        {debugVisible && (
-          <Card 
-            bg={colorMode === 'light' ? 'yellow.50' : 'yellow.900'} 
-            boxShadow="md" 
-            borderRadius="lg"
-            mb={4}
-            p={3}
-          >
-            <Heading size="sm" mb={2}>Debug State</Heading>
-            <HStack mb={2}>
-              <Text>Spinner State: <Code>{isSubmitting.toString()}</Code></Text>
-              <Text>Error State: <Code>{error ? "Error" : "null"}</Code></Text>
-              <Text>Response: <Code>{response ? "Present" : "null"}</Code></Text>
-              <Text>Render Count: <Code>{renderCount}</Code></Text>
-            </HStack>
-            <HStack mb={2}>
-              <Text>Use Simulated Response:</Text>
-              <Switch 
-                isChecked={useSimulatedResponse} 
-                onChange={() => setUseSimulatedResponse(!useSimulatedResponse)}
-                colorScheme="green"
-              />
-              <Button 
-                size="sm" 
-                colorScheme="red" 
-                onClick={forceResetSpinner}
-                isDisabled={!isSubmitting}
-                leftIcon={<span>🚨</span>}
-              >
-                Force Reset Spinner
-              </Button>
-            </HStack>
-            
-            {/* Submission Lifecycle Display */}
-            <Box mt={2} p={2} bg={colorMode === 'light' ? 'white' : 'gray.800'} borderRadius="md">
-              <Heading size="xs" mb={1}>Submission Lifecycle:</Heading>
-              <Text fontSize="xs" fontFamily="monospace">
-                Submit Click: {submissionLifecycle.submitClick?.toLocaleTimeString() || 'N/A'}
-              </Text>
-              <Text fontSize="xs" fontFamily="monospace">
-                API Call Start: {submissionLifecycle.apiCallStart?.toLocaleTimeString() || 'N/A'}
-              </Text>
-              <Text fontSize="xs" fontFamily="monospace">
-                API Response: {submissionLifecycle.apiResponse?.toLocaleTimeString() || 'N/A'}
-              </Text>
-              <Text fontSize="xs" fontFamily="monospace">
-                Failsafe Trigger: {submissionLifecycle.failsafeTrigger?.toLocaleTimeString() || 'N/A'}
-              </Text>
-              <Text fontSize="xs" fontFamily="monospace">
-                Spinner Reset Call: {submissionLifecycle.spinnerResetCall?.toLocaleTimeString() || 'N/A'}
-              </Text>
-              <Text fontSize="xs" fontFamily="monospace">
-                Spinner Reset Complete: {submissionLifecycle.spinnerResetComplete?.toLocaleTimeString() || 'N/A'}
-              </Text>
-            </Box>
-            
-            <Box mt={2} maxH="150px" overflowY="auto" bg={colorMode === 'light' ? 'gray.50' : 'gray.700'} p={2} borderRadius="md">
-              <Heading size="xs" mb={1}>Debug Logs:</Heading>
-              {debugLogs.map((log, index) => (
-                <Text key={index} fontSize="xs" fontFamily="monospace">{log}</Text>
-              ))}
-            </Box>
-          </Card>
-        )}
+        {/* Replace the inline debug card with the AgentDebugFeedback component */}
+        <AgentDebugFeedback 
+          agentType={agentType}
+          isVisible={debugVisible}
+          debugLogs={debugLogs}
+          lifecycleEvents={submissionLifecycle}
+          performanceMetrics={{
+            'Spinner State': isSubmitting.toString(),
+            'Error State': error ? "Error" : "null",
+            'Response': response ? "Present" : "null",
+            'Render Count': renderCount.toString(),
+            'Simulated Response': useSimulatedResponse ? "Enabled" : "Disabled"
+          }}
+          onClearLogs={() => setDebugLogs([])}
+          onToggleVisibility={() => setDebugVisible(!debugVisible)}
+        />
         
-        <Card 
-          bg={colorMode === 'light' ? 'white' : 'gray.700'} 
-          boxShadow="md" 
-          borderRadius="lg"
-          mb={8}
-          position="relative"
-        >
-          {/* Manual Kill Switch - Floating button */}
-          {isSubmitting && (
-            <Tooltip label="Emergency Stop" placement="top">
-              <IconButton
-                aria-label="Emergency Stop"
-                icon={<span>🚨</span>}
-                colorScheme="red"
-                size="lg"
-                position="absolute"
-                top="-15px"
-                right="-15px"
-                borderRadius="full"
-                onClick={forceResetSpinner}
-                zIndex={10}
-              />
-            </Tooltip>
-          )}
-          
+        {/* Task submission form */}
+        <Card mb={6} variant="outline">
           <CardBody>
-            <Heading size="md" mb={4}>Delegate Task</Heading>
-            
             <form onSubmit={handleSubmit}>
               <VStack spacing={4} align="stretch">
                 <FormControl isRequired>
                   <FormLabel>Task Name</FormLabel>
-                  <Input 
+                  <Input
                     value={taskName}
                     onChange={(e) => setTaskName(e.target.value)}
                     placeholder="Enter a name for this task"
-                    data-testid="task-name-input"
+                    isDisabled={isSubmitting}
                   />
                 </FormControl>
                 
                 <FormControl isRequired>
                   <FormLabel>Task Goal</FormLabel>
-                  <Textarea 
+                  <Textarea
                     value={taskGoal}
                     onChange={(e) => setTaskGoal(e.target.value)}
                     placeholder="Describe what you want the agent to accomplish"
                     rows={4}
-                    data-testid="task-goal-input"
+                    isDisabled={isSubmitting}
                   />
                 </FormControl>
                 
-                <Button 
-                  type="submit" 
-                  colorScheme="blue" 
+                {error && (
+                  <Alert status="error" borderRadius="md">
+                    <AlertIcon />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                
+                {response && response.success && (
+                  <Alert status="success" borderRadius="md">
+                    <AlertIcon />
+                    <AlertDescription>{response.message}</AlertDescription>
+                  </Alert>
+                )}
+                
+                <Button
+                  type="submit"
+                  colorScheme="blue"
                   isLoading={isSubmitting}
                   loadingText="Submitting..."
-                  width="full"
-                  data-testid="submit-button"
+                  data-testid="spinner"
                 >
-                  Delegate to {agentName ?? `${agentType} Agent`}
+                  Submit Task
                 </Button>
               </VStack>
             </form>
-            
-            {error && (
-              <Alert status="error" mt={4} borderRadius="md">
-                <AlertIcon />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            
-            {response && (
-              <Alert status="success" mt={4} borderRadius="md">
-                <AlertIcon />
-                <VStack align="start" spacing={1} width="full">
-                  <AlertTitle>Task Delegated</AlertTitle>
-                  <AlertDescription>
-                    <Text>Task ID: {response?.task_id ?? 'Unknown'}</Text>
-                    <Text>Status: {response?.status ?? 'Unknown'}</Text>
-                    <Text>{response?.message ?? ''}</Text>
-                  </AlertDescription>
-                </VStack>
-              </Alert>
-            )}
-            
-            {/* Additional Debug Panel - Force visible */}
-            <Box mt={4} p={2} borderTopWidth="1px" borderColor="gray.300">
-              <Flex justify="space-between" align="center">
-                <Heading size="xs" mb={2}>🛠️ Debug Panel</Heading>
-                {isSubmitting && (
-                  <Button 
-                    size="xs" 
-                    colorScheme="red" 
-                    onClick={forceResetSpinner}
-                    leftIcon={<span>🚨</span>}
-                  >
-                    Kill Spinner
-                  </Button>
-                )}
-              </Flex>
-              <Text fontSize="sm"><strong>isSubmitting:</strong> {isSubmitting.toString()}</Text>
-              <Text fontSize="sm"><strong>taskName:</strong> {taskName}</Text>
-              <Text fontSize="sm"><strong>agentType:</strong> {agentType}</Text>
-              <Text fontSize="sm"><strong>last response:</strong> {response ? '✅ Received' : '❌ None'}</Text>
-              <Text fontSize="sm"><strong>last error:</strong> {error || 'None'}</Text>
-              <Text fontSize="sm"><strong>last updated:</strong> {lastUpdated}</Text>
-              <Text fontSize="sm"><strong>failsafe triggered:</strong> {failsafeTriggeredRef.current.toString()}</Text>
-              <Text fontSize="sm"><strong>component mounted:</strong> {mountedRef.current.toString()}</Text>
-            </Box>
           </CardBody>
         </Card>
         
-        {/* Task History */}
-        {taskHistory.length > 0 && (
-          <Card 
-            bg={colorMode === 'light' ? 'white' : 'gray.700'} 
-            boxShadow="md" 
-            borderRadius="lg"
-          >
-            <CardBody>
-              <Heading size="md" mb={4}>Recent Tasks</Heading>
-              <VStack spacing={4} align="stretch">
-                {taskHistory.map((task) => (
-                  <Box 
-                    key={task?.id ?? Math.random()} 
-                    p={4} 
-                    borderRadius="md" 
-                    bg={colorMode === 'light' ? 'gray.50' : 'gray.600'}
-                  >
-                    <HStack justifyContent="space-between" mb={2}>
-                      <Heading size="sm">{task?.name ?? 'Unnamed Task'}</Heading>
-                      <Badge colorScheme={task?.status === 'delegated' ? 'green' : 'blue'}>
-                        {task?.status ?? 'unknown'}
+        {/* Task history section */}
+        <Card variant="outline">
+          <CardBody>
+            <Heading size="md" mb={4}>Task History</Heading>
+            
+            {taskHistory.length === 0 ? (
+              <Text color="gray.500">No tasks submitted yet</Text>
+            ) : (
+              <VStack spacing={3} align="stretch">
+                {taskHistory.map((task, index) => (
+                  <Box key={task.id || index} p={3} borderWidth="1px" borderRadius="md">
+                    <HStack justifyContent="space-between">
+                      <Heading size="sm">{task.name}</Heading>
+                      <Badge colorScheme={task.status === 'completed' ? 'green' : 'blue'}>
+                        {task.status}
                       </Badge>
                     </HStack>
-                    <Text noOfLines={2} mb={2}>{task?.goal ?? 'No description'}</Text>
-                    <Text fontSize="xs" color="gray.500">
-                      {new Date(task?.timestamp ?? Date.now()).toLocaleString()}
+                    <Text mt={2} fontSize="sm" color="gray.600">{task.goal}</Text>
+                    <Text mt={1} fontSize="xs" color="gray.500">
+                      Submitted: {task.timestamp.toLocaleString()}
                     </Text>
                   </Box>
                 ))}
               </VStack>
-            </CardBody>
-          </Card>
-        )}
+            )}
+          </CardBody>
+        </Card>
       </Box>
     );
   } catch (error) {
-    // Fallback UI if the component crashes
-    console.error('AgentPanel render error:', error);
+    console.error('Render error in AgentPanel:', error);
+    
+    // Fallback UI in case of render errors
     return (
       <Box p={4}>
-        <Alert status="error" borderRadius="md">
+        <Alert status="error" variant="solid">
           <AlertIcon />
-          <VStack align="start">
-            <AlertTitle>Component Error</AlertTitle>
-            <AlertDescription>
-              <Text>The agent panel encountered an error.</Text>
-              <Text fontSize="sm">{error.message}</Text>
-              <Button 
-                mt={2} 
-                size="sm" 
-                onClick={() => window.location.reload()}
-              >
-                Reload Page
-              </Button>
-              {isSubmitting && (
-                <Button 
-                  mt={2} 
-                  size="sm" 
-                  colorScheme="red" 
-                  onClick={forceResetSpinner}
-                >
-                  Force Reset Spinner
-                </Button>
-              )}
-            </AlertDescription>
-          </VStack>
+          <AlertTitle mr={2}>Rendering Error</AlertTitle>
+          <AlertDescription>
+            An error occurred while rendering the agent panel. Please try refreshing the page.
+          </AlertDescription>
         </Alert>
+        
+        <Card mt={4} bg="red.50" color="red.800">
+          <CardBody>
+            <Heading size="md" mb={2}>Error Details</Heading>
+            <Code p={2} borderRadius="md" display="block" whiteSpace="pre-wrap">
+              {error.toString()}
+              {error.stack}
+            </Code>
+          </CardBody>
+        </Card>
       </Box>
     );
   }
 };
 
-// Specific agent implementations
+// Builder Agent Component
 export const BuilderAgent = () => (
-  <AgentPanel 
-    agentType="builder" 
-    agentName="Builder Agent" 
-    agentDescription="Creates and manages development projects, builds applications, and implements features."
+  <AgentPanel
+    agentType="builder"
+    agentName="Builder Agent"
+    agentDescription="The Builder Agent helps you create and implement solutions. It excels at coding, design, and technical implementation tasks."
   />
 );
 
+// Ops Agent Component
 export const OpsAgent = () => (
-  <AgentPanel 
-    agentType="ops" 
-    agentName="Operations Agent" 
-    agentDescription="Handles operations, infrastructure tasks, deployments, and system maintenance."
+  <AgentPanel
+    agentType="ops"
+    agentName="Operations Agent"
+    agentDescription="The Operations Agent helps you manage and optimize systems. It excels at monitoring, maintenance, and operational tasks."
   />
 );
 
+// Research Agent Component
 export const ResearchAgent = () => (
-  <AgentPanel 
-    agentType="research" 
-    agentName="Research Agent" 
-    agentDescription="Conducts research, gathers information, and analyzes data from various sources."
+  <AgentPanel
+    agentType="research"
+    agentName="Research Agent"
+    agentDescription="The Research Agent helps you gather and analyze information. It excels at finding data, summarizing content, and providing insights."
   />
 );
+
+export default {
+  BuilderAgent,
+  OpsAgent,
+  ResearchAgent
+};
