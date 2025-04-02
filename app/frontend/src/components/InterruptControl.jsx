@@ -111,8 +111,13 @@ const InterruptControl = () => {
             throw new Error("getTaskState is not available");
           }
           
-          taskState = await window.or.getTaskState();
-          console.log("✅ Successfully fetched task state:", taskState);
+          const res = await window.or.getTaskState();
+          if (!isEqual(taskState, res)) {
+            taskState = res;
+          }
+          if (process.env.NODE_ENV === "development") {
+            console.log("✅ Successfully fetched task state:", taskState);
+          }
           setInterruptSystemOffline(false);
         } catch (err) {
           console.warn("Error while calling window.or.getTaskState:", err);
