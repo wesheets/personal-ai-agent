@@ -1,110 +1,144 @@
-# Task Memory Loop + Multi-Agent State Tracking
+# Manus Frontend Implementation Documentation
 
-## Overview
-This system implements a persistent memory-driven state management system that allows the Planner Agent to track subtask status, recall task states across sessions, resume long-running goals, avoid repeating completed work, and enable agents to update task status and outcomes.
+## Project Overview
+This document provides an overview of the Manus Personal AI Agent System frontend implementation. The frontend is built using React 18.2 with Chakra UI, following the requirements specified in the frontend UI rollout document.
 
-## Components
+## Technology Stack
+- **Framework**: React 18.2
+- **Styling**: Chakra UI
+- **Build Tool**: Vite
+- **State/API**: Axios
+- **Color Mode**: Light + Dark Mode Toggle
+- **Deployment**: Railway (Static Site)
 
-### 1. Task State Manager (`/app/core/task_state_manager.py`)
-The Task State Manager implements a task tracking model that stores:
-- Goal and subtask IDs
-- Subtask descriptions
-- Agent assignments
-- Status information (queued, in_progress, complete, failed)
-- Timestamps and updates
-- Output summaries and error messages
-
-This component provides CRUD operations for task states, memory integration, and logging support.
-
-### 2. Status Tracker Tool (`/app/tools/status_tracker.py`)
-The Status Tracker Tool allows agents to update task status with operations like:
-- Marking tasks as complete
-- Reporting failures
-- Indicating blocked status
-- Reporting progress
-- Requesting retries
-
-### 3. Planner Orchestrator (`/app/core/planner_orchestrator.py`)
-The Planner Orchestrator has been enhanced to:
-- Check task memory before assigning work
-- Update status on assignment, completion, or failure
-- Retry failed tasks when confidence is above threshold
-- Log updates to task state logs
-- Allow continuation of partially complete goals
-
-### 4. Planner Agent Enhancer (`/app/core/planner_agent_enhancer.py`)
-The Planner Agent Enhancer provides:
-- Task prioritization based on memory
-- Escalation for stalled or failed tasks
-- Queryable goal progress
-- Persistence across sessions
-
-### 5. Planner Agent Configuration (`/app/prompts/planner.json`)
-The Planner Agent configuration has been updated to support:
-- Task prioritization factors
-- Escalation policies
-- Goal tracking settings
-- Agent assignment rules
-
-## Usage
-
-### Creating a Task
-```python
-from app.core.task_state_manager import get_task_state_manager
-
-task_manager = get_task_state_manager()
-task_state = task_manager.create_task_state(
-    goal_id="goal_123",
-    subtask_id="goal_123_subtask_1",
-    subtask_description="Implement feature X",
-    assigned_agent="builder"
-)
+## Project Structure
+```
+manus-frontend/
+├── public/
+├── src/
+│   ├── api/
+│   │   └── ApiService.js
+│   ├── components/
+│   │   ├── ActivityFeedPanel.jsx
+│   │   ├── ColorModeToggle.jsx
+│   │   ├── ErrorBoundary.jsx
+│   │   └── Sidebar.jsx
+│   ├── pages/
+│   │   ├── AgentPanels.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── MainActivityFeed.jsx
+│   │   ├── MemoryAgentView.jsx
+│   │   ├── MemoryBrowser.jsx
+│   │   └── SettingsPage.jsx
+│   ├── theme/
+│   │   └── index.js
+│   ├── utils/
+│   │   └── defensiveCoding.js
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── .env
+├── .env.production
+├── package.json
+└── vite.config.js
 ```
 
-### Updating Task Status
-```python
-from app.tools.status_tracker import get_status_tracker
+## Key Features
 
-status_tracker = get_status_tracker()
-result = status_tracker.complete_task(
-    subtask_id="goal_123_subtask_1",
-    output_summary="Feature X implemented successfully"
-)
+### 1. Sidebar Navigation
+- Responsive sidebar with mobile drawer
+- Sections for Dashboard, Builder Agent, Ops Agent, Research Agent, Memory Agent, Memory Browser, and Settings
+- Active route highlighting
+
+### 2. Dashboard View
+- 4 Agent Cards with null-safe property access
+- Recent Activity Feed with auto-refresh
+- Connection to /api/logs/latest endpoint
+
+### 3. Agent Panels (Builder/Ops/Research)
+- Task Name and Goal inputs
+- Submission to POST /api/agent/delegate
+- Response display with Task ID and Status
+- Local history of last 3 delegated tasks
+
+### 4. Memory Agent View
+- Split pane layout
+- Paste Text functionality with POST /api/memory
+- Upload Files feature with drag & drop support for TXT, PDF, and JSON files
+
+### 5. Memory Browser
+- Fetches and displays data from GET /api/memory
+- Shows title, timestamp, and preview content
+- Expand/collapse functionality
+
+### 6. Activity Feed Panel
+- ChatGPT-like center pane
+- Smooth scrolling UX
+- Displays logs, task results, and memory interactions
+
+### 7. Settings Page
+- Basic layout with "Settings coming soon" message
+- Placeholder sections for future implementation
+
+## API Integration
+All API calls use environment variables to avoid hardcoding URLs:
+```javascript
+// Example from ApiService.js
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 ```
 
-### Processing a Goal with Memory
-```python
-from app.core.planner_agent_enhancer import get_planner_agent_enhancer
+## Error Handling & Defensive Coding
+The application implements comprehensive error handling and defensive coding:
 
-enhancer = get_planner_agent_enhancer()
-result = enhancer.process_goal_with_memory({
-    "id": "goal_123",
-    "description": "Implement new feature",
-    "type": "development"
-})
-```
+1. **ErrorBoundary Component**: Catches and displays errors gracefully
+2. **Null-Safe Property Access**: Uses optional chaining (obj?.prop) throughout
+3. **Fallback Values**: Uses nullish coalescing (obj ?? defaultValue) for all potentially undefined properties
+4. **Defensive Rendering**: Implements filtering in mapping loops to handle null/undefined items
+5. **Utility Functions**: Includes defensive coding utilities in defensiveCoding.js
 
-### Checking Goal Progress
-```python
-from app.core.task_state_manager import get_task_state_manager
+## Environment Configuration
+- **.env**: Contains development environment variables
+  ```
+  VITE_API_BASE_URL=http://localhost:8000
+  ```
+- **.env.production**: Contains production environment variables
+  ```
+  VITE_API_BASE_URL=https://personal-ai-agent-backend-production.up.railway.app
+  ```
 
-task_manager = get_task_state_manager()
-progress = task_manager.get_goal_progress("goal_123")
-print(f"Completion: {progress['completion_percentage']}%")
-```
+## Deployment Instructions
+1. Build the project:
+   ```
+   npm run build
+   ```
+2. Deploy the `dist` folder to Railway as a static site
+3. Ensure the backend CORS configuration includes the frontend URL:
+   ```python
+   origins = [
+     "http://localhost:5173",
+     "https://your-frontend.up.railway.app"
+   ]
+   ```
 
-## Testing
-A comprehensive test suite is available in `test_task_memory_system.py` that validates:
+## Known Issues
+- Dependency compatibility issues between Chakra UI packages may require further resolution
+- Local development server may encounter errors related to component imports
+
+## Future Improvements
+- Complete API integration with actual backend endpoints
+- Implement real-time updates for activity feed
+- Add user authentication and profile management
+- Expand settings functionality
+
+## Backend Integration
+This frontend integrates with the Task Memory Loop + Multi-Agent State Tracking backend system, which provides:
 - Task state management
 - Status tracking
 - Goal continuation
 - Multi-agent coordination
 - Persistence across sessions
-
-Run the tests with:
-```
-python test_task_memory_system.py
-```
-
-## Integration with Existing System
-This system integrates with the existing Planner Agent and enhances its capabilities with persistent memory-driven state management. It builds on the existing agent architecture and extends it with robust task tracking and coordination features.

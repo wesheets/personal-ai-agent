@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Box, VStack, Text, Flex, Spinner, Badge, Divider, useColorModeValue } from '@chakra-ui/react';
 import { logsService } from '../services/api';
+import isEqual from 'lodash/isEqual';
 
 const ActivityFeed = () => {
   const [activities, setActivities] = useState([]);
@@ -17,9 +18,20 @@ const ActivityFeed = () => {
     // Function to fetch latest logs
     const fetchLogs = async () => {
       try {
+        if (activities.length === 0) {
+          setLoading(true);
+        }
         const data = await logsService.getLatestLogs();
-        setActivities(data);
-        setLoading(false);
+        
+        // Compare data before updating state to avoid unnecessary re-renders
+        const dataChanged = !isEqual(data, activities);
+        if (dataChanged) {
+          setActivities(data);
+        }
+        
+        if (loading) {
+          setLoading(false);
+        }
       } catch (err) {
         setError('Failed to fetch activity logs');
         setLoading(false);
@@ -46,7 +58,11 @@ const ActivityFeed = () => {
 
   // Function to determine badge color based on agent type
   const getAgentColor = (agentType) => {
-    switch (agentType?.toLowerCase()) {
+    if (!agentType || typeof agentType !== 'string') {
+      return 'gray';
+    }
+    
+    switch (agentType.toLowerCase()) {
       case 'builder':
         return 'blue';
       case 'research':
@@ -60,20 +76,27 @@ const ActivityFeed = () => {
     }
   };
 
+  // Memoize the activities list to prevent unnecessary re-renders
+  const memoizedActivities = useMemo(() => activities, [activities]);
+
   if (loading) {
     return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" />
-        <Text mt={4}>Loading activity feed...</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Flex direction="column" align="center">
+          <Spinner size="xl" mb={4} />
+          <Text>Loading activity feed...</Text>
+        </Flex>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} color="red.500">
-        <Text fontSize="lg">{error}</Text>
-        <Text mt={2}>Please try refreshing the page.</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Flex direction="column" align="center">
+          <Text fontSize="lg" color="red.500">{error}</Text>
+          <Text mt={2}>Please try refreshing the page.</Text>
+        </Flex>
       </Box>
     );
   }
@@ -92,33 +115,42 @@ const ActivityFeed = () => {
       <VStack spacing={4} align="stretch">
         <Text fontWeight="bold" fontSize="lg">Activity Feed</Text>
         
-        {activities.length === 0 ? (
-          <Text textAlign="center" py={10} color="gray.500">
-            No activities to display
-          </Text>
+        {memoizedActivities.length === 0 ? (
+          <Box 
+            minH="240px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            borderWidth="1px" 
+            borderRadius="md" 
+            borderStyle="dashed"
+            borderColor={borderColor}
+          >
+            <Text color="gray.500">No activities to display</Text>
+          </Box>
         ) : (
           <VStack spacing={4} align="stretch" divider={<Divider />}>
-            {activities.map((activity, index) => (
+            {memoizedActivities.filter(activity => activity).map((activity, index) => (
               <Box 
                 key={index} 
                 p={3} 
                 borderRadius="md" 
-                bg={activity.source === 'user' ? userBgColor : agentBgColor}
+                bg={activity?.source === 'user' ? userBgColor : agentBgColor}
                 borderWidth="1px"
                 borderColor={borderColor}
               >
                 <Flex justifyContent="space-between" alignItems="center" mb={2}>
-                  <Badge colorScheme={activity.source === 'user' ? 'blue' : getAgentColor(activity.agent_type)}>
-                    {activity.source === 'user' ? 'User' : activity.agent_type || 'System'}
+                  <Badge colorScheme={activity?.source === 'user' ? 'blue' : getAgentColor(activity?.agent_type)}>
+                    {activity?.source === 'user' ? 'User' : activity?.agent_type || 'System'}
                   </Badge>
                   <Text fontSize="xs" color="gray.500">
-                    {new Date(activity.timestamp).toLocaleString()}
+                    {activity?.timestamp ? new Date(activity.timestamp).toLocaleString() : 'Unknown time'}
                   </Text>
                 </Flex>
                 
-                <Text whiteSpace="pre-wrap">{activity.content}</Text>
+                <Text whiteSpace="pre-wrap">{activity?.content || 'No content'}</Text>
                 
-                {activity.metadata && (
+                {activity?.metadata && (
                   <Box mt={2} fontSize="sm" color="gray.500">
                     {Object.entries(activity.metadata).map(([key, value]) => (
                       <Text key={key}>

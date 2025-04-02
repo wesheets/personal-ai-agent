@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Box, 
   VStack, 
@@ -11,6 +11,7 @@ import {
   Heading
 } from '@chakra-ui/react';
 import { goalsService } from '../services/api';
+import isEqual from 'lodash/isEqual';
 
 // Component for visualizing the goal loop with subtasks and agent assignments
 const GoalLoopVisualization = () => {
@@ -32,7 +33,7 @@ const GoalLoopVisualization = () => {
         const data = await goalsService.getGoals();
         
         // Compare data before updating state to avoid unnecessary re-renders
-        const dataChanged = JSON.stringify(data) !== JSON.stringify(goals);
+        const dataChanged = !isEqual(data, goals);
         if (dataChanged) {
           setGoals(data);
         }
@@ -50,7 +51,7 @@ const GoalLoopVisualization = () => {
     // Initial fetch
     fetchGoals();
 
-    // Set up polling for real-time updates (keep at 5 seconds as it's already reasonable)
+    // Set up polling for real-time updates (every 5 seconds as requested)
     const intervalId = setInterval(fetchGoals, 5000);
 
     // Clean up interval on component unmount
@@ -78,36 +79,39 @@ const GoalLoopVisualization = () => {
     }
   };
 
+  // Memoize the goals list to prevent unnecessary re-renders
+  const memoizedGoals = useMemo(() => goals, [goals]);
+
   if (loading) {
     return (
-      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center">
-        <Spinner size="xl" mx="auto" />
-        <Text mt={4}>Loading goal data...</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Flex direction="column" align="center">
+          <Spinner size="xl" mb={4} />
+          <Text>Loading goal data...</Text>
+        </Flex>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center" color="red.500">
-        <Text fontSize="lg">{error}</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Text fontSize="lg" color="red.500">{error}</Text>
       </Box>
     );
   }
 
-  if (goals.length === 0) {
+  if (memoizedGoals.length === 0) {
     return (
       <Box 
-        textAlign="center" 
-        py={10} 
+        minH="inherit"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
         borderWidth="1px" 
         borderRadius="md" 
         borderStyle="dashed"
         borderColor={borderColor}
-        minH="200px"
-        display="flex"
-        flexDirection="column"
-        justifyContent="center"
       >
         <Text color="gray.500">No active goals found</Text>
       </Box>
@@ -115,8 +119,8 @@ const GoalLoopVisualization = () => {
   }
 
   return (
-    <VStack spacing={6} align="stretch" minH="200px">
-      {goals.filter(goal => goal).map((goal) => (
+    <VStack spacing={6} align="stretch" minH="inherit">
+      {memoizedGoals.filter(goal => goal).map((goal) => (
         <Box 
           key={goal?.goal_id || `goal-${Math.random()}`} 
           borderWidth="1px" 
@@ -128,53 +132,53 @@ const GoalLoopVisualization = () => {
         >
           <Flex justifyContent="space-between" alignItems="center" mb={3}>
             <Heading size="md">
-              <Badge colorScheme={getStatusColor(goal.status)} mr={2}>
-                {goal.status}
+              <Badge colorScheme={getStatusColor(goal?.status)} mr={2}>
+                {goal?.status || 'Unknown'}
               </Badge>
-              {goal.title}
+              {goal?.title || 'Untitled Goal'}
             </Heading>
             <Text fontSize="sm" color="gray.500">
-              Created: {new Date(goal.created_at).toLocaleString()}
+              Created: {goal?.created_at ? new Date(goal.created_at).toLocaleString() : 'Unknown'}
             </Text>
           </Flex>
           
-          <Text mb={4}>{goal.description}</Text>
+          <Text mb={4}>{goal?.description || 'No description available'}</Text>
           
           {/* Subtasks visualization */}
           <Box mb={4}>
             <Heading size="sm" mb={2}>Subtasks</Heading>
-            {goal.tasks && goal.tasks.length > 0 ? (
+            {goal?.tasks && goal.tasks.length > 0 ? (
               <VStack spacing={3} align="stretch">
-                {goal.tasks.map((task) => (
+                {goal.tasks.filter(task => task).map((task) => (
                   <Box 
-                    key={task.task_id} 
+                    key={task?.task_id || `task-${Math.random()}`} 
                     p={3} 
                     borderWidth="1px" 
                     borderRadius="md" 
                     borderLeftWidth="4px"
-                    borderLeftColor={`${getStatusColor(task.status)}.500`}
+                    borderLeftColor={`${getStatusColor(task?.status)}.500`}
                   >
                     <Flex justifyContent="space-between" alignItems="center" mb={1}>
-                      <Text fontWeight="bold">{task.title}</Text>
-                      <Badge colorScheme={getStatusColor(task.status)}>
-                        {task.status}
+                      <Text fontWeight="bold">{task?.title || 'Untitled Task'}</Text>
+                      <Badge colorScheme={getStatusColor(task?.status)}>
+                        {task?.status || 'Unknown'}
                       </Badge>
                     </Flex>
                     
-                    <Text fontSize="sm" mb={2}>{task.description}</Text>
+                    <Text fontSize="sm" mb={2}>{task?.description || 'No description'}</Text>
                     
                     <Flex gap={2} flexWrap="wrap" fontSize="xs">
                       <Badge colorScheme="purple">
-                        Agent: {task.assigned_agent || 'Unassigned'}
+                        Agent: {task?.assigned_agent || 'Unassigned'}
                       </Badge>
                       
-                      {task.started_at && (
+                      {task?.started_at && (
                         <Text color="gray.500">
                           Started: {new Date(task.started_at).toLocaleString()}
                         </Text>
                       )}
                       
-                      {task.completed_at && (
+                      {task?.completed_at && (
                         <Text color="gray.500">
                           Completed: {new Date(task.completed_at).toLocaleString()}
                         </Text>
@@ -200,25 +204,26 @@ const GoalLoopVisualization = () => {
           {/* Timeline visualization */}
           <Box>
             <Heading size="sm" mb={2}>Timeline</Heading>
-            {goal.tasks && goal.tasks.length > 0 ? (
+            {goal?.tasks && goal.tasks.length > 0 ? (
               <VStack spacing={0} align="stretch" position="relative">
                 {goal.tasks
+                  .filter(task => task?.created_at)
                   .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
                   .map((task, index) => (
-                    <Flex key={`timeline-${task.task_id}`} mb={2}>
+                    <Flex key={`timeline-${task?.task_id || index}`} mb={2}>
                       <Box 
                         w="12px" 
                         h="12px" 
                         borderRadius="full" 
-                        bg={`${getStatusColor(task.status)}.500`} 
+                        bg={`${getStatusColor(task?.status)}.500`} 
                         mt={1}
                         mr={3}
                       />
                       <Box flex="1">
-                        <Text fontWeight="medium">{task.title}</Text>
+                        <Text fontWeight="medium">{task?.title || 'Untitled Task'}</Text>
                         <Flex fontSize="xs" color="gray.500">
-                          <Text mr={2}>{task.status}</Text>
-                          <Text>{new Date(task.created_at).toLocaleString()}</Text>
+                          <Text mr={2}>{task?.status || 'Unknown'}</Text>
+                          <Text>{task?.created_at ? new Date(task.created_at).toLocaleString() : 'Unknown time'}</Text>
                         </Flex>
                       </Box>
                     </Flex>

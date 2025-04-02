@@ -5,6 +5,7 @@ import {
   Box, 
   Heading, 
   Flex,
+  SimpleGrid,
   useColorModeValue
 } from '@chakra-ui/react';
 import GoalLoopVisualization from './GoalLoopVisualization';
@@ -22,9 +23,9 @@ const Dashboard = () => {
     <Box>
       <Heading as="h1" size="lg" mb={6}>Dashboard</Heading>
       
-      <Grid templateColumns="repeat(12, 1fr)" gap={6}>
+      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
         {/* Left column - Agent Panel and Activity Feed */}
-        <GridItem colSpan={{ base: 12, md: 6, lg: 4 }}>
+        <GridItem>
           <Flex direction="column" gap={6}>
             <AgentPanel />
             
@@ -35,21 +36,22 @@ const Dashboard = () => {
               shadow="md" 
               bg={bgColor} 
               borderColor={borderColor}
-              minH="300px"
             >
               <Heading size="md" mb={4}>Goal Loop Visualization</Heading>
-              <GoalLoopVisualization />
+              <Box minH="240px" w="full" display="flex" flexDir="column" justifyContent="flex-start">
+                <GoalLoopVisualization />
+              </Box>
             </Box>
           </Flex>
         </GridItem>
         
         {/* Center column - Activity Feed */}
-        <GridItem colSpan={{ base: 12, md: 6, lg: 4 }} height="70vh">
+        <GridItem>
           <ActivityFeed />
         </GridItem>
         
         {/* Right column - Memory Viewer, Interrupt Control, Status Feedback */}
-        <GridItem colSpan={{ base: 12, md: 12, lg: 4 }}>
+        <GridItem>
           <Flex direction="column" gap={6}>
             <Box 
               borderWidth="1px" 
@@ -60,7 +62,9 @@ const Dashboard = () => {
               borderColor={borderColor}
             >
               <Heading size="md" mb={4}>Memory Viewer</Heading>
-              <MemoryViewer />
+              <Box minH="240px" w="full" display="flex" flexDir="column" justifyContent="flex-start">
+                <MemoryViewer />
+              </Box>
             </Box>
             
             <Box 
@@ -70,10 +74,11 @@ const Dashboard = () => {
               shadow="md" 
               bg={bgColor} 
               borderColor={borderColor}
-              minH="300px"
             >
               <Heading size="md" mb={4}>Interrupt Control</Heading>
-              <InterruptControl />
+              <Box minH="240px" w="full" display="flex" flexDir="column" justifyContent="flex-start">
+                <InterruptControl />
+              </Box>
             </Box>
             
             <Box 
@@ -83,14 +88,15 @@ const Dashboard = () => {
               shadow="md" 
               bg={bgColor} 
               borderColor={borderColor}
-              minH="300px"
             >
               <Heading size="md" mb={4}>Status Feedback</Heading>
-              <StatusFeedback />
+              <Box minH="240px" w="full" display="flex" flexDir="column" justifyContent="flex-start">
+                <StatusFeedback />
+              </Box>
             </Box>
           </Flex>
         </GridItem>
-      </Grid>
+      </SimpleGrid>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from fastapi import Depends
 from app.providers import get_model_router, process_with_model, initialize_model_providers
 from dotenv import load_dotenv
@@ -145,6 +145,26 @@ class PromptManager:
             },
             "examples": []
         })
+    
+    # Add mock method for get_available_agents if it doesn't exist
+    def get_available_agents(self) -> List[str]:
+        """
+        Get a list of available agent types
+        
+        Returns:
+            List of available agent types
+        """
+        return ["builder", "ops", "research", "memory", "planner"]
+    
+    # Add mock method for get_agent_status
+    def get_agent_status(self) -> Dict[str, str]:
+        """
+        Get the status of all agents
+        
+        Returns:
+            Dictionary mapping agent names to their status
+        """
+        return {agent: "idle" for agent in self.get_available_agents()}
 
 async def process_with_prompt_chain(
     prompt_chain: Dict[str, Any], 

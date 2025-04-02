@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Box, 
   VStack, 
@@ -14,6 +14,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react';
 import { memoryService } from '../services/api';
+import isEqual from 'lodash/isEqual';
 
 // Component for viewing memory entries with filtering capabilities
 const MemoryViewer = () => {
@@ -44,7 +45,13 @@ const MemoryViewer = () => {
         if (filters.endTimestamp) params.end_timestamp = filters.endTimestamp;
         
         const data = await memoryService.getMemoryEntries(params);
-        setMemories(data);
+        
+        // Compare data before updating state to avoid unnecessary re-renders
+        const dataChanged = !isEqual(data, memories);
+        if (dataChanged) {
+          setMemories(data);
+        }
+        
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch memory data');
@@ -55,6 +62,12 @@ const MemoryViewer = () => {
 
     // Initial fetch
     fetchMemories();
+    
+    // Set up polling for real-time updates (every 5 seconds as requested)
+    const intervalId = setInterval(fetchMemories, 5000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
   }, [filters]);
 
   // Handle filter changes
@@ -76,25 +89,30 @@ const MemoryViewer = () => {
     });
   };
 
+  // Memoize the memories list to prevent unnecessary re-renders
+  const memoizedMemories = useMemo(() => memories, [memories]);
+
   if (loading) {
     return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" />
-        <Text mt={4}>Loading memory data...</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Flex direction="column" align="center">
+          <Spinner size="xl" mb={4} />
+          <Text>Loading memory data...</Text>
+        </Flex>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} color="red.500">
-        <Text fontSize="lg">{error}</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Text fontSize="lg" color="red.500">{error}</Text>
       </Box>
     );
   }
 
   return (
-    <Box>
+    <Box minH="inherit">
       {/* Filter controls */}
       <Box 
         mb={6} 
@@ -173,11 +191,11 @@ const MemoryViewer = () => {
       
       {/* Memory entries display */}
       <Box>
-        {memories.length > 0 ? (
+        {memoizedMemories.length > 0 ? (
           <VStack spacing={4} align="stretch" divider={<Divider />}>
-            {memories.map((memory) => (
+            {memoizedMemories.filter(memory => memory).map((memory) => (
               <Box 
-                key={memory.id} 
+                key={memory?.id || `memory-${Math.random()}`} 
                 p={4} 
                 borderWidth="1px" 
                 borderRadius="md" 
@@ -185,18 +203,18 @@ const MemoryViewer = () => {
                 borderColor={borderColor}
               >
                 <Flex justifyContent="space-between" alignItems="center" mb={2}>
-                  <Text fontWeight="bold">{memory.title || 'Memory Entry'}</Text>
+                  <Text fontWeight="bold">{memory?.title || 'Memory Entry'}</Text>
                   <Text fontSize="sm" color="gray.500">
-                    {new Date(memory.timestamp).toLocaleString()}
+                    {memory?.timestamp ? new Date(memory.timestamp).toLocaleString() : 'Unknown time'}
                   </Text>
                 </Flex>
                 
-                <Text mb={3}>{memory.content}</Text>
+                <Text mb={3}>{memory?.content || 'No content available'}</Text>
                 
                 <Flex gap={2} flexWrap="wrap" fontSize="sm" color="gray.600">
-                  <Text>Agent: {memory.agent_type || 'Unknown'}</Text>
-                  {memory.goal_id && <Text>Goal: {memory.goal_id}</Text>}
-                  {memory.tags && memory.tags.length > 0 && (
+                  <Text>Agent: {memory?.agent_type || 'Unknown'}</Text>
+                  {memory?.goal_id && <Text>Goal: {memory.goal_id}</Text>}
+                  {memory?.tags && memory.tags.length > 0 && (
                     <Text>Tags: {memory.tags.join(', ')}</Text>
                   )}
                 </Flex>
@@ -205,8 +223,10 @@ const MemoryViewer = () => {
           </VStack>
         ) : (
           <Box 
-            textAlign="center" 
-            py={10} 
+            minH="inherit"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
             borderWidth="1px" 
             borderRadius="md" 
             borderStyle="dashed"

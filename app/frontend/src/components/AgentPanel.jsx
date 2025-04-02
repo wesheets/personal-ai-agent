@@ -107,7 +107,18 @@ const AgentPanel = () => {
   };
 
   return (
-    <Box borderWidth="1px" borderRadius="lg" p={4} shadow="md" bg="white" _dark={{ bg: 'gray.700' }}>
+    <Box 
+      borderWidth="1px" 
+      borderRadius="lg" 
+      p={4} 
+      shadow="md" 
+      bg="white" 
+      _dark={{ bg: 'gray.700' }}
+      minH="240px"
+      display="flex"
+      flexDir="column"
+      justifyContent="flex-start"
+    >
       <VStack spacing={4} align="stretch">
         <Heading size="md">Agent Task Delegation</Heading>
         

@@ -97,6 +97,10 @@ const MemoryUpload = () => {
       shadow="md" 
       bg={bgColor} 
       borderColor={borderColor}
+      minH="240px"
+      display="flex"
+      flexDir="column"
+      justifyContent="flex-start"
     >
       <VStack spacing={4} align="stretch">
         <Text fontWeight="bold" fontSize="lg">Create Memory</Text>

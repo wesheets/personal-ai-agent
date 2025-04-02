@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Box, 
   VStack, 
@@ -22,6 +22,7 @@ import {
   GridItem
 } from '@chakra-ui/react';
 import { controlService } from '../services/api';
+import isEqual from 'lodash/isEqual';
 
 const StatusFeedback = () => {
   const [agents, setAgents] = useState([]);
@@ -41,8 +42,12 @@ const StatusFeedback = () => {
         }
         const data = await controlService.getAgentStatus();
         
-        // Use functional update to avoid dependency on previous state
-        setAgents(data);
+        // Compare data before updating state to avoid unnecessary re-renders
+        const dataChanged = !isEqual(data, agents);
+        if (dataChanged) {
+          // Use functional update to avoid dependency on previous state
+          setAgents(data);
+        }
         
         if (loading) {
           setLoading(false);
@@ -57,9 +62,9 @@ const StatusFeedback = () => {
     // Initial fetch
     fetchAgentStatus();
 
-    // Set up polling for real-time updates (every 3 seconds instead of 2)
+    // Set up polling for real-time updates (every 5 seconds as requested)
     // Increased interval to reduce re-renders while maintaining responsiveness
-    const intervalId = setInterval(fetchAgentStatus, 3000);
+    const intervalId = setInterval(fetchAgentStatus, 5000);
     
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
@@ -92,28 +97,33 @@ const StatusFeedback = () => {
     }
   };
 
+  // Memoize the agent list to prevent unnecessary re-renders
+  const memoizedAgents = useMemo(() => agents, [agents]);
+
   if (loading) {
     return (
-      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center">
-        <Spinner size="xl" mx="auto" />
-        <Text mt={4}>Loading agent status...</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Flex direction="column" align="center">
+          <Spinner size="xl" mb={4} />
+          <Text>Loading agent status...</Text>
+        </Flex>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center" color="red.500">
-        <Text fontSize="lg">{error}</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Text fontSize="lg" color="red.500">{error}</Text>
       </Box>
     );
   }
 
   return (
-    <Box minH="200px">
-      {agents.length > 0 ? (
+    <Box minH="inherit">
+      {memoizedAgents.length > 0 ? (
         <VStack spacing={4} align="stretch">
-          {agents.filter(agent => agent).map((agent) => (
+          {memoizedAgents.filter(agent => agent).map((agent) => (
             <Box 
               key={agent?.id || `agent-${Math.random()}`} 
               borderWidth="1px" 
@@ -139,10 +149,10 @@ const StatusFeedback = () => {
                   {agent.status}
                 </Badge>
                 
-                <Heading size="md" flex="1">{agent.name}</Heading>
+                <Heading size="md" flex="1">{agent?.name || 'Unknown Agent'}</Heading>
                 
                 <Badge colorScheme="purple" fontSize="0.8em">
-                  {agent.type}
+                  {agent?.type || 'Unknown Type'}
                 </Badge>
               </Flex>
               
@@ -245,16 +255,14 @@ const StatusFeedback = () => {
         </VStack>
       ) : (
         <Box 
-          textAlign="center" 
-          py={10} 
+          minH="inherit"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
           borderWidth="1px" 
           borderRadius="md" 
           borderStyle="dashed"
           borderColor={borderColor}
-          minH="150px"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
         >
           <Text color="gray.500">No active agents found</Text>
         </Box>

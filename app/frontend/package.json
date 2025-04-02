@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "Frontend for Personal AI Agent System",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -14,10 +15,12 @@
     "@emotion/styled": "^11.11.0",
     "axios": "^1.4.0",
     "framer-motion": "^10.15.0",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",
-    "react-router-dom": "^6.14.2"
+    "react-router-dom": "^6.14.2",
+    "styled-components": "^6.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

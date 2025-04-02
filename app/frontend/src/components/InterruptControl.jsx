@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Box, 
   VStack, 
@@ -19,9 +19,37 @@ import {
   useDisclosure,
   useColorModeValue,
   Heading,
-  Divider
+  Divider,
+  Alert,
+  AlertIcon
 } from '@chakra-ui/react';
 import { controlService } from '../services/api';
+import isEqual from 'lodash/isEqual';
+
+// Initialize window.or and getTaskState at the module level
+// This ensures it happens before any component rendering
+(function initializeGlobalOrchestrator() {
+  try {
+    if (typeof window !== 'undefined') {
+      if (!window.or) {
+        console.warn("⚠️ window.or not found, creating empty object");
+        window.or = {};
+      }
+
+      if (typeof window.or.getTaskState !== "function") {
+        console.warn("⚠️ Injecting mock getTaskState into window.or at module level");
+        window.or.getTaskState = async () => {
+          console.warn("🛑 Mock getTaskState invoked – returning empty array");
+          return { tasks: [] };
+        };
+      } else {
+        console.log("✅ getTaskState exists and is safe to use at module level");
+      }
+    }
+  } catch (err) {
+    console.error("🔥 Error initializing global orchestrator:", err);
+  }
+})();
 
 const InterruptControl = () => {
   const [systemState, setSystemState] = useState({
@@ -33,10 +61,35 @@ const InterruptControl = () => {
   const [taskPrompt, setTaskPrompt] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [interruptSystemOffline, setInterruptSystemOffline] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
+
+  // Double-check window.or.getTaskState on component mount as a safety measure
+  useEffect(() => {
+    try {
+      if (!window.or) {
+        console.warn("⚠️ window.or still not found after module init, creating empty object");
+        window.or = {};
+      }
+
+      if (typeof window.or.getTaskState !== "function") {
+        console.warn("⚠️ Re-injecting mock getTaskState into window.or");
+        window.or.getTaskState = async () => {
+          console.warn("🛑 Mock getTaskState invoked – returning empty array");
+          return { tasks: [] };
+        };
+      } else {
+        console.log("✅ getTaskState exists and is safe to use in component");
+      }
+    } catch (err) {
+      console.error("🔥 Error in component getTaskState check:", err);
+      setInterruptSystemOffline(true);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchControlState = async () => {
@@ -48,27 +101,36 @@ const InterruptControl = () => {
         
         const controlMode = await controlService.getControlMode();
 
-        // Strict guard for or.getTaskState fallback logic
+        // Strict guard for or.getTaskState fallback logic with retry
         let taskState = { tasks: [] };
 
         try {
-          if (
-            typeof window !== "undefined" &&
-            window.or &&
-            Object.prototype.hasOwnProperty.call(window.or, "getTaskState") &&
-            typeof window.or.getTaskState === "function"
-          ) {
-            taskState = await window.or.getTaskState();
-          } else {
-            console.warn("window.or.getTaskState is not defined or not a function. Using fallback.");
+          // Extra defensive check before calling
+          if (typeof window.or?.getTaskState !== "function") {
+            console.warn("⚠️ getTaskState still not a function before fetch attempt");
+            throw new Error("getTaskState is not available");
           }
+          
+          taskState = await window.or.getTaskState();
+          console.log("✅ Successfully fetched task state:", taskState);
+          setInterruptSystemOffline(false);
         } catch (err) {
           console.warn("Error while calling window.or.getTaskState:", err);
+          setInterruptSystemOffline(true);
+          
+          // Implement retry logic with exponential backoff
+          if (retryCount < 3) {
+            const timeout = Math.pow(2, retryCount) * 1000;
+            console.log(`⏱️ Retrying in ${timeout/1000} seconds...`);
+            setTimeout(() => {
+              setRetryCount(prev => prev + 1);
+            }, timeout);
+          }
         }
 
         // Compare data before updating state to avoid unnecessary re-renders
         const modeChanged = controlMode.mode !== systemState.executionMode;
-        const tasksChanged = JSON.stringify(taskState.tasks) !== JSON.stringify(activeTasks);
+        const tasksChanged = !isEqual(taskState.tasks, activeTasks);
         
         if (modeChanged) {
           setSystemState(prevState => ({
@@ -92,10 +154,10 @@ const InterruptControl = () => {
     };
 
     fetchControlState();
-    // Keep at 3 seconds as it's a reasonable interval for control operations
-    const intervalId = setInterval(fetchControlState, 3000);
+    // Set up polling for real-time updates (every 5 seconds as requested)
+    const intervalId = setInterval(fetchControlState, 5000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [retryCount]); // Re-run when retryCount changes
 
   const handleModeChange = async (mode) => {
     try {
@@ -147,25 +209,37 @@ const InterruptControl = () => {
     }
   };
 
+  // Memoize the tasks list to prevent unnecessary re-renders
+  const memoizedTasks = useMemo(() => activeTasks, [activeTasks]);
+
   if (loading) {
     return (
-      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center">
-        <Spinner size="xl" mx="auto" />
-        <Text mt={4}>Loading control panel...</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Flex direction="column" align="center">
+          <Spinner size="xl" mb={4} />
+          <Text>Loading control panel...</Text>
+        </Flex>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center" color="red.500">
-        <Text fontSize="lg">{error}</Text>
+      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
+        <Text fontSize="lg" color="red.500">{error}</Text>
       </Box>
     );
   }
 
   return (
-    <Box minH="200px">
+    <Box minH="inherit">
+      {interruptSystemOffline && (
+        <Alert status="warning" variant="left-accent" mb={4}>
+          <AlertIcon />
+          Interrupt system offline – retrying soon
+        </Alert>
+      )}
+      
       <Box mb={6} p={4} borderWidth="1px" borderRadius="lg" bg={bgColor} borderColor={borderColor}>
         <Heading size="md" mb={4}>Execution Control</Heading>
         <Flex gap={3}>
@@ -195,9 +269,9 @@ const InterruptControl = () => {
 
       <Box p={4} borderWidth="1px" borderRadius="lg" bg={bgColor} borderColor={borderColor} minH="120px">
         <Heading size="md" mb={4}>Active Tasks</Heading>
-        {activeTasks.length > 0 ? (
+        {memoizedTasks.length > 0 ? (
           <VStack spacing={4} align="stretch" divider={<Divider />}>
-            {activeTasks.filter(task => task).map((task) => (
+            {memoizedTasks.filter(task => task).map((task) => (
               <Box key={task?.task_id || `task-${Math.random()}`} p={3} borderWidth="1px" borderRadius="md">
                 <Flex justifyContent="space-between" alignItems="center" mb={2}>
                   <Text fontWeight="bold">{task?.title || 'Untitled Task'}</Text>
@@ -212,16 +286,16 @@ const InterruptControl = () => {
                   <Button 
                     size="sm"
                     colorScheme="yellow"
-                    onClick={() => handleTaskAction(task.task_id, task.status === 'in_progress' ? 'kill' : 'restart')}
-                    isDisabled={task.status === 'completed'}
+                    onClick={() => handleTaskAction(task?.task_id, task?.status === 'in_progress' ? 'kill' : 'restart')}
+                    isDisabled={task?.status === 'completed'}
                   >
-                    {task.status === 'in_progress' ? 'Kill' : 'Restart'}
+                    {task?.status === 'in_progress' ? 'Kill' : 'Restart'}
                   </Button>
                   <Select 
                     size="sm"
                     placeholder="Redirect to..."
-                    onChange={(e) => handleTaskRedirect(task.task_id, e.target.value)}
-                    isDisabled={task.status === 'completed'}
+                    onChange={(e) => handleTaskRedirect(task?.task_id, e.target.value)}
+                    isDisabled={task?.status === 'completed'}
                     maxW="200px"
                   >
                     {systemState.activeAgents.map((agent) => (
@@ -233,7 +307,7 @@ const InterruptControl = () => {
                       size="sm"
                       colorScheme="blue"
                       onClick={() => openPromptEditor(task)}
-                      isDisabled={task.status === 'completed'}
+                      isDisabled={task?.status === 'completed'}
                     >
                       Edit Prompt
                     </Button>
@@ -244,16 +318,14 @@ const InterruptControl = () => {
           </VStack>
         ) : (
           <Box 
-            textAlign="center" 
-            py={6} 
+            minH="inherit"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
             borderWidth="1px" 
             borderRadius="md" 
             borderStyle="dashed" 
             borderColor={borderColor}
-            minH="80px"
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
           >
             <Text color="gray.500">No active tasks found</Text>
           </Box>
