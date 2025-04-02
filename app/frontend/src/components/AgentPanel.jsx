@@ -28,8 +28,21 @@ const AgentPanel = () => {
     }
 
     setIsSubmitting(true);
+    
     try {
-      await controlService.delegateTask(null, selectedAgent, taskInput);
+      // Add timeout to ensure the request doesn't hang indefinitely
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timed out')), 10000);
+      });
+      
+      // Race between the actual request and the timeout
+      const result = await Promise.race([
+        controlService.delegateTask(null, selectedAgent, taskInput),
+        timeoutPromise
+      ]);
+      
+      console.log('Task delegation successful:', result);
+      
       toast({
         title: 'Task submitted',
         description: `Task delegated to ${selectedAgent} agent`,
@@ -42,12 +55,15 @@ const AgentPanel = () => {
       console.error('Error delegating task:', error);
       toast({
         title: 'Submission failed',
-        description: 'Failed to delegate task. Please try again.',
+        description: error.message === 'Request timed out' 
+          ? 'Request timed out. The task may still be processing.' 
+          : 'Failed to delegate task. Please try again.',
         status: 'error',
         duration: 5000,
         isClosable: true,
       });
     } finally {
+      // Ensure spinner is always hidden after submission attempt
       setIsSubmitting(false);
     }
   };
@@ -95,10 +111,9 @@ const AgentPanel = () => {
           onClick={handleSubmit}
           isLoading={isSubmitting}
           loadingText="Submitting"
-          isDisabled={!taskInput.trim()}
+          isDisabled={!taskInput.trim() || isSubmitting}
           width="full"
         >
-          {isSubmitting ? <Spinner size="sm" mr={2} /> : null}
           Delegate Task
         </Button>
       </VStack>
