@@ -11,7 +11,7 @@ import {
   Heading
 } from '@chakra-ui/react';
 import { goalsService } from '../services/api';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash.isequal';
 
 // Component for visualizing the goal loop with subtasks and agent assignments
 const GoalLoopVisualization = () => {
