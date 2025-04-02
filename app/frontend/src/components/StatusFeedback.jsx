@@ -4,24 +4,10 @@ import {
   VStack, 
   Text, 
   Flex, 
-  Spinner, 
   Badge, 
-  Divider, 
-  useColorModeValue,
-  Heading,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  Grid,
-  GridItem
+  useColorModeValue
 } from '@chakra-ui/react';
-import { controlService } from '../services/api';
+import { agentsService } from '../services/api';
 import isEqual from 'lodash.isequal';
 
 const StatusFeedback = () => {
@@ -57,27 +43,26 @@ const StatusFeedback = () => {
   });
 
   useEffect(() => {
-    // Function to fetch agent status
+    // Function to fetch agent status data
     const fetchAgentStatus = async () => {
       try {
         // Only show loading on initial fetch, not during polling updates
         if (agents.length === 0) {
           setLoading(true);
         }
-        const data = await controlService.getAgentStatus();
+        const data = await agentsService.getAgentStatus();
         
         // Compare data before updating state to avoid unnecessary re-renders
         const dataChanged = !isEqual(prevAgentsRef.current, data);
         if (dataChanged) {
           if (process.env.NODE_ENV === "development") {
-            console.log('Agent status changed, updating state');
+            console.log('Agent status data changed, updating state');
           }
-          // Store the new data in ref for future comparisons
+          // Create a deep copy to avoid reference issues
           prevAgentsRef.current = JSON.parse(JSON.stringify(data));
-          // Use functional update to avoid dependency on previous state
           setAgents(data);
         } else if (process.env.NODE_ENV === "development") {
-          console.log('Agent status unchanged, skipping update');
+          console.log('Agent status data unchanged, skipping update');
         }
         
         if (loading) {
@@ -95,15 +80,14 @@ const StatusFeedback = () => {
     // Initial fetch
     fetchAgentStatus();
 
-    // Set up polling for real-time updates (every 5 seconds as requested)
-    // Increased interval to reduce re-renders while maintaining responsiveness
+    // Set up polling for real-time updates (every 5 seconds)
     const intervalId = setInterval(fetchAgentStatus, 5000);
-    
+
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
-  // Function to determine status color with defensive coding
+  // Function to determine status color
   const getStatusColor = (status) => {
     // Ensure status is a string before attempting to use toLowerCase
     if (!status || typeof status !== 'string') {
@@ -111,26 +95,24 @@ const StatusFeedback = () => {
     }
     
     switch (status.toLowerCase()) {
+      case 'online':
       case 'active':
       case 'running':
-      case 'in_progress':
-        return 'blue';
+        return 'green';
       case 'idle':
-      case 'waiting':
-      case 'pending':
+        return 'blue';
+      case 'busy':
         return 'yellow';
+      case 'offline':
       case 'error':
       case 'failed':
         return 'red';
-      case 'completed':
-      case 'success':
-        return 'green';
       default:
         return 'gray';
     }
   };
 
-  // Memoize the agent list to prevent unnecessary re-renders
+  // Memoize the agents list to prevent unnecessary re-renders
   const memoizedAgents = useMemo(() => agents, [agents]);
 
   // Render content based on state
@@ -143,7 +125,6 @@ const StatusFeedback = () => {
       );
     }
 
-    // Add safety check for memoizedAgents
     if (!Array.isArray(memoizedAgents) || memoizedAgents.length === 0) {
       return (
         <Box 
@@ -162,160 +143,58 @@ const StatusFeedback = () => {
     }
 
     return (
-      <VStack spacing={4} align="stretch" h="100%">
-        {/* Add Array.isArray check before filter and map */}
+      <VStack spacing={4} align="stretch">
         {Array.isArray(memoizedAgents) && memoizedAgents.filter(agent => agent).map((agent) => (
           <Box 
-            key={agent?.id || `agent-${Math.random()}`} 
+            key={agent?.agent_id || `agent-${Math.random()}`} 
             borderWidth="1px" 
             borderRadius="lg" 
-            overflow="hidden"
-            bg={bgColor}
+            p={4} 
+            shadow="sm" 
+            bg={bgColor} 
             borderColor={borderColor}
-            minH="120px"
           >
-            <Flex 
-              p={4} 
-              alignItems="center" 
-              bg={`${getStatusColor(agent.status)}.50`}
-              _dark={{ bg: `${getStatusColor(agent.status)}.900` }}
-              borderBottomWidth="1px"
-            >
-              <Badge 
-                colorScheme={getStatusColor(agent.status)} 
-                fontSize="0.8em" 
-                p={1} 
-                borderRadius="full"
-                mr={3}
-              >
-                {agent.status}
-              </Badge>
-              
-              <Heading size="md" flex="1">{agent?.name || 'Unknown Agent'}</Heading>
-              
-              <Badge colorScheme="purple" fontSize="0.8em">
-                {agent?.type || 'Unknown Type'}
-              </Badge>
+            <Flex justifyContent="space-between" alignItems="center" mb={3}>
+              <Flex alignItems="center">
+                <Badge colorScheme={getStatusColor(agent?.status)} mr={2}>
+                  {agent?.status || 'Unknown'}
+                </Badge>
+                <Text fontWeight="bold">{agent?.name || 'Unnamed Agent'}</Text>
+              </Flex>
+              <Text fontSize="sm" color="gray.500">
+                Type: {agent?.type || 'Unknown'}
+              </Text>
             </Flex>
             
-            <Box p={4}>
-              {agent.current_task && (
-                <Box mb={3}>
-                  <Text fontWeight="bold" fontSize="sm" color="gray.500">
-                    Current Task:
-                  </Text>
-                  <Text>{agent.current_task.title}</Text>
-                </Box>
-              )}
-              
-              {agent.completion_state && (
-                <Box mb={3}>
-                  <Text fontWeight="bold" fontSize="sm" color="gray.500">
-                    Completion:
-                  </Text>
-                  <Text>{agent.completion_state}</Text>
-                </Box>
-              )}
-              
-              <Accordion allowToggle mt={3}>
-                {/* Error details (expandable) - Add Array.isArray check */}
-                {agent.errors && Array.isArray(agent.errors) && agent.errors.length > 0 && (
-                  <AccordionItem>
-                    <h2>
-                      <AccordionButton>
-                        <Box flex="1" textAlign="left">
-                          <Flex alignItems="center">
-                            <Badge colorScheme="red" mr={2}>
-                              {agent.errors.length}
-                            </Badge>
-                            Error Details
-                          </Flex>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <VStack spacing={2} align="stretch">
-                        {/* Add Array.isArray check before map */}
-                        {Array.isArray(agent.errors) && agent.errors.map((error, index) => (
-                          <Box 
-                            key={index} 
-                            p={2} 
-                            borderWidth="1px" 
-                            borderRadius="md" 
-                            borderColor="red.200"
-                            bg="red.50"
-                            _dark={{ bg: "red.900", borderColor: "red.700" }}
-                          >
-                            <Text fontSize="xs" color="gray.500">
-                              {new Date(error.timestamp).toLocaleString()}
-                            </Text>
-                            <Text>{error.message}</Text>
-                          </Box>
-                        ))}
-                      </VStack>
-                    </AccordionPanel>
-                  </AccordionItem>
-                )}
-                
-                {/* Performance metrics */}
-                {agent.metrics && (
-                  <AccordionItem>
-                    <h2>
-                      <AccordionButton>
-                        <Box flex="1" textAlign="left">
-                          Performance Metrics
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                      <Grid templateColumns="repeat(3, 1fr)" gap={4}>
-                        <Stat>
-                          <StatLabel>Tasks Completed</StatLabel>
-                          <StatNumber>{agent.metrics.tasks_completed || 0}</StatNumber>
-                        </Stat>
-                        
-                        <Stat>
-                          <StatLabel>Avg. Response Time</StatLabel>
-                          <StatNumber>{agent.metrics.avg_response_time || 'N/A'}</StatNumber>
-                          <StatHelpText>seconds</StatHelpText>
-                        </Stat>
-                        
-                        <Stat>
-                          <StatLabel>Success Rate</StatLabel>
-                          <StatNumber>{agent.metrics.success_rate || 'N/A'}</StatNumber>
-                          <StatHelpText>percent</StatHelpText>
-                        </Stat>
-                      </Grid>
-                    </AccordionPanel>
-                  </AccordionItem>
-                )}
-              </Accordion>
-            </Box>
+            <Text mb={3}>{agent?.description || 'No description available'}</Text>
+            
+            <Flex justifyContent="space-between" fontSize="sm" color="gray.500">
+              <Text>Last active: {agent?.last_active ? new Date(agent.last_active).toLocaleString() : 'Unknown'}</Text>
+              <Text>Tasks completed: {agent?.tasks_completed || 0}</Text>
+            </Flex>
+            
+            {/* Display errors if any */}
+            {agent.errors && Array.isArray(agent.errors) && agent.errors.length > 0 && (
+              <Box mt={3} p={3} borderRadius="md" bg="red.50" borderWidth="1px" borderColor="red.200">
+                <Text fontWeight="bold" color="red.500" mb={2}>Errors:</Text>
+                <VStack spacing={2} align="stretch">
+                  {Array.isArray(agent.errors) && agent.errors.map((error, index) => (
+                    <Text key={index} fontSize="sm" color="red.600">{error}</Text>
+                  ))}
+                </VStack>
+              </Box>
+            )}
           </Box>
         ))}
       </VStack>
     );
   };
 
-  // Consistent container with fixed height and absolute loading overlay
+  // Consistent container with fixed height and no spinner
   return (
-    <Box position="relative" minH="360px" overflow="hidden" w="full">
-      {loading && (
-        <Box 
-          position="absolute" 
-          inset="0" 
-          display="flex" 
-          alignItems="center" 
-          justifyContent="center" 
-          bg={overlayBg} 
-          zIndex="10"
-        >
-          <Text fontWeight="medium" fontSize="lg">Loading...</Text>
-        </Box>
-      )}
-      <Box h="100%" w="full">
+    <Box position="relative" minH="360px">
+      {loading && <Box />} {/* noop */}
+      <Box>
         {renderContent()}
       </Box>
     </Box>

@@ -4,7 +4,6 @@ import {
   VStack, 
   Text, 
   Flex, 
-  Spinner, 
   Badge, 
   Divider, 
   useColorModeValue,
@@ -272,23 +271,11 @@ const GoalLoopVisualization = () => {
     );
   };
 
-  // Consistent container with fixed height and absolute loading overlay
+  // Consistent container with fixed height and no spinner
   return (
-    <Box position="relative" minH="360px" overflow="hidden" w="full">
-      {loading && (
-        <Box 
-          position="absolute" 
-          inset="0" 
-          display="flex" 
-          alignItems="center" 
-          justifyContent="center" 
-          bg={overlayBg} 
-          zIndex="10"
-        >
-          <Text fontWeight="medium" fontSize="lg">Loading...</Text>
-        </Box>
-      )}
-      <Box h="100%" w="full">
+    <Box position="relative" minH="360px">
+      {loading && <Box />} {/* noop */}
+      <Box>
         {renderContent()}
       </Box>
     </Box>

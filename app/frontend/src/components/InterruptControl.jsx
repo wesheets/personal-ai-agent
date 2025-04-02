@@ -4,7 +4,6 @@ import {
   VStack, 
   Text, 
   Flex, 
-  Spinner, 
   Badge, 
   Button,
   Select,
@@ -291,7 +290,7 @@ const InterruptControl = () => {
       setTaskPrompt('');
     } catch (err) {
       if (process.env.NODE_ENV === "development") {
-        console.error(`Error editing prompt for task ${selectedTask.task_id}:`, err);
+        console.error(`Error editing prompt for task ${selectedTask?.task_id}:`, err);
       }
     }
   };
@@ -309,9 +308,18 @@ const InterruptControl = () => {
       );
     }
 
+    if (interruptSystemOffline) {
+      return (
+        <Box display="flex" alignItems="center" justifyContent="center" h="100%" flexDirection="column">
+          <Text fontSize="lg" color="red.500" mb={4}>Failed to fetch control state</Text>
+          <Text>The interrupt system appears to be offline.</Text>
+        </Box>
+      );
+    }
+
     return (
-      <Box h="100%">
-        <Flex mb={4} justifyContent="space-between" alignItems="center">
+      <VStack spacing={4} align="stretch">
+        <Flex justifyContent="space-between" alignItems="center">
           <Text fontWeight="bold">Execution Mode:</Text>
           <Select 
             value={systemState.executionMode} 
@@ -325,107 +333,80 @@ const InterruptControl = () => {
           </Select>
         </Flex>
         
-        {interruptSystemOffline && (
-          <Box 
-            mb={4} 
-            p={3} 
-            borderWidth="1px" 
-            borderRadius="md" 
-            borderColor="orange.200"
-            bg="orange.50"
-            _dark={{ bg: "orange.900", borderColor: "orange.700" }}
-          >
-            <Text fontSize="sm">
-              Interrupt system is offline. Some task control features may be unavailable.
-            </Text>
-          </Box>
-        )}
+        <Box>
+          <Text fontWeight="bold" mb={2}>Active Tasks:</Text>
+          {Array.isArray(memoizedTasks) && memoizedTasks.length > 0 ? (
+            <VStack spacing={3} align="stretch">
+              {Array.isArray(memoizedTasks) && memoizedTasks.map((task) => (
+                <Box 
+                  key={task?.task_id || `task-${Math.random()}`} 
+                  p={3} 
+                  borderWidth="1px" 
+                  borderRadius="md" 
+                  bg={bgColor} 
+                  borderColor={borderColor}
+                >
+                  <Flex justifyContent="space-between" alignItems="center" mb={2}>
+                    <Text fontWeight="bold">{task?.title || 'Untitled Task'}</Text>
+                    <Badge colorScheme={task?.status === 'running' ? 'green' : 'yellow'}>
+                      {task?.status || 'Unknown'}
+                    </Badge>
+                  </Flex>
+                  
+                  <Text fontSize="sm" mb={3}>{task?.description || 'No description'}</Text>
+                  
+                  <Flex gap={2} wrap="wrap">
+                    <Button 
+                      size="xs" 
+                      colorScheme="red" 
+                      onClick={() => handleTaskAction(task?.task_id, 'kill')}
+                    >
+                      Kill
+                    </Button>
+                    <Button 
+                      size="xs" 
+                      colorScheme="blue" 
+                      onClick={() => handleTaskAction(task?.task_id, 'restart')}
+                    >
+                      Restart
+                    </Button>
+                    <Button 
+                      size="xs" 
+                      colorScheme="purple" 
+                      onClick={() => openPromptEditor(task)}
+                    >
+                      Edit Prompt
+                    </Button>
+                    <Select 
+                      size="xs" 
+                      placeholder="Redirect to..." 
+                      width="auto" 
+                      onChange={(e) => handleTaskRedirect(task?.task_id, e.target.value)}
+                    >
+                      <option value="builder">Builder Agent</option>
+                      <option value="research">Research Agent</option>
+                      <option value="memory">Memory Agent</option>
+                      <option value="ops">Ops Agent</option>
+                    </Select>
+                  </Flex>
+                </Box>
+              ))}
+            </VStack>
+          ) : (
+            <Box 
+              textAlign="center" 
+              py={3} 
+              borderWidth="1px" 
+              borderRadius="md" 
+              borderStyle="dashed"
+              borderColor={borderColor}
+            >
+              <Text color="gray.500">No active tasks</Text>
+            </Box>
+          )}
+        </Box>
         
-        {/* Add Array.isArray check before accessing length and map */}
-        {Array.isArray(memoizedTasks) && memoizedTasks.length > 0 ? (
-          <VStack spacing={4} align="stretch">
-            {Array.isArray(memoizedTasks) && memoizedTasks.map((task) => (
-              <Box 
-                key={task?.task_id || `task-${Math.random()}`} 
-                borderWidth="1px" 
-                borderRadius="lg" 
-                p={4} 
-                shadow="sm" 
-                bg={bgColor} 
-                borderColor={borderColor}
-                minH="100px"
-              >
-                <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                  <Text fontWeight="bold">{task?.title || 'Untitled Task'}</Text>
-                  <Badge colorScheme={
-                    task?.status === 'in_progress' ? 'blue' : 
-                    task?.status === 'pending' ? 'yellow' : 'gray'
-                  }>
-                    {task?.status || 'Unknown'}
-                  </Badge>
-                </Flex>
-                
-                <Text fontSize="sm" mb={3}>{task?.description || 'No description'}</Text>
-                
-                <Flex gap={2} wrap="wrap">
-                  <Button 
-                    size="sm" 
-                    colorScheme="red" 
-                    onClick={() => handleTaskAction(task.task_id, 'kill')}
-                  >
-                    Kill
-                  </Button>
-                  
-                  <Button 
-                    size="sm" 
-                    colorScheme="blue" 
-                    onClick={() => handleTaskAction(task.task_id, 'restart')}
-                  >
-                    Restart
-                  </Button>
-                  
-                  <Button 
-                    size="sm" 
-                    colorScheme="purple" 
-                    onClick={() => openPromptEditor(task)}
-                  >
-                    Edit Prompt
-                  </Button>
-                  
-                  <Select 
-                    size="sm" 
-                    placeholder="Delegate to..." 
-                    width="auto" 
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        handleTaskRedirect(task.task_id, e.target.value);
-                        e.target.value = '';
-                      }
-                    }}
-                  >
-                    <option value="assistant">Assistant</option>
-                    <option value="researcher">Researcher</option>
-                    <option value="coder">Coder</option>
-                  </Select>
-                </Flex>
-              </Box>
-            ))}
-          </VStack>
-        ) : (
-          <Box 
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            borderWidth="1px" 
-            borderRadius="md" 
-            borderStyle="dashed"
-            borderColor={borderColor}
-            minH="200px"
-          >
-            <Text color="gray.500">No active tasks</Text>
-          </Box>
-        )}
-        
+        {/* Prompt Edit Modal */}
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay />
           <ModalContent>
@@ -442,12 +423,10 @@ const InterruptControl = () => {
               </FormControl>
             </ModalBody>
             <ModalFooter>
-              <Button variant="ghost" mr={3} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button colorScheme="blue" onClick={handlePromptEdit}>
+              <Button colorScheme="blue" mr={3} onClick={handlePromptEdit}>
                 Save Changes
               </Button>
+              <Button variant="ghost" onClick={onClose}>Cancel</Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
@@ -455,22 +434,10 @@ const InterruptControl = () => {
     );
   };
 
-  // Consistent container with fixed height and absolute loading overlay
+  // Consistent container with fixed height and no spinner
   return (
     <Box position="relative" minH="360px" overflow="hidden" w="full">
-      {loading && (
-        <Box 
-          position="absolute" 
-          inset="0" 
-          display="flex" 
-          alignItems="center" 
-          justifyContent="center" 
-          bg={overlayBg} 
-          zIndex="10"
-        >
-          <Text fontWeight="medium" fontSize="lg">Loading...</Text>
-        </Box>
-      )}
+      {loading && <Box />} {/* noop */}
       <Box h="100%" w="full">
         {renderContent()}
       </Box>
