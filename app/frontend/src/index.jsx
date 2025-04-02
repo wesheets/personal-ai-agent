@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/main.css';
 
 // Import components (to be created)
-import Dashboard from './components/Dashboard.jsx';
+import Dashboard from './components/Dashboard';
 
 const App = () => {
   return (

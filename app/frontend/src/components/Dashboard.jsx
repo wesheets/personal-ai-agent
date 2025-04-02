@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
 // Import components (to be created)
-import GoalLoopVisualization from './GoalLoopVisualization.jsx';
-import MemoryViewer from './MemoryViewer.jsx';
-import InterruptControl from './InterruptControl.jsx';
-import StatusFeedback from './StatusFeedback.jsx';
+import GoalLoopVisualization from './GoalLoopVisualization';
+import MemoryViewer from './MemoryViewer';
+import InterruptControl from './InterruptControl';
+import StatusFeedback from './StatusFeedback';
 
 const Dashboard = () => {
   return (
