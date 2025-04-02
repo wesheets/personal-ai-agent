@@ -195,10 +195,10 @@ const InterruptControl = () => {
         }
 
         // Compare data before updating state to avoid unnecessary re-renders
-        const modeChanged = controlMode.mode !== systemState.executionMode;
+        const executionModeChanged = controlMode.mode !== systemState.executionMode;
         const tasksChanged = !isEqual(systemState.tasks, taskState.tasks);
         
-        if (modeChanged || tasksChanged) {
+        if (executionModeChanged || tasksChanged) {
           setSystemState({
             executionMode: controlMode.mode,
             tasks: taskState.tasks || []
