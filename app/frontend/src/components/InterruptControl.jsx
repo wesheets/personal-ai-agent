@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+<<<<<<< HEAD
 import { 
   Box, 
   VStack, 
@@ -6,6 +7,16 @@ import {
   Flex, 
   Spinner, 
   Badge, 
+=======
+import isEqual from 'lodash.isequal';
+import {
+  Box,
+  VStack,
+  Text,
+  Flex,
+  Spinner,
+  Badge,
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
   Button,
   Select,
   Modal,
@@ -43,6 +54,9 @@ const InterruptControl = () => {
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
 
+  const lastTasksRef = useRef([]);
+  const lastModeRef = useRef('');
+
   useEffect(() => {
     // Increment render counter for diagnostic purposes
     renderCountRef.current += 1;
@@ -58,9 +72,7 @@ const InterruptControl = () => {
         setLoading(true);
         const controlMode = await controlService.getControlMode();
 
-        // Strict guard for or.getTaskState fallback logic
         let taskState = { tasks: [] };
-
         try {
           if (
             typeof window !== "undefined" &&
@@ -82,27 +94,46 @@ const InterruptControl = () => {
               taskState = lastTaskStateRef.current;
             }
           } else {
+<<<<<<< HEAD
             if (process.env.NODE_ENV === "development") {
+=======
+            if (process.env.NODE_ENV === 'development') {
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
               console.warn("window.or.getTaskState is not defined or not a function. Using fallback.");
             }
           }
         } catch (err) {
+<<<<<<< HEAD
           if (process.env.NODE_ENV === "development") {
+=======
+          if (process.env.NODE_ENV === 'development') {
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
             console.warn("Error while calling window.or.getTaskState:", err);
           }
         }
 
-        setSystemState(prevState => ({
-          ...prevState,
-          executionMode: controlMode.mode || 'auto'
-        }));
+        if (!isEqual(lastModeRef.current, controlMode.mode)) {
+          setSystemState(prev => ({
+            ...prev,
+            executionMode: controlMode.mode || 'auto'
+          }));
+          lastModeRef.current = controlMode.mode;
+        }
 
-        setActiveTasks(taskState.tasks || []);
+        if (!isEqual(lastTasksRef.current, taskState.tasks)) {
+          setActiveTasks(taskState.tasks || []);
+          lastTasksRef.current = JSON.parse(JSON.stringify(taskState.tasks));
+        }
+
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch control state');
         setLoading(false);
+<<<<<<< HEAD
         if (process.env.NODE_ENV === "development") {
+=======
+        if (process.env.NODE_ENV === 'development') {
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
           console.error('Error fetching control state:', err);
         }
       }
@@ -116,12 +147,16 @@ const InterruptControl = () => {
   const handleModeChange = async (mode) => {
     try {
       await controlService.setControlMode(mode);
-      setSystemState(prevState => ({
-        ...prevState,
+      setSystemState(prev => ({
+        ...prev,
         executionMode: mode
       }));
     } catch (err) {
+<<<<<<< HEAD
       if (process.env.NODE_ENV === "development") {
+=======
+      if (process.env.NODE_ENV === 'development') {
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         console.error(`Error setting mode to ${mode}:`, err);
       }
     }
@@ -135,7 +170,11 @@ const InterruptControl = () => {
         await controlService.restartTask(taskId);
       }
     } catch (err) {
+<<<<<<< HEAD
       if (process.env.NODE_ENV === "development") {
+=======
+      if (process.env.NODE_ENV === 'development') {
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         console.error(`Error performing ${action} on task ${taskId}:`, err);
       }
     }
@@ -146,7 +185,11 @@ const InterruptControl = () => {
     try {
       await controlService.delegateTask(taskId, targetAgent);
     } catch (err) {
+<<<<<<< HEAD
       if (process.env.NODE_ENV === "development") {
+=======
+      if (process.env.NODE_ENV === 'development') {
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         console.error(`Error redirecting task ${taskId} to ${targetAgent}:`, err);
       }
     }
@@ -165,7 +208,11 @@ const InterruptControl = () => {
       setSelectedTask(null);
       setTaskPrompt('');
     } catch (err) {
+<<<<<<< HEAD
       if (process.env.NODE_ENV === "development") {
+=======
+      if (process.env.NODE_ENV === 'development') {
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         console.error(`Error editing prompt for task ${selectedTask.task_id}:`, err);
       }
     }
@@ -197,21 +244,21 @@ const InterruptControl = () => {
       <Box mb={6} p={4} borderWidth="1px" borderRadius="lg" bg={bgColor} borderColor={borderColor}>
         <Heading size="md" mb={4}>Execution Control</Heading>
         <Flex gap={3}>
-          <Button 
+          <Button
             colorScheme={systemState.executionMode === 'auto' ? 'blue' : 'gray'}
             onClick={() => handleModeChange('auto')}
             flex="1"
           >
             Auto Mode
           </Button>
-          <Button 
+          <Button
             colorScheme={systemState.executionMode === 'manual' ? 'blue' : 'gray'}
             onClick={() => handleModeChange('manual')}
             flex="1"
           >
             Manual Mode
           </Button>
-          <Button 
+          <Button
             colorScheme={systemState.executionMode === 'paused' ? 'yellow' : 'gray'}
             onClick={() => handleModeChange('paused')}
             flex="1"
@@ -237,7 +284,7 @@ const InterruptControl = () => {
                   Agent: {task.assigned_agent || 'Unassigned'}
                 </Text>
                 <Flex gap={2} wrap="wrap">
-                  <Button 
+                  <Button
                     size="sm"
                     colorScheme="yellow"
                     onClick={() => handleTaskAction(task.task_id, task.status === 'in_progress' ? 'kill' : 'restart')}
@@ -245,7 +292,7 @@ const InterruptControl = () => {
                   >
                     {task.status === 'in_progress' ? 'Kill' : 'Restart'}
                   </Button>
-                  <Select 
+                  <Select
                     size="sm"
                     placeholder="Redirect to..."
                     onChange={(e) => handleTaskRedirect(task.task_id, e.target.value)}
@@ -257,7 +304,7 @@ const InterruptControl = () => {
                     ))}
                   </Select>
                   {systemState.executionMode === 'manual' && (
-                    <Button 
+                    <Button
                       size="sm"
                       colorScheme="blue"
                       onClick={() => openPromptEditor(task)}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+<<<<<<< HEAD
 import { 
   Box, 
   VStack, 
@@ -7,6 +8,17 @@ import {
   Spinner, 
   Badge, 
   Divider, 
+=======
+import isEqual from 'lodash.isequal';
+import {
+  Box,
+  VStack,
+  Text,
+  Flex,
+  Spinner,
+  Badge,
+  Divider,
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
   useColorModeValue,
   Heading,
   Accordion,
@@ -28,15 +40,21 @@ const StatusFeedback = () => {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+<<<<<<< HEAD
   
   // Add refs for tracking previous state and render count
   const lastAgentStateRef = useRef(null);
   const renderCountRef = useRef(0);
   
+=======
+  const prevAgentsRef = useRef([]);
+
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
 
   useEffect(() => {
+<<<<<<< HEAD
     // Increment render counter for diagnostic purposes
     renderCountRef.current += 1;
     
@@ -63,27 +81,36 @@ const StatusFeedback = () => {
           console.log('Agent status unchanged, skipping update');
         }
         
+=======
+    const fetchAgentStatus = async () => {
+      try {
+        const data = await controlService.getAgentStatus();
+
+        if (!isEqual(prevAgentsRef.current, data)) {
+          setAgents(data);
+          prevAgentsRef.current = JSON.parse(JSON.stringify(data));
+        }
+
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch agent status');
         setLoading(false);
+<<<<<<< HEAD
         if (process.env.NODE_ENV === "development") {
+=======
+        if (process.env.NODE_ENV === 'development') {
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
           console.error('Error fetching agent status:', err);
         }
       }
     };
 
-    // Initial fetch
     fetchAgentStatus();
-
-    // Set up polling for real-time updates (every 2 seconds)
-    const intervalId = setInterval(fetchAgentStatus, 2000);
-    
-    // Clean up interval on component unmount
+    const intervalId = setInterval(fetchAgentStatus, 3000);
     return () => clearInterval(intervalId);
   }, []);
 
-  // Function to determine status color
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'active':
@@ -127,42 +154,48 @@ const StatusFeedback = () => {
   }
 
   return (
+<<<<<<< HEAD
     <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start">
+=======
+    <Box h="100%" minH="300px" overflow="hidden" display="flex" flexDir="column" justifyContent="flex-start">
+>>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
       {agents.length > 0 ? (
         <VStack spacing={4} align="stretch">
           {agents.map((agent) => (
-            <Box 
-              key={agent.id} 
-              borderWidth="1px" 
-              borderRadius="lg" 
+            <Box
+              key={agent.id}
+              borderWidth="1px"
+              borderRadius="lg"
               overflow="hidden"
               bg={bgColor}
               borderColor={borderColor}
             >
-              <Flex 
-                p={4} 
-                alignItems="center" 
+              <Flex
+                p={4}
+                alignItems="center"
                 bg={`${getStatusColor(agent.status)}.50`}
                 _dark={{ bg: `${getStatusColor(agent.status)}.900` }}
                 borderBottomWidth="1px"
               >
-                <Badge 
-                  colorScheme={getStatusColor(agent.status)} 
-                  fontSize="0.8em" 
-                  p={1} 
+                <Badge
+                  colorScheme={getStatusColor(agent.status)}
+                  fontSize="0.8em"
+                  p={1}
                   borderRadius="full"
                   mr={3}
                 >
                   {agent.status}
                 </Badge>
-                
-                <Heading size="md" flex="1">{agent.name}</Heading>
-                
+
+                <Heading size="md" flex="1">
+                  {agent.name}
+                </Heading>
+
                 <Badge colorScheme="purple" fontSize="0.8em">
                   {agent.type}
                 </Badge>
               </Flex>
-              
+
               <Box p={4}>
                 {agent.current_task && (
                   <Box mb={3}>
@@ -172,7 +205,7 @@ const StatusFeedback = () => {
                     <Text>{agent.current_task.title}</Text>
                   </Box>
                 )}
-                
+
                 {agent.completion_state && (
                   <Box mb={3}>
                     <Text fontWeight="bold" fontSize="sm" color="gray.500">
@@ -181,9 +214,8 @@ const StatusFeedback = () => {
                     <Text>{agent.completion_state}</Text>
                   </Box>
                 )}
-                
+
                 <Accordion allowToggle mt={3}>
-                  {/* Error details (expandable) */}
                   {agent.errors && agent.errors.length > 0 && (
                     <AccordionItem>
                       <h2>
@@ -202,14 +234,14 @@ const StatusFeedback = () => {
                       <AccordionPanel pb={4}>
                         <VStack spacing={2} align="stretch">
                           {agent.errors.map((error, index) => (
-                            <Box 
-                              key={index} 
-                              p={2} 
-                              borderWidth="1px" 
-                              borderRadius="md" 
+                            <Box
+                              key={index}
+                              p={2}
+                              borderWidth="1px"
+                              borderRadius="md"
                               borderColor="red.200"
                               bg="red.50"
-                              _dark={{ bg: "red.900", borderColor: "red.700" }}
+                              _dark={{ bg: 'red.900', borderColor: 'red.700' }}
                             >
                               <Text fontSize="xs" color="gray.500">
                                 {new Date(error.timestamp).toLocaleString()}
@@ -221,8 +253,7 @@ const StatusFeedback = () => {
                       </AccordionPanel>
                     </AccordionItem>
                   )}
-                  
-                  {/* Performance metrics */}
+
                   {agent.metrics && (
                     <AccordionItem>
                       <h2>
@@ -239,13 +270,13 @@ const StatusFeedback = () => {
                             <StatLabel>Tasks Completed</StatLabel>
                             <StatNumber>{agent.metrics.tasks_completed || 0}</StatNumber>
                           </Stat>
-                          
+
                           <Stat>
                             <StatLabel>Avg. Response Time</StatLabel>
                             <StatNumber>{agent.metrics.avg_response_time || 'N/A'}</StatNumber>
                             <StatHelpText>seconds</StatHelpText>
                           </Stat>
-                          
+
                           <Stat>
                             <StatLabel>Success Rate</StatLabel>
                             <StatNumber>{agent.metrics.success_rate || 'N/A'}</StatNumber>
@@ -261,11 +292,11 @@ const StatusFeedback = () => {
           ))}
         </VStack>
       ) : (
-        <Box 
-          textAlign="center" 
-          py={10} 
-          borderWidth="1px" 
-          borderRadius="md" 
+        <Box
+          textAlign="center"
+          py={10}
+          borderWidth="1px"
+          borderRadius="md"
           borderStyle="dashed"
           borderColor={borderColor}
           minH="inherit"
