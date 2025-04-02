@@ -46,7 +46,7 @@ async def get_memory_entries(
     
     # Search memory with filters
     # Adapt parameters to match what search_memories accepts
-    results = memory.search_memories(
+    results = await memory.search_memories(
         query="",  # Empty query to get all entries matching filters
         limit=limit
         # Note: filter_string and filter_dict parameters are not supported by search_memories
