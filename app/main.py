@@ -69,7 +69,13 @@ async def log_requests(request, call_next):
         
         # Store detailed log entry
         try:
-            await logging_manager.log_request(request, response, process_time, error)
+            await logging_manager.log_request(
+                request=request,
+                response=response,
+                process_time=process_time,
+                status_code=response.status_code,
+                error=error
+            )
         except Exception as log_error:
             logger.error(f"Error logging request: {str(log_error)}")
         
@@ -83,7 +89,13 @@ async def log_requests(request, call_next):
         
         # Store detailed log entry with error
         try:
-            await logging_manager.log_request(request, None, process_time, error)
+            await logging_manager.log_request(
+                request=request,
+                response=None,
+                process_time=process_time,
+                status_code=500,
+                error=error
+            )
         except Exception as log_error:
             logger.error(f"Error logging request with error: {str(log_error)}")
         raise

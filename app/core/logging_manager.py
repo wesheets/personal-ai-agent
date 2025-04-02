@@ -64,7 +64,7 @@ class LoggingManager:
         self.recent_logs = []
         self.max_recent_logs = 100
     
-    def log_request(self, request, response, process_time):
+    async def log_request(self, request, response, process_time, status_code, error=None):
         """
         Log an API request and response
         
@@ -72,6 +72,8 @@ class LoggingManager:
             request: The FastAPI request object
             response: The FastAPI response object
             process_time: The time taken to process the request in seconds
+            status_code: The HTTP status code of the response
+            error: Optional exception if an error occurred
         """
         try:
             # Create log entry
@@ -79,11 +81,15 @@ class LoggingManager:
                 "timestamp": datetime.now().isoformat(),
                 "method": request.method,
                 "url": str(request.url),
-                "status_code": response.status_code,
+                "status_code": status_code if status_code is not None else (response.status_code if response else 500),
                 "process_time": process_time,
                 "client_ip": request.client.host if request.client else "unknown",
                 "user_agent": request.headers.get("user-agent", "unknown"),
             }
+            
+            # Add error information if available
+            if error:
+                log_entry["error"] = str(error)
             
             # Add request body if available
             try:
