@@ -14,7 +14,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react';
 import { memoryService } from '../services/api';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash.isequal';
 
 // Component for viewing memory entries with filtering capabilities
 const MemoryViewer = () => {

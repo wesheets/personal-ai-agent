@@ -7,7 +7,6 @@ import {
   Badge, 
   useColorModeValue
 } from '@chakra-ui/react';
-import { agentsService } from '../services/api';
 import isEqual from 'lodash.isequal';
 
 const StatusFeedback = () => {
