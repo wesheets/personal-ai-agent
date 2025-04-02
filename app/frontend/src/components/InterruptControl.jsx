@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Box, 
   VStack, 
@@ -22,6 +22,7 @@ import {
   Divider
 } from '@chakra-ui/react';
 import { controlService } from '../services/api';
+import isEqual from 'lodash/isEqual';
 
 const InterruptControl = () => {
   const [systemState, setSystemState] = useState({
@@ -34,9 +35,22 @@ const InterruptControl = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Add refs for tracking previous state and render count
+  const lastTaskStateRef = useRef(null);
+  const renderCountRef = useRef(0);
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
+
+  useEffect(() => {
+    // Increment render counter for diagnostic purposes
+    renderCountRef.current += 1;
+    
+    if (process.env.NODE_ENV === "development") {
+      console.log(`InterruptControl render count: ${renderCountRef.current}`);
+    }
+  });
 
   useEffect(() => {
     const fetchControlState = async () => {
@@ -54,12 +68,28 @@ const InterruptControl = () => {
             Object.prototype.hasOwnProperty.call(window.or, "getTaskState") &&
             typeof window.or.getTaskState === "function"
           ) {
-            taskState = await window.or.getTaskState();
+            const fetchedTaskState = await window.or.getTaskState();
+            
+            // Only update if data has changed (deep comparison)
+            if (!isEqual(fetchedTaskState, lastTaskStateRef.current)) {
+              if (process.env.NODE_ENV === "development") {
+                console.log('Task state changed, updating state');
+              }
+              lastTaskStateRef.current = JSON.parse(JSON.stringify(fetchedTaskState));
+              taskState = fetchedTaskState;
+            } else if (process.env.NODE_ENV === "development") {
+              console.log('Task state unchanged, skipping update');
+              taskState = lastTaskStateRef.current;
+            }
           } else {
-            console.warn("window.or.getTaskState is not defined or not a function. Using fallback.");
+            if (process.env.NODE_ENV === "development") {
+              console.warn("window.or.getTaskState is not defined or not a function. Using fallback.");
+            }
           }
         } catch (err) {
-          console.warn("Error while calling window.or.getTaskState:", err);
+          if (process.env.NODE_ENV === "development") {
+            console.warn("Error while calling window.or.getTaskState:", err);
+          }
         }
 
         setSystemState(prevState => ({
@@ -72,7 +102,9 @@ const InterruptControl = () => {
       } catch (err) {
         setError('Failed to fetch control state');
         setLoading(false);
-        console.error('Error fetching control state:', err);
+        if (process.env.NODE_ENV === "development") {
+          console.error('Error fetching control state:', err);
+        }
       }
     };
 
@@ -89,7 +121,9 @@ const InterruptControl = () => {
         executionMode: mode
       }));
     } catch (err) {
-      console.error(`Error setting mode to ${mode}:`, err);
+      if (process.env.NODE_ENV === "development") {
+        console.error(`Error setting mode to ${mode}:`, err);
+      }
     }
   };
 
@@ -101,7 +135,9 @@ const InterruptControl = () => {
         await controlService.restartTask(taskId);
       }
     } catch (err) {
-      console.error(`Error performing ${action} on task ${taskId}:`, err);
+      if (process.env.NODE_ENV === "development") {
+        console.error(`Error performing ${action} on task ${taskId}:`, err);
+      }
     }
   };
 
@@ -110,7 +146,9 @@ const InterruptControl = () => {
     try {
       await controlService.delegateTask(taskId, targetAgent);
     } catch (err) {
-      console.error(`Error redirecting task ${taskId} to ${targetAgent}:`, err);
+      if (process.env.NODE_ENV === "development") {
+        console.error(`Error redirecting task ${taskId} to ${targetAgent}:`, err);
+      }
     }
   };
 
@@ -127,29 +165,35 @@ const InterruptControl = () => {
       setSelectedTask(null);
       setTaskPrompt('');
     } catch (err) {
-      console.error(`Error editing prompt for task ${selectedTask.task_id}:`, err);
+      if (process.env.NODE_ENV === "development") {
+        console.error(`Error editing prompt for task ${selectedTask.task_id}:`, err);
+      }
     }
   };
 
   if (loading) {
     return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" />
-        <Text mt={4}>Loading control panel...</Text>
+      <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start">
+        <Box textAlign="center" py={10} minH="inherit">
+          <Spinner size="xl" />
+          <Text mt={4}>Loading control panel...</Text>
+        </Box>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} color="red.500">
-        <Text fontSize="lg">{error}</Text>
+      <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start">
+        <Box textAlign="center" py={10} color="red.500" minH="inherit">
+          <Text fontSize="lg">{error}</Text>
+        </Box>
       </Box>
     );
   }
 
   return (
-    <Box>
+    <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start">
       <Box mb={6} p={4} borderWidth="1px" borderRadius="lg" bg={bgColor} borderColor={borderColor}>
         <Heading size="md" mb={4}>Execution Control</Heading>
         <Flex gap={3}>
@@ -227,7 +271,15 @@ const InterruptControl = () => {
             ))}
           </VStack>
         ) : (
-          <Box textAlign="center" py={6} borderWidth="1px" borderRadius="md" borderStyle="dashed" borderColor={borderColor}>
+          <Box 
+            textAlign="center" 
+            py={6} 
+            borderWidth="1px" 
+            borderRadius="md" 
+            borderStyle="dashed" 
+            borderColor={borderColor}
+            minH="inherit"
+          >
             <Text color="gray.500">No active tasks found</Text>
           </Box>
         )}

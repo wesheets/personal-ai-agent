@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Box, 
   VStack, 
@@ -22,27 +22,54 @@ import {
   GridItem
 } from '@chakra-ui/react';
 import { controlService } from '../services/api';
+import isEqual from 'lodash/isEqual';
 
 const StatusFeedback = () => {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  // Add refs for tracking previous state and render count
+  const lastAgentStateRef = useRef(null);
+  const renderCountRef = useRef(0);
+  
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
+
+  useEffect(() => {
+    // Increment render counter for diagnostic purposes
+    renderCountRef.current += 1;
+    
+    if (process.env.NODE_ENV === "development") {
+      console.log(`StatusFeedback render count: ${renderCountRef.current}`);
+    }
+  });
 
   useEffect(() => {
     // Function to fetch agent status
     const fetchAgentStatus = async () => {
       try {
         setLoading(true);
-        const data = await controlService.getAgentStatus();
-        setAgents(data);
+        const fetchedAgentStatus = await controlService.getAgentStatus();
+        
+        // Only update state if data has actually changed (deep comparison)
+        if (!isEqual(fetchedAgentStatus, lastAgentStateRef.current)) {
+          if (process.env.NODE_ENV === "development") {
+            console.log('Agent status changed, updating state');
+          }
+          lastAgentStateRef.current = JSON.parse(JSON.stringify(fetchedAgentStatus));
+          setAgents(fetchedAgentStatus);
+        } else if (process.env.NODE_ENV === "development") {
+          console.log('Agent status unchanged, skipping update');
+        }
+        
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch agent status');
         setLoading(false);
-        console.error('Error fetching agent status:', err);
+        if (process.env.NODE_ENV === "development") {
+          console.error('Error fetching agent status:', err);
+        }
       }
     };
 
@@ -80,23 +107,27 @@ const StatusFeedback = () => {
 
   if (loading) {
     return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" />
-        <Text mt={4}>Loading agent status...</Text>
+      <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start">
+        <Box textAlign="center" py={10} minH="inherit">
+          <Spinner size="xl" />
+          <Text mt={4}>Loading agent status...</Text>
+        </Box>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} color="red.500">
-        <Text fontSize="lg">{error}</Text>
+      <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start">
+        <Box textAlign="center" py={10} color="red.500" minH="inherit">
+          <Text fontSize="lg">{error}</Text>
+        </Box>
       </Box>
     );
   }
 
   return (
-    <Box>
+    <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start">
       {agents.length > 0 ? (
         <VStack spacing={4} align="stretch">
           {agents.map((agent) => (
@@ -237,6 +268,7 @@ const StatusFeedback = () => {
           borderRadius="md" 
           borderStyle="dashed"
           borderColor={borderColor}
+          minH="inherit"
         >
           <Text color="gray.500">No active agents found</Text>
         </Box>
