@@ -430,7 +430,7 @@ const InterruptControl = () => {
             </ModalFooter>
           </ModalContent>
         </Modal>
-      </Box>
+      </VStack>
     );
   };
 
