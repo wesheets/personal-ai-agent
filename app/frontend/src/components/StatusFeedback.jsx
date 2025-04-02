@@ -1,14 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-<<<<<<< HEAD
-import { 
-  Box, 
-  VStack, 
-  Text, 
-  Flex, 
-  Spinner, 
-  Badge, 
-  Divider, 
-=======
 import isEqual from 'lodash.isequal';
 import {
   Box,
@@ -18,7 +8,6 @@ import {
   Spinner,
   Badge,
   Divider,
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
   useColorModeValue,
   Heading,
   Accordion,
@@ -34,43 +23,31 @@ import {
   GridItem
 } from '@chakra-ui/react';
 import { controlService } from '../services/api';
-import isEqual from 'lodash/isEqual';
 
 const StatusFeedback = () => {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-<<<<<<< HEAD
-  
-  // Add refs for tracking previous state and render count
   const lastAgentStateRef = useRef(null);
   const renderCountRef = useRef(0);
-  
-=======
-  const prevAgentsRef = useRef([]);
 
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
 
   useEffect(() => {
-<<<<<<< HEAD
-    // Increment render counter for diagnostic purposes
+    // Track render count (for development only)
     renderCountRef.current += 1;
-    
     if (process.env.NODE_ENV === "development") {
       console.log(`StatusFeedback render count: ${renderCountRef.current}`);
     }
   });
 
   useEffect(() => {
-    // Function to fetch agent status
     const fetchAgentStatus = async () => {
       try {
         setLoading(true);
         const fetchedAgentStatus = await controlService.getAgentStatus();
-        
-        // Only update state if data has actually changed (deep comparison)
+
         if (!isEqual(fetchedAgentStatus, lastAgentStateRef.current)) {
           if (process.env.NODE_ENV === "development") {
             console.log('Agent status changed, updating state');
@@ -80,27 +57,12 @@ const StatusFeedback = () => {
         } else if (process.env.NODE_ENV === "development") {
           console.log('Agent status unchanged, skipping update');
         }
-        
-=======
-    const fetchAgentStatus = async () => {
-      try {
-        const data = await controlService.getAgentStatus();
 
-        if (!isEqual(prevAgentsRef.current, data)) {
-          setAgents(data);
-          prevAgentsRef.current = JSON.parse(JSON.stringify(data));
-        }
-
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch agent status');
         setLoading(false);
-<<<<<<< HEAD
-        if (process.env.NODE_ENV === "development") {
-=======
         if (process.env.NODE_ENV === 'development') {
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
           console.error('Error fetching agent status:', err);
         }
       }
@@ -154,11 +116,7 @@ const StatusFeedback = () => {
   }
 
   return (
-<<<<<<< HEAD
     <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start">
-=======
-    <Box h="100%" minH="300px" overflow="hidden" display="flex" flexDir="column" justifyContent="flex-start">
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
       {agents.length > 0 ? (
         <VStack spacing={4} align="stretch">
           {agents.map((agent) => (

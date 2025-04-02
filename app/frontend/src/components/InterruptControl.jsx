@@ -1,13 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-<<<<<<< HEAD
-import { 
-  Box, 
-  VStack, 
-  Text, 
-  Flex, 
-  Spinner, 
-  Badge, 
-=======
 import isEqual from 'lodash.isequal';
 import {
   Box,
@@ -16,7 +7,6 @@ import {
   Flex,
   Spinner,
   Badge,
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
   Button,
   Select,
   Modal,
@@ -33,7 +23,6 @@ import {
   Divider
 } from '@chakra-ui/react';
 import { controlService } from '../services/api';
-import isEqual from 'lodash/isEqual';
 
 const InterruptControl = () => {
   const [systemState, setSystemState] = useState({
@@ -46,21 +35,17 @@ const InterruptControl = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Add refs for tracking previous state and render count
   const lastTaskStateRef = useRef(null);
   const renderCountRef = useRef(0);
+  const lastTasksRef = useRef([]);
+  const lastModeRef = useRef('');
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
 
-  const lastTasksRef = useRef([]);
-  const lastModeRef = useRef('');
-
   useEffect(() => {
-    // Increment render counter for diagnostic purposes
     renderCountRef.current += 1;
-    
     if (process.env.NODE_ENV === "development") {
       console.log(`InterruptControl render count: ${renderCountRef.current}`);
     }
@@ -77,37 +62,29 @@ const InterruptControl = () => {
           if (
             typeof window !== "undefined" &&
             window.or &&
-            Object.prototype.hasOwnProperty.call(window.or, "getTaskState") &&
             typeof window.or.getTaskState === "function"
           ) {
             const fetchedTaskState = await window.or.getTaskState();
-            
-            // Only update if data has changed (deep comparison)
+
             if (!isEqual(fetchedTaskState, lastTaskStateRef.current)) {
               if (process.env.NODE_ENV === "development") {
                 console.log('Task state changed, updating state');
               }
               lastTaskStateRef.current = JSON.parse(JSON.stringify(fetchedTaskState));
               taskState = fetchedTaskState;
-            } else if (process.env.NODE_ENV === "development") {
-              console.log('Task state unchanged, skipping update');
+            } else {
+              if (process.env.NODE_ENV === "development") {
+                console.log('Task state unchanged, skipping update');
+              }
               taskState = lastTaskStateRef.current;
             }
           } else {
-<<<<<<< HEAD
             if (process.env.NODE_ENV === "development") {
-=======
-            if (process.env.NODE_ENV === 'development') {
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
               console.warn("window.or.getTaskState is not defined or not a function. Using fallback.");
             }
           }
         } catch (err) {
-<<<<<<< HEAD
           if (process.env.NODE_ENV === "development") {
-=======
-          if (process.env.NODE_ENV === 'development') {
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
             console.warn("Error while calling window.or.getTaskState:", err);
           }
         }
@@ -129,11 +106,7 @@ const InterruptControl = () => {
       } catch (err) {
         setError('Failed to fetch control state');
         setLoading(false);
-<<<<<<< HEAD
         if (process.env.NODE_ENV === "development") {
-=======
-        if (process.env.NODE_ENV === 'development') {
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
           console.error('Error fetching control state:', err);
         }
       }
@@ -152,11 +125,7 @@ const InterruptControl = () => {
         executionMode: mode
       }));
     } catch (err) {
-<<<<<<< HEAD
       if (process.env.NODE_ENV === "development") {
-=======
-      if (process.env.NODE_ENV === 'development') {
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         console.error(`Error setting mode to ${mode}:`, err);
       }
     }
@@ -170,11 +139,7 @@ const InterruptControl = () => {
         await controlService.restartTask(taskId);
       }
     } catch (err) {
-<<<<<<< HEAD
       if (process.env.NODE_ENV === "development") {
-=======
-      if (process.env.NODE_ENV === 'development') {
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         console.error(`Error performing ${action} on task ${taskId}:`, err);
       }
     }
@@ -185,11 +150,7 @@ const InterruptControl = () => {
     try {
       await controlService.delegateTask(taskId, targetAgent);
     } catch (err) {
-<<<<<<< HEAD
       if (process.env.NODE_ENV === "development") {
-=======
-      if (process.env.NODE_ENV === 'development') {
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         console.error(`Error redirecting task ${taskId} to ${targetAgent}:`, err);
       }
     }
@@ -208,11 +169,7 @@ const InterruptControl = () => {
       setSelectedTask(null);
       setTaskPrompt('');
     } catch (err) {
-<<<<<<< HEAD
       if (process.env.NODE_ENV === "development") {
-=======
-      if (process.env.NODE_ENV === 'development') {
->>>>>>> 6b2ed86 (Fix: Final layout deduplication + visual stability across polling components)
         console.error(`Error editing prompt for task ${selectedTask.task_id}:`, err);
       }
     }
@@ -318,12 +275,12 @@ const InterruptControl = () => {
             ))}
           </VStack>
         ) : (
-          <Box 
-            textAlign="center" 
-            py={6} 
-            borderWidth="1px" 
-            borderRadius="md" 
-            borderStyle="dashed" 
+          <Box
+            textAlign="center"
+            py={6}
+            borderWidth="1px"
+            borderRadius="md"
+            borderStyle="dashed"
             borderColor={borderColor}
             minH="inherit"
           >
