@@ -136,16 +136,20 @@ const InterruptControl = () => {
           setLoading(true);
         }
         
-        const res = await controlService.getControlMode();
+        // TEMPORARILY DISABLED: Fetch call to controlService.getControlMode()
+        // const res = await controlService.getControlMode();
+        
+        // Use mock data instead
+        const mockControlData = { data: { mode: 'auto' } };
         
         // Compare data before updating state to avoid unnecessary re-renders
-        const controlModeChanged = !isEqual(prevControlModeRef.current, res.data);
+        const controlModeChanged = !isEqual(prevControlModeRef.current, mockControlData.data);
         if (controlModeChanged) {
           if (process.env.NODE_ENV === "development") {
             console.log('Control mode changed, updating state');
           }
-          prevControlModeRef.current = JSON.parse(JSON.stringify(res.data));
-          setControlMode(res.data);
+          prevControlModeRef.current = JSON.parse(JSON.stringify(mockControlData.data));
+          setControlMode(mockControlData.data);
         } else if (process.env.NODE_ENV === "development") {
           console.log('Control mode unchanged, skipping update');
         }
@@ -239,7 +243,11 @@ const InterruptControl = () => {
 
   const handleModeChange = async (mode) => {
     try {
-      await controlService.setControlMode(mode);
+      // TEMPORARILY DISABLED: Fetch call to controlService.setControlMode()
+      // await controlService.setControlMode(mode);
+      
+      console.log('Mode change temporarily disabled, but UI will update:', mode);
+      
       setSystemState(prevState => ({
         ...prevState,
         executionMode: mode
@@ -253,11 +261,17 @@ const InterruptControl = () => {
 
   const handleTaskAction = async (taskId, action) => {
     try {
+      // TEMPORARILY DISABLED: Fetch calls to controlService methods
+      /*
       if (action === 'kill') {
         await controlService.killTask(taskId);
       } else if (action === 'restart') {
         await controlService.restartTask(taskId);
       }
+      */
+      
+      console.log(`Task action ${action} temporarily disabled for task ${taskId}`);
+      
     } catch (err) {
       if (process.env.NODE_ENV === "development") {
         console.error(`Error performing ${action} on task ${taskId}:`, err);
@@ -268,7 +282,11 @@ const InterruptControl = () => {
   const handleTaskRedirect = async (taskId, targetAgent) => {
     if (!targetAgent) return;
     try {
-      await controlService.delegateTask(taskId, targetAgent);
+      // TEMPORARILY DISABLED: Fetch call to controlService.delegateTask()
+      // await controlService.delegateTask(taskId, targetAgent);
+      
+      console.log(`Task redirection temporarily disabled for task ${taskId} to ${targetAgent}`);
+      
     } catch (err) {
       if (process.env.NODE_ENV === "development") {
         console.error(`Error redirecting task ${taskId} to ${targetAgent}:`, err);
@@ -284,7 +302,11 @@ const InterruptControl = () => {
 
   const handlePromptEdit = async () => {
     try {
-      await controlService.editTaskPrompt(selectedTask.task_id, taskPrompt);
+      // TEMPORARILY DISABLED: Fetch call to controlService.editTaskPrompt()
+      // await controlService.editTaskPrompt(selectedTask.task_id, taskPrompt);
+      
+      console.log('Prompt edit temporarily disabled, but UI will update');
+      
       onClose();
       setSelectedTask(null);
       setTaskPrompt('');

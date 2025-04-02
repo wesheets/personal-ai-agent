@@ -49,17 +49,41 @@ const StatusFeedback = () => {
         if (agents.length === 0) {
           setLoading(true);
         }
-        const data = await agentsService.getAgentStatus();
+        
+        // TEMPORARILY DISABLED: Fetch call to agentsService.getAgentStatus()
+        // const data = await agentsService.getAgentStatus();
+        
+        // Use mock data instead
+        const mockData = [
+          {
+            agent_id: 'builder-1',
+            name: 'Builder Agent',
+            status: 'online',
+            type: 'builder',
+            description: 'Handles building and deployment tasks',
+            last_active: new Date().toISOString(),
+            tasks_completed: 12
+          },
+          {
+            agent_id: 'research-1',
+            name: 'Research Agent',
+            status: 'idle',
+            type: 'research',
+            description: 'Performs research and data gathering',
+            last_active: new Date().toISOString(),
+            tasks_completed: 8
+          }
+        ];
         
         // Compare data before updating state to avoid unnecessary re-renders
-        const dataChanged = !isEqual(prevAgentsRef.current, data);
+        const dataChanged = !isEqual(prevAgentsRef.current, mockData);
         if (dataChanged) {
           if (process.env.NODE_ENV === "development") {
             console.log('Agent status data changed, updating state');
           }
           // Create a deep copy to avoid reference issues
-          prevAgentsRef.current = JSON.parse(JSON.stringify(data));
-          setAgents(data);
+          prevAgentsRef.current = JSON.parse(JSON.stringify(mockData));
+          setAgents(mockData);
         } else if (process.env.NODE_ENV === "development") {
           console.log('Agent status data unchanged, skipping update');
         }
@@ -68,10 +92,10 @@ const StatusFeedback = () => {
           setLoading(false);
         }
       } catch (err) {
-        setError('Failed to fetch agent status');
+        setError('Agent status service temporarily unavailable');
         setLoading(false);
         if (process.env.NODE_ENV === "development") {
-          console.error('Error fetching agent status:', err);
+          console.error('Error in mock agent status:', err);
         }
       }
     };
