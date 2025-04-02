@@ -77,23 +77,38 @@ class LoggingManager:
         """
         try:
             # Debug logging
-            path = str(request.url).split(str(request.base_url))[1] if hasattr(request, 'base_url') else str(request.url)
+            try:
+                path = getattr(request.url, "path", None) or str(request.url).split(str(request.base_url))[1] if hasattr(request, 'base_url') else str(request.url)
+            except (AttributeError, IndexError):
+                path = str(request.url)
+            
             logger.info(f"[DEBUG] log_request called for path: {path}")
             logger.info(f"[DEBUG] response is None: {response is None}")
             logger.info(f"[DEBUG] status_code provided: {status_code}")
             if response is not None:
                 logger.info(f"[DEBUG] response.status_code: {getattr(response, 'status_code', 'N/A')}")
             
-            # Create log entry
-            log_entry = {
-                "timestamp": datetime.now().isoformat(),
-                "method": request.method,
-                "url": str(request.url),
-                "status_code": status_code if status_code is not None else (getattr(response, 'status_code', 500) if response else 500),
-                "process_time": process_time,
-                "client_ip": request.client.host if request.client else "unknown",
-                "user_agent": request.headers.get("user-agent", "unknown"),
-            }
+            # Create log entry with safe attribute access
+            try:
+                log_entry = {
+                    "timestamp": datetime.now().isoformat(),
+                    "method": getattr(request, "method", "UNKNOWN"),
+                    "url": str(request.url),
+                    "status_code": status_code if status_code is not None else (getattr(response, 'status_code', 500) if response else 500),
+                    "process_time": process_time,
+                    "client_ip": getattr(request.client, "host", "unknown") if hasattr(request, "client") else "unknown",
+                    "user_agent": getattr(request, "headers", {}).get("user-agent", "unknown"),
+                }
+            except Exception as e:
+                logger.error(f"Error creating log entry: {str(e)}")
+                # Create minimal log entry as fallback
+                log_entry = {
+                    "timestamp": datetime.now().isoformat(),
+                    "method": "UNKNOWN",
+                    "url": str(request.url) if hasattr(request, "url") else "unknown",
+                    "status_code": status_code if status_code is not None else 500,
+                    "process_time": process_time,
+                }
             
             # Add error information if available
             if error:
@@ -184,15 +199,26 @@ class LoggingManager:
         logger.info(f"[DEBUG] log_request_response called for URL: {request.url}")
         logger.info(f"[DEBUG] response is None: {response is None}")
         
-        # Extract request details
-        method = request.method
+        # Extract request details with safe attribute access
         try:
-            path = str(request.url).split(str(request.base_url))[1]
-        except (AttributeError, IndexError):
-            # Fallback if we can't extract path from base_url
-            path = str(request.url)
-            logger.info(f"[DEBUG] Using fallback path: {path}")
-        request_headers = dict(request.headers)
+            method = getattr(request, "method", "UNKNOWN")
+            
+            # Try multiple methods to get the path
+            try:
+                path = getattr(request.url, "path", None)
+                if not path:
+                    path = str(request.url).split(str(request.base_url))[1]
+            except (AttributeError, IndexError):
+                # Fallback if we can't extract path from base_url
+                path = str(request.url)
+                logger.info(f"[DEBUG] Using fallback path: {path}")
+            
+            request_headers = dict(getattr(request, "headers", {}))
+        except Exception as e:
+            logger.error(f"Error extracting request details: {str(e)}")
+            method = "UNKNOWN"
+            path = "unknown"
+            request_headers = {}
         
         # Try to get request body
         request_body = None
@@ -211,9 +237,14 @@ class LoggingManager:
             except Exception as e:
                 logger.warning(f"Could not read request body: {str(e)}")
         
-        # Extract response details
-        status_code = getattr(response, 'status_code', 500) if response else 500
-        response_headers = dict(response.headers) if response else {}
+        # Extract response details with safe attribute access
+        try:
+            status_code = getattr(response, 'status_code', 500) if response else 500
+            response_headers = dict(getattr(response, 'headers', {})) if response else {}
+        except Exception as e:
+            logger.error(f"Error extracting response details: {str(e)}")
+            status_code = 500
+            response_headers = {}
         
         # Try to get response body
         response_body = None
@@ -222,11 +253,16 @@ class LoggingManager:
         logger.info(f"[DEBUG] Extracted status_code: {status_code}")
         
         # Process error if any
-        error_str = None
-        stack_trace = None
-        if error:
-            error_str = str(error)
-            stack_trace = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+        try:
+            error_str = None
+            stack_trace = None
+            if error:
+                error_str = str(error)
+                stack_trace = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+        except Exception as e:
+            logger.error(f"Error processing exception details: {str(e)}")
+            error_str = "Error processing exception details"
+            stack_trace = None
         
         # Create log entry with additional error handling
         try:
@@ -245,7 +281,7 @@ class LoggingManager:
             )
             logger.info(f"[DEBUG] Successfully created LogEntry object")
         except Exception as e:
-            logger.error(f"[DEBUG] Error creating LogEntry: {str(e)}")
+            logger.error(f"Error creating LogEntry: {str(e)}")
             # Create a minimal valid log entry as fallback
             log_entry = LogEntry(
                 timestamp=timestamp,
@@ -260,21 +296,31 @@ class LoggingManager:
             log_id = f"{int(time.time())}_{method}_{safe_path}"
             logger.info(f"[DEBUG] Generated log_id: {log_id}")
         except Exception as e:
-            logger.error(f"[DEBUG] Error generating log_id: {str(e)}")
+            logger.error(f"Error generating log_id: {str(e)}")
             log_id = f"{int(time.time())}_{method}_unknown_path"
         
-        # Save to file
-        log_path = os.path.join(self.logs_dir, f"{log_id}.json")
-        with open(log_path, "w") as f:
-            f.write(log_entry.model_dump_json(indent=2))
+        # Save to file with error handling
+        try:
+            log_path = os.path.join(self.logs_dir, f"{log_id}.json")
+            with open(log_path, "w") as f:
+                f.write(log_entry.model_dump_json(indent=2))
+        except Exception as e:
+            logger.error(f"Error saving log to file: {str(e)}")
+            # Continue execution even if file saving fails
         
-        # Add to recent logs
-        self.recent_logs.append(log_entry)
-        if len(self.recent_logs) > self.max_recent_logs:
-            self.recent_logs.pop(0)  # Remove oldest log
+        # Add to recent logs with error handling
+        try:
+            self.recent_logs.append(log_entry)
+            if len(self.recent_logs) > self.max_recent_logs:
+                self.recent_logs.pop(0)  # Remove oldest log
+        except Exception as e:
+            logger.error(f"Error adding log to recent_logs: {str(e)}")
         
         # Clean up old logs if needed
-        self._cleanup_old_logs()
+        try:
+            self._cleanup_old_logs()
+        except Exception as e:
+            logger.error(f"Error during log cleanup: {str(e)}")
         
         return log_id
     
@@ -304,27 +350,31 @@ class LoggingManager:
         Returns:
             List of log entries
         """
-        # Use in-memory cache if available
-        if self.recent_logs:
-            return sorted(self.recent_logs, key=lambda x: x.timestamp, reverse=True)[:limit]
-        
-        # Otherwise read from disk
         try:
-            log_files = [os.path.join(self.logs_dir, f) for f in os.listdir(self.logs_dir) if f.endswith(".json")]
-            log_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+            # Use in-memory cache if available
+            if self.recent_logs:
+                return sorted(self.recent_logs, key=lambda x: x.timestamp, reverse=True)[:limit]
             
-            logs = []
-            for log_file in log_files[:limit]:
-                try:
-                    with open(log_file, "r") as f:
-                        log_data = json.load(f)
-                        logs.append(LogEntry(**log_data))
-                except Exception as e:
-                    logger.warning(f"Could not read log file {log_file}: {str(e)}")
-            
-            return logs
+            # Otherwise read from disk
+            try:
+                log_files = [os.path.join(self.logs_dir, f) for f in os.listdir(self.logs_dir) if f.endswith(".json")]
+                log_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                
+                logs = []
+                for log_file in log_files[:limit]:
+                    try:
+                        with open(log_file, "r") as f:
+                            log_data = json.load(f)
+                            logs.append(LogEntry(**log_data))
+                    except Exception as e:
+                        logger.warning(f"Could not read log file {log_file}: {str(e)}")
+                
+                return logs
+            except Exception as e:
+                logger.error(f"Error getting latest logs from disk: {str(e)}")
+                return []
         except Exception as e:
-            logger.error(f"Error getting latest logs: {str(e)}")
+            logger.error(f"Error in get_latest_logs: {str(e)}")
             return []
 
 # Singleton instance

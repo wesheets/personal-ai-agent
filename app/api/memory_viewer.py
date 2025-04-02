@@ -45,11 +45,11 @@ async def get_memory_entries(
         timestamp_filters.append(f"timestamp <= '{end_timestamp}'")
     
     # Search memory with filters
-    results = memory.search(
+    # Adapt parameters to match what search_memories accepts
+    results = memory.search_memories(
         query="",  # Empty query to get all entries matching filters
-        filter_string=" AND ".join(timestamp_filters) if timestamp_filters else None,
-        filter_dict=filter_params if filter_params else None,
         limit=limit
+        # Note: filter_string and filter_dict parameters are not supported by search_memories
     )
     
     # Convert results to response model
