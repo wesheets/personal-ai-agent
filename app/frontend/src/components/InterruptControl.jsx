@@ -139,8 +139,8 @@ const InterruptControl = () => {
         const res = await controlService.getControlMode();
         
         // Compare data before updating state to avoid unnecessary re-renders
-        const modeChanged = !isEqual(prevControlModeRef.current, res.data);
-        if (modeChanged) {
+        const controlModeChanged = !isEqual(prevControlModeRef.current, res.data);
+        if (controlModeChanged) {
           if (process.env.NODE_ENV === "development") {
             console.log('Control mode changed, updating state');
           }
