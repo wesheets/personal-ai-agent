@@ -466,7 +466,7 @@ const InterruptControl = () => {
           alignItems="center" 
           justifyContent="center" 
           bg={overlayBg} 
-          zIndex="1"
+          zIndex="10"
         >
           <Spinner size="xl" />
         </Box>
