@@ -22,12 +22,15 @@ import {
   GridItem
 } from '@chakra-ui/react';
 import { controlService } from '../services/api';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash.isequal';
 
 const StatusFeedback = () => {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Add ref for tracking render count
+  const renderCountRef = useRef(0);
   
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
@@ -39,6 +42,16 @@ const StatusFeedback = () => {
   useEffect(() => {
     if (process.env.NODE_ENV === "development") {
       console.log("StatusFeedback component rendered/redrawn");
+    }
+  });
+
+  // Track render count for debugging
+  useEffect(() => {
+    // Increment render counter for diagnostic purposes
+    renderCountRef.current += 1;
+    
+    if (process.env.NODE_ENV === "development") {
+      console.log(`StatusFeedback render count: ${renderCountRef.current}`);
     }
   });
 
@@ -55,10 +68,15 @@ const StatusFeedback = () => {
         // Compare data before updating state to avoid unnecessary re-renders
         const dataChanged = !isEqual(prevAgentsRef.current, data);
         if (dataChanged) {
+          if (process.env.NODE_ENV === "development") {
+            console.log('Agent status changed, updating state');
+          }
           // Store the new data in ref for future comparisons
-          prevAgentsRef.current = data;
+          prevAgentsRef.current = JSON.parse(JSON.stringify(data));
           // Use functional update to avoid dependency on previous state
           setAgents(data);
+        } else if (process.env.NODE_ENV === "development") {
+          console.log('Agent status unchanged, skipping update');
         }
         
         if (loading) {
@@ -114,29 +132,22 @@ const StatusFeedback = () => {
   // Memoize the agent list to prevent unnecessary re-renders
   const memoizedAgents = useMemo(() => agents, [agents]);
 
-  if (loading) {
-    return (
-      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
-        <Flex direction="column" align="center">
-          <Spinner size="xl" mb={4} />
-          <Text>Loading agent status...</Text>
-        </Flex>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
-        <Text fontSize="lg" color="red.500">{error}</Text>
-      </Box>
-    );
-  }
-
+  // Consistent container for all states with fixed height and no transitions
   return (
-    <Box minH="inherit">
-      {memoizedAgents.length > 0 ? (
-        <VStack spacing={4} align="stretch">
+    <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start" transition="none">
+      {loading ? (
+        <Box display="flex" alignItems="center" justifyContent="center" minH="inherit">
+          <Flex direction="column" align="center">
+            <Spinner size="xl" mb={4} />
+            <Text>Loading agent status...</Text>
+          </Flex>
+        </Box>
+      ) : error ? (
+        <Box display="flex" alignItems="center" justifyContent="center" minH="inherit">
+          <Text fontSize="lg" color="red.500">{error}</Text>
+        </Box>
+      ) : memoizedAgents.length > 0 ? (
+        <VStack spacing={4} align="stretch" minH="inherit">
           {memoizedAgents.filter(agent => agent).map((agent) => (
             <Box 
               key={agent?.id || `agent-${Math.random()}`} 
@@ -145,6 +156,8 @@ const StatusFeedback = () => {
               overflow="hidden"
               bg={bgColor}
               borderColor={borderColor}
+              minH="120px"
+              transition="none"
             >
               <Flex 
                 p={4} 
@@ -269,7 +282,6 @@ const StatusFeedback = () => {
         </VStack>
       ) : (
         <Box 
-          minH="inherit"
           display="flex"
           alignItems="center"
           justifyContent="center"
@@ -277,6 +289,8 @@ const StatusFeedback = () => {
           borderRadius="md" 
           borderStyle="dashed"
           borderColor={borderColor}
+          minH="inherit"
+          transition="none"
         >
           <Text color="gray.500">No active agents found</Text>
         </Box>

@@ -22,7 +22,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react';
 import { controlService } from '../services/api';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash.isequal';
 
 // This ensures it happens before any component rendering
 (function initializeGlobalOrchestrator() {
@@ -69,6 +69,9 @@ const InterruptControl = () => {
   const [activeTasks, setActiveTasks] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   
+  // Add ref for tracking render count
+  const renderCountRef = useRef(0);
+  
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   
@@ -80,6 +83,16 @@ const InterruptControl = () => {
   useEffect(() => {
     if (process.env.NODE_ENV === "development") {
       console.log("InterruptControl component rendered/redrawn");
+    }
+  });
+
+  // Track render count for debugging
+  useEffect(() => {
+    // Increment render counter for diagnostic purposes
+    renderCountRef.current += 1;
+    
+    if (process.env.NODE_ENV === "development") {
+      console.log(`InterruptControl render count: ${renderCountRef.current}`);
     }
   });
 
@@ -127,8 +140,13 @@ const InterruptControl = () => {
         // Compare data before updating state to avoid unnecessary re-renders
         const modeChanged = !isEqual(prevControlModeRef.current, res.data);
         if (modeChanged) {
-          prevControlModeRef.current = res.data;
+          if (process.env.NODE_ENV === "development") {
+            console.log('Control mode changed, updating state');
+          }
+          prevControlModeRef.current = JSON.parse(JSON.stringify(res.data));
           setControlMode(res.data);
+        } else if (process.env.NODE_ENV === "development") {
+          console.log('Control mode unchanged, skipping update');
         }
         
         // Strict guard for or.getTaskState fallback logic with retry
@@ -147,11 +165,16 @@ const InterruptControl = () => {
           
           // Deep compare task state before updating to prevent unnecessary re-renders
           if (!isEqual(prevTaskStateRef.current, res)) {
-            prevTaskStateRef.current = res;
+            if (process.env.NODE_ENV === "development") {
+              console.log('Task state changed, updating state');
+            }
+            prevTaskStateRef.current = JSON.parse(JSON.stringify(res));
             taskState = res;
             if (process.env.NODE_ENV === "development") {
               console.log("✅ Successfully fetched task state:", taskState);
             }
+          } else if (process.env.NODE_ENV === "development") {
+            console.log('Task state unchanged, skipping update');
           }
           setInterruptSystemOffline(false);
         } catch (err) {
@@ -272,165 +295,165 @@ const InterruptControl = () => {
   // Memoize the tasks list to prevent unnecessary re-renders
   const memoizedTasks = useMemo(() => activeTasks, [activeTasks]);
 
-  if (loading) {
-    return (
-      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
-        <Flex direction="column" align="center">
-          <Spinner size="xl" mb={4} />
-          <Text>Loading control state...</Text>
-        </Flex>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
-        <Text fontSize="lg" color="red.500">{error}</Text>
-      </Box>
-    );
-  }
-
+  // Consistent container for all states with fixed height and no transitions
   return (
-    <Box minH="inherit">
-      <Flex mb={4} justifyContent="space-between" alignItems="center">
-        <Text fontWeight="bold">Execution Mode:</Text>
-        <Select 
-          value={systemState.executionMode} 
-          onChange={(e) => handleModeChange(e.target.value)}
-          width="auto"
-          ml={2}
-        >
-          <option value="auto">Automatic</option>
-          <option value="manual">Manual</option>
-          <option value="paused">Paused</option>
-        </Select>
-      </Flex>
-      
-      {interruptSystemOffline && (
-        <Box 
-          mb={4} 
-          p={3} 
-          borderWidth="1px" 
-          borderRadius="md" 
-          borderColor="orange.200"
-          bg="orange.50"
-          _dark={{ bg: "orange.900", borderColor: "orange.700" }}
-        >
-          <Text fontSize="sm">
-            Interrupt system is offline. Some task control features may be unavailable.
-          </Text>
+    <Box h="100%" minH="300px" overflow="hidden" w="full" display="flex" flexDir="column" justifyContent="flex-start" transition="none">
+      {loading ? (
+        <Box display="flex" alignItems="center" justifyContent="center" minH="inherit">
+          <Flex direction="column" align="center">
+            <Spinner size="xl" mb={4} />
+            <Text>Loading control state...</Text>
+          </Flex>
         </Box>
-      )}
-      
-      {memoizedTasks.length > 0 ? (
-        <VStack spacing={4} align="stretch">
-          {memoizedTasks.map((task) => (
-            <Box 
-              key={task?.task_id || `task-${Math.random()}`} 
-              borderWidth="1px" 
-              borderRadius="lg" 
-              p={4} 
-              shadow="sm" 
-              bg={bgColor} 
-              borderColor={borderColor}
-            >
-              <Flex justifyContent="space-between" alignItems="center" mb={3}>
-                <Text fontWeight="bold">{task?.title || 'Untitled Task'}</Text>
-                <Badge colorScheme={
-                  task?.status === 'in_progress' ? 'blue' : 
-                  task?.status === 'pending' ? 'yellow' : 'gray'
-                }>
-                  {task?.status || 'Unknown'}
-                </Badge>
-              </Flex>
-              
-              <Text fontSize="sm" mb={3}>{task?.description || 'No description'}</Text>
-              
-              <Flex gap={2} wrap="wrap">
-                <Button 
-                  size="sm" 
-                  colorScheme="red" 
-                  onClick={() => handleTaskAction(task.task_id, 'kill')}
-                >
-                  Kill
-                </Button>
-                
-                <Button 
-                  size="sm" 
-                  colorScheme="blue" 
-                  onClick={() => handleTaskAction(task.task_id, 'restart')}
-                >
-                  Restart
-                </Button>
-                
-                <Button 
-                  size="sm" 
-                  colorScheme="purple" 
-                  onClick={() => openPromptEditor(task)}
-                >
-                  Edit Prompt
-                </Button>
-                
-                <Select 
-                  size="sm" 
-                  placeholder="Delegate to..." 
-                  width="auto" 
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      handleTaskRedirect(task.task_id, e.target.value);
-                      e.target.value = '';
-                    }
-                  }}
-                >
-                  <option value="assistant">Assistant</option>
-                  <option value="researcher">Researcher</option>
-                  <option value="coder">Coder</option>
-                </Select>
-              </Flex>
-            </Box>
-          ))}
-        </VStack>
+      ) : error ? (
+        <Box display="flex" alignItems="center" justifyContent="center" minH="inherit">
+          <Text fontSize="lg" color="red.500">{error}</Text>
+        </Box>
       ) : (
-        <Box 
-          minH="inherit"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          borderWidth="1px" 
-          borderRadius="md" 
-          borderStyle="dashed"
-          borderColor={borderColor}
-        >
-          <Text color="gray.500">No active tasks</Text>
+        <Box minH="inherit">
+          <Flex mb={4} justifyContent="space-between" alignItems="center">
+            <Text fontWeight="bold">Execution Mode:</Text>
+            <Select 
+              value={systemState.executionMode} 
+              onChange={(e) => handleModeChange(e.target.value)}
+              width="auto"
+              ml={2}
+            >
+              <option value="auto">Automatic</option>
+              <option value="manual">Manual</option>
+              <option value="paused">Paused</option>
+            </Select>
+          </Flex>
+          
+          {interruptSystemOffline && (
+            <Box 
+              mb={4} 
+              p={3} 
+              borderWidth="1px" 
+              borderRadius="md" 
+              borderColor="orange.200"
+              bg="orange.50"
+              _dark={{ bg: "orange.900", borderColor: "orange.700" }}
+            >
+              <Text fontSize="sm">
+                Interrupt system is offline. Some task control features may be unavailable.
+              </Text>
+            </Box>
+          )}
+          
+          {memoizedTasks.length > 0 ? (
+            <VStack spacing={4} align="stretch" minH="200px">
+              {memoizedTasks.map((task) => (
+                <Box 
+                  key={task?.task_id || `task-${Math.random()}`} 
+                  borderWidth="1px" 
+                  borderRadius="lg" 
+                  p={4} 
+                  shadow="sm" 
+                  bg={bgColor} 
+                  borderColor={borderColor}
+                  minH="100px"
+                  transition="none"
+                >
+                  <Flex justifyContent="space-between" alignItems="center" mb={3}>
+                    <Text fontWeight="bold">{task?.title || 'Untitled Task'}</Text>
+                    <Badge colorScheme={
+                      task?.status === 'in_progress' ? 'blue' : 
+                      task?.status === 'pending' ? 'yellow' : 'gray'
+                    }>
+                      {task?.status || 'Unknown'}
+                    </Badge>
+                  </Flex>
+                  
+                  <Text fontSize="sm" mb={3}>{task?.description || 'No description'}</Text>
+                  
+                  <Flex gap={2} wrap="wrap">
+                    <Button 
+                      size="sm" 
+                      colorScheme="red" 
+                      onClick={() => handleTaskAction(task.task_id, 'kill')}
+                    >
+                      Kill
+                    </Button>
+                    
+                    <Button 
+                      size="sm" 
+                      colorScheme="blue" 
+                      onClick={() => handleTaskAction(task.task_id, 'restart')}
+                    >
+                      Restart
+                    </Button>
+                    
+                    <Button 
+                      size="sm" 
+                      colorScheme="purple" 
+                      onClick={() => openPromptEditor(task)}
+                    >
+                      Edit Prompt
+                    </Button>
+                    
+                    <Select 
+                      size="sm" 
+                      placeholder="Delegate to..." 
+                      width="auto" 
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleTaskRedirect(task.task_id, e.target.value);
+                          e.target.value = '';
+                        }
+                      }}
+                    >
+                      <option value="assistant">Assistant</option>
+                      <option value="researcher">Researcher</option>
+                      <option value="coder">Coder</option>
+                    </Select>
+                  </Flex>
+                </Box>
+              ))}
+            </VStack>
+          ) : (
+            <Box 
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              borderWidth="1px" 
+              borderRadius="md" 
+              borderStyle="dashed"
+              borderColor={borderColor}
+              minH="200px"
+              transition="none"
+            >
+              <Text color="gray.500">No active tasks</Text>
+            </Box>
+          )}
+          
+          <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Edit Task Prompt</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <FormControl>
+                  <FormLabel>Prompt</FormLabel>
+                  <Textarea 
+                    value={taskPrompt} 
+                    onChange={(e) => setTaskPrompt(e.target.value)} 
+                    rows={10}
+                  />
+                </FormControl>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="ghost" mr={3} onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button colorScheme="blue" onClick={handlePromptEdit}>
+                  Save Changes
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </Box>
       )}
-      
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit Task Prompt</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <FormLabel>Prompt</FormLabel>
-              <Textarea 
-                value={taskPrompt} 
-                onChange={(e) => setTaskPrompt(e.target.value)} 
-                rows={10}
-              />
-            </FormControl>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button colorScheme="blue" onClick={handlePromptEdit}>
-              Save Changes
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </Box>
   );
 };
