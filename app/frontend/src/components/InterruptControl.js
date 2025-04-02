@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import isEqual from 'lodash.isequal';
 import { controlService, goalsService } from '../services/api';
 
 // Component for controlling agent execution with interrupt capabilities

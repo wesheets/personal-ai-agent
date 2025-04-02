@@ -76,12 +76,20 @@ class LoggingManager:
             error: Optional exception if an error occurred
         """
         try:
+            # Debug logging
+            path = str(request.url).split(str(request.base_url))[1] if hasattr(request, 'base_url') else str(request.url)
+            logger.info(f"[DEBUG] log_request called for path: {path}")
+            logger.info(f"[DEBUG] response is None: {response is None}")
+            logger.info(f"[DEBUG] status_code provided: {status_code}")
+            if response is not None:
+                logger.info(f"[DEBUG] response.status_code: {getattr(response, 'status_code', 'N/A')}")
+            
             # Create log entry
             log_entry = {
                 "timestamp": datetime.now().isoformat(),
                 "method": request.method,
                 "url": str(request.url),
-                "status_code": status_code if status_code is not None else (response.status_code if response else 500),
+                "status_code": status_code if status_code is not None else (getattr(response, 'status_code', 500) if response else 500),
                 "process_time": process_time,
                 "client_ip": request.client.host if request.client else "unknown",
                 "user_agent": request.headers.get("user-agent", "unknown"),
@@ -116,8 +124,7 @@ class LoggingManager:
                 
             return log_entry
         except Exception as e:
-            import logging
-            logger = logging.getLogger("api")
+            # Use the already imported logger instead of creating a new one
             logger.error(f"Error logging request: {str(e)}")
             return None
     
@@ -173,9 +180,18 @@ class LoggingManager:
         # Generate timestamp
         timestamp = datetime.now().isoformat()
         
+        # Debug logging
+        logger.info(f"[DEBUG] log_request_response called for URL: {request.url}")
+        logger.info(f"[DEBUG] response is None: {response is None}")
+        
         # Extract request details
         method = request.method
-        path = str(request.url).split(str(request.base_url))[1]
+        try:
+            path = str(request.url).split(str(request.base_url))[1]
+        except (AttributeError, IndexError):
+            # Fallback if we can't extract path from base_url
+            path = str(request.url)
+            logger.info(f"[DEBUG] Using fallback path: {path}")
         request_headers = dict(request.headers)
         
         # Try to get request body
@@ -196,11 +212,14 @@ class LoggingManager:
                 logger.warning(f"Could not read request body: {str(e)}")
         
         # Extract response details
-        status_code = response.status_code
-        response_headers = dict(response.headers)
+        status_code = getattr(response, 'status_code', 500) if response else 500
+        response_headers = dict(response.headers) if response else {}
         
         # Try to get response body
         response_body = None
+        
+        # Debug logging
+        logger.info(f"[DEBUG] Extracted status_code: {status_code}")
         
         # Process error if any
         error_str = None
@@ -209,23 +228,40 @@ class LoggingManager:
             error_str = str(error)
             stack_trace = "".join(traceback.format_exception(type(error), error, error.__traceback__))
         
-        # Create log entry
-        log_entry = LogEntry(
-            timestamp=timestamp,
-            method=method,
-            path=path,
-            status_code=status_code,
-            request_headers=self._redact_sensitive_data(request_headers),
-            request_body=self._redact_sensitive_data(request_body),
-            response_headers=self._redact_sensitive_data(response_headers),
-            response_body=self._redact_sensitive_data(response_body),
-            process_time_ms=process_time * 1000,  # Convert to milliseconds
-            error=error_str,
-            stack_trace=stack_trace
-        )
+        # Create log entry with additional error handling
+        try:
+            log_entry = LogEntry(
+                timestamp=timestamp,
+                method=method,
+                path=path,
+                status_code=status_code,
+                request_headers=self._redact_sensitive_data(request_headers),
+                request_body=self._redact_sensitive_data(request_body),
+                response_headers=self._redact_sensitive_data(response_headers),
+                response_body=self._redact_sensitive_data(response_body),
+                process_time_ms=process_time * 1000,  # Convert to milliseconds
+                error=error_str,
+                stack_trace=stack_trace
+            )
+            logger.info(f"[DEBUG] Successfully created LogEntry object")
+        except Exception as e:
+            logger.error(f"[DEBUG] Error creating LogEntry: {str(e)}")
+            # Create a minimal valid log entry as fallback
+            log_entry = LogEntry(
+                timestamp=timestamp,
+                method=method,
+                path=path if path else "unknown",
+                status_code=status_code
+            )
         
-        # Generate log ID
-        log_id = f"{int(time.time())}_{method}_{path.replace('/', '_')}"
+        # Generate log ID with error handling
+        try:
+            safe_path = path.replace('/', '_') if path else "unknown_path"
+            log_id = f"{int(time.time())}_{method}_{safe_path}"
+            logger.info(f"[DEBUG] Generated log_id: {log_id}")
+        except Exception as e:
+            logger.error(f"[DEBUG] Error generating log_id: {str(e)}")
+            log_id = f"{int(time.time())}_{method}_unknown_path"
         
         # Save to file
         log_path = os.path.join(self.logs_dir, f"{log_id}.json")
