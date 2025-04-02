@@ -9,6 +9,8 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Add timeout to all requests
+  timeout: 12000,
 });
 
 // Goals API
@@ -120,6 +122,8 @@ export const controlService = {
   
   // Delegate task to another agent
   delegateTask: async (taskId, targetAgent, taskDescription = null) => {
+    console.log(`API call: delegateTask to ${targetAgent} with description: ${taskDescription?.substring(0, 50)}...`);
+    
     try {
       const payload = {
         task_id: taskId,
@@ -131,10 +135,18 @@ export const controlService = {
         payload.task_description = taskDescription;
       }
       
+      console.log('Sending delegate task payload:', payload);
+      
       const response = await apiClient.post('/api/agent/delegate', payload);
+      console.log('Delegate task response received:', response.status, response.statusText);
       return response.data;
     } catch (error) {
-      console.error(`Error delegating task to ${targetAgent}:`, error);
+      console.error(`Error delegating task to ${targetAgent}:`, {
+        message: error.message,
+        code: error.code,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
       throw error;
     }
   },
