@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Box, 
   VStack, 
@@ -21,6 +21,16 @@ const GoalLoopVisualization = () => {
   
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
+  
+  // Add ref to store previous goals for comparison
+  const prevGoalsRef = useRef(null);
+
+  // Diagnostic DOM logging to detect component redraws
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("GoalLoopVisualization component rendered/redrawn");
+    }
+  });
 
   useEffect(() => {
     // Function to fetch goals data from the API
@@ -33,8 +43,9 @@ const GoalLoopVisualization = () => {
         const data = await goalsService.getGoals();
         
         // Compare data before updating state to avoid unnecessary re-renders
-        const dataChanged = !isEqual(data, goals);
+        const dataChanged = !isEqual(prevGoalsRef.current, data);
         if (dataChanged) {
+          prevGoalsRef.current = data;
           setGoals(data);
         }
         
@@ -44,7 +55,9 @@ const GoalLoopVisualization = () => {
       } catch (err) {
         setError('Failed to fetch goals data');
         setLoading(false);
-        console.error('Error fetching goals:', err);
+        if (process.env.NODE_ENV === "development") {
+          console.error('Error fetching goals:', err);
+        }
       }
     };
 

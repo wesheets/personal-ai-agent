@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Box, 
   VStack, 
@@ -31,6 +31,16 @@ const StatusFeedback = () => {
   
   const bgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
+  
+  // Add ref to store previous agents for comparison
+  const prevAgentsRef = useRef(null);
+
+  // Diagnostic DOM logging to detect component redraws
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("StatusFeedback component rendered/redrawn");
+    }
+  });
 
   useEffect(() => {
     // Function to fetch agent status
@@ -43,8 +53,10 @@ const StatusFeedback = () => {
         const data = await controlService.getAgentStatus();
         
         // Compare data before updating state to avoid unnecessary re-renders
-        const dataChanged = !isEqual(data, agents);
+        const dataChanged = !isEqual(prevAgentsRef.current, data);
         if (dataChanged) {
+          // Store the new data in ref for future comparisons
+          prevAgentsRef.current = data;
           // Use functional update to avoid dependency on previous state
           setAgents(data);
         }
@@ -55,7 +67,9 @@ const StatusFeedback = () => {
       } catch (err) {
         setError('Failed to fetch agent status');
         setLoading(false);
-        console.error('Error fetching agent status:', err);
+        if (process.env.NODE_ENV === "development") {
+          console.error('Error fetching agent status:', err);
+        }
       }
     };
 
