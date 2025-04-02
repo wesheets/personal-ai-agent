@@ -143,7 +143,8 @@ const StatusFeedback = () => {
       );
     }
 
-    if (memoizedAgents.length === 0) {
+    // Add safety check for memoizedAgents
+    if (!Array.isArray(memoizedAgents) || memoizedAgents.length === 0) {
       return (
         <Box 
           display="flex"
@@ -162,7 +163,8 @@ const StatusFeedback = () => {
 
     return (
       <VStack spacing={4} align="stretch" h="100%">
-        {memoizedAgents.filter(agent => agent).map((agent) => (
+        {/* Add Array.isArray check before filter and map */}
+        {Array.isArray(memoizedAgents) && memoizedAgents.filter(agent => agent).map((agent) => (
           <Box 
             key={agent?.id || `agent-${Math.random()}`} 
             borderWidth="1px" 
@@ -216,8 +218,8 @@ const StatusFeedback = () => {
               )}
               
               <Accordion allowToggle mt={3}>
-                {/* Error details (expandable) */}
-                {agent.errors && agent.errors.length > 0 && (
+                {/* Error details (expandable) - Add Array.isArray check */}
+                {agent.errors && Array.isArray(agent.errors) && agent.errors.length > 0 && (
                   <AccordionItem>
                     <h2>
                       <AccordionButton>
@@ -234,7 +236,8 @@ const StatusFeedback = () => {
                     </h2>
                     <AccordionPanel pb={4}>
                       <VStack spacing={2} align="stretch">
-                        {agent.errors.map((error, index) => (
+                        {/* Add Array.isArray check before map */}
+                        {Array.isArray(agent.errors) && agent.errors.map((error, index) => (
                           <Box 
                             key={index} 
                             p={2} 

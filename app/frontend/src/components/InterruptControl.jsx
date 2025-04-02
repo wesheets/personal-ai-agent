@@ -132,7 +132,8 @@ const InterruptControl = () => {
     const fetchControlState = async () => {
       try {
         // Only show loading on initial fetch, not during polling updates
-        if (activeTasks.length === 0) {
+        // Add Array.isArray check before accessing length
+        if (!Array.isArray(activeTasks) || activeTasks.length === 0) {
           setLoading(true);
         }
         
@@ -204,11 +205,13 @@ const InterruptControl = () => {
             tasks: taskState.tasks || []
           });
           
-          // Filter active tasks
-          const active = (taskState.tasks || []).filter(task => 
-            task && task.status && 
-            ['pending', 'in_progress', 'running'].includes(task.status.toLowerCase())
-          );
+          // Filter active tasks - Add explicit Array.isArray check
+          const active = Array.isArray(taskState.tasks) 
+            ? taskState.tasks.filter(task => 
+                task && task.status && 
+                ['pending', 'in_progress', 'running'].includes(task.status.toLowerCase())
+              )
+            : [];
           
           if (!isEqual(activeTasks, active)) {
             setActiveTasks(active);
@@ -338,9 +341,10 @@ const InterruptControl = () => {
           </Box>
         )}
         
-        {memoizedTasks.length > 0 ? (
+        {/* Add Array.isArray check before accessing length and map */}
+        {Array.isArray(memoizedTasks) && memoizedTasks.length > 0 ? (
           <VStack spacing={4} align="stretch">
-            {memoizedTasks.map((task) => (
+            {Array.isArray(memoizedTasks) && memoizedTasks.map((task) => (
               <Box 
                 key={task?.task_id || `task-${Math.random()}`} 
                 borderWidth="1px" 
