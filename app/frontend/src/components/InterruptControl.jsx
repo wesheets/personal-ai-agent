@@ -41,7 +41,11 @@ const InterruptControl = () => {
   useEffect(() => {
     const fetchControlState = async () => {
       try {
-        setLoading(true);
+        // Only show loading on initial fetch, not during polling updates
+        if (activeTasks.length === 0 && systemState.executionMode === 'auto') {
+          setLoading(true);
+        }
+        
         const controlMode = await controlService.getControlMode();
 
         // Strict guard for or.getTaskState fallback logic
@@ -62,13 +66,24 @@ const InterruptControl = () => {
           console.warn("Error while calling window.or.getTaskState:", err);
         }
 
-        setSystemState(prevState => ({
-          ...prevState,
-          executionMode: controlMode.mode || 'auto'
-        }));
+        // Compare data before updating state to avoid unnecessary re-renders
+        const modeChanged = controlMode.mode !== systemState.executionMode;
+        const tasksChanged = JSON.stringify(taskState.tasks) !== JSON.stringify(activeTasks);
+        
+        if (modeChanged) {
+          setSystemState(prevState => ({
+            ...prevState,
+            executionMode: controlMode.mode || 'auto'
+          }));
+        }
 
-        setActiveTasks(taskState.tasks || []);
-        setLoading(false);
+        if (tasksChanged) {
+          setActiveTasks(taskState.tasks || []);
+        }
+        
+        if (loading) {
+          setLoading(false);
+        }
       } catch (err) {
         setError('Failed to fetch control state');
         setLoading(false);
@@ -77,6 +92,7 @@ const InterruptControl = () => {
     };
 
     fetchControlState();
+    // Keep at 3 seconds as it's a reasonable interval for control operations
     const intervalId = setInterval(fetchControlState, 3000);
     return () => clearInterval(intervalId);
   }, []);
@@ -133,8 +149,8 @@ const InterruptControl = () => {
 
   if (loading) {
     return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" />
+      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center">
+        <Spinner size="xl" mx="auto" />
         <Text mt={4}>Loading control panel...</Text>
       </Box>
     );
@@ -142,14 +158,14 @@ const InterruptControl = () => {
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} color="red.500">
+      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center" color="red.500">
         <Text fontSize="lg">{error}</Text>
       </Box>
     );
   }
 
   return (
-    <Box>
+    <Box minH="200px">
       <Box mb={6} p={4} borderWidth="1px" borderRadius="lg" bg={bgColor} borderColor={borderColor}>
         <Heading size="md" mb={4}>Execution Control</Heading>
         <Flex gap={3}>
@@ -177,20 +193,20 @@ const InterruptControl = () => {
         </Flex>
       </Box>
 
-      <Box p={4} borderWidth="1px" borderRadius="lg" bg={bgColor} borderColor={borderColor}>
+      <Box p={4} borderWidth="1px" borderRadius="lg" bg={bgColor} borderColor={borderColor} minH="120px">
         <Heading size="md" mb={4}>Active Tasks</Heading>
         {activeTasks.length > 0 ? (
           <VStack spacing={4} align="stretch" divider={<Divider />}>
-            {activeTasks.map((task) => (
-              <Box key={task.task_id} p={3} borderWidth="1px" borderRadius="md">
+            {activeTasks.filter(task => task).map((task) => (
+              <Box key={task?.task_id || `task-${Math.random()}`} p={3} borderWidth="1px" borderRadius="md">
                 <Flex justifyContent="space-between" alignItems="center" mb={2}>
-                  <Text fontWeight="bold">{task.title}</Text>
-                  <Badge colorScheme={task.status === 'in_progress' ? 'blue' : 'yellow'}>
-                    {task.status}
+                  <Text fontWeight="bold">{task?.title || 'Untitled Task'}</Text>
+                  <Badge colorScheme={task?.status === 'in_progress' ? 'blue' : 'yellow'}>
+                    {task?.status || 'unknown'}
                   </Badge>
                 </Flex>
                 <Text fontSize="sm" mb={3}>
-                  Agent: {task.assigned_agent || 'Unassigned'}
+                  Agent: {task?.assigned_agent || 'Unassigned'}
                 </Text>
                 <Flex gap={2} wrap="wrap">
                   <Button 
@@ -227,7 +243,18 @@ const InterruptControl = () => {
             ))}
           </VStack>
         ) : (
-          <Box textAlign="center" py={6} borderWidth="1px" borderRadius="md" borderStyle="dashed" borderColor={borderColor}>
+          <Box 
+            textAlign="center" 
+            py={6} 
+            borderWidth="1px" 
+            borderRadius="md" 
+            borderStyle="dashed" 
+            borderColor={borderColor}
+            minH="80px"
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+          >
             <Text color="gray.500">No active tasks found</Text>
           </Box>
         )}

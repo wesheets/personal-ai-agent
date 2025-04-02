@@ -35,6 +35,7 @@ const Dashboard = () => {
               shadow="md" 
               bg={bgColor} 
               borderColor={borderColor}
+              minH="300px"
             >
               <Heading size="md" mb={4}>Goal Loop Visualization</Heading>
               <GoalLoopVisualization />
@@ -69,6 +70,7 @@ const Dashboard = () => {
               shadow="md" 
               bg={bgColor} 
               borderColor={borderColor}
+              minH="300px"
             >
               <Heading size="md" mb={4}>Interrupt Control</Heading>
               <InterruptControl />
@@ -81,6 +83,7 @@ const Dashboard = () => {
               shadow="md" 
               bg={bgColor} 
               borderColor={borderColor}
+              minH="300px"
             >
               <Heading size="md" mb={4}>Status Feedback</Heading>
               <StatusFeedback />

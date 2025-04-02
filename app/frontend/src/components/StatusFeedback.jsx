@@ -35,10 +35,18 @@ const StatusFeedback = () => {
     // Function to fetch agent status
     const fetchAgentStatus = async () => {
       try {
-        setLoading(true);
+        // Only show loading on initial fetch, not during polling updates
+        if (agents.length === 0) {
+          setLoading(true);
+        }
         const data = await controlService.getAgentStatus();
+        
+        // Use functional update to avoid dependency on previous state
         setAgents(data);
-        setLoading(false);
+        
+        if (loading) {
+          setLoading(false);
+        }
       } catch (err) {
         setError('Failed to fetch agent status');
         setLoading(false);
@@ -49,16 +57,22 @@ const StatusFeedback = () => {
     // Initial fetch
     fetchAgentStatus();
 
-    // Set up polling for real-time updates (every 2 seconds)
-    const intervalId = setInterval(fetchAgentStatus, 2000);
+    // Set up polling for real-time updates (every 3 seconds instead of 2)
+    // Increased interval to reduce re-renders while maintaining responsiveness
+    const intervalId = setInterval(fetchAgentStatus, 3000);
     
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
-  // Function to determine status color
+  // Function to determine status color with defensive coding
   const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
+    // Ensure status is a string before attempting to use toLowerCase
+    if (!status || typeof status !== 'string') {
+      return 'gray';
+    }
+    
+    switch (status.toLowerCase()) {
       case 'active':
       case 'running':
       case 'in_progress':
@@ -80,8 +94,8 @@ const StatusFeedback = () => {
 
   if (loading) {
     return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" />
+      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center">
+        <Spinner size="xl" mx="auto" />
         <Text mt={4}>Loading agent status...</Text>
       </Box>
     );
@@ -89,19 +103,19 @@ const StatusFeedback = () => {
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} color="red.500">
+      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center" color="red.500">
         <Text fontSize="lg">{error}</Text>
       </Box>
     );
   }
 
   return (
-    <Box>
+    <Box minH="200px">
       {agents.length > 0 ? (
         <VStack spacing={4} align="stretch">
-          {agents.map((agent) => (
+          {agents.filter(agent => agent).map((agent) => (
             <Box 
-              key={agent.id} 
+              key={agent?.id || `agent-${Math.random()}`} 
               borderWidth="1px" 
               borderRadius="lg" 
               overflow="hidden"
@@ -237,6 +251,10 @@ const StatusFeedback = () => {
           borderRadius="md" 
           borderStyle="dashed"
           borderColor={borderColor}
+          minH="150px"
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
         >
           <Text color="gray.500">No active agents found</Text>
         </Box>

@@ -25,10 +25,21 @@ const GoalLoopVisualization = () => {
     // Function to fetch goals data from the API
     const fetchGoals = async () => {
       try {
-        setLoading(true);
+        // Only show loading on initial fetch, not during polling updates
+        if (goals.length === 0) {
+          setLoading(true);
+        }
         const data = await goalsService.getGoals();
-        setGoals(data);
-        setLoading(false);
+        
+        // Compare data before updating state to avoid unnecessary re-renders
+        const dataChanged = JSON.stringify(data) !== JSON.stringify(goals);
+        if (dataChanged) {
+          setGoals(data);
+        }
+        
+        if (loading) {
+          setLoading(false);
+        }
       } catch (err) {
         setError('Failed to fetch goals data');
         setLoading(false);
@@ -39,16 +50,21 @@ const GoalLoopVisualization = () => {
     // Initial fetch
     fetchGoals();
 
-    // Set up polling for real-time updates (every 5 seconds)
+    // Set up polling for real-time updates (keep at 5 seconds as it's already reasonable)
     const intervalId = setInterval(fetchGoals, 5000);
 
     // Clean up interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
-  // Function to determine status color
+  // Function to determine status color with defensive coding
   const getStatusColor = (status) => {
-    switch (status?.toLowerCase()) {
+    // Ensure status is a string before attempting to use toLowerCase
+    if (!status || typeof status !== 'string') {
+      return 'gray';
+    }
+    
+    switch (status.toLowerCase()) {
       case 'completed':
         return 'green';
       case 'in_progress':
@@ -64,8 +80,8 @@ const GoalLoopVisualization = () => {
 
   if (loading) {
     return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" />
+      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center">
+        <Spinner size="xl" mx="auto" />
         <Text mt={4}>Loading goal data...</Text>
       </Box>
     );
@@ -73,7 +89,7 @@ const GoalLoopVisualization = () => {
 
   if (error) {
     return (
-      <Box textAlign="center" py={10} color="red.500">
+      <Box textAlign="center" py={10} minH="200px" display="flex" flexDirection="column" justifyContent="center" color="red.500">
         <Text fontSize="lg">{error}</Text>
       </Box>
     );
@@ -88,6 +104,10 @@ const GoalLoopVisualization = () => {
         borderRadius="md" 
         borderStyle="dashed"
         borderColor={borderColor}
+        minH="200px"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
       >
         <Text color="gray.500">No active goals found</Text>
       </Box>
@@ -95,10 +115,10 @@ const GoalLoopVisualization = () => {
   }
 
   return (
-    <VStack spacing={6} align="stretch">
-      {goals.map((goal) => (
+    <VStack spacing={6} align="stretch" minH="200px">
+      {goals.filter(goal => goal).map((goal) => (
         <Box 
-          key={goal.goal_id} 
+          key={goal?.goal_id || `goal-${Math.random()}`} 
           borderWidth="1px" 
           borderRadius="lg" 
           p={4} 
