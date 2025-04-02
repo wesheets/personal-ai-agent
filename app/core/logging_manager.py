@@ -150,7 +150,43 @@ class LoggingManager:
         Args:
             limit: Maximum number of logs to return
         """
-        return self.recent_logs[-limit:] if limit < len(self.recent_logs) else self.recent_logs
+        # Convert dictionary logs to LogEntry objects if needed
+        result_logs = []
+        for log in self.recent_logs[-limit:] if limit < len(self.recent_logs) else self.recent_logs:
+            if isinstance(log, dict):
+                try:
+                    # Ensure required fields exist
+                    if 'path' not in log and 'url' in log:
+                        # Extract path from URL if missing
+                        url = log['url']
+                        path = url.split('://')[-1].split('/', 1)[-1] if '/' in url else ''
+                        log['path'] = f"/{path}" if not path.startswith('/') else path
+                    elif 'path' not in log:
+                        log['path'] = 'unknown'
+                        
+                    # Create LogEntry object
+                    log_entry = LogEntry(
+                        timestamp=log.get('timestamp', datetime.now().isoformat()),
+                        method=log.get('method', 'UNKNOWN'),
+                        path=log.get('path', 'unknown'),
+                        status_code=log.get('status_code', 500),
+                        request_headers=log.get('request_headers', {}),
+                        request_body=log.get('request_body', None),
+                        response_headers=log.get('response_headers', {}),
+                        response_body=log.get('response_body', None),
+                        process_time_ms=log.get('process_time', 0) * 1000 if 'process_time' in log else None,
+                        error=log.get('error', None),
+                        stack_trace=log.get('stack_trace', None)
+                    )
+                    result_logs.append(log_entry)
+                except Exception as e:
+                    logger.error(f"Error converting log dict to LogEntry: {str(e)}")
+                    # Skip this log entry
+            else:
+                # Already a LogEntry object
+                result_logs.append(log)
+                
+        return result_logs
     
     def _redact_sensitive_data(self, data: Any) -> Any:
         """
