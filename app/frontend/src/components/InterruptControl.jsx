@@ -468,7 +468,7 @@ const InterruptControl = () => {
           bg={overlayBg} 
           zIndex="10"
         >
-          <Spinner size="xl" />
+          <Text fontWeight="medium" fontSize="lg">Loading...</Text>
         </Box>
       )}
       <Box h="100%" w="full">
