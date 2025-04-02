@@ -119,15 +119,22 @@ export const controlService = {
   },
   
   // Delegate task to another agent
-  delegateTask: async (taskId, targetAgent) => {
+  delegateTask: async (taskId, targetAgent, taskDescription = null) => {
     try {
-      const response = await apiClient.post('/api/agent/delegate', {
+      const payload = {
         task_id: taskId,
         target_agent: targetAgent
-      });
+      };
+      
+      // Add task_description to payload if provided
+      if (taskDescription) {
+        payload.task_description = taskDescription;
+      }
+      
+      const response = await apiClient.post('/api/agent/delegate', payload);
       return response.data;
     } catch (error) {
-      console.error(`Error delegating task ${taskId} to ${targetAgent}:`, error);
+      console.error(`Error delegating task to ${targetAgent}:`, error);
       throw error;
     }
   },
