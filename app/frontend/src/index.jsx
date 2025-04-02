@@ -6,6 +6,9 @@ import './styles/main.css';
 // Import components (to be created)
 import Dashboard from './components/Dashboard';
 
+// Trigger Vercel redeploy
+console.log("Triggering redeploy");
+
 const App = () => {
   return (
     <Router>
