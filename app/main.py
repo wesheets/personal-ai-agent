@@ -23,7 +23,11 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "*",  # Keep wildcard for local development
+        "https://personal-ai-agent-production.up.railway.app",
+        # "https://*.vercel.app"  # Temporary during testing
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
