@@ -53,25 +53,39 @@ async def get_memory_entries(
         
         # Search memory with filters - wrapped in try/except
         try:
-            # Check if search is async or sync method
-            if hasattr(memory, "search_async"):
-                # Use async method if available
-                results = await memory.search_async(
-                    query="",  # Empty query to get all entries matching filters
-                    filter_string=" AND ".join(timestamp_filters) if timestamp_filters else None,
-                    filter_dict=filter_params if filter_params else None,
-                    limit=limit
-                )
-            else:
-                # Fall back to sync method
-                results = memory.search(
-                    query="",  # Empty query to get all entries matching filters
-                    filter_string=" AND ".join(timestamp_filters) if timestamp_filters else None,
-                    filter_dict=filter_params if filter_params else None,
-                    limit=limit
-                )
+            # Use the correct search_memories method instead of search
+            results = await memory.search_memories(
+                query="",  # Empty query to get all entries matching filters
+                limit=limit
+                # Note: search_memories doesn't support filter_string and filter_dict parameters
+                # We'll need to filter the results after retrieval
+            )
             
-            logger.info(f"Found {len(results)} memory entries")
+            # Apply filters manually if needed
+            filtered_results = []
+            for result in results:
+                # Check if result matches our filters
+                metadata = result.get("metadata", {}) or {}
+                
+                # Check goal_id filter
+                if goal_id and metadata.get("goal_id") != goal_id:
+                    continue
+                
+                # Check agent_type filter
+                if agent_type and metadata.get("agent_type") != agent_type:
+                    continue
+                
+                # Check timestamp filters
+                timestamp = metadata.get("timestamp", "")
+                if start_timestamp and timestamp < start_timestamp:
+                    continue
+                if end_timestamp and timestamp > end_timestamp:
+                    continue
+                
+                filtered_results.append(result)
+            
+            results = filtered_results[:limit]  # Apply limit after filtering
+            logger.info(f"Found {len(results)} memory entries after filtering")
         except Exception as e:
             logger.error(f"Error searching memory: {str(e)}")
             # Return empty results instead of failing
@@ -82,9 +96,9 @@ async def get_memory_entries(
         for result in results:
             try:
                 # Handle potential attribute errors
-                result_id = getattr(result, "id", "unknown")
-                result_text = getattr(result, "text", "")
-                result_metadata = getattr(result, "metadata", {}) or {}
+                result_id = result.get("id", "unknown")
+                result_text = result.get("content", "")
+                result_metadata = result.get("metadata", {}) or {}
                 
                 entry = MemoryEntryModel(
                     id=result_id,
