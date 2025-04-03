@@ -106,20 +106,41 @@ async def search_memories(
         
         # Search memories with error handling
         try:
-            results = await memory_system.search_memories(
-                query=query,
-                limit=limit,
-                priority_only=priority_only
-            )
+            import logging
+            logger = logging.getLogger("api")
+            
+            # Use safe pattern with hasattr checks
+            if hasattr(memory_system, "search_memories"):
+                results = await memory_system.search_memories(
+                    query=query,
+                    limit=limit,
+                    priority_only=priority_only
+                )
+                logger.info("[MemoryEndpoint] Using method: search_memories")
+            elif hasattr(memory_system, "similarity_search"):
+                results = await memory_system.similarity_search(
+                    query=query,
+                    limit=limit,
+                    priority_only=priority_only
+                )
+                logger.info("[MemoryEndpoint] Using method: similarity_search")
+            else:
+                logger.error("Memory system has no valid search method")
+                raise HTTPException(status_code=500, detail="Memory system is not compatible")
             
             # Validate results
             if results is None:
                 results = []
                 
+        except AttributeError as e:
+            import logging
+            logger = logging.getLogger("api")
+            logger.error(f"AttributeError in memory search: {str(e)}")
+            results = []
         except Exception as e:
             import logging
             logger = logging.getLogger("api")
-            logger.error(f"Error in memory_system.search_memories: {str(e)}")
+            logger.error(f"Error in memory system search: {str(e)}")
             results = []
         
         # Process results with defensive programming
