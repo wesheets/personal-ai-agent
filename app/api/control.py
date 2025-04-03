@@ -151,13 +151,13 @@ async def get_agent_status():
 
 @router.post("/agent/delegate")
 async def delegate_task(
-    payload: DelegateRequestModel,
+    request: DelegateRequestModel,
     background_tasks: BackgroundTasks
 ):
-    logger.info(f"[DELEGATE] Received task for agent '{payload.target_agent}' with ID '{payload.task.id}'")
+    logger.info(f"[DELEGATE] Received task for agent '{request.target_agent}' with ID '{request.task.id}'")
     
     # Offload the processing to background
-    background_tasks.add_task(process_delegate, payload)
+    background_tasks.add_task(process_delegate, request)
 
     return {"status": "accepted", "message": "Task is being processed in the background."}
 
