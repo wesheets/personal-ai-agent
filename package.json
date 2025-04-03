@@ -1,0 +1,7 @@
+{
+  "name": "personal-ai-agent-root",
+  "private": true,
+  "scripts": {
+    "build": "cd app/frontend && npm install && npm run build"
+  }
+}
