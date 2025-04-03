@@ -149,36 +149,63 @@ async def get_agent_status():
         # Return a minimal response instead of throwing 500
         return AgentStatusResponseModel(agents=[])
 
+@router.get("/health")
+async def healthcheck():
+    """Health check endpoint for Railway"""
+    logger.info("Health check requested")
+    return {"status": "ok"}
+
 @router.post("/agent/delegate")
 async def delegate_task(
     request: DelegateRequestModel,
     background_tasks: BackgroundTasks
 ):
-    logger.info(f"[DELEGATE] Received task for agent '{request.target_agent}' with ID '{request.task.id}'")
-    
-    # Offload the processing to background
-    background_tasks.add_task(process_delegate, request)
-
-    return {"status": "accepted", "message": "Task is being processed in the background."}
+    try:
+        logger.info(f"[DELEGATE] Received task for agent '{request.target_agent}' with ID '{request.task.id}'")
+        print(f"[DELEGATE] Received task for agent '{request.target_agent}' with ID '{request.task.id}'")
+        
+        # Log before adding background task
+        logger.info(f"[DELEGATE] About to add background task for '{request.task.id}'")
+        print(f"[DELEGATE] About to add background task for '{request.task.id}'")
+        
+        # Offload the processing to background
+        background_tasks.add_task(process_delegate, request)
+        
+        # Log after adding background task
+        logger.info(f"[DELEGATE] Successfully added background task for '{request.task.id}'")
+        print(f"[DELEGATE] Successfully added background task for '{request.task.id}'")
+        
+        return {"status": "accepted", "message": "Task is being processed in the background."}
+    except Exception as e:
+        # Log any exceptions that occur during task delegation
+        logger.exception(f"[DELEGATE] Error during task delegation: {str(e)}")
+        print(f"[DELEGATE] Error during task delegation: {str(e)}")
+        # Re-raise the exception to be handled by FastAPI
+        raise
 
 
 async def process_delegate(payload: DelegateRequestModel):
     try:
         logger.info(f"[DELEGATE] Starting background task for '{payload.task.id}'")
+        print(f"[DELEGATE] Starting background task for '{payload.task.id}'")
 
         agent = get_agent_by_name(payload.target_agent)
         if not agent:
             logger.error(f"[DELEGATE] Agent '{payload.target_agent}' not found.")
+            print(f"[DELEGATE] Agent '{payload.target_agent}' not found.")
             return
 
         logger.info(f"[DELEGATE] Found agent '{payload.target_agent}' – invoking handle_task")
+        print(f"[DELEGATE] Found agent '{payload.target_agent}' – invoking handle_task")
 
         await agent.handle_task(payload.task)
 
         logger.info(f"[DELEGATE] Task '{payload.task.id}' completed successfully for agent '{payload.target_agent}'")
+        print(f"[DELEGATE] Task '{payload.task.id}' completed successfully for agent '{payload.target_agent}'")
     
     except Exception as e:
         logger.exception(f"[DELEGATE] Error handling task '{payload.task.id}': {str(e)}")
+        print(f"[DELEGATE] Error handling task '{payload.task.id}': {str(e)}")
 
 @router.post("/agent/goal/{task_id}/edit-prompt", response_model=Dict[str, str])
 async def edit_task_prompt(task_id: str, prompt_data: EditPromptModel):

@@ -106,6 +106,24 @@ async def log_requests(request: Request, call_next):
         logger.error(f"Process time: {process_time:.4f}s")
         raise
 
+# Add middleware to log response headers for CORS debugging
+@app.middleware("http")
+async def log_headers(request: Request, call_next):
+    response = await call_next(request)
+    print("[CORS DEBUG] Response Headers:", dict(response.headers))
+    logger.info(f"[CORS DEBUG] Response Headers: {dict(response.headers)}")
+    return response
+
+# Add startup event handler
+@app.on_event("startup")
+async def startup_event():
+    print("[STARTUP] FastAPI application starting up")
+    logger.info("[STARTUP] FastAPI application starting up")
+    print("[STARTUP] CORS_ALLOWED_ORIGINS =", cors_allowed_origins)
+    logger.info(f"[STARTUP] CORS_ALLOWED_ORIGINS = {cors_allowed_origins}")
+    print("[STARTUP] Application is configured to run on port 8080")
+    logger.info("[STARTUP] Application is configured to run on port 8080")
+
 # Initialize model providers
 initialize_model_providers()
 
@@ -198,7 +216,7 @@ async def delegate_debug(request: Request):
 async def health_check():
     """Health check endpoint for Railway"""
     logger.info("Health check requested")
-    return Response(content="OK", media_type="text/plain")
+    return {"status": "ok"}
 
 # Add CORS preflight OPTIONS handler for all routes
 @app.options("/{rest_of_path:path}")
@@ -244,3 +262,10 @@ async def root():
             "logs": "/api/logs/latest"
         }
     }
+
+# Run the application with uvicorn when this script is executed directly
+if __name__ == "__main__":
+    import uvicorn
+    print("[MAIN] Starting uvicorn server on port 8080")
+    logger.info("[MAIN] Starting uvicorn server on port 8080")
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8080, reload=False)
