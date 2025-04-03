@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd app/frontend && npm run build",
+  "buildCommand": "pwd && ls -la && npm --prefix app/frontend run build",
   "outputDirectory": "app/frontend/dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
