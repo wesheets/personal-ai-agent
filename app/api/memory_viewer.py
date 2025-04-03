@@ -43,6 +43,10 @@ async def get_memory_entries(
             logger = logging.getLogger("api")
             logger.info(f"Successfully initialized memory system: {type(memory).__name__}")
             
+            # Add diagnostic logging for memory object type and available methods
+            logger.info(f"[MemoryViewer] Memory object type: {type(memory)}")
+            logger.info(f"[MemoryViewer] memory dir: {dir(memory)}")
+            
             # Check if memory system is properly initialized
             if not hasattr(memory, 'table_name') or not hasattr(memory, 'embedding_model'):
                 logger.warning("Memory system missing expected attributes")
