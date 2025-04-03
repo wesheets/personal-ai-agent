@@ -118,6 +118,7 @@ class LoggingManager:
             try:
                 # Properly await the request.body() coroutine
                 body = await request.body()
+                logger.info(f"[LogFix] Awaited body correctly for request to {path}")
                 if body:
                     try:
                         body_json = json.loads(body)
