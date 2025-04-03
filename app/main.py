@@ -33,8 +33,26 @@ logger = logging.getLogger("api")
 cors_allowed_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://compassionate-compassion-production.up.railway.app,https://frontend-agent-ui-production.up.railway.app")
 cors_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 
+# Debug print for environment variables
+print("[DEBUG] os.environ['CORS_ALLOWED_ORIGINS'] =", os.environ.get("CORS_ALLOWED_ORIGINS"))
+print("[DEBUG] Default CORS_ALLOWED_ORIGINS =", cors_allowed_origins)
+
 # Parse allowed origins
 allowed_origins = cors_allowed_origins.split(",")
+
+# Add Vercel domains for testing
+vercel_domains = [
+    "https://personal-ai-agent.vercel.app",
+    "https://personal-ai-agent-git-manus-ui.vercel.app",
+    "https://personal-ai-agent-h4g988sig-ted-sheets-projects.vercel.app"
+]
+
+# Combine all allowed origins
+all_allowed_origins = allowed_origins + vercel_domains
+
+# Debug print for CORS origins
+print("[DEBUG] CORS_ALLOWED_ORIGINS =", cors_allowed_origins)
+print("[DEBUG] All allowed origins =", all_allowed_origins)
 
 # Initialize the FastAPI app
 app = FastAPI(
@@ -42,20 +60,22 @@ app = FastAPI(
     description="A personal AI agent system with vector memory, multi-model support, and configurable agent personalities",
     version="1.0.0")
 
-# Add CORS middleware configuration
+# Add CORS middleware configuration - IMPORTANT: This must be added before any include_router() calls
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "*",  # Keep wildcard for local development
-        "http://localhost:5173",
-        "https://personal-ai-agent-production.up.railway.app",
-        "https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app",
-        # "https://*.vercel.app"  # Temporary during testing
-    ],
+    allow_origins=all_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+# Add middleware to log response headers for debugging CORS issues
+@app.middleware("http")
+async def log_headers(request: Request, call_next):
+    response = await call_next(request)
+    print("[CORS DEBUG] Response Headers:", dict(response.headers))
+    logger.info(f"[CORS DEBUG] Response Headers: {dict(response.headers)}")
+    return response
 
 # Add middleware to log all requests and responses for debugging
 @app.middleware("http")
@@ -70,6 +90,7 @@ async def log_requests(request: Request, call_next):
     logger.info(f"Request: {request.method} {request.url}")
     print(f"Request: {request.method} {request.url}")
     logger.info(f"Request headers: {request.headers}")
+    print(f"[CORS DEBUG] Request headers: {dict(request.headers)}")
     
     # Log request body for debugging task delegation issues
     if "delegate" in str(request.url) or "latest" in str(request.url) or "goals" in str(request.url):
@@ -204,16 +225,37 @@ async def health_check():
 @app.options("/{rest_of_path:path}")
 async def options_handler(rest_of_path: str):
     logger.info(f"CORS preflight request for path: /{rest_of_path}")
-    return Response(
+    print(f"[CORS DEBUG] OPTIONS request for: /{rest_of_path}")
+    
+    # Get origin from request headers for debugging
+    origin = request.headers.get("origin", "unknown")
+    print(f"[CORS DEBUG] Request origin: {origin}")
+    logger.info(f"[CORS DEBUG] Request origin: {origin}")
+    
+    # Check if origin is in allowed origins
+    is_allowed = origin in all_allowed_origins
+    print(f"[CORS DEBUG] Is origin allowed: {is_allowed}")
+    logger.info(f"[CORS DEBUG] Is origin allowed: {is_allowed}")
+    
+    # Use the actual origin if it's in the allowed list
+    cors_origin = origin if origin in all_allowed_origins else all_allowed_origins[0]
+    
+    response = Response(
         content="",
         headers={
-            "Access-Control-Allow-Origin": cors_allowed_origins.split(",")[0] if "," in cors_allowed_origins else cors_allowed_origins,
+            "Access-Control-Allow-Origin": cors_origin,
             "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
             "Access-Control-Allow-Headers": "*",
             "Access-Control-Allow-Credentials": "true" if cors_allow_credentials else "false",
             "Access-Control-Max-Age": "86400",  # 24 hours in seconds
         }
     )
+    
+    # Log the response headers for debugging
+    print(f"[CORS DEBUG] OPTIONS response headers: {dict(response.headers)}")
+    logger.info(f"[CORS DEBUG] OPTIONS response headers: {dict(response.headers)}")
+    
+    return response
 
 # Serve frontend static files if they exist
 frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend/dist")
