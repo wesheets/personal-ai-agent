@@ -77,7 +77,8 @@ async def get_memory_entries(
                 
                 # Try alternative method names if available
                 if hasattr(memory, 'similarity_search'):
-                    logger.info("Using similarity_search method as fallback")
+                    used_method = "similarity_search"
+                    logger.info(f"[MemoryViewer] Using method: {used_method}")
                     results = await memory.similarity_search(
                         query="",  # Empty query to get all entries matching filters
                         limit=limit
@@ -87,6 +88,8 @@ async def get_memory_entries(
                     return []
             else:
                 # Use the standard search_memories method
+                used_method = "search_memories"
+                logger.info(f"[MemoryViewer] Using method: {used_method}")
                 results = await memory.search_memories(
                     query="",  # Empty query to get all entries matching filters
                     limit=limit
