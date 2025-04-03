@@ -35,7 +35,9 @@ app.add_middleware(
         "https://compassionate-compassion-production.up.railway.app",
         "https://personal-ai-agent.vercel.app",
         "https://personal-ai-agent-git-hotfix-day-56-*.vercel.app",
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://personal-ai-agent-hs1g5n4z-ted-sheets-projects.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
