@@ -20,7 +20,7 @@ export default defineConfig({
     sourcemap: false, // ✅ Sourcemaps disabled for Chakra UI + Vercel compatibility
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'public/index.html'),
+        main: path.resolve(__dirname, 'index.html'),
       },
     },
   },
