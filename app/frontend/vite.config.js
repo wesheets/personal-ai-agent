@@ -17,10 +17,10 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    sourcemap: false, // 🔥 This is the only change
+    sourcemap: false, // ✅ Sourcemaps disabled for Chakra UI + Vercel compatibility
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'index.html'),
+        main: path.resolve(__dirname, 'public/index.html'),
       },
     },
   },
