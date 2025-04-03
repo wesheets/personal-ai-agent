@@ -85,7 +85,7 @@ async def get_memory_entries(
                     )
                 else:
                     logger.error("No suitable search method found in VectorMemorySystem")
-                    return []
+                    raise HTTPException(status_code=500, detail="Memory system has no valid search method")
             else:
                 # Use the standard search_memories method
                 used_method = "search_memories"
