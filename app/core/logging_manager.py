@@ -152,39 +152,69 @@ class LoggingManager:
         """
         # Convert dictionary logs to LogEntry objects if needed
         result_logs = []
-        for log in self.recent_logs[-limit:] if limit < len(self.recent_logs) else self.recent_logs:
+        
+        # Handle empty logs case
+        if not self.recent_logs:
+            logger.warning("No logs available in recent_logs")
+            return result_logs
+            
+        # Safely get the logs with proper limit handling
+        logs_to_process = self.recent_logs[-limit:] if limit < len(self.recent_logs) else self.recent_logs
+        
+        for log in logs_to_process:
             if isinstance(log, dict):
                 try:
                     # Ensure required fields exist
-                    if 'path' not in log and 'url' in log:
-                        # Extract path from URL if missing
-                        url = log['url']
-                        path = url.split('://')[-1].split('/', 1)[-1] if '/' in url else ''
-                        log['path'] = f"/{path}" if not path.startswith('/') else path
-                    elif 'path' not in log:
-                        log['path'] = 'unknown'
-                        
-                    # Create LogEntry object
+                    if 'path' not in log:
+                        if 'url' in log and log['url']:
+                            # Extract path from URL if missing
+                            try:
+                                url = str(log['url'])
+                                if '://' in url:
+                                    path = url.split('://')[-1].split('/', 1)[-1] if '/' in url.split('://')[-1] else ''
+                                else:
+                                    path = url.split('/', 1)[-1] if '/' in url else ''
+                                log['path'] = f"/{path}" if path and not path.startswith('/') else path or '/unknown'
+                            except Exception as e:
+                                logger.error(f"Error extracting path from URL: {str(e)}")
+                                log['path'] = '/unknown'
+                        else:
+                            log['path'] = '/unknown'
+                    
+                    # Safely handle process_time_ms calculation
+                    process_time_ms = None
+                    if 'process_time' in log:
+                        try:
+                            if log['process_time'] is not None:
+                                process_time_ms = float(log['process_time']) * 1000
+                        except (TypeError, ValueError) as e:
+                            logger.error(f"Error converting process_time to milliseconds: {str(e)}")
+                    
+                    # Create LogEntry object with safe defaults
                     log_entry = LogEntry(
                         timestamp=log.get('timestamp', datetime.now().isoformat()),
                         method=log.get('method', 'UNKNOWN'),
-                        path=log.get('path', 'unknown'),
-                        status_code=log.get('status_code', 500),
-                        request_headers=log.get('request_headers', {}),
+                        path=log.get('path', '/unknown'),
+                        status_code=int(log.get('status_code', 500)) if log.get('status_code') is not None else 500,
+                        request_headers=log.get('request_headers', {}) or {},
                         request_body=log.get('request_body', None),
-                        response_headers=log.get('response_headers', {}),
+                        response_headers=log.get('response_headers', {}) or {},
                         response_body=log.get('response_body', None),
-                        process_time_ms=log.get('process_time', 0) * 1000 if 'process_time' in log else None,
+                        process_time_ms=process_time_ms,
                         error=log.get('error', None),
                         stack_trace=log.get('stack_trace', None)
                     )
                     result_logs.append(log_entry)
                 except Exception as e:
                     logger.error(f"Error converting log dict to LogEntry: {str(e)}")
-                    # Skip this log entry
-            else:
+                    # Skip this log entry but log the error details
+                    logger.error(f"Problematic log entry: {str(log)[:200]}...")
+            elif isinstance(log, LogEntry):
                 # Already a LogEntry object
                 result_logs.append(log)
+            else:
+                # Skip invalid log entries
+                logger.warning(f"Skipping invalid log entry of type: {type(log)}")
                 
         return result_logs
     
