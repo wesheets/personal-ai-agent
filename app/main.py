@@ -15,7 +15,7 @@ from app.providers import initialize_model_providers, get_available_models
 load_dotenv()
 
 # Get CORS configuration from environment variables
-cors_allowed_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://compassionate-compassion-production.up.railway.app,https://frontend-agent-ui-production.up.railway.app,https://personal-ai-agent-ekldclp52-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-hotfix-day-56-00c339-ted-sheets-projects.vercel.app")
+cors_allowed_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://compassionate-compassion-production.up.railway.app,https://frontend-agent-ui-production.up.railway.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-git-hotfix-day-56-*.vercel.app")
 cors_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 
 # Parse allowed origins
@@ -33,8 +33,8 @@ app.add_middleware(
     allow_origins=[
         "https://frontend-agent-ui-production.up.railway.app",
         "https://compassionate-compassion-production.up.railway.app",
-        "https://personal-ai-agent-ekldclp52-ted-sheets-projects.vercel.app",
-        "https://personal-ai-agent-git-hotfix-day-56-00c339-ted-sheets-projects.vercel.app",
+        "https://personal-ai-agent.vercel.app",
+        "https://personal-ai-agent-git-hotfix-day-56-*.vercel.app",
         "http://localhost:3000"
     ],
     allow_credentials=True,
