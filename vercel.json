@@ -1,5 +1,3 @@
-// NOTE: Prefixing paths in build commands should only be used if Vercel's root is at the monorepo root.
-// Always verify the working directory context before assuming paths.
 {
   "buildCommand": "pwd && ls -la && npm run build",
   "outputDirectory": "dist",
