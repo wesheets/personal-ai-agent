@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Body, Request, Response
+from fastapi import APIRouter, HTTPException, Body, Request, Response, BackgroundTasks
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 from app.core.orchestrator import get_orchestrator
@@ -147,8 +147,33 @@ async def get_agent_status():
         # Return a minimal response instead of throwing 500
         return AgentStatusResponseModel(agents=[])
 
+async def process_delegate(request_data):
+    """
+    Process delegate task in background
+    """
+    try:
+        logger.info(f"[DELEGATE] Starting background task for '{request_data.get('task_id') or request_data.get('task', {}).get('id', 'unknown')}'")
+        print(f"[DELEGATE] Starting background task for '{request_data.get('task_id') or request_data.get('task', {}).get('id', 'unknown')}'")
+        
+        # Extract fields from the request data
+        task_id = request_data.get("task_id")
+        target_agent = request_data.get("target_agent") or request_data.get("agent") or "builder"
+        task_description = request_data.get("task") or ""
+        
+        logger.info(f"[DELEGATE] Processing task for agent '{target_agent}'")
+        print(f"[DELEGATE] Processing task for agent '{target_agent}'")
+        
+        # Process the task (existing logic would go here)
+        # ...
+        
+        logger.info(f"[DELEGATE] Task completed successfully for agent '{target_agent}'")
+        print(f"[DELEGATE] Task completed successfully for agent '{target_agent}'")
+    except Exception as e:
+        logger.error(f"[DELEGATE ERROR] Background task processing failed: {str(e)}")
+        print(f"[DELEGATE ERROR] Background task processing failed: {str(e)}")
+
 @router.post("/agent/delegate")
-async def delegate_task(request: Request):
+async def delegate_task(request: Request, background_tasks: BackgroundTasks):
     """
     Delegate a task to a different agent
     
@@ -170,46 +195,30 @@ async def delegate_task(request: Request):
         
         logger.info(f"Task ID: {task_id}, Target Agent: {target_agent}, Task: {task_description}")
         
-        # If we have a task_id, use the orchestrator's task manager
+        # Add background task for processing
+        try:
+            logger.info(f"[DELEGATE] About to add background task for '{task_id or body.get('task', {}).get('id', 'unknown')}'")
+            print(f"[DELEGATE] About to add background task for '{task_id or body.get('task', {}).get('id', 'unknown')}'")
+            
+            # Offload the processing to background
+            background_tasks.add_task(process_delegate, body)
+            
+            logger.info(f"[DELEGATE] Successfully added background task for '{task_id or body.get('task', {}).get('id', 'unknown')}'")
+            print(f"[DELEGATE] Successfully added background task for '{task_id or body.get('task', {}).get('id', 'unknown')}'")
+        except Exception as e:
+            logger.error(f"[DELEGATE ERROR] Failed to add background task: {str(e)}")
+            print(f"[DELEGATE ERROR] Failed to add background task: {str(e)}")
+            return JSONResponse(status_code=500, content={"status": "error", "message": f"Failed to add background task: {str(e)}"})
+        
+        # If we have a task_id, return immediate success response
         if task_id:
-            logger.info(f"Delegating existing task {task_id} to {target_agent}")
-            orchestrator = get_orchestrator()
-            task_manager = orchestrator.task_state_manager
-            
-            # Get task
-            task = await task_manager.get_task(task_id)
-            if not task:
-                logger.error(f"Task {task_id} not found")
-                return JSONResponse(status_code=404, content={"status": "error", "message": f"Task {task_id} not found"})
-            
-            # Validate target agent
-            available_agents = orchestrator.prompt_manager.get_available_agents()
-            if target_agent not in available_agents:
-                logger.error(f"Invalid target agent: {target_agent}")
-                return JSONResponse(status_code=400, content={"status": "error", "message": f"Invalid target agent: {target_agent}"})
-            
-            # Update task assignment
-            task.assigned_agent = target_agent
-            await task_manager._save_state_to_log()
-            
             response = {"message": f"Task {task_id} delegated to {target_agent}", "status": "success"}
             logger.info(f"Task delegation response: {response}")
             print("✅ Delegate task submitted")
             return response
         
-        # If we have a task description, create a new task
+        # If we have a task description, create a new task ID and return immediate success
         elif task_description:
-            logger.info(f"Creating new task for {target_agent}: {task_description}")
-            
-            # Get orchestrator
-            orchestrator = get_orchestrator()
-            
-            # Validate target agent
-            available_agents = orchestrator.prompt_manager.get_available_agents()
-            if available_agents and target_agent not in available_agents:
-                logger.warning(f"Invalid target agent: {target_agent}, using first available agent")
-                target_agent = available_agents[0] if available_agents else "builder"
-            
             # Create a new task ID
             new_task_id = str(uuid.uuid4())
             

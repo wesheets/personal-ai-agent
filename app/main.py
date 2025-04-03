@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 import logging
 from dotenv import load_dotenv
+from datetime import datetime
 from app.api.agent import router as agent_router
 from app.api.memory import router as memory_router
 from app.api.goals import goals_router
@@ -56,6 +57,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+# Add middleware to log healthcheck requests with timestamp
+@app.middleware("http")
+async def log_healthcheck_requests(request: Request, call_next):
+    if request.url.path == "/health":
+        timestamp = datetime.utcnow()
+        logger.info(f"[HEALTHCHECK] Request received at {timestamp}")
+        print(f"[HEALTHCHECK] Request received at {timestamp}")
+    return await call_next(request)
 
 # Add middleware to log all requests and responses for debugging
 @app.middleware("http")
@@ -156,49 +166,13 @@ async def get_system_status():
             "version": "1.0.0"
         }
 
-# Include routers
-app.include_router(agent_router, prefix="/agent", tags=["Agents"])
-app.include_router(memory_router, prefix="/memory", tags=["Memory"])
-app.include_router(system_router)
-
-# Include new routers for UI integration
-app.include_router(goals_router, prefix="/api", tags=["Goals"])
-app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
-app.include_router(control_router, prefix="/api", tags=["Control"])
-app.include_router(logs_router, prefix="/api", tags=["Logs"])
-
-# Mount agent router again with /api prefix to fix routing issues
-app.include_router(agent_router, prefix="/api/agent", tags=["API Agents"])
-
-# Add a direct route for debugging delegate endpoint issues
-@app.post("/api/agent/delegate-debug")
-async def delegate_debug(request: Request):
-    print("✅ /delegate-debug direct route hit")
-    logger.info("✅ /delegate-debug direct route hit")
-    
-    try:
-        # Get the request body
-        body = await request.json()
-        print("🧠 Debug body received:", body)
-        logger.info(f"🧠 Debug body received: {body}")
-        
-        # Return a simulated response for testing
-        return {
-            "status": "success",
-            "message": "Debug delegate endpoint response",
-            "task_id": "debug-task-123"
-        }
-    except Exception as e:
-        print("❌ Delegate debug crash:", e)
-        logger.error(f"❌ Delegate debug crash: {str(e)}")
-        return {"status": "error", "message": f"Debug error: {str(e)}"}
-
 # Health check endpoint for Railway
 @app.get("/health", tags=["Health"])
 async def health_check():
     """Health check endpoint for Railway"""
     logger.info("Health check requested")
-    return Response(content="OK", media_type="text/plain")
+    print("[HEALTH] Health check requested")
+    return {"status": "ok"}
 
 # Add CORS preflight OPTIONS handler for all routes
 @app.options("/{rest_of_path:path}")
@@ -244,3 +218,10 @@ async def root():
             "logs": "/api/logs/latest"
         }
     }
+
+# Run the application with uvicorn when this script is executed directly
+if __name__ == "__main__":
+    import uvicorn
+    print("[MAIN] Starting uvicorn server on port 8080")
+    logger.info("[MAIN] Starting uvicorn server on port 8080")
+    uvicorn.run(app, host="0.0.0.0", port=8080)
