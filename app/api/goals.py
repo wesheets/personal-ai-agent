@@ -37,42 +37,108 @@ async def get_goals():
     Get all active goals with their subtasks
     """
     try:
-        task_manager = get_task_state_manager()
+        # Get task manager with error handling
+        try:
+            task_manager = get_task_state_manager()
+        except Exception as e:
+            import logging
+            logger = logging.getLogger("api")
+            logger.error(f"Error getting task state manager: {str(e)}")
+            return []  # Return empty list if task manager can't be initialized
         
+        # Validate task_manager has required attributes
+        if not hasattr(task_manager, 'goals') or not hasattr(task_manager, 'tasks'):
+            import logging
+            logger = logging.getLogger("api")
+            logger.error("Task manager missing required attributes (goals or tasks)")
+            return []
+            
         # Get all goals
         goals_data = []
-        for goal_id, goal in task_manager.goals.items():
-            # Get tasks for this goal
-            goal_tasks = []
-            for task_id, task in task_manager.tasks.items():
-                if task.goal_id == goal_id:
-                    goal_tasks.append(TaskModel(
-                        task_id=task.task_id,
-                        title=task.title,
-                        description=task.description,
-                        status=task.status,
-                        assigned_agent=task.assigned_agent,
-                        created_at=task.created_at,
-                        started_at=task.started_at,
-                        completed_at=task.completed_at,
-                        dependencies=task.dependencies,
-                        retry_count=task.retry_count,
-                        error=task.error
-                    ))
+        
+        # Safely iterate through goals
+        try:
+            goals_items = task_manager.goals.items() if hasattr(task_manager.goals, 'items') else []
+        except Exception as e:
+            import logging
+            logger = logging.getLogger("api")
+            logger.error(f"Error accessing goals: {str(e)}")
+            goals_items = []
             
-            # Create goal model with tasks
-            goals_data.append(GoalModel(
-                goal_id=goal.goal_id,
-                title=goal.title,
-                description=goal.description,
-                status=goal.status,
-                created_at=goal.created_at,
-                completed_at=goal.completed_at,
-                tasks=goal_tasks
-            ))
+        for goal_id, goal in goals_items:
+            # Skip invalid goals
+            if not goal:
+                continue
+                
+            # Get tasks for this goal with defensive programming
+            goal_tasks = []
+            
+            # Safely iterate through tasks
+            try:
+                tasks_items = task_manager.tasks.items() if hasattr(task_manager.tasks, 'items') else []
+            except Exception as e:
+                import logging
+                logger = logging.getLogger("api")
+                logger.error(f"Error accessing tasks: {str(e)}")
+                tasks_items = []
+                
+            for task_id, task in tasks_items:
+                # Skip invalid tasks
+                if not task:
+                    continue
+                    
+                # Check if task belongs to this goal
+                try:
+                    task_goal_id = getattr(task, 'goal_id', None)
+                    if task_goal_id != goal_id:
+                        continue
+                except Exception:
+                    continue
+                
+                # Create task model with safe attribute access
+                try:
+                    goal_tasks.append(TaskModel(
+                        task_id=getattr(task, 'task_id', task_id),
+                        title=getattr(task, 'title', 'Untitled Task'),
+                        description=getattr(task, 'description', None),
+                        status=getattr(task, 'status', 'unknown'),
+                        assigned_agent=getattr(task, 'assigned_agent', None),
+                        created_at=getattr(task, 'created_at', ''),
+                        started_at=getattr(task, 'started_at', None),
+                        completed_at=getattr(task, 'completed_at', None),
+                        dependencies=getattr(task, 'dependencies', None),
+                        retry_count=getattr(task, 'retry_count', 0),
+                        error=getattr(task, 'error', None)
+                    ))
+                except Exception as e:
+                    import logging
+                    logger = logging.getLogger("api")
+                    logger.error(f"Error creating task model: {str(e)}")
+                    # Continue to next task
+            
+            # Create goal model with safe attribute access
+            try:
+                goals_data.append(GoalModel(
+                    goal_id=getattr(goal, 'goal_id', goal_id),
+                    title=getattr(goal, 'title', 'Untitled Goal'),
+                    description=getattr(goal, 'description', ''),
+                    status=getattr(goal, 'status', 'unknown'),
+                    created_at=getattr(goal, 'created_at', ''),
+                    completed_at=getattr(goal, 'completed_at', None),
+                    tasks=goal_tasks
+                ))
+            except Exception as e:
+                import logging
+                logger = logging.getLogger("api")
+                logger.error(f"Error creating goal model: {str(e)}")
+                # Continue to next goal
         
         return goals_data
-    except Exception:
+    except Exception as e:
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger("api")
+        logger.error(f"Error in get_goals: {str(e)}")
         # Return empty goals list as fallback
         return []
 
