@@ -1,27 +1,47 @@
 {
   "name": "personal-ai-agent-frontend",
+  "private": true,
   "version": "1.0.0",
+<<<<<<< HEAD
   "description": "Frontend for Personal AI Agent System",
   "main": "index.html",
+=======
+  "type": "module",
+>>>>>>> manus-ui-restore
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@chakra-ui/react": "^3.15.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "axios": "^1.6.0",
     "framer-motion": "^12.6.2",
     "lodash.isequal": "^4.5.0",
+=======
+    "@chakra-ui/react": "^2.8.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "axios": "^1.4.0",
+    "framer-motion": "^10.15.0",
+>>>>>>> manus-ui-restore
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.18.0",
-    "styled-components": "^6.1.0"
+    "react-icons": "^4.10.1",
+    "react-router-dom": "^6.14.2"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.2.3"
+=======
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "vite": "^4.4.5"
+>>>>>>> manus-ui-restore
   }
 }

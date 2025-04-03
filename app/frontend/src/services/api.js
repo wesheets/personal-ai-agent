@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Base API URL - can be configured based on environment
-const API_BASE_URL = '';
+// Base API URL - configured from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -69,6 +69,17 @@ export const memoryService = {
       console.error('Error fetching memory entries:', error);
       throw error;
     }
+  },
+  
+  // Create a new memory entry
+  createMemoryEntry: async (memoryData) => {
+    try {
+      const response = await apiClient.post('/api/memory', memoryData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating memory entry:', error);
+      throw error;
+    }
   }
 };
 
@@ -108,15 +119,22 @@ export const controlService = {
   },
   
   // Delegate task to another agent
-  delegateTask: async (taskId, targetAgent) => {
+  delegateTask: async (taskId, targetAgent, taskDescription = null) => {
     try {
-      const response = await apiClient.post('/api/agent/delegate', {
+      const payload = {
         task_id: taskId,
         target_agent: targetAgent
-      });
+      };
+      
+      // Add task_description to payload if provided
+      if (taskDescription) {
+        payload.task_description = taskDescription;
+      }
+      
+      const response = await apiClient.post('/api/agent/delegate', payload);
       return response.data;
     } catch (error) {
-      console.error(`Error delegating task ${taskId} to ${targetAgent}:`, error);
+      console.error(`Error delegating task to ${targetAgent}:`, error);
       throw error;
     }
   },
@@ -133,8 +151,23 @@ export const controlService = {
   }
 };
 
+// Logs API
+export const logsService = {
+  // Get latest logs
+  getLatestLogs: async () => {
+    try {
+      const response = await apiClient.get('/api/logs/latest');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching latest logs:', error);
+      throw error;
+    }
+  }
+};
+
 export default {
   goalsService,
   memoryService,
-  controlService
+  controlService,
+  logsService
 };
