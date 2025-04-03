@@ -116,15 +116,21 @@ class LoggingManager:
             
             # Add request body if available
             try:
-                body = request.body()
+                # Properly await the request.body() coroutine
+                body = await request.body()
                 if body:
                     try:
                         body_json = json.loads(body)
                         log_entry["request_body"] = self._redact_sensitive_data(body_json)
-                    except:
+                    except json.JSONDecodeError:
                         # Not JSON, store as string with limited length
-                        log_entry["request_body"] = str(body)[:1000] + "..." if len(str(body)) > 1000 else str(body)
-            except:
+                        body_str = str(body)
+                        log_entry["request_body"] = body_str[:1000] + "..." if len(body_str) > 1000 else body_str
+                    except Exception as e:
+                        logger.error(f"Error processing request body: {str(e)}")
+                        log_entry["request_body"] = "Error processing request body"
+            except Exception as e:
+                logger.error(f"Error reading request body: {str(e)}")
                 log_entry["request_body"] = "Could not read request body"
             
             # Store log
