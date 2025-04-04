@@ -10,6 +10,7 @@ from app.api.goals import goals_router
 from app.api.memory_viewer import memory_router as memory_viewer_router
 from app.api.control import control_router
 from app.api.logs import logs_router
+from app.api.routes.agent import router as routes_agent_router
 from app.providers import initialize_model_providers, get_available_models
 from app.core.seeding import get_seeding_manager
 from app.core.prompt_manager import PromptManager
@@ -169,6 +170,9 @@ app.include_router(logs_router, prefix="/api", tags=["Logs"])
 
 # Mount agent router again with /api prefix to fix routing issues
 app.include_router(agent_router, prefix="/api/agent", tags=["API Agents"])
+
+# Include the routes agent router for delegate endpoint
+app.include_router(routes_agent_router, tags=["Agent Routes"])
 
 # Add a direct route for debugging delegate endpoint issues
 @app.post("/api/agent/delegate-debug")
