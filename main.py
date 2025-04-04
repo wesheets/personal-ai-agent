@@ -162,7 +162,7 @@ if os.path.exists(frontend_dir):
 async def root():
     return {
         "message": "Welcome to the Enhanced AI Agent System",
-        "docs": "/docs",
+        "docs": "/api/docs",
         "agents": [
             "/agent/builder",
             "/agent/ops",
