@@ -14,6 +14,8 @@ from app.api.goals import goals_router
 from app.api.memory_viewer import memory_router as memory_viewer_router
 from app.api.control import control_router
 from app.api.logs import logs_router
+from app.api.delegate import router as delegate_router  # ✅ HAL ROUTER
+
 from app.providers import initialize_model_providers, get_available_models
 from app.core.seeding import get_seeding_manager
 from app.core.prompt_manager import PromptManager
@@ -132,23 +134,12 @@ app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
 app.include_router(control_router, prefix="/api", tags=["Control"])
 app.include_router(logs_router, prefix="/api", tags=["Logs"])
 app.include_router(system_router)
+app.include_router(delegate_router)  # ✅ HAL ROUTE MOUNTED
 
 # Swagger docs route
 @app.get("/api/docs", include_in_schema=False)
 def overridden_swagger_docs():
     return get_swagger_ui_html(openapi_url="/openapi.json", title="Agent API Docs")
-
-# NEW: Delegate route
-@app.post("/api/agent/delegate")
-async def delegate(request: Request):
-    body = await request.json()
-    logger.info(f"🧠 HAL received a task: {body}")
-    return {
-        "status": "success",
-        "agent": "HAL9000",
-        "message": "I'm sorry, Dave. I'm afraid I can't do that.",
-        "received": body
-    }
 
 # Debug route
 @app.post("/api/agent/delegate-debug")
