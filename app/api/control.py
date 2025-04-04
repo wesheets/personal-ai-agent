@@ -147,96 +147,97 @@ async def get_agent_status():
         # Return a minimal response instead of throwing 500
         return AgentStatusResponseModel(agents=[])
 
-@router.post("/agent/delegate")
-async def delegate_task(request: Request):
-    """
-    Delegate a task to a different agent
-    
-    This endpoint allows delegating tasks to specific agents.
-    """
-    print("✅ /delegate hit")
-    logger.info("✅ /delegate hit")
-    
-    try:
-        # Get the request body
-        body = await request.json()
-        print("🧠 Body received:", body)
-        logger.info(f"🧠 Body received: {body}")
-        
-        # Extract fields from the request body
-        task_id = body.get("task_id")
-        target_agent = body.get("target_agent") or body.get("agent") or "builder"
-        task_description = body.get("task") or ""
-        
-        logger.info(f"Task ID: {task_id}, Target Agent: {target_agent}, Task: {task_description}")
-        
-        # If we have a task_id, use the orchestrator's task manager
-        if task_id:
-            logger.info(f"Delegating existing task {task_id} to {target_agent}")
-            orchestrator = get_orchestrator()
-            task_manager = orchestrator.task_state_manager
-            
-            # Get task
-            task = await task_manager.get_task(task_id)
-            if not task:
-                logger.error(f"Task {task_id} not found")
-                return JSONResponse(status_code=404, content={"status": "error", "message": f"Task {task_id} not found"})
-            
-            # Validate target agent
-            available_agents = orchestrator.prompt_manager.get_available_agents()
-            if target_agent not in available_agents:
-                logger.error(f"Invalid target agent: {target_agent}")
-                return JSONResponse(status_code=400, content={"status": "error", "message": f"Invalid target agent: {target_agent}"})
-            
-            # Update task assignment
-            task.assigned_agent = target_agent
-            await task_manager._save_state_to_log()
-            
-            response = {"message": f"Task {task_id} delegated to {target_agent}", "status": "success"}
-            logger.info(f"Task delegation response: {response}")
-            print("✅ Delegate task submitted")
-            return response
-        
-        # If we have a task description, create a new task
-        elif task_description:
-            logger.info(f"Creating new task for {target_agent}: {task_description}")
-            
-            # Get orchestrator
-            orchestrator = get_orchestrator()
-            
-            # Validate target agent
-            available_agents = orchestrator.prompt_manager.get_available_agents()
-            if available_agents and target_agent not in available_agents:
-                logger.warning(f"Invalid target agent: {target_agent}, using first available agent")
-                target_agent = available_agents[0] if available_agents else "builder"
-            
-            # Create a new task ID
-            new_task_id = str(uuid.uuid4())
-            
-            # Return a simulated response for testing
-            response = {
-                "status": "success",
-                "message": f"Task delegated to {target_agent}",
-                "task_id": new_task_id
-            }
-            
-            logger.info(f"New task delegation successful: {response}")
-            print("✅ Delegate task submitted")
-            return response
-        
-        else:
-            logger.error("Either task_id or task description is required")
-            return JSONResponse(status_code=400, content={"status": "error", "message": "Either task_id or task description is required"})
-            
-    except Exception as e:
-        print("❌ Delegate crash:", e)
-        logger.error(f"❌ Delegate crash: {str(e)}")
-        # Return a helpful error response instead of throwing 500
-        return JSONResponse(status_code=500, content={"status": "error", "message": f"Failed to delegate task: {str(e)}"})
-
-    # Fallback return in case all other logic paths fail
-    print("✅ Delegate task submitted (fallback)")
-    return {"message": "Simulated response", "status": "success"}  # TEMP for test
+# Legacy delegate endpoint - commented out to allow the new implementation to take precedence
+# @router.post("/agent/delegate")
+# async def delegate_task(request: Request):
+#     """
+#     Delegate a task to a different agent
+#     
+#     This endpoint allows delegating tasks to specific agents.
+#     """
+#     print("✅ /delegate hit")
+#     logger.info("✅ /delegate hit")
+#     
+#     try:
+#         # Get the request body
+#         body = await request.json()
+#         print("🧠 Body received:", body)
+#         logger.info(f"🧠 Body received: {body}")
+#         
+#         # Extract fields from the request body
+#         task_id = body.get("task_id")
+#         target_agent = body.get("target_agent") or body.get("agent") or "builder"
+#         task_description = body.get("task") or ""
+#         
+#         logger.info(f"Task ID: {task_id}, Target Agent: {target_agent}, Task: {task_description}")
+#         
+#         # If we have a task_id, use the orchestrator's task manager
+#         if task_id:
+#             logger.info(f"Delegating existing task {task_id} to {target_agent}")
+#             orchestrator = get_orchestrator()
+#             task_manager = orchestrator.task_state_manager
+#             
+#             # Get task
+#             task = await task_manager.get_task(task_id)
+#             if not task:
+#                 logger.error(f"Task {task_id} not found")
+#                 return JSONResponse(status_code=404, content={"status": "error", "message": f"Task {task_id} not found"})
+#             
+#             # Validate target agent
+#             available_agents = orchestrator.prompt_manager.get_available_agents()
+#             if target_agent not in available_agents:
+#                 logger.error(f"Invalid target agent: {target_agent}")
+#                 return JSONResponse(status_code=400, content={"status": "error", "message": f"Invalid target agent: {target_agent}"})
+#             
+#             # Update task assignment
+#             task.assigned_agent = target_agent
+#             await task_manager._save_state_to_log()
+#             
+#             response = {"message": f"Task {task_id} delegated to {target_agent}", "status": "success"}
+#             logger.info(f"Task delegation response: {response}")
+#             print("✅ Delegate task submitted")
+#             return response
+#         
+#         # If we have a task description, create a new task
+#         elif task_description:
+#             logger.info(f"Creating new task for {target_agent}: {task_description}")
+#             
+#             # Get orchestrator
+#             orchestrator = get_orchestrator()
+#             
+#             # Validate target agent
+#             available_agents = orchestrator.prompt_manager.get_available_agents()
+#             if available_agents and target_agent not in available_agents:
+#                 logger.warning(f"Invalid target agent: {target_agent}, using first available agent")
+#                 target_agent = available_agents[0] if available_agents else "builder"
+#             
+#             # Create a new task ID
+#             new_task_id = str(uuid.uuid4())
+#             
+#             # Return a simulated response for testing
+#             response = {
+#                 "status": "success",
+#                 "message": f"Task delegated to {target_agent}",
+#                 "task_id": new_task_id
+#             }
+#             
+#             logger.info(f"New task delegation successful: {response}")
+#             print("✅ Delegate task submitted")
+#             return response
+#         
+#         else:
+#             logger.error("Either task_id or task description is required")
+#             return JSONResponse(status_code=400, content={"status": "error", "message": "Either task_id or task description is required"})
+#             
+#     except Exception as e:
+#         print("❌ Delegate crash:", e)
+#         logger.error(f"❌ Delegate crash: {str(e)}")
+#         # Return a helpful error response instead of throwing 500
+#         return JSONResponse(status_code=500, content={"status": "error", "message": f"Failed to delegate task: {str(e)}"})
+#
+#     # Fallback return in case all other logic paths fail
+#     print("✅ Delegate task submitted (fallback)")
+#     return {"message": "Simulated response", "status": "success"}  # TEMP for test
 
 @router.post("/agent/goal/{task_id}/edit-prompt", response_model=Dict[str, str])
 async def edit_task_prompt(task_id: str, prompt_data: EditPromptModel):

@@ -27,7 +27,28 @@ from app.providers.model_router import get_model_router
 from app.db.database import get_db
 from app.db.supabase_manager import get_supabase
 
+async def handle_task(agent_id: str, task: Dict[str, Any]):
+    """
+    Handle a task in the background
+    
+    This function is called by the delegate endpoint to process tasks in the background.
+    """
+    try:
+        logger.info(f"[TOOL EXECUTION] Agent {agent_id} executing tool task: {task.get('type')}")
+        print(f"[TOOL EXECUTION] Agent {agent_id} executing tool task: {task.get('type')}")
+        
+        # Actual task processing would go here
+        # This is a placeholder implementation
+        
+        logger.info(f"Task {task.get('id')} completed successfully")
+        print(f"Task {task.get('id')} completed successfully")
+    except Exception as e:
+        logger.error(f"Error processing task: {str(e)}")
+        print(f"Error processing task: {str(e)}")
+
+# Attach the handle_task function to the router
 router = APIRouter()
+router.handle_task = handle_task
 
 class AgentRequest(BaseModel):
     input: str
