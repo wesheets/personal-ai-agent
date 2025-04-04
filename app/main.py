@@ -14,7 +14,7 @@ from app.api.goals import goals_router
 from app.api.memory_viewer import memory_router as memory_viewer_router
 from app.api.control import control_router
 from app.api.logs import logs_router
-from app.api.delegate import router as delegate_router  # ✅ HAL ROUTER
+from app.api.delegate_route import router as delegate_router  # ✅ HAL ROUTER
 
 from app.providers import initialize_model_providers, get_available_models
 from app.core.seeding import get_seeding_manager
