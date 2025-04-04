@@ -3,5 +3,8 @@
   "private": true,
   "scripts": {
     "build": "cd app/frontend && npm install && vite build"
+  },
+  "dependencies": {
+    "lodash.isequal": "^4.5.0"
   }
 }
