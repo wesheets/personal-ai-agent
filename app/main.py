@@ -1,6 +1,8 @@
-from fastapi import FastAPI, APIRouter, Response, Request
+from fastapi import FastAPI, APIRouter, Response, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+from typing import Dict, Any, Optional
 import os
 import logging
 from dotenv import load_dotenv
@@ -169,6 +171,38 @@ app.include_router(logs_router, prefix="/api", tags=["Logs"])
 
 # Mount agent router again with /api prefix to fix routing issues
 app.include_router(agent_router, prefix="/api/agent", tags=["API Agents"])
+
+# Define models for the delegate endpoint
+class TaskPayload(BaseModel):
+    id: str
+    type: str
+    input: str
+
+class AgentTaskRequest(BaseModel):
+    agent_id: str
+    task: TaskPayload
+
+# Add the delegate endpoint
+@app.post("/api/agent/delegate")
+async def delegate_task(request: AgentTaskRequest, background_tasks: BackgroundTasks):
+    """
+    Delegate a task to an agent for execution
+    
+    This endpoint accepts a task request and processes it in the background.
+    """
+    # Log the task delegation
+    print(f"[DELEGATE] Background task starting for {request.task.id}")
+    logger.info(f"[DELEGATE] Background task starting for {request.task.id}")
+    
+    # Log the agent execution
+    print(f"[TOOL EXECUTION] Agent {request.agent_id} executing tool task")
+    logger.info(f"[TOOL EXECUTION] Agent {request.agent_id} executing tool task")
+    
+    # Add the task to background processing
+    background_tasks.add_task(agent_router.handle_task, request.agent_id, request.task)
+    
+    # Return success response
+    return {"status": "delegated"}
 
 # Add a direct route for debugging delegate endpoint issues
 @app.post("/api/agent/delegate-debug")
