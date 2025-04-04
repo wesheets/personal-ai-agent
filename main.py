@@ -127,6 +127,18 @@ app.include_router(system_router)
 def overridden_swagger_docs():
     return get_swagger_ui_html(openapi_url="/openapi.json", title="Agent API Docs")
 
+# NEW: Delegate route
+@app.post("/api/agent/delegate")
+async def delegate(request: Request):
+    body = await request.json()
+    logger.info(f"🧠 HAL received a task: {body}")
+    return {
+        "status": "success",
+        "agent": "HAL9000",
+        "message": "I'm sorry, Dave. I'm afraid I can't do that.",
+        "received": body
+    }
+
 # Debug route
 @app.post("/api/agent/delegate-debug")
 async def delegate_debug(request: Request):
