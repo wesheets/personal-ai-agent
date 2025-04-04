@@ -2,8 +2,10 @@ from fastapi import FastAPI, APIRouter, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.routing import APIRoute
 import os
 import logging
+import inspect
 from dotenv import load_dotenv
 
 from app.api.agent import router as agent_router
@@ -42,6 +44,15 @@ app = FastAPI(
     description="A personal AI agent system with vector memory, multi-model support, and configurable agent personalities",
     version="1.0.0"
 )
+
+# Route logger for debugging
+@app.on_event("startup")
+async def log_all_routes():
+    print("🚀 Booting Enhanced AI Agent System...")
+    print("📡 ROUTES REGISTERED ON STARTUP:")
+    for route in app.routes:
+        if isinstance(route, APIRoute):
+            print(f"➡️ {route.path} [{', '.join(route.methods)}] from {inspect.getsourcefile(route.endpoint)}")
 
 # CORS middleware
 app.add_middleware(
