@@ -2,6 +2,9 @@ from fastapi import APIRouter, Request
 import logging
 from fastapi.routing import APIRoute
 import inspect
+import time
+import asyncio
+from fastapi.responses import JSONResponse
 
 router = APIRouter(tags=["Debug"])
 logger = logging.getLogger("api")
@@ -54,3 +57,48 @@ async def hal_status():
             "status": "error",
             "error": str(e)
         }
+
+@router.get("/debug/middleware-timing")
+async def middleware_timing():
+    """Monitor middleware timing and performance."""
+    logger.info("🔍 Middleware timing endpoint called")
+    return {
+        "status": "active",
+        "middleware": {
+            "log_requests": {
+                "body_read_timeout": "3.0 seconds",
+                "request_timeout": "10.0 seconds",
+                "status": "enabled"
+            }
+        },
+        "monitoring": "Use X-Process-Time header in responses to track request processing time"
+    }
+
+@router.post("/debug/test-timeout")
+async def test_timeout(request: Request, delay: float = 0):
+    """Test endpoint that simulates a delay to test timeout handling."""
+    logger.info(f"🔍 Test timeout endpoint called with delay={delay}")
+    
+    try:
+        # Simulate processing delay
+        if delay > 0:
+            await asyncio.sleep(delay)
+            
+        # Read and return the request body
+        body = await request.json()
+        return {
+            "status": "success",
+            "message": f"Request processed after {delay} seconds",
+            "received": body,
+            "timestamp": time.time()
+        }
+    except Exception as e:
+        logger.error(f"🔥 Error in test timeout endpoint: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": "Error processing request",
+                "error": str(e)
+            }
+        )

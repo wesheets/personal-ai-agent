@@ -68,27 +68,69 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# Middleware for logging
+# Middleware for logging with timeout handling
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     import time
+    import asyncio
+    from fastapi.responses import JSONResponse
+    
     logger.info(f"Request: {request.method} {request.url}")
-    logger.info(f"Request headers: {request.headers}")
+    
+    # Only log headers for non-production environments or if explicitly enabled
+    if os.environ.get("LOG_HEADERS", "false").lower() == "true":
+        logger.info(f"Request headers: {request.headers}")
+    
+    # Set timeout for body reading (3 seconds max)
+    body = None
     if "delegate" in str(request.url) or "latest" in str(request.url) or "goals" in str(request.url):
         try:
-            body = await request.body()
+            # Use asyncio.wait_for to implement timeout for body reading
+            body = await asyncio.wait_for(request.body(), timeout=3.0)
             if body:
-                logger.info(f"Request body: {body.decode()}")
+                # Only log body summary for security/performance
+                body_str = body.decode()
+                log_body = body_str[:100] + "..." if len(body_str) > 100 else body_str
+                logger.info(f"Request body summary: {log_body}")
+                # Restore body for route handler
                 request._body = body
+        except asyncio.TimeoutError:
+            logger.error(f"Timeout reading request body for {request.url}")
+            return JSONResponse(
+                status_code=408,
+                content={
+                    "status": "error",
+                    "message": "Request body reading timed out",
+                    "error": "Timeout while reading request body"
+                }
+            )
         except Exception as e:
             logger.error(f"Error reading request body: {str(e)}")
+    
+    # Set overall request timeout (10 seconds max)
     start_time = time.time()
     try:
-        response = await call_next(request)
+        # Use asyncio.wait_for to implement timeout for the entire request
+        response = await asyncio.wait_for(call_next(request), timeout=10.0)
+        process_time = time.time() - start_time
         logger.info(f"Response status: {response.status_code}")
-        logger.info(f"Response headers: {response.headers}")
-        logger.info(f"Process time: {time.time() - start_time:.4f}s")
+        logger.info(f"Process time: {process_time:.4f}s")
+        
+        # Add timing header to response
+        response.headers["X-Process-Time"] = str(process_time)
         return response
+    except asyncio.TimeoutError:
+        logger.error(f"Timeout processing request for {request.url}")
+        process_time = time.time() - start_time
+        logger.error(f"Process time before timeout: {process_time:.4f}s")
+        return JSONResponse(
+            status_code=504,
+            content={
+                "status": "error",
+                "message": "Request processing timed out",
+                "error": "Timeout while processing request"
+            }
+        )
     except Exception as e:
         logger.error(f"Error during request processing: {str(e)}")
         logger.error(f"Process time: {time.time() - start_time:.4f}s")
