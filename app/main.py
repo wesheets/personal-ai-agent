@@ -59,8 +59,8 @@ async def log_all_routes():
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*", "http://localhost:5173", "https://personal-ai-agent-production.up.railway.app", "https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=cors_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"]
 )
