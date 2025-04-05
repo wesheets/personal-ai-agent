@@ -35,14 +35,18 @@ apiClient.interceptors.response.use(
 
 // API service functions with null-safe handling
 const ApiService = {
-  // Agent delegation
+  // Agent delegation (legacy non-streaming version)
   delegateTask: async (agentType, taskName, taskGoal) => {
     try {
       console.log('📤 Delegate Task Request:', { agent: agentType, name: taskName, goal: taskGoal });
       
       const response = await apiClient.post('/api/agent/delegate', {
-        agent: agentType,
-        task: taskGoal, // Changed to match backend expectations
+        agent_id: agentType,
+        task: {
+          task_id: `task-${Date.now()}`,
+          task_type: 'text',
+          input: taskGoal
+        }
       });
       
       // Log the raw response for debugging
@@ -65,6 +69,84 @@ const ApiService = {
       return responseData;
     } catch (error) {
       console.error(`❌ Error delegating task to ${agentType} agent:`, error);
+      throw error;
+    }
+  },
+
+  // Agent delegation with streaming support
+  delegateTaskStreaming: async (agentId, taskName, taskGoal, onProgress, onComplete, onError) => {
+    try {
+      console.log('📤 Streaming Delegate Task Request:', { agent_id: agentId, name: taskName, goal: taskGoal });
+      
+      // Prepare request body
+      const requestBody = {
+        agent_id: agentId,
+        task: {
+          task_id: `task-${Date.now()}`,
+          task_type: 'text',
+          input: taskGoal
+        }
+      };
+
+      // Use fetch API for streaming support
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/agent/delegate-stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Request failed: ${response.status} ${response.statusText}`);
+      }
+      
+      // Handle streaming response
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      
+      let done = false;
+      let finalResponse = null;
+      
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        
+        if (done) break;
+        
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter(line => line.trim());
+        
+        for (const line of lines) {
+          try {
+            const data = JSON.parse(line);
+            
+            // Handle different types of streaming responses
+            if (data.status === 'progress' && typeof onProgress === 'function') {
+              onProgress(data);
+            } else if (data.status === 'success') {
+              finalResponse = data;
+              if (typeof onComplete === 'function') {
+                onComplete(data);
+              }
+            } else if (data.status === 'error' && typeof onError === 'function') {
+              onError(data);
+            }
+          } catch (parseError) {
+            console.error('Error parsing JSON from stream:', parseError, line);
+            if (typeof onError === 'function') {
+              onError({ status: 'error', message: 'Error parsing response', error: parseError.message });
+            }
+          }
+        }
+      }
+      
+      return finalResponse;
+    } catch (error) {
+      console.error(`❌ Error streaming task to ${agentId} agent:`, error);
+      if (typeof onError === 'function') {
+        onError({ status: 'error', message: error.message });
+      }
       throw error;
     }
   },

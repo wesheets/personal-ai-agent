@@ -21,38 +21,7 @@ import {
 } from '@chakra-ui/react';
 import { FiRefreshCw, FiClock, FiAlertCircle } from 'react-icons/fi';
 
-// Mock data for initial development - will be replaced with API calls
-const mockAgents = [
-  {
-    id: 'builder',
-    config: {
-      name: 'Builder Agent',
-      description: 'Creates and manages development projects'
-    }
-  },
-  {
-    id: 'ops',
-    config: {
-      name: 'Ops Agent',
-      description: 'Handles operations and infrastructure tasks'
-    }
-  },
-  {
-    id: 'research',
-    config: {
-      name: 'Research Agent',
-      description: 'Conducts research and gathers information'
-    }
-  },
-  {
-    id: 'memory',
-    config: {
-      name: 'Memory Agent',
-      description: 'Manages knowledge and information storage'
-    }
-  }
-];
-
+// Mock data for activity feed - will be replaced with API calls
 const mockLogs = [
   { id: 1, timestamp: '2025-03-31T10:15:00Z', message: 'Builder agent completed task: Create React component', agent: 'builder' },
   { id: 2, timestamp: '2025-03-31T10:10:00Z', message: 'Memory agent stored new information', agent: 'memory' },
@@ -60,11 +29,23 @@ const mockLogs = [
   { id: 4, timestamp: '2025-03-31T10:00:00Z', message: 'Ops agent deployed new version', agent: 'ops' }
 ];
 
-// Agent Card Component with null-safe property access
+// Agent Card Component with dynamic metadata display
 const AgentCard = ({ agent }) => {
   const { colorMode } = useColorMode();
   const navigate = (path) => {
     window.location.href = path;
+  };
+
+  // Get agent color based on type
+  const getAgentColor = (type) => {
+    switch(type) {
+      case 'system':
+        return 'blue';
+      case 'persona':
+        return 'purple';
+      default:
+        return 'gray';
+    }
   };
 
   return (
@@ -85,12 +66,25 @@ const AgentCard = ({ agent }) => {
       height="100%"
     >
       <CardHeader pb={0}>
-        <Heading size="md" color={colorMode === 'light' ? 'brand.600' : 'brand.300'}>
-          {agent?.config?.name ?? "Agent"}
-        </Heading>
+        <HStack>
+          <Heading size="md" color={colorMode === 'light' ? 'brand.600' : 'brand.300'}>
+            {agent?.icon && <span style={{ marginRight: '8px' }}>{agent.icon}</span>}
+            {agent?.name ?? "Agent"}
+          </Heading>
+          {agent?.type && (
+            <Badge colorScheme={getAgentColor(agent.type)}>
+              {agent.type}
+            </Badge>
+          )}
+        </HStack>
       </CardHeader>
       <CardBody>
-        <Text>{agent?.config?.description ?? "No description"}</Text>
+        <Text>{agent?.description ?? "No description"}</Text>
+        {agent?.tone && (
+          <Badge mt={2} colorScheme="teal" variant="outline">
+            {agent.tone}
+          </Badge>
+        )}
       </CardBody>
       <CardFooter pt={0}>
         <Button variant="ghost" colorScheme="blue" size="sm">
@@ -216,15 +210,40 @@ const Dashboard = () => {
   const { colorMode } = useColorMode();
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const toast = useToast();
 
-  // Simulate API call to fetch agents
+  // Fetch agents from the API
   useEffect(() => {
-    // This will be replaced with actual API call
-    setTimeout(() => {
-      setAgents(mockAgents);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const fetchAgents = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/agents');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch agents: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setAgents(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching agents:', err);
+        setError('Failed to load agents. Please try again later.');
+        toast({
+          title: 'Error',
+          description: 'Failed to load agents. Please try again later.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAgents();
+  }, [toast]);
 
   if (loading) {
     return (
@@ -234,14 +253,31 @@ const Dashboard = () => {
     );
   }
 
+  if (error) {
+    return (
+      <Box p={4}>
+        <Heading mb={6} size="lg">Dashboard</Heading>
+        <Box p={5} borderWidth="1px" borderRadius="lg" bg="red.50">
+          <Heading size="md" color="red.500" mb={2}>Error</Heading>
+          <Text>{error}</Text>
+          <Button mt={4} colorScheme="red" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box p={4}>
       <Heading mb={6} size="lg">Dashboard</Heading>
       
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={6} mb={8}>
-        {agents?.map((agent) => (
-          <AgentCard key={agent?.id ?? Math.random()} agent={agent} />
-        )) ?? (
+        {agents?.length > 0 ? (
+          agents.map((agent) => (
+            <AgentCard key={agent?.id ?? Math.random()} agent={agent} />
+          ))
+        ) : (
           <Text>No agents available</Text>
         )}
       </Grid>

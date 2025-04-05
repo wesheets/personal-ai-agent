@@ -27,6 +27,14 @@ AGENT_PERSONALITIES = {
         "description": "Executes tasks with minimal interpretation or delay.",
         "icon": "⚙️"
     },
+    "planner": {
+        "name": "Cortex",
+        "type": "system",
+        "tone": "strategic",
+        "message": "Analyzing request. Formulating strategic approach.",
+        "description": "Coordinates complex tasks and creates detailed roadmaps.",
+        "icon": "🧠"
+    },
     "hal9000": {
         "name": "HAL 9000",
         "type": "persona",

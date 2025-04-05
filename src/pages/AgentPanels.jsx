@@ -25,7 +25,8 @@ import {
   Switch,
   IconButton,
   Flex,
-  Tooltip
+  Tooltip,
+  Progress
 } from '@chakra-ui/react';
 import ApiService from '../api/ApiService';
 import { AgentDebugFeedback } from '../components';
@@ -62,6 +63,11 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     spinnerResetCall: null,
     spinnerResetComplete: null
   });
+
+  // Streaming state
+  const [streamingProgress, setStreamingProgress] = useState([]);
+  const [streamingEnabled, setStreamingEnabled] = useState(true);
+  const [currentProgress, setCurrentProgress] = useState(0);
   
   // Track render count for debugging
   useEffect(() => {
@@ -253,9 +259,11 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     // Update submission lifecycle
     updateLifecycleState('submitClick', submissionStartTimeRef.current);
     
-    // Reset previous response and error
+    // Reset previous response, error, and streaming progress
     setResponse(null);
     setError(null);
+    setStreamingProgress([]);
+    setCurrentProgress(0);
     
     // Validate inputs
     if (!taskName.trim() || !taskGoal.trim()) {
@@ -308,15 +316,91 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
         // Reset form
         setTaskName('');
         setTaskGoal('');
-      } else {
-        // Make actual API call
-        addDebugLog('📡 Sending API request');
+      } else if (streamingEnabled) {
+        // Use streaming API
+        addDebugLog('📡 Sending streaming API request');
         
-        const apiResponse = await ApiService.submitTask({
+        try {
+          // Handle progress updates
+          const handleProgress = (progressData) => {
+            if (!mountedRef.current) return;
+            
+            addDebugLog(`🔄 Progress: ${progressData.stage} - ${progressData.message}`);
+            setStreamingProgress(prev => [...prev, progressData]);
+            
+            // Update progress percentage if available
+            if (progressData.progress) {
+              setCurrentProgress(progressData.progress);
+            }
+          };
+          
+          // Handle completion
+          const handleComplete = (completeData) => {
+            if (!mountedRef.current) return;
+            
+            addDebugLog(`✅ Complete: ${completeData.agent} - ${completeData.message}`);
+            setResponse(completeData);
+            
+            // Add to task history
+            setTaskHistory(prev => [
+              {
+                id: `task-${Date.now()}`,
+                name: taskName,
+                goal: taskGoal,
+                status: 'completed',
+                timestamp: new Date(),
+                agent: completeData.agent,
+                tone: completeData.tone,
+                message: completeData.message
+              },
+              ...prev
+            ]);
+            
+            // Reset form
+            setTaskName('');
+            setTaskGoal('');
+            
+            // Update submission lifecycle
+            updateLifecycleState('apiResponse', new Date());
+          };
+          
+          // Handle errors
+          const handleError = (errorData) => {
+            if (!mountedRef.current) return;
+            
+            addDebugLog(`❌ Error: ${errorData.message}`);
+            setError(errorData.message || 'An error occurred during streaming');
+            
+            // Update submission lifecycle
+            updateLifecycleState('apiResponse', new Date());
+          };
+          
+          // Call streaming API
+          await ApiService.delegateTaskStreaming(
+            agentType,
+            taskName,
+            taskGoal,
+            handleProgress,
+            handleComplete,
+            handleError
+          );
+        } catch (streamingError) {
+          console.error('Error in streaming task:', streamingError);
+          setError(streamingError.message || 'An error occurred during streaming');
+          addDebugLog(`❌ Streaming error: ${streamingError.message}`);
+          
+          // Update submission lifecycle
+          updateLifecycleState('apiResponse', new Date());
+        }
+      } else {
+        // Make regular API call
+        addDebugLog('📡 Sending regular API request');
+        
+        const apiResponse = await ApiService.delegateTask(
           agentType,
           taskName,
           taskGoal
-        });
+        );
         
         // Update submission lifecycle
         updateLifecycleState('apiResponse', new Date());
@@ -374,6 +458,22 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
       }, 0);
     }
   };
+
+  // Get color scheme based on agent tone
+  const getToneColorScheme = (tone) => {
+    switch(tone?.toLowerCase()) {
+      case 'calm':
+        return 'blue';
+      case 'clinical':
+        return 'purple';
+      case 'decisive':
+        return 'green';
+      case 'direct':
+        return 'orange';
+      default:
+        return 'gray';
+    }
+  };
   
   // Error boundary for the entire component
   try {
@@ -413,7 +513,8 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
             'Error State': error ? "Error" : "null",
             'Response': response ? "Present" : "null",
             'Render Count': renderCount.toString(),
-            'Simulated Response': useSimulatedResponse ? "Enabled" : "Disabled"
+            'Simulated Response': useSimulatedResponse ? "Enabled" : "Disabled",
+            'Streaming': streamingEnabled ? "Enabled" : "Disabled"
           }}
           onClearLogs={() => setDebugLogs([])}
           onToggleVisibility={() => setDebugVisible(!debugVisible)}
@@ -444,6 +545,34 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
                     isDisabled={isSubmitting}
                   />
                 </FormControl>
+
+                <HStack>
+                  <FormControl display="flex" alignItems="center">
+                    <FormLabel htmlFor="streaming-toggle" mb="0" fontSize="sm">
+                      Use Streaming API
+                    </FormLabel>
+                    <Switch 
+                      id="streaming-toggle" 
+                      isChecked={streamingEnabled}
+                      onChange={() => setStreamingEnabled(!streamingEnabled)}
+                      colorScheme="blue"
+                      isDisabled={isSubmitting}
+                    />
+                  </FormControl>
+
+                  <FormControl display="flex" alignItems="center">
+                    <FormLabel htmlFor="simulated-toggle" mb="0" fontSize="sm">
+                      Simulated Response (Debug)
+                    </FormLabel>
+                    <Switch 
+                      id="simulated-toggle" 
+                      isChecked={useSimulatedResponse}
+                      onChange={() => setUseSimulatedResponse(!useSimulatedResponse)}
+                      colorScheme="purple"
+                      isDisabled={isSubmitting || streamingEnabled}
+                    />
+                  </FormControl>
+                </HStack>
                 
                 {error && (
                   <Alert status="error" borderRadius="md">
@@ -451,12 +580,67 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
+
+                {/* Streaming Progress Display */}
+                {streamingEnabled && streamingProgress.length > 0 && (
+                  <Box mt={2} p={3} borderWidth="1px" borderRadius="md" bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}>
+                    <Text fontWeight="bold" mb={2}>Processing Task:</Text>
+                    <Progress 
+                      value={currentProgress} 
+                      size="sm" 
+                      colorScheme="blue" 
+                      mb={3}
+                      hasStripe
+                      isAnimated
+                    />
+                    <VStack align="start" spacing={1}>
+                      {streamingProgress.map((progress, index) => (
+                        <Text key={index} fontSize="sm">
+                          {progress.stage}: {progress.message}
+                          {progress.progress && ` (${Math.round(progress.progress)}%)`}
+                        </Text>
+                      ))}
+                    </VStack>
+                  </Box>
+                )}
                 
-                {response && response.success && (
-                  <Alert status="success" borderRadius="md">
-                    <AlertIcon />
-                    <AlertDescription>{response.message}</AlertDescription>
-                  </Alert>
+                {/* Persona-based Response Display */}
+                {response && response.status === 'success' && (
+                  <Box 
+                    mt={2} 
+                    p={4} 
+                    borderWidth="1px" 
+                    borderRadius="md" 
+                    bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}
+                    borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                  >
+                    <VStack align="stretch" spacing={3}>
+                      <HStack>
+                        <Text fontWeight="bold">Agent:</Text>
+                        <Text>{response.agent}</Text>
+                      </HStack>
+                      
+                      <HStack>
+                        <Text fontWeight="bold">Tone:</Text>
+                        <Badge colorScheme={getToneColorScheme(response.tone)}>
+                          {response.tone}
+                        </Badge>
+                      </HStack>
+                      
+                      <Box>
+                        <Text fontWeight="bold" mb={1}>Response:</Text>
+                        <Box 
+                          p={3} 
+                          bg={colorMode === 'light' ? 'white' : 'gray.800'}
+                          borderRadius="md"
+                          borderWidth="1px"
+                          borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                        >
+                          <Text>{response.message}</Text>
+                        </Box>
+                      </Box>
+                    </VStack>
+                  </Box>
                 )}
                 
                 <Button
@@ -491,6 +675,25 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
                       </Badge>
                     </HStack>
                     <Text mt={2} fontSize="sm" color="gray.600">{task.goal}</Text>
+                    
+                    {/* Persona details in history if available */}
+                    {task.agent && (
+                      <HStack mt={2} spacing={2}>
+                        <Badge size="sm">Agent: {task.agent}</Badge>
+                        {task.tone && (
+                          <Badge colorScheme={getToneColorScheme(task.tone)} size="sm">
+                            {task.tone}
+                          </Badge>
+                        )}
+                      </HStack>
+                    )}
+                    
+                    {task.message && (
+                      <Text mt={1} fontSize="sm" fontStyle="italic">
+                        "{task.message}"
+                      </Text>
+                    )}
+                    
                     <Text mt={1} fontSize="xs" color="gray.500">
                       Submitted: {task.timestamp.toLocaleString()}
                     </Text>
