@@ -56,6 +56,7 @@ async def log_all_routes():
     for route in app.routes:
         if isinstance(route, APIRoute):
             print(f"➡️ {route.path} [{', '.join(route.methods)}] from {inspect.getsourcefile(route.endpoint)}")
+            logger.info(f"🔍 {route.path} [{','.join(route.methods)}]")
 
 # CORS middleware
 app.add_middleware(
