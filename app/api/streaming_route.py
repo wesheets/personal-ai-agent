@@ -7,6 +7,9 @@ import asyncio
 import json
 from typing import Dict, Any, AsyncGenerator, List
 
+# Import AGENT_PERSONALITIES from delegate_route
+from app.api.delegate_route import AGENT_PERSONALITIES
+
 router = APIRouter()
 logger = logging.getLogger("api")
 
@@ -16,11 +19,11 @@ logger.info(f"📡 Streaming Router object created: {router}")
 
 # Enhanced processing stages for more detailed progress updates
 PROCESSING_STAGES = [
-    {"status": "initializing", "message": "Initializing HAL systems"},
+    {"status": "initializing", "message": "Initializing agent systems"},
     {"status": "analyzing", "message": "Analyzing request parameters"},
     {"status": "processing", "message": "Processing request data"},
     {"status": "thinking", "message": "Formulating response"},
-    {"status": "finalizing", "message": "Finalizing HAL response"}
+    {"status": "finalizing", "message": "Finalizing agent response"}
 ]
 
 # Streaming response generator with enhanced progress reporting
@@ -39,7 +42,7 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
         "message": "Processing request",
         "timestamp": time.time(),
         "metadata": {
-            "request_id": f"hal-{int(start_time)}",
+            "request_id": f"agent-{int(start_time)}",
             "stream_type": "ndjson"
         }
     }).encode() + b'\n'
@@ -93,6 +96,16 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
             "elapsed": time.time() - start_time
         }).encode() + b'\n'
         
+        # Get agent_id from request body and look up personality
+        agent_id = body.get("agent_id", "").lower() if body else ""
+        personality = AGENT_PERSONALITIES.get(agent_id)
+        
+        # Log agent selection
+        if personality:
+            logger.info(f"🤖 Selected agent personality: {agent_id} ({personality['name']})")
+        else:
+            logger.warning(f"⚠️ Unknown agent_id requested: {agent_id}")
+        
         # Process the request with detailed progress updates
         for i, stage in enumerate(PROCESSING_STAGES):
             # Calculate dynamic delay based on stage complexity
@@ -114,23 +127,43 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
         
         # Prepare the final response with enhanced metadata
         processing_time = time.time() - start_time
-        response_data = {
-            "status": "success",
-            "agent": "HAL9000",
-            "message": "I'm sorry, Dave. I'm afraid I can't do that.",
-            "received": body,
-            "processing": {
-                "total_time": processing_time,
-                "body_parse_time": body_parse_time,
-                "processing_time": processing_time - body_parse_time,
-                "stages_completed": len(PROCESSING_STAGES),
-                "timestamp": time.time()
+        
+        # Use the appropriate personality response based on agent_id
+        if personality:
+            response_data = {
+                "status": "success",
+                "agent": personality["name"],
+                "message": personality["message"],
+                "tone": personality["tone"],
+                "received": body,
+                "processing": {
+                    "total_time": processing_time,
+                    "body_parse_time": body_parse_time,
+                    "processing_time": processing_time - body_parse_time,
+                    "stages_completed": len(PROCESSING_STAGES),
+                    "timestamp": time.time()
+                }
             }
-        }
+        else:
+            # Default response for unknown agent_id
+            response_data = {
+                "status": "success",
+                "agent": agent_id or "unknown",
+                "message": "No personality assigned. Executing generic protocol.",
+                "tone": "neutral",
+                "received": body,
+                "processing": {
+                    "total_time": processing_time,
+                    "body_parse_time": body_parse_time,
+                    "processing_time": processing_time - body_parse_time,
+                    "stages_completed": len(PROCESSING_STAGES),
+                    "timestamp": time.time()
+                }
+            }
         
         # Stream the final response
         yield json.dumps(response_data).encode() + b'\n'
-        logger.info(f"🔄 Streaming response completed in {processing_time:.4f}s")
+        logger.info(f"🔄 Streaming response completed in {processing_time:.4f}s for agent: {agent_id}")
         
     except Exception as e:
         # Enhanced error response with detailed diagnostics
@@ -159,8 +192,12 @@ async def delegate_stream(request: Request):
     2. Providing immediate feedback to the client
     3. Reducing memory usage for large responses
     4. Handling complex operations with detailed progress updates
+    
+    Supports multiple agent personalities based on agent_id parameter:
+    - hal9000: HAL 9000 with calm tone
+    - ash-xenomorph: Ash with clinical tone
     """
-    logger.info(f"🔄 Streaming HAL delegate route executed from {inspect.currentframe().f_code.co_filename}")
+    logger.info(f"🔄 Streaming delegate route executed from {inspect.currentframe().f_code.co_filename}")
     
     # Return streaming response with enhanced headers
     return StreamingResponse(
@@ -168,7 +205,7 @@ async def delegate_stream(request: Request):
         media_type="application/x-ndjson",
         headers={
             "X-Streaming-Mode": "enabled",
-            "X-HAL-Version": "1.0.0",
+            "X-Agent-Version": "1.0.0",
             "Cache-Control": "no-cache"
         }
     )
