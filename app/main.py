@@ -15,6 +15,7 @@ from app.api.memory_viewer import memory_router as memory_viewer_router
 from app.api.control import control_router
 from app.api.logs import logs_router
 from app.api.delegate_route import router as delegate_router  # ✅ HAL ROUTER
+from app.diagnostics.hal_route_debug import router as hal_debug_router
 
 from app.providers import initialize_model_providers, get_available_models
 from app.core.seeding import get_seeding_manager
@@ -135,6 +136,7 @@ app.include_router(control_router, prefix="/api", tags=["Control"])
 app.include_router(logs_router, prefix="/api", tags=["Logs"])
 app.include_router(system_router)
 app.include_router(delegate_router)  # ✅ HAL ROUTE MOUNTED
+app.include_router(hal_debug_router)  # Diagnostic router for debugging routes
 
 # Swagger docs route
 @app.get("/api/docs", include_in_schema=False)
