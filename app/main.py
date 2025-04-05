@@ -18,6 +18,8 @@ from app.api.delegate_route import router as delegate_router  # ✅ HAL ROUTER
 from app.diagnostics.hal_route_debug import router as hal_debug_router
 from app.api.debug_routes import router as debug_router  # Debug routes for diagnostics
 from app.api.performance_monitoring import router as performance_router  # Performance monitoring
+from app.api.streaming_route import router as streaming_router  # Streaming response router
+from app.middleware.size_limiter import limit_request_body_size  # Request body size limiter
 
 from app.providers import initialize_model_providers, get_available_models
 from app.core.seeding import get_seeding_manager
@@ -69,11 +71,15 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+# Request body size limiter middleware
+app.middleware("http")(limit_request_body_size)
+
 # Middleware for logging with timeout handling
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     import time
     import asyncio
+    import json
     from fastapi.responses import JSONResponse
     
     logger.info(f"Request: {request.method} {request.url}")
@@ -82,37 +88,50 @@ async def log_requests(request: Request, call_next):
     if os.environ.get("LOG_HEADERS", "false").lower() == "true":
         logger.info(f"Request headers: {request.headers}")
     
-    # Set timeout for body reading (3 seconds max)
-    body = None
+    # Pre-parse body for delegate routes to avoid double parsing
     if "delegate" in str(request.url) or "latest" in str(request.url) or "goals" in str(request.url):
         try:
             # Use asyncio.wait_for to implement timeout for body reading
-            body = await asyncio.wait_for(request.body(), timeout=3.0)
-            if body:
-                # Only log body summary for security/performance
-                body_str = body.decode()
-                log_body = body_str[:100] + "..." if len(body_str) > 100 else body_str
-                logger.info(f"Request body summary: {log_body}")
-                # Restore body for route handler
-                request._body = body
+            raw_body = await asyncio.wait_for(request.body(), timeout=8.0)
+            if raw_body:
+                # Store raw body for later use
+                request._body = raw_body
+                
+                # Try to parse as JSON and store in request.state
+                try:
+                    body_str = raw_body.decode()
+                    # Only log body summary for security/performance
+                    log_body = body_str[:100] + "..." if len(body_str) > 100 else body_str
+                    logger.info(f"Request body summary: {log_body}")
+                    
+                    # Pre-parse JSON and store in request state
+                    request.state.body = json.loads(body_str)
+                    logger.info("Successfully pre-parsed JSON body in middleware")
+                except json.JSONDecodeError:
+                    # Not valid JSON, just store raw body
+                    logger.warning("Request body is not valid JSON, storing raw body only")
+                except Exception as e:
+                    logger.error(f"Error parsing JSON body: {str(e)}")
         except asyncio.TimeoutError:
             logger.error(f"Timeout reading request body for {request.url}")
             return JSONResponse(
                 status_code=408,
                 content={
                     "status": "error",
-                    "message": "Request body reading timed out",
+                    "message": "Request body reading timed out in middleware",
                     "error": "Timeout while reading request body"
                 }
             )
         except Exception as e:
             logger.error(f"Error reading request body: {str(e)}")
     
-    # Set overall request timeout (10 seconds max)
+    # Set overall request timeout (15 seconds max for Railway environment)
     start_time = time.time()
     try:
         # Use asyncio.wait_for to implement timeout for the entire request
-        response = await asyncio.wait_for(call_next(request), timeout=10.0)
+        # Increased timeout for Railway environment
+        timeout_seconds = 15.0 if os.environ.get("RAILWAY_ENVIRONMENT") else 10.0
+        response = await asyncio.wait_for(call_next(request), timeout=timeout_seconds)
         process_time = time.time() - start_time
         logger.info(f"Response status: {response.status_code}")
         logger.info(f"Process time: {process_time:.4f}s")
@@ -184,6 +203,7 @@ app.include_router(delegate_router, prefix="/api", tags=["HAL"])  # ✅ HAL ROUT
 app.include_router(hal_debug_router, prefix="/api", tags=["Diagnostics"])  # Diagnostic router for debugging routes
 app.include_router(debug_router, prefix="/api", tags=["Debug"])  # Additional debug routes for comprehensive diagnostics
 app.include_router(performance_router, prefix="/api", tags=["Performance"])  # Performance monitoring router
+app.include_router(streaming_router, prefix="/api", tags=["Streaming"])  # Streaming response router
 
 # Swagger docs route
 @app.get("/api/docs", include_in_schema=False)
