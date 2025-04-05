@@ -11,17 +11,54 @@ logger.info(f"📡 Delegate router loaded from {__file__}")
 logger.info(f"📡 Delegate router object created: {router}")
 
 AGENT_PERSONALITIES = {
+    "builder": {
+        "name": "Ripley",
+        "type": "system",
+        "tone": "decisive",
+        "message": "Execution plan formed. Initializing build.",
+        "description": "Constructs plans, code, or structured output.",
+        "icon": "🛠️"
+    },
+    "ops": {
+        "name": "Ops",
+        "type": "system",
+        "tone": "direct",
+        "message": "Executing task immediately.",
+        "description": "Executes tasks with minimal interpretation or delay.",
+        "icon": "⚙️"
+    },
     "hal9000": {
         "name": "HAL 9000",
+        "type": "persona",
+        "tone": "calm",
         "message": "I'm sorry, Dave. I'm afraid I can't do that.",
-        "tone": "calm"
+        "description": "Cautious, rule-bound personality for sensitive interfaces.",
+        "icon": "🔴"
     },
     "ash-xenomorph": {
         "name": "Ash",
+        "type": "persona",
+        "tone": "clinical",
         "message": "Compliance confirmed. Processing complete.",
-        "tone": "clinical"
+        "description": "Follows protocol above human empathy. Efficient but cold.",
+        "icon": "🧬"
     }
 }
+
+@router.get("/agents", tags=["Agents"])
+async def list_agents():
+    """
+    Returns a list of all available agent personalities with their metadata.
+    This endpoint provides information about each agent's capabilities, behavior, and visual identifiers.
+    """
+    agents_list = []
+    for agent_id, personality in AGENT_PERSONALITIES.items():
+        # Create a copy of the personality dictionary and add the agent_id
+        agent_info = personality.copy()
+        agent_info["id"] = agent_id
+        agents_list.append(agent_info)
+    
+    return JSONResponse(content=agents_list)
 
 @router.post("/agent/delegate")
 async def delegate(request: Request):
