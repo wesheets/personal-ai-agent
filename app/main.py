@@ -135,8 +135,8 @@ app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
 app.include_router(control_router, prefix="/api", tags=["Control"])
 app.include_router(logs_router, prefix="/api", tags=["Logs"])
 app.include_router(system_router)
-app.include_router(delegate_router)  # ✅ HAL ROUTE MOUNTED
-app.include_router(hal_debug_router)  # Diagnostic router for debugging routes
+app.include_router(delegate_router, prefix="/api", tags=["HAL"])  # ✅ HAL ROUTE MOUNTED
+app.include_router(hal_debug_router, prefix="/api", tags=["Diagnostics"])  # Diagnostic router for debugging routes
 
 # Swagger docs route
 @app.get("/api/docs", include_in_schema=False)

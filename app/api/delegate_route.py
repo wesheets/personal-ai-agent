@@ -1,13 +1,20 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 import logging
+import inspect
 
 router = APIRouter()
 logger = logging.getLogger("api")
 
-@router.post("/api/agent/delegate")
+# Debug logging for route registration
+logger.info(f"🔍 HAL Router module loaded from {__file__}")
+logger.info(f"🔍 HAL Router object created: {router}")
+
+@router.post("/agent/delegate")
 async def delegate(request: Request):
     try:
+        # Log route execution
+        logger.info(f"🚀 HAL delegate route executed from {inspect.currentframe().f_code.co_filename}")
         body = await request.json()
         logger.info(f"🧠 HAL received a task: {body}")
         return JSONResponse(content={
