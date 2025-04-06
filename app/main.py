@@ -6,6 +6,7 @@ import os
 import logging
 import inspect
 import re
+import datetime
 from dotenv import load_dotenv
 from app.core.middleware.cors import CustomCORSMiddleware, normalize_origin, sanitize_origin_for_header
 
@@ -374,6 +375,14 @@ async def delegate_debug(request: Request):
     body = await request.json()
     logger.info(f"🧠 Debug body received: {body}")
     return {"status": "success", "message": "Debug delegate endpoint response", "task_id": "debug-task-123"}
+
+# Debug route for API testing
+@app.get("/api/test")
+def test():
+    """
+    Simple diagnostic endpoint to verify backend deployment.
+    """
+    return {"status": "backend live", "timestamp": str(datetime.datetime.now())}
 
 # Health check
 @app.get("/health", tags=["Health"])
