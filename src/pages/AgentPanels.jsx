@@ -72,11 +72,8 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     setRenderCount(prev => prev + 1);
     setLastUpdated(new Date().toLocaleTimeString());
     
-    console.debug(`Loaded: AgentPanel (${agentType}) ✅`);
-    
     // Cleanup function to track component unmounting
     return () => {
-      console.log('⚠️ Component unmounting - setting mountedRef to false');
       mountedRef.current = false;
     };
   }, [agentType]);
@@ -106,7 +103,6 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
       submissionStartTimeRef.current = new Date();
     }
     
-    console.log('⏱️ Starting failsafe timeout for spinner reset');
     addDebugLog('⏱️ Starting failsafe timeout (8s)');
     
     // Update submission lifecycle
@@ -114,10 +110,6 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     
     // Primary failsafe - 8 seconds
     timeoutRefs.primary = setTimeout(() => {
-      console.log('✅ Spinner should now stop (8s failsafe)');
-      console.log('🔥 Failsafe reset triggered');
-      console.warn('⏱️ Failsafe triggered: Forcing spinner reset after 8s');
-      
       // Mark that failsafe was triggered
       failsafeTriggeredRef.current = true;
       
@@ -139,17 +131,12 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
           duration: 5000,
           isClosable: true,
         });
-      } else {
-        console.log('⚠️ Component not mounted during 8s failsafe - cannot reset spinner');
       }
     }, 8000);
     
     // Secondary ultra-failsafe - 12 seconds (in case the first one fails)
     timeoutRefs.secondary = setTimeout(() => {
       if (mountedRef.current && isSubmitting) {
-        console.log('✅ Spinner should now stop (12s ultra-failsafe)');
-        console.log('🔥🔥 ULTRA-FAILSAFE: Last resort spinner reset triggered');
-        
         // Update submission lifecycle
         updateLifecycleState('failsafeTrigger', new Date());
         updateLifecycleState('spinnerResetCall', new Date());
@@ -159,16 +146,11 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
         
         updateLifecycleState('spinnerResetComplete', new Date());
         addDebugLog('🔥🔥 ULTRA-FAILSAFE: Last resort spinner reset at 12s');
-      } else {
-        console.log('⚠️ Component not mounted or not submitting during 12s failsafe');
       }
     }, 12000);
     
     // Tertiary nuclear-failsafe - 16 seconds (absolute last resort)
     timeoutRefs.tertiary = setTimeout(() => {
-      console.log('✅ Spinner should now stop (16s nuclear-failsafe)');
-      console.log('☢️☢️☢️ NUCLEAR-FAILSAFE: Emergency spinner reset triggered');
-      
       // Try multiple approaches to reset the spinner
       try {
         // Direct DOM manipulation as absolute last resort
@@ -189,13 +171,12 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
         
         addDebugLog('☢️☢️☢️ NUCLEAR-FAILSAFE: Emergency spinner reset at 16s');
       } catch (err) {
-        console.error('Failed to apply nuclear failsafe:', err);
+        // Silently handle errors
       }
     }, 16000);
     
     // Clean up all timeouts
     return () => {
-      console.log('🧹 Cleaning up failsafe timeouts');
       clearTimeout(timeoutRefs.primary);
       clearTimeout(timeoutRefs.secondary);
       clearTimeout(timeoutRefs.tertiary);
@@ -269,7 +250,6 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
       };
       
       // Log request details
-      console.log('📤 Sending request:', payload);
       addDebugLog(`📤 Sending request to ${agentType} agent`);
       
       // Update submission lifecycle
@@ -277,7 +257,6 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
       
       // Use simulated response in debug mode if enabled
       if (useSimulatedResponse) {
-        console.log('🧪 Using simulated response (debug mode)');
         addDebugLog('🧪 Using simulated response (debug mode)');
         
         // Simulate API delay
@@ -422,8 +401,6 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
       setTaskName('');
       setTaskGoal('');
     } catch (err) {
-      console.error('Error submitting task:', err);
-      
       // Update submission lifecycle
       updateLifecycleState('apiCallError', new Date());
       
@@ -510,11 +487,11 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
                 
                 {DEBUG_MODE && (
                   <FormControl display="flex" alignItems="center" width="auto">
-                    <FormLabel htmlFor="simulate-toggle" mb="0" mr={2}>
-                      Simulate
+                    <FormLabel htmlFor="simulated-toggle" mb="0" mr={2}>
+                      Simulated
                     </FormLabel>
                     <Switch
-                      id="simulate-toggle"
+                      id="simulated-toggle"
                       isChecked={useSimulatedResponse}
                       onChange={(e) => setUseSimulatedResponse(e.target.checked)}
                       colorScheme="purple"
@@ -522,37 +499,37 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
                     />
                   </FormControl>
                 )}
-                
-                <Button
-                  type="submit"
-                  colorScheme="blue"
-                  isLoading={isSubmitting}
-                  loadingText="Submitting..."
-                  rightIcon={<FiRefreshCw />}
-                >
-                  Submit Task
-                </Button>
               </HStack>
+              
+              <Button
+                type="submit"
+                colorScheme="blue"
+                isLoading={isSubmitting}
+                loadingText="Processing..."
+                isDisabled={!taskName || !taskGoal || isSubmitting}
+              >
+                Submit Task
+              </Button>
+              
+              {streamingEnabled && currentProgress > 0 && currentProgress < 100 && (
+                <Progress
+                  value={currentProgress}
+                  size="sm"
+                  colorScheme="blue"
+                  borderRadius="md"
+                  hasStripe
+                  isAnimated
+                />
+              )}
             </VStack>
           </form>
         </CardBody>
       </Card>
       
-      {/* Progress indicator for streaming responses */}
-      {isSubmitting && streamingEnabled && (
-        <Box mb={6}>
-          <HStack mb={2}>
-            <Text fontWeight="medium">Processing task</Text>
-            <Spinner size="sm" />
-          </HStack>
-          <Progress value={currentProgress} size="sm" colorScheme="blue" borderRadius="full" />
-        </Box>
-      )}
-      
-      {/* Response display */}
-      {(response || streamingProgress.length > 0 || error) && (
-        <Card 
-          variant="outline" 
+      {/* Response Display */}
+      {(response || error || streamingProgress.length > 0) && (
+        <Card
+          variant="outline"
           bg={colorMode === 'light' ? 'white' : 'gray.700'}
           boxShadow="md"
           borderRadius="lg"
@@ -572,25 +549,43 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
             ) : response ? (
               <Box>
                 <HStack mb={2}>
-                  <Badge colorScheme="green">
-                    {response.agent || agentType}
-                  </Badge>
+                  <Badge colorScheme="green">{response.agent || agentType}</Badge>
                   {response.timestamp && (
-                    <Text fontSize="xs" color="gray.500">
-                      {new Date(response.timestamp).toLocaleString()}
-                    </Text>
+                    <Badge colorScheme="blue">
+                      {new Date(response.timestamp).toLocaleTimeString()}
+                    </Badge>
                   )}
                 </HStack>
-                <Text whiteSpace="pre-wrap">{response.message}</Text>
+                <Box
+                  p={3}
+                  borderWidth="1px"
+                  borderRadius="md"
+                  bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}
+                  whiteSpace="pre-wrap"
+                >
+                  {response.message}
+                </Box>
               </Box>
             ) : streamingProgress.length > 0 ? (
-              <VStack align="stretch" spacing={3}>
-                {streamingProgress.map((progress, index) => (
-                  <Box key={index}>
-                    <Text whiteSpace="pre-wrap">{progress.content}</Text>
-                  </Box>
-                ))}
-              </VStack>
+              <Box>
+                <VStack align="stretch" spacing={3}>
+                  {streamingProgress.map((progress, index) => (
+                    <Box key={index}>
+                      {index === 0 && (
+                        <HStack mb={2}>
+                          <Badge colorScheme="blue">{progress.agent || agentType}</Badge>
+                          {progress.timestamp && (
+                            <Badge colorScheme="blue">
+                              {new Date(progress.timestamp).toLocaleTimeString()}
+                            </Badge>
+                          )}
+                        </HStack>
+                      )}
+                      <Text>{progress.content}</Text>
+                    </Box>
+                  ))}
+                </VStack>
+              </Box>
             ) : null}
           </CardBody>
         </Card>
@@ -598,8 +593,8 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
       
       {/* Task History */}
       {taskHistory.length > 0 && (
-        <Card 
-          variant="outline" 
+        <Card
+          variant="outline"
           bg={colorMode === 'light' ? 'white' : 'gray.700'}
           boxShadow="md"
           borderRadius="lg"
@@ -608,19 +603,25 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
           <CardBody>
             <Heading size="md" mb={4}>Recent Tasks</Heading>
             
-            <VStack spacing={3} align="stretch" divider={<Divider />}>
-              {taskHistory.map(task => (
-                <Box key={task.id}>
-                  <HStack mb={1} justifyContent="space-between">
-                    <Heading size="sm">{task.name}</Heading>
+            <VStack align="stretch" spacing={3} maxH="300px" overflowY="auto">
+              {taskHistory.map((task) => (
+                <Box
+                  key={task.id}
+                  p={3}
+                  borderWidth="1px"
+                  borderRadius="md"
+                  bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}
+                >
+                  <HStack mb={2} justify="space-between">
+                    <Badge colorScheme="blue">{task.name}</Badge>
                     <Badge colorScheme={task.status === 'completed' ? 'green' : 'yellow'}>
                       {task.status}
                     </Badge>
                   </HStack>
-                  <Text fontSize="sm" color="gray.500" mb={2}>
+                  <Text fontSize="sm" noOfLines={2}>{task.goal}</Text>
+                  <Text fontSize="xs" color="gray.500" mt={1}>
                     {new Date(task.timestamp).toLocaleString()}
                   </Text>
-                  <Text noOfLines={2} fontSize="sm">{task.goal}</Text>
                 </Box>
               ))}
             </VStack>
@@ -630,64 +631,130 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
       
       {/* Debug Panel (only visible in debug mode) */}
       {DEBUG_MODE && (
-        <Box mb={6}>
-          <HStack mb={2}>
-            <Heading size="md">Debug Info</Heading>
-            <IconButton
-              icon={debugVisible ? <FiXCircle /> : <FiInfo />}
-              size="sm"
-              variant="ghost"
-              onClick={() => setDebugVisible(!debugVisible)}
-              aria-label={debugVisible ? "Hide debug info" : "Show debug info"}
-            />
-          </HStack>
-          
-          {debugVisible && (
-            <Card 
-              variant="outline" 
-              bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}
-              boxShadow="sm"
-              borderRadius="lg"
-            >
-              <CardBody>
-                <AgentDebugFeedback
-                  agentType={agentType}
-                  renderCount={renderCount}
-                  lastUpdated={lastUpdated}
-                  submissionLifecycle={submissionLifecycle}
-                  debugLogs={debugLogs}
-                />
-              </CardBody>
-            </Card>
-          )}
-        </Box>
+        <Card
+          variant="outline"
+          bg={colorMode === 'light' ? 'white' : 'gray.700'}
+          boxShadow="md"
+          borderRadius="lg"
+          mb={6}
+        >
+          <CardBody>
+            <HStack justify="space-between" mb={2}>
+              <Heading size="md">Debug Panel</Heading>
+              <HStack>
+                <Text fontSize="xs" color="gray.500">
+                  Renders: {renderCount}
+                </Text>
+                <Text fontSize="xs" color="gray.500">
+                  Last: {lastUpdated}
+                </Text>
+                <Button
+                  size="xs"
+                  leftIcon={<FiRefreshCw />}
+                  onClick={() => setRenderCount(prev => prev + 1)}
+                >
+                  Force Render
+                </Button>
+              </HStack>
+            </HStack>
+            
+            <Divider mb={4} />
+            
+            <VStack align="stretch" spacing={4}>
+              <Box>
+                <Heading size="xs" mb={2}>Component State:</Heading>
+                <Code p={2} borderRadius="md" fontSize="xs" width="100%" overflowX="auto">
+                  isSubmitting: {isSubmitting ? 'true' : 'false'}
+                  <br />
+                  streamingEnabled: {streamingEnabled ? 'true' : 'false'}
+                  <br />
+                  useSimulatedResponse: {useSimulatedResponse ? 'true' : 'false'}
+                  <br />
+                  currentProgress: {currentProgress}
+                  <br />
+                  streamingProgress: {streamingProgress.length} items
+                  <br />
+                  response: {response ? 'present' : 'null'}
+                  <br />
+                  error: {error ? 'present' : 'null'}
+                </Code>
+              </Box>
+              
+              <Box>
+                <Heading size="xs" mb={2}>Submission Lifecycle:</Heading>
+                <Code p={2} borderRadius="md" fontSize="xs" width="100%" overflowX="auto">
+                  {Object.entries(submissionLifecycle).map(([stage, timestamp]) => (
+                    <div key={stage}>
+                      {stage}: {timestamp ? new Date(timestamp).toLocaleTimeString() : 'N/A'}
+                    </div>
+                  ))}
+                </Code>
+              </Box>
+              
+              <Box>
+                <HStack justify="space-between" mb={2}>
+                  <Heading size="xs">Debug Logs:</Heading>
+                  <Button
+                    size="xs"
+                    onClick={() => setDebugLogs([])}
+                  >
+                    Clear Logs
+                  </Button>
+                </HStack>
+                <Box
+                  p={2}
+                  borderWidth="1px"
+                  borderRadius="md"
+                  bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}
+                  maxH="200px"
+                  overflowY="auto"
+                  fontSize="xs"
+                  fontFamily="monospace"
+                >
+                  {debugLogs.length > 0 ? (
+                    debugLogs.map((log) => (
+                      <Box key={log.id} mb={1}>
+                        <Text as="span" color="gray.500">[{log.timestamp}]</Text>{' '}
+                        <Text as="span">{log.message}</Text>
+                      </Box>
+                    ))
+                  ) : (
+                    <Text color="gray.500">No logs yet</Text>
+                  )}
+                </Box>
+              </Box>
+            </VStack>
+          </CardBody>
+        </Card>
       )}
     </Box>
   );
 };
 
-// Specific agent implementations
+// Builder Agent Component
 export const BuilderAgent = () => (
   <AgentPanel
     agentType="builder"
     agentName="Builder Agent"
-    agentDescription="The Builder Agent helps create and modify code, components, and other technical artifacts."
+    agentDescription="The Builder Agent helps with creating and modifying code, components, and other development tasks."
   />
 );
 
+// Ops Agent Component
 export const OpsAgent = () => (
   <AgentPanel
     agentType="ops"
     agentName="Operations Agent"
-    agentDescription="The Operations Agent helps with deployment, monitoring, and maintenance tasks."
+    agentDescription="The Operations Agent helps with deployment, monitoring, and system maintenance tasks."
   />
 );
 
+// Research Agent Component
 export const ResearchAgent = () => (
   <AgentPanel
     agentType="research"
     agentName="Research Agent"
-    agentDescription="The Research Agent helps gather information, analyze data, and provide insights."
+    agentDescription="The Research Agent helps with finding information, analyzing data, and generating insights."
   />
 );
 

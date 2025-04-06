@@ -65,17 +65,12 @@ const AgentTestPanel = () => {
         
         if (isMounted) {
           setAvailableAgents(visibleAgents);
-          console.log("Loaded agents from status API:", visibleAgents);
-          console.debug(`Loaded ${visibleAgents.length} agents from status API`);
         }
       } catch (err) {
         // Ignore abort errors as they're expected during cleanup
         if (err.name === 'AbortError') {
-          console.debug("AgentTestPanel - Fetch aborted during cleanup");
           return;
         }
-        
-        console.error('Error fetching agents:', err);
         
         if (isMounted) {
           toast({
@@ -148,7 +143,6 @@ const AgentTestPanel = () => {
     
     // Prevent duplicate submissions
     if (isLoading) {
-      console.debug('Submission already in progress, ignoring duplicate request');
       return;
     }
     
@@ -160,7 +154,6 @@ const AgentTestPanel = () => {
     
     // Set up failsafe timeout to reset loading state after 16 seconds
     const failsafeTimeout = setTimeout(() => {
-      console.warn('⏱️ Failsafe triggered: Forcing loading reset after 16s');
       setIsLoading(false);
       setError({ message: 'Request timed out. The agent may still be processing your task in the background.' });
       toast({
@@ -230,12 +223,11 @@ const AgentTestPanel = () => {
               });
             }
           } catch (parseError) {
-            console.error('Error parsing JSON from stream:', parseError, line);
+            // Silently handle parse errors
           }
         }
       }
     } catch (err) {
-      console.error('Error sending request:', err);
       setError({ message: err.message });
       toast({
         title: 'Request failed',

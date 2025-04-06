@@ -22,7 +22,6 @@ export const getVisibleAgents = async (options = {}) => {
     const response = await controlService.getAgentStatus();
     
     if (!response || !Array.isArray(response.agents)) {
-      console.error('Invalid response from agent status API:', response);
       return getFallbackAgents();
     }
     
@@ -41,10 +40,8 @@ export const getVisibleAgents = async (options = {}) => {
       );
     }
     
-    console.log(`Retrieved ${visibleAgents.length} agents from status API`);
     return visibleAgents;
   } catch (error) {
-    console.error('Error fetching agents from status API:', error);
     return getFallbackAgents();
   }
 };
@@ -56,7 +53,6 @@ export const getVisibleAgents = async (options = {}) => {
  * @returns {Array} - Array of fallback agent objects
  */
 const getFallbackAgents = () => {
-  console.warn('Using fallback agents due to API failure');
   return [
     { id: 'hal9000', name: 'HAL 9000', icon: '🔴', status: 'active', type: 'system' },
     { id: 'ash-xenomorph', name: 'Ash', icon: '🧬', status: 'active', type: 'persona' }

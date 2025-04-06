@@ -237,23 +237,15 @@ const Dashboard = () => {
       try {
         setLoading(true);
         
-        // Add debug log
-        console.debug("Loaded: Dashboard - Fetching agents from status API ⏳");
-        
         // Use the centralized getVisibleAgents utility instead of direct fetch
         const visibleAgents = await getVisibleAgents({ includeInactive: true });
         
         // Only update state if component is still mounted
         if (isMounted) {
           setAgents(visibleAgents);
-          // Log agents for debugging
-          console.log("Loaded agents from status API:", visibleAgents);
           setError(null);
-          console.debug("Loaded: Dashboard - Agents loaded successfully from status API ✅");
         }
       } catch (err) {
-        console.error('Error fetching agents:', err);
-        
         // Only update state if component is still mounted
         if (isMounted) {
           setError('Failed to load agents. Please try again later.');
@@ -264,7 +256,6 @@ const Dashboard = () => {
             duration: 5000,
             isClosable: true,
           });
-          console.debug("Loaded: Dashboard - Error loading agents from status API ❌");
         }
       } finally {
         // Only update state if component is still mounted
