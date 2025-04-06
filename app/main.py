@@ -41,9 +41,9 @@ logging.basicConfig(
 logger = logging.getLogger("api")
 
 # CORS configuration
-cors_allowed_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://personal-ai-agent-frontend.vercel.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-h49q98819-ted-sheets-projects.vercel.app,https://personal-ai-agent-dkmvk5af-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app,https://studio.manus.im")
+raw_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://personal-ai-agent-frontend.vercel.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-h49q98819-ted-sheets-projects.vercel.app,https://personal-ai-agent-dkmvk5af-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app,https://studio.manus.im")
+allowed_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
 cors_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
-allowed_origins = cors_allowed_origins.split(",")
 
 # FastAPI app init
 app = FastAPI(
@@ -64,9 +64,10 @@ async def log_all_routes():
     
     # Log CORS configuration on startup
     logger.info(f"🔒 CORS Configuration Loaded:")
-    logger.info(f"🔒 CORS_ALLOWED_ORIGINS: {cors_allowed_origins}")
+    logger.info(f"🔒 CORS_ALLOWED_ORIGINS: {raw_origins}")
     logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
     logger.info(f"🔒 Allowed Origins Count: {len(allowed_origins)}")
+    logger.info(f"✅ Injecting CORS allow_origins: {allowed_origins}")
     for idx, origin in enumerate(allowed_origins):
         logger.info(f"🔒 Origin {idx+1}: {origin}")
 
@@ -264,7 +265,7 @@ async def options_handler(rest_of_path: str):
     return Response(
         content="",
         headers={
-            "Access-Control-Allow-Origin": allowed_origins[0] if "," in cors_allowed_origins else cors_allowed_origins,
+            "Access-Control-Allow-Origin": allowed_origins[0] if len(allowed_origins) > 0 else "*",
             "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
             "Access-Control-Allow-Headers": "*",
             "Access-Control-Allow-Credentials": "true" if cors_allow_credentials else "false",
