@@ -20,6 +20,7 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { FiRefreshCw, FiClock, FiAlertCircle } from 'react-icons/fi';
+import DEBUG_MODE from '../config/debug';
 
 // Mock data for activity feed - will be replaced with API calls
 const mockLogs = [
@@ -134,11 +135,25 @@ const ActivityFeed = () => {
 
   // Auto-refresh every 10 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      refreshLogs();
-    }, 10000);
+    let isMounted = true;
     
-    return () => clearInterval(interval);
+    // Only set up auto-refresh if not in debug mode
+    if (!DEBUG_MODE) {
+      const interval = setInterval(() => {
+        if (isMounted) {
+          refreshLogs();
+        }
+      }, 10000);
+      
+      return () => {
+        isMounted = false;
+        clearInterval(interval);
+      };
+    }
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -215,6 +230,8 @@ const Dashboard = () => {
 
   // Fetch agents from the API
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchAgents = async () => {
       try {
         setLoading(true);
@@ -225,30 +242,56 @@ const Dashboard = () => {
         }
         
         const data = await response.json();
-        setAgents(data);
-        setError(null);
+        
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setAgents(data);
+          setError(null);
+        }
       } catch (err) {
         console.error('Error fetching agents:', err);
-        setError('Failed to load agents. Please try again later.');
-        toast({
-          title: 'Error',
-          description: 'Failed to load agents. Please try again later.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
+        
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setError('Failed to load agents. Please try again later.');
+          toast({
+            title: 'Error',
+            description: 'Failed to load agents. Please try again later.',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+        }
       } finally {
-        setLoading(false);
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchAgents();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [toast]);
 
   if (loading) {
     return (
       <Flex justify="center" align="center" height="100%" p={10}>
-        <Spinner size="xl" color="brand.500" thickness="4px" />
+        <VStack spacing={4}>
+          <Spinner size="xl" color="brand.500" thickness="4px" />
+          {agents.length > 0 && (
+            <Box textAlign="center">
+              <Text>Loading latest data...</Text>
+              <Badge colorScheme="yellow" mt={2}>Showing stale data</Badge>
+              <Button size="sm" mt={3} onClick={() => window.location.reload()}>
+                Refresh Page
+              </Button>
+            </Box>
+          )}
+        </VStack>
       </Flex>
     );
   }

@@ -28,8 +28,10 @@ import {
   Tooltip,
   Progress
 } from '@chakra-ui/react';
+import { FiRefreshCw, FiInfo, FiAlertCircle, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import ApiService from '../api/ApiService';
 import { AgentDebugFeedback } from '../components';
+import DEBUG_MODE from '../config/debug';
 
 // Generic Agent Panel component that can be used for Builder, Ops, and Research agents
 const AgentPanel = ({ agentType, agentName, agentDescription }) => {
@@ -49,22 +51,17 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
   // State for task history
   const [taskHistory, setTaskHistory] = useState([]);
   
-  // Debug state
-  const [renderCount, setRenderCount] = useState(0);
-  const [useSimulatedResponse, setUseSimulatedResponse] = useState(false);
+  // State for debug info
+  const [debugVisible, setDebugVisible] = useState(DEBUG_MODE);
   const [debugLogs, setDebugLogs] = useState([]);
-  const [lastUpdated, setLastUpdated] = useState(new Date().toLocaleTimeString());
-  const [debugVisible, setDebugVisible] = useState(true);
-  const [submissionLifecycle, setSubmissionLifecycle] = useState({
-    submitClick: null,
-    apiCallStart: null,
-    apiResponse: null,
-    failsafeTrigger: null,
-    spinnerResetCall: null,
-    spinnerResetComplete: null
-  });
-
-  // Streaming state
+  const [renderCount, setRenderCount] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState('');
+  const [submissionLifecycle, setSubmissionLifecycle] = useState({});
+  
+  // State for simulated response (for development)
+  const [useSimulatedResponse, setUseSimulatedResponse] = useState(DEBUG_MODE);
+  
+  // State for streaming response
   const [streamingProgress, setStreamingProgress] = useState([]);
   const [streamingEnabled, setStreamingEnabled] = useState(true);
   const [currentProgress, setCurrentProgress] = useState(0);
@@ -83,6 +80,11 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
   
   // ENHANCED: Failsafe timeout to force spinner reset after 8 seconds
   useEffect(() => {
+    // Only set up failsafe timeouts if not in debug mode
+    if (DEBUG_MODE) {
+      return;
+    }
+    
     // Store reference to the timeouts so we can access them outside the cleanup function
     const timeoutRefs = {
       primary: null,
@@ -201,228 +203,142 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
   const updateLifecycleState = (stage, timestamp) => {
     if (!mountedRef.current) return;
     
-    console.log(`📊 Lifecycle: ${stage} at ${timestamp.toLocaleTimeString()}`);
-    
     setSubmissionLifecycle(prev => ({
       ...prev,
       [stage]: timestamp
     }));
   };
   
-  // Add debug log
+  // Add a debug log entry
   const addDebugLog = (message) => {
+    if (!mountedRef.current) return;
+    
     const timestamp = new Date().toLocaleTimeString();
-    
-    // Only update state if component is still mounted
-    if (mountedRef.current) {
-      setDebugLogs(prev => [...prev.slice(-9), `${timestamp}: ${message}`]);
-      setLastUpdated(timestamp);
-    }
-    
-    // Always log to console
-    console.log(`[${timestamp}] ${message}`);
+    setDebugLogs(prev => [
+      {
+        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        timestamp,
+        message
+      },
+      ...prev.slice(0, 49) // Keep only the 50 most recent logs
+    ]);
   };
   
-  // Force reset spinner state (emergency function)
-  const forceResetSpinner = () => {
-    console.log('✅ Spinner should now stop (manual reset)');
-    console.log('🚨 Manual spinner reset triggered');
-    
-    if (mountedRef.current) {
-      updateLifecycleState('spinnerResetCall', new Date());
-      setIsSubmitting(false);
-      updateLifecycleState('spinnerResetComplete', new Date());
-      addDebugLog('🚨 Manual spinner reset triggered by user');
-      
-      toast({
-        title: 'Manual reset',
-        description: 'Spinner has been manually reset',
-        status: 'info',
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      console.log('⚠️ Component not mounted during manual reset - cannot reset spinner');
-    }
-  };
-  
-  // Handle form submission
+  // Handle form submission with debounce
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Debug logging - added for spinner debugging
-    console.log("✅ Submission started");
+    // Prevent rapid consecutive submissions
+    if (isSubmitting) {
+      addDebugLog('⚠️ Submission already in progress, ignoring duplicate request');
+      return;
+    }
     
-    // Reset submission tracking
+    // Validate form
+    if (!taskName.trim() || !taskGoal.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please provide both a task name and goal.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+    
+    // Reset state
+    setIsSubmitting(true);
+    setResponse(null);
+    setError(null);
     submissionStartTimeRef.current = new Date();
     
     // Update submission lifecycle
     updateLifecycleState('submitClick', submissionStartTimeRef.current);
-    
-    // Reset previous response, error, and streaming progress
-    setResponse(null);
-    setError(null);
-    setStreamingProgress([]);
-    setCurrentProgress(0);
-    
-    // Validate inputs
-    if (!taskName.trim() || !taskGoal.trim()) {
-      setError('Please fill in all required fields');
-      return;
-    }
-    
-    // Set submitting state
-    setIsSubmitting(true);
-    addDebugLog('🚀 Form submission started');
+    addDebugLog(`🚀 Submitting task to ${agentType} agent`);
     
     try {
+      // Prepare request payload
+      const payload = {
+        agent_id: agentType,
+        task_name: taskName,
+        task_goal: taskGoal,
+        use_streaming: streamingEnabled
+      };
+      
+      // Log request details
+      console.log('📤 Sending request:', payload);
+      addDebugLog(`📤 Sending request to ${agentType} agent`);
+      
       // Update submission lifecycle
       updateLifecycleState('apiCallStart', new Date());
       
-      // Use simulated response for testing if enabled
+      // Use simulated response in debug mode if enabled
       if (useSimulatedResponse) {
-        addDebugLog('🧪 Using simulated response (3s delay)');
+        addDebugLog('🧪 Using simulated response (debug mode)');
         
         // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Simulate API response
+        // Simulate streaming updates if enabled
+        if (streamingEnabled) {
+          simulateStreamingUpdates();
+        }
+        
+        // Simulate final response
         const simulatedResponse = {
           success: true,
-          message: 'Task submitted successfully (SIMULATED)',
-          taskId: `sim-${Date.now()}`,
-          status: 'pending'
+          message: 'Task processed successfully (simulated)',
+          result: `I've analyzed your request for "${taskName}" and here's my response:\n\n1. First, I'll need to gather information about ${taskGoal}\n2. Then, I'll create a structured approach\n3. Finally, I'll deliver the results in your preferred format.\n\nPlease let me know if you need any clarification or have additional requirements.`,
+          task_id: `sim-${Date.now()}`
         };
         
-        // Update submission lifecycle
-        updateLifecycleState('apiResponse', new Date());
-        
-        // Update state with simulated response
-        setResponse(simulatedResponse);
-        addDebugLog('✅ Simulated response received');
-        
-        // Add to task history
-        setTaskHistory(prev => [
-          {
-            id: simulatedResponse.taskId,
-            name: taskName,
-            goal: taskGoal,
-            status: 'pending',
-            timestamp: new Date()
-          },
-          ...prev
-        ]);
-        
-        // Reset form
-        setTaskName('');
-        setTaskGoal('');
-      } else if (streamingEnabled) {
-        // Use streaming API
-        addDebugLog('📡 Sending streaming API request');
-        
-        try {
-          // Handle progress updates
-          const handleProgress = (progressData) => {
-            if (!mountedRef.current) return;
-            
-            addDebugLog(`🔄 Progress: ${progressData.stage} - ${progressData.message}`);
-            setStreamingProgress(prev => [...prev, progressData]);
-            
-            // Update progress percentage if available
-            if (progressData.progress) {
-              setCurrentProgress(progressData.progress);
-            }
-          };
-          
-          // Handle completion
-          const handleComplete = (completeData) => {
-            if (!mountedRef.current) return;
-            
-            addDebugLog(`✅ Complete: ${completeData.agent} - ${completeData.message}`);
-            setResponse(completeData);
-            
-            // Add to task history
-            setTaskHistory(prev => [
-              {
-                id: `task-${Date.now()}`,
-                name: taskName,
-                goal: taskGoal,
-                status: 'completed',
-                timestamp: new Date(),
-                agent: completeData.agent,
-                tone: completeData.tone,
-                message: completeData.message
-              },
-              ...prev
-            ]);
-            
-            // Reset form
-            setTaskName('');
-            setTaskGoal('');
-            
-            // Update submission lifecycle
-            updateLifecycleState('apiResponse', new Date());
-          };
-          
-          // Handle errors
-          const handleError = (errorData) => {
-            if (!mountedRef.current) return;
-            
-            addDebugLog(`❌ Error: ${errorData.message}`);
-            setError(errorData.message || 'An error occurred during streaming');
-            
-            // Update submission lifecycle
-            updateLifecycleState('apiResponse', new Date());
-          };
-          
-          // Call streaming API
-          await ApiService.delegateTaskStreaming(
-            agentType,
-            taskName,
-            taskGoal,
-            handleProgress,
-            handleComplete,
-            handleError
-          );
-        } catch (streamingError) {
-          console.error('Error in streaming task:', streamingError);
-          setError(streamingError.message || 'An error occurred during streaming');
-          addDebugLog(`❌ Streaming error: ${streamingError.message}`);
-          
-          // Update submission lifecycle
+        // Only update state if component is still mounted
+        if (mountedRef.current) {
           updateLifecycleState('apiResponse', new Date());
-        }
-      } else {
-        // Make regular API call
-        addDebugLog('📡 Sending regular API request');
-        
-        const apiResponse = await ApiService.delegateTask(
-          agentType,
-          taskName,
-          taskGoal
-        );
-        
-        // Update submission lifecycle
-        updateLifecycleState('apiResponse', new Date());
-        
-        // Update state with API response
-        setResponse(apiResponse);
-        addDebugLog('✅ API response received');
-        
-        // Add to task history if successful
-        if (apiResponse.success) {
+          setResponse(simulatedResponse);
+          
+          // Add to task history
           setTaskHistory(prev => [
             {
-              id: apiResponse.taskId,
+              id: simulatedResponse.task_id,
               name: taskName,
               goal: taskGoal,
-              status: apiResponse.status || 'pending',
-              timestamp: new Date()
+              timestamp: new Date().toISOString(),
+              result: simulatedResponse.result
             },
-            ...prev
+            ...prev.slice(0, 9) // Keep only the 10 most recent tasks
           ]);
           
-          // Reset form on success
+          // Reset form
+          setTaskName('');
+          setTaskGoal('');
+        }
+      } else {
+        // Make actual API call
+        const endpoint = streamingEnabled ? 'delegate-stream' : 'delegate';
+        const apiResponse = await ApiService.delegateTask(endpoint, payload);
+        
+        // Update submission lifecycle
+        updateLifecycleState('apiResponse', new Date());
+        addDebugLog(`✅ Received response from ${agentType} agent`);
+        
+        // Only update state if component is still mounted
+        if (mountedRef.current) {
+          setResponse(apiResponse);
+          
+          // Add to task history
+          setTaskHistory(prev => [
+            {
+              id: apiResponse.task_id || `task-${Date.now()}`,
+              name: taskName,
+              goal: taskGoal,
+              timestamp: new Date().toISOString(),
+              result: apiResponse.result || apiResponse.message
+            },
+            ...prev.slice(0, 9) // Keep only the 10 most recent tasks
+          ]);
+          
+          // Reset form
           setTaskName('');
           setTaskGoal('');
         }
@@ -430,338 +346,259 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     } catch (err) {
       console.error('Error submitting task:', err);
       
-      // Update submission lifecycle
-      updateLifecycleState('apiResponse', new Date());
-      
-      // Set error state
-      setError(err.message || 'An error occurred while submitting the task');
-      addDebugLog('❌ Error: ' + (err.message || 'Unknown error'));
-    } finally {
-      // Use setTimeout to ensure state updates don't conflict
-      setTimeout(() => {
-        // Only update state if component is still mounted
-        if (mountedRef.current) {
-          // Reset submitting state
-          setIsSubmitting(false);
-          addDebugLog('✅ Form submission completed');
-          console.log("✓ Spinner should now stop (normal flow)");
-          console.log("✓ Spinner reset in finally block");
-          
-          // Update submission lifecycle
-          updateLifecycleState('spinnerResetCall', new Date());
-          updateLifecycleState('spinnerResetComplete', new Date());
-        } else if (failsafeTriggeredRef.current) {
-          console.log("✓ Spinner already reset before setTimeout executed");
-        } else {
-          console.log("⚠️ Component unmounted before spinner reset in setTimeout");
+      // Only update state if component is still mounted
+      if (mountedRef.current) {
+        // Determine error type for better user feedback
+        let errorMessage = 'Failed to submit task. Please try again.';
+        let errorType = 'Unknown Error';
+        
+        if (err.message && err.message.includes('timeout')) {
+          errorType = 'Timeout Error';
+          errorMessage = 'Request timed out. The server took too long to respond.';
+        } else if (err.message && err.message.includes('network')) {
+          errorType = 'Network Error';
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (err.response && err.response.status === 403) {
+          errorType = 'Access Denied';
+          errorMessage = 'You do not have permission to perform this action.';
+        } else if (err.response && err.response.status === 404) {
+          errorType = 'Invalid Agent';
+          errorMessage = `Agent "${agentType}" not found or not available.`;
         }
-      }, 0);
-    }
-  };
-
-  // Get color scheme based on agent tone
-  const getToneColorScheme = (tone) => {
-    switch(tone?.toLowerCase()) {
-      case 'calm':
-        return 'blue';
-      case 'clinical':
-        return 'purple';
-      case 'decisive':
-        return 'green';
-      case 'direct':
-        return 'orange';
-      default:
-        return 'gray';
+        
+        setError({
+          type: errorType,
+          message: errorMessage,
+          details: err.message || 'No additional details available',
+          timestamp: new Date().toISOString()
+        });
+        
+        addDebugLog(`❌ Error: ${errorType} - ${errorMessage}`);
+        
+        toast({
+          title: errorType,
+          description: errorMessage,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } finally {
+      // Only update state if component is still mounted and failsafe wasn't triggered
+      if (mountedRef.current && !failsafeTriggeredRef.current) {
+        updateLifecycleState('spinnerResetCall', new Date());
+        setIsSubmitting(false);
+        updateLifecycleState('spinnerResetComplete', new Date());
+        addDebugLog('✅ Form submission complete');
+      } else if (!mountedRef.current) {
+        console.log('⚠️ Component not mounted during submission completion - cannot update state');
+      } else {
+        console.log('⚠️ Failsafe already triggered - skipping normal completion flow');
+      }
     }
   };
   
-  // Error boundary for the entire component
-  try {
-    return (
-      <Box p={4}>
-        <Heading mb={6} size="lg">{agentName ?? `${agentType} Agent`}</Heading>
-        <Text mb={6} color="gray.500">{agentDescription ?? 'No description available'}</Text>
-        
-        {/* EMERGENCY KILL SWITCH - Always visible at the top */}
-        {isSubmitting && (
-          <Alert status="warning" mb={4} borderRadius="md">
-            <AlertIcon />
-            <AlertTitle mr={2}>Submission in progress</AlertTitle>
-            <AlertDescription>
-              Started at {submissionStartTimeRef.current?.toLocaleTimeString()}
-            </AlertDescription>
-            <Button 
-              ml="auto" 
-              colorScheme="red" 
-              size="sm" 
-              onClick={forceResetSpinner}
-              leftIcon={<span>🚨</span>}
-            >
-              EMERGENCY STOP
-            </Button>
-          </Alert>
-        )}
-        
-        {/* Replace the inline debug card with the AgentDebugFeedback component */}
-        <AgentDebugFeedback 
-          agentType={agentType}
-          isVisible={debugVisible}
-          debugLogs={debugLogs}
-          lifecycleEvents={submissionLifecycle}
-          performanceMetrics={{
-            'Spinner State': isSubmitting.toString(),
-            'Error State': error ? "Error" : "null",
-            'Response': response ? "Present" : "null",
-            'Render Count': renderCount.toString(),
-            'Simulated Response': useSimulatedResponse ? "Enabled" : "Disabled",
-            'Streaming': streamingEnabled ? "Enabled" : "Disabled"
-          }}
-          onClearLogs={() => setDebugLogs([])}
-          onToggleVisibility={() => setDebugVisible(!debugVisible)}
-        />
-        
-        {/* Task submission form */}
-        <Card mb={6} variant="outline">
-          <CardBody>
-            <form onSubmit={handleSubmit}>
-              <VStack spacing={4} align="stretch">
-                <FormControl isRequired>
-                  <FormLabel>Task Name</FormLabel>
-                  <Input
-                    value={taskName}
-                    onChange={(e) => setTaskName(e.target.value)}
-                    placeholder="Enter a name for this task"
-                    isDisabled={isSubmitting}
-                  />
-                </FormControl>
-                
-                <FormControl isRequired>
-                  <FormLabel>Task Goal</FormLabel>
-                  <Textarea
-                    value={taskGoal}
-                    onChange={(e) => setTaskGoal(e.target.value)}
-                    placeholder="Describe what you want the agent to accomplish"
-                    rows={4}
-                    isDisabled={isSubmitting}
-                  />
-                </FormControl>
-
-                <HStack>
-                  <FormControl display="flex" alignItems="center">
-                    <FormLabel htmlFor="streaming-toggle" mb="0" fontSize="sm">
-                      Use Streaming API
-                    </FormLabel>
-                    <Switch 
-                      id="streaming-toggle" 
-                      isChecked={streamingEnabled}
-                      onChange={() => setStreamingEnabled(!streamingEnabled)}
-                      colorScheme="blue"
-                      isDisabled={isSubmitting}
-                    />
-                  </FormControl>
-
-                  <FormControl display="flex" alignItems="center">
-                    <FormLabel htmlFor="simulated-toggle" mb="0" fontSize="sm">
-                      Simulated Response (Debug)
-                    </FormLabel>
-                    <Switch 
-                      id="simulated-toggle" 
-                      isChecked={useSimulatedResponse}
-                      onChange={() => setUseSimulatedResponse(!useSimulatedResponse)}
-                      colorScheme="purple"
-                      isDisabled={isSubmitting || streamingEnabled}
-                    />
-                  </FormControl>
-                </HStack>
-                
-                {error && (
-                  <Alert status="error" borderRadius="md">
-                    <AlertIcon />
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-
-                {/* Streaming Progress Display */}
-                {streamingEnabled && streamingProgress.length > 0 && (
-                  <Box mt={2} p={3} borderWidth="1px" borderRadius="md" bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}>
-                    <Text fontWeight="bold" mb={2}>Processing Task:</Text>
-                    <Progress 
-                      value={currentProgress} 
-                      size="sm" 
-                      colorScheme="blue" 
-                      mb={3}
-                      hasStripe
-                      isAnimated
-                    />
-                    <VStack align="start" spacing={1}>
-                      {streamingProgress.map((progress, index) => (
-                        <Text key={index} fontSize="sm">
-                          {progress.stage}: {progress.message}
-                          {progress.progress && ` (${Math.round(progress.progress)}%)`}
-                        </Text>
-                      ))}
-                    </VStack>
-                  </Box>
-                )}
-                
-                {/* Persona-based Response Display */}
-                {response && response.status === 'success' && (
-                  <Box 
-                    mt={2} 
-                    p={4} 
-                    borderWidth="1px" 
-                    borderRadius="md" 
-                    bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}
-                    borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
-                  >
-                    <VStack align="stretch" spacing={3}>
-                      <HStack>
-                        <Text fontWeight="bold">Agent:</Text>
-                        <Text>{response.agent}</Text>
-                      </HStack>
-                      
-                      <HStack>
-                        <Text fontWeight="bold">Tone:</Text>
-                        <Badge colorScheme={getToneColorScheme(response.tone)}>
-                          {response.tone}
-                        </Badge>
-                      </HStack>
-                      
-                      <Box>
-                        <Text fontWeight="bold" mb={1}>Response:</Text>
-                        <Box 
-                          p={3} 
-                          bg={colorMode === 'light' ? 'white' : 'gray.800'}
-                          borderRadius="md"
-                          borderWidth="1px"
-                          borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
-                        >
-                          <Text>{response.message}</Text>
-                        </Box>
-                      </Box>
-                    </VStack>
-                  </Box>
-                )}
-                
-                <Button
-                  type="submit"
-                  colorScheme="blue"
-                  isLoading={isSubmitting}
-                  loadingText="Submitting..."
-                  data-testid="spinner"
-                >
-                  Submit Task
-                </Button>
-              </VStack>
-            </form>
-          </CardBody>
-        </Card>
-        
-        {/* Task history section */}
-        <Card variant="outline">
-          <CardBody>
-            <Heading size="md" mb={4}>Task History</Heading>
-            
-            {taskHistory.length === 0 ? (
-              <Text color="gray.500">No tasks submitted yet</Text>
-            ) : (
-              <VStack spacing={3} align="stretch">
-                {taskHistory.map((task, index) => (
-                  <Box key={task.id || index} p={3} borderWidth="1px" borderRadius="md">
-                    <HStack justifyContent="space-between">
-                      <Heading size="sm">{task.name}</Heading>
-                      <Badge colorScheme={task.status === 'completed' ? 'green' : 'blue'}>
-                        {task.status}
-                      </Badge>
-                    </HStack>
-                    <Text mt={2} fontSize="sm" color="gray.600">{task.goal}</Text>
-                    
-                    {/* Persona details in history if available */}
-                    {task.agent && (
-                      <HStack mt={2} spacing={2}>
-                        <Badge size="sm">Agent: {task.agent}</Badge>
-                        {task.tone && (
-                          <Badge colorScheme={getToneColorScheme(task.tone)} size="sm">
-                            {task.tone}
-                          </Badge>
-                        )}
-                      </HStack>
-                    )}
-                    
-                    {task.message && (
-                      <Text mt={1} fontSize="sm" fontStyle="italic">
-                        "{task.message}"
-                      </Text>
-                    )}
-                    
-                    <Text mt={1} fontSize="xs" color="gray.500">
-                      Submitted: {task.timestamp.toLocaleString()}
-                    </Text>
-                  </Box>
-                ))}
-              </VStack>
-            )}
-          </CardBody>
-        </Card>
-      </Box>
-    );
-  } catch (error) {
-    console.error('Render error in AgentPanel:', error);
+  // Simulate streaming updates for development
+  const simulateStreamingUpdates = () => {
+    const updates = [
+      { stage: 'init', message: 'Initializing task processing', progress: 10 },
+      { stage: 'planning', message: 'Planning approach', progress: 25 },
+      { stage: 'processing', message: 'Processing task data', progress: 50 },
+      { stage: 'analyzing', message: 'Analyzing results', progress: 75 },
+      { stage: 'finalizing', message: 'Finalizing response', progress: 90 }
+    ];
     
-    // Fallback UI in case of render errors
+    let index = 0;
+    
+    const interval = setInterval(() => {
+      if (index < updates.length && mountedRef.current) {
+        setStreamingProgress(prev => [...prev, updates[index]]);
+        setCurrentProgress(updates[index].progress);
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 500);
+  };
+  
+  // Add a manual refresh button in DevMode
+  const ManualRefreshButton = () => {
+    if (!DEBUG_MODE) return null;
+    
     return (
-      <Box p={4}>
-        <Alert status="error" variant="solid">
-          <AlertIcon />
-          <AlertTitle mr={2}>Rendering Error</AlertTitle>
-          <AlertDescription>
-            An error occurred while rendering the agent panel. Please try refreshing the page.
-          </AlertDescription>
-        </Alert>
-        
-        <Card mt={4} bg="red.50" color="red.800">
-          <CardBody>
-            <Heading size="md" mb={2}>Error Details</Heading>
-            <Code p={2} borderRadius="md" display="block" whiteSpace="pre-wrap">
-              {error.toString()}
-              {error.stack}
-            </Code>
-          </CardBody>
-        </Card>
+      <Box mt={4} p={3} borderWidth="1px" borderRadius="md" bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}>
+        <Heading size="sm" mb={2}>DevMode Controls</Heading>
+        <HStack spacing={4}>
+          <Button 
+            size="sm" 
+            leftIcon={<FiRefreshCw />}
+            colorScheme="blue"
+            onClick={() => {
+              toast({
+                title: 'Manual Refresh',
+                description: 'Refreshing agent data...',
+                status: 'info',
+                duration: 2000,
+              });
+              // Refresh agent data here
+              addDebugLog('🔄 Manual refresh triggered');
+            }}
+          >
+            Refresh Agents
+          </Button>
+          <Button 
+            size="sm" 
+            colorScheme="purple"
+            onClick={() => {
+              setUseSimulatedResponse(!useSimulatedResponse);
+              addDebugLog(`🧪 Simulated responses ${!useSimulatedResponse ? 'enabled' : 'disabled'}`);
+            }}
+          >
+            {useSimulatedResponse ? 'Use Real API' : 'Use Simulated API'}
+          </Button>
+          <Button 
+            size="sm" 
+            colorScheme="red"
+            onClick={() => {
+              setDebugVisible(!debugVisible);
+            }}
+          >
+            {debugVisible ? 'Hide Debug' : 'Show Debug'}
+          </Button>
+        </HStack>
       </Box>
     );
-  }
+  };
+  
+  // Render error display with improved details
+  const ErrorDisplay = () => {
+    if (!error) return null;
+    
+    return (
+      <Alert status="error" variant="left-accent" mt={4} borderRadius="md">
+        <AlertIcon />
+        <Box flex="1">
+          <AlertTitle>{error.type || 'Error'}</AlertTitle>
+          <AlertDescription display="block">
+            {error.message}
+            {DEBUG_MODE && error.details && (
+              <Code mt={2} p={2} display="block" fontSize="xs">
+                {error.details}
+              </Code>
+            )}
+            <Text fontSize="xs" mt={1} color="gray.500">
+              {new Date(error.timestamp).toLocaleTimeString()}
+            </Text>
+          </AlertDescription>
+        </Box>
+      </Alert>
+    );
+  };
+  
+  // Render response display with improved formatting
+  const ResponseDisplay = () => {
+    if (!response) {
+      if (isSubmitting) {
+        return (
+          <Box mt={4} p={4} borderWidth="1px" borderRadius="md" bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}>
+            <Text mb={2}>Processing your request...</Text>
+            {streamingEnabled ? (
+              <>
+                <Progress value={currentProgress} size="sm" colorScheme="blue" mb={2} />
+                <VStack align="stretch" spacing={1} mt={2}>
+                  {streamingProgress.map((progress, index) => (
+                    <Text key={index} fontSize="xs">
+                      <Badge colorScheme="blue" mr={1}>{progress.stage}</Badge>
+                      {progress.message}
+                    </Text>
+                  ))}
+                </VStack>
+              </>
+            ) : (
+              <Spinner size="md" />
+            )}
+          </Box>
+        );
+      }
+      return (
+        <Box mt={4} p={4} borderWidth="1px" borderRadius="md" bg={colorMode === 'light' ? 'gray.50' : 'gray.700'}>
+          <Text color="gray.500">Agent has not responded yet</Text>
+        </Box>
+      );
+    }
+    
+    return (
+      <Card mt={4} variant="outline">
+        <CardBody>
+          <Heading size="sm" mb={2}>Response</Heading>
+          <Text whiteSpace="pre-wrap">{response.result || response.message}</Text>
+        </CardBody>
+      </Card>
+    );
+  };
+  
+  return (
+    <Box p={4}>
+      <Heading size="md" mb={2}>{agentName}</Heading>
+      <Text mb={4}>{agentDescription}</Text>
+      
+      {/* Manual Refresh Button (DevMode only) */}
+      <ManualRefreshButton />
+      
+      <form onSubmit={handleSubmit}>
+        <VStack spacing={4} align="stretch">
+          <FormControl isRequired>
+            <FormLabel>Task Name</FormLabel>
+            <Input 
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)}
+              placeholder="Enter a short, descriptive name for this task"
+              disabled={isSubmitting}
+            />
+          </FormControl>
+          
+          <FormControl isRequired>
+            <FormLabel>Task Goal</FormLabel>
+            <Textarea 
+              value={taskGoal}
+              onChange={(e) => setTaskGoal(e.target.value)}
+              placeholder="Describe what you want the agent to accomplish"
+              rows={4}
+              disabled={isSubmitting}
+            />
+          </FormControl>
+          
+          <HStack>
+            <Button 
+              type="submit" 
+              colorScheme="blue" 
+              isLoading={isSubmitting}
+              loadingText="Submitting"
+              width="full"
+            >
+              Submit Task
+            </Button>
+          </HStack>
+        </VStack>
+      </form>
+      
+      {/* Error Display */}
+      <ErrorDisplay />
+      
+      {/* Response Display */}
+      <ResponseDisplay />
+      
+      {/* Debug Information */}
+      {debugVisible && (
+        <AgentDebugFeedback 
+          logs={debugLogs}
+          renderCount={renderCount}
+          lastUpdated={lastUpdated}
+          submissionLifecycle={submissionLifecycle}
+        />
+      )}
+    </Box>
+  );
 };
 
-// Builder Agent Component
-export const BuilderAgent = () => (
-  <AgentPanel
-    agentType="builder"
-    agentName="Builder Agent"
-    agentDescription="The Builder Agent helps you create and implement solutions. It excels at coding, design, and technical implementation tasks."
-  />
-);
-
-// Ops Agent Component
-export const OpsAgent = () => (
-  <AgentPanel
-    agentType="ops"
-    agentName="Operations Agent"
-    agentDescription="The Operations Agent helps you manage and optimize systems. It excels at monitoring, maintenance, and operational tasks."
-  />
-);
-
-// Research Agent Component
-export const ResearchAgent = () => (
-  <AgentPanel
-    agentType="research"
-    agentName="Research Agent"
-    agentDescription="The Research Agent helps you gather and analyze information. It excels at finding data, summarizing content, and providing insights."
-  />
-);
-
-export default {
-  BuilderAgent,
-  OpsAgent,
-  ResearchAgent
-};
+export default AgentPanel;

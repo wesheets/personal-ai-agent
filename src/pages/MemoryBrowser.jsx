@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Heading,
@@ -18,6 +18,7 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { FiChevronDown, FiChevronUp, FiRefreshCw, FiClock, FiFileText } from 'react-icons/fi';
+import DEBUG_MODE from '../config/debug';
 
 // Mock data for initial development - will be replaced with API calls
 const mockMemories = [
@@ -83,8 +84,11 @@ const MemoryBrowser = () => {
     }
   };
   
-  // Function to refresh memories
+  // Function to refresh memories with debounce
   const refreshMemories = async () => {
+    // Prevent rapid consecutive calls
+    if (loading) return;
+    
     setLoading(true);
     setError(null);
     
@@ -115,7 +119,48 @@ const MemoryBrowser = () => {
   
   // Fetch memories on component mount
   useEffect(() => {
-    refreshMemories();
+    let isMounted = true;
+    
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setMemories(mockMemories);
+          setError(null);
+        }
+      } catch (err) {
+        console.error('Error fetching memories:', err);
+        
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setError('Failed to fetch memories. Please try again.');
+          
+          toast({
+            title: 'Error',
+            description: 'Failed to fetch memories. Please try again.',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+        }
+      } finally {
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+    
+    fetchData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
   
   // Function to get preview content (first 300-500 characters)
@@ -203,7 +248,18 @@ const MemoryBrowser = () => {
       
       {loading ? (
         <Flex justify="center" align="center" height="200px">
-          <Spinner size="xl" color="brand.500" thickness="4px" />
+          <VStack spacing={4}>
+            <Spinner size="xl" color="brand.500" thickness="4px" />
+            {memories.length > 0 && (
+              <Box textAlign="center">
+                <Text>Loading latest data...</Text>
+                <Badge colorScheme="yellow" mt={2}>Showing stale data</Badge>
+                <Button size="sm" mt={3} onClick={refreshMemories}>
+                  Retry
+                </Button>
+              </Box>
+            )}
+          </VStack>
         </Flex>
       ) : error ? (
         <Card bg={colorMode === 'light' ? 'red.50' : 'red.900'} p={4} borderRadius="md">
