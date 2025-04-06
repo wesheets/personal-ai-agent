@@ -21,6 +21,7 @@ import {
 } from '@chakra-ui/react';
 import { FiRefreshCw, FiClock, FiAlertCircle } from 'react-icons/fi';
 import DEBUG_MODE from '../config/debug';
+import { getVisibleAgents } from '../utils/agentUtils';
 
 // Mock data for activity feed - will be replaced with API calls
 const mockLogs = [
@@ -228,44 +229,29 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const toast = useToast();
 
-  // Fetch agents from the API
+  // Fetch agents from the API using the centralized utility
   useEffect(() => {
     let isMounted = true;
-    const controller = new AbortController();
     
     const fetchAgents = async () => {
       try {
         setLoading(true);
         
         // Add debug log
-        console.debug("Loaded: Dashboard - Fetching agents ⏳");
+        console.debug("Loaded: Dashboard - Fetching agents from status API ⏳");
         
-        // Use AbortController signal for fetch
-        const response = await fetch('/api/agents', {
-          signal: controller.signal
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch agents: ${response.status} ${response.statusText}`);
-        }
-        
-        const data = await response.json();
+        // Use the centralized getVisibleAgents utility instead of direct fetch
+        const visibleAgents = await getVisibleAgents({ includeInactive: true });
         
         // Only update state if component is still mounted
         if (isMounted) {
-          setAgents(data);
+          setAgents(visibleAgents);
           // Log agents for debugging
-          console.log("Loaded agents:", data);
+          console.log("Loaded agents from status API:", visibleAgents);
           setError(null);
-          console.debug("Loaded: Dashboard - Agents loaded successfully ✅");
+          console.debug("Loaded: Dashboard - Agents loaded successfully from status API ✅");
         }
       } catch (err) {
-        // Ignore abort errors as they're expected during cleanup
-        if (err.name === 'AbortError') {
-          console.debug("Dashboard - Fetch aborted during cleanup");
-          return;
-        }
-        
         console.error('Error fetching agents:', err);
         
         // Only update state if component is still mounted
@@ -278,7 +264,7 @@ const Dashboard = () => {
             duration: 5000,
             isClosable: true,
           });
-          console.debug("Loaded: Dashboard - Error loading agents ❌");
+          console.debug("Loaded: Dashboard - Error loading agents from status API ❌");
         }
       } finally {
         // Only update state if component is still mounted
@@ -288,16 +274,15 @@ const Dashboard = () => {
       }
     };
 
-    // Add a 3 second delay to prevent immediate fetch on first render
+    // Add a short delay to prevent immediate fetch on first render
     const timeout = setTimeout(() => {
       if (isMounted) {
         fetchAgents();
       }
-    }, 3000);
+    }, 1000);
     
     return () => {
       isMounted = false;
-      controller.abort(); // Abort any in-flight fetch
       clearTimeout(timeout);
     };
   }, [toast]);
