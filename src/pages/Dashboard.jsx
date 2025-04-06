@@ -235,6 +235,10 @@ const Dashboard = () => {
     const fetchAgents = async () => {
       try {
         setLoading(true);
+        
+        // Add debug log
+        console.debug("Loaded: Dashboard - Fetching agents ⏳");
+        
         const response = await fetch('/api/agents');
         
         if (!response.ok) {
@@ -247,6 +251,7 @@ const Dashboard = () => {
         if (isMounted) {
           setAgents(data);
           setError(null);
+          console.debug("Loaded: Dashboard - Agents loaded successfully ✅");
         }
       } catch (err) {
         console.error('Error fetching agents:', err);
@@ -261,6 +266,7 @@ const Dashboard = () => {
             duration: 5000,
             isClosable: true,
           });
+          console.debug("Loaded: Dashboard - Error loading agents ❌");
         }
       } finally {
         // Only update state if component is still mounted
@@ -270,10 +276,16 @@ const Dashboard = () => {
       }
     };
 
-    fetchAgents();
+    // Add a small delay to prevent immediate fetch on first render
+    const timeout = setTimeout(() => {
+      if (isMounted) {
+        fetchAgents();
+      }
+    }, 100);
     
     return () => {
       isMounted = false;
+      clearTimeout(timeout);
     };
   }, [toast]);
 

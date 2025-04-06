@@ -18,6 +18,7 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { FiSend, FiUser, FiCpu, FiRefreshCw, FiMessageSquare } from 'react-icons/fi';
+import DEBUG_MODE from '../config/debug';
 
 // Mock data for initial development - will be replaced with API calls
 const mockActivities = [
@@ -95,12 +96,33 @@ const ActivityFeedPanel = () => {
     }
   };
   
-  // Function to refresh activities
+  // Function to refresh activities with debounce
   const refreshActivities = async () => {
+    // Prevent rapid consecutive calls
+    if (loading) return;
+    
     setLoading(true);
     setError(null);
     
+    // Set up failsafe timeout to reset loading state after 8 seconds
+    const failsafeTimeout = setTimeout(() => {
+      console.warn('⏱️ Failsafe triggered: Forcing loading reset after 8s');
+      setLoading(false);
+      setError('Loading took too long. Please try refreshing.');
+      
+      toast({
+        title: 'Loading timeout',
+        description: 'Loading activities took longer than expected. Showing any available data.',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+    }, 8000);
+    
     try {
+      // Add debug log
+      console.debug("ActivityFeedPanel - Refreshing activities ⏳");
+      
       // This will be replaced with actual API call
       // const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/logs/latest`;
       
@@ -109,6 +131,7 @@ const ActivityFeedPanel = () => {
       
       // Simulate response
       setActivities(mockActivities);
+      console.debug("ActivityFeedPanel - Activities refreshed successfully ✅");
     } catch (err) {
       console.error('Error fetching activities:', err);
       setError('Failed to fetch activities. Please try again.');
@@ -120,26 +143,90 @@ const ActivityFeedPanel = () => {
         duration: 5000,
         isClosable: true,
       });
+      console.debug("ActivityFeedPanel - Error refreshing activities ❌");
     } finally {
+      clearTimeout(failsafeTimeout);
       setLoading(false);
     }
   };
   
   // Fetch activities on component mount
   useEffect(() => {
-    refreshActivities();
+    let isMounted = true;
     
-    // Set up auto-refresh every 10 seconds
-    const interval = setInterval(() => {
-      refreshActivities();
-    }, 10000);
+    const fetchData = async () => {
+      try {
+        if (!isMounted) return;
+        setLoading(true);
+        
+        // Add debug log
+        console.debug("Loaded: ActivityFeedPanel - Fetching activities ⏳");
+        
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setActivities(mockActivities);
+          setError(null);
+          console.debug("Loaded: ActivityFeedPanel - Activities loaded successfully ✅");
+        }
+      } catch (err) {
+        console.error('Error fetching activities:', err);
+        
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setError('Failed to fetch activities. Please try again.');
+          
+          toast({
+            title: 'Error',
+            description: 'Failed to fetch activities. Please try again.',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+          console.debug("Loaded: ActivityFeedPanel - Error loading activities ❌");
+        }
+      } finally {
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
     
-    return () => clearInterval(interval);
+    fetchData();
+    
+    // Set up auto-refresh every 10 seconds only if not in debug mode
+    if (!DEBUG_MODE) {
+      const interval = setInterval(() => {
+        if (isMounted) {
+          fetchData();
+        }
+      }, 10000);
+      
+      return () => {
+        isMounted = false;
+        clearInterval(interval);
+      };
+    }
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
   
   // Scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    let isMounted = true;
+    
+    if (isMounted && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    return () => {
+      isMounted = false;
+    };
   }, [activities]);
   
   // Handle user input submission

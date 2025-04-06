@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { FiChevronDown, FiChevronUp, FiRefreshCw, FiClock, FiFileText } from 'react-icons/fi';
 import DEBUG_MODE from '../config/debug';
+import { debounce } from '../utils/debounceUtils';
 
 // Mock data for initial development - will be replaced with API calls
 const mockMemories = [
@@ -117,51 +118,85 @@ const MemoryBrowser = () => {
     }
   };
   
-  // Fetch memories on component mount
-  useEffect(() => {
-    let isMounted = true;
-    
-    const fetchData = async () => {
+  // Create debounced fetch function
+  const debouncedFetchData = useRef(
+    debounce(async (isMountedRef, setLoadingFn, setMemoriesFn, setErrorFn, toastFn) => {
       try {
-        setLoading(true);
+        setLoadingFn(true);
+        
+        // Add debug log
+        console.debug("Loaded: MemoryBrowser - Fetching memories ⏳");
         
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         // Only update state if component is still mounted
-        if (isMounted) {
-          setMemories(mockMemories);
-          setError(null);
+        if (isMountedRef.current) {
+          setMemoriesFn(mockMemories);
+          setErrorFn(null);
+          console.debug("Loaded: MemoryBrowser - Memories loaded successfully ✅");
         }
       } catch (err) {
         console.error('Error fetching memories:', err);
         
         // Only update state if component is still mounted
-        if (isMounted) {
-          setError('Failed to fetch memories. Please try again.');
+        if (isMountedRef.current) {
+          setErrorFn('Failed to fetch memories. Please try again.');
           
-          toast({
+          toastFn({
             title: 'Error',
             description: 'Failed to fetch memories. Please try again.',
             status: 'error',
             duration: 5000,
             isClosable: true,
           });
+          console.debug("Loaded: MemoryBrowser - Error loading memories ❌");
         }
       } finally {
         // Only update state if component is still mounted
-        if (isMounted) {
-          setLoading(false);
+        if (isMountedRef.current) {
+          setLoadingFn(false);
         }
       }
-    };
+    }, 500)
+  ).current;
+  
+  // Set up failsafe timeout ref
+  const failsafeTimeoutRef = useRef(null);
+  
+  // Fetch memories on component mount
+  useEffect(() => {
+    const isMountedRef = { current: true };
     
-    fetchData();
+    // Set up failsafe timeout to reset loading state after 8 seconds
+    failsafeTimeoutRef.current = setTimeout(() => {
+      if (isMountedRef.current && loading) {
+        console.warn('⏱️ Failsafe triggered: Forcing loading reset after 8s');
+        setLoading(false);
+        setError('Loading took too long. Please try refreshing.');
+        
+        toast({
+          title: 'Loading timeout',
+          description: 'Loading memories took longer than expected. Showing any available data.',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    }, 8000);
+    
+    // Trigger debounced fetch with a delay to prevent simultaneous API calls
+    setTimeout(() => {
+      if (isMountedRef.current) {
+        debouncedFetchData(isMountedRef, setLoading, setMemories, setError, toast);
+      }
+    }, 300);
     
     return () => {
-      isMounted = false;
+      isMountedRef.current = false;
+      clearTimeout(failsafeTimeoutRef.current);
     };
-  }, []);
+  }, [debouncedFetchData, toast]);
   
   // Function to get preview content (first 300-500 characters)
   const getPreviewContent = (content) => {

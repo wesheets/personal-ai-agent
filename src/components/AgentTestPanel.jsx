@@ -51,7 +51,11 @@ const AgentTestPanel = () => {
   
   // Fetch available agents on component mount
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchAgents = async () => {
+      if (!isMounted) return;
+      
       setIsLoadingAgents(true);
       try {
         const response = await fetch('/api/agents');
@@ -59,34 +63,52 @@ const AgentTestPanel = () => {
           throw new Error(`Failed to fetch agents: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
-        setAvailableAgents(data);
+        
+        if (isMounted) {
+          setAvailableAgents(data);
+        }
       } catch (err) {
         console.error('Error fetching agents:', err);
-        toast({
-          title: 'Error fetching agents',
-          description: err.message,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-        // Fallback to default agents if API fails
-        setAvailableAgents([
-          { id: 'hal9000', name: 'HAL 9000', icon: '🔴', tone: 'calm' },
-          { id: 'ash-xenomorph', name: 'Ash', icon: '🧬', tone: 'clinical' }
-        ]);
+        
+        if (isMounted) {
+          toast({
+            title: 'Error fetching agents',
+            description: err.message,
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+          // Fallback to default agents if API fails
+          setAvailableAgents([
+            { id: 'hal9000', name: 'HAL 9000', icon: '🔴', tone: 'calm' },
+            { id: 'ash-xenomorph', name: 'Ash', icon: '🧬', tone: 'clinical' }
+          ]);
+        }
       } finally {
-        setIsLoadingAgents(false);
+        if (isMounted) {
+          setIsLoadingAgents(false);
+        }
       }
     };
     
     fetchAgents();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [toast]);
   
   // Auto-scroll to bottom of response box when new content arrives
   useEffect(() => {
-    if (responseBoxRef.current) {
+    let isMounted = true;
+    
+    if (isMounted && responseBoxRef.current) {
       responseBoxRef.current.scrollTop = responseBoxRef.current.scrollHeight;
     }
+    
+    return () => {
+      isMounted = false;
+    };
   }, [streamingProgress, finalResponse]);
   
   // Handle form submission
@@ -115,11 +137,31 @@ const AgentTestPanel = () => {
       return;
     }
     
+    // Prevent duplicate submissions
+    if (isLoading) {
+      console.debug('Submission already in progress, ignoring duplicate request');
+      return;
+    }
+    
     // Reset previous response data
     setIsLoading(true);
     setStreamingProgress([]);
     setFinalResponse(null);
     setError(null);
+    
+    // Set up failsafe timeout to reset loading state after 16 seconds
+    const failsafeTimeout = setTimeout(() => {
+      console.warn('⏱️ Failsafe triggered: Forcing loading reset after 16s');
+      setIsLoading(false);
+      setError({ message: 'Request timed out. The agent may still be processing your task in the background.' });
+      toast({
+        title: 'Request timeout',
+        description: 'The request is taking longer than expected. The agent may still be processing your task.',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+    }, 16000);
     
     // Prepare request body
     const requestBody = {
@@ -194,6 +236,9 @@ const AgentTestPanel = () => {
         isClosable: true,
       });
     } finally {
+      // Clear the failsafe timeout
+      clearTimeout(failsafeTimeout);
+      
       setIsLoading(false);
       // Generate new task ID for next request
       setTaskId(`demo-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`);

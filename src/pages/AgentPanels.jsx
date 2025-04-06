@@ -71,12 +71,14 @@ const AgentPanel = ({ agentType, agentName, agentDescription }) => {
     setRenderCount(prev => prev + 1);
     setLastUpdated(new Date().toLocaleTimeString());
     
+    console.debug(`Loaded: AgentPanel (${agentType}) ✅`);
+    
     // Cleanup function to track component unmounting
     return () => {
       console.log('⚠️ Component unmounting - setting mountedRef to false');
       mountedRef.current = false;
     };
-  }, []);
+  }, [agentType]);
   
   // ENHANCED: Failsafe timeout to force spinner reset after 8 seconds
   useEffect(() => {
