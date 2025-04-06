@@ -10,10 +10,12 @@ import MemoryBrowser from './pages/MemoryBrowser';
 import MainActivityFeed from './pages/MainActivityFeed';
 import SettingsPage from './pages/SettingsPage';
 import AgentListPage from './pages/AgentListPage';
+import AgentActivityPage from './pages/AgentActivityPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import StatusOverlay from './components/StatusOverlay';
 import { StatusProvider } from './context/StatusContext';
 import { SettingsProvider } from './context/SettingsContext';
+import './styles/animations.css';
 
 function App() {
   const { colorMode } = useColorMode();
@@ -78,6 +80,11 @@ function App() {
                     <Route path="/activity" element={
                       <ErrorBoundary>
                         <MainActivityFeed />
+                      </ErrorBoundary>
+                    } />
+                    <Route path="/agent-activity" element={
+                      <ErrorBoundary>
+                        <AgentActivityPage />
                       </ErrorBoundary>
                     } />
                     <Route path="/settings" element={
