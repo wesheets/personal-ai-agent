@@ -92,7 +92,7 @@ async def log_requests(request: Request, call_next):
     if "delegate" in str(request.url) or "latest" in str(request.url) or "goals" in str(request.url):
         try:
             # Use asyncio.wait_for to implement timeout for body reading
-            raw_body = await asyncio.wait_for(request.body(), timeout=8.0)
+            raw_body = await asyncio.wait_for(request.body(), timeout=15.0)  # Increased from 8.0 to 15.0 seconds
             if raw_body:
                 # Store raw body for later use
                 request._body = raw_body
