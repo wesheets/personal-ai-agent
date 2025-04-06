@@ -65,7 +65,12 @@ const AgentTestPanel = () => {
         const data = await response.json();
         
         if (isMounted) {
-          setAvailableAgents(data);
+          // Filter to include both system and persona type agents
+          const visibleAgents = data.filter(a => 
+            ["system", "persona"].includes(a.type)
+          );
+          setAvailableAgents(visibleAgents);
+          console.debug(`Loaded ${visibleAgents.length} agents (system and persona types)`);
         }
       } catch (err) {
         console.error('Error fetching agents:', err);
@@ -290,7 +295,7 @@ const AgentTestPanel = () => {
                 >
                   {availableAgents.map(agent => (
                     <option key={agent.id} value={agent.id}>
-                      {agent.icon} {agent.name}
+                      {agent.icon} {agent.name} {agent.tone ? `(${agent.tone})` : ''}
                     </option>
                   ))}
                 </Select>
