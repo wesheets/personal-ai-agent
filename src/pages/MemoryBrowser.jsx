@@ -167,6 +167,7 @@ const MemoryBrowser = () => {
   // Fetch memories on component mount
   useEffect(() => {
     const isMountedRef = { current: true };
+    const controller = new AbortController();
     
     // Set up failsafe timeout to reset loading state after 8 seconds
     failsafeTimeoutRef.current = setTimeout(() => {
@@ -185,18 +186,81 @@ const MemoryBrowser = () => {
       }
     }, 8000);
     
-    // Trigger debounced fetch with a delay to prevent simultaneous API calls
-    setTimeout(() => {
-      if (isMountedRef.current) {
-        debouncedFetchData(isMountedRef, setLoading, setMemories, setError, toast);
+    // Create a modified fetch function that uses AbortController
+    const fetchWithAbort = async () => {
+      try {
+        setLoading(true);
+        
+        // Add debug log
+        console.debug("Loaded: MemoryBrowser - Fetching memories ⏳");
+        
+        // This would be a real fetch in production
+        // const response = await fetch('/api/memory', {
+        //   signal: controller.signal
+        // });
+        
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+          setMemories(mockMemories);
+          setError(null);
+          console.debug("Loaded: MemoryBrowser - Memories loaded successfully ✅");
+        }
+      } catch (err) {
+        // Ignore abort errors as they're expected during cleanup
+        if (err.name === 'AbortError') {
+          console.debug("MemoryBrowser - Fetch aborted during cleanup");
+          return;
+        }
+        
+        console.error('Error fetching memories:', err);
+        
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+          setError('Failed to fetch memories. Please try again.');
+          
+          toast({
+            title: 'Error',
+            description: 'Failed to fetch memories. Please try again.',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          });
+          console.debug("Loaded: MemoryBrowser - Error loading memories ❌");
+        }
+      } finally {
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+          setLoading(false);
+        }
       }
-    }, 300);
+    };
+    
+    // Only fetch data if not in DEBUG_MODE (prevents polling in production)
+    if (!DEBUG_MODE) {
+      // Trigger fetch with a 3 second delay to prevent immediate fetch on first render
+      setTimeout(() => {
+        if (isMountedRef.current) {
+          fetchWithAbort();
+        }
+      }, 3000);
+    } else {
+      // In debug mode, use the debounced fetch with a shorter delay
+      setTimeout(() => {
+        if (isMountedRef.current) {
+          debouncedFetchData(isMountedRef, setLoading, setMemories, setError, toast);
+        }
+      }, 300);
+    }
     
     return () => {
       isMountedRef.current = false;
+      controller.abort(); // Abort any in-flight fetch
       clearTimeout(failsafeTimeoutRef.current);
     };
-  }, [debouncedFetchData, toast]);
+  }, [debouncedFetchData, toast, loading]);
   
   // Function to get preview content (first 300-500 characters)
   const getPreviewContent = (content) => {

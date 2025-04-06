@@ -1,5 +1,7 @@
 // Debug mode configuration
-const DEBUG_MODE = false; // Set to false for production, true for development
+// Set to false for production, true for development
+// This controls polling behavior across the application
+const DEBUG_MODE = process.env.NODE_ENV === 'development';
 
 // Console debug logging function that only logs in debug mode
 export const debugLog = (component, message, type = 'info') => {

@@ -11,6 +11,7 @@ import MainActivityFeed from './pages/MainActivityFeed';
 import SettingsPage from './pages/SettingsPage';
 import AgentListPage from './pages/AgentListPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import StatusOverlay from './components/StatusOverlay';
 
 function App() {
   const { colorMode } = useColorMode();
@@ -90,6 +91,7 @@ function App() {
           </Flex>
         </Box>
       </Router>
+      <StatusOverlay />
     </ErrorBoundary>
   );
 }

@@ -52,13 +52,16 @@ const AgentTestPanel = () => {
   // Fetch available agents on component mount
   useEffect(() => {
     let isMounted = true;
+    const controller = new AbortController();
     
     const fetchAgents = async () => {
       if (!isMounted) return;
       
       setIsLoadingAgents(true);
       try {
-        const response = await fetch('/api/agents');
+        const response = await fetch('/api/agents', {
+          signal: controller.signal
+        });
         if (!response.ok) {
           throw new Error(`Failed to fetch agents: ${response.status} ${response.statusText}`);
         }
@@ -70,9 +73,16 @@ const AgentTestPanel = () => {
             ["system", "persona"].includes(a.type)
           );
           setAvailableAgents(visibleAgents);
+          console.log("Loaded agents:", visibleAgents);
           console.debug(`Loaded ${visibleAgents.length} agents (system and persona types)`);
         }
       } catch (err) {
+        // Ignore abort errors as they're expected during cleanup
+        if (err.name === 'AbortError') {
+          console.debug("AgentTestPanel - Fetch aborted during cleanup");
+          return;
+        }
+        
         console.error('Error fetching agents:', err);
         
         if (isMounted) {
@@ -88,6 +98,7 @@ const AgentTestPanel = () => {
             { id: 'hal9000', name: 'HAL 9000', icon: '🔴', tone: 'calm' },
             { id: 'ash-xenomorph', name: 'Ash', icon: '🧬', tone: 'clinical' }
           ]);
+          console.log("Using fallback agents: HAL and ASH");
         }
       } finally {
         if (isMounted) {
@@ -96,10 +107,17 @@ const AgentTestPanel = () => {
       }
     };
     
-    fetchAgents();
+    // Add a 3 second delay before initial fetch
+    const timeout = setTimeout(() => {
+      if (isMounted) {
+        fetchAgents();
+      }
+    }, 3000);
     
     return () => {
       isMounted = false;
+      controller.abort(); // Abort any in-flight fetch
+      clearTimeout(timeout);
     };
   }, [toast]);
   

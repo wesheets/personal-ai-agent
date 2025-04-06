@@ -231,6 +231,7 @@ const Dashboard = () => {
   // Fetch agents from the API
   useEffect(() => {
     let isMounted = true;
+    const controller = new AbortController();
     
     const fetchAgents = async () => {
       try {
@@ -239,7 +240,10 @@ const Dashboard = () => {
         // Add debug log
         console.debug("Loaded: Dashboard - Fetching agents ⏳");
         
-        const response = await fetch('/api/agents');
+        // Use AbortController signal for fetch
+        const response = await fetch('/api/agents', {
+          signal: controller.signal
+        });
         
         if (!response.ok) {
           throw new Error(`Failed to fetch agents: ${response.status} ${response.statusText}`);
@@ -250,10 +254,18 @@ const Dashboard = () => {
         // Only update state if component is still mounted
         if (isMounted) {
           setAgents(data);
+          // Log agents for debugging
+          console.log("Loaded agents:", data);
           setError(null);
           console.debug("Loaded: Dashboard - Agents loaded successfully ✅");
         }
       } catch (err) {
+        // Ignore abort errors as they're expected during cleanup
+        if (err.name === 'AbortError') {
+          console.debug("Dashboard - Fetch aborted during cleanup");
+          return;
+        }
+        
         console.error('Error fetching agents:', err);
         
         // Only update state if component is still mounted
@@ -276,15 +288,16 @@ const Dashboard = () => {
       }
     };
 
-    // Add a small delay to prevent immediate fetch on first render
+    // Add a 3 second delay to prevent immediate fetch on first render
     const timeout = setTimeout(() => {
       if (isMounted) {
         fetchAgents();
       }
-    }, 100);
+    }, 3000);
     
     return () => {
       isMounted = false;
+      controller.abort(); // Abort any in-flight fetch
       clearTimeout(timeout);
     };
   }, [toast]);

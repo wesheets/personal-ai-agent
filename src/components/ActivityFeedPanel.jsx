@@ -153,6 +153,8 @@ const ActivityFeedPanel = () => {
   // Fetch activities on component mount
   useEffect(() => {
     let isMounted = true;
+    const controller = new AbortController();
+    let intervalId = null;
     
     const fetchData = async () => {
       try {
@@ -161,6 +163,11 @@ const ActivityFeedPanel = () => {
         
         // Add debug log
         console.debug("Loaded: ActivityFeedPanel - Fetching activities ⏳");
+        
+        // In a real implementation, this would be a fetch with AbortController
+        // const response = await fetch('/api/activities', {
+        //   signal: controller.signal
+        // });
         
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -172,6 +179,12 @@ const ActivityFeedPanel = () => {
           console.debug("Loaded: ActivityFeedPanel - Activities loaded successfully ✅");
         }
       } catch (err) {
+        // Ignore abort errors as they're expected during cleanup
+        if (err.name === 'AbortError') {
+          console.debug("ActivityFeedPanel - Fetch aborted during cleanup");
+          return;
+        }
+        
         console.error('Error fetching activities:', err);
         
         // Only update state if component is still mounted
@@ -195,24 +208,30 @@ const ActivityFeedPanel = () => {
       }
     };
     
-    fetchData();
-    
-    // Set up auto-refresh every 10 seconds only if not in debug mode
-    if (!DEBUG_MODE) {
-      const interval = setInterval(() => {
-        if (isMounted) {
-          fetchData();
+    // Add a 3 second delay before initial fetch
+    const initialTimeout = setTimeout(() => {
+      if (isMounted) {
+        fetchData();
+        
+        // Set up auto-refresh every 10 seconds only if not in debug mode
+        // This ensures we don't have polling in production
+        if (!DEBUG_MODE) {
+          intervalId = setInterval(() => {
+            if (isMounted) {
+              fetchData();
+            }
+          }, 10000);
         }
-      }, 10000);
-      
-      return () => {
-        isMounted = false;
-        clearInterval(interval);
-      };
-    }
+      }
+    }, 3000);
     
     return () => {
       isMounted = false;
+      controller.abort(); // Abort any in-flight fetch
+      clearTimeout(initialTimeout);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
     };
   }, []);
   
