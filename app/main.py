@@ -134,11 +134,10 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
             except Exception as e:
                 logger.error(f"🔒 CustomCORSMiddleware: Error in regex matching: {str(e)}")
         
-        # If no match found and we have allowed origins, use the first one
-        if not matching_origin and self.allow_origins:
-            logger.info(f"🔒 CustomCORSMiddleware: No match found, using first allowed origin")
-            matching_origin = sanitize_origin_for_header(self.allow_origins[0])
-            logger.info(f"✅ Sanitized Origin Header: '{matching_origin}'")
+        # If no match found, return 403 Forbidden instead of using fallback
+        if not matching_origin:
+            logger.warning(f"🚫 CustomCORSMiddleware: No matching origin found for request: {origin}")
+            return Response("Forbidden Origin", status_code=403)
         
         # If it's an OPTIONS request, return a response with CORS headers
         if request.method == "OPTIONS":
@@ -173,6 +172,12 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
     def _get_cors_headers(self, origin):
         # Ensure origin is sanitized
         clean_origin = sanitize_origin_for_header(origin)
+        
+        # Double-check for any remaining semicolons
+        if ";" in clean_origin:
+            logger.warning(f"⚠️ Semicolon still present after sanitization: '{clean_origin}'")
+            clean_origin = clean_origin.replace(";", "")
+            logger.info(f"🧹 Forcibly removed semicolon: '{clean_origin}'")
         
         headers = {
             "Access-Control-Allow-Origin": clean_origin,
