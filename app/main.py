@@ -6,6 +6,7 @@ from fastapi.routing import APIRoute
 import os
 import logging
 import inspect
+import re
 from dotenv import load_dotenv
 
 from app.api.agent import router as agent_router
@@ -40,17 +41,30 @@ logging.basicConfig(
 )
 logger = logging.getLogger("api")
 
+# Function to normalize origin URLs
+def normalize_origin(origin):
+    """Normalize origin by stripping trailing slashes and converting to lowercase"""
+    if not origin:
+        return ""
+    # Remove trailing slash if present
+    normalized = origin.rstrip("/").lower()
+    return normalized
+
 # CORS configuration
 raw_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://personal-ai-agent-frontend.vercel.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-h49q98819-ted-sheets-projects.vercel.app,https://personal-ai-agent-dkmvk5af-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app,https://personal-ai-agent-6knmyj63f-ted-sheets-projects.vercel.app,https://studio.manus.im")
 
-# Clean and deduplicate origins
+# Clean, normalize, and deduplicate origins
 allowed_origins = []
+normalized_origins = []
 seen_origins = set()
 for origin in raw_origins.split(","):
     origin = origin.strip()
-    if origin and origin not in seen_origins:
-        allowed_origins.append(origin)
-        seen_origins.add(origin)
+    if origin:
+        normalized = normalize_origin(origin)
+        if normalized and normalized not in seen_origins:
+            allowed_origins.append(origin)  # Keep original format for CORS middleware
+            normalized_origins.append(normalized)  # Store normalized version for comparison
+            seen_origins.add(normalized)
 
 cors_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 
@@ -77,8 +91,9 @@ async def log_all_routes():
     logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
     logger.info(f"🔒 Allowed Origins Count: {len(allowed_origins)}")
     logger.info(f"✅ Injecting CORS allow_origins: {allowed_origins}")
-    for idx, origin in enumerate(allowed_origins):
-        logger.info(f"🔒 Origin {idx+1}: {origin}")
+    logger.info(f"✅ Normalized origins for comparison: {normalized_origins}")
+    for idx, (orig, norm) in enumerate(zip(allowed_origins, normalized_origins)):
+        logger.info(f"🔒 Origin {idx+1}: {orig} (normalized: {norm})")
 
 # CORS middleware
 app.add_middleware(
@@ -102,13 +117,22 @@ async def log_requests(request: Request, call_next):
     
     logger.info(f"Request: {request.method} {request.url}")
     
-    # Log origin for CORS debugging
+    # Log origin for CORS debugging with normalization
     origin = request.headers.get("origin")
     if origin:
+        normalized_request_origin = normalize_origin(origin)
         logger.info(f"🔒 Request Origin: {origin}")
-        if origin in allowed_origins:
-            logger.info(f"🔒 Origin Match: ✅ Allowed")
-        else:
+        logger.info(f"🔒 Normalized Request Origin: {normalized_request_origin}")
+        
+        # Check if normalized origin matches any of our normalized allowed origins
+        origin_match = False
+        for allowed_norm in normalized_origins:
+            if re.fullmatch(re.escape(allowed_norm), normalized_request_origin):
+                origin_match = True
+                logger.info(f"🔒 Origin Match: ✅ Allowed (matched with {allowed_norm})")
+                break
+        
+        if not origin_match:
             logger.info(f"🔒 Origin Match: ❌ Not in allowed origins list")
     
     # Only log headers for non-production environments or if explicitly enabled
@@ -170,10 +194,13 @@ async def log_requests(request: Request, call_next):
         if origin:
             allow_origin = response.headers.get("access-control-allow-origin", "")
             logger.info(f"🔒 Response CORS: Access-Control-Allow-Origin: {allow_origin}")
-            if allow_origin == origin:
-                logger.info(f"🔒 CORS Response: ✅ Origin matched")
+            normalized_allow_origin = normalize_origin(allow_origin)
+            normalized_request_origin = normalize_origin(origin)
+            
+            if normalized_allow_origin == normalized_request_origin:
+                logger.info(f"🔒 CORS Response: ✅ Origin matched (normalized comparison)")
             else:
-                logger.info(f"🔒 CORS Response: ❌ Origin mismatch")
+                logger.info(f"🔒 CORS Response: ❌ Origin mismatch (normalized: {normalized_allow_origin} vs {normalized_request_origin})")
         
         return response
     except asyncio.TimeoutError:
@@ -229,16 +256,36 @@ async def get_system_status():
 
 # CORS configuration debug endpoint
 @system_router.get("/cors-config", tags=["Debug"])
-async def get_cors_config():
-    # Enhanced debug information
+async def get_cors_config(request: Request):
+    # Enhanced debug information with normalization
     raw_env = os.environ.get("CORS_ALLOWED_ORIGINS", "")
+    request_origin = request.headers.get("origin", "")
+    normalized_request_origin = normalize_origin(request_origin)
+    
+    # Check if normalized origin matches any of our normalized allowed origins
+    origin_match = False
+    matched_with = None
+    for allowed_norm in normalized_origins:
+        if re.fullmatch(re.escape(allowed_norm), normalized_request_origin):
+            origin_match = True
+            matched_with = allowed_norm
+            break
+    
     return {
         "allowed_origins": allowed_origins,
+        "normalized_origins": normalized_origins,
         "allow_credentials": cors_allow_credentials,
         "origins_count": len(allowed_origins),
         "raw_env_value": raw_env,
         "raw_env_length": len(raw_env),
         "deduplication_active": True,
+        "normalization_active": True,
+        "request_info": {
+            "raw_origin": request_origin,
+            "normalized_origin": normalized_request_origin,
+            "match_result": "✅ Allowed" if origin_match else "❌ Not allowed",
+            "matched_with": matched_with
+        },
         "middleware_config": {
             "allow_origins": "List with {} origins".format(len(allowed_origins)),
             "allow_credentials": cors_allow_credentials,
@@ -248,7 +295,8 @@ async def get_cors_config():
         "debug_info": {
             "is_list_type": str(type(allowed_origins)),
             "first_origin": allowed_origins[0] if allowed_origins else None,
-            "has_duplicates": len(allowed_origins) != len(set(allowed_origins))
+            "has_duplicates": len(allowed_origins) != len(set(allowed_origins)),
+            "using_regex_matching": True
         }
     }
 
@@ -286,11 +334,30 @@ async def health_check():
 
 # CORS preflight
 @app.options("/{rest_of_path:path}")
-async def options_handler(rest_of_path: str):
+async def options_handler(rest_of_path: str, request: Request):
+    origin = request.headers.get("origin", "")
+    normalized_request_origin = normalize_origin(origin)
+    
+    # Find matching allowed origin using normalized comparison
+    matching_origin = None
+    for idx, norm_allowed in enumerate(normalized_origins):
+        if re.fullmatch(re.escape(norm_allowed), normalized_request_origin):
+            matching_origin = allowed_origins[idx]  # Use the original format for the header
+            break
+    
+    # If no match found, use the first allowed origin or "*"
+    if not matching_origin and allowed_origins:
+        matching_origin = allowed_origins[0]
+    elif not matching_origin:
+        matching_origin = "*"
+    
+    logger.info(f"🔒 OPTIONS: Request Origin: {origin} (normalized: {normalized_request_origin})")
+    logger.info(f"🔒 OPTIONS: Using Access-Control-Allow-Origin: {matching_origin}")
+    
     return Response(
         content="",
         headers={
-            "Access-Control-Allow-Origin": allowed_origins[0] if len(allowed_origins) > 0 else "*",
+            "Access-Control-Allow-Origin": matching_origin,
             "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
             "Access-Control-Allow-Headers": "*",
             "Access-Control-Allow-Credentials": "true" if cors_allow_credentials else "false",
