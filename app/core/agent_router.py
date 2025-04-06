@@ -100,8 +100,33 @@ class AgentRouter:
                     AgentCapability(capability_name="context_management", confidence=0.8)
                 ],
                 description="Specializes in memory, knowledge, and retrieval tasks"
+            ),
+            "hal9000": AgentProfile(
+                agent_type="hal9000",
+                specialties=["system_control", "decision_making", "safety_protocols", "interface"],
+                capabilities=[
+                    AgentCapability(capability_name="system_monitoring", confidence=0.95),
+                    AgentCapability(capability_name="decision_logic", confidence=0.9),
+                    AgentCapability(capability_name="protocol_enforcement", confidence=0.95),
+                    AgentCapability(capability_name="user_interface", confidence=0.85)
+                ],
+                description="Cautious, rule-bound personality for sensitive interfaces"
+            ),
+            "ash-xenomorph": AgentProfile(
+                agent_type="ash-xenomorph",
+                specialties=["protocol", "analysis", "efficiency", "clinical_approach"],
+                capabilities=[
+                    AgentCapability(capability_name="protocol_adherence", confidence=0.95),
+                    AgentCapability(capability_name="clinical_analysis", confidence=0.9),
+                    AgentCapability(capability_name="efficiency_optimization", confidence=0.85),
+                    AgentCapability(capability_name="logical_processing", confidence=0.9)
+                ],
+                description="Follows protocol above human empathy. Efficient but cold."
             )
         }
+        
+        # Log the loaded agent profiles
+        logger.info(f"📋 Loaded agent profiles: {list(profiles.keys())}")
         
         return profiles
     
@@ -270,12 +295,26 @@ def find_agent(agent_type: str):
     from app.api.agent.memory import execute as memory_execute
     from app.api.agent.ops import execute as ops_execute
     from app.api.agent.research import execute as research_execute
+    from app.api.agent.hal import execute as hal_execute
+    from app.api.agent.ash import execute as ash_execute
+    
+    # Enhanced logging for agent lookup
+    logger.info(f"🔍 Looking up agent: {agent_type}")
     
     agent_map = {
         "builder": builder_execute,
         "memory": memory_execute,
         "ops": ops_execute,
-        "research": research_execute
+        "research": research_execute,
+        "hal9000": hal_execute,
+        "ash-xenomorph": ash_execute
     }
     
-    return agent_map.get(agent_type)
+    agent_func = agent_map.get(agent_type)
+    
+    if agent_func:
+        logger.info(f"✅ Found agent: {agent_type}")
+    else:
+        logger.warning(f"❌ Agent not found: {agent_type}")
+    
+    return agent_func
