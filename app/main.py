@@ -41,8 +41,17 @@ logging.basicConfig(
 logger = logging.getLogger("api")
 
 # CORS configuration
-raw_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://personal-ai-agent-frontend.vercel.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-h49q98819-ted-sheets-projects.vercel.app,https://personal-ai-agent-dkmvk5af-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app,https://studio.manus.im")
-allowed_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+raw_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://personal-ai-agent-frontend.vercel.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-h49q98819-ted-sheets-projects.vercel.app,https://personal-ai-agent-dkmvk5af-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app,https://personal-ai-agent-6knmyj63f-ted-sheets-projects.vercel.app,https://studio.manus.im")
+
+# Clean and deduplicate origins
+allowed_origins = []
+seen_origins = set()
+for origin in raw_origins.split(","):
+    origin = origin.strip()
+    if origin and origin not in seen_origins:
+        allowed_origins.append(origin)
+        seen_origins.add(origin)
+
 cors_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 
 # FastAPI app init
@@ -64,7 +73,7 @@ async def log_all_routes():
     
     # Log CORS configuration on startup
     logger.info(f"🔒 CORS Configuration Loaded:")
-    logger.info(f"🔒 CORS_ALLOWED_ORIGINS: {raw_origins}")
+    logger.info(f"🔒 CORS_ALLOWED_ORIGINS raw: {raw_origins}")
     logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
     logger.info(f"🔒 Allowed Origins Count: {len(allowed_origins)}")
     logger.info(f"✅ Injecting CORS allow_origins: {allowed_origins}")
@@ -221,10 +230,26 @@ async def get_system_status():
 # CORS configuration debug endpoint
 @system_router.get("/cors-config", tags=["Debug"])
 async def get_cors_config():
+    # Enhanced debug information
+    raw_env = os.environ.get("CORS_ALLOWED_ORIGINS", "")
     return {
         "allowed_origins": allowed_origins,
         "allow_credentials": cors_allow_credentials,
-        "origins_count": len(allowed_origins)
+        "origins_count": len(allowed_origins),
+        "raw_env_value": raw_env,
+        "raw_env_length": len(raw_env),
+        "deduplication_active": True,
+        "middleware_config": {
+            "allow_origins": "List with {} origins".format(len(allowed_origins)),
+            "allow_credentials": cors_allow_credentials,
+            "allow_methods": "*",
+            "allow_headers": "*"
+        },
+        "debug_info": {
+            "is_list_type": str(type(allowed_origins)),
+            "first_origin": allowed_origins[0] if allowed_origins else None,
+            "has_duplicates": len(allowed_origins) != len(set(allowed_origins))
+        }
     }
 
 # Mount routers
