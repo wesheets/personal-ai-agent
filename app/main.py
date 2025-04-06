@@ -41,7 +41,7 @@ logging.basicConfig(
 logger = logging.getLogger("api")
 
 # CORS configuration
-cors_allowed_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://compassionate-compassion-production.up.railway.app,https://frontend-agent-ui-production.up.railway.app")
+cors_allowed_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://personal-ai-agent-frontend.vercel.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-h49q98819-ted-sheets-projects.vercel.app,https://personal-ai-agent-dkmvk5af-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app,https://studio.manus.im")
 cors_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 allowed_origins = cors_allowed_origins.split(",")
 
@@ -61,6 +61,14 @@ async def log_all_routes():
         if isinstance(route, APIRoute):
             print(f"➡️ {route.path} [{', '.join(route.methods)}] from {inspect.getsourcefile(route.endpoint)}")
             logger.info(f"🔍 {route.path} [{','.join(route.methods)}]")
+    
+    # Log CORS configuration on startup
+    logger.info(f"🔒 CORS Configuration Loaded:")
+    logger.info(f"🔒 CORS_ALLOWED_ORIGINS: {cors_allowed_origins}")
+    logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
+    logger.info(f"🔒 Allowed Origins Count: {len(allowed_origins)}")
+    for idx, origin in enumerate(allowed_origins):
+        logger.info(f"🔒 Origin {idx+1}: {origin}")
 
 # CORS middleware
 app.add_middleware(
@@ -83,6 +91,15 @@ async def log_requests(request: Request, call_next):
     from fastapi.responses import JSONResponse
     
     logger.info(f"Request: {request.method} {request.url}")
+    
+    # Log origin for CORS debugging
+    origin = request.headers.get("origin")
+    if origin:
+        logger.info(f"🔒 Request Origin: {origin}")
+        if origin in allowed_origins:
+            logger.info(f"🔒 Origin Match: ✅ Allowed")
+        else:
+            logger.info(f"🔒 Origin Match: ❌ Not in allowed origins list")
     
     # Only log headers for non-production environments or if explicitly enabled
     if os.environ.get("LOG_HEADERS", "false").lower() == "true":
@@ -138,6 +155,16 @@ async def log_requests(request: Request, call_next):
         
         # Add timing header to response
         response.headers["X-Process-Time"] = str(process_time)
+        
+        # Log CORS headers for debugging
+        if origin:
+            allow_origin = response.headers.get("access-control-allow-origin", "")
+            logger.info(f"🔒 Response CORS: Access-Control-Allow-Origin: {allow_origin}")
+            if allow_origin == origin:
+                logger.info(f"🔒 CORS Response: ✅ Origin matched")
+            else:
+                logger.info(f"🔒 CORS Response: ❌ Origin mismatch")
+        
         return response
     except asyncio.TimeoutError:
         logger.error(f"Timeout processing request for {request.url}")
@@ -189,6 +216,15 @@ async def get_system_status():
         }
     except Exception as e:
         return {"status": "degraded", "error": str(e), "version": "1.0.0"}
+
+# CORS configuration debug endpoint
+@system_router.get("/cors-config", tags=["Debug"])
+async def get_cors_config():
+    return {
+        "allowed_origins": allowed_origins,
+        "allow_credentials": cors_allow_credentials,
+        "origins_count": len(allowed_origins)
+    }
 
 # Mount routers
 app.include_router(agent_router, prefix="/agent", tags=["Agents"])
