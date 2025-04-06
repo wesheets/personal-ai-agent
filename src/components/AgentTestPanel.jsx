@@ -69,12 +69,11 @@ const AgentTestPanel = () => {
         
         if (isMounted) {
           // Filter to include both system and persona type agents
-          const visibleAgents = data.filter(a => 
-            ["system", "persona"].includes(a.type)
-          );
+          // No filtering - show all agents including HAL and ASH
+          const visibleAgents = data;
           setAvailableAgents(visibleAgents);
           console.log("Loaded agents:", visibleAgents);
-          console.debug(`Loaded ${visibleAgents.length} agents (system and persona types)`);
+          console.debug(`Loaded ${visibleAgents.length} agents (all types)`);
         }
       } catch (err) {
         // Ignore abort errors as they're expected during cleanup

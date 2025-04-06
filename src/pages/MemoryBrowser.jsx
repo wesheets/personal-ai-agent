@@ -188,44 +188,71 @@ const MemoryBrowser = () => {
       }
     }, 8000);
     
+    // Function to fetch memory data with proper error handling
+    const fetchMemoryData = async () => {
+      try {
+        // Add debug log
+        console.debug("Loaded: MemoryBrowser - Fetching memories ⏳");
+        
+        // Make a real fetch to the API
+        const response = await fetch('/api/memory/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: '', limit: 20 }),
+          signal: controller.signal
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Memory search failed: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        // For local testing, if no real API is available, use mock data
+        if (!data || !data.results) {
+          console.warn("No results from API, using mock data");
+          // Simulate API call with mock data that includes a warning
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Mock API response with warning to simulate quota issues
+          return {
+            results: mockMemories,
+            metadata: {
+              query: "",
+              limit: 20,
+              result_count: mockMemories.length,
+              warning: "OpenAI quota exceeded. Memory results limited."
+            }
+          };
+        }
+        
+        return data;
+      } catch (error) {
+        console.error("Error fetching memory data:", error);
+        // Return a fallback response with a warning
+        return {
+          results: [],
+          metadata: {
+            warning: `Failed to fetch memories: ${error.message}`
+          }
+        };
+      }
+    };
+    
     // Create a modified fetch function that uses AbortController
     const fetchWithAbort = async () => {
       try {
         setLoading(true);
         
-        // Add debug log
-        console.debug("Loaded: MemoryBrowser - Fetching memories ⏳");
-        
-        // This would be a real fetch in production
-        // const response = await fetch('/api/memory/search', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ query: '', limit: 20 }),
-        //   signal: controller.signal
-        // });
-        // const data = await response.json();
-        
-        // Simulate API call with mock data that includes a warning
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Mock API response with warning to simulate quota issues
-        const mockApiResponse = {
-          results: mockMemories,
-          metadata: {
-            query: "",
-            limit: 20,
-            result_count: mockMemories.length,
-            // Uncomment to test warning display:
-            // warning: "OpenAI quota exceeded. Memory results limited."
-          }
-        };
+        // Fetch data using the helper function
+        const responseData = await fetchMemoryData();
         
         // Only update state if component is still mounted
         if (isMountedRef.current) {
-          setMemories(mockApiResponse.results);
-          setApiResponse(mockApiResponse); // Store full response for warning handling
+          setMemories(responseData.results || []);
+          setApiResponse(responseData); // Store full response for warning handling
           setError(null);
-          console.debug("Loaded: MemoryBrowser - Memories loaded successfully ✅");
+          console.debug("Loaded: MemoryBrowser - Memories loaded successfully ✅", responseData);
         }
       } catch (err) {
         // Ignore abort errors as they're expected during cleanup
@@ -405,6 +432,12 @@ const MemoryBrowser = () => {
         <VStack spacing={4} align="stretch">
           {memories.map(memory => renderMemoryItem(memory))}
         </VStack>
+      ) : apiResponse?.metadata?.warning ? (
+        <Card bg={colorMode === 'light' ? 'yellow.50' : 'yellow.900'} p={4} borderRadius="md" textAlign="center">
+          <Heading size="md" mb={2}>⚠️ Memory unavailable – using fallback</Heading>
+          <Text>The memory system is currently operating in a degraded state.</Text>
+          <Text mt={2} fontWeight="bold">{apiResponse.metadata.warning}</Text>
+        </Card>
       ) : (
         <Card bg={colorMode === 'light' ? 'white' : 'gray.700'} p={8} borderRadius="md" textAlign="center">
           <Heading size="md" mb={2}>No Memories Found</Heading>

@@ -1,14 +1,15 @@
-# Memory Quota Fail-Safe Patch
+# Final UI Patch Tasks
 
-## Tasks
-- [x] Clone repository (already cloned)
-- [x] Examine backend code structure
-- [x] Locate memory API endpoint
-- [x] Analyze OpenAI embedding implementation
-- [x] Create memory_api_quota_guard.py
-- [x] Modify vector_memory.py to use quota guard
-- [x] Update memory.py API to handle warnings
-- [x] Update frontend to handle warnings
-- [x] Test changes locally (created test script)
-- [ ] Commit and push changes
-- [ ] Verify deployment
+## Issues to Fix
+- [x] Hook Up MemoryWarningHandler.jsx
+  - [x] Inject into MemoryBrowser.jsx
+  - [x] Watch for response.warning, display warning as toast or banner
+  - [x] Prevent infinite loader by showing fallback message
+- [x] Fix Agent Dropdown: HAL + ASH Not Showing
+  - [x] Check /api/agent/status response
+  - [x] Fix frontend dropdown filter
+  - [x] Add debug log for loaded agents
+- [x] Eliminate vite.svg 404
+  - [x] Remove <img src="/vite.svg" /> from layout files
+  - [x] Replace with valid logo or nothing
+  - [x] Prevent render loop caused by failed static asset fetch
