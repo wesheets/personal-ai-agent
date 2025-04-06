@@ -52,6 +52,16 @@ def normalize_origin(origin):
     normalized = origin.rstrip("/").lower()
     return normalized
 
+# Function to sanitize origin for header use
+def sanitize_origin_for_header(origin):
+    """Sanitize origin for use in Access-Control-Allow-Origin header"""
+    if not origin:
+        return ""
+    # Remove any trailing semicolons, commas, or other invalid characters
+    sanitized = origin.rstrip(";,").strip()
+    logger.info(f"✅ Sanitized Origin Header: '{sanitized}'")
+    return sanitized
+
 # CORS configuration
 raw_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://personal-ai-agent-frontend.vercel.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-h49q98819-ted-sheets-projects.vercel.app,https://personal-ai-agent-dkmvk5af-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app,https://personal-ai-agent-6knmyj63f-ted-sheets-projects.vercel.app,https://studio.manus.im")
 
@@ -61,6 +71,8 @@ normalized_origins = []
 seen_origins = set()
 for origin in raw_origins.split(","):
     origin = origin.strip()
+    # Sanitize origin to remove any trailing semicolons
+    origin = sanitize_origin_for_header(origin)
     if origin:
         normalized = normalize_origin(origin)
         if normalized and normalized not in seen_origins:
@@ -114,8 +126,10 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
         for idx, norm_allowed in enumerate(self.normalized_origins):
             try:
                 if re.fullmatch(re.escape(norm_allowed), normalized_request_origin):
-                    matching_origin = self.allow_origins[idx]  # Use the original format for the header
+                    # Get the original format but ensure it's sanitized
+                    matching_origin = sanitize_origin_for_header(self.allow_origins[idx])
                     logger.info(f"🔒 CustomCORSMiddleware: Origin Match: ✅ Allowed (matched with {norm_allowed})")
+                    logger.info(f"✅ Sanitized Origin Header: '{matching_origin}'")
                     break
             except Exception as e:
                 logger.error(f"🔒 CustomCORSMiddleware: Error in regex matching: {str(e)}")
@@ -123,15 +137,18 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
         # If no match found and we have allowed origins, use the first one
         if not matching_origin and self.allow_origins:
             logger.info(f"🔒 CustomCORSMiddleware: No match found, using first allowed origin")
-            matching_origin = self.allow_origins[0]
+            matching_origin = sanitize_origin_for_header(self.allow_origins[0])
+            logger.info(f"✅ Sanitized Origin Header: '{matching_origin}'")
         
         # If it's an OPTIONS request, return a response with CORS headers
         if request.method == "OPTIONS":
             logger.info(f"🔒 CustomCORSMiddleware: OPTIONS request, returning CORS headers")
+            headers = self._get_cors_headers(matching_origin)
+            logger.info(f"🔒 CustomCORSMiddleware: OPTIONS headers: {headers}")
             return Response(
                 content="",
                 status_code=200,
-                headers=self._get_cors_headers(matching_origin),
+                headers=headers,
             )
         
         # For other requests, proceed with the request and add CORS headers to the response
@@ -140,7 +157,10 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
         # Add CORS headers to the response
         if matching_origin:
             logger.info(f"🔒 CustomCORSMiddleware: Adding CORS headers to response")
-            for key, value in self._get_cors_headers(matching_origin).items():
+            headers = self._get_cors_headers(matching_origin)
+            for key, value in headers.items():
+                # Explicitly log the exact header being set
+                logger.info(f"🔒 Setting header: {key}='{value}'")
                 response.headers[key] = value
             
             # Log the response headers for debugging
@@ -151,8 +171,11 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
         return response
     
     def _get_cors_headers(self, origin):
+        # Ensure origin is sanitized
+        clean_origin = sanitize_origin_for_header(origin)
+        
         headers = {
-            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Origin": clean_origin,
             "Access-Control-Allow-Methods": ", ".join(self.allow_methods),
             "Access-Control-Allow-Headers": ", ".join(self.allow_headers),
         }
@@ -166,6 +189,8 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
         if self.max_age:
             headers["Access-Control-Max-Age"] = str(self.max_age)
         
+        # Log the exact headers being returned
+        logger.info(f"🔒 CORS Headers: {headers}")
         return headers
 
 # FastAPI app init
@@ -194,7 +219,8 @@ async def log_all_routes():
     logger.info(f"✅ Allowed origins: {allowed_origins}")
     logger.info(f"✅ Normalized origins for comparison: {normalized_origins}")
     for idx, (orig, norm) in enumerate(zip(allowed_origins, normalized_origins)):
-        logger.info(f"🔒 Origin {idx+1}: {orig} (normalized: {norm})")
+        sanitized = sanitize_origin_for_header(orig)
+        logger.info(f"🔒 Origin {idx+1}: {orig} (normalized: {norm}, sanitized: {sanitized})")
 
 # Add custom CORS middleware instead of FastAPI's CORSMiddleware
 app.add_middleware(
@@ -285,10 +311,18 @@ async def log_requests(request: Request, call_next):
         # Log CORS headers for debugging
         if origin:
             allow_origin = response.headers.get("access-control-allow-origin", "")
-            logger.info(f"🔒 Response CORS: Access-Control-Allow-Origin: {allow_origin}")
+            logger.info(f"🔒 Response CORS: Access-Control-Allow-Origin: '{allow_origin}'")
             
             if allow_origin:
-                logger.info(f"🔒 CORS Response: ✅ Header present: {allow_origin}")
+                # Check for semicolons in the header
+                if ";" in allow_origin:
+                    logger.warning(f"🔒 CORS Response: ⚠️ Header contains semicolon: '{allow_origin}'")
+                    # Fix the header by removing the semicolon
+                    clean_origin = sanitize_origin_for_header(allow_origin)
+                    logger.info(f"🔒 CORS Response: 🧹 Cleaning header: '{clean_origin}'")
+                    response.headers["access-control-allow-origin"] = clean_origin
+                else:
+                    logger.info(f"🔒 CORS Response: ✅ Header clean: '{allow_origin}'")
             else:
                 logger.warning(f"🔒 CORS Response: ❌ Header missing")
         
@@ -351,6 +385,7 @@ async def get_cors_config(request: Request):
     raw_env = os.environ.get("CORS_ALLOWED_ORIGINS", "")
     request_origin = request.headers.get("origin", "")
     normalized_request_origin = normalize_origin(request_origin)
+    sanitized_request_origin = sanitize_origin_for_header(request_origin)
     
     # Check if normalized origin matches any of our normalized allowed origins
     origin_match = False
@@ -368,6 +403,16 @@ async def get_cors_config(request: Request):
             response_headers["middleware_type"] = "CustomCORSMiddleware"
             break
     
+    # Test header sanitization
+    test_origins = [
+        "https://example.com",
+        "https://example.com;",
+        "https://example.com,",
+        "https://example.com; ",
+        " https://example.com;"
+    ]
+    sanitization_tests = {origin: sanitize_origin_for_header(origin) for origin in test_origins}
+    
     return {
         "allowed_origins": allowed_origins,
         "normalized_origins": normalized_origins,
@@ -377,10 +422,12 @@ async def get_cors_config(request: Request):
         "raw_env_length": len(raw_env),
         "deduplication_active": True,
         "normalization_active": True,
+        "sanitization_active": True,
         "custom_middleware_active": True,
         "request_info": {
             "raw_origin": request_origin,
             "normalized_origin": normalized_request_origin,
+            "sanitized_origin": sanitized_request_origin,
             "match_result": "✅ Allowed" if origin_match else "❌ Not allowed",
             "matched_with": matched_with
         },
@@ -391,12 +438,14 @@ async def get_cors_config(request: Request):
             "allow_methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
             "allow_headers": "*"
         },
+        "sanitization_tests": sanitization_tests,
         "debug_info": {
             "is_list_type": str(type(allowed_origins)),
             "first_origin": allowed_origins[0] if allowed_origins else None,
             "has_duplicates": len(allowed_origins) != len(set(allowed_origins)),
             "using_regex_matching": True,
-            "using_custom_middleware": True
+            "using_custom_middleware": True,
+            "using_header_sanitization": True
         }
     }
 
