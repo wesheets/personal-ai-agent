@@ -20,6 +20,7 @@ import {
 import { FiChevronDown, FiChevronUp, FiRefreshCw, FiClock, FiFileText } from 'react-icons/fi';
 import DEBUG_MODE from '../config/debug';
 import { debounce } from '../utils/debounceUtils';
+import MemoryWarningHandler from '../components/MemoryWarningHandler';
 
 // Mock data for initial development - will be replaced with API calls
 const mockMemories = [
@@ -63,6 +64,7 @@ const MemoryBrowser = () => {
   const [memories, setMemories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [apiResponse, setApiResponse] = useState(null);
   
   // State for expanded items
   const [expandedItems, setExpandedItems] = useState({});
@@ -195,16 +197,33 @@ const MemoryBrowser = () => {
         console.debug("Loaded: MemoryBrowser - Fetching memories ⏳");
         
         // This would be a real fetch in production
-        // const response = await fetch('/api/memory', {
+        // const response = await fetch('/api/memory/search', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ query: '', limit: 20 }),
         //   signal: controller.signal
         // });
+        // const data = await response.json();
         
-        // Simulate API call
+        // Simulate API call with mock data that includes a warning
         await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Mock API response with warning to simulate quota issues
+        const mockApiResponse = {
+          results: mockMemories,
+          metadata: {
+            query: "",
+            limit: 20,
+            result_count: mockMemories.length,
+            // Uncomment to test warning display:
+            // warning: "OpenAI quota exceeded. Memory results limited."
+          }
+        };
         
         // Only update state if component is still mounted
         if (isMountedRef.current) {
-          setMemories(mockMemories);
+          setMemories(mockApiResponse.results);
+          setApiResponse(mockApiResponse); // Store full response for warning handling
           setError(null);
           console.debug("Loaded: MemoryBrowser - Memories loaded successfully ✅");
         }
@@ -220,6 +239,21 @@ const MemoryBrowser = () => {
         // Only update state if component is still mounted
         if (isMountedRef.current) {
           setError('Failed to fetch memories. Please try again.');
+          
+          // Check if the error response contains a warning
+          try {
+            if (err.response && err.response.data && err.response.data.warning) {
+              // Set API response with the warning
+              setApiResponse({
+                results: [],
+                metadata: {
+                  warning: err.response.data.warning
+                }
+              });
+            }
+          } catch (parseErr) {
+            console.error('Error parsing error response:', parseErr);
+          }
           
           toast({
             title: 'Error',
@@ -344,6 +378,9 @@ const MemoryBrowser = () => {
           Refresh
         </Button>
       </HStack>
+      
+      {/* Display memory warnings if present */}
+      <MemoryWarningHandler apiResponse={apiResponse} showAlert={true} onClose={() => setApiResponse(null)} />
       
       {loading ? (
         <Flex justify="center" align="center" height="200px">

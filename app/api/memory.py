@@ -42,15 +42,56 @@ async def add_memory(
     Add a new memory to the vector memory system
     """
     try:
-        memory_id = await memory_system.store_memory(
+        memory_id, warning = await memory_system.store_memory(
             content=request.content,
             metadata=request.metadata,
             priority=request.priority
         )
         
-        return {"message": "Memory added successfully", "memory_id": memory_id}
+        response = {"message": "Memory added successfully", "memory_id": memory_id}
+        
+        # Add warning to response if present
+        if warning:
+            response["warning"] = warning
+            
+        return response
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error adding memory: {str(e)}")
+        # Instead of raising an exception, log and return a graceful response
+        import logging
+        logger = logging.getLogger("memory_api")
+        logger.error(f"[MEMORY FAILSAFE] Error in add_memory endpoint: {str(e)}")
+        
+        # Try to store without embedding as last resort
+        try:
+            # Add a note about the error to metadata
+            metadata = request.metadata or {}
+            metadata["error_note"] = f"Stored without embedding due to error: {str(e)}"
+            
+            # Store directly in database without embedding
+            from app.db.supabase_manager import SupabaseManager
+            manager = SupabaseManager()
+            result = await manager.insert_record(
+                table=memory_system.table_name,
+                data={
+                    "content": request.content,
+                    "metadata": metadata,
+                    "embedding": None,
+                    "priority": request.priority
+                }
+            )
+            
+            return {
+                "message": "Memory added with limitations",
+                "memory_id": result["id"],
+                "warning": "Memory stored without embedding due to backend error."
+            }
+        except Exception as inner_e:
+            # If even the fallback fails, return a meaningful error but don't crash
+            logger.error(f"[MEMORY FAILSAFE] Fallback storage also failed: {str(inner_e)}")
+            return {
+                "message": "Memory operation partially completed",
+                "warning": "Unable to store memory properly due to backend errors."
+            }
 
 @router.post("/search", response_model=MemorySearchResponse)
 async def search_memories(
@@ -61,13 +102,13 @@ async def search_memories(
     Search for memories similar to the query
     """
     try:
-        results = await memory_system.search_memories(
+        results, warning = await memory_system.search_memories(
             query=request.query,
             limit=request.limit,
             priority_only=request.priority_only
         )
         
-        return MemorySearchResponse(
+        response = MemorySearchResponse(
             results=results,
             metadata={
                 "query": request.query,
@@ -76,8 +117,33 @@ async def search_memories(
                 "result_count": len(results)
             }
         )
+        
+        # Add warning to response if present
+        if warning:
+            response.metadata["warning"] = warning
+            
+        return response
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error searching memories: {str(e)}")
+        # Instead of raising an exception, return a graceful fallback response
+        import logging
+        logger = logging.getLogger("memory_api")
+        logger.error(f"[MEMORY FAILSAFE] Error in search_memories endpoint: {str(e)}")
+        
+        # Get fallback memories
+        from app.core.memory_api_quota_guard import get_quota_guard
+        quota_guard = get_quota_guard()
+        fallback_memories = quota_guard.get_fallback_memories(request.limit)
+        
+        return MemorySearchResponse(
+            results=fallback_memories,
+            metadata={
+                "query": request.query,
+                "limit": request.limit,
+                "priority_only": request.priority_only,
+                "result_count": len(fallback_memories),
+                "warning": f"Memory search failed: {str(e)}"
+            }
+        )
 
 @router.get("/get/{memory_id}", response_model=MemoryResponse)
 async def get_memory(
@@ -153,13 +219,38 @@ async def get_memory_status(
         manager = SupabaseManager()
         db_info = await manager.get_database_info()
         
-        return {
-            "status": "operational",
-            "database": db_info,
-            "embedding_model": memory_system.embedding_model
-        }
+        # Check if OpenAI embeddings are working
+        try:
+            from app.core.memory_api_quota_guard import get_quota_guard
+            quota_guard = get_quota_guard()
+            test_embedding, warning = quota_guard.get_embedding_safe("test")
+            
+            if test_embedding is None:
+                return {
+                    "status": "degraded",
+                    "database": db_info,
+                    "embedding_model": "text-embedding-ada-002",
+                    "embedding_status": "unavailable",
+                    "warning": warning
+                }
+            else:
+                return {
+                    "status": "operational",
+                    "database": db_info,
+                    "embedding_model": "text-embedding-ada-002",
+                    "embedding_status": "available"
+                }
+        except Exception as e:
+            return {
+                "status": "degraded",
+                "database": db_info,
+                "embedding_model": "text-embedding-ada-002",
+                "embedding_status": "error",
+                "warning": f"Error checking embedding status: {str(e)}"
+            }
     except Exception as e:
         return {
             "status": "error",
-            "error": str(e)
+            "error": str(e),
+            "warning": "Memory system status check failed"
         }

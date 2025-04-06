@@ -1,8 +1,13 @@
 import os
 import time
 from supabase import create_client, Client
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 import openai
+from app.core.memory_api_quota_guard import get_quota_guard
+import logging
+
+# Configure logging
+logger = logging.getLogger("vector_memory")
 
 # Singleton instance
 _vector_memory_instance = None
@@ -70,15 +75,22 @@ class VectorMemorySystem:
             
         Returns:
             The embedding vector
+        
+        Raises:
+            ValueError: If embedding generation fails
         """
-        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        response = client.embeddings.create(
-            model="text-embedding-ada-002",
-            input=text
-        )
-        return response.data[0].embedding
+        # Use the quota guard to safely get embeddings
+        quota_guard = get_quota_guard()
+        embedding, warning = quota_guard.get_embedding_safe(text)
+        
+        if embedding is None:
+            # Log the warning and raise an exception with the warning message
+            logger.warning(f"Failed to generate embedding: {warning}")
+            raise ValueError(f"Embedding generation failed: {warning}")
+            
+        return embedding
     
-    async def store_memory(self, content: str, metadata: Optional[Dict[str, Any]] = None, priority: bool = False) -> str:
+    async def store_memory(self, content: str, metadata: Optional[Dict[str, Any]] = None, priority: bool = False) -> Tuple[str, Optional[str]]:
         """
         Store a memory in the vector database
         
@@ -88,23 +100,46 @@ class VectorMemorySystem:
             priority: Whether this is a priority memory
             
         Returns:
-            The ID of the stored memory
+            Tuple of (memory ID, warning message or None)
         """
-        # Get embedding for the content
-        embedding = self._get_embedding(content)
+        warning = None
         
-        # Store in Supabase
-        result = self.supabase.table(self.table_name).insert({
-            "content": content,
-            "metadata": metadata or {},
-            "embedding": embedding,
-            "priority": priority
-        }).execute()
-        
-        # Return the ID of the inserted record
-        return result.data[0]["id"]
+        try:
+            # Get embedding for the content
+            embedding = self._get_embedding(content)
+            
+            # Store in Supabase
+            result = self.supabase.table(self.table_name).insert({
+                "content": content,
+                "metadata": metadata or {},
+                "embedding": embedding,
+                "priority": priority
+            }).execute()
+            
+            # Return the ID of the inserted record
+            return result.data[0]["id"], None
+            
+        except ValueError as e:
+            # This is likely from the embedding generation failure
+            warning = str(e)
+            logger.warning(f"[MEMORY FAILSAFE] Storing memory without embedding: {warning}")
+            
+            # Store without embedding as fallback
+            result = self.supabase.table(self.table_name).insert({
+                "content": content,
+                "metadata": metadata or {},
+                "embedding": None,  # No embedding available
+                "priority": priority
+            }).execute()
+            
+            return result.data[0]["id"], "Memory stored without embedding due to API limits."
+            
+        except Exception as e:
+            # Handle any other database errors
+            logger.error(f"[MEMORY FAILSAFE] Failed to store memory: {e}")
+            raise
     
-    async def search_memories(self, query: str, limit: int = 5, priority_only: bool = False) -> List[Dict[str, Any]]:
+    async def search_memories(self, query: str, limit: int = 5, priority_only: bool = False) -> Tuple[List[Dict[str, Any]], Optional[str]]:
         """
         Search for memories similar to the query
         
@@ -114,33 +149,57 @@ class VectorMemorySystem:
             priority_only: Whether to only return priority memories
             
         Returns:
-            List of memory items sorted by relevance
+            Tuple of (list of memory items sorted by relevance, warning message or None)
         """
-        # Get embedding for the query
-        query_embedding = self._get_embedding(query)
+        warning = None
         
-        # Build the query
-        rpc_query = {
-            "query_embedding": query_embedding,
-            "match_threshold": 0.5,  # Adjust as needed
-            "match_count": limit
-        }
-        
-        # Execute the query
-        if priority_only:
-            # Only return priority memories
-            result = self.supabase.rpc(
-                "match_memories_priority", 
-                rpc_query
-            ).execute()
-        else:
-            # Return all memories
-            result = self.supabase.rpc(
-                "match_memories", 
-                rpc_query
-            ).execute()
-        
-        return result.data
+        try:
+            # Get embedding for the query
+            query_embedding = self._get_embedding(query)
+            
+            # Build the query
+            rpc_query = {
+                "query_embedding": query_embedding,
+                "match_threshold": 0.5,  # Adjust as needed
+                "match_count": limit
+            }
+            
+            # Execute the query
+            if priority_only:
+                # Only return priority memories
+                result = self.supabase.rpc(
+                    "match_memories_priority", 
+                    rpc_query
+                ).execute()
+            else:
+                # Return all memories
+                result = self.supabase.rpc(
+                    "match_memories", 
+                    rpc_query
+                ).execute()
+            
+            return result.data, None
+            
+        except ValueError as e:
+            # This is likely from the embedding generation failure
+            warning = str(e)
+            logger.warning(f"[MEMORY FAILSAFE] Returning fallback memories: {warning}")
+            
+            # Get fallback memories when embedding fails
+            quota_guard = get_quota_guard()
+            fallback_memories = quota_guard.get_fallback_memories(limit)
+            
+            return fallback_memories, "Memory search limited due to API quota constraints."
+            
+        except Exception as e:
+            # Handle any other database errors
+            logger.error(f"[MEMORY FAILSAFE] Failed to search memories: {e}")
+            
+            # Return empty list with warning
+            quota_guard = get_quota_guard()
+            fallback_memories = quota_guard.get_fallback_memories(1)  # Just return system note
+            
+            return fallback_memories, f"Memory search failed: {str(e)}"
     
     async def get_memory_by_id(self, memory_id: str) -> Optional[Dict[str, Any]]:
         """
