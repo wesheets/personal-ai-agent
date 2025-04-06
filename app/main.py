@@ -8,6 +8,8 @@ import logging
 import inspect
 import re
 from dotenv import load_dotenv
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.types import ASGIApp
 
 from app.api.agent import router as agent_router
 from app.api.memory import router as memory_router
@@ -68,6 +70,104 @@ for origin in raw_origins.split(","):
 
 cors_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 
+# Custom CORS middleware that uses normalized origin matching
+class CustomCORSMiddleware(BaseHTTPMiddleware):
+    def __init__(
+        self,
+        app: ASGIApp,
+        allow_origins: list = None,
+        normalized_origins: list = None,
+        allow_methods: list = ["*"],
+        allow_headers: list = ["*"],
+        allow_credentials: bool = False,
+        expose_headers: list = None,
+        max_age: int = 600,
+    ) -> None:
+        super().__init__(app)
+        self.allow_origins = allow_origins or []
+        self.normalized_origins = normalized_origins or []
+        self.allow_methods = allow_methods
+        self.allow_headers = allow_headers
+        self.allow_credentials = allow_credentials
+        self.expose_headers = expose_headers or []
+        self.max_age = max_age
+        logger.info(f"🔒 CustomCORSMiddleware initialized with {len(self.allow_origins)} origins")
+        logger.info(f"🔒 Allowed origins: {self.allow_origins}")
+        logger.info(f"🔒 Normalized origins: {self.normalized_origins}")
+
+    async def dispatch(self, request: Request, call_next):
+        # Get the origin from the request headers
+        origin = request.headers.get("origin")
+        
+        # If no origin, just proceed with the request
+        if not origin:
+            logger.info("🔒 No origin header in request, skipping CORS processing")
+            return await call_next(request)
+        
+        # Normalize the request origin
+        normalized_request_origin = normalize_origin(origin)
+        logger.info(f"🔒 CustomCORSMiddleware: Request Origin: {origin}")
+        logger.info(f"🔒 CustomCORSMiddleware: Normalized Request Origin: {normalized_request_origin}")
+        
+        # Check if the normalized origin matches any of our normalized allowed origins
+        matching_origin = None
+        for idx, norm_allowed in enumerate(self.normalized_origins):
+            try:
+                if re.fullmatch(re.escape(norm_allowed), normalized_request_origin):
+                    matching_origin = self.allow_origins[idx]  # Use the original format for the header
+                    logger.info(f"🔒 CustomCORSMiddleware: Origin Match: ✅ Allowed (matched with {norm_allowed})")
+                    break
+            except Exception as e:
+                logger.error(f"🔒 CustomCORSMiddleware: Error in regex matching: {str(e)}")
+        
+        # If no match found and we have allowed origins, use the first one
+        if not matching_origin and self.allow_origins:
+            logger.info(f"🔒 CustomCORSMiddleware: No match found, using first allowed origin")
+            matching_origin = self.allow_origins[0]
+        
+        # If it's an OPTIONS request, return a response with CORS headers
+        if request.method == "OPTIONS":
+            logger.info(f"🔒 CustomCORSMiddleware: OPTIONS request, returning CORS headers")
+            return Response(
+                content="",
+                status_code=200,
+                headers=self._get_cors_headers(matching_origin),
+            )
+        
+        # For other requests, proceed with the request and add CORS headers to the response
+        response = await call_next(request)
+        
+        # Add CORS headers to the response
+        if matching_origin:
+            logger.info(f"🔒 CustomCORSMiddleware: Adding CORS headers to response")
+            for key, value in self._get_cors_headers(matching_origin).items():
+                response.headers[key] = value
+            
+            # Log the response headers for debugging
+            logger.info(f"🔒 CustomCORSMiddleware: Response headers: {dict(response.headers)}")
+        else:
+            logger.warning(f"🔒 CustomCORSMiddleware: No matching origin found, not adding CORS headers")
+        
+        return response
+    
+    def _get_cors_headers(self, origin):
+        headers = {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Methods": ", ".join(self.allow_methods),
+            "Access-Control-Allow-Headers": ", ".join(self.allow_headers),
+        }
+        
+        if self.allow_credentials:
+            headers["Access-Control-Allow-Credentials"] = "true"
+        
+        if self.expose_headers:
+            headers["Access-Control-Expose-Headers"] = ", ".join(self.expose_headers)
+        
+        if self.max_age:
+            headers["Access-Control-Max-Age"] = str(self.max_age)
+        
+        return headers
+
 # FastAPI app init
 app = FastAPI(
     title="Enhanced AI Agent System",
@@ -90,18 +190,21 @@ async def log_all_routes():
     logger.info(f"🔒 CORS_ALLOWED_ORIGINS raw: {raw_origins}")
     logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
     logger.info(f"🔒 Allowed Origins Count: {len(allowed_origins)}")
-    logger.info(f"✅ Injecting CORS allow_origins: {allowed_origins}")
+    logger.info(f"✅ Using custom CORS middleware with normalized origin matching")
+    logger.info(f"✅ Allowed origins: {allowed_origins}")
     logger.info(f"✅ Normalized origins for comparison: {normalized_origins}")
     for idx, (orig, norm) in enumerate(zip(allowed_origins, normalized_origins)):
         logger.info(f"🔒 Origin {idx+1}: {orig} (normalized: {norm})")
 
-# CORS middleware
+# Add custom CORS middleware instead of FastAPI's CORSMiddleware
 app.add_middleware(
-    CORSMiddleware,
+    CustomCORSMiddleware,
     allow_origins=allowed_origins,
+    normalized_origins=normalized_origins,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
+    allow_headers=["*"],
     allow_credentials=cors_allow_credentials,
-    allow_methods=["*"],
-    allow_headers=["*"]
+    max_age=86400,
 )
 
 # Request body size limiter middleware
@@ -123,17 +226,6 @@ async def log_requests(request: Request, call_next):
         normalized_request_origin = normalize_origin(origin)
         logger.info(f"🔒 Request Origin: {origin}")
         logger.info(f"🔒 Normalized Request Origin: {normalized_request_origin}")
-        
-        # Check if normalized origin matches any of our normalized allowed origins
-        origin_match = False
-        for allowed_norm in normalized_origins:
-            if re.fullmatch(re.escape(allowed_norm), normalized_request_origin):
-                origin_match = True
-                logger.info(f"🔒 Origin Match: ✅ Allowed (matched with {allowed_norm})")
-                break
-        
-        if not origin_match:
-            logger.info(f"🔒 Origin Match: ❌ Not in allowed origins list")
     
     # Only log headers for non-production environments or if explicitly enabled
     if os.environ.get("LOG_HEADERS", "false").lower() == "true":
@@ -194,13 +286,11 @@ async def log_requests(request: Request, call_next):
         if origin:
             allow_origin = response.headers.get("access-control-allow-origin", "")
             logger.info(f"🔒 Response CORS: Access-Control-Allow-Origin: {allow_origin}")
-            normalized_allow_origin = normalize_origin(allow_origin)
-            normalized_request_origin = normalize_origin(origin)
             
-            if normalized_allow_origin == normalized_request_origin:
-                logger.info(f"🔒 CORS Response: ✅ Origin matched (normalized comparison)")
+            if allow_origin:
+                logger.info(f"🔒 CORS Response: ✅ Header present: {allow_origin}")
             else:
-                logger.info(f"🔒 CORS Response: ❌ Origin mismatch (normalized: {normalized_allow_origin} vs {normalized_request_origin})")
+                logger.warning(f"🔒 CORS Response: ❌ Header missing")
         
         return response
     except asyncio.TimeoutError:
@@ -271,6 +361,13 @@ async def get_cors_config(request: Request):
             matched_with = allowed_norm
             break
     
+    # Check response headers
+    response_headers = {}
+    for middleware in app.user_middleware:
+        if hasattr(middleware, "cls") and middleware.cls.__name__ == "CustomCORSMiddleware":
+            response_headers["middleware_type"] = "CustomCORSMiddleware"
+            break
+    
     return {
         "allowed_origins": allowed_origins,
         "normalized_origins": normalized_origins,
@@ -280,23 +377,26 @@ async def get_cors_config(request: Request):
         "raw_env_length": len(raw_env),
         "deduplication_active": True,
         "normalization_active": True,
+        "custom_middleware_active": True,
         "request_info": {
             "raw_origin": request_origin,
             "normalized_origin": normalized_request_origin,
             "match_result": "✅ Allowed" if origin_match else "❌ Not allowed",
             "matched_with": matched_with
         },
+        "response_headers": response_headers,
         "middleware_config": {
             "allow_origins": "List with {} origins".format(len(allowed_origins)),
             "allow_credentials": cors_allow_credentials,
-            "allow_methods": "*",
+            "allow_methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
             "allow_headers": "*"
         },
         "debug_info": {
             "is_list_type": str(type(allowed_origins)),
             "first_origin": allowed_origins[0] if allowed_origins else None,
             "has_duplicates": len(allowed_origins) != len(set(allowed_origins)),
-            "using_regex_matching": True
+            "using_regex_matching": True,
+            "using_custom_middleware": True
         }
     }
 
@@ -331,39 +431,6 @@ async def delegate_debug(request: Request):
 @app.get("/health", tags=["Health"])
 async def health_check():
     return Response(content="OK", media_type="text/plain")
-
-# CORS preflight
-@app.options("/{rest_of_path:path}")
-async def options_handler(rest_of_path: str, request: Request):
-    origin = request.headers.get("origin", "")
-    normalized_request_origin = normalize_origin(origin)
-    
-    # Find matching allowed origin using normalized comparison
-    matching_origin = None
-    for idx, norm_allowed in enumerate(normalized_origins):
-        if re.fullmatch(re.escape(norm_allowed), normalized_request_origin):
-            matching_origin = allowed_origins[idx]  # Use the original format for the header
-            break
-    
-    # If no match found, use the first allowed origin or "*"
-    if not matching_origin and allowed_origins:
-        matching_origin = allowed_origins[0]
-    elif not matching_origin:
-        matching_origin = "*"
-    
-    logger.info(f"🔒 OPTIONS: Request Origin: {origin} (normalized: {normalized_request_origin})")
-    logger.info(f"🔒 OPTIONS: Using Access-Control-Allow-Origin: {matching_origin}")
-    
-    return Response(
-        content="",
-        headers={
-            "Access-Control-Allow-Origin": matching_origin,
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
-            "Access-Control-Allow-Headers": "*",
-            "Access-Control-Allow-Credentials": "true" if cors_allow_credentials else "false",
-            "Access-Control-Max-Age": "86400"
-        }
-    )
 
 # Frontend fallback
 frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend/dist")
