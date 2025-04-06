@@ -1,5 +1,4 @@
 from fastapi import FastAPI, APIRouter, Response, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.routing import APIRoute
@@ -8,8 +7,7 @@ import logging
 import inspect
 import re
 from dotenv import load_dotenv
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.types import ASGIApp
+from app.core.middleware.cors import CustomCORSMiddleware, normalize_origin, sanitize_origin_for_header
 
 from app.api.agent import router as agent_router
 from app.api.memory import router as memory_router
@@ -22,6 +20,7 @@ from app.diagnostics.hal_route_debug import router as hal_debug_router
 from app.api.debug_routes import router as debug_router  # Debug routes for diagnostics
 from app.api.performance_monitoring import router as performance_router  # Performance monitoring
 from app.api.streaming_route import router as streaming_router  # Streaming response router
+from app.api.system_routes import router as system_routes  # System routes including CORS debug
 from app.middleware.size_limiter import limit_request_body_size  # Request body size limiter
 
 from app.providers import initialize_model_providers, get_available_models
@@ -43,25 +42,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("api")
 
-# Function to normalize origin URLs
-def normalize_origin(origin):
-    """Normalize origin by stripping trailing slashes and converting to lowercase"""
-    if not origin:
-        return ""
-    # Remove trailing slash if present
-    normalized = origin.rstrip("/").lower()
-    return normalized
-
-# Function to sanitize origin for header use
-def sanitize_origin_for_header(origin):
-    """Sanitize origin for use in Access-Control-Allow-Origin header"""
-    if not origin:
-        return ""
-    # Remove any trailing semicolons, commas, or other invalid characters
-    sanitized = origin.rstrip(";,").strip()
-    logger.info(f"✅ Sanitized Origin Header: '{sanitized}'")
-    return sanitized
-
 # CORS configuration
 raw_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://personal-ai-agent-frontend.vercel.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-h49q98819-ted-sheets-projects.vercel.app,https://personal-ai-agent-dkmvk5af-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app,https://personal-ai-agent-6knmyj63f-ted-sheets-projects.vercel.app,https://studio.manus.im")
 
@@ -82,121 +62,8 @@ for origin in raw_origins.split(","):
 
 cors_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
 
-# Custom CORS middleware that uses normalized origin matching
-class CustomCORSMiddleware(BaseHTTPMiddleware):
-    def __init__(
-        self,
-        app: ASGIApp,
-        allow_origins: list = None,
-        normalized_origins: list = None,
-        allow_methods: list = ["*"],
-        allow_headers: list = ["*"],
-        allow_credentials: bool = False,
-        expose_headers: list = None,
-        max_age: int = 600,
-    ) -> None:
-        super().__init__(app)
-        self.allow_origins = allow_origins or []
-        self.normalized_origins = normalized_origins or []
-        self.allow_methods = allow_methods
-        self.allow_headers = allow_headers
-        self.allow_credentials = allow_credentials
-        self.expose_headers = expose_headers or []
-        self.max_age = max_age
-        logger.info(f"🔒 CustomCORSMiddleware initialized with {len(self.allow_origins)} origins")
-        logger.info(f"🔒 Allowed origins: {self.allow_origins}")
-        logger.info(f"🔒 Normalized origins: {self.normalized_origins}")
-
-    async def dispatch(self, request: Request, call_next):
-        # Get the origin from the request headers
-        origin = request.headers.get("origin")
-        
-        # If no origin, just proceed with the request
-        if not origin:
-            logger.info("🔒 No origin header in request, skipping CORS processing")
-            return await call_next(request)
-        
-        # Normalize the request origin
-        normalized_request_origin = normalize_origin(origin)
-        logger.info(f"🔒 CustomCORSMiddleware: Request Origin: {origin}")
-        logger.info(f"🔒 CustomCORSMiddleware: Normalized Request Origin: {normalized_request_origin}")
-        
-        # Check if the normalized origin matches any of our normalized allowed origins
-        matching_origin = None
-        for idx, norm_allowed in enumerate(self.normalized_origins):
-            try:
-                if re.fullmatch(re.escape(norm_allowed), normalized_request_origin):
-                    # Get the original format but ensure it's sanitized
-                    matching_origin = sanitize_origin_for_header(self.allow_origins[idx])
-                    logger.info(f"🔒 CustomCORSMiddleware: Origin Match: ✅ Allowed (matched with {norm_allowed})")
-                    logger.info(f"✅ Sanitized Origin Header: '{matching_origin}'")
-                    break
-            except Exception as e:
-                logger.error(f"🔒 CustomCORSMiddleware: Error in regex matching: {str(e)}")
-        
-        # If no match found, return 403 Forbidden instead of using fallback
-        if not matching_origin:
-            logger.warning(f"🚫 CustomCORSMiddleware: No matching origin found for request: {origin}")
-            return Response("Forbidden Origin", status_code=403)
-        
-        # If it's an OPTIONS request, return a response with CORS headers
-        if request.method == "OPTIONS":
-            logger.info(f"🔒 CustomCORSMiddleware: OPTIONS request, returning CORS headers")
-            headers = self._get_cors_headers(matching_origin)
-            logger.info(f"🔒 CustomCORSMiddleware: OPTIONS headers: {headers}")
-            return Response(
-                content="",
-                status_code=200,
-                headers=headers,
-            )
-        
-        # For other requests, proceed with the request and add CORS headers to the response
-        response = await call_next(request)
-        
-        # Add CORS headers to the response
-        if matching_origin:
-            logger.info(f"🔒 CustomCORSMiddleware: Adding CORS headers to response")
-            headers = self._get_cors_headers(matching_origin)
-            for key, value in headers.items():
-                # Explicitly log the exact header being set
-                logger.info(f"🔒 Setting header: {key}='{value}'")
-                response.headers[key] = value
-            
-            # Log the response headers for debugging
-            logger.info(f"🔒 CustomCORSMiddleware: Response headers: {dict(response.headers)}")
-        else:
-            logger.warning(f"🔒 CustomCORSMiddleware: No matching origin found, not adding CORS headers")
-        
-        return response
-    
-    def _get_cors_headers(self, origin):
-        # Ensure origin is sanitized
-        clean_origin = sanitize_origin_for_header(origin)
-        
-        # Double-check for any remaining semicolons
-        if ";" in clean_origin:
-            logger.warning(f"⚠️ Semicolon still present after sanitization: '{clean_origin}'")
-            clean_origin = clean_origin.replace(";", "")
-            logger.info(f"🧹 Forcibly removed semicolon: '{clean_origin}'")
-        
-        headers = {
-            "Access-Control-Allow-Origin": clean_origin,
-            "Access-Control-Allow-Methods": ", ".join(self.allow_methods),
-            "Access-Control-Allow-Headers": ", ".join(self.allow_headers),
-        }
-        
-        if self.allow_credentials:
-            headers["Access-Control-Allow-Credentials"] = "true"
-        
-        if self.expose_headers:
-            headers["Access-Control-Expose-Headers"] = ", ".join(self.expose_headers)
-        
-        if self.max_age:
-            headers["Access-Control-Max-Age"] = str(self.max_age)
-        
-        # Log the exact headers being returned
-        logger.info(f"🔒 CORS Headers: {headers}")
-        return headers
+# Enable CORS debug mode if specified in environment
+os.environ["CORS_DEBUG"] = os.environ.get("CORS_DEBUG", "false")
 
 # FastAPI app init
 app = FastAPI(
@@ -227,11 +94,10 @@ async def log_all_routes():
         sanitized = sanitize_origin_for_header(orig)
         logger.info(f"🔒 Origin {idx+1}: {orig} (normalized: {norm}, sanitized: {sanitized})")
 
-# Add custom CORS middleware instead of FastAPI's CORSMiddleware
+# Add custom CORS middleware from the extracted module
 app.add_middleware(
     CustomCORSMiddleware,
     allow_origins=allowed_origins,
-    normalized_origins=normalized_origins,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
     allow_headers=["*"],
     allow_credentials=cors_allow_credentials,
@@ -395,8 +261,19 @@ async def get_cors_config(request: Request):
     # Check if normalized origin matches any of our normalized allowed origins
     origin_match = False
     matched_with = None
+    comparison_results = []
+    
     for allowed_norm in normalized_origins:
-        if re.fullmatch(re.escape(allowed_norm), normalized_request_origin):
+        # Use strict string equality for validation
+        is_match = normalized_request_origin == allowed_norm
+        comparison_results.append({
+            "allowed_origin": allowed_norm,
+            "request_origin": normalized_request_origin,
+            "is_match": is_match,
+            "comparison_type": "strict equality"
+        })
+        
+        if is_match:
             origin_match = True
             matched_with = allowed_norm
             break
@@ -418,6 +295,20 @@ async def get_cors_config(request: Request):
     ]
     sanitization_tests = {origin: sanitize_origin_for_header(origin) for origin in test_origins}
     
+    # Add a memory log for CORS fix verification
+    try:
+        from app.api.memory import add_memory_entry
+        import asyncio
+        asyncio.create_task(add_memory_entry(
+            "CORS Fix Complete", 
+            f"CORS origin matching fixed using strict equality. Frontend origin: {request_origin}",
+            "system"
+        ))
+        cors_memory_added = True
+    except Exception as e:
+        cors_memory_added = False
+        logger.error(f"Failed to add CORS fix memory: {str(e)}")
+    
     return {
         "allowed_origins": allowed_origins,
         "normalized_origins": normalized_origins,
@@ -436,6 +327,7 @@ async def get_cors_config(request: Request):
             "match_result": "✅ Allowed" if origin_match else "❌ Not allowed",
             "matched_with": matched_with
         },
+        "comparison_results": comparison_results,
         "response_headers": response_headers,
         "middleware_config": {
             "allow_origins": "List with {} origins".format(len(allowed_origins)),
@@ -448,9 +340,11 @@ async def get_cors_config(request: Request):
             "is_list_type": str(type(allowed_origins)),
             "first_origin": allowed_origins[0] if allowed_origins else None,
             "has_duplicates": len(allowed_origins) != len(set(allowed_origins)),
-            "using_regex_matching": True,
+            "using_regex_matching": False,
+            "using_strict_equality": True,
             "using_custom_middleware": True,
-            "using_header_sanitization": True
+            "using_header_sanitization": True,
+            "cors_memory_added": cors_memory_added
         }
     }
 
@@ -462,7 +356,7 @@ app.include_router(goals_router, prefix="/api", tags=["Goals"])
 app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
 app.include_router(control_router, prefix="/api", tags=["Control"])
 app.include_router(logs_router, prefix="/api", tags=["Logs"])
-app.include_router(system_router)
+app.include_router(system_routes, prefix="/api", tags=["System"])  # System routes including CORS debug
 app.include_router(delegate_router, prefix="/api", tags=["HAL"])  # ✅ HAL ROUTE MOUNTED
 app.include_router(hal_debug_router, prefix="/api", tags=["Diagnostics"])  # Diagnostic router for debugging routes
 app.include_router(debug_router, prefix="/api", tags=["Debug"])  # Additional debug routes for comprehensive diagnostics
