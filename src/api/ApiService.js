@@ -41,7 +41,7 @@ export const controlService = {
       // Attempt to call the actual API endpoint
       const response = await apiClient.get('/agents/status');
       return response.data;
-    } catch (error) {
+    } catch (_) {
       console.warn("Using mock data for agent status - API endpoint may not exist yet");
       // Return mock data if the API call fails
       return {
@@ -59,7 +59,7 @@ export const controlService = {
       // Attempt to call the actual API endpoint
       const response = await apiClient.get('/agents/control-mode');
       return response.data;
-    } catch (error) {
+    } catch (_) {
       console.warn("Using default control mode - API endpoint may not exist yet");
       // Return default control mode if the API call fails
       return {

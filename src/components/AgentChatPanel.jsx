@@ -111,7 +111,7 @@ const AgentChatPanel = () => {
     } else {
       setMessages([]);
     }
-  }, [agentId]);
+  }, [agentId, agentDetails.systemMessage, agentDetails.name]);
   
   // Scroll to bottom when messages change
   useEffect(() => {
