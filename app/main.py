@@ -376,6 +376,38 @@ async def delegate_debug(request: Request):
     logger.info(f"🧠 Debug body received: {body}")
     return {"status": "success", "message": "Debug delegate endpoint response", "task_id": "debug-task-123"}
 
+# Temporary handler for delegate-stream endpoint to fix 405 Method Not Allowed error
+@app.post("/api/delegate-stream")
+async def delegate_stream_handler(request: Request):
+    """
+    Temporary handler for the /api/delegate-stream endpoint to fix 405 Method Not Allowed error.
+    This endpoint logs the request body and returns a mock JSON response.
+    """
+    try:
+        body = await request.json()
+        logger.info(f"🔄 Delegate stream request received: {body}")
+        
+        # Return a streaming response with mock data
+        return StreamingResponse(
+            stream_response(request),
+            media_type="application/x-ndjson",
+            headers={
+                "X-Streaming-Mode": "enabled",
+                "X-Agent-Version": "1.0.0",
+                "Cache-Control": "no-cache"
+            }
+        )
+    except Exception as e:
+        logger.error(f"❌ Error in delegate-stream handler: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": "Error processing delegate-stream request",
+                "error": str(e)
+            }
+        )
+
 # Debug route for API testing
 @app.get("/api/test")
 def test():
