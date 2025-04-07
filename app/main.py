@@ -10,6 +10,7 @@ import datetime
 from dotenv import load_dotenv
 from app.core.middleware.cors import CustomCORSMiddleware, normalize_origin, sanitize_origin_for_header
 
+from app.api.auth import router as auth_router  # Import the new auth router
 from app.api.agent import router as agent_router
 from app.api.memory import router as memory_router
 from app.api.goals import goals_router
@@ -250,169 +251,43 @@ async def get_system_status():
     except Exception as e:
         return {"status": "degraded", "error": str(e), "version": "1.0.0"}
 
-# CORS configuration debug endpoint
-@system_router.get("/cors-config", tags=["Debug"])
-async def get_cors_config(request: Request):
-    # Enhanced debug information with normalization
-    raw_env = os.environ.get("CORS_ALLOWED_ORIGINS", "")
-    request_origin = request.headers.get("origin", "")
-    normalized_request_origin = normalize_origin(request_origin)
-    sanitized_request_origin = sanitize_origin_for_header(request_origin)
-    
-    # Check if normalized origin matches any of our normalized allowed origins
-    origin_match = False
-    matched_with = None
-    comparison_results = []
-    
-    for allowed_norm in normalized_origins:
-        # Use strict string equality for validation
-        is_match = normalized_request_origin == allowed_norm
-        comparison_results.append({
-            "allowed_origin": allowed_norm,
-            "request_origin": normalized_request_origin,
-            "is_match": is_match,
-            "comparison_type": "strict equality"
-        })
-        
-        if is_match:
-            origin_match = True
-            matched_with = allowed_norm
-            break
-    
-    # Check response headers
-    response_headers = {}
-    for middleware in app.user_middleware:
-        if hasattr(middleware, "cls") and middleware.cls.__name__ == "CustomCORSMiddleware":
-            response_headers["middleware_type"] = "CustomCORSMiddleware"
-            break
-    
-    # Test header sanitization
-    test_origins = [
-        "https://example.com",
-        "https://example.com;",
-        "https://example.com,",
-        "https://example.com; ",
-        " https://example.com;"
-    ]
-    sanitization_tests = {origin: sanitize_origin_for_header(origin) for origin in test_origins}
-    
-    # Add a memory log for CORS fix verification
-    try:
-        from app.api.memory import add_memory_entry
-        import asyncio
-        asyncio.create_task(add_memory_entry(
-            "CORS Fix Complete", 
-            f"CORS origin matching fixed using strict equality. Frontend origin: {request_origin}",
-            "system"
-        ))
-        cors_memory_added = True
-    except Exception as e:
-        cors_memory_added = False
-        logger.error(f"Failed to add CORS fix memory: {str(e)}")
-    
-    return {
-        "allowed_origins": allowed_origins,
-        "normalized_origins": normalized_origins,
-        "allow_credentials": cors_allow_credentials,
-        "origins_count": len(allowed_origins),
-        "raw_env_value": raw_env,
-        "raw_env_length": len(raw_env),
-        "deduplication_active": True,
-        "normalization_active": True,
-        "sanitization_active": True,
-        "custom_middleware_active": True,
-        "request_info": {
-            "raw_origin": request_origin,
-            "normalized_origin": normalized_request_origin,
-            "sanitized_origin": sanitized_request_origin,
-            "match_result": "✅ Allowed" if origin_match else "❌ Not allowed",
-            "matched_with": matched_with
-        },
-        "comparison_results": comparison_results,
-        "response_headers": response_headers,
-        "middleware_config": {
-            "allow_origins": "List with {} origins".format(len(allowed_origins)),
-            "allow_credentials": cors_allow_credentials,
-            "allow_methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
-            "allow_headers": "*"
-        },
-        "sanitization_tests": sanitization_tests,
-        "debug_info": {
-            "is_list_type": str(type(allowed_origins)),
-            "first_origin": allowed_origins[0] if allowed_origins else None,
-            "has_duplicates": len(allowed_origins) != len(set(allowed_origins)),
-            "using_regex_matching": False,
-            "using_strict_equality": True,
-            "using_custom_middleware": True,
-            "using_header_sanitization": True,
-            "cors_memory_added": cors_memory_added
-        }
-    }
+# Include routers
+app.include_router(auth_router)  # Add the auth router
+app.include_router(agent_router)
+app.include_router(memory_router)
+app.include_router(goals_router)
+app.include_router(memory_viewer_router)
+app.include_router(control_router)
+app.include_router(logs_router)
+app.include_router(delegate_router)
+app.include_router(hal_debug_router)
+app.include_router(debug_router)
+app.include_router(performance_router)
+app.include_router(streaming_router)
+app.include_router(system_routes)
+app.include_router(system_router)
 
-# Mount routers
-app.include_router(agent_router, prefix="/agent", tags=["Agents"])
-app.include_router(agent_router, prefix="/api/agent", tags=["API Agents"])
-app.include_router(memory_router, prefix="/memory", tags=["Memory"])
-app.include_router(goals_router, prefix="/api", tags=["Goals"])
-app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
-app.include_router(control_router, prefix="/api", tags=["Control"])
-app.include_router(logs_router, prefix="/api", tags=["Logs"])
-app.include_router(system_routes, prefix="/api", tags=["System"])  # System routes including CORS debug
-app.include_router(delegate_router, prefix="/api", tags=["HAL"])  # ✅ HAL ROUTE MOUNTED
-app.include_router(hal_debug_router, prefix="/api", tags=["Diagnostics"])  # Diagnostic router for debugging routes
-app.include_router(debug_router, prefix="/api", tags=["Debug"])  # Additional debug routes for comprehensive diagnostics
-app.include_router(performance_router, prefix="/api", tags=["Performance"])  # Performance monitoring router
-app.include_router(streaming_router, prefix="/api", tags=["Streaming"])  # Streaming response router
+# Mount static files
+app.mount("/static", StaticFiles(directory="public"), name="static")
 
-# Swagger docs route
-@app.get("/api/docs", include_in_schema=False)
-def overridden_swagger_docs():
-    return get_swagger_ui_html(openapi_url="/openapi.json", title="Agent API Docs")
+# Serve frontend
+@app.get("/", include_in_schema=False)
+async def serve_frontend():
+    with open("index.html", "r") as f:
+        html_content = f.read()
+    return Response(content=html_content, media_type="text/html")
 
-# Debug route
-@app.post("/api/agent/delegate-debug")
-async def delegate_debug(request: Request):
-    body = await request.json()
-    logger.info(f"🧠 Debug body received: {body}")
-    return {"status": "success", "message": "Debug delegate endpoint response", "task_id": "debug-task-123"}
+# Serve Swagger UI with custom CSS
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=app.title + " - API Documentation",
+        swagger_js_url="/static/swagger-ui-bundle.js",
+        swagger_css_url="/static/swagger-ui.css",
+    )
 
-# Debug route for API testing
-@app.get("/api/test")
-def test():
-    """
-    Simple diagnostic endpoint to verify backend deployment.
-    """
-    return {"status": "backend live", "timestamp": str(datetime.datetime.now())}
-
-# Health check
-@app.get("/health", tags=["Health"])
+# Health check endpoint
+@app.get("/health", include_in_schema=False)
 async def health_check():
-    return Response(content="OK", media_type="text/plain")
-
-# Frontend fallback
-frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend/dist")
-if os.path.exists(frontend_dir):
-    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
-
-@app.get("/")
-async def root():
-    return {
-        "message": "Welcome to the Enhanced AI Agent System",
-        "docs": "/api/docs",
-        "agents": [
-            "/agent/builder",
-            "/agent/ops",
-            "/agent/research",
-            "/agent/memory"
-        ],
-        "memory": "/memory",
-        "models": "/system/models",
-        "ui": {
-            "goals": "/api/goals",
-            "task_state": "/api/task-state",
-            "memory": "/api/memory",
-            "control_mode": "/api/system/control-mode",
-            "agent_status": "/api/agent/status",
-            "logs": "/api/logs/latest"
-        }
-    }
+    return {"status": "healthy", "timestamp": datetime.datetime.now().isoformat()}
