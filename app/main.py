@@ -78,14 +78,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Direct route for delegate-test to ensure it's registered before any middleware
-@app.post("/api/agent/delegate-test")
-async def delegate_test(request: Request):
+# Direct route with unique name to avoid potential Vercel routing conflicts
+@app.post("/api/_test_delegate_hook")
+async def delegate_test_unique(request: Request):
     """
-    Simple test endpoint that returns a JSON response to verify route registration.
+    Simple test endpoint with unique name to avoid potential Vercel routing conflicts.
+    Returns a JSON response to verify route registration.
     """
-    print("✅ /api/agent/delegate-test hit")  # Explicit print for debugging
-    logger.info(f"🔄 Direct delegate-test route executed from {inspect.currentframe().f_code.co_filename}")
+    print("✅ /api/_test_delegate_hook hit")  # Explicit print for debugging
+    logger.info(f"🔄 Direct delegate test route with unique name executed from {inspect.currentframe().f_code.co_filename}")
     
     # Return simple JSON response to verify route is working
     return {"message": "Route works"}
