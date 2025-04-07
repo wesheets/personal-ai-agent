@@ -118,6 +118,9 @@ async def log_all_routes():
     
     # Log CORS configuration on startup
     logger.info(f"🔒 CORS Configuration Loaded:")
+    import os
+    
+    raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
     logger.info(f"🔒 CORS_ALLOWED_ORIGINS raw: {raw_origins}")
     logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
     logger.info(f"🔒 Allowed Origins Count: {len(allowed_origins)}")
