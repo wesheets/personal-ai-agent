@@ -15,8 +15,10 @@ import {
   Alert,
   AlertIcon,
   AlertDescription,
+  Spinner,
 } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 /**
  * LoginPage - Public login page that is always accessible
@@ -34,6 +36,7 @@ const LoginPage = ({ isRegister = false }) => {
   const [nameError, setNameError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const { login, register, isAuthenticated, loading } = useAuth();
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const boxBgColor = useColorModeValue('white', 'gray.700');
@@ -43,14 +46,13 @@ const LoginPage = ({ isRegister = false }) => {
   // Check for redirect path on component mount
   useEffect(() => {
     // If user is already authenticated, redirect to dashboard or saved redirect path
-    const token = localStorage.getItem('token');
-    if (token) {
+    if (isAuthenticated && !loading) {
       const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/dashboard';
       navigate(redirectPath, { replace: true });
       // Clear the stored redirect path
       sessionStorage.removeItem('redirectAfterLogin');
     }
-  }, [navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   const validateForm = () => {
     let isValid = true;
@@ -93,40 +95,34 @@ const LoginPage = ({ isRegister = false }) => {
     setError('');
 
     try {
-      // In production, this would call the actual login/register endpoint
-      // const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
-      // const body = isRegister ? { email, password, name } : { email, password };
-      // const response = await fetch(endpoint, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(body),
-      // });
+      if (isRegister) {
+        await register(email, password, name);
+      } else {
+        await login(email, password);
+      }
       
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   throw new Error(errorData.message || 'Authentication failed');
-      // }
-      
-      // const data = await response.json();
-      // localStorage.setItem('token', data.token);
-      
-      // Simulate successful authentication for demo
-      localStorage.setItem('token', 'mock-jwt-token');
-      
-      // Get redirect path or default to dashboard
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/dashboard';
-      
-      // Clear the stored redirect path
-      sessionStorage.removeItem('redirectAfterLogin');
-      
-      // Redirect to the appropriate page
-      navigate(redirectPath, { replace: true });
+      // Note: Navigation is handled in the auth context after successful login/register
     } catch (err) {
       setError(err.message || 'Authentication failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show loading spinner while auth state is being determined
+  if (loading) {
+    return (
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minH="100vh"
+        bg={bgColor}
+      >
+        <Spinner size="xl" color="blue.500" />
+      </Box>
+    );
+  }
 
   return (
     <Box minH="100vh" bg={bgColor} color={textColor} py={10}>

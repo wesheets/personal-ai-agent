@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 /**
  * AuthGuard - Component to protect routes that require authentication
@@ -12,37 +13,15 @@ import { Navigate, useLocation } from 'react-router-dom';
  */
 const AuthGuard = ({ children }) => {
   const location = useLocation();
+  const { isAuthenticated, loading } = useAuth();
   
-  // Check if token exists
-  const token = localStorage.getItem('token');
+  // If auth is still loading, show nothing or a loader
+  if (loading) {
+    return null;
+  }
   
-  // Function to check if token is expired
-  const isTokenExpired = (token) => {
-    if (!token) return true;
-    
-    try {
-      // For JWT tokens, we would normally decode and check expiration
-      // This is a simplified version for demonstration
-      
-      // In a real implementation, we would do:
-      // const decoded = jwt_decode(token);
-      // return decoded.exp < Date.now() / 1000;
-      
-      // For demo purposes, we'll just check if token exists
-      return false;
-    } catch (error) {
-      console.error('Error checking token expiration:', error);
-      return true;
-    }
-  };
-  
-  // If no token or token is expired, redirect to login
-  if (!token || isTokenExpired(token)) {
-    // Clear any existing token if it's expired
-    if (token && isTokenExpired(token)) {
-      localStorage.removeItem('token');
-    }
-    
+  // If not authenticated, redirect to login
+  if (!isAuthenticated) {
     // Store the current location to redirect back after login
     // This enables "return to previous page" functionality
     const currentPath = location.pathname + location.search + location.hash;
