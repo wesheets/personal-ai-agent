@@ -8,6 +8,10 @@ import inspect
 import re
 import datetime
 from dotenv import load_dotenv
+from fastapi.responses import StreamingResponse
+import json
+import asyncio
+import time
 from app.core.middleware.cors import CustomCORSMiddleware, normalize_origin, sanitize_origin_for_header
 
 from app.api.agent import router as agent_router
@@ -16,11 +20,11 @@ from app.api.goals import goals_router
 from app.api.memory_viewer import memory_router as memory_viewer_router
 from app.api.control import control_router
 from app.api.logs import logs_router
-from app.api.delegate_route import router as delegate_router  # ✅ HAL ROUTER
+from app.api.delegate_route import router as delegate_router, AGENT_PERSONALITIES  # ✅ HAL ROUTER
 from app.diagnostics.hal_route_debug import router as hal_debug_router
 from app.api.debug_routes import router as debug_router  # Debug routes for diagnostics
 from app.api.performance_monitoring import router as performance_router  # Performance monitoring
-from app.api.streaming_route import router as streaming_router  # Streaming response router
+from app.api.streaming_route import router as streaming_router, stream_response  # Streaming response router
 from app.api.system_routes import router as system_routes  # System routes including CORS debug
 from app.middleware.size_limiter import limit_request_body_size  # Request body size limiter
 from app.health import health_router  # Health check endpoint for Railway deployment
@@ -382,21 +386,25 @@ async def get_cors_config(request: Request):
         }
     }
 
-# Mount routers
-app.include_router(agent_router, prefix="/agent", tags=["Agents"])
-app.include_router(agent_router, prefix="/api/agent", tags=["API Agents"])
-app.include_router(memory_router, prefix="/memory", tags=["Memory"])
-app.include_router(goals_router, prefix="/api", tags=["Goals"])
-app.include_router(memory_viewer_router, prefix="/api", tags=["Memory Viewer"])
-app.include_router(control_router, prefix="/api", tags=["Control"])
-app.include_router(logs_router, prefix="/api", tags=["Logs"])
-app.include_router(system_routes, prefix="/api", tags=["System"])  # System routes including CORS debug
-app.include_router(delegate_router, prefix="/api", tags=["HAL"])  # ✅ HAL ROUTE MOUNTED
-app.include_router(hal_debug_router, prefix="/api", tags=["Diagnostics"])  # Diagnostic router for debugging routes
-app.include_router(debug_router, prefix="/api", tags=["Debug"])  # Additional debug routes for comprehensive diagnostics
-app.include_router(performance_router, prefix="/api", tags=["Performance"])  # Performance monitoring router
-app.include_router(streaming_router, prefix="/api", tags=["Streaming"])  # Streaming response router
-app.include_router(health_router, tags=["Health"])  # Health check endpoint for Railway deployment
+# Direct route for delegate-stream to bypass any router mounting issues
+@app.post("/api/delegate-stream")
+async def direct_delegate_stream(request: Request):
+    """
+    Direct implementation of delegate-stream endpoint to bypass router mounting issues.
+    This endpoint streams the response back to the client.
+    """
+    logger.info(f"🔄 Direct delegate-stream route executed from {inspect.currentframe().f_code.co_filename}")
+    
+    # Return streaming response with enhanced headers
+    return StreamingResponse(
+        stream_response(request),
+        media_type="application/x-ndjson",
+        headers={
+            "X-Streaming-Mode": "enabled",
+            "X-Agent-Version": "1.0.0",
+            "Cache-Control": "no-cache"
+        }
+    )
 
 # Swagger docs route
 @app.get("/api/docs", include_in_schema=False)
