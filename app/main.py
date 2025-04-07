@@ -53,8 +53,8 @@ normalized_origins = []
 seen_origins = set()
 for origin in raw_origins.split(","):
     origin = origin.strip()
-    # Sanitize origin to remove any trailing semicolons
-    origin = sanitize_origin_for_header(origin)
+    # Sanitize origin to remove any trailing semicolons or other invalid characters
+    origin = origin.replace(";", "").replace(",", "").strip()
     if origin:
         normalized = normalize_origin(origin)
         if normalized and normalized not in seen_origins:
@@ -74,14 +74,23 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Direct healthcheck endpoint for Railway deployment
+# Direct healthcheck endpoints for Railway deployment
 @app.get("/health")
 async def health():
     """
     Simple health check endpoint that returns a 200 OK response.
     Used by Railway to verify the application is running properly.
     """
-    logger.info("Health check endpoint accessed")
+    logger.info("Health check endpoint accessed at /health")
+    return {"status": "ok"}
+
+@app.get("/")
+async def root_health():
+    """
+    Root-level health check endpoint that returns a 200 OK response.
+    Some platforms expect the healthcheck at the root level.
+    """
+    logger.info("Health check endpoint accessed at root level")
     return {"status": "ok"}
 
 # Route logger for debugging
