@@ -74,6 +74,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Direct healthcheck endpoint for Railway deployment
+@app.get("/health")
+async def health():
+    """
+    Simple health check endpoint that returns a 200 OK response.
+    Used by Railway to verify the application is running properly.
+    """
+    logger.info("Health check endpoint accessed")
+    return {"status": "ok"}
+
 # Route logger for debugging
 @app.on_event("startup")
 async def log_all_routes():
@@ -369,84 +379,14 @@ app.include_router(health_router, tags=["Health"])  # Health check endpoint for 
 # Swagger docs route
 @app.get("/api/docs", include_in_schema=False)
 def overridden_swagger_docs():
-    return get_swagger_ui_html(openapi_url="/openapi.json", title="Agent API Docs")
+    return get_swagger_ui_html(
+        openapi_url="/openapi.json",
+        title="Enhanced AI Agent API",
+        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
+        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
+    )
 
-# Debug route
-@app.post("/api/agent/delegate-debug")
-async def delegate_debug(request: Request):
-    body = await request.json()
-    logger.info(f"🧠 Debug body received: {body}")
-    return {"status": "success", "message": "Debug delegate endpoint response", "task_id": "debug-task-123"}
-
-# Temporary handler for delegate-stream endpoint to fix 405 Method Not Allowed error
-@app.post("/api/delegate-stream")
-async def delegate_stream_handler(request: Request):
-    """
-    Temporary handler for the /api/delegate-stream endpoint to fix 405 Method Not Allowed error.
-    This endpoint logs the request body and returns a mock JSON response.
-    """
-    try:
-        body = await request.json()
-        logger.info(f"🔄 Delegate stream request received: {body}")
-        
-        # Return a streaming response with mock data
-        return StreamingResponse(
-            stream_response(request),
-            media_type="application/x-ndjson",
-            headers={
-                "X-Streaming-Mode": "enabled",
-                "X-Agent-Version": "1.0.0",
-                "Cache-Control": "no-cache"
-            }
-        )
-    except Exception as e:
-        logger.error(f"❌ Error in delegate-stream handler: {str(e)}")
-        return JSONResponse(
-            status_code=500,
-            content={
-                "status": "error",
-                "message": "Error processing delegate-stream request",
-                "error": str(e)
-            }
-        )
-
-# Debug route for API testing
-@app.get("/api/test")
-def test():
-    """
-    Simple diagnostic endpoint to verify backend deployment.
-    """
-    return {"status": "backend live", "timestamp": str(datetime.datetime.now())}
-
-# Health check
-@app.get("/health", tags=["Health"])
-async def health_check():
-    return Response(content="OK", media_type="text/plain")
-
-# Frontend fallback
-frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend/dist")
-if os.path.exists(frontend_dir):
-    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
-
-@app.get("/")
-async def root():
-    return {
-        "message": "Welcome to the Enhanced AI Agent System",
-        "docs": "/api/docs",
-        "agents": [
-            "/agent/builder",
-            "/agent/ops",
-            "/agent/research",
-            "/agent/memory"
-        ],
-        "memory": "/memory",
-        "models": "/system/models",
-        "ui": {
-            "goals": "/api/goals",
-            "task_state": "/api/task-state",
-            "memory": "/api/memory",
-            "control_mode": "/api/system/control-mode",
-            "agent_status": "/api/agent/status",
-            "logs": "/api/logs/latest"
-        }
-    }
+# Root route
+@app.get("/", include_in_schema=False)
+def root():
+    return {"message": "API is running. Use /api/docs for API documentation."}
