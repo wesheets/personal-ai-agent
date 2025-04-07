@@ -61,18 +61,26 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Direct route with unique name to avoid potential Vercel routing conflicts
-@app.post("/api/_test_delegate_hook")
-async def delegate_test_unique(request: Request):
+# Direct route for delegate-stream
+@app.post("/api/delegate-stream")
+async def delegate_stream(request: Request):
     """
-    Simple test endpoint with unique name to avoid potential Vercel routing conflicts.
-    Returns a JSON response to verify route registration.
+    Direct implementation of delegate-stream endpoint.
+    This endpoint streams the response back to the client.
     """
-    print("✅ /api/_test_delegate_hook hit")  # Explicit print for debugging
-    logger.info(f"🔄 Direct delegate test route with unique name executed from {inspect.currentframe().f_code.co_filename}")
+    print("✅ /api/delegate-stream hit")  # Explicit print for debugging
+    logger.info(f"🔄 Direct delegate-stream route executed from {inspect.currentframe().f_code.co_filename}")
     
-    # Return simple JSON response to verify route is working
-    return {"message": "Route works"}
+    # Return streaming response with enhanced headers
+    return StreamingResponse(
+        stream_response(request),
+        media_type="application/x-ndjson",
+        headers={
+            "X-Streaming-Mode": "enabled",
+            "X-Agent-Version": "1.0.0",
+            "Cache-Control": "no-cache"
+        }
+    )
 
 # Direct healthcheck endpoints for Railway deployment
 @app.get("/health")
@@ -132,16 +140,10 @@ async def log_all_routes():
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
 
-# Add temporary debug middleware to print the request origin
-@app.middleware("http")
-async def log_origin(request: Request, call_next):
-    print(f"🔍 ORIGIN HEADER: {request.headers.get('origin')}")
-    return await call_next(request)
-
-# Temporarily override the CORS middleware with wildcard to validate frontend connectivity
+# Production CORS middleware with regex pattern to allow only Vercel deploys and Promethios domain
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TEMP UNLOCK for live frontend testing
+    allow_origin_regex=r"https://(.*\.vercel\.app|promethios\.ai)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
