@@ -126,7 +126,7 @@ const ApiService = {
       };
 
       // Use fetch API for streaming support
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/agent/delegate-test`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/_test_delegate_hook`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
