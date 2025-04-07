@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Flex, useColorMode } from '@chakra-ui/react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ColorModeToggle from './components/ColorModeToggle';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
@@ -15,98 +15,183 @@ import ErrorBoundary from './components/ErrorBoundary';
 import StatusOverlay from './components/StatusOverlay';
 import { StatusProvider } from './context/StatusContext';
 import { SettingsProvider } from './context/SettingsContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import AuthSwitcher from './components/auth/AuthSwitcher';
 import './styles/animations.css';
 
-function App() {
+// Protected route component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <Box p={5}>Loading...</Box>;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  return children;
+};
+
+// Auth layout without sidebar for login/register pages
+const AuthLayout = ({ children }) => {
   const { colorMode } = useColorMode();
   
   return (
-    <ErrorBoundary>
-      <SettingsProvider>
-        <StatusProvider>
-          <Router>
-            <Box minH="100vh" bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}>
-              <Flex direction="column" h="100vh">
-                {/* Top navigation area with color mode toggle */}
-                <Flex 
-                  as="header" 
-                  position="fixed" 
-                  w="full" 
-                  zIndex="1000"
-                  bg={colorMode === 'light' ? 'white' : 'gray.800'}
-                  boxShadow="sm"
-                  justifyContent="flex-end"
-                  p={2}
-                >
-                  <ColorModeToggle />
-                </Flex>
-                
-                {/* Sidebar navigation */}
-                <Sidebar />
-                
-                {/* Main content area */}
-                <Box ml={{ base: 0, md: '60' }} p="4" pt="20">
-                  <Routes>
-                    <Route path="/" element={
-                      <ErrorBoundary>
-                        <Dashboard />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/builder" element={
-                      <ErrorBoundary>
-                        <BuilderAgent />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/ops" element={
-                      <ErrorBoundary>
-                        <OpsAgent />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/research" element={
-                      <ErrorBoundary>
-                        <ResearchAgent />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/memory" element={
-                      <ErrorBoundary>
-                        <MemoryAgentView />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/memory-browser" element={
-                      <ErrorBoundary>
-                        <MemoryBrowser />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/activity" element={
-                      <ErrorBoundary>
-                        <MainActivityFeed />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/agent-activity" element={
-                      <ErrorBoundary>
-                        <AgentActivityPage />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/settings" element={
-                      <ErrorBoundary>
-                        <SettingsPage />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/agents" element={
-                      <ErrorBoundary>
-                        <AgentListPage />
-                      </ErrorBoundary>
-                    } />
-                  </Routes>
-                </Box>
-              </Flex>
-            </Box>
+    <Box minH="100vh" bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}>
+      <Flex direction="column" h="100vh" justifyContent="center" alignItems="center">
+        {children}
+      </Flex>
+    </Box>
+  );
+};
+
+// Main application with routing
+function AppRoutes() {
+  const { colorMode } = useColorMode();
+  const { user, isAuthenticated } = useAuth();
+  
+  return (
+    <Box minH="100vh" bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}>
+      <Flex direction="column" h="100vh">
+        {/* Top navigation area with color mode toggle and auth switcher */}
+        <Flex 
+          as="header" 
+          position="fixed" 
+          w="full" 
+          zIndex="1000"
+          bg={colorMode === 'light' ? 'white' : 'gray.800'}
+          boxShadow="sm"
+          justifyContent="space-between"
+          alignItems="center"
+          p={2}
+        >
+          <Box></Box> {/* Empty box for flex spacing */}
+          <Flex alignItems="center" gap={4}>
+            <AuthSwitcher user={user} isAuthenticated={isAuthenticated} />
+            <ColorModeToggle />
+          </Flex>
+        </Flex>
+        
+        {/* Sidebar navigation - only shown when authenticated */}
+        {isAuthenticated && <Sidebar />}
+        
+        {/* Main content area */}
+        <Box 
+          ml={{ base: 0, md: isAuthenticated ? '60' : 0 }} 
+          p="4" 
+          pt="20"
+          width="full"
+        >
+          <Routes>
+            {/* Auth routes */}
+            <Route path="/login" element={
+              <AuthLayout>
+                <LoginPage />
+              </AuthLayout>
+            } />
+            <Route path="/register" element={
+              <AuthLayout>
+                <RegisterPage />
+              </AuthLayout>
+            } />
             
-            {/* Global StatusOverlay - now accessible from anywhere in the app */}
-            <StatusOverlay />
-          </Router>
-        </StatusProvider>
-      </SettingsProvider>
+            {/* Protected routes */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <Dashboard />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/builder" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <BuilderAgent />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/ops" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <OpsAgent />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/research" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <ResearchAgent />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/memory" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <MemoryAgentView />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/memory-browser" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <MemoryBrowser />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/activity" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <MainActivityFeed />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/agent-activity" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <AgentActivityPage />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <SettingsPage />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+            <Route path="/agents" element={
+              <ProtectedRoute>
+                <ErrorBoundary>
+                  <AgentListPage />
+                </ErrorBoundary>
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </Box>
+      </Flex>
+      
+      {/* Global StatusOverlay - now accessible from anywhere in the app */}
+      <StatusOverlay />
+    </Box>
+  );
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <Router>
+        <SettingsProvider>
+          <StatusProvider>
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
+          </StatusProvider>
+        </SettingsProvider>
+      </Router>
     </ErrorBoundary>
   );
 }
