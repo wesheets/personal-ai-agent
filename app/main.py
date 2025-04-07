@@ -48,25 +48,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("api")
 
-# CORS configuration
-raw_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,https://personal-ai-agent-frontend.vercel.app,https://personal-ai-agent.vercel.app,https://personal-ai-agent-h49q98819-ted-sheets-projects.vercel.app,https://personal-ai-agent-dkmvk5af-ted-sheets-projects.vercel.app,https://personal-ai-agent-git-manus-ui-restore-ted-sheets-projects.vercel.app,https://personal-ai-agent-6knmyj63f-ted-sheets-projects.vercel.app,https://studio.manus.im")
-
-# Clean, normalize, and deduplicate origins
-allowed_origins = []
-normalized_origins = []
-seen_origins = set()
-for origin in raw_origins.split(","):
-    origin = origin.strip()
-    # Sanitize origin to remove any trailing semicolons or other invalid characters
-    origin = origin.replace(";", "").replace(",", "").strip()
-    if origin:
-        normalized = normalize_origin(origin)
-        if normalized and normalized not in seen_origins:
-            allowed_origins.append(origin)  # Keep original format for CORS middleware
-            normalized_origins.append(normalized)  # Store normalized version for comparison
-            seen_origins.add(normalized)
-
-cors_allow_credentials = os.environ.get("CORS_ALLOW_CREDENTIALS", "true").lower() == "true"
+# CORS configuration - Using regex to allow all Vercel preview branches and production domain
+# Note: Previous environment variable based configuration has been replaced with regex pattern
 
 # Enable CORS debug mode if specified in environment
 os.environ["CORS_DEBUG"] = os.environ.get("CORS_DEBUG", "false")
@@ -146,13 +129,14 @@ async def log_all_routes():
         logger.info(f"🔒 Origin {idx+1}: {orig} (normalized: {norm}, sanitized: {sanitized})")
 
 # Add custom CORS middleware from the extracted module
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
-    CustomCORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
+    CORSMiddleware,
+    allow_origin_regex=r"https://(.*\.vercel\.app|promethios\.ai)",  # ✅ match both preview + prod
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=cors_allow_credentials,
-    max_age=86400,
 )
 
 # Request body size limiter middleware
