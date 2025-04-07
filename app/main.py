@@ -130,10 +130,18 @@ async def log_all_routes():
 
 # Add custom CORS middleware from the extracted module
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Request
 
+# Add temporary debug middleware to print the request origin
+@app.middleware("http")
+async def log_origin(request: Request, call_next):
+    print(f"🔍 ORIGIN HEADER: {request.headers.get('origin')}")
+    return await call_next(request)
+
+# Temporarily override the CORS middleware with wildcard to validate frontend connectivity
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://(.*\.vercel\.app|promethios\.ai)",  # ✅ match both preview + prod
+    allow_origins=["*"],  # TEMP UNLOCK for live frontend testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
