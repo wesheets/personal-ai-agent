@@ -33,6 +33,14 @@ apiClient.interceptors.response.use(
   }
 );
 
+// Placeholder for controlService that's imported in agentUtils.js
+export const controlService = {
+  getAgentStatus: () => {
+    console.warn("controlService.getAgentStatus is not implemented yet");
+    return Promise.resolve({ agents: [] });
+  }
+};
+
 // API service functions with null-safe handling
 const ApiService = {
   // Agent delegation (legacy non-streaming version)
