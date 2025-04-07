@@ -13,7 +13,7 @@ import logging
 from typing import List, Dict, Any, Optional, Tuple, Union
 import openai
 from openai import OpenAI
-from openai.types.error import APIError, RateLimitError
+from openai.error import APIError, RateLimitError
 
 # Configure logging
 logger = logging.getLogger("memory_failsafe")
