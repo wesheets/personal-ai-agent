@@ -78,6 +78,18 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Direct route for delegate-test to ensure it's registered before any middleware
+@app.post("/api/agent/delegate-test")
+async def delegate_test(request: Request):
+    """
+    Simple test endpoint that returns a JSON response to verify route registration.
+    """
+    print("✅ /api/agent/delegate-test hit")  # Explicit print for debugging
+    logger.info(f"🔄 Direct delegate-test route executed from {inspect.currentframe().f_code.co_filename}")
+    
+    # Return simple JSON response to verify route is working
+    return {"message": "Route works"}
+
 # Direct healthcheck endpoints for Railway deployment
 @app.get("/health")
 async def health():
