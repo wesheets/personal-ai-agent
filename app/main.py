@@ -125,13 +125,8 @@ async def log_all_routes():
     
     cors_allow_credentials = os.getenv("CORS_ALLOW_CREDENTIALS", "true")
     logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
-    logger.info(f"🔒 Allowed Origins Count: {len(allowed_origins)}")
-    logger.info(f"✅ Using custom CORS middleware with normalized origin matching")
-    logger.info(f"✅ Allowed origins: {allowed_origins}")
-    logger.info(f"✅ Normalized origins for comparison: {normalized_origins}")
-    for idx, (orig, norm) in enumerate(zip(allowed_origins, normalized_origins)):
-        sanitized = sanitize_origin_for_header(orig)
-        logger.info(f"🔒 Origin {idx+1}: {orig} (normalized: {norm}, sanitized: {sanitized})")
+    # Removed legacy allowed_origins references to fix startup issues
+    logger.info(f"✅ Using CORSMiddleware with allow_origin_regex")
 
 # Add custom CORS middleware from the extracted module
 from fastapi.middleware.cors import CORSMiddleware
