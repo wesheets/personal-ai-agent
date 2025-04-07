@@ -78,20 +78,20 @@ app = FastAPI(
 @app.get("/health")
 async def health():
     """
-    Simple health check endpoint that returns a 200 OK response.
+    Simple health check endpoint that returns a plain text "OK" response.
     Used by Railway to verify the application is running properly.
     """
     logger.info("Health check endpoint accessed at /health")
-    return {"status": "ok"}
+    return Response(content="OK", media_type="text/plain")
 
 @app.get("/")
 async def root_health():
     """
-    Root-level health check endpoint that returns a 200 OK response.
+    Root-level health check endpoint that returns a plain text "OK" response.
     Some platforms expect the healthcheck at the root level.
     """
     logger.info("Health check endpoint accessed at root level")
-    return {"status": "ok"}
+    return Response(content="OK", media_type="text/plain")
 
 # Route logger for debugging
 @app.on_event("startup")
@@ -394,8 +394,3 @@ def overridden_swagger_docs():
         swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
         swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
     )
-
-# Root route
-@app.get("/", include_in_schema=False)
-def root():
-    return {"message": "API is running. Use /api/docs for API documentation."}
