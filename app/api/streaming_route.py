@@ -183,7 +183,7 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
         yield json.dumps(error_data).encode() + b'\n'
         logger.error(f"🔥 Streaming error after {error_time:.4f}s: {str(e)}")
 
-@router.post("/delegate-stream")
+@router.post("/delegate-stream-old")  # Renamed to avoid conflict with direct route
 async def delegate_stream(request: Request):
     """
     Enhanced streaming version of the delegate endpoint.

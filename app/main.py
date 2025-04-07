@@ -387,13 +387,14 @@ async def get_cors_config(request: Request):
     }
 
 # Direct route for delegate-stream to bypass any router mounting issues
-@app.post("/api/delegate-stream")
+@app.post("/api/agent/delegate-test")
 async def direct_delegate_stream(request: Request):
     """
     Direct implementation of delegate-stream endpoint to bypass router mounting issues.
     This endpoint streams the response back to the client.
     """
-    logger.info(f"🔄 Direct delegate-stream route executed from {inspect.currentframe().f_code.co_filename}")
+    print("✅ /api/agent/delegate-test hit")  # Explicit print for debugging
+    logger.info(f"🔄 Direct delegate-test route executed from {inspect.currentframe().f_code.co_filename}")
     
     # Return streaming response with enhanced headers
     return StreamingResponse(
