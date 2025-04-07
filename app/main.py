@@ -23,6 +23,7 @@ from app.api.performance_monitoring import router as performance_router  # Perfo
 from app.api.streaming_route import router as streaming_router  # Streaming response router
 from app.api.system_routes import router as system_routes  # System routes including CORS debug
 from app.middleware.size_limiter import limit_request_body_size  # Request body size limiter
+from app.health import health_router  # Health check endpoint for Railway deployment
 
 from app.providers import initialize_model_providers, get_available_models
 from app.core.seeding import get_seeding_manager
@@ -363,6 +364,7 @@ app.include_router(hal_debug_router, prefix="/api", tags=["Diagnostics"])  # Dia
 app.include_router(debug_router, prefix="/api", tags=["Debug"])  # Additional debug routes for comprehensive diagnostics
 app.include_router(performance_router, prefix="/api", tags=["Performance"])  # Performance monitoring router
 app.include_router(streaming_router, prefix="/api", tags=["Streaming"])  # Streaming response router
+app.include_router(health_router, tags=["Health"])  # Health check endpoint for Railway deployment
 
 # Swagger docs route
 @app.get("/api/docs", include_in_schema=False)
