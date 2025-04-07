@@ -304,6 +304,74 @@ const ChatContent = ({ agentId }) => {
 const AgentDetailContent = ({ agentId }) => {
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const navigate = useNavigate();
+  const [agentData, setAgentData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Fetch agent data
+  useEffect(() => {
+    const fetchAgentData = async () => {
+      setIsLoading(true);
+      try {
+        // This would be replaced with an actual API call in production
+        // Simulating API delay
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Get agent details
+        const details = getAgentDetails(agentId);
+        setAgentData(details);
+      } catch (error) {
+        console.error('Error fetching agent details:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    if (agentId) {
+      fetchAgentData();
+    }
+  }, [agentId]);
+  
+  // Render loading state
+  if (isLoading) {
+    return (
+      <Box textAlign="center" py={10}>
+        <VStack spacing={4}>
+          <Spinner size="xl" color="blue.500" thickness="4px" />
+          <Text>Loading agent details...</Text>
+        </VStack>
+      </Box>
+    );
+  }
+  
+  // Render error state if no agent data
+  if (!agentData) {
+    return (
+      <Box textAlign="center" py={10} px={6}>
+        <Box
+          display="inline-block"
+          bg="red.500"
+          rounded="full"
+          color="white"
+          p={3}
+          mb={4}
+        >
+          !
+        </Box>
+        <Heading as="h2" size="lg" mb={2}>
+          Agent Not Found
+        </Heading>
+        <Text mb={6}>
+          We couldn't find details for this agent. Please select a valid agent.
+        </Text>
+        <Button
+          colorScheme="blue"
+          onClick={() => navigate('/dashboard')}
+        >
+          Return to Dashboard
+        </Button>
+      </Box>
+    );
+  }
   
   // Determine agent details based on agentId
   const getAgentDetails = (id) => {

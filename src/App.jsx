@@ -18,6 +18,8 @@ import StatusOverlay from './components/StatusOverlay';
 import { StatusProvider } from './context/StatusContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { useAuth } from './context/AuthContext';
+import UIv2Shell from './pages/UIv2Shell';
+import AgentChatPanel from './components/AgentChatPanel';
 import './styles/animations.css';
 
 // Layout component for authenticated routes
@@ -189,6 +191,28 @@ function App() {
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <AgentListPage />
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              </AuthGuard>
+            } />
+            
+            {/* Agent chat routes */}
+            <Route path="/chat/:agentId" element={
+              <AuthGuard>
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <AgentChatPanel />
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              </AuthGuard>
+            } />
+            
+            {/* Agent detail routes */}
+            <Route path="/agent/:agentId" element={
+              <AuthGuard>
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <UIv2Shell activePage="agent" />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
               </AuthGuard>

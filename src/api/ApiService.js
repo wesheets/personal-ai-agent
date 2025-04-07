@@ -33,6 +33,43 @@ apiClient.interceptors.response.use(
   }
 );
 
+// Agent control service implementation
+export const controlService = {
+  // Get agent status from API or return mock data if endpoint doesn't exist
+  getAgentStatus: async () => {
+    try {
+      // Attempt to call the actual API endpoint
+      const response = await apiClient.get('/agents/status');
+      return response.data;
+    } catch (error) {
+      console.warn("Using mock data for agent status - API endpoint may not exist yet");
+      // Return mock data if the API call fails
+      return {
+        agents: [
+          { id: 'hal9000', name: 'HAL 9000', icon: '🔴', status: 'ready', type: 'system' },
+          { id: 'ash-xenomorph', name: 'Ash', icon: '🧬', status: 'idle', type: 'persona' }
+        ]
+      };
+    }
+  },
+  
+  // Get control mode or return default if not implemented
+  getControlMode: async () => {
+    try {
+      // Attempt to call the actual API endpoint
+      const response = await apiClient.get('/agents/control-mode');
+      return response.data;
+    } catch (error) {
+      console.warn("Using default control mode - API endpoint may not exist yet");
+      // Return default control mode if the API call fails
+      return {
+        mode: 'standard',
+        permissions: ['chat', 'memory', 'files']
+      };
+    }
+  }
+};
+
 // API service functions with null-safe handling
 const ApiService = {
   // Agent delegation (legacy non-streaming version)

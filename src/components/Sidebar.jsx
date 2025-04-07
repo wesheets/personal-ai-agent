@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -8,13 +8,34 @@ import {
   HStack,
   useColorMode,
   Divider,
+  Spinner,
+  Badge,
 } from '@chakra-ui/react';
-import { FiMenu, FiHome, FiSettings, FiActivity, FiDatabase, FiList, FiCode, FiServer, FiSearch } from 'react-icons/fi';
+import { FiMenu, FiHome, FiSettings, FiActivity, FiDatabase, FiList, FiCode, FiServer, FiSearch, FiMessageCircle } from 'react-icons/fi';
 import { Link, useLocation } from 'react-router-dom';
+import { getVisibleAgents } from '../utils/agentUtils';
 
 const Sidebar = () => {
   const { colorMode } = useColorMode();
   const location = useLocation();
+  const [systemAgents, setSystemAgents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Fetch system agents
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const agents = await getVisibleAgents();
+        setSystemAgents(agents);
+      } catch (error) {
+        console.error('Error fetching agents:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAgents();
+  }, []);
   
   // Navigation items
   const navItems = [
@@ -73,6 +94,53 @@ const Sidebar = () => {
             </HStack>
           </Link>
         ))}
+        
+        {/* System Agents Section */}
+        <Box px={8} py={3} mt={2}>
+          <Flex align="center" mb={2}>
+            <Text fontSize="sm" fontWeight="medium" color={colorMode === 'light' ? 'gray.500' : 'gray.400'}>
+              SYSTEM AGENTS
+            </Text>
+            {isLoading && <Spinner size="xs" ml={2} color="blue.500" />}
+          </Flex>
+          
+          {systemAgents.map((agent) => (
+            <Link to={`/chat/${agent.id}`} key={agent.id}>
+              <HStack
+                py={2}
+                spacing={3}
+                bg={location.pathname === `/chat/${agent.id}` ? (colorMode === 'light' ? 'gray.100' : 'gray.700') : 'transparent'}
+                color={location.pathname === `/chat/${agent.id}` ? (colorMode === 'light' ? 'brand.600' : 'brand.300') : (colorMode === 'light' ? 'gray.600' : 'gray.300')}
+                _hover={{
+                  bg: colorMode === 'light' ? 'gray.100' : 'gray.700',
+                  color: colorMode === 'light' ? 'brand.600' : 'brand.300',
+                }}
+                transition="all 0.2s"
+                borderLeftWidth={location.pathname === `/chat/${agent.id}` ? '4px' : '0px'}
+                borderColor={location.pathname === `/chat/${agent.id}` ? (colorMode === 'light' ? 'brand.500' : 'brand.300') : 'transparent'}
+                pl={location.pathname === `/chat/${agent.id}` ? 3 : 4}
+              >
+                <Text fontSize="lg">{agent.icon || '🤖'}</Text>
+                <Text fontWeight={location.pathname === `/chat/${agent.id}` ? 'medium' : 'normal'} fontSize="sm">
+                  {agent.name}
+                </Text>
+                <Badge 
+                  size="sm" 
+                  colorScheme={agent.status === 'ready' ? 'green' : agent.status === 'idle' ? 'yellow' : 'gray'}
+                  ml="auto"
+                >
+                  {agent.status}
+                </Badge>
+              </HStack>
+            </Link>
+          ))}
+          
+          {!isLoading && systemAgents.length === 0 && (
+            <Text fontSize="sm" color="gray.500" py={2}>
+              No agents available
+            </Text>
+          )}
+        </Box>
       </VStack>
       
       <Divider my={4} />

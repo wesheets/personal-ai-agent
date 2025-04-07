@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Flex, VStack, Text, Input, Button, IconButton, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, VStack, Text, Input, Button, IconButton, useColorModeValue, Spinner, Center } from '@chakra-ui/react';
 import { FiSend, FiPaperclip } from 'react-icons/fi';
+import { useParams } from 'react-router-dom';
 import FileAttachmentHandler from './FileAttachmentHandler';
 import ActivityLogTray from './ActivityLogTray';
 import MemoryUserScoping from './MemoryUserScoping';
+import { controlService } from '../api/ApiService';
 
 /**
  * AgentChatPanel component
  * Handles chat interactions with streaming support
  */
-const AgentChatPanel = ({ agentId }) => {
+const AgentChatPanel = () => {
+  // Get agentId from URL params
+  const { agentId } = useParams();
+  const [agentData, setAgentData] = useState(null);
+  const [isAgentLoading, setIsAgentLoading] = useState(true);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -22,8 +28,64 @@ const AgentChatPanel = ({ agentId }) => {
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const bgColor = useColorModeValue('white', 'gray.800');
   
-  // Determine agent details based on agentId
+  // Fetch agent data from API
+  useEffect(() => {
+    const fetchAgentData = async () => {
+      setIsAgentLoading(true);
+      try {
+        const response = await controlService.getAgentStatus();
+        if (response && response.agents) {
+          const agent = response.agents.find(a => a.id === agentId);
+          if (agent) {
+            setAgentData(agent);
+          } else {
+            console.warn(`Agent with ID ${agentId} not found in API response`);
+            // Use fallback data if agent not found
+            setAgentData({
+              id: agentId,
+              name: getAgentNameFromId(agentId),
+              status: 'unknown',
+              type: 'system'
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching agent data:', error);
+      } finally {
+        setIsAgentLoading(false);
+      }
+    };
+    
+    if (agentId) {
+      fetchAgentData();
+    }
+  }, [agentId]);
+  
+  // Helper function to get agent name from ID
+  const getAgentNameFromId = (id) => {
+    switch(id) {
+      case 'hal9000':
+        return 'HAL 9000';
+      case 'ash-xenomorph':
+        return 'ASH';
+      default:
+        return 'Unknown Agent';
+    }
+  };
+  
+  // Determine agent details based on agentId or agentData
   const getAgentDetails = (id) => {
+    // If we have agent data from API, use that
+    if (agentData) {
+      const color = id === 'hal9000' ? 'blue' : id === 'ash-xenomorph' ? 'purple' : 'gray';
+      return { 
+        name: agentData.name?.split(' ')[0] || 'Agent', 
+        color: color, 
+        systemMessage: true 
+      };
+    }
+    
+    // Fallback to hardcoded values
     switch(id) {
       case 'hal9000':
         return { name: 'HAL', color: 'blue', systemMessage: true };
@@ -164,6 +226,47 @@ const AgentChatPanel = ({ agentId }) => {
     }, 1500);
   };
   
+  // Render loading state
+  if (isAgentLoading) {
+    return (
+      <Center h="calc(100vh - 140px)">
+        <VStack spacing={4}>
+          <Spinner size="xl" color="blue.500" thickness="4px" />
+          <Text>Loading agent interface...</Text>
+        </VStack>
+      </Center>
+    );
+  }
+
+  // Render error state if no agent data and not loading
+  if (!agentId) {
+    return (
+      <Center h="calc(100vh - 140px)">
+        <VStack spacing={4} maxW="md" textAlign="center" p={8} borderWidth="1px" borderRadius="lg" borderColor={borderColor} bg={bgColor}>
+          <Box
+            bg="red.500"
+            color="white"
+            borderRadius="full"
+            boxSize="60px"
+            fontSize="xl"
+            fontWeight="bold"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            mb={2}
+          >
+            !
+          </Box>
+          <Text fontWeight="bold" fontSize="xl">Agent Not Found</Text>
+          <Text>The requested agent could not be loaded. Please select a valid agent from the dashboard.</Text>
+          <Button colorScheme="blue" onClick={() => window.location.href = '/dashboard'}>
+            Return to Dashboard
+          </Button>
+        </VStack>
+      </Center>
+    );
+  }
+
   return (
     <VStack spacing={4} align="stretch" h="calc(100vh - 140px)">
       <Flex 
@@ -192,7 +295,7 @@ const AgentChatPanel = ({ agentId }) => {
           </Box>
           <Box>
             <Text fontWeight="bold">Chat with {agentDetails.name}</Text>
-            <Text fontSize="sm" opacity="0.8">System Agent</Text>
+            <Text fontSize="sm" opacity="0.8">{agentData?.type || 'System'} Agent</Text>
           </Box>
         </Flex>
         
