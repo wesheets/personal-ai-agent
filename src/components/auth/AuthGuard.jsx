@@ -1,6 +1,29 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
+
+// Helper for safely accessing browser APIs
+const isBrowser = typeof window !== 'undefined';
+
+// Safe sessionStorage functions
+const safeSessionStorage = {
+  getItem: (key) => {
+    if (isBrowser) {
+      return sessionStorage.getItem(key);
+    }
+    return null;
+  },
+  setItem: (key, value) => {
+    if (isBrowser) {
+      sessionStorage.setItem(key, value);
+    }
+  },
+  removeItem: (key) => {
+    if (isBrowser) {
+      sessionStorage.removeItem(key);
+    }
+  }
+};
 
 /**
  * AuthGuard - Component to protect routes that require authentication
@@ -24,9 +47,11 @@ const AuthGuard = ({ children }) => {
   if (!isAuthenticated) {
     // Store the current location to redirect back after login
     // This enables "return to previous page" functionality
-    const currentPath = location.pathname + location.search + location.hash;
-    if (currentPath !== '/login' && currentPath !== '/register') {
-      sessionStorage.setItem('redirectAfterLogin', currentPath);
+    if (isBrowser) {
+      const currentPath = location.pathname + location.search + location.hash;
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        safeSessionStorage.setItem('redirectAfterLogin', currentPath);
+      }
     }
     
     // Redirect to login page

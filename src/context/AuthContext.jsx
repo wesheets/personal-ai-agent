@@ -8,6 +8,29 @@ const AuthContext = createContext(null);
 // Custom hook to use the auth context
 export const useAuth = () => useContext(AuthContext);
 
+// Helper for safely accessing browser APIs
+const isBrowser = typeof window !== 'undefined';
+
+// Safe localStorage functions
+const safeLocalStorage = {
+  getItem: (key) => {
+    if (isBrowser) {
+      return localStorage.getItem(key);
+    }
+    return null;
+  },
+  setItem: (key, value) => {
+    if (isBrowser) {
+      localStorage.setItem(key, value);
+    }
+  },
+  removeItem: (key) => {
+    if (isBrowser) {
+      localStorage.removeItem(key);
+    }
+  }
+};
+
 // Provider component that wraps the app and makes auth object available to any child component that calls useAuth()
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -17,10 +40,16 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is authenticated on initial load
   useEffect(() => {
+    // Skip on server-side
+    if (!isBrowser) {
+      setLoading(false);
+      return;
+    }
+
     const checkUserAuthentication = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
+        const token = safeLocalStorage.getItem('token');
         
         if (token) {
           // Verify token and get user data
@@ -30,7 +59,7 @@ export const AuthProvider = ({ children }) => {
           } catch (err) {
             // If token is invalid or expired, clear it and redirect to login
             console.error('Authentication error:', err);
-            localStorage.removeItem('token');
+            safeLocalStorage.removeItem('token');
             setCurrentUser(null);
             navigate('/login');
           }
@@ -54,7 +83,7 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.login(email, password);
       
       // Store token in localStorage
-      localStorage.setItem('token', data.token);
+      safeLocalStorage.setItem('token', data.token);
       
       // Set current user
       setCurrentUser(data.user);
@@ -79,7 +108,7 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.register(email, password, name);
       
       // Store token in localStorage
-      localStorage.setItem('token', data.token);
+      safeLocalStorage.setItem('token', data.token);
       
       // Set current user
       setCurrentUser(data.user);
@@ -99,7 +128,7 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = () => {
     // Clear token from localStorage
-    localStorage.removeItem('token');
+    safeLocalStorage.removeItem('token');
     
     // Clear current user
     setCurrentUser(null);
@@ -110,7 +139,7 @@ export const AuthProvider = ({ children }) => {
 
   // Check if token is expired
   const isTokenExpired = () => {
-    const token = localStorage.getItem('token');
+    const token = safeLocalStorage.getItem('token');
     if (!token) return true;
     
     try {
