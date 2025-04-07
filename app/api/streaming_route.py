@@ -209,3 +209,23 @@ async def delegate_stream(request: Request):
             "Cache-Control": "no-cache"
         }
     )
+
+@router.post("/agent/delegate-test")  # Test route for frontend alignment
+async def direct_delegate_stream(request: Request):
+    """
+    Test route for frontend alignment.
+    This endpoint provides the same streaming functionality as the delegate-stream endpoint
+    but with a different route path for testing purposes.
+    """
+    logger.info(f"🔄 Test streaming delegate route executed from {inspect.currentframe().f_code.co_filename}")
+    
+    # Return streaming response with enhanced headers
+    return StreamingResponse(
+        stream_response(request),
+        media_type="application/x-ndjson",
+        headers={
+            "X-Streaming-Mode": "enabled",
+            "X-Agent-Version": "1.0.0",
+            "Cache-Control": "no-cache"
+        }
+    )
