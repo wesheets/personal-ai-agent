@@ -7,95 +7,63 @@ import {
   Fade,
   HStack,
   Icon,
-  Tooltip
+  Tooltip,
+  VStack,
+  Flex,
+  CloseButton,
+  Collapse,
+  Button,
+  Divider
 } from '@chakra-ui/react';
-import { FiCheckCircle, FiAlertTriangle, FiInfo } from 'react-icons/fi';
-import DEBUG_MODE from '../config/debug';
+import { FiCheckCircle, FiAlertTriangle, FiAlertCircle, FiInfo, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { useStatus, STATUS_TYPES } from '../context/StatusContext';
 
 /**
  * StatusOverlay Component
  * 
- * A toast-like component that displays API status information
- * Helps debug connection issues and request cancellations
+ * A globally accessible component that displays system status information
+ * Shows warnings, errors, and health status from various parts of the system
  */
 const StatusOverlay = () => {
   const { colorMode } = useColorMode();
-  const [status, setStatus] = useState('idle');
-  const [message, setMessage] = useState('');
-  const [visible, setVisible] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [currentPingIndex, setCurrentPingIndex] = useState(0);
   
-  // Monitor fetch requests to detect cancellations
+  // Get status from context
+  const {
+    systemStatus,
+    warnings,
+    memoryFallback,
+    controlMode,
+    delegateStatus,
+    agentHealthPings,
+    overlayVisible,
+    toggleOverlay,
+    removeWarning
+  } = useStatus();
+  
+  // Rotate through agent health pings
   useEffect(() => {
-    if (!DEBUG_MODE) return; // Only run in debug mode
+    if (!agentHealthPings || agentHealthPings.length === 0) return;
     
-    const originalFetch = window.fetch;
-    let activeRequests = 0;
+    const interval = setInterval(() => {
+      setCurrentPingIndex(prev => (prev + 1) % agentHealthPings.length);
+    }, 5000);
     
-    // Override fetch to track requests
-    window.fetch = function(...args) {
-      activeRequests++;
-      console.debug(`📡 API Request started (${activeRequests} active)`);
-      
-      // Show stable status after successful requests
-      setStatus('pending');
-      setMessage(`API Request in progress (${activeRequests} active)`);
-      setVisible(true);
-      
-      return originalFetch.apply(this, args)
-        .then(response => {
-          activeRequests = Math.max(0, activeRequests - 1);
-          
-          if (response.ok) {
-            setStatus('success');
-            setMessage(`📡 API Stable – ${response.status} ${response.statusText}`);
-          } else {
-            setStatus('error');
-            setMessage(`API Error: ${response.status} ${response.statusText}`);
-          }
-          
-          // Auto-hide success messages after 3 seconds
-          if (response.ok) {
-            setTimeout(() => {
-              setVisible(false);
-            }, 3000);
-          }
-          
-          return response;
-        })
-        .catch(error => {
-          activeRequests = Math.max(0, activeRequests - 1);
-          
-          if (error.name === 'AbortError') {
-            setStatus('warning');
-            setMessage('⚠️ Request canceled – poll loop likely active');
-            console.warn('⚠️ Request canceled – poll loop likely active', error);
-          } else {
-            setStatus('error');
-            setMessage(`API Error: ${error.message}`);
-            console.error('API Error:', error);
-          }
-          
-          throw error;
-        });
-    };
-    
-    return () => {
-      // Restore original fetch when component unmounts
-      window.fetch = originalFetch;
-    };
-  }, []);
+    return () => clearInterval(interval);
+  }, [agentHealthPings]);
   
-  // Don't render anything if not visible or not in debug mode
-  if (!visible || !DEBUG_MODE) return null;
+  // Don't render anything if not visible
+  if (!overlayVisible && warnings.length === 0 && systemStatus.type === STATUS_TYPES.STABLE) return null;
   
   // Determine styling based on status
   const getBgColor = () => {
-    switch (status) {
-      case 'success':
+    switch (systemStatus.type) {
+      case STATUS_TYPES.STABLE:
         return colorMode === 'light' ? 'green.50' : 'green.900';
-      case 'error':
+      case STATUS_TYPES.UNAVAILABLE:
         return colorMode === 'light' ? 'red.50' : 'red.900';
-      case 'warning':
+      case STATUS_TYPES.DEGRADED:
         return colorMode === 'light' ? 'yellow.50' : 'yellow.900';
       default:
         return colorMode === 'light' ? 'blue.50' : 'blue.900';
@@ -103,12 +71,12 @@ const StatusOverlay = () => {
   };
   
   const getBorderColor = () => {
-    switch (status) {
-      case 'success':
+    switch (systemStatus.type) {
+      case STATUS_TYPES.STABLE:
         return colorMode === 'light' ? 'green.200' : 'green.700';
-      case 'error':
+      case STATUS_TYPES.UNAVAILABLE:
         return colorMode === 'light' ? 'red.200' : 'red.700';
-      case 'warning':
+      case STATUS_TYPES.DEGRADED:
         return colorMode === 'light' ? 'yellow.200' : 'yellow.700';
       default:
         return colorMode === 'light' ? 'blue.200' : 'blue.700';
@@ -116,11 +84,12 @@ const StatusOverlay = () => {
   };
   
   const getIcon = () => {
-    switch (status) {
-      case 'success':
+    switch (systemStatus.type) {
+      case STATUS_TYPES.STABLE:
         return FiCheckCircle;
-      case 'error':
-      case 'warning':
+      case STATUS_TYPES.UNAVAILABLE:
+        return FiAlertCircle;
+      case STATUS_TYPES.DEGRADED:
         return FiAlertTriangle;
       default:
         return FiInfo;
@@ -128,46 +97,180 @@ const StatusOverlay = () => {
   };
   
   const getStatusText = () => {
-    switch (status) {
-      case 'success':
-        return 'Success';
-      case 'error':
-        return 'Error';
-      case 'warning':
-        return 'Warning';
-      case 'pending':
-        return 'Pending';
+    switch (systemStatus.type) {
+      case STATUS_TYPES.STABLE:
+        return '🟢 Stable';
+      case STATUS_TYPES.UNAVAILABLE:
+        return '🔴 Unavailable';
+      case STATUS_TYPES.DEGRADED:
+        return '🟡 Degraded';
       default:
-        return 'Info';
+        return 'System Status';
     }
   };
   
+  const getStatusColor = () => {
+    switch (systemStatus.type) {
+      case STATUS_TYPES.STABLE:
+        return 'green';
+      case STATUS_TYPES.UNAVAILABLE:
+        return 'red';
+      case STATUS_TYPES.DEGRADED:
+        return 'yellow';
+      default:
+        return 'blue';
+    }
+  };
+  
+  // Get current agent health ping
+  const currentPing = agentHealthPings.length > 0 ? agentHealthPings[currentPingIndex] : null;
+  
   return (
-    <Fade in={visible}>
+    <Fade in={true}>
       <Box
         position="fixed"
         bottom="20px"
         right="20px"
         zIndex={9999}
-        p={3}
         borderRadius="md"
         bg={getBgColor()}
         borderWidth="1px"
         borderColor={getBorderColor()}
         boxShadow="md"
         maxW="400px"
+        overflow="hidden"
       >
-        <HStack spacing={2} align="center">
-          <Icon as={getIcon()} />
-          <Badge colorScheme={
-            status === 'success' ? 'green' :
-            status === 'error' ? 'red' :
-            status === 'warning' ? 'yellow' : 'blue'
-          }>
-            {getStatusText()}
-          </Badge>
-          <Text fontSize="sm">{message}</Text>
-        </HStack>
+        {/* Header */}
+        <Flex 
+          p={3} 
+          justifyContent="space-between" 
+          alignItems="center"
+          borderBottomWidth={expanded ? "1px" : "0"}
+          borderBottomColor={getBorderColor()}
+        >
+          <HStack spacing={2} align="center">
+            <Icon as={getIcon()} />
+            <Badge colorScheme={getStatusColor()}>
+              {getStatusText()}
+            </Badge>
+            <Text fontSize="sm">{systemStatus.message}</Text>
+          </HStack>
+          
+          <HStack>
+            <Button 
+              size="xs" 
+              variant="ghost" 
+              onClick={() => setExpanded(!expanded)}
+              aria-label={expanded ? "Collapse" : "Expand"}
+            >
+              <Icon as={expanded ? FiChevronUp : FiChevronDown} />
+            </Button>
+            <CloseButton size="sm" onClick={toggleOverlay} />
+          </HStack>
+        </Flex>
+        
+        {/* Expanded content */}
+        <Collapse in={expanded} animateOpacity>
+          <Box p={3}>
+            {/* Memory fallback status */}
+            {memoryFallback.active && (
+              <Box mb={3} p={2} bg={colorMode === 'light' ? 'yellow.100' : 'yellow.800'} borderRadius="md">
+                <HStack>
+                  <Icon as={FiAlertTriangle} color="yellow.500" />
+                  <Text fontSize="sm" fontWeight="medium">Memory Fallback Active</Text>
+                </HStack>
+                {memoryFallback.reason && (
+                  <Text fontSize="xs" mt={1}>{memoryFallback.reason}</Text>
+                )}
+              </Box>
+            )}
+            
+            {/* Control mode status */}
+            {controlMode.loadError && (
+              <Box mb={3} p={2} bg={colorMode === 'light' ? 'red.100' : 'red.800'} borderRadius="md">
+                <HStack>
+                  <Icon as={FiAlertCircle} color="red.500" />
+                  <Text fontSize="sm" fontWeight="medium">Control Mode Load Failure</Text>
+                </HStack>
+                {controlMode.errorMessage && (
+                  <Text fontSize="xs" mt={1}>{controlMode.errorMessage}</Text>
+                )}
+              </Box>
+            )}
+            
+            {/* Delegate endpoint errors */}
+            {delegateStatus.errors.length > 0 && (
+              <Box mb={3} p={2} bg={colorMode === 'light' ? 'red.100' : 'red.800'} borderRadius="md">
+                <HStack>
+                  <Icon as={FiAlertCircle} color="red.500" />
+                  <Text fontSize="sm" fontWeight="medium">Delegate Endpoint Errors</Text>
+                </HStack>
+                <Text fontSize="xs" mt={1}>
+                  {delegateStatus.errors[0].message}
+                  {delegateStatus.errors.length > 1 && ` (+${delegateStatus.errors.length - 1} more)`}
+                </Text>
+              </Box>
+            )}
+            
+            {/* Warnings */}
+            {warnings.length > 0 && (
+              <Box mb={3}>
+                <Text fontSize="sm" fontWeight="medium" mb={1}>Warnings</Text>
+                <VStack spacing={2} align="stretch">
+                  {warnings.slice(0, 3).map(warning => (
+                    <Box 
+                      key={warning.id} 
+                      p={2} 
+                      bg={colorMode === 'light' ? 'yellow.100' : 'yellow.800'} 
+                      borderRadius="md"
+                      position="relative"
+                    >
+                      <CloseButton 
+                        size="xs" 
+                        position="absolute" 
+                        top={1} 
+                        right={1} 
+                        onClick={() => removeWarning(warning.id)} 
+                      />
+                      <Text fontSize="xs" fontWeight="medium">{warning.title}</Text>
+                      <Text fontSize="xs">{warning.message}</Text>
+                    </Box>
+                  ))}
+                  {warnings.length > 3 && (
+                    <Text fontSize="xs" textAlign="center">
+                      +{warnings.length - 3} more warnings
+                    </Text>
+                  )}
+                </VStack>
+              </Box>
+            )}
+            
+            {/* Agent health pings */}
+            {currentPing && (
+              <Box>
+                <Text fontSize="sm" fontWeight="medium" mb={1}>Agent Health</Text>
+                <HStack spacing={2} p={2} bg={colorMode === 'light' ? 'blue.50' : 'blue.800'} borderRadius="md">
+                  <Badge colorScheme={
+                    currentPing.status === 'active' ? 'green' :
+                    currentPing.status === 'degraded' ? 'yellow' : 'red'
+                  }>
+                    {currentPing.status === 'active' ? '🟢' : 
+                     currentPing.status === 'degraded' ? '🟡' : '🔴'}
+                  </Badge>
+                  <Text fontSize="xs">{currentPing.name || currentPing.id}</Text>
+                  <Text fontSize="xs" color="gray.500" ml="auto">
+                    {new Date(currentPing.lastPing).toLocaleTimeString()}
+                  </Text>
+                </HStack>
+                {agentHealthPings.length > 1 && (
+                  <Text fontSize="xs" textAlign="center" mt={1}>
+                    Showing 1 of {agentHealthPings.length} agents
+                  </Text>
+                )}
+              </Box>
+            )}
+          </Box>
+        </Collapse>
       </Box>
     </Fade>
   );

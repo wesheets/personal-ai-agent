@@ -22,6 +22,7 @@ import {
   Spinner,
   Code
 } from '@chakra-ui/react';
+import { getVisibleAgents } from '../utils/agentUtils';
 
 /**
  * AgentTestPanel Component
@@ -59,30 +60,17 @@ const AgentTestPanel = () => {
       
       setIsLoadingAgents(true);
       try {
-        const response = await fetch('/api/agents', {
-          signal: controller.signal
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch agents: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
+        // Use the centralized getVisibleAgents utility instead of direct fetch
+        const visibleAgents = await getVisibleAgents();
         
         if (isMounted) {
-          // Filter to include both system and persona type agents
-          // No filtering - show all agents including HAL and ASH
-          const visibleAgents = data;
           setAvailableAgents(visibleAgents);
-          console.log("Loaded agents:", visibleAgents);
-          console.debug(`Loaded ${visibleAgents.length} agents (all types)`);
         }
       } catch (err) {
         // Ignore abort errors as they're expected during cleanup
         if (err.name === 'AbortError') {
-          console.debug("AgentTestPanel - Fetch aborted during cleanup");
           return;
         }
-        
-        console.error('Error fetching agents:', err);
         
         if (isMounted) {
           toast({
@@ -92,12 +80,6 @@ const AgentTestPanel = () => {
             duration: 5000,
             isClosable: true,
           });
-          // Fallback to default agents if API fails
-          setAvailableAgents([
-            { id: 'hal9000', name: 'HAL 9000', icon: '🔴', tone: 'calm' },
-            { id: 'ash-xenomorph', name: 'Ash', icon: '🧬', tone: 'clinical' }
-          ]);
-          console.log("Using fallback agents: HAL and ASH");
         }
       } finally {
         if (isMounted) {
@@ -106,12 +88,12 @@ const AgentTestPanel = () => {
       }
     };
     
-    // Add a 3 second delay before initial fetch
+    // Add a short delay before initial fetch
     const timeout = setTimeout(() => {
       if (isMounted) {
         fetchAgents();
       }
-    }, 3000);
+    }, 1000);
     
     return () => {
       isMounted = false;
@@ -161,7 +143,6 @@ const AgentTestPanel = () => {
     
     // Prevent duplicate submissions
     if (isLoading) {
-      console.debug('Submission already in progress, ignoring duplicate request');
       return;
     }
     
@@ -173,7 +154,6 @@ const AgentTestPanel = () => {
     
     // Set up failsafe timeout to reset loading state after 16 seconds
     const failsafeTimeout = setTimeout(() => {
-      console.warn('⏱️ Failsafe triggered: Forcing loading reset after 16s');
       setIsLoading(false);
       setError({ message: 'Request timed out. The agent may still be processing your task in the background.' });
       toast({
@@ -243,12 +223,11 @@ const AgentTestPanel = () => {
               });
             }
           } catch (parseError) {
-            console.error('Error parsing JSON from stream:', parseError, line);
+            // Silently handle parse errors
           }
         }
       }
     } catch (err) {
-      console.error('Error sending request:', err);
       setError({ message: err.message });
       toast({
         title: 'Request failed',
@@ -320,25 +299,14 @@ const AgentTestPanel = () => {
               
               <FormControl isRequired>
                 <FormLabel htmlFor="task-input">Task Input</FormLabel>
-                <Textarea 
+                <Textarea
                   id="task-input"
                   value={taskInput}
                   onChange={(e) => setTaskInput(e.target.value)}
-                  placeholder="Enter your task prompt here..."
+                  placeholder="Enter your task here..."
+                  size="md"
+                  rows={4}
                   isDisabled={isLoading}
-                  rows={3}
-                />
-              </FormControl>
-              
-              <FormControl>
-                <FormLabel htmlFor="task-id">Task ID</FormLabel>
-                <Input 
-                  id="task-id"
-                  value={taskId}
-                  onChange={(e) => setTaskId(e.target.value)}
-                  placeholder="Task ID (auto-generated)"
-                  isDisabled={isLoading}
-                  size="sm"
                 />
               </FormControl>
               
@@ -346,150 +314,92 @@ const AgentTestPanel = () => {
                 type="submit" 
                 colorScheme="blue" 
                 isLoading={isLoading}
-                loadingText="Sending..."
+                loadingText="Submitting..."
                 isDisabled={!agentId || !taskInput || isLoading}
-                width="full"
               >
-                Send Task
+                Submit Task
               </Button>
             </VStack>
           </form>
           
           <Divider />
           
-          {/* Response Display Section */}
+          {/* Response Display */}
           <Box>
-            <Text fontWeight="bold" mb={2}>Response:</Text>
-            
-            {/* Streaming Progress */}
-            {streamingProgress.length > 0 && (
-              <Box 
-                mb={4} 
-                p={2} 
-                bg={colorMode === 'light' ? 'gray.100' : 'gray.800'}
-                borderRadius="md"
-                fontSize="sm"
-              >
-                <Text fontWeight="bold" mb={2}>Progress:</Text>
-                {streamingProgress.map((progress, index) => (
-                  <Text key={index} fontSize="xs">
-                    {progress.stage}: {progress.message} 
-                    {progress.progress && ` (${Math.round(progress.progress)}%)`}
-                  </Text>
-                ))}
-              </Box>
-            )}
-            
-            {/* Final Response */}
-            {finalResponse && (
-              <Box 
-                ref={responseBoxRef}
-                p={4} 
-                bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}
-                borderRadius="md"
-                borderWidth="1px"
-                borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
-                maxHeight="300px"
-                overflowY="auto"
-              >
+            <Text fontWeight="medium" mb={2}>Response:</Text>
+            <Box
+              ref={responseBoxRef}
+              border="1px"
+              borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+              borderRadius="md"
+              p={3}
+              bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}
+              height="300px"
+              overflowY="auto"
+            >
+              {isLoading && streamingProgress.length === 0 ? (
+                <VStack spacing={4} justify="center" height="100%">
+                  <Spinner size="lg" />
+                  <Text>Waiting for response...</Text>
+                </VStack>
+              ) : error ? (
+                <Box color="red.500" p={2}>
+                  <Text fontWeight="bold">Error:</Text>
+                  <Text>{error.message}</Text>
+                </Box>
+              ) : finalResponse ? (
                 <VStack align="stretch" spacing={3}>
                   <HStack>
-                    <Text fontWeight="bold">Agent:</Text>
-                    <Text>
+                    <Badge colorScheme="green" fontSize="0.8em" px={2} py={1} borderRadius="full">
                       {getAgentIcon(agentId)} {finalResponse.agent}
-                    </Text>
-                  </HStack>
-                  
-                  <HStack>
-                    <Text fontWeight="bold">Tone:</Text>
-                    <Badge colorScheme={
-                      finalResponse.tone === 'calm' ? 'blue' : 
-                      finalResponse.tone === 'clinical' ? 'purple' :
-                      'gray'
-                    }>
-                      {finalResponse.tone}
                     </Badge>
+                    {finalResponse.tone && (
+                      <Badge colorScheme="purple" fontSize="0.8em" px={2} py={1} borderRadius="full">
+                        {finalResponse.tone}
+                      </Badge>
+                    )}
                   </HStack>
-                  
-                  <Box>
-                    <Text fontWeight="bold" mb={1}>Message:</Text>
-                    <Box 
-                      p={3} 
-                      bg={colorMode === 'light' ? 'white' : 'gray.700'}
-                      borderRadius="md"
-                      borderWidth="1px"
-                      borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
-                    >
-                      <Text>{finalResponse.message}</Text>
-                    </Box>
-                  </Box>
-                  
-                  <Box>
-                    <Text fontWeight="bold" mb={1}>Raw Response:</Text>
-                    <Code 
-                      p={2} 
-                      borderRadius="md" 
-                      width="100%" 
-                      fontSize="xs"
-                      whiteSpace="pre-wrap"
-                      overflowX="auto"
-                    >
-                      {JSON.stringify(finalResponse, null, 2)}
-                    </Code>
-                  </Box>
+                  <Text whiteSpace="pre-wrap">{finalResponse.message}</Text>
                 </VStack>
-              </Box>
-            )}
-            
-            {/* Loading Indicator */}
-            {isLoading && !finalResponse && (
-              <Box textAlign="center" py={4}>
-                <Spinner size="md" />
-                <Text mt={2}>Waiting for response...</Text>
-              </Box>
-            )}
-            
-            {/* Error Display */}
-            {error && (
-              <Box 
-                p={3} 
-                bg="red.50" 
-                color="red.800" 
-                borderRadius="md"
-                borderWidth="1px"
-                borderColor="red.200"
-              >
-                <Text fontWeight="bold">Error:</Text>
-                <Text>{error.message}</Text>
-                {error.error && (
-                  <Text fontSize="sm" mt={1}>
-                    {error.error}
-                  </Text>
-                )}
-              </Box>
-            )}
-            
-            {/* Empty State */}
-            {!isLoading && !finalResponse && !error && streamingProgress.length === 0 && (
-              <Box 
-                p={4} 
-                textAlign="center" 
-                color={colorMode === 'light' ? 'gray.500' : 'gray.400'}
-                bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}
-                borderRadius="md"
-              >
+              ) : streamingProgress.length > 0 ? (
+                <VStack align="stretch" spacing={3}>
+                  {streamingProgress.map((progress, index) => (
+                    <Box key={index}>
+                      {index === 0 && (
+                        <HStack mb={2}>
+                          <Badge colorScheme="blue" fontSize="0.8em" px={2} py={1} borderRadius="full">
+                            {getAgentIcon(agentId)} {progress.agent || agentId}
+                          </Badge>
+                          {progress.tone && (
+                            <Badge colorScheme="purple" fontSize="0.8em" px={2} py={1} borderRadius="full">
+                              {progress.tone}
+                            </Badge>
+                          )}
+                        </HStack>
+                      )}
+                      <Text whiteSpace="pre-wrap">{progress.content}</Text>
+                    </Box>
+                  ))}
+                </VStack>
+              ) : (
                 <Text>Select an agent and submit a task to see the response</Text>
-              </Box>
-            )}
+              )}
+            </Box>
+          </Box>
+          
+          {/* Debug Info */}
+          <Box>
+            <Heading size="xs" mb={2}>Debug Info:</Heading>
+            <Code p={2} borderRadius="md" fontSize="xs" width="100%" overflowX="auto">
+              Task ID: {taskId}
+              <br />
+              Selected Agent: {agentId}
+              <br />
+              Streaming from /api/agent/delegate-stream
+            </Code>
           </Box>
         </VStack>
       </CardBody>
-      
-      <CardFooter pt={0} justifyContent="flex-end">
-        <Text fontSize="xs" color={colorMode === 'light' ? 'gray.500' : 'gray.400'}>
-          Streaming from /api/agent/delegate-stream
-        </Text>
-      </CardFooter>
     </Card>
   );
 };

@@ -1,64 +1,136 @@
-import React, { useEffect } from 'react';
-import { useToast, Box, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  VStack,
+  HStack,
+  Text,
+  Badge,
+  Switch,
+  FormControl,
+  FormLabel,
+  useColorMode,
+  Divider,
+  Heading,
+  Button,
+  Tooltip,
+  Icon
+} from '@chakra-ui/react';
+import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
+import { useStatus } from '../context/StatusContext';
 
 /**
  * MemoryWarningHandler Component
  * 
- * This component handles warnings from the memory API and displays them as toasts
- * or alerts to the user. It can be included in any component that makes memory API calls.
- * 
- * @param {Object} props - Component props
- * @param {Object} props.apiResponse - The API response object that might contain warnings
- * @param {boolean} props.showAlert - Whether to show an alert in addition to a toast
- * @param {function} props.onClose - Callback when alert is closed
+ * Displays memory fallback state and warnings
+ * Integrated with the global StatusContext
  */
-const MemoryWarningHandler = ({ apiResponse, showAlert = false, onClose = () => {} }) => {
-  const toast = useToast();
+const MemoryWarningHandler = () => {
+  const { colorMode } = useColorMode();
+  const [showFallbackAlerts, setShowFallbackAlerts] = useState(true);
   
-  useEffect(() => {
-    // Check if the API response contains a warning
-    if (apiResponse?.metadata?.warning) {
-      const warning = apiResponse.metadata.warning;
-      
-      // Show toast notification
-      toast({
-        title: 'Memory System Warning',
-        description: warning,
-        status: 'warning',
-        duration: 8000,
-        isClosable: true,
-        position: 'top-right',
-      });
-      
-      // Log the warning to console
-      console.warn(`[Memory Warning] ${warning}`);
-    }
-  }, [apiResponse, toast]);
+  // Get status from context
+  const { 
+    memoryFallback, 
+    setMemoryFallbackState 
+  } = useStatus();
   
-  // If showAlert is true and there's a warning, show an alert box
-  if (showAlert && apiResponse?.metadata?.warning) {
-    return (
-      <Box my={4}>
-        <Alert status="warning" variant="left-accent">
-          <AlertIcon />
-          <Box flex="1">
-            <AlertTitle>Memory System Warning</AlertTitle>
-            <AlertDescription display="block">
-              {apiResponse.metadata.warning}
-              <br />
-              <Box as="span" fontSize="sm" mt={1}>
-                The system is operating in degraded mode. Some memory features may be limited.
-              </Box>
-            </AlertDescription>
-          </Box>
-          <CloseButton position="absolute" right="8px" top="8px" onClick={onClose} />
-        </Alert>
-      </Box>
-    );
-  }
+  // Simulate fallback for testing
+  const simulateFallback = () => {
+    setMemoryFallbackState(true, 'OpenAI API quota exceeded');
+  };
   
-  // If no warning or showAlert is false, render nothing
-  return null;
+  // Clear fallback state
+  const clearFallback = () => {
+    setMemoryFallbackState(false);
+  };
+  
+  // If not in fallback state and alerts are enabled, don't render anything
+  if (!memoryFallback.active && !showFallbackAlerts) return null;
+  
+  return (
+    <Box
+      p={4}
+      borderWidth="1px"
+      borderRadius="md"
+      borderColor={memoryFallback.active ? "yellow.300" : "gray.200"}
+      bg={memoryFallback.active ? (colorMode === 'light' ? 'yellow.50' : 'yellow.900') : 'transparent'}
+      mb={4}
+    >
+      <VStack spacing={3} align="stretch">
+        <HStack justifyContent="space-between">
+          <HStack>
+            {memoryFallback.active && <Icon as={FiAlertTriangle} color="yellow.500" />}
+            <Heading size="sm">Memory System Status</Heading>
+          </HStack>
+          
+          <FormControl display="flex" alignItems="center" width="auto">
+            <FormLabel htmlFor="fallback-alerts" mb="0" mr={2} fontSize="sm">
+              Show Alerts
+            </FormLabel>
+            <Switch
+              id="fallback-alerts"
+              isChecked={showFallbackAlerts}
+              onChange={(e) => setShowFallbackAlerts(e.target.checked)}
+              colorScheme="blue"
+            />
+          </FormControl>
+        </HStack>
+        
+        <Divider />
+        
+        <HStack justifyContent="space-between">
+          <Text fontSize="sm">Fallback State:</Text>
+          <Badge colorScheme={memoryFallback.active ? "yellow" : "green"}>
+            {memoryFallback.active ? "ACTIVE" : "INACTIVE"}
+          </Badge>
+        </HStack>
+        
+        {memoryFallback.active && (
+          <>
+            <HStack justifyContent="space-between">
+              <Text fontSize="sm">Reason:</Text>
+              <Text fontSize="sm" fontWeight="medium">{memoryFallback.reason || "Unknown"}</Text>
+            </HStack>
+            
+            <HStack justifyContent="space-between">
+              <Text fontSize="sm">Since:</Text>
+              <Text fontSize="sm">
+                {memoryFallback.timestamp ? new Date(memoryFallback.timestamp).toLocaleTimeString() : "Unknown"}
+              </Text>
+            </HStack>
+            
+            <Text fontSize="sm" color={colorMode === 'light' ? 'yellow.700' : 'yellow.200'}>
+              Memory system is operating in fallback mode. Vector search is disabled.
+            </Text>
+            
+            <Button size="sm" colorScheme="yellow" onClick={clearFallback}>
+              Clear Fallback State
+            </Button>
+          </>
+        )}
+        
+        {!memoryFallback.active && (
+          <>
+            <Text fontSize="sm" color={colorMode === 'light' ? 'green.700' : 'green.200'}>
+              Memory system is operating normally with vector search enabled.
+            </Text>
+            
+            <Tooltip label="For testing only">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                colorScheme="yellow" 
+                leftIcon={<FiRefreshCw />}
+                onClick={simulateFallback}
+              >
+                Simulate Fallback
+              </Button>
+            </Tooltip>
+          </>
+        )}
+      </VStack>
+    </Box>
+  );
 };
 
 export default MemoryWarningHandler;
