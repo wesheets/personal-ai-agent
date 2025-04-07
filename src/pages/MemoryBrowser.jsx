@@ -195,7 +195,8 @@ const MemoryBrowser = () => {
         console.debug("Loaded: MemoryBrowser - Fetching memories ⏳");
         
         // Make a real fetch to the API
-        const response = await fetch('/api/memory/search', {
+        const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/memory/search`;
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: '', limit: 20 }),
@@ -209,7 +210,7 @@ const MemoryBrowser = () => {
         const data = await response.json();
         
         // For local testing, if no real API is available, use mock data
-        if (!data || !data.results) {
+        if (!data || !data.results || data.results.length === 0) {
           console.warn("No results from API, using mock data");
           // Simulate API call with mock data that includes a warning
           await new Promise(resolve => setTimeout(resolve, 500));
@@ -221,7 +222,7 @@ const MemoryBrowser = () => {
               query: "",
               limit: 20,
               result_count: mockMemories.length,
-              warning: "OpenAI quota exceeded. Memory results limited."
+              warning: "Using mock memory data as fallback."
             }
           };
         }

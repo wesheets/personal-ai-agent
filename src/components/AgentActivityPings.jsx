@@ -23,6 +23,7 @@ import { FiActivity, FiRefreshCw, FiClock, FiInfo } from 'react-icons/fi';
 import { useStatus } from '../context/StatusContext';
 import { useSettings } from '../context/SettingsContext';
 import { getVisibleAgents } from '../utils/agentUtils';
+import { getAgentActivity } from '../api/AgentActivityService';
 
 /**
  * AgentActivityPings Component
@@ -34,6 +35,7 @@ const AgentActivityPings = () => {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [agentActivities, setAgentActivities] = useState({});
   
   // Get status from context
   const { agentHealthPings } = useStatus();
@@ -65,6 +67,26 @@ const AgentActivityPings = () => {
           
           setAgents(mergedAgents);
           setLastUpdated(new Date());
+          
+          // Fetch activity data for each agent
+          const activityPromises = mergedAgents.map(agent => 
+            getAgentActivity(agent.id)
+              .then(data => ({ agentId: agent.id, data }))
+              .catch(() => ({ agentId: agent.id, data: null }))
+          );
+          
+          const activitiesResults = await Promise.all(activityPromises);
+          const activitiesMap = {};
+          
+          activitiesResults.forEach(result => {
+            if (result.data) {
+              activitiesMap[result.agentId] = result.data;
+            }
+          });
+          
+          if (isMounted) {
+            setAgentActivities(activitiesMap);
+          }
         }
       } catch (error) {
         console.error('Error fetching agents:', error);
@@ -109,6 +131,24 @@ const AgentActivityPings = () => {
       
       setAgents(mergedAgents);
       setLastUpdated(new Date());
+      
+      // Fetch activity data for each agent
+      const activityPromises = mergedAgents.map(agent => 
+        getAgentActivity(agent.id)
+          .then(data => ({ agentId: agent.id, data }))
+          .catch(() => ({ agentId: agent.id, data: null }))
+      );
+      
+      const activitiesResults = await Promise.all(activityPromises);
+      const activitiesMap = {};
+      
+      activitiesResults.forEach(result => {
+        if (result.data) {
+          activitiesMap[result.agentId] = result.data;
+        }
+      });
+      
+      setAgentActivities(activitiesMap);
     } catch (error) {
       console.error('Error refreshing agents:', error);
     } finally {
@@ -166,6 +206,17 @@ const AgentActivityPings = () => {
     }
   };
   
+  // Get latest activity for an agent
+  const getLatestActivity = (agentId) => {
+    const activities = agentActivities[agentId]?.activities || [];
+    if (activities.length === 0) return null;
+    
+    // Sort by timestamp (newest first) and return the first one
+    return activities.sort((a, b) => 
+      new Date(b.timestamp) - new Date(a.timestamp)
+    )[0];
+  };
+  
   return (
     <Card bg={colorMode === 'light' ? 'white' : 'gray.700'} boxShadow="md" borderRadius="lg">
       <CardBody>
@@ -205,67 +256,87 @@ const AgentActivityPings = () => {
           </Box>
         ) : (
           <Grid templateColumns={{ base: "repeat(1, 1fr)", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap={4}>
-            {agents.map(agent => (
-              <GridItem key={agent.id}>
-                <Box
-                  p={4}
-                  borderWidth="1px"
-                  borderRadius="md"
-                  borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
-                  position="relative"
-                  overflow="hidden"
-                >
-                  {/* Ping animation */}
+            {agents.map(agent => {
+              const latestActivity = getLatestActivity(agent.id);
+              
+              return (
+                <GridItem key={agent.id}>
                   <Box
-                    position="absolute"
-                    top={0}
-                    right={0}
-                    width="100%"
-                    height="100%"
-                    pointerEvents="none"
-                    opacity={0.1}
-                    className={getPingAnimation(agent.status)}
+                    p={4}
+                    borderWidth="1px"
+                    borderRadius="md"
+                    borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
+                    position="relative"
+                    overflow="hidden"
                   >
-                    <Circle
-                      size="300px"
+                    {/* Ping animation */}
+                    <Box
                       position="absolute"
-                      top="-150px"
-                      right="-150px"
-                      bg={`${getStatusColor(agent.status)}.500`}
-                    />
-                  </Box>
-                  
-                  <VStack align="stretch" spacing={2}>
-                    <HStack justify="space-between">
-                      <HStack>
-                        <Circle size="10px" bg={`${getStatusColor(agent.status)}.500`} />
-                        <Text fontWeight="bold">{agent.name || agent.id}</Text>
+                      top={0}
+                      right={0}
+                      width="100%"
+                      height="100%"
+                      pointerEvents="none"
+                      opacity={0.1}
+                      className={getPingAnimation(agent.status)}
+                    >
+                      <Circle
+                        size="300px"
+                        position="absolute"
+                        top="-150px"
+                        right="-150px"
+                        bg={`${getStatusColor(agent.status)}.500`}
+                      />
+                    </Box>
+                    
+                    <VStack align="stretch" spacing={2}>
+                      <HStack justify="space-between">
+                        <HStack>
+                          <Circle size="10px" bg={`${getStatusColor(agent.status)}.500`} />
+                          <Text fontWeight="bold">{agent.name || agent.id}</Text>
+                        </HStack>
+                        <Badge colorScheme={getStatusColor(agent.status)}>
+                          {agent.status || 'unknown'}
+                        </Badge>
                       </HStack>
-                      <Badge colorScheme={getStatusColor(agent.status)}>
-                        {agent.status || 'unknown'}
-                      </Badge>
-                    </HStack>
-                    
-                    <Text fontSize="sm" color="gray.500" noOfLines={2}>
-                      {agent.description || 'No description available'}
-                    </Text>
-                    
-                    <HStack justify="space-between" mt={2}>
-                      <Badge variant="outline" colorScheme={agent.type === 'system' ? 'blue' : 'purple'}>
-                        {agent.type || 'unknown'}
-                      </Badge>
                       
-                      <Tooltip label={agent.lastPing ? new Date(agent.lastPing).toLocaleString() : 'No ping data'}>
-                        <Text fontSize="xs" color="gray.500">
-                          <Icon as={FiClock} mr={1} />
-                          {formatTimeDiff(agent.lastPing)}
-                        </Text>
-                      </Tooltip>
-                    </HStack>
-                  </VStack>
-                </Box>
-              </GridItem>
-            ))}
+                      <Text fontSize="sm" color="gray.500" noOfLines={2}>
+                        {agent.description || 'No description available'}
+                      </Text>
+                      
+                      {latestActivity && (
+                        <Box 
+                          mt={1} 
+                          p={2} 
+                          bg={colorMode === 'light' ? 'gray.50' : 'gray.600'} 
+                          borderRadius="md"
+                          fontSize="xs"
+                        >
+                          <Text fontWeight="medium">Latest Activity:</Text>
+                          <Text noOfLines={2}>{latestActivity.content}</Text>
+                          <Text color="gray.500" mt={1}>
+                            {formatTimeDiff(latestActivity.timestamp)}
+                          </Text>
+                        </Box>
+                      )}
+                      
+                      <HStack justify="space-between" mt={2}>
+                        <Badge variant="outline" colorScheme={agent.type === 'system' ? 'blue' : 'purple'}>
+                          {agent.type || 'unknown'}
+                        </Badge>
+                        
+                        <Tooltip label={agent.lastPing ? new Date(agent.lastPing).toLocaleString() : 'No ping data'}>
+                          <Text fontSize="xs" color="gray.500">
+                            <Icon as={FiClock} mr={1} />
+                            {formatTimeDiff(agent.lastPing)}
+                          </Text>
+                        </Tooltip>
+                      </HStack>
+                    </VStack>
+                  </Box>
+                </GridItem>
+              );
+            })}
           </Grid>
         )}
         

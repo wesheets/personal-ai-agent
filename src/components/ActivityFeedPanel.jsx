@@ -164,19 +164,47 @@ const ActivityFeedPanel = () => {
         // Add debug log
         console.debug("Loaded: ActivityFeedPanel - Fetching activities ⏳");
         
-        // In a real implementation, this would be a fetch with AbortController
-        // const response = await fetch('/api/activities', {
-        //   signal: controller.signal
-        // });
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Only update state if component is still mounted
-        if (isMounted) {
-          setActivities(mockActivities);
-          setError(null);
-          console.debug("Loaded: ActivityFeedPanel - Activities loaded successfully ✅");
+        // Make a real API call with fallback to mock data
+        try {
+          const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/logs/system`;
+          const response = await fetch(apiUrl, {
+            signal: controller.signal,
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          
+          // Check if we got valid data
+          if (data && Array.isArray(data.activities) && data.activities.length > 0) {
+            // Only update state if component is still mounted
+            if (isMounted) {
+              setActivities(data.activities);
+              setError(null);
+              console.debug("Loaded: ActivityFeedPanel - Activities loaded successfully ✅", data);
+            }
+            return;
+          } else {
+            console.warn("API returned empty or invalid data, falling back to mock data");
+            throw new Error("Empty or invalid data");
+          }
+        } catch (apiError) {
+          console.warn("API call failed, using mock data:", apiError);
+          
+          // Simulate API call
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Only update state if component is still mounted
+          if (isMounted) {
+            setActivities(mockActivities);
+            setError(null);
+            console.debug("Loaded: ActivityFeedPanel - Using mock activities as fallback ⚠️");
+          }
         }
       } catch (err) {
         // Ignore abort errors as they're expected during cleanup

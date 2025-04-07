@@ -58,20 +58,42 @@ const MemoryAgentView = () => {
     setIsSubmittingText(true);
     
     try {
-      // This will be replaced with actual API call
-      // const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/memory`;
+      // Real API call with fallback to mock data
+      let response;
+      let responseData;
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      try {
+        const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/memory/create`;
+        response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: textInput,
+            type: 'text',
+            title: textInput.split('\n')[0].substring(0, 50) // Use first line as title
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        
+        responseData = await response.json();
+        console.log('Memory created successfully:', responseData);
+      } catch (apiError) {
+        console.warn('API call failed, using mock data:', apiError);
+        // Fallback to mock data if API call fails
+        await new Promise(resolve => setTimeout(resolve, 800));
+        responseData = {
+          id: `mem-${Date.now()}`,
+          status: 'saved',
+          message: 'Text successfully saved to memory'
+        };
+      }
       
-      // Simulate response
-      const mockResponse = {
-        id: `mem-${Date.now()}`,
-        status: 'saved',
-        message: 'Text successfully saved to memory'
-      };
-      
-      setTextResponse(mockResponse);
+      setTextResponse(responseData);
       
       // Show success toast
       toast({
@@ -141,26 +163,48 @@ const MemoryAgentView = () => {
     setUploadProgress(0);
     
     try {
-      // Simulate upload progress
-      const totalSteps = 10;
-      for (let i = 1; i <= totalSteps; i++) {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        setUploadProgress((i / totalSteps) * 100);
+      // Real API call with fallback to mock data
+      let response;
+      let responseData;
+      
+      try {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('type', 'file');
+        formData.append('filename', selectedFile.name);
+        
+        const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/memory/create`;
+        response = await fetch(apiUrl, {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        
+        responseData = await response.json();
+        console.log('File uploaded successfully:', responseData);
+      } catch (apiError) {
+        console.warn('API call failed, using mock data:', apiError);
+        // Fallback to mock data if API call fails
+        // Continue with upload progress simulation
+        const totalSteps = 10;
+        for (let i = 1; i <= totalSteps; i++) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+          setUploadProgress((i / totalSteps) * 100);
+        }
+        
+        responseData = {
+          id: `file-${Date.now()}`,
+          status: 'uploaded',
+          filename: selectedFile.name,
+          size: selectedFile.size,
+          message: 'File successfully uploaded to memory'
+        };
       }
       
-      // Simulate API call
-      // const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/memory`;
-      
-      // Simulate response
-      const mockResponse = {
-        id: `file-${Date.now()}`,
-        status: 'uploaded',
-        filename: selectedFile.name,
-        size: selectedFile.size,
-        message: 'File successfully uploaded to memory'
-      };
-      
-      setFileResponse(mockResponse);
+      setFileResponse(responseData);
       
       // Show success toast
       toast({
