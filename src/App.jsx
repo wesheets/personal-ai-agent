@@ -20,6 +20,7 @@ import { SettingsProvider } from './context/SettingsContext';
 import { useAuth } from './context/AuthContext';
 import UIv2Shell from './pages/UIv2Shell';
 import AgentChatPanel from './components/AgentChatPanel';
+import AgentChat from './AgentChat';
 import './styles/animations.css';
 
 // Layout component for authenticated routes
@@ -90,9 +91,23 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<LoginPage isRegister={true} />} />
             
+            {/* Auth redirect route */}
+            <Route path="/auth" element={<Navigate to="/hal" />} />
+            
             {/* Root path redirect based on auth status */}
             <Route path="/" element={
-              isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+              isAuthenticated ? <Navigate to="/hal" /> : <Navigate to="/login" />
+            } />
+            
+            {/* HAL Agent Chat - default interface after authentication */}
+            <Route path="/hal" element={
+              <AuthGuard>
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <AgentChat />
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              </AuthGuard>
             } />
             
             {/* Protected routes */}
@@ -220,7 +235,7 @@ function App() {
             
             {/* Fallback redirect for unknown routes */}
             <Route path="*" element={
-              isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+              isAuthenticated ? <Navigate to="/hal" /> : <Navigate to="/login" />
             } />
           </Routes>
           
