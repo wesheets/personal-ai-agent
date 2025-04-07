@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    { "source": "/ui-v2", "destination": "/ui-v2/index.html" },
+    { "source": "/ui-v2/(.*)", "destination": "/ui-v2/index.html" }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/ui-v2/?(.*)", "dest": "/ui-v2/index.html" }
+  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
+}
