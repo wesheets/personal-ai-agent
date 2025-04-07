@@ -122,6 +122,8 @@ async def log_all_routes():
     
     raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
     logger.info(f"🔒 CORS_ALLOWED_ORIGINS raw: {raw_origins}")
+    
+    cors_allow_credentials = os.getenv("CORS_ALLOW_CREDENTIALS", "true")
     logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
     logger.info(f"🔒 Allowed Origins Count: {len(allowed_origins)}")
     logger.info(f"✅ Using custom CORS middleware with normalized origin matching")
