@@ -93,6 +93,19 @@ async def root_health():
     logger.info("Health check endpoint accessed at root level")
     return Response(content="OK", media_type="text/plain")
 
+# Add startup delay to ensure FastAPI is fully initialized before healthcheck
+import asyncio
+
+@app.on_event("startup")
+async def startup_delay():
+    """
+    Add a small delay during startup to ensure FastAPI is fully initialized
+    before Railway attempts the healthcheck.
+    """
+    logger.info("Adding startup delay to ensure application is fully initialized...")
+    await asyncio.sleep(1)  # give it breathing room before healthcheck
+    logger.info("Startup delay completed, application ready for healthcheck")
+
 # Route logger for debugging
 @app.on_event("startup")
 async def log_all_routes():
