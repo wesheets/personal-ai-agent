@@ -17,7 +17,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import StatusOverlay from './components/StatusOverlay';
 import { StatusProvider } from './context/StatusContext';
 import { SettingsProvider } from './context/SettingsContext';
-import { useAuth } from './context/AuthContext';
+import { isAuthenticated } from './hooks/useAuth';
 import UIv2Shell from './pages/UIv2Shell';
 import AgentChatPanel from './components/AgentChatPanel';
 import AgentChat from './AgentChat';
@@ -57,9 +57,9 @@ const AuthenticatedLayout = ({ children }) => {
 };
 
 function App() {
-  const { isAuthenticated, loading } = useAuth();
+  // Show loading state while app is initializing
+  const loading = false;
   
-  // Show loading state while auth is initializing
   if (loading) {
     return (
       <Box 
@@ -91,151 +91,151 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<LoginPage isRegister={true} />} />
             
-            {/* Auth redirect route */}
-            <Route path="/auth" element={<Navigate to="/hal" />} />
+            {/* Auth route */}
+            <Route path="/auth" element={<LoginPage />} />
             
             {/* Root path redirect based on auth status */}
             <Route path="/" element={
-              isAuthenticated ? <Navigate to="/hal" /> : <Navigate to="/login" />
+              isAuthenticated() ? <Navigate to="/hal" /> : <Navigate to="/auth" />
             } />
             
             {/* HAL Agent Chat - default interface after authentication */}
             <Route path="/hal" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <AgentChat />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             {/* Protected routes */}
             <Route path="/dashboard" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <Dashboard />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             <Route path="/builder" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <BuilderAgent />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             <Route path="/ops" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <OpsAgent />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             <Route path="/research" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <ResearchAgent />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             <Route path="/memory" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <MemoryAgentView />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             <Route path="/memory-browser" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <MemoryBrowser />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             <Route path="/activity" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <MainActivityFeed />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             <Route path="/agent-activity" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <AgentActivityPage />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             <Route path="/settings" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <SettingsPage />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             <Route path="/agents" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <AgentListPage />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             {/* Agent chat routes */}
             <Route path="/chat/:agentId" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <AgentChatPanel />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             {/* Agent detail routes */}
             <Route path="/agent/:agentId" element={
-              <AuthGuard>
+              isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <UIv2Shell activePage="agent" />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              </AuthGuard>
+              ) : <Navigate to="/auth" />
             } />
             
             {/* Fallback redirect for unknown routes */}
             <Route path="*" element={
-              isAuthenticated ? <Navigate to="/hal" /> : <Navigate to="/login" />
+              isAuthenticated() ? <Navigate to="/hal" /> : <Navigate to="/auth" />
             } />
           </Routes>
           

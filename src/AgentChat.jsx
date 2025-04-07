@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAgentDebug } from './useAgentDebug'
 import TerminalDrawer from './TerminalDrawer'
+import { logout } from './hooks/useAuth'
 
 export default function AgentChat() {
   const [messages, setMessages] = useState([])
@@ -13,6 +15,7 @@ export default function AgentChat() {
   const feedRef = useRef(null)
   const [debugOpen, setDebugOpen] = useState(false)
   const { payload, memory, logs, logPayload, logMemory, logThoughts } = useAgentDebug()
+  const navigate = useNavigate()
 
   useEffect(() => {
     feedRef.current?.scrollTo(0, feedRef.current.scrollHeight)
@@ -92,6 +95,11 @@ export default function AgentChat() {
     e.preventDefault()
   }
 
+  const handleLogout = () => {
+    logout()
+    navigate('/auth')
+  }
+
   return (
     <div 
       className="flex flex-col h-screen"
@@ -99,6 +107,15 @@ export default function AgentChat() {
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
+      <div className="p-2 flex justify-end">
+        <button 
+          onClick={handleLogout} 
+          className="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Logout
+        </button>
+      </div>
+      
       <div ref={feedRef} className="flex-1 overflow-y-auto p-4">
         {messages.map((msg, i) => (
           <div key={i} className={`my-2 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
