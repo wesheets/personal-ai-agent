@@ -177,7 +177,7 @@ const AgentTestPanel = () => {
     
     try {
       // Send request to streaming endpoint
-      const response = await fetch('/api/agent/delegate-stream', {
+      const response = await fetch('/api/delegate-stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
