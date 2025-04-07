@@ -11,6 +11,7 @@ import MainActivityFeed from './pages/MainActivityFeed';
 import SettingsPage from './pages/SettingsPage';
 import AgentListPage from './pages/AgentListPage';
 import AgentActivityPage from './pages/AgentActivityPage';
+import UIv2Shell from './pages/UIv2Shell';
 import ErrorBoundary from './components/ErrorBoundary';
 import StatusOverlay from './components/StatusOverlay';
 import { StatusProvider } from './context/StatusContext';
@@ -50,6 +51,11 @@ function App() {
                     <Route path="/" element={
                       <ErrorBoundary>
                         <Dashboard />
+                      </ErrorBoundary>
+                    } />
+                    <Route path="/ui-v2" element={
+                      <ErrorBoundary>
+                        <UIv2Shell />
                       </ErrorBoundary>
                     } />
                     <Route path="/builder" element={
