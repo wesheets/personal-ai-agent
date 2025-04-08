@@ -1,21 +1,25 @@
 import React from 'react';
+import { Box, Flex, Text, Icon, VStack, HStack, useColorMode, Divider } from '@chakra-ui/react';
 import {
-  Box,
-  Flex,
-  Text,
-  Icon,
-  VStack,
-  HStack,
-  useColorMode,
-  Divider,
-} from '@chakra-ui/react';
-import { FiMenu, FiHome, FiSettings, FiActivity, FiDatabase, FiList, FiCode, FiServer, FiSearch } from 'react-icons/fi';
-import { Link, useLocation } from 'react-router-dom';
+  FiMenu,
+  FiHome,
+  FiSettings,
+  FiActivity,
+  FiDatabase,
+  FiList,
+  FiCode,
+  FiServer,
+  FiSearch
+} from 'react-icons/fi';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 const Sidebar = () => {
   const { colorMode } = useColorMode();
   const location = useLocation();
-  
+  const navigate = useNavigate();
+  const { isAuthenticated, loading } = useAuth();
+
   // Navigation items with corrected paths to match App.jsx routes
   const navItems = [
     { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
@@ -27,9 +31,19 @@ const Sidebar = () => {
     { name: 'Activity Feed', icon: FiActivity, path: '/activity' },
     { name: 'Agent Activity', icon: FiActivity, path: '/agent-activity' },
     { name: 'Settings', icon: FiSettings, path: '/settings' },
-    { name: 'HAL Interface', icon: FiCode, path: '/hal' },
+    { name: 'HAL Interface', icon: FiCode, path: '/hal' }
   ];
-  
+
+  // Safe navigation handler that checks auth state before navigating
+  const handleNavigation = (path) => (e) => {
+    e.preventDefault(); // Prevent default Link behavior
+
+    // Only navigate if authenticated and not in loading state
+    if (isAuthenticated() && !loading) {
+      navigate(path);
+    }
+  };
+
   return (
     <Box
       as="nav"
@@ -44,40 +58,70 @@ const Sidebar = () => {
       zIndex="900"
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontWeight="bold" color={colorMode === 'light' ? 'brand.500' : 'brand.300'}>
+        <Text
+          fontSize="2xl"
+          fontWeight="bold"
+          color={colorMode === 'light' ? 'brand.500' : 'brand.300'}
+        >
           Promethios
         </Text>
         <Icon as={FiMenu} display={{ base: 'flex', md: 'none' }} />
       </Flex>
-      
+
       <VStack spacing={0} align="stretch" mt={4}>
         {navItems.map((item) => (
-          <Link to={item.path} key={item.name}>
+          <Box
+            as="a"
+            href={item.path}
+            key={item.name}
+            onClick={handleNavigation(item.path)}
+            cursor="pointer"
+          >
             <HStack
               px={8}
               py={3}
               spacing={4}
-              bg={location.pathname === item.path ? (colorMode === 'light' ? 'gray.100' : 'gray.700') : 'transparent'}
-              color={location.pathname === item.path ? (colorMode === 'light' ? 'brand.600' : 'brand.300') : (colorMode === 'light' ? 'gray.600' : 'gray.300')}
+              bg={
+                location.pathname === item.path
+                  ? colorMode === 'light'
+                    ? 'gray.100'
+                    : 'gray.700'
+                  : 'transparent'
+              }
+              color={
+                location.pathname === item.path
+                  ? colorMode === 'light'
+                    ? 'brand.600'
+                    : 'brand.300'
+                  : colorMode === 'light'
+                    ? 'gray.600'
+                    : 'gray.300'
+              }
               _hover={{
                 bg: colorMode === 'light' ? 'gray.100' : 'gray.700',
-                color: colorMode === 'light' ? 'brand.600' : 'brand.300',
+                color: colorMode === 'light' ? 'brand.600' : 'brand.300'
               }}
               transition="all 0.2s"
               borderLeftWidth={location.pathname === item.path ? '4px' : '0px'}
-              borderColor={location.pathname === item.path ? (colorMode === 'light' ? 'brand.500' : 'brand.300') : 'transparent'}
+              borderColor={
+                location.pathname === item.path
+                  ? colorMode === 'light'
+                    ? 'brand.500'
+                    : 'brand.300'
+                  : 'transparent'
+              }
             >
               <Icon as={item.icon} />
               <Text fontWeight={location.pathname === item.path ? 'medium' : 'normal'}>
                 {item.name}
               </Text>
             </HStack>
-          </Link>
+          </Box>
         ))}
       </VStack>
-      
+
       <Divider my={4} />
-      
+
       <Box px={8} py={4}>
         <Text fontSize="xs" color="gray.500">
           Promethios OS v1.0.0

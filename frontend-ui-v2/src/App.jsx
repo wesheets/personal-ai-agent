@@ -103,12 +103,23 @@ const AgentChatView = () => {
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
+  // Show loading indicator while auth state is being determined
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minH="100vh">
+        <Text fontSize="lg">Loading...</Text>
+      </Box>
+    );
+  }
+
+  // Only redirect if not authenticated and not in loading state
   if (!isAuthenticated()) {
     return <Navigate to="/auth" />;
   }
 
+  // Render the authenticated layout with children
   return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
 };
 
