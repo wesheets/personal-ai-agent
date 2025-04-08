@@ -16,7 +16,7 @@ import { Link, useLocation } from 'react-router-dom';
 const Sidebar = () => {
   const { colorMode } = useColorMode();
   const location = useLocation();
-
+  
   // Navigation items with corrected paths to match App.jsx routes
   const navItems = [
     { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
@@ -67,7 +67,7 @@ const Sidebar = () => {
               // Ensure authentication state is preserved
               const isAuth = localStorage.getItem('isAuthenticated') === 'true';
               if (isAuth) {
-                // Use window.location for a full page navigation to avoid React Router issues
+                // Use relative paths for navigation to avoid hardcoded URLs
                 window.location.href = item.path;
               } else {
                 // If not authenticated, redirect to login

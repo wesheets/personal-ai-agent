@@ -31,6 +31,46 @@ apiClient.interceptors.response.use(
   }
 );
 
+// Control service for system status and control operations
+export const controlService = {
+  // Get agent status
+  getAgentStatus: async () => {
+    try {
+      const response = await apiClient.get('/api/agent/status');
+      return response.data;
+    } catch (error) {
+      console.error('Error getting agent status:', error);
+      return {
+        agents: [],
+        status: 'error',
+        message: error.message
+      };
+    }
+  },
+
+  // Get control mode
+  getControlMode: async () => {
+    try {
+      const response = await apiClient.get('/api/system/control-mode');
+      return response.data;
+    } catch (error) {
+      console.error('Error getting control mode:', error);
+      throw error;
+    }
+  },
+
+  // Set control mode
+  setControlMode: async (mode) => {
+    try {
+      const response = await apiClient.post('/api/system/control-mode', { mode });
+      return response.data;
+    } catch (error) {
+      console.error('Error setting control mode:', error);
+      throw error;
+    }
+  }
+};
+
 // API service functions with null-safe handling
 const ApiService = {
   // Mock streaming function for development

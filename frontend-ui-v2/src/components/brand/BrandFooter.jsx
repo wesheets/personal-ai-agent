@@ -7,6 +7,9 @@ const BrandFooter = ({ showVersion = true, ...props }) => {
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   const textColor = useColorModeValue('gray.600', 'gray.400');
   
+  // Get frontend URL from environment variables or default to production domain
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL || 'https://promethios.ai';
+  
   const version = 'v2.0.0'; // Version should be dynamically pulled from package.json in a real implementation
   const currentYear = new Date().getFullYear();
   
@@ -46,7 +49,7 @@ const BrandFooter = ({ showVersion = true, ...props }) => {
           
           <Button 
             as="a" 
-            href="https://promethios.ai/privacy" 
+            href={`${frontendUrl}/privacy`} 
             target="_blank"
             variant="ghost" 
             size="sm"
@@ -57,7 +60,7 @@ const BrandFooter = ({ showVersion = true, ...props }) => {
           
           <Button 
             as="a" 
-            href="https://promethios.ai/terms" 
+            href={`${frontendUrl}/terms`} 
             target="_blank"
             variant="ghost" 
             size="sm"
