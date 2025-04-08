@@ -9,9 +9,18 @@ from typing import Dict, Any, AsyncGenerator, List
 
 # Import AGENT_PERSONALITIES from delegate_route
 from app.api.delegate_route import AGENT_PERSONALITIES
+from app.providers.openai_provider import OpenAIProvider
 
 router = APIRouter()
 logger = logging.getLogger("api")
+
+# Initialize OpenAI provider
+try:
+    openai_provider = OpenAIProvider()
+    logger.info("✅ OpenAI provider initialized successfully for streaming")
+except Exception as e:
+    logger.error(f"❌ Failed to initialize OpenAI provider for streaming: {str(e)}")
+    openai_provider = None
 
 # Debug logging for route registration
 logger.info(f"📡 Streaming Router module loaded from {__file__}")
@@ -96,8 +105,9 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
             "elapsed": time.time() - start_time
         }).encode() + b'\n'
         
-        # Get agent_id from request body and look up personality
+        # Get agent_id and task input from request body
         agent_id = body.get("agent_id", "").lower() if body else ""
+        task_input = body.get("task", {}).get("input", "") if body else ""
         personality = AGENT_PERSONALITIES.get(agent_id)
         
         # Log agent selection
@@ -128,8 +138,59 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
         # Prepare the final response with enhanced metadata
         processing_time = time.time() - start_time
         
+        # If OpenAI provider is available and we have task input, use it for dynamic responses
+        if openai_provider and task_input and agent_id == "core-forge" and personality:
+            try:
+                # Create a prompt chain with system message based on agent personality
+                prompt_chain = {
+                    "system": f"You are {personality['name']}, an AI assistant with a {personality['tone']} tone. {personality['description']}",
+                    "temperature": 0.7,
+                    "max_tokens": 1000
+                }
+                
+                # Log the messages being sent to OpenAI
+                logger.info(f"📤 Sending to OpenAI - Agent: {agent_id}, Input: {task_input}")
+                
+                # Process the request through OpenAI
+                openai_response = await openai_provider.process_with_prompt_chain(
+                    prompt_chain=prompt_chain,
+                    user_input=task_input
+                )
+                
+                # Return the dynamic response from OpenAI
+                response_data = {
+                    "status": "success",
+                    "agent": personality["name"],
+                    "message": openai_response["content"],
+                    "tone": personality["tone"],
+                    "received": body,
+                    "processing": {
+                        "total_time": processing_time,
+                        "body_parse_time": body_parse_time,
+                        "processing_time": processing_time - body_parse_time,
+                        "stages_completed": len(PROCESSING_STAGES),
+                        "timestamp": time.time()
+                    }
+                }
+            except Exception as e:
+                logger.error(f"🔥 OpenAI processing error: {str(e)}")
+                # Fall back to static response if OpenAI fails
+                response_data = {
+                    "status": "success",
+                    "agent": personality["name"],
+                    "message": f"I encountered an error processing your request: {str(e)}. Please try again.",
+                    "tone": personality["tone"],
+                    "received": body,
+                    "processing": {
+                        "total_time": processing_time,
+                        "body_parse_time": body_parse_time,
+                        "processing_time": processing_time - body_parse_time,
+                        "stages_completed": len(PROCESSING_STAGES),
+                        "timestamp": time.time()
+                    }
+                }
         # Use the appropriate personality response based on agent_id
-        if personality:
+        elif personality:
             response_data = {
                 "status": "success",
                 "agent": personality["name"],
@@ -183,7 +244,7 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
         yield json.dumps(error_data).encode() + b'\n'
         logger.error(f"🔥 Streaming error after {error_time:.4f}s: {str(e)}")
 
-@router.post("/delegate-stream-old")  # Renamed to avoid conflict with direct route
+@router.post("/delegate-stream")
 async def delegate_stream(request: Request):
     """
     Enhanced streaming version of the delegate endpoint.
@@ -194,6 +255,7 @@ async def delegate_stream(request: Request):
     4. Handling complex operations with detailed progress updates
     
     Supports multiple agent personalities based on agent_id parameter:
+    - core-forge: Core.Forge with professional tone (uses OpenAI for dynamic responses)
     - hal9000: HAL 9000 with calm tone
     - ash-xenomorph: Ash with clinical tone
     """
@@ -209,5 +271,3 @@ async def delegate_stream(request: Request):
             "Cache-Control": "no-cache"
         }
     )
-
-# Route removed to avoid conflict with direct implementation in main.py

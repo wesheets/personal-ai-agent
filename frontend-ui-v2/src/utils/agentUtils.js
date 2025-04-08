@@ -41,7 +41,8 @@ export const getVisibleAgents = async (options = {}) => {
     }
     
     return visibleAgents;
-  } catch (_) {
+  } catch (error) {
+    console.error('Error fetching agents:', error);
     return getFallbackAgents();
   }
 };

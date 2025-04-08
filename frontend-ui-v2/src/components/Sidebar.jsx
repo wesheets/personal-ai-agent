@@ -11,15 +11,12 @@ import {
   FiServer,
   FiSearch
 } from 'react-icons/fi';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
   const { colorMode } = useColorMode();
   const location = useLocation();
-  const navigate = useNavigate();
-  const { isAuthenticated, loading } = useAuth();
-
+  
   // Navigation items with corrected paths to match App.jsx routes
   const navItems = [
     { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
@@ -31,16 +28,21 @@ const Sidebar = () => {
     { name: 'Activity Feed', icon: FiActivity, path: '/activity' },
     { name: 'Agent Activity', icon: FiActivity, path: '/agent-activity' },
     { name: 'Settings', icon: FiSettings, path: '/settings' },
-    { name: 'HAL Interface', icon: FiCode, path: '/hal' }
+    { name: 'Core.Forge Interface', icon: FiCode, path: '/core-forge' }
   ];
 
   // Safe navigation handler that checks auth state before navigating
   const handleNavigation = (path) => (e) => {
     e.preventDefault(); // Prevent default Link behavior
 
-    // Only navigate if authenticated and not in loading state
-    if (isAuthenticated() && !loading) {
-      navigate(path);
+    // Ensure authentication state is preserved
+    const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+    if (isAuth) {
+      // Use direct location change to ensure auth state is properly evaluated
+      window.location.href = path;
+    } else {
+      // If not authenticated, redirect to login
+      window.location.href = '/auth';
     }
   };
 

@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     if (JSON.stringify(storedUser) !== JSON.stringify(user)) {
       setUser(storedUser);
     }
-  }, [location.pathname, loading]); // Re-run when route changes or loading state changes
+  }, [location.pathname, isLoggedIn, user, loading]); // Re-run when route changes, auth state changes, or loading state changes
 
   // Login function
   const login = async (email, password) => {
@@ -79,7 +79,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     setIsLoggedIn(false);
     setUser(null);
-
+    
+    // Use relative path for logout redirect
+    window.location.href = '/auth';
+    
     setLoading(false); // Clear loading state after logout
   };
 

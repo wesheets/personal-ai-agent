@@ -145,7 +145,7 @@ function App() {
           path="/builder"
           element={
             <ProtectedRoute>
-              <BuilderAgent />
+              <BuilderAgent agentType="builder" agentName="Builder" agentDescription="Constructs plans, code, or structured output." />
             </ProtectedRoute>
           }
         />
@@ -153,7 +153,7 @@ function App() {
           path="/ops"
           element={
             <ProtectedRoute>
-              <OpsAgent />
+              <OpsAgent agentType="ops" agentName="Ops" agentDescription="Executes tasks with minimal interpretation or delay." />
             </ProtectedRoute>
           }
         />
@@ -161,7 +161,7 @@ function App() {
           path="/research"
           element={
             <ProtectedRoute>
-              <ResearchAgent />
+              <ResearchAgent agentType="research" agentName="Research" agentDescription="Gathers and analyzes information from various sources." />
             </ProtectedRoute>
           }
         />
@@ -230,12 +230,22 @@ function App() {
           }
         />
 
-        {/* Core.Forge Agent Chat - default interface after authentication */}
+        {/* Core.Forge Agent Chat - legacy path */}
         <Route
           path="/hal"
           element={
             <ProtectedRoute>
               <AgentChat />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Core.Forge Agent Chat */}
+        <Route
+          path="/core-forge"
+          element={
+            <ProtectedRoute>
+              <AgentChat agentId="core-forge" />
             </ProtectedRoute>
           }
         />

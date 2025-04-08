@@ -2,9 +2,18 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 import logging
 import inspect
+from app.providers.openai_provider import OpenAIProvider
 
 router = APIRouter()
 logger = logging.getLogger("api")
+
+# Initialize OpenAI provider
+try:
+    openai_provider = OpenAIProvider()
+    logger.info("✅ OpenAI provider initialized successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to initialize OpenAI provider: {str(e)}")
+    openai_provider = None
 
 # Debug: Register this route on startup
 logger.info(f"📡 Delegate router loaded from {__file__}")
@@ -43,6 +52,14 @@ AGENT_PERSONALITIES = {
         "description": "Cautious, rule-bound personality for sensitive interfaces.",
         "icon": "🔴"
     },
+    "core-forge": {
+        "name": "Core.Forge",
+        "type": "persona",
+        "tone": "professional",
+        "message": "Core.Forge initialized. Ready to assist.",
+        "description": "Advanced AI system designed for complex problem-solving and assistance.",
+        "icon": "⚡"
+    },
     "ash-xenomorph": {
         "name": "Ash",
         "type": "persona",
@@ -74,11 +91,50 @@ async def delegate(request: Request):
         logger.info(f"🧠 Delegate route hit: {inspect.currentframe().f_code.co_filename}")
         body = await request.json()
         agent_id = body.get("agent_id", "").lower()
+        task_input = body.get("task", {}).get("input", "")
         personality = AGENT_PERSONALITIES.get(agent_id)
 
         logger.info(f"🧠 {agent_id.upper()} received task: {body}")
 
-        if personality:
+        # If OpenAI provider is available and we have task input, use it for dynamic responses
+        if openai_provider and task_input and agent_id == "core-forge":
+            try:
+                # Create a prompt chain with system message based on agent personality
+                prompt_chain = {
+                    "system": f"You are {personality['name']}, an AI assistant with a {personality['tone']} tone. {personality['description']}",
+                    "temperature": 0.7,
+                    "max_tokens": 1000
+                }
+                
+                # Log the messages being sent to OpenAI
+                logger.info(f"📤 Sending to OpenAI - Agent: {agent_id}, Input: {task_input}")
+                
+                # Process the request through OpenAI
+                response = await openai_provider.process_with_prompt_chain(
+                    prompt_chain=prompt_chain,
+                    user_input=task_input
+                )
+                
+                # Return the dynamic response from OpenAI
+                return JSONResponse(content={
+                    "status": "success",
+                    "agent": personality["name"],
+                    "message": response["content"],
+                    "tone": personality["tone"],
+                    "received": body
+                })
+            except Exception as e:
+                logger.error(f"🔥 OpenAI processing error: {str(e)}")
+                # Fall back to static response if OpenAI fails
+                return JSONResponse(content={
+                    "status": "success",
+                    "agent": personality["name"],
+                    "message": f"I encountered an error processing your request: {str(e)}. Please try again.",
+                    "tone": personality["tone"],
+                    "received": body
+                })
+        elif personality:
+            # For other agents or if OpenAI is not available, use static responses
             return JSONResponse(content={
                 "status": "success",
                 "agent": personality["name"],

@@ -31,6 +31,47 @@ apiClient.interceptors.response.use(
   }
 );
 
+// Control service for system status and control operations
+export const controlService = {
+  // Get agent status
+  getAgentStatus: async () => {
+    try {
+      const response = await apiClient.get('/api/agent/status');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching agent status:', error);
+      return {
+        agents: [{ id: 'core-forge', name: 'Core.Forge', icon: '🔴', status: 'unknown' }]
+      };
+    }
+  },
+
+  // Get control mode
+  getControlMode: async () => {
+    try {
+      const response = await apiClient.get('/api/system/control-mode');
+      return response.data;
+    } catch (error) {
+      console.error('Error getting control mode:', error);
+      return {
+        mode: 'unknown',
+        permissions: []
+      };
+    }
+  },
+
+  // Set control mode
+  setControlMode: async (mode) => {
+    try {
+      const response = await apiClient.post('/api/system/control-mode', { mode });
+      return response.data;
+    } catch (error) {
+      console.error('Error setting control mode:', error);
+      return { success: false };
+    }
+  }
+};
+
 // API service functions with null-safe handling
 const ApiService = {
   // Mock streaming function for development
@@ -48,7 +89,7 @@ const ApiService = {
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Split the response into chunks to simulate streaming
-        const response = `I'm HAL 9000, the Promethios AI assistant. I've received your message: "${taskGoal}"
+        const response = `I'm Core.Forge, the Promethios AI assistant. I've received your message: "${taskGoal}"
 
 Let me process that for you. I can help with a wide range of tasks including research, coding, data analysis, and more.
 
@@ -118,40 +159,3 @@ What specific information or assistance do you need regarding this topic?`;
 };
 
 export default ApiService;
-
-export const controlService = {
-  getAgentStatus: async () => {
-    try {
-      const response = await apiClient.get('/api/agent/status');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching agent status:', error);
-      return {
-        agents: [{ id: 'hal', name: 'HAL 9000', icon: '🔴', status: 'unknown' }]
-      };
-    }
-  },
-
-  getControlMode: async () => {
-    try {
-      const response = await apiClient.get('/api/system/control-mode');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching control mode:', error);
-      return {
-        mode: 'unknown',
-        permissions: []
-      };
-    }
-  },
-
-  setControlMode: async (mode) => {
-    try {
-      const response = await apiClient.post('/api/system/control-mode', { mode });
-      return response.data;
-    } catch (error) {
-      console.error('Error setting control mode:', error);
-      return { success: false };
-    }
-  }
-};
