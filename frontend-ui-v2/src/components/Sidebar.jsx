@@ -16,17 +16,18 @@ const Sidebar = () => {
   const { colorMode } = useColorMode();
   const location = useLocation();
   
-  // Navigation items
+  // Navigation items with updated paths to match App.jsx routes
   const navItems = [
-    { name: 'Dashboard', icon: FiHome, path: '/' },
+    { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
     { name: 'Builder Agent', icon: FiCode, path: '/builder' },
     { name: 'Ops Agent', icon: FiServer, path: '/ops' },
     { name: 'Research Agent', icon: FiSearch, path: '/research' },
-    { name: 'Memory Agent', icon: FiDatabase, path: '/memory' },
+    { name: 'Memory Agent', icon: FiDatabase, path: '/memory-agent' },
     { name: 'Memory Browser', icon: FiList, path: '/memory-browser' },
-    { name: 'Activity Feed', icon: FiActivity, path: '/activity' },
+    { name: 'Activity Feed', icon: FiActivity, path: '/activity-feed' },
     { name: 'Agent Activity', icon: FiActivity, path: '/agent-activity' },
     { name: 'Settings', icon: FiSettings, path: '/settings' },
+    { name: 'HAL Interface', icon: FiCode, path: '/hal' },
   ];
   
   return (
