@@ -1,33 +1,90 @@
-// src/components/TerminalDrawer.jsx
-// eslint-disable-next-line no-unused-vars
-import { useState } from 'react'
+import React from 'react';
+import {
+  Box,
+  Button,
+  Heading,
+  Text,
+  VStack,
+  Flex,
+  CloseButton,
+  Divider
+} from '@chakra-ui/react';
 
 export default function TerminalDrawer({ open, onClose, payload, memory, logs }) {
   return (
-    <div className={`fixed top-0 right-0 h-full w-[30rem] bg-black text-green-400 p-4 shadow-lg transition-transform z-50 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
-      <button onClick={onClose} className="text-white absolute top-2 right-2 text-xl">✕</button>
-      <h2 className="text-lg mb-4">🧠 Agent Debug View</h2>
+    <Box
+      position="fixed"
+      top="0"
+      right="0"
+      h="100%"
+      w="30rem"
+      bg="black"
+      color="green.400"
+      p={4}
+      boxShadow="lg"
+      transform={open ? 'translateX(0)' : 'translateX(100%)'}
+      transition="transform 0.3s ease"
+      zIndex={50}
+      overflowY="auto"
+    >
+      <CloseButton position="absolute" top={2} right={2} color="white" onClick={onClose} />
+      <Heading size="md" mb={4}>🧠 Agent Debug View</Heading>
 
-      <section className="mb-6">
-        <h3 className="text-sm font-bold border-b border-green-700 mb-1">🔁 Task Payload</h3>
-        <pre className="whitespace-pre-wrap text-xs overflow-x-auto bg-black p-2 border border-green-700 rounded">
-{JSON.stringify(payload, null, 2) || '// No task submitted yet'}
-        </pre>
-      </section>
+      <VStack spacing={6} align="stretch">
+        <Box>
+          <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>
+            🔁 Task Payload
+          </Text>
+          <Box 
+            whiteSpace="pre-wrap" 
+            fontSize="xs" 
+            overflowX="auto" 
+            bg="black" 
+            p={2} 
+            border="1px" 
+            borderColor="green.700" 
+            borderRadius="md"
+          >
+            {JSON.stringify(payload, null, 2) || '// No task submitted yet'}
+          </Box>
+        </Box>
 
-      <section className="mb-6">
-        <h3 className="text-sm font-bold border-b border-green-700 mb-1">🧠 Memory Accessed</h3>
-        <pre className="whitespace-pre-wrap text-xs overflow-x-auto bg-black p-2 border border-green-700 rounded">
-{memory || '// No memory log yet'}
-        </pre>
-      </section>
+        <Box>
+          <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>
+            🧠 Memory Accessed
+          </Text>
+          <Box 
+            whiteSpace="pre-wrap" 
+            fontSize="xs" 
+            overflowX="auto" 
+            bg="black" 
+            p={2} 
+            border="1px" 
+            borderColor="green.700" 
+            borderRadius="md"
+          >
+            {memory || '// No memory log yet'}
+          </Box>
+        </Box>
 
-      <section>
-        <h3 className="text-sm font-bold border-b border-green-700 mb-1">🧪 Reasoning & Logs</h3>
-        <pre className="whitespace-pre-wrap text-xs overflow-x-auto bg-black p-2 border border-green-700 rounded">
-{logs || '// Agent has not returned internal reasoning yet'}
-        </pre>
-      </section>
-    </div>
-  )
+        <Box>
+          <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>
+            🧪 Reasoning & Logs
+          </Text>
+          <Box 
+            whiteSpace="pre-wrap" 
+            fontSize="xs" 
+            overflowX="auto" 
+            bg="black" 
+            p={2} 
+            border="1px" 
+            borderColor="green.700" 
+            borderRadius="md"
+          >
+            {logs || '// Agent has not returned internal reasoning yet'}
+          </Box>
+        </Box>
+      </VStack>
+    </Box>
+  );
 }
