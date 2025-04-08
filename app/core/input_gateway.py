@@ -286,7 +286,7 @@ async def startup_event():
 if __name__ == "__main__":
     import uvicorn
     create_log_directories()
-    # Get port from environment variable with fallback to 8000
-    port = int(os.environ.get("PORT", 8000))
+    # Explicitly set port to 8000 for consistency across environments
+    port = 8000
     logger.info(f"Starting server on port {port}")
     uvicorn.run(app, host="0.0.0.0", port=port)

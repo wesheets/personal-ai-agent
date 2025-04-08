@@ -1,9 +1,11 @@
 # Manus Frontend Implementation Documentation
 
 ## Project Overview
+
 This document provides an overview of the Manus Personal AI Agent System frontend implementation. The frontend is built using React 18.2 with Chakra UI, following the requirements specified in the frontend UI rollout document.
 
 ## Technology Stack
+
 - **Framework**: React 18.2
 - **Styling**: Chakra UI
 - **Build Tool**: Vite
@@ -12,6 +14,7 @@ This document provides an overview of the Manus Personal AI Agent System fronten
 - **Deployment**: Railway (Static Site)
 
 ## Project Structure
+
 ```
 manus-frontend/
 ├── public/
@@ -46,53 +49,67 @@ manus-frontend/
 ## Key Features
 
 ### 1. Sidebar Navigation
+
 - Responsive sidebar with mobile drawer
 - Sections for Dashboard, Builder Agent, Ops Agent, Research Agent, Memory Agent, Memory Browser, and Settings
 - Active route highlighting
 
 ### 2. Dashboard View
+
 - 4 Agent Cards with null-safe property access
 - Recent Activity Feed with auto-refresh
 - Connection to /api/logs/latest endpoint
 
 ### 3. Agent Panels (Builder/Ops/Research)
+
 - Task Name and Goal inputs
 - Submission to POST /api/agent/delegate
 - Response display with Task ID and Status
 - Local history of last 3 delegated tasks
 
 ### 4. Memory Agent View
+
 - Split pane layout
 - Paste Text functionality with POST /api/memory
 - Upload Files feature with drag & drop support for TXT, PDF, and JSON files
 
 ### 5. Memory Browser
+
 - Fetches and displays data from GET /api/memory
 - Shows title, timestamp, and preview content
 - Expand/collapse functionality
 
 ### 6. Activity Feed Panel
+
 - ChatGPT-like center pane
 - Smooth scrolling UX
 - Displays logs, task results, and memory interactions
 
 ### 7. Settings Page
+
 - Basic layout with "Settings coming soon" message
 - Placeholder sections for future implementation
 
 ## API Integration
+
 All API calls use environment variables to avoid hardcoding URLs:
+
 ```javascript
 // Example from ApiService.js
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
-  },
+    'Content-Type': 'application/json'
+  }
 });
 ```
 
+## Backend Configuration
+
+The backend runs on port 8000 by default. Railway's healthcheck and Uvicorn must match this to avoid false failures. This standardization ensures consistent behavior across local development, Railway, and other deployment environments.
+
 ## Error Handling & Defensive Coding
+
 The application implements comprehensive error handling and defensive coding:
 
 1. **ErrorBoundary Component**: Catches and displays errors gracefully
@@ -102,6 +119,7 @@ The application implements comprehensive error handling and defensive coding:
 5. **Utility Functions**: Includes defensive coding utilities in defensiveCoding.js
 
 ## Environment Configuration
+
 - **.env**: Contains development environment variables
   ```
   VITE_API_BASE_URL=http://localhost:8000
@@ -112,6 +130,7 @@ The application implements comprehensive error handling and defensive coding:
   ```
 
 ## Deployment Instructions
+
 1. Build the project:
    ```
    npm run build
@@ -124,19 +143,27 @@ The application implements comprehensive error handling and defensive coding:
      "https://your-frontend.up.railway.app"
    ]
    ```
+4. Configure Railway service settings:
+   - Set Healthcheck Port to 8000
+   - Set Healthcheck Path to /health
+   - Consider increasing timeout to 10-15s for startup delay compatibility
 
 ## Known Issues
+
 - Dependency compatibility issues between Chakra UI packages may require further resolution
 - Local development server may encounter errors related to component imports
 
 ## Future Improvements
+
 - Complete API integration with actual backend endpoints
 - Implement real-time updates for activity feed
 - Add user authentication and profile management
 - Expand settings functionality
 
 ## Backend Integration
+
 This frontend integrates with the Task Memory Loop + Multi-Agent State Tracking backend system, which provides:
+
 - Task state management
 - Status tracking
 - Goal continuation
