@@ -19,15 +19,15 @@ export const AuthProvider = ({ children }) => {
         role: 'admin',
         lastLogin: new Date().toISOString()
       };
-      
+
       // Store auth state in localStorage
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('user', JSON.stringify(userData));
-      
+
       // Update state
       setIsLoggedIn(true);
       setUser(userData);
-      
+
       return true;
     } else {
       throw new Error('Invalid credentials');
@@ -39,15 +39,24 @@ export const AuthProvider = ({ children }) => {
     // Clear auth state from localStorage
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
-    
+
     // Update state
     setIsLoggedIn(false);
     setUser(null);
   };
 
   // Check if user is authenticated
+  // Modified to check localStorage directly to ensure consistent auth state
   const isAuthenticated = () => {
-    return isLoggedIn;
+    // Always check localStorage directly to avoid stale state issues
+    const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+
+    // Update state if it doesn't match localStorage
+    if (authStatus !== isLoggedIn) {
+      setIsLoggedIn(authStatus);
+    }
+
+    return authStatus;
   };
 
   // Auth context value
