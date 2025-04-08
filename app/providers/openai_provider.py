@@ -30,33 +30,31 @@ class OpenAIProvider(ModelProvider):
     ) -> Dict[str, Any]:
         """
         Process user input through a prompt chain using OpenAI's API
-        
-        Args:
-            prompt_chain: The prompt chain configuration
-            user_input: The user's input text
-            context: Optional context information
-            
-        Returns:
-            Dict containing the response and metadata
         """
-        # Prepare the messages based on the prompt chain
         messages = self._prepare_messages(prompt_chain, user_input, context)
-        
-        # Get the model from the prompt chain or use default
+
+        # Inject HAL's fallback personality if no system message exists
+        has_system = any(msg["role"] == "system" for msg in messages)
+        if not has_system:
+            messages.insert(0, {
+                "role": "system",
+                "content": (
+                    "You are HAL, an emotionally-aware, hyper-intelligent AI assistant. "
+                    "You speak calmly, precisely, and always with thoughtful intent."
+                )
+            })
+
         model = prompt_chain.get("model", self.default_model)
-        
-        # Call the OpenAI API
+
         response = await self.client.chat.completions.create(
             model=model,
             messages=messages,
             temperature=prompt_chain.get("temperature", 0.7),
             max_tokens=prompt_chain.get("max_tokens", 1000),
         )
-        
-        # Extract the content from the response
+
         content = response.choices[0].message.content
-        
-        # Return the result with metadata
+
         return {
             "content": content,
             "usage": {
@@ -77,53 +75,28 @@ class OpenAIProvider(ModelProvider):
     ) -> list:
         """
         Prepare the messages for the OpenAI API based on the prompt chain
-        
-        Args:
-            prompt_chain: The prompt chain configuration
-            user_input: The user's input text
-            context: Optional context information
-            
-        Returns:
-            List of message dictionaries for the OpenAI API
         """
         messages = []
-        
-        # Add system message if present
+
         if "system" in prompt_chain:
             messages.append({"role": "system", "content": prompt_chain["system"]})
-        
-        # Add examples if present
+
         if "examples" in prompt_chain:
             for example in prompt_chain["examples"]:
                 if "user" in example:
                     messages.append({"role": "user", "content": example["user"]})
                 if "assistant" in example:
                     messages.append({"role": "assistant", "content": example["assistant"]})
-        
-        # Add context if provided
+
         if context:
             context_str = json.dumps(context)
             messages.append({"role": "system", "content": f"Additional context: {context_str}"})
-        
-        # Add user input
+
         messages.append({"role": "user", "content": user_input})
-        
         return messages
     
     def get_available_models(self) -> List[str]:
-        """
-        Get a list of available OpenAI models
-        
-        Returns:
-            List of model identifiers
-        """
         return self.available_models
     
     def get_default_model(self) -> str:
-        """
-        Get the default OpenAI model
-        
-        Returns:
-            Default model identifier
-        """
         return self.default_model
