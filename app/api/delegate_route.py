@@ -90,32 +90,30 @@ async def delegate(request: Request):
     try:
         logger.info(f"🧠 Delegate route hit: {inspect.currentframe().f_code.co_filename}")
         body = await request.json()
+
         agent_id = body.get("agent_id", "").lower()
+        prompt = body.get("prompt", "").strip()
         task_input = body.get("task", {}).get("input", "")
         personality = AGENT_PERSONALITIES.get(agent_id)
 
-        logger.info(f"🧠 {agent_id.upper()} received task: {body}")
+        logger.info(f"🧠 {agent_id.upper()} received task: {task_input or prompt}")
 
-        # If OpenAI provider is available and we have task input, use it for dynamic responses
+        # Handle Core.Forge with OpenAIProvider if available
         if openai_provider and task_input and agent_id == "core-forge":
             try:
-                # Create a prompt chain with system message based on agent personality
                 prompt_chain = {
                     "system": f"You are {personality['name']}, an AI assistant with a {personality['tone']} tone. {personality['description']}",
                     "temperature": 0.7,
                     "max_tokens": 1000
                 }
-                
-                # Log the messages being sent to OpenAI
+
                 logger.info(f"📤 Sending to OpenAI - Agent: {agent_id}, Input: {task_input}")
-                
-                # Process the request through OpenAI
+
                 response = await openai_provider.process_with_prompt_chain(
                     prompt_chain=prompt_chain,
                     user_input=task_input
                 )
-                
-                # Return the dynamic response from OpenAI
+
                 return JSONResponse(content={
                     "status": "success",
                     "agent": personality["name"],
@@ -125,7 +123,6 @@ async def delegate(request: Request):
                 })
             except Exception as e:
                 logger.error(f"🔥 OpenAI processing error: {str(e)}")
-                # Fall back to static response if OpenAI fails
                 return JSONResponse(content={
                     "status": "success",
                     "agent": personality["name"],
@@ -133,23 +130,16 @@ async def delegate(request: Request):
                     "tone": personality["tone"],
                     "received": body
                 })
-        elif personality:
-            # For other agents or if OpenAI is not available, use static responses
-            return JSONResponse(content={
-                "status": "success",
-                "agent": personality["name"],
-                "message": personality["message"],
-                "tone": personality["tone"],
-                "received": body
-            })
-        else:
-            return JSONResponse(content={
-                "status": "success",
-                "agent": agent_id or "unknown",
-                "message": "No personality assigned. Executing generic protocol.",
-                "tone": "neutral",
-                "received": body
-            })
+
+        # Fallback for static response (non-Core.Forge or no OpenAI fallback)
+        fallback_msg = personality["message"] if personality else "Ready to assist."
+        return JSONResponse(content={
+            "status": "success",
+            "agent": personality["name"] if personality else agent_id,
+            "message": fallback_msg,
+            "tone": personality["tone"] if personality else "neutral",
+            "received": body
+        })
 
     except Exception as e:
         logger.error(f"🔥 Delegate route error: {str(e)}")
