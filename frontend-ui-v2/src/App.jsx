@@ -17,6 +17,11 @@ import { StatusProvider } from './context/StatusContext';
 import { SettingsProvider } from './context/SettingsContext';
 import './styles/animations.css';
 
+// Import HAL UI and Auth components
+import AgentChat from './components/AgentChat';
+import LoginPage from './pages/LoginPage';
+import { isAuthenticated, logout } from './hooks/useAuth';
+
 // Agent Chat View Component
 const AgentChatView = () => {
   const { agentId } = useParams();
@@ -30,7 +35,7 @@ const AgentChatView = () => {
         setLoading(true);
         // Try to fetch agent data from API
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/agents/${agentId}`);
-        
+
         // If API fails, use mock data
         if (!response.ok) {
           // Mock data for specific agents
@@ -117,38 +122,46 @@ const AgentChatView = () => {
   return (
     <Box p={4}>
       <Flex align="center" mb={6}>
-        <Box fontSize="3xl" mr={3}>{agentData.icon}</Box>
+        <Box fontSize="3xl" mr={3}>
+          {agentData.icon}
+        </Box>
         <Box>
-          <Box fontSize="2xl" fontWeight="bold">{agentData.name}</Box>
+          <Box fontSize="2xl" fontWeight="bold">
+            {agentData.name}
+          </Box>
           <Box color="gray.500">Status: {agentData.status}</Box>
         </Box>
       </Flex>
-      
+
       <Box mb={6}>{agentData.description}</Box>
-      
+
       <Box p={4} borderWidth="1px" borderRadius="lg">
-        <Box fontWeight="bold" mb={3}>Chat Interface</Box>
+        <Box fontWeight="bold" mb={3}>
+          Chat Interface
+        </Box>
         <Box bg="gray.100" p={4} borderRadius="md" height="300px" mb={4}>
           {/* Chat messages would appear here */}
           <Box textAlign="center" color="gray.500" mt="120px">
             No messages yet. Start a conversation with {agentData.name}.
           </Box>
         </Box>
-        
+
         <Flex>
           <Box flex="1" mr={3}>
-            <Box as="input" 
-              w="100%" 
-              p={2} 
-              borderWidth="1px" 
+            <Box
+              as="input"
+              w="100%"
+              p={2}
+              borderWidth="1px"
               borderRadius="md"
               placeholder={`Message ${agentData.name}...`}
             />
           </Box>
-          <Box as="button" 
-            bg="blue.500" 
-            color="white" 
-            px={4} 
+          <Box
+            as="button"
+            bg="blue.500"
+            color="white"
+            px={4}
             borderRadius="md"
             _hover={{ bg: 'blue.600' }}
           >
@@ -160,104 +173,265 @@ const AgentChatView = () => {
   );
 };
 
+// Layout component for authenticated routes
+const AuthenticatedLayout = ({ children }) => {
+  const { colorMode } = useColorMode();
+  const navigate = React.useCallback(() => {
+    // This is a simplified version - in a real app, you'd use useNavigate from react-router-dom
+    window.location.href = '/auth';
+  }, []);
+
+  return (
+    <Box minH="100vh" bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}>
+      <Flex direction="column" h="100vh">
+        {/* Top navigation area with color mode toggle and logout */}
+        <Flex
+          as="header"
+          position="fixed"
+          w="full"
+          zIndex="1000"
+          bg={colorMode === 'light' ? 'white' : 'gray.800'}
+          boxShadow="sm"
+          justifyContent="space-between"
+          p={2}
+        >
+          <Box></Box> {/* Empty box for spacing */}
+          <Flex>
+            <Box
+              as="button"
+              mr={4}
+              px={3}
+              py={1}
+              borderRadius="md"
+              bg="red.500"
+              color="white"
+              _hover={{ bg: 'red.600' }}
+              onClick={() => {
+                logout();
+                navigate();
+              }}
+            >
+              Logout
+            </Box>
+            <ColorModeToggle />
+          </Flex>
+        </Flex>
+
+        {/* Sidebar navigation */}
+        <Sidebar />
+
+        {/* Main content area */}
+        <Box ml={{ base: 0, md: '60' }} p="4" pt="20">
+          {children}
+        </Box>
+      </Flex>
+    </Box>
+  );
+};
+
 function App() {
   const { colorMode } = useColorMode();
-  
+
   return (
     <ErrorBoundary>
       <SettingsProvider>
         <StatusProvider>
           <Router>
             <Box minH="100vh" bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}>
-              <Flex direction="column" h="100vh">
-                {/* Top navigation area with color mode toggle */}
-                <Flex 
-                  as="header" 
-                  position="fixed" 
-                  w="full" 
-                  zIndex="1000"
-                  bg={colorMode === 'light' ? 'white' : 'gray.800'}
-                  boxShadow="sm"
-                  justifyContent="flex-end"
-                  p={2}
-                >
-                  <ColorModeToggle />
-                </Flex>
-                
-                {/* Sidebar navigation */}
-                <Sidebar />
-                
-                {/* Main content area */}
-                <Box ml={{ base: 0, md: '60' }} p="4" pt="20">
-                  <Routes>
-                    {/* Default route redirects to dashboard */}
-                    <Route path="/" element={
-                      <ErrorBoundary>
-                        <Dashboard />
-                      </ErrorBoundary>
-                    } />
-                    
-                    {/* Agent chat routes */}
-                    <Route path="/chat/:agentId" element={
-                      <ErrorBoundary>
-                        <AgentChatView />
-                      </ErrorBoundary>
-                    } />
-                    
-                    {/* Existing routes */}
-                    <Route path="/builder" element={
-                      <ErrorBoundary>
-                        <BuilderAgent />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/ops" element={
-                      <ErrorBoundary>
-                        <OpsAgent />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/research" element={
-                      <ErrorBoundary>
-                        <ResearchAgent />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/memory" element={
-                      <ErrorBoundary>
-                        <MemoryAgentView />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/memory-browser" element={
-                      <ErrorBoundary>
-                        <MemoryBrowser />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/activity" element={
-                      <ErrorBoundary>
-                        <MainActivityFeed />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/agent-activity" element={
-                      <ErrorBoundary>
-                        <AgentActivityPage />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/settings" element={
-                      <ErrorBoundary>
-                        <SettingsPage />
-                      </ErrorBoundary>
-                    } />
-                    <Route path="/agents" element={
-                      <ErrorBoundary>
-                        <AgentListPage />
-                      </ErrorBoundary>
-                    } />
-                    
-                    {/* Fallback for unknown routes */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </Box>
-              </Flex>
+              <Routes>
+                {/* Auth route */}
+                <Route path="/auth" element={<LoginPage />} />
+
+                {/* Root path redirect based on auth status */}
+                <Route
+                  path="/"
+                  element={isAuthenticated() ? <Navigate to="/hal" /> : <Navigate to="/auth" />}
+                />
+
+                {/* HAL Agent Chat - default interface after authentication */}
+                <Route
+                  path="/hal"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <AgentChat />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+
+                {/* Default route redirects to dashboard */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <Dashboard />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+
+                {/* Agent chat routes */}
+                <Route
+                  path="/chat/:agentId"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <AgentChatView />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+
+                {/* Existing routes with authentication */}
+                <Route
+                  path="/builder"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <BuilderAgent />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+                <Route
+                  path="/ops"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <OpsAgent />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+                <Route
+                  path="/research"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <ResearchAgent />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+                <Route
+                  path="/memory"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <MemoryAgentView />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+                <Route
+                  path="/memory-browser"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <MemoryBrowser />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+                <Route
+                  path="/activity"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <MainActivityFeed />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+                <Route
+                  path="/agent-activity"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <AgentActivityPage />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <SettingsPage />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+                <Route
+                  path="/agents"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <AgentListPage />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+
+                {/* Fallback for unknown routes */}
+                <Route
+                  path="*"
+                  element={isAuthenticated() ? <Navigate to="/hal" /> : <Navigate to="/auth" />}
+                />
+              </Routes>
             </Box>
-            
+
             {/* Global StatusOverlay - now accessible from anywhere in the app */}
             <StatusOverlay />
           </Router>
