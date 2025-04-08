@@ -16,6 +16,7 @@ import { useMemoryStore } from '../hooks/useMemoryStore';
 import MemoryFeed from './MemoryFeed';
 import { useAgentTraining } from '../hooks/useAgentTraining';
 import { injectContext } from '../hooks/useMemoryRecall';
+import { callOpenAI } from '../api/callOpenAI';
 
 const AgentChat = () => {
   const { colorMode } = useColorMode();
@@ -24,12 +25,12 @@ const AgentChat = () => {
   const msgBg = useColorModeValue('white', 'gray.700');
   const halMsgBg = useColorModeValue('blue.50', 'blue.900');
 
-  const fileInputRef = useRef(null);
+  // Removed unused fileInputRef
   const feedRef = useRef(null);
 
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
-  const [streaming, setStreaming] = useState(true);
+  // Removed streaming state as it's no longer needed with direct OpenAI calls
   const [showDebug, setShowDebug] = useState(false);
   const [showMemoryConfirm, setShowMemoryConfirm] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
@@ -60,35 +61,24 @@ const AgentChat = () => {
     setMessages(prev => [...prev, newMessage]);
     setInput('');
 
-    const contextPrompt = injectContext(input, memories);
-    const taskPayload = {
-      task_name: 'HAL',
-      task_goal: contextPrompt,
-      streaming
-    };
-    logPayload(taskPayload);
-
     try {
-      const res = await fetch('/api/delegate-stream', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskPayload)
-      });
-
-      if (!res.ok || !res.body) return;
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let agentMsg = '';
-      setMessages(prev => [...prev, { role: 'hal', content: '' }]);
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        agentMsg += decoder.decode(value);
-        setMessages(prev => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: agentMsg } : m));
-      }
-
+      // Create context-enhanced prompt
+      const contextPrompt = injectContext(input, memories);
+      
+      // Log the payload for debugging
+      const taskPayload = {
+        task_name: 'HAL',
+        task_goal: contextPrompt
+      };
+      logPayload(taskPayload);
+      
+      // Call OpenAI to get natural language response
+      const response = await callOpenAI(contextPrompt);
+      
+      // Add the response to messages
+      setMessages(prev => [...prev, { role: 'hal', content: response }]);
+      
+      // Create and add memory entry
       const memoryEntry = createMemory({
         content: input,
         type: 'task',
@@ -96,10 +86,16 @@ const AgentChat = () => {
         tags: ['hal', 'task']
       });
       addMemory(memoryEntry);
+      
+      // Show memory confirmation and log the response
       setShowMemoryConfirm(true);
-      logMemory(agentMsg);
+      logMemory(response);
     } catch (error) {
-      console.error('Error in stream:', error);
+      console.error('Error processing request:', error);
+      setMessages(prev => [...prev, { 
+        role: 'hal', 
+        content: "I'm sorry, I encountered an error processing your request. Please try again." 
+      }]);
     } finally {
       setLoading(false);
     }
@@ -138,13 +134,7 @@ const AgentChat = () => {
       </Flex>
 
       <Flex p={4} align="center" borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
-        <Text fontWeight="bold" mr={4}>Streaming</Text>
-        <Input
-          type="checkbox"
-          isChecked={streaming}
-          onChange={() => setStreaming(!streaming)}
-          w="auto"
-        />
+        <Text fontWeight="bold" mr={4}>HAL GPT-4 Interface</Text>
         <Tooltip label="Toggle Debug Drawer">
           <IconButton
             ml={4}
