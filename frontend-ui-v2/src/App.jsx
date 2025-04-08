@@ -72,20 +72,31 @@ const AgentChatView = () => {
   }, [agentId]);
 
   if (loading) return <Box p={5}>Loading agent interface...</Box>;
-  if (error) return <Box p={5} color="red.500">{error}</Box>;
+  if (error)
+    return (
+      <Box p={5} color="red.500">
+        {error}
+      </Box>
+    );
   if (!agentData) return <Box p={5}>Agent Not Found</Box>;
 
   return (
     <Box p={4}>
       <Flex align="center" mb={6}>
-        <Box fontSize="3xl" mr={3}>{agentData.icon}</Box>
+        <Box fontSize="3xl" mr={3}>
+          {agentData.icon}
+        </Box>
         <Box>
-          <Box fontSize="2xl" fontWeight="bold">{agentData.name}</Box>
+          <Box fontSize="2xl" fontWeight="bold">
+            {agentData.name}
+          </Box>
           <Box color="gray.500">Status: {agentData.status}</Box>
         </Box>
       </Flex>
       <Box mb={6}>{agentData.description}</Box>
-      <Box p={4} borderWidth="1px" borderRadius="lg">Chat with {agentData.name} coming soon.</Box>
+      <Box p={4} borderWidth="1px" borderRadius="lg">
+        Chat with {agentData.name} coming soon.
+      </Box>
     </Box>
   );
 };
@@ -93,55 +104,136 @@ const AgentChatView = () => {
 // Protected route component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
-  
+
   if (!isAuthenticated()) {
     return <Navigate to="/auth" />;
   }
-  
-  return (
-    <AuthenticatedLayout>
-      {children}
-    </AuthenticatedLayout>
-  );
+
+  return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
 };
 
 function App() {
   const { colorMode } = useColorMode();
-  
+
   return (
     <Box minH="100vh" bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}>
       <Routes>
         {/* Auth route */}
         <Route path="/auth" element={<LoginPage />} />
-        
+
         {/* Protected routes - all wrapped with AuthenticatedLayout */}
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/builder" element={<ProtectedRoute><BuilderAgent /></ProtectedRoute>} />
-        <Route path="/ops" element={<ProtectedRoute><OpsAgent /></ProtectedRoute>} />
-        <Route path="/research" element={<ProtectedRoute><ResearchAgent /></ProtectedRoute>} />
-        <Route path="/memory" element={<ProtectedRoute><MemoryAgentView /></ProtectedRoute>} />
-        <Route path="/memory-browser" element={<ProtectedRoute><MemoryBrowser /></ProtectedRoute>} />
-        <Route path="/activity" element={<ProtectedRoute><MainActivityFeed /></ProtectedRoute>} />
-        <Route path="/agent-activity" element={<ProtectedRoute><AgentActivityPage /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-        <Route path="/agents" element={<ProtectedRoute><AgentListPage /></ProtectedRoute>} />
-        <Route path="/chat/:agentId" element={<ProtectedRoute><AgentChatView /></ProtectedRoute>} />
-        <Route path="/training" element={<ProtectedRoute><TrainingDashboard /></ProtectedRoute>} />
-        
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/builder"
+          element={
+            <ProtectedRoute>
+              <BuilderAgent />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ops"
+          element={
+            <ProtectedRoute>
+              <OpsAgent />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/research"
+          element={
+            <ProtectedRoute>
+              <ResearchAgent />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/memory"
+          element={
+            <ProtectedRoute>
+              <MemoryAgentView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/memory-browser"
+          element={
+            <ProtectedRoute>
+              <MemoryBrowser />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/activity"
+          element={
+            <ProtectedRoute>
+              <MainActivityFeed />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/agent-activity"
+          element={
+            <ProtectedRoute>
+              <AgentActivityPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/agents"
+          element={
+            <ProtectedRoute>
+              <AgentListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat/:agentId"
+          element={
+            <ProtectedRoute>
+              <AgentChatView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/training"
+          element={
+            <ProtectedRoute>
+              <TrainingDashboard />
+            </ProtectedRoute>
+          }
+        />
+
         {/* HAL Agent Chat - default interface after authentication */}
-        <Route path="/hal" element={<ProtectedRoute><AgentChat /></ProtectedRoute>} />
-        
+        <Route
+          path="/hal"
+          element={
+            <ProtectedRoute>
+              <AgentChat />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Root path redirect to HAL if authenticated, otherwise to auth */}
-        <Route 
-          path="/" 
-          element={<Navigate to="/hal" />} 
-        />
-        
+        <Route path="/" element={<Navigate to="/hal" />} />
+
         {/* Fallback for unknown routes */}
-        <Route 
-          path="*" 
-          element={<Navigate to="/hal" />} 
-        />
+        <Route path="*" element={<Navigate to="/hal" />} />
       </Routes>
     </Box>
   );
@@ -149,18 +241,18 @@ function App() {
 
 const AppWithProviders = () => {
   return (
-    <AuthProvider>
-      <ErrorBoundary>
-        <SettingsProvider>
-          <StatusProvider>
-            <Router>
+    <ErrorBoundary>
+      <SettingsProvider>
+        <StatusProvider>
+          <Router>
+            <AuthProvider>
               <App />
               <StatusOverlay />
-            </Router>
-          </StatusProvider>
-        </SettingsProvider>
-      </ErrorBoundary>
-    </AuthProvider>
+            </AuthProvider>
+          </Router>
+        </StatusProvider>
+      </SettingsProvider>
+    </ErrorBoundary>
   );
 };
 
