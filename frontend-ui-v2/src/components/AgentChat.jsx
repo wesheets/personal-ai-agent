@@ -1,77 +1,159 @@
-// src/components/AgentChat.jsx
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Box,
+  Flex,
+  Input,
+  Text,
+  Textarea,
+  VStack,
+  IconButton,
+  Tooltip,
+  useColorMode,
+  useColorModeValue,
+  Button
+} from '@chakra-ui/react';
+import { AttachmentIcon, CloseIcon } from '@chakra-ui/icons';
+import TerminalDrawer from './TerminalDrawer';
+import { useAgentDebug } from '../hooks/useAgentDebug';
+import AgentFileUpload from './AgentFileUpload';
+import { createMemory } from '../api/memorySchema';
+import { useMemoryStore } from '../hooks/useMemoryStore';
+import MemoryFeed from './MemoryFeed';
 
-export default function AgentChat() {
-  const [messages, setMessages] = useState([])
-  const [input, setInput] = useState('')
-  const [streaming, setStreaming] = useState(true)
-  const [loading, setLoading] = useState(false)
-  const feedRef = useRef(null)
+const AgentChat = () => {
+  const { colorMode } = useColorMode();
+  const bg = useColorModeValue('gray.50', 'gray.800');
+  const fileInputRef = useRef(null);
+  const feedRef = useRef(null);
+
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [streaming, setStreaming] = useState(true);
+  const [showDebug, setShowDebug] = useState(false);
+  const [showMemoryConfirm, setShowMemoryConfirm] = useState(false);
+
+  const { payload, memory, logs, logPayload, logMemory, logThoughts, resetDebug } = useAgentDebug();
+  const { memories, addMemory, getAllMemories } = useMemoryStore();
 
   useEffect(() => {
-    feedRef.current?.scrollTo(0, feedRef.current.scrollHeight)
-  }, [messages])
+    feedRef.current?.scrollTo(0, feedRef.current.scrollHeight);
+  }, [messages]);
 
   const handleSubmit = async () => {
-    if (!input.trim()) return
-    setLoading(true)
+    if (!input.trim()) return;
 
-    const newMessage = { role: 'user', content: input }
-    setMessages(prev => [...prev, newMessage])
-    setInput('')
+    const taskPayload = { task_name: 'HAL', task_goal: input, streaming };
+    logPayload(taskPayload);
+
+    const userMessage = { role: 'user', content: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
 
     const res = await fetch('/api/delegate-stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task_name: 'user', task_goal: input, streaming })
-    })
+      body: JSON.stringify(taskPayload)
+    });
 
-    if (!res.ok || !res.body) return
+    if (!res.ok || !res.body) return;
 
-    const reader = res.body.getReader()
-    const decoder = new TextDecoder()
-    let agentMsg = ''
-    setMessages(prev => [...prev, { role: 'hal', content: '' }])
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let agentMsg = '';
+    setMessages(prev => [...prev, { role: 'hal', content: '' }]);
 
     while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      agentMsg += decoder.decode(value)
-      setMessages(prev => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: agentMsg } : m))
+      const { done, value } = await reader.read();
+      if (done) break;
+      agentMsg += decoder.decode(value);
+      setMessages(prev => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: agentMsg } : m));
     }
 
-    setMessages(prev => [...prev, { role: 'system', content: '💾 Memory Logged' }])
-    setLoading(false)
-  }
+    const memoryEntry = createMemory({
+      content: input,
+      type: 'task',
+      agent: 'HAL',
+      tags: ['hal', 'task']
+    });
+    addMemory(memoryEntry);
+    setShowMemoryConfirm(true);
+    logMemory(agentMsg);
+  };
+
+  const handleUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      console.log('File uploaded:', file.name);
+    }
+  };
 
   return (
-    <div className="flex flex-col h-screen">
-      <div ref={feedRef} className="flex-1 overflow-y-auto p-4">
-        {messages.map((msg, i) => (
-          <div key={i} className={`my-2 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-            <div className={`inline-block px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'}`}>
-              <strong>{msg.role === 'user' ? 'You' : msg.role.toUpperCase()}:</strong> {msg.content}
-            </div>
-          </div>
-        ))}
-      </div>
+    <Box bg={bg} p={4} minH="100vh">
+      <Flex justify="space-between" align="center" mb={4}>
+        <Text fontSize="2xl" fontWeight="bold">HAL Interface</Text>
+        <Button colorScheme="red" onClick={() => {
+          localStorage.removeItem('isAuthenticated');
+          window.location.href = '/auth';
+        }}>Logout</Button>
+      </Flex>
 
-      <div className="p-4 border-t flex items-center gap-2">
-        <button onClick={() => setStreaming(!streaming)} className="text-sm px-2 py-1 border rounded">
-          {streaming ? 'Streaming ON' : 'Streaming OFF'}
-        </button>
-        <textarea
-          className="flex-1 border rounded p-2"
-          rows={2}
-          placeholder="Enter your task..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSubmit())}
+      <Box mb={4}>
+        <Flex align="center" mb={2}>
+          <Text fontWeight="bold" mr={2}>Streaming</Text>
+          <Input
+            type="checkbox"
+            isChecked={streaming}
+            onChange={() => setStreaming(!streaming)}
+            w="auto"
+          />
+          <Tooltip label="Toggle Debug Drawer">
+            <IconButton
+              ml={3}
+              icon={<Text>{"</>"}</Text>}
+              onClick={() => setShowDebug(!showDebug)}
+              aria-label="Toggle Debug"
+            />
+          </Tooltip>
+        </Flex>
+
+        <Flex>
+          <Input
+            placeholder="Enter your task..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            mr={2}
+          />
+          <IconButton icon={<AttachmentIcon />} onClick={() => fileInputRef.current.click()} mr={2} />
+          <Button onClick={handleSubmit}>Send</Button>
+        </Flex>
+
+        <input type="file" hidden ref={fileInputRef} onChange={handleUpload} />
+      </Box>
+
+      <Box ref={feedRef} maxH="400px" overflowY="auto" p={4} bg="gray.700" borderRadius="md">
+        {messages.map((msg, i) => (
+          <Box key={i} bg={msg.role === 'hal' ? 'blue.700' : 'gray.600'} color="white" p={3} mb={2} borderRadius="md">
+            <strong>{msg.role.toUpperCase()}:</strong> {msg.content}
+          </Box>
+        ))}
+        {showMemoryConfirm && (
+          <Text mt={2} color="green.400" fontSize="sm">💾 Memory Logged</Text>
+        )}
+      </Box>
+
+      <MemoryFeed memories={getAllMemories()} />
+
+      {showDebug && (
+        <TerminalDrawer
+          open={showDebug}
+          onClose={() => setShowDebug(false)}
+          payload={payload}
+          memory={memory}
+          logs={logs}
         />
-        <button onClick={handleSubmit} disabled={loading} className="bg-white text-black px-4 py-2 rounded">
-          {loading ? 'Thinking...' : 'Send'}
-        </button>
-      </div>
-    </div>
-  )
-}
+      )}
+    </Box>
+  );
+};
+
+export default AgentChat;
