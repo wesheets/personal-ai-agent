@@ -1,4 +1,3 @@
-// src/hooks/useAgentDebug.js
 import { useState } from 'react'
 
 export function useAgentDebug() {
@@ -7,8 +6,8 @@ export function useAgentDebug() {
   const [logs, setLogs] = useState('')
 
   const logPayload = (taskPayload) => setPayload(taskPayload)
-  const logMemory = (memoryText) => setMemory(memoryText)
-  const logThoughts = (reasoning) => setLogs(reasoning)
+  const logMemory = (memoryText) => setMemory(prev => prev ? `${prev}\n${memoryText}` : memoryText)
+  const logThoughts = (reasoning) => setLogs(prev => prev ? `${prev}\n${reasoning}` : reasoning)
 
   const resetDebug = () => {
     setPayload(null)

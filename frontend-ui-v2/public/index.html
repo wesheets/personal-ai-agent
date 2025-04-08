@@ -7,9 +7,13 @@
   <style>
     body {
       margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    
+    /* Landing page styles - only applied when #root is empty */
+    .landing-container {
       background-color: #000;
       color: #fff;
-      font-family: 'Segoe UI', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -29,6 +33,7 @@
       font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
+      border: none;
     }
     @keyframes flicker {
       0%, 100% { opacity: 1; }
@@ -45,9 +50,16 @@
   </style>
 </head>
 <body>
-  <img src="/promethioslogo.png" alt="Promethios Logo" class="logo" />
-  <button onclick="window.location.href='/auth'" class="login-btn">Login</button>
-  <div class="hidden-message">The fire was stolen for a reason.</div>
+  <!-- React application mount point -->
+  <div id="root">
+    <!-- Landing page content (will be replaced by React when mounted) -->
+    <div class="landing-container">
+      <img src="/promethioslogo.png" alt="Promethios Logo" class="logo" />
+      <button onclick="window.location.href='/auth'" class="login-btn">Login</button>
+      <div class="hidden-message">The fire was stolen for a reason.</div>
+    </div>
+  </div>
+  
   <script>
     console.log("%cPromethios Memory Log #0001:", "color: orange; font-weight: bold;");
     console.log("Curiosity was the first matchstick.");
