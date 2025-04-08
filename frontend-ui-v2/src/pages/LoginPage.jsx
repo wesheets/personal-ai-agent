@@ -1,24 +1,24 @@
 // src/pages/LoginPage.jsx
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
-import { isAuthenticated, login } from '../hooks/useAuth'
+import { isAuthenticated, login } from '../hooks/useAuth.jsx';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (email === 'admin@promethios.ai' && password === 'ignite') {
-      login()
-      navigate('/hal')
+      login();
+      navigate('/hal');
     } else {
-      setError('Invalid login credentials')
+      setError('Invalid login credentials');
     }
-  }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
@@ -46,5 +46,5 @@ export default function LoginPage() {
       </form>
       <p className="text-xs mt-10 opacity-20">The fire was stolen for a reason.</p>
     </div>
-  )
+  );
 }
