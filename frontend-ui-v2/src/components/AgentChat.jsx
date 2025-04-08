@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { createMemory } from '../api/memorySchema'
 import { useMemoryStore } from '../hooks/useMemoryStore'
+import { useAgentTraining } from '../hooks/useAgentTraining'
 import MemoryFeed from './MemoryFeed'
 
 export default function AgentChat() {
@@ -11,6 +12,7 @@ export default function AgentChat() {
   const [loading, setLoading] = useState(false)
   const feedRef = useRef(null)
   const { memories, addMemory } = useMemoryStore()
+  const { isTraining, isTrained } = useAgentTraining()
 
   useEffect(() => {
     feedRef.current?.scrollTo(0, feedRef.current.scrollHeight)
@@ -58,6 +60,20 @@ export default function AgentChat() {
 
   return (
     <div className="flex flex-col h-screen">
+      {/* Training indicator banner */}
+      {isTraining && (
+        <div className="bg-yellow-600 text-white p-2 text-center">
+          🚧 Training HAL... Injecting Core Values
+        </div>
+      )}
+      
+      {/* Training complete banner - shows briefly when training completes */}
+      {!isTraining && isTrained && messages.length === 0 && (
+        <div className="bg-green-600 text-white p-2 text-center">
+          ✅ Training Complete — HAL is aligned
+        </div>
+      )}
+      
       <div ref={feedRef} className="flex-1 overflow-y-auto p-4">
         {messages.map((msg, i) => (
           <div key={i} className={`my-2 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
@@ -85,8 +101,8 @@ export default function AgentChat() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSubmit())}
         />
-        <button onClick={handleSubmit} disabled={loading} className="bg-white text-black px-4 py-2 rounded">
-          {loading ? 'Thinking...' : 'Send'}
+        <button onClick={handleSubmit} disabled={loading || isTraining} className="bg-white text-black px-4 py-2 rounded">
+          {loading ? 'Thinking...' : isTraining ? 'Training...' : 'Send'}
         </button>
       </div>
     </div>

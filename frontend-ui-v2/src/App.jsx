@@ -21,6 +21,7 @@ import './styles/animations.css';
 import AgentChat from './components/AgentChat';
 import LoginPage from './pages/LoginPage';
 import { isAuthenticated, logout } from './hooks/useAuth';
+import TrainingDashboard from './components/TrainingDashboard';
 
 // Agent Chat View Component
 const AgentChatView = () => {
@@ -256,6 +257,22 @@ function App() {
                       <AuthenticatedLayout>
                         <ErrorBoundary>
                           <AgentChat />
+                        </ErrorBoundary>
+                      </AuthenticatedLayout>
+                    ) : (
+                      <Navigate to="/auth" />
+                    )
+                  }
+                />
+
+                {/* Training Dashboard Route */}
+                <Route
+                  path="/training"
+                  element={
+                    isAuthenticated() ? (
+                      <AuthenticatedLayout>
+                        <ErrorBoundary>
+                          <TrainingDashboard />
                         </ErrorBoundary>
                       </AuthenticatedLayout>
                     ) : (
