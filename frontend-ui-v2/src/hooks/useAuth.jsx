@@ -1,3 +1,4 @@
+
 import { useState, createContext, useContext, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -12,7 +13,6 @@ export const AuthProvider = ({ children }) => {
 
   // Effect to check authentication status on route change
   useEffect(() => {
-    // Check localStorage on every navigation to ensure auth state is consistent
     const storedAuthState = localStorage.getItem('isAuthenticated') === 'true';
     if (storedAuthState !== isLoggedIn) {
       setIsLoggedIn(storedAuthState);
@@ -22,12 +22,10 @@ export const AuthProvider = ({ children }) => {
     if (JSON.stringify(storedUser) !== JSON.stringify(user)) {
       setUser(storedUser);
     }
-  }, [location.pathname]); // Re-run when route changes
+  }, [location.pathname]);
 
   // Login function
   const login = async (email, password) => {
-    // In a real app, this would make an API call
-    // For now, we'll just simulate authentication with hardcoded credentials
     if (email === 'admin@promethios.ai' && password === 'ignite') {
       const userData = {
         email,
@@ -36,11 +34,9 @@ export const AuthProvider = ({ children }) => {
         lastLogin: new Date().toISOString()
       };
 
-      // Store auth state in localStorage
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('user', JSON.stringify(userData));
 
-      // Update state
       setIsLoggedIn(true);
       setUser(userData);
 
@@ -52,22 +48,21 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = () => {
-    // Clear auth state from localStorage
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
-
-    // Update state
     setIsLoggedIn(false);
     setUser(null);
   };
 
-  // Check if user is authenticated
+  // Check if user is authenticated with localStorage as source of truth
   const isAuthenticated = () => {
-    // Always check localStorage directly to ensure we have the latest state
-    return localStorage.getItem('isAuthenticated') === 'true';
+    const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+    if (authStatus !== isLoggedIn) {
+      setIsLoggedIn(authStatus);
+    }
+    return authStatus;
   };
 
-  // Auth context value
   const value = {
     user,
     login,
