@@ -42,6 +42,7 @@ export const getVisibleAgents = async (options = {}) => {
     
     return visibleAgents;
   } catch (error) {
+    console.error('Error fetching agents:', error);
     return getFallbackAgents();
   }
 };
@@ -54,8 +55,8 @@ export const getVisibleAgents = async (options = {}) => {
  */
 const getFallbackAgents = () => {
   return [
-    { id: 'hal9000', name: 'HAL 9000', icon: '🔴', status: 'active', type: 'system' },
-    { id: 'ash-xenomorph', name: 'Ash', icon: '🧬', status: 'active', type: 'persona' }
+    { id: 'core-forge', name: 'Core.Forge', icon: '🔴', status: 'active', type: 'system' },
+    { id: 'core-run', name: 'Core.Run', icon: '🧬', status: 'active', type: 'persona' }
   ];
 };
 

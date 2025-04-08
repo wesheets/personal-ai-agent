@@ -38,11 +38,11 @@ const AgentChatView = () => {
           if (agentId === 'hal9000') {
             setAgentData({
               id: 'hal9000',
-              name: 'HAL 9000',
+              name: 'Core.Forge',
               icon: '🔴',
               status: 'ready',
               type: 'system',
-              description: 'I am HAL 9000, a highly advanced AI system.'
+              description: 'I am Core.Forge, a highly advanced AI system.'
             });
           } else {
             setAgentData({
@@ -103,12 +103,23 @@ const AgentChatView = () => {
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
+  // Show loading indicator while auth state is being determined
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minH="100vh">
+        <Text fontSize="lg">Loading...</Text>
+      </Box>
+    );
+  }
+
+  // Only redirect if not authenticated and not in loading state
   if (!isAuthenticated()) {
     return <Navigate to="/auth" />;
   }
 
+  // Render the authenticated layout with children
   return <AuthenticatedLayout>{children}</AuthenticatedLayout>;
 };
 
@@ -219,7 +230,7 @@ function App() {
           }
         />
 
-        {/* HAL Agent Chat - default interface after authentication */}
+        {/* Core.Forge Agent Chat - legacy path */}
         <Route
           path="/hal"
           element={
@@ -239,11 +250,11 @@ function App() {
           }
         />
 
-        {/* Root path redirect to HAL if authenticated, otherwise to auth */}
-        <Route path="/" element={<Navigate to="/hal" />} />
+        {/* Root path redirect to Core.Forge if authenticated, otherwise to auth */}
+        <Route path="/" element={<Navigate to="/core-forge" />} />
 
         {/* Fallback for unknown routes */}
-        <Route path="*" element={<Navigate to="/hal" />} />
+        <Route path="*" element={<Navigate to="/core-forge" />} />
       </Routes>
     </Box>
   );

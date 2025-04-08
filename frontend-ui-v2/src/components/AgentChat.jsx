@@ -1,11 +1,23 @@
-
 // src/components/AgentChat.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Box, Flex, Input, Text, VStack, IconButton, Tooltip,
-  useColorMode, useColorModeValue, Button, Heading,
-  Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton,
-  DrawerHeader, DrawerBody
+  Box,
+  Flex,
+  Input,
+  Text,
+  VStack,
+  IconButton,
+  Tooltip,
+  useColorMode,
+  useColorModeValue,
+  Button,
+  Heading,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerHeader,
+  DrawerBody
 } from '@chakra-ui/react';
 import { AttachmentIcon } from '@chakra-ui/icons';
 import TerminalDrawer from './TerminalDrawer';
@@ -65,13 +77,13 @@ const AgentChat = ({ agentId = 'hal' }) => {
     setLoading(true);
 
     const newMessage = { role: 'user', content: input };
-    setMessages(prev => [...prev, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     setInput('');
 
     try {
       // Create context-enhanced prompt
       const contextPrompt = injectContext(input, memories);
-      
+
       // Log the payload for debugging
       const taskPayload = {
         task_name: agentName,
@@ -79,7 +91,7 @@ const AgentChat = ({ agentId = 'hal' }) => {
         agent_id: agentId
       };
       logPayload(taskPayload);
-      
+
       // Call OpenAI to get natural language response
       const response = await callOpenAI(contextPrompt, agentId);
       
@@ -94,7 +106,7 @@ const AgentChat = ({ agentId = 'hal' }) => {
         tags: [agentId, 'task']
       });
       addMemory(memoryEntry);
-      
+
       // Show memory confirmation and log the response
       setShowMemoryConfirm(true);
       logMemory(response);
@@ -112,10 +124,13 @@ const AgentChat = ({ agentId = 'hal' }) => {
   const handleUpload = (file) => {
     if (file) {
       console.log('File uploaded:', file.name);
-      setMessages(prev => [...prev, {
-        role: 'system',
-        content: `File uploaded: ${file.name} (${Math.round(file.size / 1024)} KB)`
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'system',
+          content: `File uploaded: ${file.name} (${Math.round(file.size / 1024)} KB)`
+        }
+      ]);
       setShowFileUpload(false);
     }
   };
@@ -146,7 +161,7 @@ const AgentChat = ({ agentId = 'hal' }) => {
         <Tooltip label="Toggle Debug Drawer">
           <IconButton
             ml={4}
-            icon={<Text>{"</>"}</Text>}
+            icon={<Text>{'</>'}</Text>}
             onClick={() => setShowDebug(!showDebug)}
             aria-label="Toggle Debug"
             variant="outline"
@@ -154,8 +169,24 @@ const AgentChat = ({ agentId = 'hal' }) => {
         </Tooltip>
       </Flex>
 
-      <Box flex="1" overflow="hidden" display="flex" flexDirection="column" p={4} position="relative">
-        <Box ref={feedRef} flex="1" overflowY="auto" bg={feedBg} borderRadius="md" p={4} mb={4} boxShadow="sm">
+      <Box
+        flex="1"
+        overflow="hidden"
+        display="flex"
+        flexDirection="column"
+        p={4}
+        position="relative"
+      >
+        <Box
+          ref={feedRef}
+          flex="1"
+          overflowY="auto"
+          bg={feedBg}
+          borderRadius="md"
+          p={4}
+          mb={4}
+          boxShadow="sm"
+        >
           {messages.map((msg, i) => (
             <Box key={i} bg={msg.role === agentId ? agentMsgBg : msgBg} color={colorMode === 'light' ? 'gray.800' : 'white'} p={4} mb={3} borderRadius="lg" boxShadow="sm">
               <Text fontWeight="bold" mb={1}>{msg.role === agentId ? agentName : msg.role.toUpperCase()}:</Text>
@@ -163,7 +194,9 @@ const AgentChat = ({ agentId = 'hal' }) => {
             </Box>
           ))}
           {showMemoryConfirm && (
-            <Text mt={2} color="green.400" fontSize="sm">💾 Memory Logged</Text>
+            <Text mt={2} color="green.400" fontSize="sm">
+              💾 Memory Logged
+            </Text>
           )}
         </Box>
 
@@ -183,7 +216,12 @@ const AgentChat = ({ agentId = 'hal' }) => {
             border="1px"
             borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
           />
-          <IconButton icon={<AttachmentIcon />} onClick={() => setShowFileUpload(!showFileUpload)} mr={2} aria-label="Attach file" />
+          <IconButton
+            icon={<AttachmentIcon />}
+            onClick={() => setShowFileUpload(!showFileUpload)}
+            mr={2}
+            aria-label="Attach file"
+          />
           <Button onClick={handleSubmit} colorScheme="blue" disabled={loading || isTraining}>
             {loading ? 'Thinking...' : isTraining ? 'Training...' : 'Send'}
           </Button>
@@ -194,24 +232,77 @@ const AgentChat = ({ agentId = 'hal' }) => {
         <DrawerOverlay />
         <DrawerContent bg="black" color="green.400">
           <DrawerCloseButton color="white" />
-          <DrawerHeader borderBottomWidth="1px" borderColor="green.700">🧠 Agent Debug View</DrawerHeader>
+          <DrawerHeader borderBottomWidth="1px" borderColor="green.700">
+            🧠 Agent Debug View
+          </DrawerHeader>
           <DrawerBody>
             <VStack spacing={6} align="stretch">
               <Box>
-                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>🔁 Task Payload</Text>
-                <Box whiteSpace="pre-wrap" fontSize="xs" overflowX="auto" bg="black" p={2} border="1px" borderColor="green.700" borderRadius="md">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  borderBottom="1px"
+                  borderColor="green.700"
+                  mb={1}
+                >
+                  🔁 Task Payload
+                </Text>
+                <Box
+                  whiteSpace="pre-wrap"
+                  fontSize="xs"
+                  overflowX="auto"
+                  bg="black"
+                  p={2}
+                  border="1px"
+                  borderColor="green.700"
+                  borderRadius="md"
+                >
                   {JSON.stringify(payload, null, 2) || '// No task submitted yet'}
                 </Box>
               </Box>
               <Box>
-                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>🧠 Memory Accessed</Text>
-                <Box whiteSpace="pre-wrap" fontSize="xs" overflowX="auto" bg="black" p={2} border="1px" borderColor="green.700" borderRadius="md">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  borderBottom="1px"
+                  borderColor="green.700"
+                  mb={1}
+                >
+                  🧠 Memory Accessed
+                </Text>
+                <Box
+                  whiteSpace="pre-wrap"
+                  fontSize="xs"
+                  overflowX="auto"
+                  bg="black"
+                  p={2}
+                  border="1px"
+                  borderColor="green.700"
+                  borderRadius="md"
+                >
                   {memory || '// No memory log yet'}
                 </Box>
               </Box>
               <Box>
-                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>🧪 Reasoning & Logs</Text>
-                <Box whiteSpace="pre-wrap" fontSize="xs" overflowX="auto" bg="black" p={2} border="1px" borderColor="green.700" borderRadius="md">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  borderBottom="1px"
+                  borderColor="green.700"
+                  mb={1}
+                >
+                  🧪 Reasoning & Logs
+                </Text>
+                <Box
+                  whiteSpace="pre-wrap"
+                  fontSize="xs"
+                  overflowX="auto"
+                  bg="black"
+                  p={2}
+                  border="1px"
+                  borderColor="green.700"
+                  borderRadius="md"
+                >
                   {logs || '// Agent has not returned internal reasoning yet'}
                 </Box>
               </Box>

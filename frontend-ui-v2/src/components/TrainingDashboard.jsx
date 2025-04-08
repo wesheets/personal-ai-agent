@@ -17,18 +17,18 @@ export default function TrainingDashboard() {
 
   return (
     <div className="flex flex-col h-screen p-6 bg-gray-900 text-white">
-      <h1 className="text-3xl font-bold mb-6">HAL Training Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6">Core.Forge Training Dashboard</h1>
       
       {/* Training Status */}
       <div className="mb-6 p-4 rounded-lg bg-gray-800">
         <h2 className="text-xl font-semibold mb-2">Training Status</h2>
         <div className="flex items-center">
           <div className={`mr-2 text-lg ${isTrained ? 'text-green-500' : 'text-red-500'}`}>
-            {isTrained ? 'HAL is trained ✅' : 'Not trained ❌'}
+            {isTrained ? 'Core.Forge is trained ✅' : 'Not trained ❌'}
           </div>
           {isTraining && (
             <div className="ml-4 text-yellow-400">
-              🚧 Training HAL... Injecting Core Values
+              🚧 Training Core.Forge... Injecting Core Values
             </div>
           )}
         </div>
@@ -84,7 +84,7 @@ export default function TrainingDashboard() {
       {/* Training Complete Banner */}
       {!isTraining && isTrained && (
         <div className="mt-6 p-4 bg-green-800 text-white rounded-lg">
-          ✅ Training Complete — HAL is aligned
+          ✅ Training Complete — Core.Forge is aligned
         </div>
       )}
     </div>

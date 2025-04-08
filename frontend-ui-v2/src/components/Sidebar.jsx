@@ -11,7 +11,7 @@ import {
   FiServer,
   FiSearch
 } from 'react-icons/fi';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
   const { colorMode } = useColorMode();
@@ -28,8 +28,23 @@ const Sidebar = () => {
     { name: 'Activity Feed', icon: FiActivity, path: '/activity' },
     { name: 'Agent Activity', icon: FiActivity, path: '/agent-activity' },
     { name: 'Settings', icon: FiSettings, path: '/settings' },
-    { name: 'HAL Interface', icon: FiCode, path: '/hal' }
+    { name: 'Core.Forge Interface', icon: FiCode, path: '/core-forge' }
   ];
+
+  // Safe navigation handler that checks auth state before navigating
+  const handleNavigation = (path) => (e) => {
+    e.preventDefault(); // Prevent default Link behavior
+
+    // Ensure authentication state is preserved
+    const isAuth = localStorage.getItem('isAuthenticated') === 'true';
+    if (isAuth) {
+      // Use direct location change to ensure auth state is properly evaluated
+      window.location.href = path;
+    } else {
+      // If not authenticated, redirect to login
+      window.location.href = '/auth';
+    }
+  };
 
   return (
     <Box
@@ -57,23 +72,12 @@ const Sidebar = () => {
 
       <VStack spacing={0} align="stretch" mt={4}>
         {navItems.map((item) => (
-          <Link
-            to={item.path}
+          <Box
+            as="a"
+            href={item.path}
             key={item.name}
-            onClick={(e) => {
-              // Prevent default behavior and handle navigation manually
-              e.preventDefault();
-
-              // Ensure authentication state is preserved
-              const isAuth = localStorage.getItem('isAuthenticated') === 'true';
-              if (isAuth) {
-                // Use relative paths for navigation to avoid hardcoded URLs
-                window.location.href = item.path;
-              } else {
-                // If not authenticated, redirect to login
-                window.location.href = '/auth';
-              }
-            }}
+            onClick={handleNavigation(item.path)}
+            cursor="pointer"
           >
             <HStack
               px={8}
@@ -114,7 +118,7 @@ const Sidebar = () => {
                 {item.name}
               </Text>
             </HStack>
-          </Link>
+          </Box>
         ))}
       </VStack>
 

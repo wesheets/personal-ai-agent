@@ -6,7 +6,7 @@ import { useMemoryStore } from './useMemoryStore';
 export const useAgentTraining = () => {
   const [isTraining, setIsTraining] = useState(false);
   const [isTrained, setIsTrained] = useState(false);
-  const [progress, setProgress] = useState({ total: 0, completed: 0, percentage: 0 });
+  const [progress] = useState({ total: 0, completed: 0, percentage: 0 });
   const { addMemory } = useMemoryStore();
 
   // Function to log memory that can be passed to the shadow trainer
@@ -19,10 +19,10 @@ export const useAgentTraining = () => {
     setIsTraining(true);
     
     try {
-      const result = await runShadowTraining('HAL', logMemory);
+      const result = await runShadowTraining('Core.Forge', logMemory);
       
       if (result.completed) {
-        localStorage.setItem('hal_trained', 'true');
+        localStorage.setItem('core_forge_trained', 'true');
         setIsTrained(true);
       }
     } catch (error) {
@@ -34,14 +34,14 @@ export const useAgentTraining = () => {
 
   // Function to clear training and retrain
   const clearAndRetrain = useCallback(() => {
-    localStorage.removeItem('hal_trained');
+    localStorage.removeItem('core_forge_trained');
     setIsTrained(false);
     runTraining();
   }, [runTraining]);
 
   // Check if agent is already trained on initial load
   useEffect(() => {
-    const trained = localStorage.getItem('hal_trained');
+    const trained = localStorage.getItem('core_forge_trained');
     if (trained) {
       setIsTrained(true);
     } else {

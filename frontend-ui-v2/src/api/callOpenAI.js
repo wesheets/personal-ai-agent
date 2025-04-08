@@ -1,6 +1,6 @@
 /**
  * API utility to call OpenAI's GPT-4 model
- * 
+ *
  * @param {string} prompt - The prompt to send to OpenAI
  * @param {string} agentId - The ID of the agent making the request (default: 'hal')
  * @returns {Promise<string>} - The natural language response from GPT-4
@@ -21,6 +21,26 @@ export const callOpenAI = async (prompt, agentId = 'hal') => {
     } else {
       return getHalResponse(prompt);
     }
+
+    // In production, this would be replaced with actual OpenAI API call:
+    /*
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 500
+      })
+    });
+    
+    const data = await response.json();
+    return data.choices[0].message.content;
+    */
   } catch (error) {
     console.error('Error calling OpenAI:', error);
     return "I'm sorry, I encountered an error processing your request. Please try again.";

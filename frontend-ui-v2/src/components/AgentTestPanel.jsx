@@ -26,7 +26,7 @@ import { getVisibleAgents } from '../utils/agentUtils';
 
 /**
  * AgentTestPanel Component
- * 
+ *
  * A UI component for testing HAL and Ash personas via the streaming route.
  * Allows users to select an agent, submit a task, and view the streaming response.
  */
@@ -34,35 +34,39 @@ const AgentTestPanel = () => {
   const { colorMode } = useColorMode();
   const toast = useToast();
   const responseBoxRef = useRef(null);
-  
+
   // State for form inputs
   const [agentId, setAgentId] = useState('hal9000');
   const [taskInput, setTaskInput] = useState('');
-  const [taskId, setTaskId] = useState(`demo-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`);
-  
+  const [taskId, setTaskId] = useState(
+    `demo-${Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, '0')}`
+  );
+
   // State for response handling
   const [isLoading, setIsLoading] = useState(false);
   const [streamingProgress, setStreamingProgress] = useState([]);
   const [finalResponse, setFinalResponse] = useState(null);
   const [error, setError] = useState(null);
-  
+
   // State for available agents
   const [availableAgents, setAvailableAgents] = useState([]);
   const [isLoadingAgents, setIsLoadingAgents] = useState(false);
-  
+
   // Fetch available agents on component mount
   useEffect(() => {
     let isMounted = true;
     const controller = new AbortController();
-    
+
     const fetchAgents = async () => {
       if (!isMounted) return;
-      
+
       setIsLoadingAgents(true);
       try {
         // Use the centralized getVisibleAgents utility instead of direct fetch
         const visibleAgents = await getVisibleAgents();
-        
+
         if (isMounted) {
           setAvailableAgents(visibleAgents);
         }
@@ -71,14 +75,14 @@ const AgentTestPanel = () => {
         if (err.name === 'AbortError') {
           return;
         }
-        
+
         if (isMounted) {
           toast({
             title: 'Error fetching agents',
             description: err.message,
             status: 'error',
             duration: 5000,
-            isClosable: true,
+            isClosable: true
           });
         }
       } finally {
@@ -87,84 +91,87 @@ const AgentTestPanel = () => {
         }
       }
     };
-    
+
     // Add a short delay before initial fetch
     const timeout = setTimeout(() => {
       if (isMounted) {
         fetchAgents();
       }
     }, 1000);
-    
+
     return () => {
       isMounted = false;
       controller.abort(); // Abort any in-flight fetch
       clearTimeout(timeout);
     };
   }, [toast]);
-  
+
   // Auto-scroll to bottom of response box when new content arrives
   useEffect(() => {
     let isMounted = true;
-    
+
     if (isMounted && responseBoxRef.current) {
       responseBoxRef.current.scrollTop = responseBoxRef.current.scrollHeight;
     }
-    
+
     return () => {
       isMounted = false;
     };
   }, [streamingProgress, finalResponse]);
-  
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!agentId) {
       toast({
         title: 'Agent ID required',
         description: 'Please select or enter an agent ID',
         status: 'warning',
         duration: 3000,
-        isClosable: true,
+        isClosable: true
       });
       return;
     }
-    
+
     if (!taskInput) {
       toast({
         title: 'Task input required',
         description: 'Please enter a task input',
         status: 'warning',
         duration: 3000,
-        isClosable: true,
+        isClosable: true
       });
       return;
     }
-    
+
     // Prevent duplicate submissions
     if (isLoading) {
       return;
     }
-    
+
     // Reset previous response data
     setIsLoading(true);
     setStreamingProgress([]);
     setFinalResponse(null);
     setError(null);
-    
+
     // Set up failsafe timeout to reset loading state after 16 seconds
     const failsafeTimeout = setTimeout(() => {
       setIsLoading(false);
-      setError({ message: 'Request timed out. The agent may still be processing your task in the background.' });
+      setError({
+        message: 'Request timed out. The agent may still be processing your task in the background.'
+      });
       toast({
         title: 'Request timeout',
-        description: 'The request is taking longer than expected. The agent may still be processing your task.',
+        description:
+          'The request is taking longer than expected. The agent may still be processing your task.',
         status: 'warning',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     }, 16000);
-    
+
     // Prepare request body
     const requestBody = {
       agent_id: agentId,
@@ -174,7 +181,7 @@ const AgentTestPanel = () => {
         input: taskInput
       }
     };
-    
+
     try {
       // Send request to streaming endpoint
       const response = await fetch('/api/delegate-stream', {
@@ -184,39 +191,47 @@ const AgentTestPanel = () => {
         },
         body: JSON.stringify(requestBody)
       });
-      
+
       if (!response.ok) {
         throw new Error(`Request failed: ${response.status} ${response.statusText}`);
       }
-      
+
       // Handle streaming response
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      
+
       let done = false;
       while (!done) {
         const { value, done: readerDone } = await reader.read();
         done = readerDone;
-        
+
         if (done) break;
-        
+
         const chunk = decoder.decode(value);
-        const lines = chunk.split('\n').filter(line => line.trim());
-        
+        const lines = chunk.split('\n').filter((line) => line.trim());
+
         for (const line of lines) {
           try {
             const data = JSON.parse(line);
-            
+
             // Handle different types of streaming responses
             if (data.status === 'progress') {
               // Ensure we're only storing the message content if it's a JSON object
-              if (typeof data.content === 'object' && data.content !== null && data.content.message) {
+              if (
+                typeof data.content === 'object' &&
+                data.content !== null &&
+                data.content.message
+              ) {
                 data.content = data.content.message;
               }
-              setStreamingProgress(prev => [...prev, data]);
+              setStreamingProgress((prev) => [...prev, data]);
             } else if (data.status === 'success') {
               // Ensure we're only storing the message content if it's a JSON object
-              if (typeof data.message === 'object' && data.message !== null && data.message.message) {
+              if (
+                typeof data.message === 'object' &&
+                data.message !== null &&
+                data.message.message
+              ) {
                 data.message = data.message.message;
               }
               setFinalResponse(data);
@@ -227,7 +242,7 @@ const AgentTestPanel = () => {
                 description: data.message || 'Unknown error',
                 status: 'error',
                 duration: 5000,
-                isClosable: true,
+                isClosable: true
               });
             }
           } catch (error) {
@@ -243,34 +258,38 @@ const AgentTestPanel = () => {
         description: err.message,
         status: 'error',
         duration: 5000,
-        isClosable: true,
+        isClosable: true
       });
     } finally {
       // Clear the failsafe timeout
       clearTimeout(failsafeTimeout);
-      
+
       setIsLoading(false);
       // Generate new task ID for next request
-      setTaskId(`demo-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`);
+      setTaskId(
+        `demo-${Math.floor(Math.random() * 1000)
+          .toString()
+          .padStart(3, '0')}`
+      );
     }
   };
-  
+
   // Get agent details for display (commented out unused variable to fix ESLint error)
   // const selectedAgent = finalResponse ? {
   //   name: finalResponse.agent,
   //   tone: finalResponse.tone,
   //   message: finalResponse.message
   // } : availableAgents.find(agent => agent.id === agentId);
-  
+
   // Get agent icon
   const getAgentIcon = (agentId) => {
-    const agent = availableAgents.find(a => a.id === agentId);
+    const agent = availableAgents.find((a) => a.id === agentId);
     return agent?.icon || '';
   };
-  
+
   return (
-    <Card 
-      variant="outline" 
+    <Card
+      variant="outline"
       bg={colorMode === 'light' ? 'white' : 'gray.700'}
       borderColor={colorMode === 'light' ? 'gray.200' : 'gray.600'}
       boxShadow="md"
@@ -283,7 +302,7 @@ const AgentTestPanel = () => {
           Test HAL and Ash personas via the streaming route
         </Text>
       </CardHeader>
-      
+
       <CardBody>
         <VStack spacing={4} align="stretch">
           {/* Agent Selection and Task Input Form */}
@@ -291,21 +310,21 @@ const AgentTestPanel = () => {
             <VStack spacing={4} align="stretch">
               <FormControl isRequired>
                 <FormLabel htmlFor="agent-id">Agent ID</FormLabel>
-                <Select 
+                <Select
                   id="agent-id"
                   value={agentId}
                   onChange={(e) => setAgentId(e.target.value)}
                   isDisabled={isLoading || isLoadingAgents}
-                  placeholder={isLoadingAgents ? "Loading agents..." : "Select an agent"}
+                  placeholder={isLoadingAgents ? 'Loading agents...' : 'Select an agent'}
                 >
-                  {availableAgents.map(agent => (
+                  {availableAgents.map((agent) => (
                     <option key={agent.id} value={agent.id}>
                       {agent.icon} {agent.name} {agent.tone ? `(${agent.tone})` : ''}
                     </option>
                   ))}
                 </Select>
               </FormControl>
-              
+
               <FormControl isRequired>
                 <FormLabel htmlFor="task-input">Task Input</FormLabel>
                 <Textarea
@@ -318,10 +337,10 @@ const AgentTestPanel = () => {
                   isDisabled={isLoading}
                 />
               </FormControl>
-              
-              <Button 
-                type="submit" 
-                colorScheme="blue" 
+
+              <Button
+                type="submit"
+                colorScheme="blue"
                 isLoading={isLoading}
                 loadingText="Submitting..."
                 isDisabled={!agentId || !taskInput || isLoading}
@@ -330,12 +349,14 @@ const AgentTestPanel = () => {
               </Button>
             </VStack>
           </form>
-          
+
           <Divider />
-          
+
           {/* Response Display */}
           <Box>
-            <Text fontWeight="medium" mb={2}>Response:</Text>
+            <Text fontWeight="medium" mb={2}>
+              Response:
+            </Text>
             <Box
               ref={responseBoxRef}
               border="1px"
@@ -363,18 +384,23 @@ const AgentTestPanel = () => {
                       {getAgentIcon(agentId)} {finalResponse.agent}
                     </Badge>
                     {finalResponse.tone && (
-                      <Badge colorScheme="purple" fontSize="0.8em" px={2} py={1} borderRadius="full">
+                      <Badge
+                        colorScheme="purple"
+                        fontSize="0.8em"
+                        px={2}
+                        py={1}
+                        borderRadius="full"
+                      >
                         {finalResponse.tone}
                       </Badge>
                     )}
                   </HStack>
                   <Text whiteSpace="pre-wrap">
-                    {typeof finalResponse.message === 'string' 
-                      ? finalResponse.message 
+                    {typeof finalResponse.message === 'string'
+                      ? finalResponse.message
                       : typeof finalResponse.message === 'object' && finalResponse.message !== null
-                        ? (finalResponse.message.message || JSON.stringify(finalResponse.message))
-                        : String(finalResponse.message)
-                    }
+                        ? finalResponse.message.message || JSON.stringify(finalResponse.message)
+                        : String(finalResponse.message)}
                   </Text>
                 </VStack>
               ) : streamingProgress.length > 0 ? (
@@ -383,23 +409,34 @@ const AgentTestPanel = () => {
                     <Box key={index}>
                       {index === 0 && (
                         <HStack mb={2}>
-                          <Badge colorScheme="blue" fontSize="0.8em" px={2} py={1} borderRadius="full">
+                          <Badge
+                            colorScheme="blue"
+                            fontSize="0.8em"
+                            px={2}
+                            py={1}
+                            borderRadius="full"
+                          >
                             {getAgentIcon(agentId)} {progress.agent || agentId}
                           </Badge>
                           {progress.tone && (
-                            <Badge colorScheme="purple" fontSize="0.8em" px={2} py={1} borderRadius="full">
+                            <Badge
+                              colorScheme="purple"
+                              fontSize="0.8em"
+                              px={2}
+                              py={1}
+                              borderRadius="full"
+                            >
                               {progress.tone}
                             </Badge>
                           )}
                         </HStack>
                       )}
                       <Text whiteSpace="pre-wrap">
-                        {typeof progress.content === 'string' 
-                          ? progress.content 
+                        {typeof progress.content === 'string'
+                          ? progress.content
                           : typeof progress.content === 'object' && progress.content !== null
-                            ? (progress.content.message || JSON.stringify(progress.content))
-                            : String(progress.content)
-                        }
+                            ? progress.content.message || JSON.stringify(progress.content)
+                            : String(progress.content)}
                       </Text>
                     </Box>
                   ))}
@@ -409,10 +446,12 @@ const AgentTestPanel = () => {
               )}
             </Box>
           </Box>
-          
+
           {/* Debug Info */}
           <Box>
-            <Heading size="xs" mb={2}>Debug Info:</Heading>
+            <Heading size="xs" mb={2}>
+              Debug Info:
+            </Heading>
             <Code p={2} borderRadius="md" fontSize="xs" width="100%" overflowX="auto">
               Task ID: {taskId}
               <br />
