@@ -35,7 +35,7 @@ const AgentChat = () => {
   const bg = useColorModeValue('gray.50', 'gray.900');
   const feedBg = useColorModeValue('gray.100', 'gray.800');
   const msgBg = useColorModeValue('white', 'gray.700');
-  const halMsgBg = useColorModeValue('blue.50', 'blue.900');
+  const forgeMsgBg = useColorModeValue('blue.50', 'blue.900');
 
   // Removed unused fileInputRef
   const feedRef = useRef(null);
@@ -79,7 +79,7 @@ const AgentChat = () => {
 
       // Log the payload for debugging
       const taskPayload = {
-        task_name: 'HAL',
+        task_name: "Core.Forge",
         task_goal: contextPrompt
       };
       logPayload(taskPayload);
@@ -88,14 +88,14 @@ const AgentChat = () => {
       const response = await callOpenAI(contextPrompt);
 
       // Add the response to messages
-      setMessages((prev) => [...prev, { role: 'hal', content: response }]);
+      setMessages((prev) => [...prev, { role: 'core-forge', content: response }]);
 
       // Create and add memory entry
       const memoryEntry = createMemory({
         content: input,
         type: 'task',
-        agent: 'HAL',
-        tags: ['hal', 'task']
+        agent: "Core.Forge",
+        tags: ['core-forge', 'task']
       });
       addMemory(memoryEntry);
 
@@ -107,7 +107,7 @@ const AgentChat = () => {
       setMessages((prev) => [
         ...prev,
         {
-          role: 'hal',
+          role: 'core-forge',
           content: "I'm sorry, I encountered an error processing your request. Please try again."
         }
       ]);
@@ -134,12 +134,12 @@ const AgentChat = () => {
     <Box bg={bg} h="calc(100vh - 80px)" display="flex" flexDirection="column">
       {isTraining && (
         <Box bg="yellow.600" color="white" p={2} textAlign="center">
-          🚧 Training HAL... Injecting Core Values
+          🚧 Training Core.Forge... Injecting Core Values
         </Box>
       )}
       {!isTraining && isTrained && messages.length === 0 && (
         <Box bg="green.600" color="white" p={2} textAlign="center">
-          ✅ Training Complete — HAL is aligned
+          ✅ Training Complete — Core.Forge is aligned
         </Box>
       )}
 
@@ -150,7 +150,7 @@ const AgentChat = () => {
         borderBottom="1px"
         borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
       >
-        <Heading size="lg">HAL Interface</Heading>
+        <Heading size="lg">Core.Forge Interface</Heading>
         <Button
           colorScheme="red"
           size="sm"
@@ -170,7 +170,7 @@ const AgentChat = () => {
         borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
       >
         <Text fontWeight="bold" mr={4}>
-          HAL GPT-4 Interface
+          Core.Forge GPT-4 Interface
         </Text>
         <Tooltip label="Toggle Debug Drawer">
           <IconButton
@@ -204,7 +204,7 @@ const AgentChat = () => {
           {messages.map((msg, i) => (
             <Box
               key={i}
-              bg={msg.role === 'hal' ? halMsgBg : msgBg}
+              bg={msg.role === 'core-forge' ? forgeMsgBg : msgBg}
               color={colorMode === 'light' ? 'gray.800' : 'white'}
               p={4}
               mb={3}
