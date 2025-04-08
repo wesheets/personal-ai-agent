@@ -4,21 +4,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage';
 import AgentChat from './components/AgentChat';
+import AuthenticatedLayout from './components/AuthenticatedLayout';
 import { useAuth } from './hooks/useAuth';
-
-// Protected route component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated()) {
-    return <Navigate to="/auth" />;
-  }
-  
-  return children;
-};
 
 function App() {
   const { colorMode } = useColorMode();
+  const { isAuthenticated } = useAuth();
   
   return (
     <Box minH="100vh" bg={colorMode === 'light' ? 'gray.50' : 'gray.800'}>
@@ -30,9 +21,11 @@ function App() {
         <Route 
           path="/hal" 
           element={
-            <ProtectedRoute>
-              <AgentChat />
-            </ProtectedRoute>
+            isAuthenticated() ? (
+              <AuthenticatedLayout>
+                <AgentChat />
+              </AuthenticatedLayout>
+            ) : <Navigate to="/auth" />
           } 
         />
         

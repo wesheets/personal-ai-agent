@@ -10,7 +10,8 @@ import {
   Tooltip,
   useColorMode,
   useColorModeValue,
-  Button
+  Button,
+  Heading
 } from '@chakra-ui/react';
 import { AttachmentIcon, CloseIcon } from '@chakra-ui/icons';
 import TerminalDrawer from './TerminalDrawer';
@@ -22,7 +23,10 @@ import MemoryFeed from './MemoryFeed';
 
 const AgentChat = () => {
   const { colorMode } = useColorMode();
-  const bg = useColorModeValue('gray.50', 'gray.800');
+  const bg = useColorModeValue('gray.50', 'gray.900');
+  const feedBg = useColorModeValue('gray.100', 'gray.800');
+  const msgBg = useColorModeValue('white', 'gray.700');
+  const halMsgBg = useColorModeValue('blue.50', 'blue.900');
   const fileInputRef = useRef(null);
   const feedRef = useRef(null);
 
@@ -88,33 +92,63 @@ const AgentChat = () => {
   };
 
   return (
-    <Box bg={bg} p={4} minH="100vh">
-      <Flex justify="space-between" align="center" mb={4}>
-        <Text fontSize="2xl" fontWeight="bold">HAL Interface</Text>
-        <Button colorScheme="red" onClick={() => {
+    <Box bg={bg} h="calc(100vh - 80px)" display="flex" flexDirection="column">
+      <Flex justify="space-between" align="center" p={4} borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
+        <Heading size="lg">HAL Interface</Heading>
+        <Button colorScheme="red" size="sm" onClick={() => {
           localStorage.removeItem('isAuthenticated');
           window.location.href = '/auth';
         }}>Logout</Button>
       </Flex>
 
-      <Box mb={4}>
-        <Flex align="center" mb={2}>
-          <Text fontWeight="bold" mr={2}>Streaming</Text>
-          <Input
-            type="checkbox"
-            isChecked={streaming}
-            onChange={() => setStreaming(!streaming)}
-            w="auto"
+      <Flex p={4} align="center" borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
+        <Text fontWeight="bold" mr={4}>Streaming</Text>
+        <Input
+          type="checkbox"
+          isChecked={streaming}
+          onChange={() => setStreaming(!streaming)}
+          w="auto"
+        />
+        <Tooltip label="Toggle Debug Drawer">
+          <IconButton
+            ml={4}
+            icon={<Text>{"</>"}</Text>}
+            onClick={() => setShowDebug(!showDebug)}
+            aria-label="Toggle Debug"
+            variant="outline"
           />
-          <Tooltip label="Toggle Debug Drawer">
-            <IconButton
-              ml={3}
-              icon={<Text>{"</>"}</Text>}
-              onClick={() => setShowDebug(!showDebug)}
-              aria-label="Toggle Debug"
-            />
-          </Tooltip>
-        </Flex>
+        </Tooltip>
+      </Flex>
+
+      <Box flex="1" overflow="hidden" display="flex" flexDirection="column" p={4}>
+        <Box 
+          ref={feedRef} 
+          flex="1" 
+          overflowY="auto" 
+          bg={feedBg} 
+          borderRadius="md" 
+          p={4} 
+          mb={4}
+          boxShadow="sm"
+        >
+          {messages.map((msg, i) => (
+            <Box 
+              key={i} 
+              bg={msg.role === 'hal' ? halMsgBg : msgBg} 
+              color={colorMode === 'light' ? 'gray.800' : 'white'} 
+              p={4} 
+              mb={3} 
+              borderRadius="lg"
+              boxShadow="sm"
+            >
+              <Text fontWeight="bold" mb={1}>{msg.role.toUpperCase()}:</Text> 
+              <Text>{msg.content}</Text>
+            </Box>
+          ))}
+          {showMemoryConfirm && (
+            <Text mt={2} color="green.400" fontSize="sm">💾 Memory Logged</Text>
+          )}
+        </Box>
 
         <Flex>
           <Input
@@ -122,26 +156,35 @@ const AgentChat = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             mr={2}
+            bg={colorMode === 'light' ? 'white' : 'gray.700'}
+            border="1px"
+            borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
+            _focus={{
+              borderColor: 'blue.500',
+              boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
+            }}
           />
-          <IconButton icon={<AttachmentIcon />} onClick={() => fileInputRef.current.click()} mr={2} />
-          <Button onClick={handleSubmit}>Send</Button>
+          <IconButton 
+            icon={<AttachmentIcon />} 
+            onClick={() => fileInputRef.current.click()} 
+            mr={2}
+            aria-label="Attach file"
+          />
+          <Button 
+            onClick={handleSubmit}
+            colorScheme="blue"
+          >
+            Send
+          </Button>
         </Flex>
 
         <input type="file" hidden ref={fileInputRef} onChange={handleUpload} />
       </Box>
 
-      <Box ref={feedRef} maxH="400px" overflowY="auto" p={4} bg="gray.700" borderRadius="md">
-        {messages.map((msg, i) => (
-          <Box key={i} bg={msg.role === 'hal' ? 'blue.700' : 'gray.600'} color="white" p={3} mb={2} borderRadius="md">
-            <strong>{msg.role.toUpperCase()}:</strong> {msg.content}
-          </Box>
-        ))}
-        {showMemoryConfirm && (
-          <Text mt={2} color="green.400" fontSize="sm">💾 Memory Logged</Text>
-        )}
+      <Box p={4} borderTop="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
+        <Text fontWeight="bold" mb={2}>Memory Feed</Text>
+        <MemoryFeed memories={getAllMemories()} />
       </Box>
-
-      <MemoryFeed memories={getAllMemories()} />
 
       {showDebug && (
         <TerminalDrawer
