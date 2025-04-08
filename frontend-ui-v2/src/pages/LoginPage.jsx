@@ -1,50 +1,134 @@
-// src/pages/LoginPage.jsx
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-// eslint-disable-next-line no-unused-vars
-import { isAuthenticated, login } from '../hooks/useAuth'
+import React, { useState } from 'react';
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  Text,
+  VStack,
+  keyframes
+} from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
+const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (email === 'admin@promethios.ai' && password === 'ignite') {
-      login()
-      navigate('/hal')
-    } else {
-      setError('Invalid login credentials')
+  // Create flicker animation using Chakra's keyframes
+  const flickerAnimation = keyframes`
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  `;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      if (email === 'admin@promethios.ai' && password === 'ignite') {
+        await login(email, password);
+        navigate('/hal');
+      } else {
+        setError('Invalid credentials. Please try again.');
+      }
+    } catch (err) {
+      setError('Login failed. Please try again.');
+      console.error('Login error:', err);
     }
-  }
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
-      <img src="/promethioslogo.png" alt="Promethios Logo" className="w-72 mb-6 animate-pulse" />
-      <form onSubmit={handleSubmit} className="bg-white text-black p-6 rounded-md w-96 space-y-4">
-        <h2 className="text-xl font-semibold text-center">Login to Promethios</h2>
-        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <button type="submit" className="w-full bg-black text-white p-2 rounded hover:bg-gray-800">
-          Login
-        </button>
-      </form>
-      <p className="text-xs mt-10 opacity-20">The fire was stolen for a reason.</p>
-    </div>
-  )
-}
+    <Flex
+      direction="column"
+      align="center"
+      justify="center"
+      minH="100vh"
+      bg="black"
+      color="white"
+    >
+      <Box
+        w="300px"
+        mb={8}
+        animation={`${flickerAnimation} 4s infinite ease-in-out`}
+        textAlign="center"
+      >
+        <img src="/promethioslogo.png" alt="Promethios Logo" style={{ maxWidth: '100%' }} />
+      </Box>
+
+      <Box
+        bg="gray.900"
+        p={8}
+        borderRadius="md"
+        boxShadow="lg"
+        w={{ base: "90%", sm: "400px" }}
+      >
+        <VStack spacing={6}>
+          <Heading size="lg" textAlign="center">Login to Promethios</Heading>
+
+          {error && (
+            <Text color="red.400" textAlign="center">
+              {error}
+            </Text>
+          )}
+
+          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+            <VStack spacing={4} align="flex-start" w="100%">
+              <FormControl isRequired>
+                <FormLabel color="gray.300">Email</FormLabel>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@promethios.ai"
+                  bg="gray.800"
+                  border="1px"
+                  borderColor="gray.700"
+                  _hover={{ borderColor: 'blue.300' }}
+                  _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px #3182ce' }}
+                />
+              </FormControl>
+
+              <FormControl isRequired>
+                <FormLabel color="gray.300">Password</FormLabel>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  bg="gray.800"
+                  border="1px"
+                  borderColor="gray.700"
+                  _hover={{ borderColor: 'blue.300' }}
+                  _focus={{ borderColor: 'blue.500', boxShadow: '0 0 0 1px #3182ce' }}
+                />
+              </FormControl>
+
+              <Button
+                type="submit"
+                colorScheme="blue"
+                size="lg"
+                w="100%"
+                mt={4}
+              >
+                Login
+              </Button>
+            </VStack>
+          </form>
+        </VStack>
+      </Box>
+
+      <Text fontSize="xs" mt={10} opacity={0.2}>
+        The fire was stolen for a reason.
+      </Text>
+    </Flex>
+  );
+};
+
+export default LoginPage;
