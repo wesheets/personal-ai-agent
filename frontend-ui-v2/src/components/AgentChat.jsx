@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { createMemory } from '../api/memorySchema'
 import { useMemoryStore } from '../hooks/useMemoryStore'
 import { useAgentTraining } from '../hooks/useAgentTraining'
+import { injectContext } from '../hooks/useMemoryRecall'
 import MemoryFeed from './MemoryFeed'
 
 export default function AgentChat() {
@@ -26,10 +27,18 @@ export default function AgentChat() {
     setMessages(prev => [...prev, newMessage])
     setInput('')
 
+    // Inject context from the latest memory
+    const contextPrompt = injectContext(input, memories)
+    const taskPayload = {
+      task_name: 'HAL',
+      task_goal: contextPrompt,
+      streaming
+    }
+
     const res = await fetch('/api/delegate-stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task_name: 'user', task_goal: input, streaming })
+      body: JSON.stringify(taskPayload)
     })
 
     if (!res.ok || !res.body) return
