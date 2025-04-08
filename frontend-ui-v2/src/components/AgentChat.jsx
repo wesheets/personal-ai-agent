@@ -1,5 +1,8 @@
 // src/components/AgentChat.jsx
 import { useState, useRef, useEffect } from 'react'
+import { createMemory } from '../api/memorySchema'
+import { useMemoryStore } from '../hooks/useMemoryStore'
+import MemoryFeed from './MemoryFeed'
 
 export default function AgentChat() {
   const [messages, setMessages] = useState([])
@@ -7,6 +10,7 @@ export default function AgentChat() {
   const [streaming, setStreaming] = useState(true)
   const [loading, setLoading] = useState(false)
   const feedRef = useRef(null)
+  const { memories, addMemory } = useMemoryStore()
 
   useEffect(() => {
     feedRef.current?.scrollTo(0, feedRef.current.scrollHeight)
@@ -40,6 +44,14 @@ export default function AgentChat() {
       setMessages(prev => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: agentMsg } : m))
     }
 
+    // Create and store memory after HAL response is complete
+    const memory = createMemory({
+      content: agentMsg,
+      tags: ['hal', 'task']
+    })
+    addMemory(memory)
+    
+    // Show memory logged confirmation after successful storage
     setMessages(prev => [...prev, { role: 'system', content: '💾 Memory Logged' }])
     setLoading(false)
   }
@@ -54,6 +66,11 @@ export default function AgentChat() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Memory Feed placed below chat stream */}
+      <div className="border-t border-gray-700 bg-gray-900">
+        <MemoryFeed memories={memories} />
       </div>
 
       <div className="p-4 border-t flex items-center gap-2">
