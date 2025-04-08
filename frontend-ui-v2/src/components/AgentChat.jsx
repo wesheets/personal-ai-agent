@@ -1,31 +1,21 @@
+
+// src/components/AgentChat.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Box,
-  Flex,
-  Input,
-  Text,
-  Textarea,
-  VStack,
-  IconButton,
-  Tooltip,
-  useColorMode,
-  useColorModeValue,
-  Button,
-  Heading,
-  Drawer,
-  DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
-  DrawerHeader,
-  DrawerBody
+  Box, Flex, Input, Text, VStack, IconButton, Tooltip,
+  useColorMode, useColorModeValue, Button, Heading,
+  Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton,
+  DrawerHeader, DrawerBody
 } from '@chakra-ui/react';
-import { AttachmentIcon, CloseIcon } from '@chakra-ui/icons';
+import { AttachmentIcon } from '@chakra-ui/icons';
 import TerminalDrawer from './TerminalDrawer';
 import { useAgentDebug } from '../hooks/useAgentDebug';
 import AgentFileUpload from './AgentFileUpload';
 import { createMemory } from '../api/memorySchema';
 import { useMemoryStore } from '../hooks/useMemoryStore';
 import MemoryFeed from './MemoryFeed';
+import { useAgentTraining } from '../hooks/useAgentTraining';
+import { injectContext } from '../hooks/useMemoryRecall';
 
 const AgentChat = () => {
   const { colorMode } = useColorMode();
@@ -33,6 +23,7 @@ const AgentChat = () => {
   const feedBg = useColorModeValue('gray.100', 'gray.800');
   const msgBg = useColorModeValue('white', 'gray.700');
   const halMsgBg = useColorModeValue('blue.50', 'blue.900');
+
   const fileInputRef = useRef(null);
   const feedRef = useRef(null);
 
@@ -42,15 +33,16 @@ const AgentChat = () => {
   const [showDebug, setShowDebug] = useState(false);
   const [showMemoryConfirm, setShowMemoryConfirm] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const { payload, memory, logs, logPayload, logMemory, logThoughts } = useAgentDebug();
-  const { addMemory, getAllMemories } = useMemoryStore();
+  const { payload, memory, logs, logPayload, logMemory } = useAgentDebug();
+  const { addMemory, getAllMemories, memories } = useMemoryStore();
+  const { isTraining, isTrained } = useAgentTraining();
 
   useEffect(() => {
     feedRef.current?.scrollTo(0, feedRef.current.scrollHeight);
   }, [messages]);
 
-  // Reset memory confirmation after 3 seconds
   useEffect(() => {
     if (showMemoryConfirm) {
       const timer = setTimeout(() => {
@@ -62,13 +54,19 @@ const AgentChat = () => {
 
   const handleSubmit = async () => {
     if (!input.trim()) return;
+    setLoading(true);
 
-    const taskPayload = { task_name: 'HAL', task_goal: input, streaming };
-    logPayload(taskPayload);
-
-    const userMessage = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
+    const newMessage = { role: 'user', content: input };
+    setMessages(prev => [...prev, newMessage]);
     setInput('');
+
+    const contextPrompt = injectContext(input, memories);
+    const taskPayload = {
+      task_name: 'HAL',
+      task_goal: contextPrompt,
+      streaming
+    };
+    logPayload(taskPayload);
 
     try {
       const res = await fetch('/api/delegate-stream', {
@@ -77,24 +75,7 @@ const AgentChat = () => {
         body: JSON.stringify(taskPayload)
       });
 
-      if (!res.ok || !res.body) {
-        // Mock response for testing if API fails
-        setTimeout(() => {
-          const mockResponse = "I'm HAL, your personal AI assistant. I'm here to help you with your tasks.";
-          setMessages(prev => [...prev, { role: 'hal', content: mockResponse }]);
-          
-          const memoryEntry = createMemory({
-            content: input,
-            type: 'task',
-            agent: 'HAL',
-            tags: ['hal', 'task']
-          });
-          addMemory(memoryEntry);
-          setShowMemoryConfirm(true);
-          logMemory(mockResponse);
-        }, 1000);
-        return;
-      }
+      if (!res.ok || !res.body) return;
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -118,31 +99,18 @@ const AgentChat = () => {
       setShowMemoryConfirm(true);
       logMemory(agentMsg);
     } catch (error) {
-      console.error("Error in stream:", error);
-      // Mock response for testing if API fails
-      setTimeout(() => {
-        const mockResponse = "I'm HAL, your personal AI assistant. I'm here to help you with your tasks.";
-        setMessages(prev => [...prev, { role: 'hal', content: mockResponse }]);
-        
-        const memoryEntry = createMemory({
-          content: input,
-          type: 'task',
-          agent: 'HAL',
-          tags: ['hal', 'task']
-        });
-        addMemory(memoryEntry);
-        setShowMemoryConfirm(true);
-        logMemory(mockResponse);
-      }, 1000);
+      console.error('Error in stream:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpload = (file) => {
     if (file) {
       console.log('File uploaded:', file.name);
-      setMessages(prev => [...prev, { 
-        role: 'system', 
-        content: `File uploaded: ${file.name} (${Math.round(file.size / 1024)} KB)` 
+      setMessages(prev => [...prev, {
+        role: 'system',
+        content: `File uploaded: ${file.name} (${Math.round(file.size / 1024)} KB)`
       }]);
       setShowFileUpload(false);
     }
@@ -150,6 +118,17 @@ const AgentChat = () => {
 
   return (
     <Box bg={bg} h="calc(100vh - 80px)" display="flex" flexDirection="column">
+      {isTraining && (
+        <Box bg="yellow.600" color="white" p={2} textAlign="center">
+          🚧 Training HAL... Injecting Core Values
+        </Box>
+      )}
+      {!isTraining && isTrained && messages.length === 0 && (
+        <Box bg="green.600" color="white" p={2} textAlign="center">
+          ✅ Training Complete — HAL is aligned
+        </Box>
+      )}
+
       <Flex justify="space-between" align="center" p={4} borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
         <Heading size="lg">HAL Interface</Heading>
         <Button colorScheme="red" size="sm" onClick={() => {
@@ -178,27 +157,10 @@ const AgentChat = () => {
       </Flex>
 
       <Box flex="1" overflow="hidden" display="flex" flexDirection="column" p={4} position="relative">
-        <Box 
-          ref={feedRef} 
-          flex="1" 
-          overflowY="auto" 
-          bg={feedBg} 
-          borderRadius="md" 
-          p={4} 
-          mb={4}
-          boxShadow="sm"
-        >
+        <Box ref={feedRef} flex="1" overflowY="auto" bg={feedBg} borderRadius="md" p={4} mb={4} boxShadow="sm">
           {messages.map((msg, i) => (
-            <Box 
-              key={i} 
-              bg={msg.role === 'hal' ? halMsgBg : msgBg} 
-              color={colorMode === 'light' ? 'gray.800' : 'white'} 
-              p={4} 
-              mb={3} 
-              borderRadius="lg"
-              boxShadow="sm"
-            >
-              <Text fontWeight="bold" mb={1}>{msg.role.toUpperCase()}:</Text> 
+            <Box key={i} bg={msg.role === 'hal' ? halMsgBg : msgBg} color={colorMode === 'light' ? 'gray.800' : 'white'} p={4} mb={3} borderRadius="lg" boxShadow="sm">
+              <Text fontWeight="bold" mb={1}>{msg.role.toUpperCase()}:</Text>
               <Text>{msg.content}</Text>
             </Box>
           ))}
@@ -222,90 +184,36 @@ const AgentChat = () => {
             bg={colorMode === 'light' ? 'white' : 'gray.700'}
             border="1px"
             borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
-            _focus={{
-              borderColor: 'blue.500',
-              boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
-            }}
           />
-          <IconButton 
-            icon={<AttachmentIcon />} 
-            onClick={() => setShowFileUpload(!showFileUpload)} 
-            mr={2}
-            aria-label="Attach file"
-          />
-          <Button 
-            onClick={handleSubmit}
-            colorScheme="blue"
-          >
-            Send
+          <IconButton icon={<AttachmentIcon />} onClick={() => setShowFileUpload(!showFileUpload)} mr={2} aria-label="Attach file" />
+          <Button onClick={handleSubmit} colorScheme="blue" disabled={loading || isTraining}>
+            {loading ? 'Thinking...' : isTraining ? 'Training...' : 'Send'}
           </Button>
         </Flex>
       </Box>
 
-      <Drawer
-        isOpen={showDebug}
-        placement="right"
-        onClose={() => setShowDebug(false)}
-        size="md"
-      >
+      <Drawer isOpen={showDebug} placement="right" onClose={() => setShowDebug(false)} size="md">
         <DrawerOverlay />
         <DrawerContent bg="black" color="green.400">
           <DrawerCloseButton color="white" />
-          <DrawerHeader borderBottomWidth="1px" borderColor="green.700">
-            🧠 Agent Debug View
-          </DrawerHeader>
+          <DrawerHeader borderBottomWidth="1px" borderColor="green.700">🧠 Agent Debug View</DrawerHeader>
           <DrawerBody>
             <VStack spacing={6} align="stretch">
               <Box>
-                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>
-                  🔁 Task Payload
-                </Text>
-                <Box 
-                  whiteSpace="pre-wrap" 
-                  fontSize="xs" 
-                  overflowX="auto" 
-                  bg="black" 
-                  p={2} 
-                  border="1px" 
-                  borderColor="green.700" 
-                  borderRadius="md"
-                >
+                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>🔁 Task Payload</Text>
+                <Box whiteSpace="pre-wrap" fontSize="xs" overflowX="auto" bg="black" p={2} border="1px" borderColor="green.700" borderRadius="md">
                   {JSON.stringify(payload, null, 2) || '// No task submitted yet'}
                 </Box>
               </Box>
-
               <Box>
-                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>
-                  🧠 Memory Accessed
-                </Text>
-                <Box 
-                  whiteSpace="pre-wrap" 
-                  fontSize="xs" 
-                  overflowX="auto" 
-                  bg="black" 
-                  p={2} 
-                  border="1px" 
-                  borderColor="green.700" 
-                  borderRadius="md"
-                >
+                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>🧠 Memory Accessed</Text>
+                <Box whiteSpace="pre-wrap" fontSize="xs" overflowX="auto" bg="black" p={2} border="1px" borderColor="green.700" borderRadius="md">
                   {memory || '// No memory log yet'}
                 </Box>
               </Box>
-
               <Box>
-                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>
-                  🧪 Reasoning & Logs
-                </Text>
-                <Box 
-                  whiteSpace="pre-wrap" 
-                  fontSize="xs" 
-                  overflowX="auto" 
-                  bg="black" 
-                  p={2} 
-                  border="1px" 
-                  borderColor="green.700" 
-                  borderRadius="md"
-                >
+                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>🧪 Reasoning & Logs</Text>
+                <Box whiteSpace="pre-wrap" fontSize="xs" overflowX="auto" bg="black" p={2} border="1px" borderColor="green.700" borderRadius="md">
                   {logs || '// Agent has not returned internal reasoning yet'}
                 </Box>
               </Box>

@@ -1,66 +1,94 @@
 import React from 'react';
 import { Box, Flex, useColorMode, Text, Center } from '@chakra-ui/react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './hooks/useAuth';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { AuthProvider, useAuth } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage';
 import AgentChat from './components/AgentChat';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
-import { useAuth } from './hooks/useAuth';
+import TrainingDashboard from './components/TrainingDashboard';
+import ErrorBoundary from './components/ErrorBoundary';
+import StatusOverlay from './components/StatusOverlay';
+import { StatusProvider } from './context/StatusContext';
+import { SettingsProvider } from './context/SettingsContext';
 
-// Placeholder components for sidebar menu items
-const Dashboard = () => (
-  <Center h="calc(100vh - 80px)" p={8}>
-    <Text fontSize="2xl">Dashboard - Coming Soon</Text>
-  </Center>
-);
+// Import actual page components from remote
+import Dashboard from './pages/Dashboard';
+import BuilderAgent from './pages/AgentPanels';
+import OpsAgent from './pages/AgentPanels';
+import ResearchAgent from './pages/AgentPanels';
+import MemoryAgentView from './pages/MemoryAgentView';
+import MemoryBrowser from './pages/MemoryBrowser';
+import MainActivityFeed from './pages/MainActivityFeed';
+import AgentListPage from './pages/AgentListPage';
+import AgentActivityPage from './pages/AgentActivityPage';
+import SettingsPage from './pages/SettingsPage';
 
-const BuilderAgent = () => (
-  <Center h="calc(100vh - 80px)" p={8}>
-    <Text fontSize="2xl">Builder Agent - Coming Soon</Text>
-  </Center>
-);
+const AgentChatView = () => {
+  const { agentId } = useParams();
+  const [agentData, setAgentData] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
 
-const OpsAgent = () => (
-  <Center h="calc(100vh - 80px)" p={8}>
-    <Text fontSize="2xl">Ops Agent - Coming Soon</Text>
-  </Center>
-);
+  React.useEffect(() => {
+    const fetchAgentData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/agents/${agentId}`);
+        if (!response.ok) {
+          if (agentId === 'hal9000') {
+            setAgentData({
+              id: 'hal9000',
+              name: 'HAL 9000',
+              icon: '🔴',
+              status: 'ready',
+              type: 'system',
+              description: 'I am HAL 9000, a highly advanced AI system.'
+            });
+          } else {
+            setAgentData({
+              id: agentId,
+              name: `Agent ${agentId}`,
+              icon: '🤖',
+              status: 'unknown',
+              type: 'generic',
+              description: 'Agent information not available.'
+            });
+          }
+        } else {
+          const data = await response.json();
+          setAgentData(data);
+        }
+      } catch (err) {
+        console.error('Error fetching agent data:', err);
+        setError('Failed to load agent data. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-const ResearchAgent = () => (
-  <Center h="calc(100vh - 80px)" p={8}>
-    <Text fontSize="2xl">Research Agent - Coming Soon</Text>
-  </Center>
-);
+    if (agentId) {
+      fetchAgentData();
+    }
+  }, [agentId]);
 
-const MemoryAgent = () => (
-  <Center h="calc(100vh - 80px)" p={8}>
-    <Text fontSize="2xl">Memory Agent - Coming Soon</Text>
-  </Center>
-);
+  if (loading) return <Box p={5}>Loading agent interface...</Box>;
+  if (error) return <Box p={5} color="red.500">{error}</Box>;
+  if (!agentData) return <Box p={5}>Agent Not Found</Box>;
 
-const MemoryBrowser = () => (
-  <Center h="calc(100vh - 80px)" p={8}>
-    <Text fontSize="2xl">Memory Browser - Coming Soon</Text>
-  </Center>
-);
-
-const ActivityFeed = () => (
-  <Center h="calc(100vh - 80px)" p={8}>
-    <Text fontSize="2xl">Activity Feed - Coming Soon</Text>
-  </Center>
-);
-
-const AgentActivity = () => (
-  <Center h="calc(100vh - 80px)" p={8}>
-    <Text fontSize="2xl">Agent Activity - Coming Soon</Text>
-  </Center>
-);
-
-const Settings = () => (
-  <Center h="calc(100vh - 80px)" p={8}>
-    <Text fontSize="2xl">Settings - Coming Soon</Text>
-  </Center>
-);
+  return (
+    <Box p={4}>
+      <Flex align="center" mb={6}>
+        <Box fontSize="3xl" mr={3}>{agentData.icon}</Box>
+        <Box>
+          <Box fontSize="2xl" fontWeight="bold">{agentData.name}</Box>
+          <Box color="gray.500">Status: {agentData.status}</Box>
+        </Box>
+      </Flex>
+      <Box mb={6}>{agentData.description}</Box>
+      <Box p={4} borderWidth="1px" borderRadius="lg">Chat with {agentData.name} coming soon.</Box>
+    </Box>
+  );
+};
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -91,21 +119,22 @@ function App() {
         <Route path="/builder" element={<ProtectedRoute><BuilderAgent /></ProtectedRoute>} />
         <Route path="/ops" element={<ProtectedRoute><OpsAgent /></ProtectedRoute>} />
         <Route path="/research" element={<ProtectedRoute><ResearchAgent /></ProtectedRoute>} />
-        <Route path="/memory-agent" element={<ProtectedRoute><MemoryAgent /></ProtectedRoute>} />
+        <Route path="/memory" element={<ProtectedRoute><MemoryAgentView /></ProtectedRoute>} />
         <Route path="/memory-browser" element={<ProtectedRoute><MemoryBrowser /></ProtectedRoute>} />
-        <Route path="/activity-feed" element={<ProtectedRoute><ActivityFeed /></ProtectedRoute>} />
-        <Route path="/agent-activity" element={<ProtectedRoute><AgentActivity /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        <Route path="/activity" element={<ProtectedRoute><MainActivityFeed /></ProtectedRoute>} />
+        <Route path="/agent-activity" element={<ProtectedRoute><AgentActivityPage /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+        <Route path="/agents" element={<ProtectedRoute><AgentListPage /></ProtectedRoute>} />
+        <Route path="/chat/:agentId" element={<ProtectedRoute><AgentChatView /></ProtectedRoute>} />
+        <Route path="/training" element={<ProtectedRoute><TrainingDashboard /></ProtectedRoute>} />
         
         {/* HAL Agent Chat - default interface after authentication */}
         <Route path="/hal" element={<ProtectedRoute><AgentChat /></ProtectedRoute>} />
         
-        {/* Root path redirect to dashboard if authenticated, otherwise to auth */}
+        {/* Root path redirect to HAL if authenticated, otherwise to auth */}
         <Route 
           path="/" 
-          element={
-            <Navigate to="/hal" />
-          } 
+          element={<Navigate to="/hal" />} 
         />
         
         {/* Fallback for unknown routes */}
@@ -118,13 +147,19 @@ function App() {
   );
 }
 
-// Wrapped App with providers
 const AppWithProviders = () => {
   return (
     <AuthProvider>
-      <Router>
-        <App />
-      </Router>
+      <ErrorBoundary>
+        <SettingsProvider>
+          <StatusProvider>
+            <Router>
+              <App />
+              <StatusOverlay />
+            </Router>
+          </StatusProvider>
+        </SettingsProvider>
+      </ErrorBoundary>
     </AuthProvider>
   );
 };
