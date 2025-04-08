@@ -209,8 +209,16 @@ const AgentTestPanel = () => {
             
             // Handle different types of streaming responses
             if (data.status === 'progress') {
+              // Ensure we're only storing the message content if it's a JSON object
+              if (typeof data.content === 'object' && data.content !== null && data.content.message) {
+                data.content = data.content.message;
+              }
               setStreamingProgress(prev => [...prev, data]);
             } else if (data.status === 'success') {
+              // Ensure we're only storing the message content if it's a JSON object
+              if (typeof data.message === 'object' && data.message !== null && data.message.message) {
+                data.message = data.message.message;
+              }
               setFinalResponse(data);
             } else if (data.status === 'error') {
               setError(data);
@@ -222,8 +230,9 @@ const AgentTestPanel = () => {
                 isClosable: true,
               });
             }
-          } catch (parseError) {
+          } catch (error) {
             // Silently handle parse errors
+            console.debug('Error parsing JSON line:', error);
           }
         }
       }
@@ -246,12 +255,12 @@ const AgentTestPanel = () => {
     }
   };
   
-  // Find selected agent details
-  const selectedAgent = finalResponse ? {
-    name: finalResponse.agent,
-    tone: finalResponse.tone,
-    message: finalResponse.message
-  } : availableAgents.find(agent => agent.id === agentId);
+  // Get agent details for display (commented out unused variable to fix ESLint error)
+  // const selectedAgent = finalResponse ? {
+  //   name: finalResponse.agent,
+  //   tone: finalResponse.tone,
+  //   message: finalResponse.message
+  // } : availableAgents.find(agent => agent.id === agentId);
   
   // Get agent icon
   const getAgentIcon = (agentId) => {
@@ -359,7 +368,14 @@ const AgentTestPanel = () => {
                       </Badge>
                     )}
                   </HStack>
-                  <Text whiteSpace="pre-wrap">{finalResponse.message}</Text>
+                  <Text whiteSpace="pre-wrap">
+                    {typeof finalResponse.message === 'string' 
+                      ? finalResponse.message 
+                      : typeof finalResponse.message === 'object' && finalResponse.message !== null
+                        ? (finalResponse.message.message || JSON.stringify(finalResponse.message))
+                        : String(finalResponse.message)
+                    }
+                  </Text>
                 </VStack>
               ) : streamingProgress.length > 0 ? (
                 <VStack align="stretch" spacing={3}>
@@ -377,7 +393,14 @@ const AgentTestPanel = () => {
                           )}
                         </HStack>
                       )}
-                      <Text whiteSpace="pre-wrap">{progress.content}</Text>
+                      <Text whiteSpace="pre-wrap">
+                        {typeof progress.content === 'string' 
+                          ? progress.content 
+                          : typeof progress.content === 'object' && progress.content !== null
+                            ? (progress.content.message || JSON.stringify(progress.content))
+                            : String(progress.content)
+                        }
+                      </Text>
                     </Box>
                   ))}
                 </VStack>
