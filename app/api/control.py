@@ -37,8 +37,8 @@ class AgentTaskRequest(BaseModel):
     target_agent: Optional[str] = None
     task: Optional[Dict[str, Any]] = None
 
-    class Config:
-        schema_extra = {
+    model_config = {
+        "json_schema_extra": {
             "example": {
                 "agent_id": "builder-1",
                 "task": {
@@ -48,6 +48,7 @@ class AgentTaskRequest(BaseModel):
                 }
             }
         }
+    }
 
 class EditPromptModel(BaseModel):
     prompt: str
