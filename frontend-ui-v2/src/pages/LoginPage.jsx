@@ -8,9 +8,9 @@ import {
   Heading,
   Input,
   Text,
-  VStack,
-  keyframes
+  VStack
 } from '@chakra-ui/react';
+import { keyframes } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 
@@ -45,14 +45,7 @@ const LoginPage = () => {
   };
 
   return (
-    <Flex
-      direction="column"
-      align="center"
-      justify="center"
-      minH="100vh"
-      bg="black"
-      color="white"
-    >
+    <Flex direction="column" align="center" justify="center" minH="100vh" bg="black" color="white">
       <Box
         w="300px"
         mb={8}
@@ -62,15 +55,11 @@ const LoginPage = () => {
         <img src="/promethioslogo.png" alt="Promethios Logo" style={{ maxWidth: '100%' }} />
       </Box>
 
-      <Box
-        bg="gray.900"
-        p={8}
-        borderRadius="md"
-        boxShadow="lg"
-        w={{ base: "90%", sm: "400px" }}
-      >
+      <Box bg="gray.900" p={8} borderRadius="md" boxShadow="lg" w={{ base: '90%', sm: '400px' }}>
         <VStack spacing={6}>
-          <Heading size="lg" textAlign="center">Login to Promethios</Heading>
+          <Heading size="lg" textAlign="center">
+            Login to Promethios
+          </Heading>
 
           {error && (
             <Text color="red.400" textAlign="center">
@@ -110,13 +99,7 @@ const LoginPage = () => {
                 />
               </FormControl>
 
-              <Button
-                type="submit"
-                colorScheme="blue"
-                size="lg"
-                w="100%"
-                mt={4}
-              >
+              <Button type="submit" colorScheme="blue" size="lg" w="100%" mt={4}>
                 Login
               </Button>
             </VStack>
