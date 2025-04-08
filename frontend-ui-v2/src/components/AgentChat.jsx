@@ -1,11 +1,23 @@
-
 // src/components/AgentChat.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Box, Flex, Input, Text, VStack, IconButton, Tooltip,
-  useColorMode, useColorModeValue, Button, Heading,
-  Drawer, DrawerOverlay, DrawerContent, DrawerCloseButton,
-  DrawerHeader, DrawerBody
+  Box,
+  Flex,
+  Input,
+  Text,
+  VStack,
+  IconButton,
+  Tooltip,
+  useColorMode,
+  useColorModeValue,
+  Button,
+  Heading,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerHeader,
+  DrawerBody
 } from '@chakra-ui/react';
 import { AttachmentIcon } from '@chakra-ui/icons';
 import TerminalDrawer from './TerminalDrawer';
@@ -16,6 +28,7 @@ import { useMemoryStore } from '../hooks/useMemoryStore';
 import MemoryFeed from './MemoryFeed';
 import { useAgentTraining } from '../hooks/useAgentTraining';
 import { injectContext } from '../hooks/useMemoryRecall';
+import { callOpenAI } from '../api/callOpenAI';
 
 const AgentChat = () => {
   const { colorMode } = useColorMode();
@@ -24,12 +37,12 @@ const AgentChat = () => {
   const msgBg = useColorModeValue('white', 'gray.700');
   const halMsgBg = useColorModeValue('blue.50', 'blue.900');
 
-  const fileInputRef = useRef(null);
+  // Removed unused fileInputRef
   const feedRef = useRef(null);
 
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
-  const [streaming, setStreaming] = useState(true);
+  // Removed streaming state as it's no longer needed with direct OpenAI calls
   const [showDebug, setShowDebug] = useState(false);
   const [showMemoryConfirm, setShowMemoryConfirm] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
@@ -57,38 +70,27 @@ const AgentChat = () => {
     setLoading(true);
 
     const newMessage = { role: 'user', content: input };
-    setMessages(prev => [...prev, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     setInput('');
 
-    const contextPrompt = injectContext(input, memories);
-    const taskPayload = {
-      task_name: 'HAL',
-      task_goal: contextPrompt,
-      streaming
-    };
-    logPayload(taskPayload);
-
     try {
-      const res = await fetch('/api/delegate-stream', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskPayload)
-      });
+      // Create context-enhanced prompt
+      const contextPrompt = injectContext(input, memories);
 
-      if (!res.ok || !res.body) return;
+      // Log the payload for debugging
+      const taskPayload = {
+        task_name: 'HAL',
+        task_goal: contextPrompt
+      };
+      logPayload(taskPayload);
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let agentMsg = '';
-      setMessages(prev => [...prev, { role: 'hal', content: '' }]);
+      // Call OpenAI to get natural language response
+      const response = await callOpenAI(contextPrompt);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        agentMsg += decoder.decode(value);
-        setMessages(prev => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: agentMsg } : m));
-      }
+      // Add the response to messages
+      setMessages((prev) => [...prev, { role: 'hal', content: response }]);
 
+      // Create and add memory entry
       const memoryEntry = createMemory({
         content: input,
         type: 'task',
@@ -96,10 +98,19 @@ const AgentChat = () => {
         tags: ['hal', 'task']
       });
       addMemory(memoryEntry);
+
+      // Show memory confirmation and log the response
       setShowMemoryConfirm(true);
-      logMemory(agentMsg);
+      logMemory(response);
     } catch (error) {
-      console.error('Error in stream:', error);
+      console.error('Error processing request:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'hal',
+          content: "I'm sorry, I encountered an error processing your request. Please try again."
+        }
+      ]);
     } finally {
       setLoading(false);
     }
@@ -108,10 +119,13 @@ const AgentChat = () => {
   const handleUpload = (file) => {
     if (file) {
       console.log('File uploaded:', file.name);
-      setMessages(prev => [...prev, {
-        role: 'system',
-        content: `File uploaded: ${file.name} (${Math.round(file.size / 1024)} KB)`
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'system',
+          content: `File uploaded: ${file.name} (${Math.round(file.size / 1024)} KB)`
+        }
+      ]);
       setShowFileUpload(false);
     }
   };
@@ -129,26 +143,39 @@ const AgentChat = () => {
         </Box>
       )}
 
-      <Flex justify="space-between" align="center" p={4} borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
+      <Flex
+        justify="space-between"
+        align="center"
+        p={4}
+        borderBottom="1px"
+        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
+      >
         <Heading size="lg">HAL Interface</Heading>
-        <Button colorScheme="red" size="sm" onClick={() => {
-          localStorage.removeItem('isAuthenticated');
-          window.location.href = '/auth';
-        }}>Logout</Button>
+        <Button
+          colorScheme="red"
+          size="sm"
+          onClick={() => {
+            localStorage.removeItem('isAuthenticated');
+            window.location.href = '/auth';
+          }}
+        >
+          Logout
+        </Button>
       </Flex>
 
-      <Flex p={4} align="center" borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
-        <Text fontWeight="bold" mr={4}>Streaming</Text>
-        <Input
-          type="checkbox"
-          isChecked={streaming}
-          onChange={() => setStreaming(!streaming)}
-          w="auto"
-        />
+      <Flex
+        p={4}
+        align="center"
+        borderBottom="1px"
+        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
+      >
+        <Text fontWeight="bold" mr={4}>
+          HAL GPT-4 Interface
+        </Text>
         <Tooltip label="Toggle Debug Drawer">
           <IconButton
             ml={4}
-            icon={<Text>{"</>"}</Text>}
+            icon={<Text>{'</>'}</Text>}
             onClick={() => setShowDebug(!showDebug)}
             aria-label="Toggle Debug"
             variant="outline"
@@ -156,16 +183,44 @@ const AgentChat = () => {
         </Tooltip>
       </Flex>
 
-      <Box flex="1" overflow="hidden" display="flex" flexDirection="column" p={4} position="relative">
-        <Box ref={feedRef} flex="1" overflowY="auto" bg={feedBg} borderRadius="md" p={4} mb={4} boxShadow="sm">
+      <Box
+        flex="1"
+        overflow="hidden"
+        display="flex"
+        flexDirection="column"
+        p={4}
+        position="relative"
+      >
+        <Box
+          ref={feedRef}
+          flex="1"
+          overflowY="auto"
+          bg={feedBg}
+          borderRadius="md"
+          p={4}
+          mb={4}
+          boxShadow="sm"
+        >
           {messages.map((msg, i) => (
-            <Box key={i} bg={msg.role === 'hal' ? halMsgBg : msgBg} color={colorMode === 'light' ? 'gray.800' : 'white'} p={4} mb={3} borderRadius="lg" boxShadow="sm">
-              <Text fontWeight="bold" mb={1}>{msg.role.toUpperCase()}:</Text>
+            <Box
+              key={i}
+              bg={msg.role === 'hal' ? halMsgBg : msgBg}
+              color={colorMode === 'light' ? 'gray.800' : 'white'}
+              p={4}
+              mb={3}
+              borderRadius="lg"
+              boxShadow="sm"
+            >
+              <Text fontWeight="bold" mb={1}>
+                {msg.role.toUpperCase()}:
+              </Text>
               <Text>{msg.content}</Text>
             </Box>
           ))}
           {showMemoryConfirm && (
-            <Text mt={2} color="green.400" fontSize="sm">💾 Memory Logged</Text>
+            <Text mt={2} color="green.400" fontSize="sm">
+              💾 Memory Logged
+            </Text>
           )}
         </Box>
 
@@ -185,7 +240,12 @@ const AgentChat = () => {
             border="1px"
             borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
           />
-          <IconButton icon={<AttachmentIcon />} onClick={() => setShowFileUpload(!showFileUpload)} mr={2} aria-label="Attach file" />
+          <IconButton
+            icon={<AttachmentIcon />}
+            onClick={() => setShowFileUpload(!showFileUpload)}
+            mr={2}
+            aria-label="Attach file"
+          />
           <Button onClick={handleSubmit} colorScheme="blue" disabled={loading || isTraining}>
             {loading ? 'Thinking...' : isTraining ? 'Training...' : 'Send'}
           </Button>
@@ -196,24 +256,77 @@ const AgentChat = () => {
         <DrawerOverlay />
         <DrawerContent bg="black" color="green.400">
           <DrawerCloseButton color="white" />
-          <DrawerHeader borderBottomWidth="1px" borderColor="green.700">🧠 Agent Debug View</DrawerHeader>
+          <DrawerHeader borderBottomWidth="1px" borderColor="green.700">
+            🧠 Agent Debug View
+          </DrawerHeader>
           <DrawerBody>
             <VStack spacing={6} align="stretch">
               <Box>
-                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>🔁 Task Payload</Text>
-                <Box whiteSpace="pre-wrap" fontSize="xs" overflowX="auto" bg="black" p={2} border="1px" borderColor="green.700" borderRadius="md">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  borderBottom="1px"
+                  borderColor="green.700"
+                  mb={1}
+                >
+                  🔁 Task Payload
+                </Text>
+                <Box
+                  whiteSpace="pre-wrap"
+                  fontSize="xs"
+                  overflowX="auto"
+                  bg="black"
+                  p={2}
+                  border="1px"
+                  borderColor="green.700"
+                  borderRadius="md"
+                >
                   {JSON.stringify(payload, null, 2) || '// No task submitted yet'}
                 </Box>
               </Box>
               <Box>
-                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>🧠 Memory Accessed</Text>
-                <Box whiteSpace="pre-wrap" fontSize="xs" overflowX="auto" bg="black" p={2} border="1px" borderColor="green.700" borderRadius="md">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  borderBottom="1px"
+                  borderColor="green.700"
+                  mb={1}
+                >
+                  🧠 Memory Accessed
+                </Text>
+                <Box
+                  whiteSpace="pre-wrap"
+                  fontSize="xs"
+                  overflowX="auto"
+                  bg="black"
+                  p={2}
+                  border="1px"
+                  borderColor="green.700"
+                  borderRadius="md"
+                >
                   {memory || '// No memory log yet'}
                 </Box>
               </Box>
               <Box>
-                <Text fontSize="sm" fontWeight="bold" borderBottom="1px" borderColor="green.700" mb={1}>🧪 Reasoning & Logs</Text>
-                <Box whiteSpace="pre-wrap" fontSize="xs" overflowX="auto" bg="black" p={2} border="1px" borderColor="green.700" borderRadius="md">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  borderBottom="1px"
+                  borderColor="green.700"
+                  mb={1}
+                >
+                  🧪 Reasoning & Logs
+                </Text>
+                <Box
+                  whiteSpace="pre-wrap"
+                  fontSize="xs"
+                  overflowX="auto"
+                  bg="black"
+                  p={2}
+                  border="1px"
+                  borderColor="green.700"
+                  borderRadius="md"
+                >
                   {logs || '// Agent has not returned internal reasoning yet'}
                 </Box>
               </Box>

@@ -86,20 +86,20 @@ async def delegate_stream(request: Request):
 @app.get("/health")
 async def health():
     """
-    Simple health check endpoint that returns a plain text "OK" response.
+    Simple health check endpoint that returns a JSON response with {"status": "ok"}.
     Used by Railway to verify the application is running properly.
     """
     logger.info("Health check endpoint accessed at /health")
-    return Response(content="OK", media_type="text/plain")
+    return {"status": "ok"}
 
 @app.get("/")
 async def root_health():
     """
-    Root-level health check endpoint that returns a plain text "OK" response.
+    Root-level health check endpoint that returns a JSON response with {"status": "ok"}.
     Some platforms expect the healthcheck at the root level.
     """
     logger.info("Health check endpoint accessed at root level")
-    return Response(content="OK", media_type="text/plain")
+    return {"status": "ok"}
 
 # Add startup delay to ensure FastAPI is fully initialized before healthcheck
 import asyncio
@@ -259,6 +259,21 @@ async def log_requests(request: Request, call_next):
         logger.error(f"Error during request processing: {str(e)}")
         logger.error(f"Process time: {time.time() - start_time:.4f}s")
         raise
+
+# Include all routers in the app
+app.include_router(agent_router, prefix="/api")
+app.include_router(memory_router, prefix="/api")
+app.include_router(goals_router, prefix="/api")
+app.include_router(memory_viewer_router, prefix="/api")
+app.include_router(control_router, prefix="/api")
+app.include_router(logs_router, prefix="/api")
+app.include_router(delegate_router, prefix="/api")
+app.include_router(hal_debug_router, prefix="/api")
+app.include_router(debug_router, prefix="/api")
+app.include_router(performance_router, prefix="/api")
+app.include_router(streaming_router, prefix="/api")
+app.include_router(system_routes, prefix="/api")
+app.include_router(health_router)  # Include health router without prefix
 
 # Initialize providers
 initialize_model_providers()

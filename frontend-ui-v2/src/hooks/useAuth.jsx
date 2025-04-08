@@ -77,21 +77,21 @@ export const AuthProvider = ({ children }) => {
     // Clear auth state from localStorage
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
-
-    // Update state
     setIsLoggedIn(false);
     setUser(null);
 
     setLoading(false); // Clear loading state after logout
   };
 
-  // Check if user is authenticated
+  // Check if user is authenticated with localStorage as source of truth
   const isAuthenticated = () => {
-    // Always check localStorage directly to ensure we have the latest state
-    return localStorage.getItem('isAuthenticated') === 'true';
+    const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+    if (authStatus !== isLoggedIn) {
+      setIsLoggedIn(authStatus);
+    }
+    return authStatus;
   };
 
-  // Auth context value
   const value = {
     user,
     login,
