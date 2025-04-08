@@ -18,19 +18,26 @@ import { useAgentTraining } from '../hooks/useAgentTraining';
 import { injectContext } from '../hooks/useMemoryRecall';
 import { callOpenAI } from '../api/callOpenAI';
 
-const AgentChat = () => {
+const AgentChat = ({ agentId = 'hal' }) => {
   const { colorMode } = useColorMode();
   const bg = useColorModeValue('gray.50', 'gray.900');
   const feedBg = useColorModeValue('gray.100', 'gray.800');
   const msgBg = useColorModeValue('white', 'gray.700');
-  const halMsgBg = useColorModeValue('blue.50', 'blue.900');
+  const agentMsgBg = useColorModeValue('blue.50', 'blue.900');
 
-  // Removed unused fileInputRef
+  // Get agent display name
+  const getAgentDisplayName = () => {
+    if (agentId === 'core-forge') return 'Core.Forge';
+    if (agentId === 'hal') return 'HAL';
+    return agentId.charAt(0).toUpperCase() + agentId.slice(1);
+  };
+
+  const agentName = getAgentDisplayName();
+
   const feedRef = useRef(null);
 
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
-  // Removed streaming state as it's no longer needed with direct OpenAI calls
   const [showDebug, setShowDebug] = useState(false);
   const [showMemoryConfirm, setShowMemoryConfirm] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
@@ -67,23 +74,24 @@ const AgentChat = () => {
       
       // Log the payload for debugging
       const taskPayload = {
-        task_name: 'HAL',
-        task_goal: contextPrompt
+        task_name: agentName,
+        task_goal: contextPrompt,
+        agent_id: agentId
       };
       logPayload(taskPayload);
       
       // Call OpenAI to get natural language response
-      const response = await callOpenAI(contextPrompt);
+      const response = await callOpenAI(contextPrompt, agentId);
       
       // Add the response to messages
-      setMessages(prev => [...prev, { role: 'hal', content: response }]);
+      setMessages(prev => [...prev, { role: agentId, content: response }]);
       
       // Create and add memory entry
       const memoryEntry = createMemory({
         content: input,
         type: 'task',
-        agent: 'HAL',
-        tags: ['hal', 'task']
+        agent: agentName,
+        tags: [agentId, 'task']
       });
       addMemory(memoryEntry);
       
@@ -93,7 +101,7 @@ const AgentChat = () => {
     } catch (error) {
       console.error('Error processing request:', error);
       setMessages(prev => [...prev, { 
-        role: 'hal', 
+        role: agentId, 
         content: "I'm sorry, I encountered an error processing your request. Please try again." 
       }]);
     } finally {
@@ -116,17 +124,17 @@ const AgentChat = () => {
     <Box bg={bg} h="calc(100vh - 80px)" display="flex" flexDirection="column">
       {isTraining && (
         <Box bg="yellow.600" color="white" p={2} textAlign="center">
-          🚧 Training HAL... Injecting Core Values
+          🚧 Training {agentName}... Injecting Core Values
         </Box>
       )}
       {!isTraining && isTrained && messages.length === 0 && (
         <Box bg="green.600" color="white" p={2} textAlign="center">
-          ✅ Training Complete — HAL is aligned
+          ✅ Training Complete — {agentName} is aligned
         </Box>
       )}
 
       <Flex justify="space-between" align="center" p={4} borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
-        <Heading size="lg">HAL Interface</Heading>
+        <Heading size="lg">{agentName} Interface</Heading>
         <Button colorScheme="red" size="sm" onClick={() => {
           localStorage.removeItem('isAuthenticated');
           window.location.href = '/auth';
@@ -134,7 +142,7 @@ const AgentChat = () => {
       </Flex>
 
       <Flex p={4} align="center" borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
-        <Text fontWeight="bold" mr={4}>HAL GPT-4 Interface</Text>
+        <Text fontWeight="bold" mr={4}>{agentName} GPT-4 Interface</Text>
         <Tooltip label="Toggle Debug Drawer">
           <IconButton
             ml={4}
@@ -149,8 +157,8 @@ const AgentChat = () => {
       <Box flex="1" overflow="hidden" display="flex" flexDirection="column" p={4} position="relative">
         <Box ref={feedRef} flex="1" overflowY="auto" bg={feedBg} borderRadius="md" p={4} mb={4} boxShadow="sm">
           {messages.map((msg, i) => (
-            <Box key={i} bg={msg.role === 'hal' ? halMsgBg : msgBg} color={colorMode === 'light' ? 'gray.800' : 'white'} p={4} mb={3} borderRadius="lg" boxShadow="sm">
-              <Text fontWeight="bold" mb={1}>{msg.role.toUpperCase()}:</Text>
+            <Box key={i} bg={msg.role === agentId ? agentMsgBg : msgBg} color={colorMode === 'light' ? 'gray.800' : 'white'} p={4} mb={3} borderRadius="lg" boxShadow="sm">
+              <Text fontWeight="bold" mb={1}>{msg.role === agentId ? agentName : msg.role.toUpperCase()}:</Text>
               <Text>{msg.content}</Text>
             </Box>
           ))}
