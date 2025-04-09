@@ -19,3 +19,19 @@ def boot_promethios():
 
     print("🧠 SYSTEM MEMORY:")
     print(handle_memory_task("SHOW"))
+    
+    # Schedule ObserverAgent journaling at end of boot
+    observer_task = {
+        "target_agent": "observer",
+        "input": "journal"
+    }
+    
+    # Execute the journaling task
+    observer_result = core.process_task(observer_task)
+    
+    # Log the journal trigger to memory
+    journal_log = "LOG: Observer journal triggered by Core.Forge boot loop"
+    handle_memory_task(journal_log)
+    
+    print("📓 OBSERVER JOURNAL TRIGGERED")
+    print(f"Observer response: {observer_result.get('output', 'No response')}")
