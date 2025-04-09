@@ -39,15 +39,24 @@ async def delegate_stream(request: Request):
         "content": config["system_prompt"]
     }
     
+    # Construct trimmed, scoped message array
+    messages = [{"role": "system", "content": config["system_prompt"]}]
+    
     # Get recent memory and inject it into the conversation
     recent_memory = handle_memory_task("SHOW")
-    memory_prompt = {
-        "role": "system",
-        "content": f"Recent system memory:\n{recent_memory}"
-    }
+    if recent_memory:
+        messages.append({"role": "system", "content": f"Recent system memory:\n{recent_memory}"})
     
-    # Construct final messages thread
-    messages = [system_prompt, memory_prompt]
+    # Optional: Add summarization if available
+    # This is experimental as mentioned in the requirements
+    try:
+        if history and len(history) > 5:
+            # Simple summarization by extracting key points
+            # In a real implementation, this would use a more sophisticated approach
+            summary = f"Previous conversation includes {len(history)} messages about: {history[-1]['content'][:50]}..."
+            messages.insert(1, {"role": "system", "content": f"Memory summary: {summary}"})
+    except Exception as e:
+        logger.warning(f"Summarization failed: {e}")
     
     # Trim history if needed (keep last 10 messages)
     if history:
