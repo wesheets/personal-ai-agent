@@ -1,18 +1,20 @@
-import os
+from app.utils.env_manager import EnvManager
+import logging
 from typing import Dict, Any, List, Optional
 import time
 import json
 from openai import AsyncOpenAI
 from app.providers.model_router import ModelProvider
 
+logger = logging.getLogger("providers")
+
 class OpenAIProvider(ModelProvider):
     """
     Provider for OpenAI models
     """
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        if not self.api_key:
-            raise ValueError("OPENAI_API_KEY environment variable is not set")
+        # Use the EnvManager to get the API key with proper error handling
+        self.api_key = api_key or EnvManager.get("OPENAI_API_KEY", required=True)
         
         self.client = AsyncOpenAI(api_key=self.api_key)
         self.available_models = [
@@ -20,7 +22,8 @@ class OpenAIProvider(ModelProvider):
             "gpt-4-turbo",
             "gpt-3.5-turbo"
         ]
-        self.default_model = "gpt-4"
+        self.default_model = EnvManager.get("DEFAULT_MODEL", "gpt-4")
+        logger.info(f"OpenAI provider initialized with default model: {self.default_model}")
     
     async def process_with_prompt_chain(
         self, 
@@ -45,27 +48,33 @@ class OpenAIProvider(ModelProvider):
             })
 
         model = prompt_chain.get("model", self.default_model)
+        temperature = prompt_chain.get("temperature", 0.7)
+        max_tokens = prompt_chain.get("max_tokens", 1000)
 
-        response = await self.client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=prompt_chain.get("temperature", 0.7),
-            max_tokens=prompt_chain.get("max_tokens", 1000),
-        )
+        try:
+            response = await self.client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
 
-        content = response.choices[0].message.content
+            content = response.choices[0].message.content
 
-        return {
-            "content": content,
-            "usage": {
-                "prompt_tokens": response.usage.prompt_tokens,
-                "completion_tokens": response.usage.completion_tokens,
-                "total_tokens": response.usage.total_tokens
-            },
-            "timestamp": time.time(),
-            "model": model,
-            "provider": "openai"
-        }
+            return {
+                "content": content,
+                "usage": {
+                    "prompt_tokens": response.usage.prompt_tokens,
+                    "completion_tokens": response.usage.completion_tokens,
+                    "total_tokens": response.usage.total_tokens
+                },
+                "timestamp": time.time(),
+                "model": model,
+                "provider": "openai"
+            }
+        except Exception as e:
+            logger.error(f"[ERROR] OpenAI API call failed: {str(e)}")
+            raise
     
     def _prepare_messages(
         self, 

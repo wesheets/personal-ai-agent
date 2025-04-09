@@ -28,6 +28,7 @@ from app.api.streaming_route import router as streaming_router, stream_response 
 from app.api.system_routes import router as system_routes  # System routes including CORS debug
 from app.middleware.size_limiter import limit_request_body_size  # Request body size limiter
 from app.health import health_router  # Health check endpoint for Railway deployment
+from app.api.agent_status import router as agent_status_router  # Agent status checker utility
 
 from app.providers import initialize_model_providers, get_available_models
 from app.core.seeding import get_seeding_manager
@@ -273,6 +274,7 @@ app.include_router(debug_router, prefix="/api")
 app.include_router(performance_router, prefix="/api")
 app.include_router(streaming_router, prefix="/api")
 app.include_router(system_routes, prefix="/api")
+app.include_router(agent_status_router, prefix="/api")  # Add agent status router
 app.include_router(health_router)  # Include health router without prefix
 
 # Initialize providers
