@@ -31,6 +31,11 @@ const Sidebar = () => {
     { name: 'Core.Forge Interface', icon: FiCode, path: '/agent/core-forge' }
   ];
 
+  // Add Control Room link for development environment only
+  if (process.env.NODE_ENV !== 'production') {
+    navItems.push({ name: 'Control Room', icon: FiServer, path: '/control-room' });
+  }
+
   // Safe navigation handler that checks auth state before navigating
   const handleNavigation = (path) => (e) => {
     e.preventDefault(); // Prevent default Link behavior

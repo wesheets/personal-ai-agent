@@ -10,6 +10,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import StatusOverlay from './components/StatusOverlay';
 import { StatusProvider } from './context/StatusContext';
 import { SettingsProvider } from './context/SettingsContext';
+import ControlRoom from './components/control-room/ControlRoom';
 
 // Import actual page components from remote
 import Dashboard from './pages/Dashboard';
@@ -104,6 +105,15 @@ function App() {
           element={
             <ProtectedRoute>
               <TrainingDashboard />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/control-room"
+          element={
+            <ProtectedRoute>
+              <ControlRoom />
             </ProtectedRoute>
           }
         />
