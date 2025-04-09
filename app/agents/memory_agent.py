@@ -199,6 +199,39 @@ def handle_memory_task(task_input: str) -> str:
         
         return "\n".join(results)
     
+    # New SEARCH mode implementation
+    elif task_input.startswith("SEARCH:"):
+        # Extract the search keyword
+        keyword = task_input.replace("SEARCH:", "").strip().lower()
+        
+        # Search all memory entries for the keyword
+        results = []
+        for entry in memory_log:
+            if isinstance(entry, dict):
+                # For structured entries, search in all fields
+                entry_str = json.dumps(entry).lower()
+                if keyword in entry_str:
+                    # Format the result with timestamp for better readability
+                    timestamp = entry.get('timestamp', 'unknown')
+                    if "raw_message" in entry:
+                        results.append(f"[{timestamp}] {entry['raw_message']}")
+                    else:
+                        # Create a readable format for structured entries
+                        source = entry.get('source', 'unknown')
+                        entry_type = entry.get('type', 'log')
+                        content = entry.get('input', '')
+                        results.append(f"[{timestamp}] {source} - {entry_type}: {content}")
+            else:
+                # For legacy string entries
+                if keyword in entry.lower():
+                    results.append(entry)
+        
+        # Return formatted results
+        if not results:
+            return f"🔍 SEARCH: No memory entries found matching '{keyword}'"
+        
+        return f"🔍 SEARCH RESULTS FOR '{keyword}':\n" + "\n".join(results)
+    
     else:
         return f"🧠 MemoryAgent did not understand: '{task_input}'"
 
