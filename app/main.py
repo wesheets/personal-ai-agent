@@ -89,6 +89,7 @@ try:
         version="1.0.0"
     )
     print("✅ FastAPI app initialized")
+    print("🔓 FastAPI app object was successfully created in main.py")
 
     # MODIFIED: Commented out delegate-stream endpoint
     """
@@ -266,6 +267,24 @@ try:
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(health_router)  # Include health router without prefix
     print("✅ Isolated AgentRunner module router included")
+
+    # Simple GET echo route for production health check
+    @app.get("/echo")
+    async def echo():
+        print("📡 /echo route was hit!")
+        return {
+            "status": "ok",
+            "message": "Echo is working"
+        }
+    
+    # Environment dump endpoint for debugging
+    import os
+    @app.get("/env")
+    async def env_dump():
+        return {
+            "cwd": os.getcwd(),
+            "env": dict(os.environ)
+        }
 
     # Failsafe route handler defined directly in main.py to bypass router issues
     from fastapi.responses import JSONResponse
