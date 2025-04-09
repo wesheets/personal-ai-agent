@@ -265,10 +265,13 @@ try:
     print("🔄 Including module routers...")
     print("📡 Including AgentRunner module router from /api/modules/agent.py")
     print("📡 Including MemoryWriter module router from /api/modules/memory.py")
+    print("📡 Including DelegationEngine module router from /api/modules/delegate.py")
     from app.api.modules import memory  # Import the memory.py route file
+    from app.api.modules import delegate  # Import the delegate.py route file
     
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(memory.router, prefix="/api/modules/memory")  # Mount the memory router
+    app.include_router(delegate.router, prefix="/api/modules")  # Mount the delegate router
     app.include_router(health_router)  # Include health router without prefix
     print("✅ Module routers included")
 
