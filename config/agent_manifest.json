@@ -1,0 +1,50 @@
+{
+  "core-forge": {
+    "version": "1.0.0",
+    "description": "System orchestrator that routes tasks to appropriate agents",
+    "status": "active",
+    "entrypoint": "app/core/forge.py"
+  },
+  "hal-agent": {
+    "version": "1.0.0",
+    "description": "Safety and constraint monitoring system",
+    "status": "active",
+    "entrypoint": "app/agents/hal_agent.py"
+  },
+  "ash-agent": {
+    "version": "0.9.0",
+    "description": "Clinical analysis and protocol-driven agent",
+    "status": "active",
+    "entrypoint": "app/agents/ash_agent.py"
+  },
+  "ops-agent": {
+    "version": "1.0.0",
+    "description": "Operations and system maintenance agent",
+    "status": "active",
+    "entrypoint": "app/agents/ops_agent.py"
+  },
+  "memory-agent": {
+    "version": "1.1.0",
+    "description": "System memory and logging with structured data storage",
+    "status": "active",
+    "entrypoint": "app/agents/memory_agent.py"
+  },
+  "lifetree-agent": {
+    "version": "0.8.5",
+    "description": "Personal life management and planning agent",
+    "status": "active",
+    "entrypoint": "app/agents/lifetree_agent.py"
+  },
+  "sitegen-agent": {
+    "version": "0.9.2",
+    "description": "Site plan generation and feature detection agent",
+    "status": "active",
+    "entrypoint": "app/agents/sitegen_agent.py"
+  },
+  "neureal-agent": {
+    "version": "0.7.0",
+    "description": "Neural network and machine learning operations agent",
+    "status": "experimental",
+    "entrypoint": "app/agents/neureal_agent.py"
+  }
+}
