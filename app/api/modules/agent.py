@@ -12,6 +12,7 @@ from typing import List, Dict, Any, Optional
 import logging
 import time
 import traceback
+import os
 
 from app.modules.agent_runner import run_agent
 
@@ -41,38 +42,51 @@ async def agent_run(request: AgentRunRequest):
         JSONResponse with the agent's response
     """
     start_time = time.time()
-    logger.info(f"Agent run request received for agent: {request.agent_id}")
     
     try:
+        print(f"🔄 API request received for agent: {request.agent_id}")
+        logger.info(f"Agent run request received for agent: {request.agent_id}")
+        
+        # Check OpenAI API key
+        api_key = os.getenv("OPENAI_API_KEY")
+        print(f"🔑 OpenAI API Key loaded in endpoint: {bool(api_key)}")
+        
         # Validate request
         if not request.agent_id:
-            logger.error("Missing agent_id in request")
+            error_msg = "Missing agent_id in request"
+            print(f"❌ {error_msg}")
+            logger.error(error_msg)
             return JSONResponse(
                 status_code=400,
                 content={
                     "status": "error",
-                    "message": "Missing agent_id in request"
+                    "message": error_msg
                 }
             )
         
         if not request.messages:
-            logger.error("Missing messages in request")
+            error_msg = "Missing messages in request"
+            print(f"❌ {error_msg}")
+            logger.error(error_msg)
             return JSONResponse(
                 status_code=400,
                 content={
                     "status": "error",
-                    "message": "Missing messages in request"
+                    "message": error_msg
                 }
             )
         
         # Run the agent
+        print(f"🏃 Calling run_agent for: {request.agent_id}")
         result = run_agent(request.agent_id, request.messages)
         
         # Check if agent execution was successful
         if result.get("status") == "error":
-            logger.error(f"Agent execution failed: {result.get('response')}")
+            error_msg = f"Agent execution failed: {result.get('response')}"
+            print(f"❌ {error_msg}")
+            logger.error(error_msg)
             return JSONResponse(
-                status_code=400,
+                status_code=500,  # Changed from 400 to 500 as per requirements
                 content={
                     "agent_id": request.agent_id,
                     "response": result.get("response", "Unknown error"),
@@ -82,6 +96,7 @@ async def agent_run(request: AgentRunRequest):
             )
         
         # Log success
+        print(f"✅ Agent execution successful for {request.agent_id} in {time.time() - start_time:.2f}s")
         logger.info(f"Agent execution successful for {request.agent_id} in {time.time() - start_time:.2f}s")
         
         # Return successful response
@@ -98,6 +113,7 @@ async def agent_run(request: AgentRunRequest):
     except Exception as e:
         # Handle any unexpected errors
         error_msg = f"Error processing agent run request: {str(e)}"
+        print(f"❌ AgentRunner API failed: {str(e)}")
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         
