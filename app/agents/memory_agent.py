@@ -9,10 +9,10 @@ def parse_log_message(message: str) -> Dict[str, Any]:
     """
     Parse a log message to extract structured information.
     
-    Example input: "LOG: Core.Forge delegated task to HAL"
+    Example input: "LOG: Core.Forge delegated task to Ops Agent"
     Example output: {
         "source": "Core.Forge",
-        "target": "HAL",
+        "target": "Ops Agent",
         "type": "delegation",
         "input": "task",
         "timestamp": "2025-04-09T00:38:49.123456"

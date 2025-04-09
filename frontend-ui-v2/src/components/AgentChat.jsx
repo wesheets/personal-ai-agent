@@ -37,11 +37,17 @@ const AgentChat = ({ agentId = 'core-forge' }) => {
   const msgBg = useColorModeValue('white', 'gray.700');
   const agentMsgBg = useColorModeValue('blue.50', 'blue.900');
   
+  // Agent names mapping
+  const agentNames = {
+    "core-forge": "Core.Forge",
+    "hal": "HAL",
+    "ash-xenomorph": "Ash",
+    "ops-agent": "Ops Agent",
+  };
+  
   // Get agent display name
   const getAgentDisplayName = () => {
-    if (agentId === 'core-forge') return 'Core.Forge';
-    if (agentId === 'hal') return 'HAL';
-    return agentId.charAt(0).toUpperCase() + agentId.slice(1);
+    return agentNames[agentId] || agentId.charAt(0).toUpperCase() + agentId.slice(1);
   };
   
   const agentName = getAgentDisplayName();
@@ -142,7 +148,7 @@ const AgentChat = ({ agentId = 'core-forge' }) => {
         justify="space-between"
         align="center"
       >
-        <Heading size="md">{agentName}</Heading>
+        <Heading size="md">{agentName} Interface</Heading>
         <Tooltip label="Debug View">
           <IconButton
             icon={<span>🛠️</span>}
