@@ -289,17 +289,37 @@ try:
     # Failsafe route handler defined directly in main.py to bypass router issues
     from fastapi.responses import JSONResponse
     from fastapi import Request
+    import traceback
 
     @app.post("/api/modules/agent/run")
     async def agentrunner_failsafe(request: Request):
-        print("🛠️ AgentRunner Failsafe Route HIT")
-        return JSONResponse(
-            status_code=200,
-            content={
-                "status": "ok",
-                "message": "Failsafe AgentRunner route is alive"
-            }
-        )
+        print("🛠️ AgentRunner Route HIT")
+        try:
+            body = await request.json()
+            print("🧠 AgentRunner called for:", body.get("agent_id", "unknown"))
+            
+            from agents.core_forge import CoreForgeAgent
+            agent = CoreForgeAgent()
+            result = agent.run(body["messages"])
+            
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "agent_id": "Core.Forge",
+                    "response": result,
+                    "status": "ok"
+                }
+            )
+        except Exception as e:
+            print(f"❌ AgentRunner error: {str(e)}")
+            traceback.print_exc()
+            return JSONResponse(
+                status_code=500, 
+                content={
+                    "status": "error",
+                    "message": str(e)
+                }
+            )
 
     # MODIFIED: Commented out other routers
     """
