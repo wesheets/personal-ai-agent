@@ -53,14 +53,17 @@ class CoreForge:
                     "output": error_msg
                 }
 
-            # Check if reflection is needed before executing the task
-            if self.reflection_enabled:
-                reflection_result = self.check_reflection_needed()
-                if reflection_result:
-                    logger.info(f"[Core.Forge] Reflection triggered: {reflection_result}")
-                    # Log the reflection to memory
-                    memory_entry = f"LOG: Core.Forge performed reflection and found: {reflection_result}"
-                    handle_memory_task(memory_entry)
+            # Always call MemoryAgent("SHOW") before responding
+            memory_content = handle_memory_task("SHOW")
+            logger.info(f"[Core.Forge] Reflecting on recent memory before responding")
+            
+            # Analyze recent memory for context
+            memory_analysis = self.analyze_recent_memory(memory_content)
+            if memory_analysis:
+                logger.info(f"[Core.Forge] Memory analysis: {memory_analysis}")
+                # Log the reflection to memory
+                memory_entry = f"LOG: Core.Forge reflected on memory before responding to {agent}: {memory_analysis}"
+                handle_memory_task(memory_entry)
 
             # Execute the task
             logger.info(f"[Core.Forge] → Routing task to {agent}: {task_input[:50]}...")
@@ -82,12 +85,13 @@ class CoreForge:
             except Exception as mem_error:
                 logger.error(f"[ERROR] Failed to log to memory: {str(mem_error)}")
 
-            # Return successful result
+            # Return successful result with memory analysis included
             return {
                 "status": "complete",
                 "executor": self.agent_id,
                 "routed_to": agent,
                 "input": task_input,
+                "memory_context": memory_analysis,
                 "output": result
             }
             
@@ -302,6 +306,70 @@ class CoreForge:
         handle_memory_task(f"LOG: Core.Forge completed async batch execution of {len(tasks)} tasks")
         
         return results
+
+    def analyze_recent_memory(self, memory_content: str) -> str:
+        """
+        Analyze recent memory content for context before responding.
+        
+        Args:
+            memory_content: Recent memory content from MemoryAgent("SHOW")
+            
+        Returns:
+            str: Analysis of recent memory for context
+        """
+        if not memory_content or memory_content == "🧠 No recent memory.":
+            return "No recent context available"
+            
+        lines = memory_content.split("\n")
+        valid_lines = [line for line in lines if line.strip()]
+        
+        if not valid_lines:
+            return "No relevant context found in memory"
+            
+        # Extract key information
+        recent_agents = set()
+        recent_actions = []
+        recent_errors = []
+        
+        for line in valid_lines:
+            # Extract agent names
+            for agent in ["Core.Forge", "HAL", "ASH", "OPS", "Memory", "Builder", "Observer"]:
+                if agent in line:
+                    recent_agents.add(agent)
+            
+            # Extract actions
+            if "delegated" in line or "completed" in line or "initialized" in line:
+                recent_actions.append(line)
+            
+            # Extract errors
+            if "error" in line.lower() or "failed" in line.lower():
+                recent_errors.append(line)
+        
+        # Build context summary
+        context_summary = []
+        
+        if recent_agents:
+            context_summary.append(f"Recent activity from: {', '.join(recent_agents)}")
+        
+        if recent_actions:
+            # Only include the 3 most recent actions
+            recent_actions = recent_actions[-3:]
+            action_summary = "; ".join(recent_actions)
+            context_summary.append(f"Recent actions: {action_summary}")
+        
+        if recent_errors:
+            error_summary = "; ".join(recent_errors)
+            context_summary.append(f"Recent errors: {error_summary}")
+        
+        # Add overall assessment
+        if recent_errors:
+            context_summary.append("System requires attention due to errors")
+        elif len(recent_actions) >= 3:
+            context_summary.append("System is actively processing multiple tasks")
+        else:
+            context_summary.append("System appears to be functioning normally")
+        
+        return " | ".join(context_summary)
 
     def check_reflection_needed(self) -> Optional[str]:
         """
