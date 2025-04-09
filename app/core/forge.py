@@ -408,10 +408,17 @@ class CoreForge:
         try:
             # If we got structured data back
             if memory_data.startswith("[") or memory_data.startswith("{"):
-                return self._analyze_structured_memory(memory_data)
+                analysis_result = self._analyze_structured_memory(memory_data)
             else:
                 # Fallback to analyzing raw text
-                return self._analyze_raw_memory(memory_data)
+                analysis_result = self._analyze_raw_memory(memory_data)
+                
+            # Trigger TrainerAgent to analyze memory and generate lessons
+            logger.info("[Core.Forge] Triggering TrainerAgent for self-improvement...")
+            trainer_result = run_agent("trainer", "train")
+            logger.info(f"[Core.Forge] TrainerAgent result: {trainer_result}")
+            
+            return analysis_result
         except Exception as e:
             logger.error(f"[ERROR] Memory analysis failed: {str(e)}")
             return f"Memory analysis failed: {str(e)}"
