@@ -1,31 +1,20 @@
+// src/main.jsx - Clean version with MSW removed
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import App from './App.jsx';
-import theme from './theme';
 import './index.css';
+import { BrowserRouter } from 'react-router-dom';
+import { ChakraProvider } from '@chakra-ui/react';
+import { AuthProvider } from './context/AuthContext';
 
-// Simple wrapper to ensure React mounts properly
-const AppWrapper = () => {
-  return (
-    <React.StrictMode>
-      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-      <ChakraProvider theme={theme}>
-        <App />
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <ChakraProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </ChakraProvider>
-    </React.StrictMode>
-  );
-};
-
-// Mount the application with error handling
-try {
-  const rootElement = document.getElementById('root');
-  if (rootElement) {
-    ReactDOM.createRoot(rootElement).render(<AppWrapper />);
-    console.log('React application successfully mounted');
-  } else {
-    console.error('Root element not found in the DOM');
-  }
-} catch (error) {
-  console.error('Error mounting React application:', error);
-}
+    </BrowserRouter>
+  </React.StrictMode>
+);
