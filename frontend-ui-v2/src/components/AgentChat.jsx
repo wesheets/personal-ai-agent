@@ -31,15 +31,9 @@ import { useAgentTraining } from '../hooks/useAgentTraining';
 import { injectContext } from '../hooks/useMemoryRecall';
 import { callOpenAI } from '../api/callOpenAI';
 
-const AgentChat = ({ defaultAgentId = 'core-forge' }) => {
-  // Get agentId from URL params, fallback to prop
-  const { agentId: urlAgentId } = useParams();
-  const agentId = urlAgentId || defaultAgentId;
-  const { colorMode } = useColorMode();
-  const bg = useColorModeValue('gray.50', 'gray.900');
-  const feedBg = useColorModeValue('gray.100', 'gray.800');
-  const msgBg = useColorModeValue('white', 'gray.700');
-  const agentMsgBg = useColorModeValue('blue.50', 'blue.900');
+const AgentChat = () => {
+  const { agentId } = useParams();
+  const finalAgentId = agentId || "core-forge";
   
   // Agent names mapping
   const agentNames = {
@@ -51,23 +45,26 @@ const AgentChat = ({ defaultAgentId = 'core-forge' }) => {
   
   // Get agent display name
   const getAgentDisplayName = () => {
-    return agentNames[agentId] || agentId.charAt(0).toUpperCase() + agentId.slice(1);
+    return agentNames[finalAgentId] || finalAgentId.charAt(0).toUpperCase() + finalAgentId.slice(1);
   };
   
   const agentName = getAgentDisplayName();
-  const feedRef = useRef(null);
-  const [input, setInput] = useState('');
   
-  // Load & store conversationHistory from localStorage
+  const { colorMode } = useColorMode();
+  const bg = useColorModeValue('gray.50', 'gray.900');
+  const feedBg = useColorModeValue('gray.100', 'gray.800');
+  const msgBg = useColorModeValue('white', 'gray.700');
+  const agentMsgBg = useColorModeValue('blue.50', 'blue.900');
+  
   const [messages, setMessages] = useState(() => {
-    const stored = localStorage.getItem(`chat_history_${agentId}`);
+    const stored = localStorage.getItem(`chat_history_${finalAgentId}`);
     return stored ? JSON.parse(stored) : [];
   });
   
   // Save messages to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem(`chat_history_${agentId}`, JSON.stringify(messages));
-  }, [messages, agentId]);
+    localStorage.setItem(`chat_history_${finalAgentId}`, JSON.stringify(messages));
+  }, [messages, finalAgentId]);
   
   // Create a unique threadId for this conversation
   const threadId = useRef(Date.now().toString());
@@ -80,6 +77,9 @@ const AgentChat = ({ defaultAgentId = 'core-forge' }) => {
   const { addMemory, getAllMemories, memories } = useMemoryStore();
   const { isTraining } = useAgentTraining();
   
+  const [input, setInput] = useState('');
+  const feedRef = useRef();
+  
   useEffect(() => {
     if (feedRef.current) {
       feedRef.current.scrollTop = feedRef.current.scrollHeight;
@@ -90,6 +90,24 @@ const AgentChat = ({ defaultAgentId = 'core-forge' }) => {
     console.log('File uploaded:', file);
     setShowFileUpload(false);
     // Here you would typically process the file
+  };
+  
+  const handleMemorize = () => {
+    if (messages.length > 0) {
+      const lastUserMessage = messages.filter(m => m.role === 'user').pop();
+      const lastAgentMessage = messages.filter(m => m.role === finalAgentId).pop();
+      
+      if (lastUserMessage && lastAgentMessage) {
+        const memory = createMemory(
+          lastUserMessage.content,
+          lastAgentMessage.content,
+          finalAgentId
+        );
+        addMemory(memory);
+        setShowMemoryConfirm(true);
+        setTimeout(() => setShowMemoryConfirm(false), 2000);
+      }
+    }
   };
   
   const handleSubmit = async () => {
@@ -105,57 +123,75 @@ const AgentChat = ({ defaultAgentId = 'core-forge' }) => {
       const taskPayload = {
         task_name: agentName,
         task_goal: contextPrompt,
-        agent_id: agentId
+        agent_id: finalAgentId
       };
       logPayload(taskPayload);
       
-      // Call OpenAI to get natural language response with history and threadId
-      const response = await callOpenAI(
-        contextPrompt, 
-        agentId, 
-        messages.map(msg => ({
-          role: msg.role,
-          content: msg.content
-        })),
-        threadId.current
-      );
-      
-      // Add the response to messages
-      setMessages(prev => [...prev, { role: agentId, content: response }]);
-      
-      // Create and add memory entry
-      const memoryEntry = createMemory({
-        content: input,
-        type: 'task',
-        agent: agentName,
-        tags: [agentId, 'task']
+      // Call API with proper parameters
+      const response = await fetch('/api/delegate-stream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agent_id: finalAgentId,
+          prompt: input,
+          history: messages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })),
+          threadId: threadId.current
+        })
       });
       
-      addMemory(memoryEntry);
-      setShowMemoryConfirm(true);
-      setTimeout(() => setShowMemoryConfirm(false), 2000);
+      if (!response.ok) {
+        throw new Error(`API call failed with status: ${response.status}`);
+      }
+      
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let responseText = '';
+      
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        responseText += chunk;
+        
+        // Update the UI with the streaming response
+        setMessages(prev => {
+          const newMessages = [...prev];
+          const lastMessage = newMessages[newMessages.length - 1];
+          
+          if (lastMessage && lastMessage.role === finalAgentId) {
+            lastMessage.content = responseText;
+            return [...newMessages];
+          } else {
+            return [...newMessages, { role: finalAgentId, content: responseText }];
+          }
+        });
+      }
+      
     } catch (error) {
-      console.error('Error in chat submission:', error);
-      setMessages(prev => [...prev, { role: agentId, content: "I'm sorry, I encountered an error processing your request." }]);
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { role: finalAgentId, content: `Error: ${error.message}` }]);
     } finally {
       setLoading(false);
     }
   };
   
   return (
-    <Box h="100%" display="flex" flexDirection="column">
+    <Box height="100vh" display="flex" flexDirection="column">
       <Flex
+        bg={colorMode === 'light' ? 'blue.600' : 'blue.900'}
+        color="white"
         p={4}
-        bg={bg}
-        borderBottom="1px"
-        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
-        justify="space-between"
-        align="center"
+        justifyContent="space-between"
+        alignItems="center"
       >
-        <Heading size="md">{agentName} Interface</Heading>
-        <Tooltip label="Debug View">
+        <Heading size="md">{agentName}</Heading>
+        <Tooltip label="Debug View" placement="bottom">
           <IconButton
-            icon={<span>🛠️</span>}
+            icon={<span>🧠</span>}
             onClick={() => setShowDebug(!showDebug)}
             aria-label="Toggle Debug"
             variant="outline"
@@ -181,8 +217,8 @@ const AgentChat = ({ defaultAgentId = 'core-forge' }) => {
           boxShadow="sm"
         >
           {messages.map((msg, i) => (
-            <Box key={i} bg={msg.role === agentId ? agentMsgBg : msgBg} color={colorMode === 'light' ? 'gray.800' : 'white'} p={4} mb={3} borderRadius="lg" boxShadow="sm">
-              <Text fontWeight="bold" mb={1}>{msg.role === agentId ? agentName : msg.role.toUpperCase()}:</Text>
+            <Box key={i} bg={msg.role === finalAgentId ? agentMsgBg : msgBg} color={colorMode === 'light' ? 'gray.800' : 'white'} p={4} mb={3} borderRadius="lg" boxShadow="sm">
+              <Text fontWeight="bold" mb={1}>{msg.role === finalAgentId ? agentName : msg.role.toUpperCase()}:</Text>
               <Text>{msg.content}</Text>
             </Box>
           ))}
