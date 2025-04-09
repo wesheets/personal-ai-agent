@@ -1,8 +1,14 @@
+"""
+Modified delegate_route.py to use the agent registry for agent lookups.
+This ensures proper integration with the failsafe agent loader.
+"""
+
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from app.core.agent_registry import AGENT_PERSONALITIES
 from app.providers.openai_provider import OpenAIProvider
 from app.agents.memory_agent import handle_memory_task
+from app.core.agent_loader import get_agent, get_all_agents
 import logging
 import inspect
 import uuid
@@ -23,13 +29,31 @@ async def list_agents():
     """
     Returns a list of all available agent personalities with their metadata.
     This endpoint provides information about each agent's capabilities, behavior, and visual identifiers.
+    
+    Modified to use the agent registry for agent lookups.
     """
     agents_list = []
-    for agent_id, personality in AGENT_PERSONALITIES.items():
-        # Create a copy of the personality dictionary and add the agent_id
-        agent_info = personality.copy()
-        agent_info["id"] = agent_id
-        agents_list.append(agent_info)
+    
+    # Get agents from registry first
+    registry_agents = get_all_agents()
+    if registry_agents:
+        for agent_id, agent_instance in registry_agents.items():
+            # Create agent info from instance attributes
+            agent_info = {
+                "id": agent_id,
+                "name": getattr(agent_instance, "name", agent_id),
+                "description": getattr(agent_instance, "description", ""),
+                "tone": getattr(agent_instance, "tone", "professional"),
+                "type": "agent"
+            }
+            agents_list.append(agent_info)
+    else:
+        # Fall back to AGENT_PERSONALITIES if registry is empty
+        for agent_id, personality in AGENT_PERSONALITIES.items():
+            # Create a copy of the personality dictionary and add the agent_id
+            agent_info = personality.copy()
+            agent_info["id"] = agent_id
+            agents_list.append(agent_info)
     
     return JSONResponse(content=agents_list)
 
@@ -44,7 +68,25 @@ async def delegate(request: Request):
         history = body.get("history", [])
         thread_id = body.get("threadId", str(uuid.uuid4()))
         
-        personality = AGENT_PERSONALITIES.get(agent_id)
+        # Try to get agent from registry first
+        agent_instance = get_agent(agent_id)
+        if agent_instance:
+            logger.info(f"🤖 Found agent in registry: {agent_id}")
+            agent_name = getattr(agent_instance, "name", agent_id)
+            agent_description = getattr(agent_instance, "description", "")
+            agent_tone = getattr(agent_instance, "tone", "professional")
+            
+            # Create personality from agent instance
+            personality = {
+                "name": agent_name,
+                "description": agent_description,
+                "tone": agent_tone
+            }
+        else:
+            # Fall back to AGENT_PERSONALITIES if agent not found in registry
+            personality = AGENT_PERSONALITIES.get(agent_id)
+            logger.warning(f"⚠️ Agent not found in registry, using personality: {agent_id}")
+        
         # Use prompt if task_input is empty
         user_input = task_input or prompt
         

@@ -1,12 +1,16 @@
 """
-System routes for the Personal AI Agent system.
+Modified system_routes.py to fix the agent manifest endpoint.
+This ensures the endpoint returns a list of available agents from the agent registry
+rather than from a static JSON file.
 """
+
 from fastapi import APIRouter, Request
 import logging
 import os
 import json
 from pathlib import Path
 from app.core.middleware.cors import normalize_origin, sanitize_origin_for_header
+from app.core.agent_loader import get_all_agents
 
 # Configure logging
 logger = logging.getLogger("api")
@@ -83,44 +87,49 @@ async def get_agents_manifest():
     """
     Returns the agent manifest containing metadata about all available agents.
     
-    The manifest includes agent status, version, and capabilities.
+    Modified to use the agent registry instead of a static JSON file.
+    This ensures the manifest reflects the actual loaded agents.
     """
     try:
-        # Path to the agent manifest file
-        manifest_path = Path(__file__).parents[2] / "config" / "agent_manifest.json"
+        # Get all loaded agents from the registry
+        loaded_agents = get_all_agents()
         
-        # Check if the file exists
-        if not manifest_path.exists():
-            logger.error(f"Agent manifest file not found at {manifest_path}")
-            return {"error": "Agent manifest file not found", "status": "error"}
+        if not loaded_agents:
+            logger.warning("Agent registry is empty or failed to initialize")
+            return {
+                "agents": [],
+                "total_agents": 0,
+                "active_agents": 0,
+                "status": "degraded",
+                "error": "Agent registry is empty or failed to initialize"
+            }
         
-        # Load the manifest file
-        with open(manifest_path, "r") as f:
-            manifest_data = json.load(f)
+        # Create a list of agent data for the response
+        agent_list = []
+        for agent_id, agent_instance in loaded_agents.items():
+            agent_info = {
+                "id": agent_id,
+                "name": getattr(agent_instance, "name", agent_id),
+                "status": "active",
+                "version": getattr(agent_instance, "version", "1.0.0"),
+                "description": getattr(agent_instance, "description", "No description available")
+            }
+            agent_list.append(agent_info)
         
-        # Add additional runtime information to each agent
-        for agent_id, agent_info in manifest_data.items():
-            # Check if the entrypoint file exists
-            entrypoint = agent_info.get("entrypoint", "")
-            if entrypoint:
-                entrypoint_path = Path(__file__).parents[2] / entrypoint
-                agent_info["entrypoint_exists"] = entrypoint_path.exists()
-            
-            # Add runtime status if not present
-            if "status" not in agent_info:
-                agent_info["status"] = "unknown"
-            
-            # Add capabilities field if not present
-            if "capabilities" not in agent_info:
-                agent_info["capabilities"] = []
-        
+        # Return the agent manifest
         return {
-            "agents": manifest_data,
-            "total_agents": len(manifest_data),
-            "active_agents": sum(1 for agent in manifest_data.values() if agent.get("status") == "active"),
+            "agents": agent_list,
+            "total_agents": len(agent_list),
+            "active_agents": len(agent_list),
             "status": "success"
         }
     
     except Exception as e:
-        logger.error(f"Error loading agent manifest: {str(e)}")
-        return {"error": str(e), "status": "error"}
+        logger.error(f"Error generating agent manifest: {str(e)}")
+        return {
+            "error": str(e),
+            "status": "error",
+            "agents": [],
+            "total_agents": 0,
+            "active_agents": 0
+        }

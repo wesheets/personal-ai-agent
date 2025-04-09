@@ -1,3 +1,8 @@
+"""
+Modified streaming_route.py to use the agent registry for agent lookups.
+This ensures proper integration with the failsafe agent loader.
+"""
+
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 import logging
@@ -7,8 +12,9 @@ import asyncio
 import json
 from typing import Dict, Any, AsyncGenerator, List
 
-# Import AGENT_PERSONALITIES from delegate_route
-from app.api.delegate_route import AGENT_PERSONALITIES
+# Import agent registry
+from app.core.agent_loader import get_agent, get_all_agents
+from app.core.agent_registry import AGENT_PERSONALITIES
 from app.providers.openai_provider import OpenAIProvider
 
 router = APIRouter()
@@ -108,7 +114,25 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
         # Get agent_id and task input from request body
         agent_id = body.get("agent_id", "").lower() if body else ""
         task_input = body.get("task", {}).get("input", "") if body else ""
-        personality = AGENT_PERSONALITIES.get(agent_id)
+        
+        # Try to get agent from registry first
+        agent_instance = get_agent(agent_id)
+        if agent_instance:
+            logger.info(f"🤖 Found agent in registry: {agent_id}")
+            agent_name = getattr(agent_instance, "name", agent_id)
+            agent_description = getattr(agent_instance, "description", "")
+            agent_tone = getattr(agent_instance, "tone", "professional")
+            
+            # Create personality from agent instance
+            personality = {
+                "name": agent_name,
+                "description": agent_description,
+                "tone": agent_tone
+            }
+        else:
+            # Fall back to AGENT_PERSONALITIES if agent not found in registry
+            personality = AGENT_PERSONALITIES.get(agent_id)
+            logger.warning(f"⚠️ Agent not found in registry, using personality: {agent_id}")
         
         # Log agent selection
         if personality:
@@ -139,7 +163,7 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
         processing_time = time.time() - start_time
         
         # If OpenAI provider is available and we have task input, use it for dynamic responses
-        if openai_provider and task_input and agent_id == "core-forge" and personality:
+        if openai_provider and task_input and agent_instance and personality:
             try:
                 # Create a prompt chain with system message based on agent personality
                 prompt_chain = {
@@ -194,7 +218,7 @@ async def stream_response(request: Request) -> AsyncGenerator[bytes, None]:
             response_data = {
                 "status": "success",
                 "agent": personality["name"],
-                "message": personality["message"],
+                "message": personality.get("message", "I'm ready to assist you."),
                 "tone": personality["tone"],
                 "received": body,
                 "processing": {
@@ -254,10 +278,7 @@ async def delegate_stream(request: Request):
     3. Reducing memory usage for large responses
     4. Handling complex operations with detailed progress updates
     
-    Supports multiple agent personalities based on agent_id parameter:
-    - core-forge: Core.Forge with professional tone (uses OpenAI for dynamic responses)
-    - hal9000: HAL 9000 with calm tone
-    - ash-xenomorph: Ash with clinical tone
+    Modified to use the agent registry for agent lookups.
     """
     logger.info(f"🔄 Streaming delegate route executed from {inspect.currentframe().f_code.co_filename}")
     
