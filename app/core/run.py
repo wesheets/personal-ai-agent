@@ -22,13 +22,15 @@ AGENT_HANDLERS = {
     "observer": handle_observer_task
 }
 
-def run_agent(agent_id, task_input):
+def run_agent(agent_id, task_input, debug=False, **kwargs):
     """
     Run an agent with the given task input.
     
     Args:
         agent_id (str): The ID of the agent to run
         task_input (str): The input to pass to the agent
+        debug (bool): Whether to run in debug mode
+        **kwargs: Additional parameters to pass to the agent
         
     Returns:
         str: The agent's response or an error message
@@ -51,6 +53,9 @@ def run_agent(agent_id, task_input):
             
         # Call the handler
         logger.info(f"Running agent: {agent_id} with input: {task_input[:50]}...")
+        if debug:
+            logger.info(f"[DEBUG MODE] Agent {agent_id} running in debug mode")
+            
         result = handler(task_input)
         
         # Check if result is valid
@@ -58,6 +63,10 @@ def run_agent(agent_id, task_input):
             error_msg = f"Agent {agent_id} returned None"
             logger.error(f"[ERROR] {error_msg}")
             return f"Error: Agent {agent_id} produced no output"
+        
+        # Add debug mode prefix if debug is enabled
+        if debug:
+            result = f"[DEBUG MODE] {result}"
             
         return result
         
