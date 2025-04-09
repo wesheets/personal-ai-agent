@@ -17,13 +17,16 @@ import {
   Card,
   CardBody,
   Spinner,
-  Button
+  Button,
+  Alert,
+  AlertIcon
 } from '@chakra-ui/react';
-import { FiActivity, FiRefreshCw, FiClock, FiInfo } from 'react-icons/fi';
+import { FiActivity, FiRefreshCw, FiClock, FiInfo, FiAlertTriangle } from 'react-icons/fi';
 import { useStatus } from '../context/StatusContext';
 import { useSettings } from '../context/SettingsContext';
 import { getVisibleAgents } from '../utils/agentUtils';
 import { getAgentActivity } from '../api/AgentActivityService';
+import { safeFetch } from '../utils/safeFetch';
 
 /**
  * AgentActivityPings Component
@@ -34,6 +37,7 @@ const AgentActivityPings = () => {
   const { colorMode } = useColorMode();
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [agentActivities, setAgentActivities] = useState({});
   
@@ -51,45 +55,63 @@ const AgentActivityPings = () => {
       try {
         setLoading(true);
         
-        // Use the centralized getVisibleAgents utility
-        const visibleAgents = await getVisibleAgents({ includeInactive: true });
-        
-        if (isMounted) {
-          // Merge with health pings data
-          const mergedAgents = visibleAgents.map(agent => {
-            const healthPing = agentHealthPings.find(ping => ping.id === agent.id);
-            return {
-              ...agent,
-              lastPing: healthPing?.lastPing || null,
-              status: healthPing?.status || agent.status || 'unknown'
-            };
-          });
-          
-          setAgents(mergedAgents);
-          setLastUpdated(new Date());
-          
-          // Fetch activity data for each agent
-          const activityPromises = mergedAgents.map(agent => 
-            getAgentActivity(agent.id)
-              .then(data => ({ agentId: agent.id, data }))
-              .catch(() => ({ agentId: agent.id, data: null }))
-          );
-          
-          const activitiesResults = await Promise.all(activityPromises);
-          const activitiesMap = {};
-          
-          activitiesResults.forEach(result => {
-            if (result.data) {
-              activitiesMap[result.agentId] = result.data;
+        // Use safeFetch to get agent status with timeout
+        await safeFetch(
+          '/api/agent/status',
+          (data) => {
+            if (isMounted) {
+              // Process agent data
+              const agentList = Array.isArray(data) ? data : [];
+              
+              // Merge with health pings data
+              const mergedAgents = agentList.map(agent => {
+                const healthPing = agentHealthPings.find(ping => ping.id === agent.id);
+                return {
+                  ...agent,
+                  lastPing: healthPing?.lastPing || null,
+                  status: healthPing?.status || agent.status || 'unknown'
+                };
+              });
+              
+              setAgents(mergedAgents);
+              setLastUpdated(new Date());
+              setError(false);
+              
+              // Fetch activity data for each agent
+              mergedAgents.forEach(agent => {
+                getAgentActivity(agent.id)
+                  .then(data => {
+                    if (isMounted) {
+                      setAgentActivities(prev => ({
+                        ...prev,
+                        [agent.id]: data
+                      }));
+                    }
+                  });
+              });
             }
-          });
-          
-          if (isMounted) {
-            setAgentActivities(activitiesMap);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching agents:', error);
+          },
+          (hasError) => {
+            if (isMounted && hasError) {
+              setError(true);
+              
+              // Use fallback data if available
+              if (agentHealthPings && agentHealthPings.length > 0) {
+                const fallbackAgents = agentHealthPings.map(ping => ({
+                  id: ping.id,
+                  name: ping.id,
+                  status: ping.status || 'unknown',
+                  lastPing: ping.lastPing,
+                  type: 'unknown'
+                }));
+                
+                setAgents(fallbackAgents);
+                setLastUpdated(new Date());
+              }
+            }
+          },
+          8000 // 8 second timeout
+        );
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -112,48 +134,64 @@ const AgentActivityPings = () => {
   }, [agentHealthPings, settings.autoRefreshPanels]);
   
   // Manual refresh
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setLoading(true);
+    setError(false);
     
-    try {
-      // Use the centralized getVisibleAgents utility
-      const visibleAgents = await getVisibleAgents({ includeInactive: true });
-      
-      // Merge with health pings data
-      const mergedAgents = visibleAgents.map(agent => {
-        const healthPing = agentHealthPings.find(ping => ping.id === agent.id);
-        return {
-          ...agent,
-          lastPing: healthPing?.lastPing || null,
-          status: healthPing?.status || agent.status || 'unknown'
-        };
-      });
-      
-      setAgents(mergedAgents);
-      setLastUpdated(new Date());
-      
-      // Fetch activity data for each agent
-      const activityPromises = mergedAgents.map(agent => 
-        getAgentActivity(agent.id)
-          .then(data => ({ agentId: agent.id, data }))
-          .catch(() => ({ agentId: agent.id, data: null }))
-      );
-      
-      const activitiesResults = await Promise.all(activityPromises);
-      const activitiesMap = {};
-      
-      activitiesResults.forEach(result => {
-        if (result.data) {
-          activitiesMap[result.agentId] = result.data;
+    // Use safeFetch to get agent status with timeout
+    safeFetch(
+      '/api/agent/status',
+      (data) => {
+        // Process agent data
+        const agentList = Array.isArray(data) ? data : [];
+        
+        // Merge with health pings data
+        const mergedAgents = agentList.map(agent => {
+          const healthPing = agentHealthPings.find(ping => ping.id === agent.id);
+          return {
+            ...agent,
+            lastPing: healthPing?.lastPing || null,
+            status: healthPing?.status || agent.status || 'unknown'
+          };
+        });
+        
+        setAgents(mergedAgents);
+        setLastUpdated(new Date());
+        
+        // Fetch activity data for each agent
+        mergedAgents.forEach(agent => {
+          getAgentActivity(agent.id)
+            .then(data => {
+              setAgentActivities(prev => ({
+                ...prev,
+                [agent.id]: data
+              }));
+            });
+        });
+      },
+      (hasError) => {
+        if (hasError) {
+          setError(true);
+          
+          // Use fallback data if available
+          if (agentHealthPings && agentHealthPings.length > 0) {
+            const fallbackAgents = agentHealthPings.map(ping => ({
+              id: ping.id,
+              name: ping.id,
+              status: ping.status || 'unknown',
+              lastPing: ping.lastPing,
+              type: 'unknown'
+            }));
+            
+            setAgents(fallbackAgents);
+            setLastUpdated(new Date());
+          }
         }
-      });
-      
-      setAgentActivities(activitiesMap);
-    } catch (error) {
-      console.error('Error refreshing agents:', error);
-    } finally {
+      },
+      8000 // 8 second timeout
+    ).finally(() => {
       setLoading(false);
-    }
+    });
   };
   
   // Format time difference
@@ -246,13 +284,29 @@ const AgentActivityPings = () => {
         
         <Divider mb={4} />
         
+        {error && (
+          <Alert status="warning" mb={4} borderRadius="md">
+            <AlertIcon />
+            <Text>Unable to load agent map. Showing available data.</Text>
+          </Alert>
+        )}
+        
         {loading && agents.length === 0 ? (
           <Flex justify="center" align="center" h="200px">
-            <Spinner size="xl" />
+            <VStack spacing={4}>
+              <Spinner size="xl" />
+              <Button size="sm" onClick={handleRefresh}>
+                Cancel
+              </Button>
+            </VStack>
           </Flex>
         ) : agents.length === 0 ? (
           <Box textAlign="center" py={10}>
+            <Icon as={FiAlertTriangle} boxSize="40px" color="gray.400" mb={4} />
             <Text color="gray.500">No agents available</Text>
+            <Button mt={4} size="sm" onClick={handleRefresh}>
+              Try Again
+            </Button>
           </Box>
         ) : (
           <Grid templateColumns={{ base: "repeat(1, 1fr)", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }} gap={4}>
