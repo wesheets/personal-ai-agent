@@ -8,435 +8,391 @@ import inspect
 import re
 import datetime
 from dotenv import load_dotenv
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 import json
 import asyncio
 import time
+import uvicorn
 from app.core.middleware.cors import CustomCORSMiddleware, normalize_origin, sanitize_origin_for_header
 
-from app.api.agent import router as agent_router
-from app.api.memory import router as memory_router
-from app.api.goals import goals_router
-from app.api.memory_viewer import memory_router as memory_viewer_router
-from app.api.control import control_router
-from app.api.logs import logs_router
-from app.api.delegate_route import router as delegate_router, AGENT_PERSONALITIES  # ✅ HAL ROUTER
-from app.diagnostics.hal_route_debug import router as hal_debug_router
-from app.api.debug_routes import router as debug_router  # Debug routes for diagnostics
-from app.api.performance_monitoring import router as performance_router  # Performance monitoring
-from app.api.streaming_route import router as streaming_router, stream_response  # Streaming response router
-from app.api.system_routes import router as system_routes  # System routes including CORS debug
-from app.middleware.size_limiter import limit_request_body_size  # Request body size limiter
-from app.health import health_router  # Health check endpoint for Railway deployment
-from app.api.agent_status import router as agent_status_router  # Agent status checker utility
-
-from app.providers import initialize_model_providers, get_available_models
-from app.core.seeding import get_seeding_manager
-from app.core.prompt_manager import PromptManager
-from app.core.task_state_manager import get_task_state_manager
-
-# Load environment variables
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('app/logs/api.log', mode='a')
-    ]
-)
-logger = logging.getLogger("api")
-
-# CORS configuration - Using regex to allow all Vercel preview branches and production domain
-# Note: Previous environment variable based configuration has been replaced with regex pattern
-
-# Enable CORS debug mode if specified in environment
-os.environ["CORS_DEBUG"] = os.environ.get("CORS_DEBUG", "false")
-
-# FastAPI app init
-app = FastAPI(
-    title="Enhanced AI Agent System",
-    description="A personal AI agent system with vector memory, multi-model support, and configurable agent personalities",
-    version="1.0.0"
-)
-
-# Direct route for delegate-stream
-@app.post("/api/delegate-stream")
-async def delegate_stream(request: Request):
-    """
-    Direct implementation of delegate-stream endpoint.
-    This endpoint streams the response back to the client.
-    """
-    print("✅ /api/delegate-stream hit")  # Explicit print for debugging
-    logger.info(f"🔄 Direct delegate-stream route executed from {inspect.currentframe().f_code.co_filename}")
+# Wrap the entire startup in a try-except block for error trapping
+try:
+    print("🚀 Starting Promethios OS...")
     
-    # Return streaming response with enhanced headers
-    return StreamingResponse(
-        stream_response(request),
-        media_type="application/x-ndjson",
-        headers={
-            "X-Streaming-Mode": "enabled",
-            "X-Agent-Version": "1.0.0",
-            "Cache-Control": "no-cache"
-        }
+    from app.api.agent import router as agent_router
+    from app.api.memory import router as memory_router
+    from app.api.goals import goals_router
+    from app.api.memory_viewer import router as memory_viewer_router
+    from app.api.control import control_router
+    from app.api.logs import logs_router
+    from app.api.delegate_route import router as delegate_router, AGENT_PERSONALITIES  # ✅ HAL ROUTER
+    from app.diagnostics.hal_route_debug import router as hal_debug_router
+    from app.api.debug_routes import router as debug_router  # Debug routes for diagnostics
+    from app.api.performance_monitoring import router as performance_router  # Performance monitoring
+    from app.api.streaming_route import router as streaming_router, stream_response  # Streaming response router
+    from app.api.system_routes import router as system_routes  # System routes including CORS debug
+    from app.middleware.size_limiter import limit_request_body_size  # Request body size limiter
+    from app.health import health_router  # Health check endpoint for Railway deployment
+    from app.api.agent_status import router as agent_status_router  # Agent status checker utility
+
+    from app.providers import initialize_model_providers, get_available_models
+    from app.core.seeding import get_seeding_manager
+    from app.core.prompt_manager import PromptManager
+    from app.core.task_state_manager import get_task_state_manager
+
+    # Load environment variables
+    load_dotenv()
+    print("✅ Environment variables loaded")
+
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler('app/logs/api.log', mode='a')
+        ]
     )
+    logger = logging.getLogger("api")
+    print("✅ Logging configured")
 
-# Direct healthcheck endpoints for Railway deployment
-@app.get("/health")
-async def health():
-    """
-    Simple health check endpoint that returns a JSON response with {"status": "ok"}.
-    Used by Railway to verify the application is running properly.
-    """
-    logger.info("Health check endpoint accessed at /health")
-    return {"status": "ok"}
+    # CORS configuration - Using regex to allow all Vercel preview branches and production domain
+    # Note: Previous environment variable based configuration has been replaced with regex pattern
 
-@app.get("/")
-async def root_health():
-    """
-    Root-level health check endpoint that returns a JSON response with {"status": "ok"}.
-    Some platforms expect the healthcheck at the root level.
-    """
-    logger.info("Health check endpoint accessed at root level")
-    return {"status": "ok"}
+    # Enable CORS debug mode if specified in environment
+    os.environ["CORS_DEBUG"] = os.environ.get("CORS_DEBUG", "false")
 
-# Add startup delay to ensure FastAPI is fully initialized before healthcheck
-import asyncio
+    # FastAPI app init
+    app = FastAPI(
+        title="Enhanced AI Agent System",
+        description="A personal AI agent system with vector memory, multi-model support, and configurable agent personalities",
+        version="1.0.0"
+    )
+    print("✅ FastAPI app initialized")
 
-@app.on_event("startup")
-async def startup_delay():
-    """
-    Add a small delay during startup to ensure FastAPI is fully initialized
-    before Railway attempts the healthcheck.
-    """
-    logger.info("Adding startup delay to ensure application is fully initialized...")
-    await asyncio.sleep(1)  # give it breathing room before healthcheck
-    logger.info("Startup delay completed, application ready for healthcheck")
+    # Direct route for delegate-stream
+    @app.post("/api/delegate-stream")
+    async def delegate_stream(request: Request):
+        """
+        Direct implementation of delegate-stream endpoint.
+        This endpoint streams the response back to the client.
+        """
+        print("✅ /api/delegate-stream hit")  # Explicit print for debugging
+        logger.info(f"🔄 Direct delegate-stream route executed from {inspect.currentframe().f_code.co_filename}")
+        
+        # Return streaming response with enhanced headers
+        return StreamingResponse(
+            stream_response(request),
+            media_type="application/x-ndjson",
+            headers={
+                "X-Streaming-Mode": "enabled",
+                "X-Agent-Version": "1.0.0",
+                "Cache-Control": "no-cache"
+            }
+        )
 
-# Route logger for debugging
-@app.on_event("startup")
-async def log_all_routes():
-    print("🚀 Booting Enhanced AI Agent System...")
-    print("📡 ROUTES REGISTERED ON STARTUP:")
-    for route in app.routes:
-        if isinstance(route, APIRoute):
-            print(f"➡️ {route.path} [{', '.join(route.methods)}] from {inspect.getsourcefile(route.endpoint)}")
-            logger.info(f"🔍 {route.path} [{','.join(route.methods)}]")
-    
-    # Log CORS configuration on startup
-    logger.info(f"🔒 CORS Configuration Loaded:")
-    import os
-    
-    raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
-    logger.info(f"🔒 CORS_ALLOWED_ORIGINS raw: {raw_origins}")
-    
-    cors_allow_credentials = os.getenv("CORS_ALLOW_CREDENTIALS", "true")
-    logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
-    # Removed legacy allowed_origins references to fix startup issues
-    logger.info(f"✅ Using CORSMiddleware with allow_origin_regex")
+    # Direct healthcheck endpoints for Railway deployment
+    @app.get("/health")
+    async def health():
+        """
+        Simple health check endpoint that returns a JSON response with {"status": "ok"}.
+        Used by Railway to verify the application is running properly.
+        """
+        logger.info("Health check endpoint accessed at /health")
+        return {"status": "ok"}
 
-# Add custom CORS middleware from the extracted module
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import Request
+    @app.get("/")
+    async def root_health():
+        """
+        Root-level health check endpoint that returns a JSON response with {"status": "ok"}.
+        Some platforms expect the healthcheck at the root level.
+        """
+        logger.info("Health check endpoint accessed at root level")
+        return {"status": "ok"}
 
-# Production CORS middleware with regex pattern to allow Vercel deploys, Railway apps, and local development
-app.add_middleware(
-    CORSMiddleware,
-    allow_origin_regex=r"https://(.*\.vercel\.app|.*\.railway\.app|promethios\.ai)|http://localhost:[0-9]+",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Request body size limiter middleware
-app.middleware("http")(limit_request_body_size)
-
-# Middleware for logging with timeout handling
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    import time
+    # Add startup delay to ensure FastAPI is fully initialized before healthcheck
     import asyncio
-    import json
-    from fastapi.responses import JSONResponse
-    
-    logger.info(f"Request: {request.method} {request.url}")
-    
-    # Log origin for CORS debugging with normalization
-    origin = request.headers.get("origin")
-    if origin:
-        normalized_request_origin = normalize_origin(origin)
-        logger.info(f"🔒 Request Origin: {origin}")
-        logger.info(f"🔒 Normalized Request Origin: {normalized_request_origin}")
-    
-    # Only log headers for non-production environments or if explicitly enabled
-    if os.environ.get("LOG_HEADERS", "false").lower() == "true":
-        logger.info(f"Request headers: {request.headers}")
-    
-    # Pre-parse body for delegate routes to avoid double parsing
-    if "delegate" in str(request.url) or "latest" in str(request.url) or "goals" in str(request.url):
-        try:
-            # Use asyncio.wait_for to implement timeout for body reading
-            raw_body = await asyncio.wait_for(request.body(), timeout=15.0)  # Increased from 8.0 to 15.0 seconds
-            if raw_body:
-                # Store raw body for later use
-                request._body = raw_body
-                
-                # Try to parse as JSON and store in request.state
-                try:
-                    body_str = raw_body.decode()
-                    # Only log body summary for security/performance
-                    log_body = body_str[:100] + "..." if len(body_str) > 100 else body_str
-                    logger.info(f"Request body summary: {log_body}")
+
+    @app.on_event("startup")
+    async def startup_delay():
+        """
+        Add a small delay during startup to ensure FastAPI is fully initialized
+        before Railway attempts the healthcheck.
+        """
+        logger.info("Adding startup delay to ensure application is fully initialized...")
+        await asyncio.sleep(1)  # give it breathing room before healthcheck
+        logger.info("Startup delay completed, application ready for healthcheck")
+
+    # Route logger for debugging
+    @app.on_event("startup")
+    async def log_all_routes():
+        print("🚀 Booting Enhanced AI Agent System...")
+        print("📡 ROUTES REGISTERED ON STARTUP:")
+        for route in app.routes:
+            if isinstance(route, APIRoute):
+                print(f"➡️ {route.path} [{', '.join(route.methods)}] from {inspect.getsourcefile(route.endpoint)}")
+                logger.info(f"🔍 {route.path} [{','.join(route.methods)}]")
+        
+        # Log CORS configuration on startup
+        logger.info(f"🔒 CORS Configuration Loaded:")
+        import os
+        
+        raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
+        logger.info(f"🔒 CORS_ALLOWED_ORIGINS raw: {raw_origins}")
+        
+        cors_allow_credentials = os.getenv("CORS_ALLOW_CREDENTIALS", "true")
+        logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
+        # Removed legacy allowed_origins references to fix startup issues
+        logger.info(f"✅ Using CORSMiddleware with allow_origin_regex")
+
+    # Add custom CORS middleware from the extracted module
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi import Request
+
+    # Production CORS middleware with regex pattern to allow Vercel deploys, Railway apps, and local development
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r"https://(.*\.vercel\.app|.*\.railway\.app|promethios\.ai)|http://localhost:[0-9]+",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    print("✅ CORS middleware added")
+
+    # Request body size limiter middleware
+    app.middleware("http")(limit_request_body_size)
+
+    # Middleware for logging with timeout handling
+    @app.middleware("http")
+    async def log_requests(request: Request, call_next):
+        import time
+        import asyncio
+        import json
+        from fastapi.responses import JSONResponse
+        
+        logger.info(f"Request: {request.method} {request.url}")
+        
+        # Log origin for CORS debugging with normalization
+        origin = request.headers.get("origin")
+        if origin:
+            normalized_request_origin = normalize_origin(origin)
+            logger.info(f"🔒 Request Origin: {origin}")
+            logger.info(f"🔒 Normalized Request Origin: {normalized_request_origin}")
+        
+        # Only log headers for non-production environments or if explicitly enabled
+        if os.environ.get("LOG_HEADERS", "false").lower() == "true":
+            logger.info(f"Request headers: {request.headers}")
+        
+        # Pre-parse body for delegate routes to avoid double parsing
+        if "delegate" in str(request.url) or "latest" in str(request.url) or "goals" in str(request.url):
+            try:
+                # Use asyncio.wait_for to implement timeout for body reading
+                raw_body = await asyncio.wait_for(request.body(), timeout=15.0)  # Increased from 8.0 to 15.0 seconds
+                if raw_body:
+                    # Store raw body for later use
+                    request._body = raw_body
                     
-                    # Pre-parse JSON and store in request state
-                    request.state.body = json.loads(body_str)
-                    logger.info("Successfully pre-parsed JSON body in middleware")
-                except json.JSONDecodeError:
-                    # Not valid JSON, just store raw body
-                    logger.warning("Request body is not valid JSON, storing raw body only")
-                except Exception as e:
-                    logger.error(f"Error parsing JSON body: {str(e)}")
+                    # Try to parse as JSON and store in request.state
+                    try:
+                        body_str = raw_body.decode()
+                        # Only log body summary for security/performance
+                        log_body = body_str[:100] + "..." if len(body_str) > 100 else body_str
+                        logger.info(f"Request body summary: {log_body}")
+                        
+                        # Pre-parse JSON and store in request state
+                        request.state.body = json.loads(body_str)
+                        logger.info("Successfully pre-parsed JSON body in middleware")
+                    except json.JSONDecodeError:
+                        # Not valid JSON, just store raw body
+                        logger.warning("Request body is not valid JSON, storing raw body only")
+                    except Exception as e:
+                        logger.error(f"Error parsing JSON body: {str(e)}")
+            except asyncio.TimeoutError:
+                logger.error(f"Timeout reading request body for {request.url}")
+                return JSONResponse(
+                    status_code=408,
+                    content={
+                        "status": "error",
+                        "message": "Request body reading timed out in middleware",
+                        "error": "Timeout while reading request body"
+                    }
+                )
+            except Exception as e:
+                logger.error(f"Error reading request body: {str(e)}")
+        
+        # Set overall request timeout (15 seconds max for Railway environment)
+        start_time = time.time()
+        try:
+            # Use asyncio.wait_for to implement timeout for the entire request
+            # Increased timeout for Railway environment
+            timeout_seconds = 15.0 if os.environ.get("RAILWAY_ENVIRONMENT") else 10.0
+            response = await asyncio.wait_for(call_next(request), timeout=timeout_seconds)
+            process_time = time.time() - start_time
+            logger.info(f"Response status: {response.status_code}")
+            logger.info(f"Process time: {process_time:.4f}s")
+            
+            # Add timing header to response
+            response.headers["X-Process-Time"] = str(process_time)
+            
+            # Log CORS headers for debugging
+            if origin:
+                allow_origin = response.headers.get("access-control-allow-origin", "")
+                logger.info(f"🔒 Response CORS: Access-Control-Allow-Origin: '{allow_origin}'")
+                
+                if allow_origin:
+                    # Check for semicolons in the header
+                    if ";" in allow_origin:
+                        logger.warning(f"🔒 CORS Response: ⚠️ Header contains semicolon: '{allow_origin}'")
+                        # Fix the header by removing the semicolon
+                        clean_origin = sanitize_origin_for_header(allow_origin)
+                        logger.info(f"🔒 CORS Response: 🧹 Cleaning header: '{clean_origin}'")
+                        response.headers["access-control-allow-origin"] = clean_origin
+                    else:
+                        logger.info(f"🔒 CORS Response: ✅ Header clean: '{allow_origin}'")
+                else:
+                    logger.warning(f"🔒 CORS Response: ❌ Header missing")
+            
+            return response
         except asyncio.TimeoutError:
-            logger.error(f"Timeout reading request body for {request.url}")
+            logger.error(f"Timeout processing request for {request.url}")
+            process_time = time.time() - start_time
+            logger.error(f"Process time before timeout: {process_time:.4f}s")
             return JSONResponse(
-                status_code=408,
+                status_code=504,
                 content={
                     "status": "error",
-                    "message": "Request body reading timed out in middleware",
-                    "error": "Timeout while reading request body"
+                    "message": "Request processing timed out",
+                    "error": "Timeout while processing request"
                 }
             )
         except Exception as e:
-            logger.error(f"Error reading request body: {str(e)}")
-    
-    # Set overall request timeout (15 seconds max for Railway environment)
-    start_time = time.time()
-    try:
-        # Use asyncio.wait_for to implement timeout for the entire request
-        # Increased timeout for Railway environment
-        timeout_seconds = 15.0 if os.environ.get("RAILWAY_ENVIRONMENT") else 10.0
-        response = await asyncio.wait_for(call_next(request), timeout=timeout_seconds)
-        process_time = time.time() - start_time
-        logger.info(f"Response status: {response.status_code}")
-        logger.info(f"Process time: {process_time:.4f}s")
-        
-        # Add timing header to response
-        response.headers["X-Process-Time"] = str(process_time)
-        
-        # Log CORS headers for debugging
-        if origin:
-            allow_origin = response.headers.get("access-control-allow-origin", "")
-            logger.info(f"🔒 Response CORS: Access-Control-Allow-Origin: '{allow_origin}'")
-            
-            if allow_origin:
-                # Check for semicolons in the header
-                if ";" in allow_origin:
-                    logger.warning(f"🔒 CORS Response: ⚠️ Header contains semicolon: '{allow_origin}'")
-                    # Fix the header by removing the semicolon
-                    clean_origin = sanitize_origin_for_header(allow_origin)
-                    logger.info(f"🔒 CORS Response: 🧹 Cleaning header: '{clean_origin}'")
-                    response.headers["access-control-allow-origin"] = clean_origin
-                else:
-                    logger.info(f"🔒 CORS Response: ✅ Header clean: '{allow_origin}'")
-            else:
-                logger.warning(f"🔒 CORS Response: ❌ Header missing")
-        
-        return response
-    except asyncio.TimeoutError:
-        logger.error(f"Timeout processing request for {request.url}")
-        process_time = time.time() - start_time
-        logger.error(f"Process time before timeout: {process_time:.4f}s")
-        return JSONResponse(
-            status_code=504,
-            content={
-                "status": "error",
-                "message": "Request processing timed out",
-                "error": "Timeout while processing request"
+            logger.error(f"Error during request processing: {str(e)}")
+            logger.error(f"Process time: {time.time() - start_time:.4f}s")
+            raise
+
+    # Include all routers in the app
+    print("🔄 Including API routers...")
+    app.include_router(agent_router, prefix="/api")
+    app.include_router(memory_router, prefix="/api")
+    app.include_router(goals_router, prefix="/api")
+    app.include_router(memory_viewer_router, prefix="/api")
+    app.include_router(control_router, prefix="/api")
+    app.include_router(logs_router, prefix="/api")
+    app.include_router(delegate_router, prefix="/api")
+    app.include_router(hal_debug_router, prefix="/api")
+    app.include_router(debug_router, prefix="/api")
+    app.include_router(performance_router, prefix="/api")
+    app.include_router(streaming_router, prefix="/api")
+    app.include_router(system_routes, prefix="/api")
+    app.include_router(agent_status_router, prefix="/api")  # Add agent status router
+    app.include_router(health_router)  # Include health router without prefix
+    print("✅ All API routers included")
+
+    # Initialize providers
+    print("🔄 Initializing model providers...")
+    initialize_model_providers()
+    print("✅ Model providers initialized")
+
+    # System routes
+    system_router = APIRouter(prefix="/system", tags=["System"])
+
+    @system_router.get("/models")
+    async def get_models():
+        models = get_available_models()
+        return models
+
+    @system_router.get("/status")
+    async def get_system_status():
+        try:
+            prompt_manager = PromptManager()
+            task_state_manager = get_task_state_manager()
+            seeding_manager = get_seeding_manager()
+            agents_seeded = await seeding_manager.seed_default_agents(prompt_manager)
+            goals_seeded = await seeding_manager.seed_default_goals(task_state_manager)
+            return {
+                "status": "operational",
+                "version": "1.0.0",
+                "uptime": "N/A",
+                "agents_count": len(prompt_manager.get_available_agents()),
+                "goals_count": len(task_state_manager.goals),
+                "tasks_count": len(task_state_manager.tasks),
+                "seeding": {
+                    "agents_seeded": agents_seeded,
+                    "goals_seeded": goals_seeded
+                }
             }
-        )
-    except Exception as e:
-        logger.error(f"Error during request processing: {str(e)}")
-        logger.error(f"Process time: {time.time() - start_time:.4f}s")
-        raise
+        except Exception as e:
+            return {"status": "degraded", "error": str(e), "version": "1.0.0"}
 
-# Include all routers in the app
-app.include_router(agent_router, prefix="/api")
-app.include_router(memory_router, prefix="/api")
-app.include_router(goals_router, prefix="/api")
-app.include_router(memory_viewer_router, prefix="/api")
-app.include_router(control_router, prefix="/api")
-app.include_router(logs_router, prefix="/api")
-app.include_router(delegate_router, prefix="/api")
-app.include_router(hal_debug_router, prefix="/api")
-app.include_router(debug_router, prefix="/api")
-app.include_router(performance_router, prefix="/api")
-app.include_router(streaming_router, prefix="/api")
-app.include_router(system_routes, prefix="/api")
-app.include_router(agent_status_router, prefix="/api")  # Add agent status router
-app.include_router(health_router)  # Include health router without prefix
-
-# Initialize providers
-initialize_model_providers()
-
-# System routes
-system_router = APIRouter(prefix="/system", tags=["System"])
-
-@system_router.get("/models")
-async def get_models():
-    models = get_available_models()
-    return models
-
-@system_router.get("/status")
-async def get_system_status():
-    try:
-        prompt_manager = PromptManager()
-        task_state_manager = get_task_state_manager()
-        seeding_manager = get_seeding_manager()
-        agents_seeded = await seeding_manager.seed_default_agents(prompt_manager)
-        goals_seeded = await seeding_manager.seed_default_goals(task_state_manager)
+    # CORS configuration debug endpoint
+    @system_router.get("/cors-config", tags=["Debug"])
+    async def get_cors_config(request: Request):
+        # Enhanced debug information with normalization
+        raw_env = os.environ.get("CORS_ALLOWED_ORIGINS", "")
+        request_origin = request.headers.get("origin", "")
+        normalized_request_origin = normalize_origin(request_origin)
+        sanitized_request_origin = sanitize_origin_for_header(request_origin)
+        
+        # Check if normalized origin matches any of our normalized allowed origins
+        origin_match = False
+        matched_with = None
+        comparison_results = []
+        
+        # Add a memory log for CORS fix verification
+        try:
+            from app.api.memory import add_memory_entry
+            import asyncio
+            asyncio.create_task(add_memory_entry(
+                "CORS Fix Complete", 
+                f"CORS origin matching fixed using strict equality. Frontend origin: {request_origin}",
+                "system"
+            ))
+            cors_memory_added = True
+        except Exception as e:
+            cors_memory_added = False
+            logger.error(f"Failed to add CORS fix memory: {str(e)}")
+        
         return {
-            "status": "operational",
-            "version": "1.0.0",
-            "uptime": "N/A",
-            "agents_count": len(prompt_manager.get_available_agents()),
-            "goals_count": len(task_state_manager.goals),
-            "tasks_count": len(task_state_manager.tasks),
-            "seeding": {
-                "agents_seeded": agents_seeded,
-                "goals_seeded": goals_seeded
-            }
-        }
-    except Exception as e:
-        return {"status": "degraded", "error": str(e), "version": "1.0.0"}
-
-# CORS configuration debug endpoint
-@system_router.get("/cors-config", tags=["Debug"])
-async def get_cors_config(request: Request):
-    # Enhanced debug information with normalization
-    raw_env = os.environ.get("CORS_ALLOWED_ORIGINS", "")
-    request_origin = request.headers.get("origin", "")
-    normalized_request_origin = normalize_origin(request_origin)
-    sanitized_request_origin = sanitize_origin_for_header(request_origin)
-    
-    # Check if normalized origin matches any of our normalized allowed origins
-    origin_match = False
-    matched_with = None
-    comparison_results = []
-    
-    for allowed_norm in normalized_origins:
-        # Use strict string equality for validation
-        is_match = normalized_request_origin == allowed_norm
-        comparison_results.append({
-            "allowed_origin": allowed_norm,
-            "request_origin": normalized_request_origin,
-            "is_match": is_match,
-            "comparison_type": "strict equality"
-        })
-        
-        if is_match:
-            origin_match = True
-            matched_with = allowed_norm
-            break
-    
-    # Check response headers
-    response_headers = {}
-    for middleware in app.user_middleware:
-        if hasattr(middleware, "cls") and middleware.cls.__name__ == "CustomCORSMiddleware":
-            response_headers["middleware_type"] = "CustomCORSMiddleware"
-            break
-    
-    # Test header sanitization
-    test_origins = [
-        "https://example.com",
-        "https://example.com;",
-        "https://example.com,",
-        "https://example.com; ",
-        " https://example.com;"
-    ]
-    sanitization_tests = {origin: sanitize_origin_for_header(origin) for origin in test_origins}
-    
-    # Add a memory log for CORS fix verification
-    try:
-        from app.api.memory import add_memory_entry
-        import asyncio
-        asyncio.create_task(add_memory_entry(
-            "CORS Fix Complete", 
-            f"CORS origin matching fixed using strict equality. Frontend origin: {request_origin}",
-            "system"
-        ))
-        cors_memory_added = True
-    except Exception as e:
-        cors_memory_added = False
-        logger.error(f"Failed to add CORS fix memory: {str(e)}")
-    
-    return {
-        "allowed_origins": allowed_origins,
-        "normalized_origins": normalized_origins,
-        "allow_credentials": cors_allow_credentials,
-        "origins_count": len(allowed_origins),
-        "raw_env_value": raw_env,
-        "raw_env_length": len(raw_env),
-        "deduplication_active": True,
-        "normalization_active": True,
-        "sanitization_active": True,
-        "custom_middleware_active": True,
-        "request_info": {
-            "raw_origin": request_origin,
-            "normalized_origin": normalized_request_origin,
-            "sanitized_origin": sanitized_request_origin,
-            "match_result": "✅ Allowed" if origin_match else "❌ Not allowed",
-            "matched_with": matched_with
-        },
-        "comparison_results": comparison_results,
-        "response_headers": response_headers,
-        "middleware_config": {
-            "allow_origins": "List with {} origins".format(len(allowed_origins)),
-            "allow_credentials": cors_allow_credentials,
-            "allow_methods": "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
-            "allow_headers": "*"
-        },
-        "sanitization_tests": sanitization_tests,
-        "debug_info": {
-            "is_list_type": str(type(allowed_origins)),
-            "first_origin": allowed_origins[0] if allowed_origins else None,
-            "has_duplicates": len(allowed_origins) != len(set(allowed_origins)),
-            "using_regex_matching": False,
-            "using_strict_equality": True,
-            "using_custom_middleware": True,
-            "using_header_sanitization": True,
+            "request_info": {
+                "raw_origin": request_origin,
+                "normalized_origin": normalized_request_origin,
+                "sanitized_origin": sanitized_request_origin
+            },
             "cors_memory_added": cors_memory_added
         }
-    }
 
-# Direct route for delegate-stream to bypass any router mounting issues
-@app.post("/api/agent/delegate-test")
-async def direct_delegate_stream(request: Request):
-    """
-    Direct implementation of delegate-stream endpoint to bypass router mounting issues.
-    This endpoint streams the response back to the client.
-    """
-    print("✅ /api/agent/delegate-test hit")  # Explicit print for debugging
-    logger.info(f"🔄 Direct delegate-test route executed from {inspect.currentframe().f_code.co_filename}")
+    # Include system router
+    app.include_router(system_router, prefix="/api")
+
+    # Final startup message
+    print("✅ Promethios backend fully initialized. App ready to serve requests.")
     
-    # Return streaming response with enhanced headers
-    return StreamingResponse(
-        stream_response(request),
-        media_type="application/x-ndjson",
-        headers={
-            "X-Streaming-Mode": "enabled",
-            "X-Agent-Version": "1.0.0",
-            "Cache-Control": "no-cache"
-        }
-    )
+except Exception as e:
+    print(f"🔥 Startup error detected: {e}")
+    # Log to file if possible
+    try:
+        with open("startup_error.log", "a") as f:
+            f.write(f"{datetime.datetime.now()} - STARTUP ERROR: {str(e)}\n")
+    except:
+        pass
+    # Re-raise to ensure the error is visible
+    raise
 
-# Swagger docs route
-@app.get("/api/docs", include_in_schema=False)
-def overridden_swagger_docs():
-    return get_swagger_ui_html(
-        openapi_url="/openapi.json",
-        title="Enhanced AI Agent API",
-        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
-        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
-    )
+# Entry point for running the application
+if __name__ == "__main__":
+    # Ensure the application uses the Railway-provided port
+    port = int(os.environ.get("PORT", 8000))
+    print(f"🚀 Starting server on port {port}")
+    
+    try:
+        uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=False)
+    except Exception as e:
+        print(f"🔥 Server startup error: {e}")
+        # Log to file if possible
+        try:
+            with open("server_error.log", "a") as f:
+                f.write(f"{datetime.datetime.now()} - SERVER ERROR: {str(e)}\n")
+        except:
+            pass
+        # Re-raise to ensure the error is visible
+        raise
