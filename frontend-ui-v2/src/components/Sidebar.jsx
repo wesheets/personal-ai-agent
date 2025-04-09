@@ -17,18 +17,18 @@ const Sidebar = () => {
   const { colorMode } = useColorMode();
   const location = useLocation();
   
-  // Navigation items with corrected paths to match App.jsx routes
+  // Navigation items with updated paths to use /agent/:agentId pattern
   const navItems = [
     { name: 'Dashboard', icon: FiHome, path: '/dashboard' },
-    { name: 'Builder Agent', icon: FiCode, path: '/builder' },
-    { name: 'Ops Agent', icon: FiServer, path: '/ops' },
-    { name: 'Research Agent', icon: FiSearch, path: '/research' },
-    { name: 'Memory Agent', icon: FiDatabase, path: '/memory' },
+    { name: 'Builder Agent', icon: FiCode, path: '/agent/builder' },
+    { name: 'Ops Agent', icon: FiServer, path: '/agent/ops-agent' },
+    { name: 'Research Agent', icon: FiSearch, path: '/agent/research' },
+    { name: 'Memory Agent', icon: FiDatabase, path: '/agent/memory-agent' },
     { name: 'Memory Browser', icon: FiList, path: '/memory-browser' },
     { name: 'Activity Feed', icon: FiActivity, path: '/activity' },
     { name: 'Agent Activity', icon: FiActivity, path: '/agent-activity' },
     { name: 'Settings', icon: FiSettings, path: '/settings' },
-    { name: 'Core.Forge Interface', icon: FiCode, path: '/core-forge' }
+    { name: 'Core.Forge Interface', icon: FiCode, path: '/agent/core-forge' }
   ];
 
   // Safe navigation handler that checks auth state before navigating

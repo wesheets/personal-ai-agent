@@ -13,93 +13,11 @@ import { SettingsProvider } from './context/SettingsContext';
 
 // Import actual page components from remote
 import Dashboard from './pages/Dashboard';
-import BuilderAgent from './pages/AgentPanels';
-import OpsAgent from './pages/AgentPanels';
-import ResearchAgent from './pages/AgentPanels';
-import MemoryAgentView from './pages/MemoryAgentView';
 import MemoryBrowser from './pages/MemoryBrowser';
 import MainActivityFeed from './pages/MainActivityFeed';
 import AgentListPage from './pages/AgentListPage';
 import AgentActivityPage from './pages/AgentActivityPage';
 import SettingsPage from './pages/SettingsPage';
-
-const AgentChatView = () => {
-  const { agentId } = useParams();
-  const [agentData, setAgentData] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
-
-  React.useEffect(() => {
-    const fetchAgentData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/agents/${agentId}`);
-        if (!response.ok) {
-          if (agentId === 'hal9000') {
-            setAgentData({
-              id: 'hal9000',
-              name: 'Core.Forge',
-              icon: '🔴',
-              status: 'ready',
-              type: 'system',
-              description: 'I am Core.Forge, a highly advanced AI system.'
-            });
-          } else {
-            setAgentData({
-              id: agentId,
-              name: `Agent ${agentId}`,
-              icon: '🤖',
-              status: 'unknown',
-              type: 'generic',
-              description: 'Agent information not available.'
-            });
-          }
-        } else {
-          const data = await response.json();
-          setAgentData(data);
-        }
-      } catch (err) {
-        console.error('Error fetching agent data:', err);
-        setError('Failed to load agent data. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (agentId) {
-      fetchAgentData();
-    }
-  }, [agentId]);
-
-  if (loading) return <Box p={5}>Loading agent interface...</Box>;
-  if (error)
-    return (
-      <Box p={5} color="red.500">
-        {error}
-      </Box>
-    );
-  if (!agentData) return <Box p={5}>Agent Not Found</Box>;
-
-  return (
-    <Box p={4}>
-      <Flex align="center" mb={6}>
-        <Box fontSize="3xl" mr={3}>
-          {agentData.icon}
-        </Box>
-        <Box>
-          <Box fontSize="2xl" fontWeight="bold">
-            {agentData.name}
-          </Box>
-          <Box color="gray.500">Status: {agentData.status}</Box>
-        </Box>
-      </Flex>
-      <Box mb={6}>{agentData.description}</Box>
-      <Box p={4} borderWidth="1px" borderRadius="lg">
-        Chat with {agentData.name} coming soon.
-      </Box>
-    </Box>
-  );
-};
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -138,38 +56,6 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/builder"
-          element={
-            <ProtectedRoute>
-              <BuilderAgent agentType="builder" agentName="Builder" agentDescription="Constructs plans, code, or structured output." />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ops"
-          element={
-            <ProtectedRoute>
-              <OpsAgent agentType="ops" agentName="Ops" agentDescription="Executes tasks with minimal interpretation or delay." />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/research"
-          element={
-            <ProtectedRoute>
-              <ResearchAgent agentType="research" agentName="Research" agentDescription="Gathers and analyzes information from various sources." />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/memory"
-          element={
-            <ProtectedRoute>
-              <MemoryAgentView />
             </ProtectedRoute>
           }
         />
@@ -214,14 +100,6 @@ function App() {
           }
         />
         <Route
-          path="/chat/:agentId"
-          element={
-            <ProtectedRoute>
-              <AgentChatView />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/training"
           element={
             <ProtectedRoute>
@@ -230,9 +108,9 @@ function App() {
           }
         />
 
-        {/* Core.Forge Agent Chat - legacy path */}
+        {/* Unified agent route */}
         <Route
-          path="/hal"
+          path="/agent/:agentId"
           element={
             <ProtectedRoute>
               <AgentChat />
@@ -240,21 +118,11 @@ function App() {
           }
         />
 
-        {/* Core.Forge Agent Chat */}
-        <Route
-          path="/core-forge"
-          element={
-            <ProtectedRoute>
-              <AgentChat agentId="core-forge" />
-            </ProtectedRoute>
-          }
-        />
-
         {/* Root path redirect to Core.Forge if authenticated, otherwise to auth */}
-        <Route path="/" element={<Navigate to="/core-forge" />} />
+        <Route path="/" element={<Navigate to="/agent/core-forge" />} />
 
         {/* Fallback for unknown routes */}
-        <Route path="*" element={<Navigate to="/core-forge" />} />
+        <Route path="*" element={<Navigate to="/agent/core-forge" />} />
       </Routes>
     </Box>
   );

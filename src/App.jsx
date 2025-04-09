@@ -19,7 +19,6 @@ import { StatusProvider } from './context/StatusContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { isAuthenticated } from './hooks/useAuth';
 import UIv2Shell from './pages/UIv2Shell';
-import AgentChatPanel from './components/AgentChatPanel';
 import AgentChat from './AgentChat';
 import './styles/animations.css';
 
@@ -96,7 +95,7 @@ function App() {
             
             {/* Root path redirect based on auth status */}
             <Route path="/" element={
-              isAuthenticated() ? <Navigate to="/hal" /> : <Navigate to="/auth" />
+              isAuthenticated() ? <Navigate to="/agent/hal" /> : <Navigate to="/auth" />
             } />
             
             {/* HAL Agent Chat - default interface after authentication */}
@@ -116,90 +115,6 @@ function App() {
                 <AuthenticatedLayout>
                   <ErrorBoundary>
                     <Dashboard />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            <Route path="/builder" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <BuilderAgent />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            {/* Added route for builder-agent */}
-            <Route path="/builder-agent" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <BuilderAgent />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            <Route path="/ops" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <OpsAgent />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            {/* Added route for ops-agent */}
-            <Route path="/ops-agent" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <OpsAgent />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            <Route path="/research" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <ResearchAgent />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            {/* Added route for research-agent */}
-            <Route path="/research-agent" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <ResearchAgent />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            <Route path="/memory" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <MemoryAgentView />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            {/* Added route for memory-agent */}
-            <Route path="/memory-agent" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <MemoryAgentView />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
               ) : <Navigate to="/auth" />
@@ -255,30 +170,8 @@ function App() {
               ) : <Navigate to="/auth" />
             } />
             
-            {/* Agent chat routes */}
-            <Route path="/chat/:agentId" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <AgentChatPanel />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            {/* Agent detail routes */}
+            {/* Agent detail routes - unified under /agent/:agentId */}
             <Route path="/agent/:agentId" element={
-              isAuthenticated() ? (
-                <AuthenticatedLayout>
-                  <ErrorBoundary>
-                    <UIv2Shell activePage="agent" />
-                  </ErrorBoundary>
-                </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
-            } />
-            
-            {/* Universal AgentChat route for any agent */}
-            <Route path="/agent-chat/:agentId" element={
               isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
