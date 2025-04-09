@@ -1,5 +1,6 @@
 // src/components/AgentChat.jsx
 import React, { useState, useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -30,7 +31,10 @@ import { useAgentTraining } from '../hooks/useAgentTraining';
 import { injectContext } from '../hooks/useMemoryRecall';
 import { callOpenAI } from '../api/callOpenAI';
 
-const AgentChat = ({ agentId = 'core-forge' }) => {
+const AgentChat = () => {
+  const { agentId } = useParams();
+  const displayName = agentId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  
   const { colorMode } = useColorMode();
   const bg = useColorModeValue('gray.50', 'gray.900');
   const feedBg = useColorModeValue('gray.100', 'gray.800');
@@ -47,7 +51,7 @@ const AgentChat = ({ agentId = 'core-forge' }) => {
   
   // Get agent display name
   const getAgentDisplayName = () => {
-    return agentNames[agentId] || agentId.charAt(0).toUpperCase() + agentId.slice(1);
+    return agentNames[agentId] || displayName;
   };
   
   const agentName = getAgentDisplayName();
@@ -148,7 +152,7 @@ const AgentChat = ({ agentId = 'core-forge' }) => {
         justify="space-between"
         align="center"
       >
-        <Heading size="md">{agentName} Interface</Heading>
+        <Heading size="md">{displayName} Interface</Heading>
         <Tooltip label="Debug View">
           <IconButton
             icon={<span>🛠️</span>}
