@@ -25,7 +25,7 @@ async def delegate_stream(request: Request):
     history = body.get("history", [])
 
     if agent_id not in AGENT_REGISTRY:
-        return JSONResponse(status_code=404, content={"error": "Agent not found"})
+        return JSONResponse(status_code=404, content={"error": f"Agent '{agent_id}' not found"})
 
     if not openai_provider:
         return JSONResponse(status_code=500, content={"error": "OpenAI provider not initialized"})
@@ -49,6 +49,9 @@ async def delegate_stream(request: Request):
             }
             
             # Use the OpenAIProvider for streaming
+            # For core-forge, ensure we're using the full conversation history
+            logger.info(f"🔄 Streaming response for agent: {agent_id} with {len(history)} history items")
+            
             response = await openai_provider.client.chat.completions.create(
                 model=prompt_chain["model"],
                 messages=messages,
@@ -56,16 +59,14 @@ async def delegate_stream(request: Request):
                 stream=True
             )
             
-            logger.info(f"🔄 Streaming response for agent: {agent_id}")
-            
             async for chunk in response:
                 delta = chunk.choices[0].delta
                 if delta.content:
                     yield delta.content
                     
         except Exception as e:
-            error_msg = f"[Error: {str(e)}]"
-            logger.error(f"🔥 Streaming error: {error_msg}")
-            yield error_msg
+            error_msg = f"Error processing request: {str(e)}"
+            logger.error(f"🔥 Streaming error for {agent_id}: {error_msg}")
+            yield f"[ERROR] {error_msg}"
 
     return StreamingResponse(stream(), media_type="text/plain")
