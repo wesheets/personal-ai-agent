@@ -1,5 +1,6 @@
 // src/components/AgentChat.jsx
 import React, { useState, useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -30,7 +31,10 @@ import { useAgentTraining } from '../hooks/useAgentTraining';
 import { injectContext } from '../hooks/useMemoryRecall';
 import { callOpenAI } from '../api/callOpenAI';
 
-const AgentChat = ({ agentId = 'core-forge' }) => {
+const AgentChat = ({ defaultAgentId = 'core-forge' }) => {
+  // Get agentId from URL params, fallback to prop
+  const { agentId: urlAgentId } = useParams();
+  const agentId = urlAgentId || defaultAgentId;
   const { colorMode } = useColorMode();
   const bg = useColorModeValue('gray.50', 'gray.900');
   const feedBg = useColorModeValue('gray.100', 'gray.800');
