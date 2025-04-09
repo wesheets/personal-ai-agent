@@ -267,6 +267,21 @@ try:
     app.include_router(health_router)  # Include health router without prefix
     print("✅ Isolated AgentRunner module router included")
 
+    # Failsafe route handler defined directly in main.py to bypass router issues
+    from fastapi.responses import JSONResponse
+    from fastapi import Request
+
+    @app.post("/api/modules/agent/run")
+    async def agentrunner_failsafe(request: Request):
+        print("🛠️ AgentRunner Failsafe Route HIT")
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": "ok",
+                "message": "Failsafe AgentRunner route is alive"
+            }
+        )
+
     # MODIFIED: Commented out other routers
     """
     # Include all routers in the app
