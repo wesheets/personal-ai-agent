@@ -11,7 +11,6 @@ import {
   Divider,
   Button,
   Spinner,
-  Collapse,
   Badge,
   Icon,
   Flex,
@@ -19,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { FiChevronDown, FiChevronUp, FiRefreshCw, FiClock, FiFileText } from 'react-icons/fi';
 import DEBUG_MODE from '../config/debug';
-import { debounce } from '../utils/debounceUtils';
+import { safeFetch } from '../utils/safeFetch';
 import MemoryWarningHandler from '../components/MemoryWarningHandler';
 
 // Mock data for initial development - will be replaced with API calls
@@ -87,201 +86,26 @@ const MemoryBrowser = () => {
     }
   };
   
-  // Function to refresh memories with debounce
-  const refreshMemories = async () => {
+  // Function to refresh memories
+  const refreshMemories = () => {
     // Prevent rapid consecutive calls
     if (loading) return;
     
     setLoading(true);
     setError(null);
     
-    try {
-      // This will be replaced with actual API call
-      // const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/memory`;
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate response
-      setMemories(mockMemories);
-    } catch (err) {
-      console.error('Error fetching memories:', err);
-      setError('Failed to fetch memories. Please try again.');
-      
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch memories. Please try again.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  // Create debounced fetch function
-  const debouncedFetchData = useRef(
-    debounce(async (isMountedRef, setLoadingFn, setMemoriesFn, setErrorFn, toastFn) => {
-      try {
-        setLoadingFn(true);
-        
-        // Add debug log
-        console.debug("Loaded: MemoryBrowser - Fetching memories ⏳");
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Only update state if component is still mounted
-        if (isMountedRef.current) {
-          setMemoriesFn(mockMemories);
-          setErrorFn(null);
-          console.debug("Loaded: MemoryBrowser - Memories loaded successfully ✅");
-        }
-      } catch (err) {
-        console.error('Error fetching memories:', err);
-        
-        // Only update state if component is still mounted
-        if (isMountedRef.current) {
-          setErrorFn('Failed to fetch memories. Please try again.');
-          
-          toastFn({
-            title: 'Error',
-            description: 'Failed to fetch memories. Please try again.',
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          });
-          console.debug("Loaded: MemoryBrowser - Error loading memories ❌");
-        }
-      } finally {
-        // Only update state if component is still mounted
-        if (isMountedRef.current) {
-          setLoadingFn(false);
-        }
-      }
-    }, 500)
-  ).current;
-  
-  // Set up failsafe timeout ref
-  const failsafeTimeoutRef = useRef(null);
-  
-  // Fetch memories on component mount
-  useEffect(() => {
-    const isMountedRef = { current: true };
-    const controller = new AbortController();
-    
-    // Set up failsafe timeout to reset loading state after 8 seconds
-    failsafeTimeoutRef.current = setTimeout(() => {
-      if (isMountedRef.current && loading) {
-        console.warn('⏱️ Failsafe triggered: Forcing loading reset after 8s');
+    // Use safeFetch with 8 second timeout
+    safeFetch(
+      '/api/memory/search',
+      (data) => {
+        setMemories(data.results || []);
+        setApiResponse(data);
         setLoading(false);
-        setError('Loading took too long. Please try refreshing.');
-        
-        toast({
-          title: 'Loading timeout',
-          description: 'Loading memories took longer than expected. Showing any available data.',
-          status: 'warning',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    }, 8000);
-    
-    // Function to fetch memory data with proper error handling
-    const fetchMemoryData = async () => {
-      try {
-        // Add debug log
-        console.debug("Loaded: MemoryBrowser - Fetching memories ⏳");
-        
-        // Make a real fetch to the API
-        const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/memory/search`;
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: '', limit: 20 }),
-          signal: controller.signal
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Memory search failed: ${response.status} ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        
-        // For local testing, if no real API is available, use mock data
-        if (!data || !data.results || data.results.length === 0) {
-          console.warn("No results from API, using mock data");
-          // Simulate API call with mock data that includes a warning
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          // Mock API response with warning to simulate quota issues
-          return {
-            results: mockMemories,
-            metadata: {
-              query: "",
-              limit: 20,
-              result_count: mockMemories.length,
-              warning: "Using mock memory data as fallback."
-            }
-          };
-        }
-        
-        return data;
-      } catch (error) {
-        console.error("Error fetching memory data:", error);
-        // Return a fallback response with a warning
-        return {
-          results: [],
-          metadata: {
-            warning: `Failed to fetch memories: ${error.message}`
-          }
-        };
-      }
-    };
-    
-    // Create a modified fetch function that uses AbortController
-    const fetchWithAbort = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch data using the helper function
-        const responseData = await fetchMemoryData();
-        
-        // Only update state if component is still mounted
-        if (isMountedRef.current) {
-          setMemories(responseData.results || []);
-          setApiResponse(responseData); // Store full response for warning handling
-          setError(null);
-          console.debug("Loaded: MemoryBrowser - Memories loaded successfully ✅", responseData);
-        }
-      } catch (err) {
-        // Ignore abort errors as they're expected during cleanup
-        if (err.name === 'AbortError') {
-          console.debug("MemoryBrowser - Fetch aborted during cleanup");
-          return;
-        }
-        
-        console.error('Error fetching memories:', err);
-        
-        // Only update state if component is still mounted
-        if (isMountedRef.current) {
-          setError('Failed to fetch memories. Please try again.');
-          
-          // Check if the error response contains a warning
-          try {
-            if (err.response && err.response.data && err.response.data.warning) {
-              // Set API response with the warning
-              setApiResponse({
-                results: [],
-                metadata: {
-                  warning: err.response.data.warning
-                }
-              });
-            }
-          } catch (parseErr) {
-            console.error('Error parsing error response:', parseErr);
-          }
+      },
+      (hasError) => {
+        if (hasError) {
+          setError('Memory fetch failed. Try again later.');
+          setLoading(false);
           
           toast({
             title: 'Error',
@@ -290,39 +114,75 @@ const MemoryBrowser = () => {
             duration: 5000,
             isClosable: true,
           });
-          console.debug("Loaded: MemoryBrowser - Error loading memories ❌");
         }
+      },
+      8000 // 8 second timeout
+    );
+  };
+  
+  // Fetch memories on component mount
+  useEffect(() => {
+    const isMounted = { current: true };
+    
+    const fetchMemories = async () => {
+      try {
+        // Use the safeFetch utility with timeout and error handling
+        await safeFetch(
+          '/api/memory/search',
+          (data) => {
+            if (isMounted.current) {
+              setMemories(data.results || []);
+              setApiResponse(data);
+              setError(null);
+            }
+          },
+          (hasError) => {
+            if (isMounted.current && hasError) {
+              setError('Memory fetch failed. Try again later.');
+              
+              // If we have no data, show mock data as fallback
+              if (!memories.length) {
+                setMemories(mockMemories);
+                setApiResponse({
+                  results: mockMemories,
+                  metadata: {
+                    warning: "Using mock memory data as fallback."
+                  }
+                });
+              }
+              
+              toast({
+                title: 'Warning',
+                description: 'Memory system is currently unavailable. Showing fallback data.',
+                status: 'warning',
+                duration: 5000,
+                isClosable: true,
+              });
+            }
+          },
+          8000 // 8 second timeout
+        );
+      } catch (err) {
+        console.error('Error in memory fetch:', err);
       } finally {
-        // Only update state if component is still mounted
-        if (isMountedRef.current) {
+        if (isMounted.current) {
           setLoading(false);
         }
       }
     };
     
-    // Only fetch data if not in DEBUG_MODE (prevents polling in production)
-    if (!DEBUG_MODE) {
-      // Trigger fetch with a 3 second delay to prevent immediate fetch on first render
-      setTimeout(() => {
-        if (isMountedRef.current) {
-          fetchWithAbort();
-        }
-      }, 3000);
-    } else {
-      // In debug mode, use the debounced fetch with a shorter delay
-      setTimeout(() => {
-        if (isMountedRef.current) {
-          debouncedFetchData(isMountedRef, setLoading, setMemories, setError, toast);
-        }
-      }, 300);
-    }
+    // Add a short delay to prevent immediate fetch on first render
+    const timeout = setTimeout(() => {
+      if (isMounted.current) {
+        fetchMemories();
+      }
+    }, 1000);
     
     return () => {
-      isMountedRef.current = false;
-      controller.abort(); // Abort any in-flight fetch
-      clearTimeout(failsafeTimeoutRef.current);
+      isMounted.current = false;
+      clearTimeout(timeout);
     };
-  }, [debouncedFetchData, toast, loading]);
+  }, [toast]);
   
   // Function to get preview content (first 300-500 characters)
   const getPreviewContent = (content) => {
@@ -428,6 +288,7 @@ const MemoryBrowser = () => {
       ) : error ? (
         <Card bg={colorMode === 'light' ? 'red.50' : 'red.900'} p={4} borderRadius="md">
           <Text>{error}</Text>
+          <Button mt={4} onClick={refreshMemories}>Try Again</Button>
         </Card>
       ) : memories?.length > 0 ? (
         <VStack spacing={4} align="stretch">
