@@ -40,10 +40,10 @@ const Sidebar = () => {
   // Navigation items
   const navItems = [
     { name: 'Dashboard', icon: FiHome, path: '/' },
-    { name: 'Builder Agent', icon: FiCode, path: '/builder' },
-    { name: 'Ops Agent', icon: FiServer, path: '/ops' },
-    { name: 'Research Agent', icon: FiSearch, path: '/research' },
-    { name: 'Memory Agent', icon: FiDatabase, path: '/memory' },
+    { name: 'Builder Agent', icon: FiCode, path: '/agent/builder' },
+    { name: 'Ops Agent', icon: FiServer, path: '/agent/ops-agent' },
+    { name: 'Research Agent', icon: FiSearch, path: '/agent/research' },
+    { name: 'Memory Agent', icon: FiDatabase, path: '/agent/memory-agent' },
     { name: 'Memory Browser', icon: FiList, path: '/memory-browser' },
     { name: 'Activity Feed', icon: FiActivity, path: '/activity' },
     { name: 'Agent Activity', icon: FiActivity, path: '/agent-activity' },
@@ -105,23 +105,23 @@ const Sidebar = () => {
           </Flex>
           
           {systemAgents.map((agent) => (
-            <Link to={`/agent/${agent.id}`} key={agent.id}>
+            <Link to={`/agent/${agent.id.toLowerCase()}`} key={agent.id}>
               <HStack
                 py={2}
                 spacing={3}
-                bg={location.pathname === `/agent/${agent.id}` ? (colorMode === 'light' ? 'gray.100' : 'gray.700') : 'transparent'}
-                color={location.pathname === `/agent/${agent.id}` ? (colorMode === 'light' ? 'brand.600' : 'brand.300') : (colorMode === 'light' ? 'gray.600' : 'gray.300')}
+                bg={location.pathname === `/agent/${agent.id.toLowerCase()}` ? (colorMode === 'light' ? 'gray.100' : 'gray.700') : 'transparent'}
+                color={location.pathname === `/agent/${agent.id.toLowerCase()}` ? (colorMode === 'light' ? 'brand.600' : 'brand.300') : (colorMode === 'light' ? 'gray.600' : 'gray.300')}
                 _hover={{
                   bg: colorMode === 'light' ? 'gray.100' : 'gray.700',
                   color: colorMode === 'light' ? 'brand.600' : 'brand.300',
                 }}
                 transition="all 0.2s"
-                borderLeftWidth={location.pathname === `/agent/${agent.id}` ? '4px' : '0px'}
-                borderColor={location.pathname === `/agent/${agent.id}` ? (colorMode === 'light' ? 'brand.500' : 'brand.300') : 'transparent'}
-                pl={location.pathname === `/agent/${agent.id}` ? 3 : 4}
+                borderLeftWidth={location.pathname === `/agent/${agent.id.toLowerCase()}` ? '4px' : '0px'}
+                borderColor={location.pathname === `/agent/${agent.id.toLowerCase()}` ? (colorMode === 'light' ? 'brand.500' : 'brand.300') : 'transparent'}
+                pl={location.pathname === `/agent/${agent.id.toLowerCase()}` ? 3 : 4}
               >
                 <Text fontSize="lg">{agent.icon || '🤖'}</Text>
-                <Text fontWeight={location.pathname === `/agent/${agent.id}` ? 'medium' : 'normal'} fontSize="sm">
+                <Text fontWeight={location.pathname === `/agent/${agent.id.toLowerCase()}` ? 'medium' : 'normal'} fontSize="sm">
                   {agent.name}
                 </Text>
                 <Badge 
