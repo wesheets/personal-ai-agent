@@ -23,7 +23,7 @@ logger = logging.getLogger("api.modules.agent")
 router = APIRouter(prefix="/modules/agent", tags=["Agent Modules"])
 print("🧠 Route defined: /api/modules/agent/run -> run_agent_endpoint")
 
-@router.post("/api/modules/agent/run")
+@router.post("/run")
 async def run_agent_echo(request: Request):
     print("📣 AgentRunner echo route was hit!")
     return JSONResponse(
