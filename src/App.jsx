@@ -131,7 +131,29 @@ function App() {
               ) : <Navigate to="/auth" />
             } />
             
+            {/* Added route for builder-agent */}
+            <Route path="/builder-agent" element={
+              isAuthenticated() ? (
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <BuilderAgent />
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              ) : <Navigate to="/auth" />
+            } />
+            
             <Route path="/ops" element={
+              isAuthenticated() ? (
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <OpsAgent />
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              ) : <Navigate to="/auth" />
+            } />
+            
+            {/* Added route for ops-agent */}
+            <Route path="/ops-agent" element={
               isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
@@ -151,7 +173,29 @@ function App() {
               ) : <Navigate to="/auth" />
             } />
             
+            {/* Added route for research-agent */}
+            <Route path="/research-agent" element={
+              isAuthenticated() ? (
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <ResearchAgent />
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              ) : <Navigate to="/auth" />
+            } />
+            
             <Route path="/memory" element={
+              isAuthenticated() ? (
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <MemoryAgentView />
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              ) : <Navigate to="/auth" />
+            } />
+            
+            {/* Added route for memory-agent */}
+            <Route path="/memory-agent" element={
               isAuthenticated() ? (
                 <AuthenticatedLayout>
                   <ErrorBoundary>
@@ -233,9 +277,29 @@ function App() {
               ) : <Navigate to="/auth" />
             } />
             
-            {/* Fallback redirect for unknown routes */}
+            {/* Universal AgentChat route for any agent */}
+            <Route path="/agent-chat/:agentId" element={
+              isAuthenticated() ? (
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <AgentChat />
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              ) : <Navigate to="/auth" />
+            } />
+            
+            {/* Improved fallback redirect for unknown routes - now renders AgentChat with error message */}
             <Route path="*" element={
-              isAuthenticated() ? <Navigate to="/hal" /> : <Navigate to="/auth" />
+              isAuthenticated() ? (
+                <AuthenticatedLayout>
+                  <ErrorBoundary>
+                    <Box p={4} borderRadius="md" bg="red.50" color="red.600" mb={4}>
+                      Route not found. Redirected to default agent interface.
+                    </Box>
+                    <AgentChat />
+                  </ErrorBoundary>
+                </AuthenticatedLayout>
+              ) : <Navigate to="/auth" />
             } />
           </Routes>
           
