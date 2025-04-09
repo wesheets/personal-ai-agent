@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import AgentStreamPanel from './AgentStreamPanel';
 import MemoryLogViewer from './MemoryLogViewer';
 import AgentCommandPanel from './AgentCommandPanel';
+import AgentCreationPanel from './AgentCreationPanel';
 import SystemStatusBar from './SystemStatusBar';
 
 const ControlRoom = () => {
@@ -16,6 +17,8 @@ const ControlRoom = () => {
         return <MemoryLogViewer />;
       case 'command':
         return <AgentCommandPanel />;
+      case 'create':
+        return <AgentCreationPanel />;
       default:
         return <AgentStreamPanel />;
     }
@@ -29,6 +32,7 @@ const ControlRoom = () => {
           <button onClick={() => setActivePanel('stream')} className="text-left hover:text-blue-400">Live Stream</button>
           <button onClick={() => setActivePanel('log')} className="text-left hover:text-blue-400">Memory Logs</button>
           <button onClick={() => setActivePanel('command')} className="text-left hover:text-blue-400">Command Console</button>
+          <button onClick={() => setActivePanel('create')} className="text-left hover:text-blue-400">Create Agent</button>
         </nav>
       </aside>
       <main className="flex-1 bg-gray-100 p-6 overflow-auto">
