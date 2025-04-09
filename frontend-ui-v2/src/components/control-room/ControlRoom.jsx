@@ -4,6 +4,7 @@ import AgentStreamPanel from './AgentStreamPanel';
 import MemoryLogViewer from './MemoryLogViewer';
 import AgentCommandPanel from './AgentCommandPanel';
 import AgentCreationPanel from './AgentCreationPanel';
+import TrainingDashboardPanel from './TrainingDashboardPanel';
 import SystemStatusBar from './SystemStatusBar';
 
 const ControlRoom = () => {
@@ -19,6 +20,8 @@ const ControlRoom = () => {
         return <AgentCommandPanel />;
       case 'create':
         return <AgentCreationPanel />;
+      case 'train-log':
+        return <TrainingDashboardPanel />;
       default:
         return <AgentStreamPanel />;
     }
@@ -33,6 +36,7 @@ const ControlRoom = () => {
           <button onClick={() => setActivePanel('log')} className="text-left hover:text-blue-400">Memory Logs</button>
           <button onClick={() => setActivePanel('command')} className="text-left hover:text-blue-400">Command Console</button>
           <button onClick={() => setActivePanel('create')} className="text-left hover:text-blue-400">Create Agent</button>
+          <button onClick={() => setActivePanel('train-log')} className="text-left hover:text-blue-400">Training Logs</button>
         </nav>
       </aside>
       <main className="flex-1 bg-gray-100 p-6 overflow-auto">
