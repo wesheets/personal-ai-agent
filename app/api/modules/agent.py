@@ -3,6 +3,8 @@ API endpoint for the AgentRunner module.
 
 This module provides a REST API endpoint for executing agents in isolation,
 without relying on the central agent registry, UI, or delegate-stream system.
+
+MODIFIED: Enhanced error handling and logging to prevent 502 errors
 """
 
 from fastapi import APIRouter, Request, HTTPException
@@ -35,14 +37,21 @@ async def agent_run(request: AgentRunRequest):
     This endpoint allows executing agent cognition in isolation,
     without relying on the central agent registry, UI, or delegate-stream system.
     
+    MODIFIED: Enhanced error handling and logging to prevent 502 errors
+    
     Args:
         request: AgentRunRequest containing agent_id and messages
         
     Returns:
         JSONResponse with the agent's response
     """
+    # ADDED: Entry confirmation logging
+    print("🔥 AgentRunner API endpoint invoked")
+    logger.info("🔥 AgentRunner API endpoint invoked")
+    
     start_time = time.time()
     
+    # MODIFIED: Wrapped all logic in global try/except
     try:
         print(f"🔄 API request received for agent: {request.agent_id}")
         logger.info(f"Agent run request received for agent: {request.agent_id}")
@@ -80,13 +89,19 @@ async def agent_run(request: AgentRunRequest):
         print(f"🏃 Calling run_agent for: {request.agent_id}")
         result = run_agent(request.agent_id, request.messages)
         
+        # Check if result is already a JSONResponse (from error handling in run_agent)
+        if isinstance(result, JSONResponse):
+            print("⚠️ Received JSONResponse from run_agent, returning directly")
+            logger.info("Received JSONResponse from run_agent, returning directly")
+            return result
+        
         # Check if agent execution was successful
         if result.get("status") == "error":
             error_msg = f"Agent execution failed: {result.get('response')}"
             print(f"❌ {error_msg}")
             logger.error(error_msg)
             return JSONResponse(
-                status_code=500,  # Changed from 400 to 500 as per requirements
+                status_code=500,
                 content={
                     "agent_id": request.agent_id,
                     "response": result.get("response", "Unknown error"),

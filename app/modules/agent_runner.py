@@ -4,7 +4,7 @@ AgentRunner Module
 This module provides isolated agent execution functionality, allowing agents to run
 independently from the central agent registry, UI, or delegate-stream system.
 
-MODIFIED: Completely removed registry dependencies to ensure standalone operation
+MODIFIED: Added full runtime logging and error protection to prevent 502 errors
 """
 
 import logging
@@ -13,6 +13,7 @@ from typing import List, Dict, Any, Optional
 import time
 import traceback
 import sys
+from fastapi.responses import JSONResponse
 
 # Import OpenAI client
 try:
@@ -107,23 +108,27 @@ class CoreForgeAgent:
                 "status": "error"
             }
 
-def run_agent(agent_id: str, messages: List[Dict[str, Any]]) -> Dict[str, Any]:
+def run_agent(agent_id: str, messages: List[Dict[str, Any]]):
     """
     Run an agent with the given messages, with no registry dependencies.
     
-    MODIFIED: Removed all registry dependencies to ensure standalone operation
+    MODIFIED: Added full runtime logging and error protection to prevent 502 errors
     
     Args:
         agent_id: The ID of the agent to run
         messages: List of message dictionaries with role and content
         
     Returns:
-        Dict containing the response and metadata
+        Dict containing the response and metadata or JSONResponse with error details
     """
+    # ADDED: Entry confirmation logging
+    print("🔥 AgentRunner route invoked")
+    logger.info("🔥 AgentRunner route invoked")
+    
+    # MODIFIED: Wrapped all logic in global try/except
     try:
-        start_time = time.time()
-        print(f"🧠 Starting AgentRunner for: {agent_id}")
-        logger.info(f"Starting agent execution: {agent_id}")
+        print("🧠 Attempting to run CoreForgeAgent fallback")
+        logger.info("Attempting to run CoreForgeAgent fallback")
         
         # Check OpenAI API key
         api_key = os.getenv("OPENAI_API_KEY")
@@ -134,59 +139,47 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]) -> Dict[str, Any]:
             error_msg = "OpenAI API key is not set in environment variables"
             print(f"❌ {error_msg}")
             logger.error(error_msg)
-            return {
-                "agent_id": agent_id,
-                "response": error_msg,
-                "status": "error",
-                "execution_time": time.time() - start_time
-            }
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "agent_id": agent_id,
+                    "response": error_msg,
+                    "status": "error"
+                }
+            )
         
-        # MODIFIED: Direct CoreForge integration with no registry dependency
-        if agent_id.lower() in ["core.forge", "core-forge"]:
-            print("🔄 Using direct CoreForgeAgent implementation (no registry)")
-            logger.info("Using direct CoreForgeAgent implementation")
-            agent = CoreForgeAgent()
-        else:
-            # No support for other agents in isolated mode
-            error_msg = f"Agent {agent_id} not supported in isolated mode. Only Core.Forge is available."
+        # Create CoreForgeAgent instance
+        print(f"🔄 Creating CoreForgeAgent instance for: {agent_id}")
+        agent = CoreForgeAgent()
+        
+        # Call agent's run method
+        print(f"🏃 Calling CoreForgeAgent.run() method with {len(messages)} messages")
+        result = agent.run(messages)
+        
+        # Check if agent execution was successful
+        if result.get("status") == "error":
+            error_msg = f"CoreForgeAgent execution failed: {result.get('content')}"
             print(f"❌ {error_msg}")
             logger.error(error_msg)
-            return {
-                "agent_id": agent_id,
-                "response": error_msg,
-                "status": "error",
-                "execution_time": time.time() - start_time
-            }
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "agent_id": "Core.Forge",
+                    "response": result.get("content", "Unknown error"),
+                    "status": "error"
+                }
+            )
         
-        # Check if agent has run method
-        if hasattr(agent, "run") and callable(getattr(agent, "run")):
-            # Call agent's run method
-            print(f"🏃 Calling {agent_id}.run() method")
-            result = agent.run(messages)
-            
-            # Log result
-            print(f"✅ Agent {agent_id} execution completed successfully")
-            logger.info(f"Agent {agent_id} execution completed successfully")
-            
-            # Return result
-            return {
-                "agent_id": agent_id,
-                "response": result.get("content", "No content returned"),
-                "status": "ok",
-                "registry_available": False,  # Always false in isolated mode
-                "execution_time": time.time() - start_time,
-                "usage": result.get("usage", {})
-            }
+        # Log success
+        print("✅ AgentRunner success, returning response")
+        logger.info("AgentRunner success, returning response")
         
-        # This should never happen with our CoreForgeAgent implementation
-        error_msg = f"Agent {agent_id} doesn't have run method"
-        print(f"❌ {error_msg}")
-        logger.error(error_msg)
+        # Return successful response
         return {
-            "agent_id": agent_id,
-            "response": error_msg,
-            "status": "error",
-            "execution_time": time.time() - start_time
+            "agent_id": "Core.Forge",
+            "response": result.get("content", ""),
+            "status": "ok",
+            "usage": result.get("usage", {})
         }
     
     except Exception as e:
@@ -196,12 +189,16 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]) -> Dict[str, Any]:
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         
-        return {
-            "agent_id": agent_id,
-            "response": error_msg,
-            "status": "error",
-            "execution_time": time.time() - start_time
-        }
+        # Return structured error response
+        return JSONResponse(
+            status_code=500,
+            content={
+                "agent_id": agent_id,
+                "response": error_msg,
+                "status": "error",
+                "message": str(e)
+            }
+        )
 
 def test_core_forge_isolation():
     """
