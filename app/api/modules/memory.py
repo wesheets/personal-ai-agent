@@ -4,7 +4,7 @@ from app.modules.memory_writer import write_memory
 
 router = APIRouter()
 
-@router.post("/api/modules/memory/write")
+@router.post("/write")
 async def memory_write(request: Request):
     try:
         body = await request.json()

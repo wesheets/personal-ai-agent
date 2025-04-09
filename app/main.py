@@ -268,7 +268,7 @@ try:
     from app.api.modules import memory  # Import the memory.py route file
     
     app.include_router(agent_module_router, prefix="/api")
-    app.include_router(memory.router, prefix="/api")  # Mount the memory router
+    app.include_router(memory.router, prefix="/api/modules/memory")  # Mount the memory router
     app.include_router(health_router)  # Include health router without prefix
     print("✅ Module routers included")
 
