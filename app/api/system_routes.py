@@ -4,6 +4,8 @@ System routes for the Personal AI Agent system.
 from fastapi import APIRouter, Request
 import logging
 import os
+import json
+from pathlib import Path
 from app.core.middleware.cors import normalize_origin, sanitize_origin_for_header
 
 # Configure logging
@@ -75,3 +77,50 @@ async def cors_debug(request: Request):
             "sanitization_active": True
         }
     }
+
+@router.get("/agents/manifest")
+async def get_agents_manifest():
+    """
+    Returns the agent manifest containing metadata about all available agents.
+    
+    The manifest includes agent status, version, and capabilities.
+    """
+    try:
+        # Path to the agent manifest file
+        manifest_path = Path(__file__).parents[2] / "config" / "agent_manifest.json"
+        
+        # Check if the file exists
+        if not manifest_path.exists():
+            logger.error(f"Agent manifest file not found at {manifest_path}")
+            return {"error": "Agent manifest file not found", "status": "error"}
+        
+        # Load the manifest file
+        with open(manifest_path, "r") as f:
+            manifest_data = json.load(f)
+        
+        # Add additional runtime information to each agent
+        for agent_id, agent_info in manifest_data.items():
+            # Check if the entrypoint file exists
+            entrypoint = agent_info.get("entrypoint", "")
+            if entrypoint:
+                entrypoint_path = Path(__file__).parents[2] / entrypoint
+                agent_info["entrypoint_exists"] = entrypoint_path.exists()
+            
+            # Add runtime status if not present
+            if "status" not in agent_info:
+                agent_info["status"] = "unknown"
+            
+            # Add capabilities field if not present
+            if "capabilities" not in agent_info:
+                agent_info["capabilities"] = []
+        
+        return {
+            "agents": manifest_data,
+            "total_agents": len(manifest_data),
+            "active_agents": sum(1 for agent in manifest_data.values() if agent.get("status") == "active"),
+            "status": "success"
+        }
+    
+    except Exception as e:
+        logger.error(f"Error loading agent manifest: {str(e)}")
+        return {"error": str(e), "status": "error"}
