@@ -7,6 +7,7 @@ from app.agents.memory_agent import handle_memory_task
 from app.agents.lifetree_agent import handle_lifetree_task
 from app.agents.sitegen_agent import handle_sitegen_task
 from app.agents.neureal_agent import handle_neureal_task
+from app.agents.observer_agent import handle_observer_task
 
 logger = logging.getLogger("core")
 
@@ -17,7 +18,8 @@ AGENT_HANDLERS = {
     "memory-agent": handle_memory_task,
     "lifetree": handle_lifetree_task,
     "sitegen": handle_sitegen_task,
-    "neureal": handle_neureal_task
+    "neureal": handle_neureal_task,
+    "observer": handle_observer_task
 }
 
 def run_agent(agent_id, task_input):
