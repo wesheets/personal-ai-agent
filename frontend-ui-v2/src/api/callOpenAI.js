@@ -2,26 +2,22 @@
  * API utility to call OpenAI's GPT-4 model
  *
  * @param {string} prompt - The prompt to send to OpenAI
- * @param {string} agentId - The ID of the agent making the request (default: 'hal')
+ * @param {string} agentId - The ID of the agent making the request (default: 'core-forge')
+ * @param {Array} history - The conversation history
+ * @param {string} threadId - Unique identifier for the conversation thread
  * @returns {Promise<string>} - The natural language response from GPT-4
  */
-export const callOpenAI = async (prompt, agentId = 'hal') => {
+export const callOpenAI = async (prompt, agentId = 'core-forge', history = [], threadId = Date.now().toString()) => {
   try {
     // In a production environment, this would make an actual API call to OpenAI
     // For now, we'll simulate a response with a mock implementation
     
     console.log(`Calling OpenAI with prompt for ${agentId}:`, prompt);
+    console.log(`Thread ID: ${threadId}, History items: ${history.length}`);
     
     // Simulate API latency
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Get agent-specific responses based on agentId
-    if (agentId === 'core-forge') {
-      return getCoreForgeResponse(prompt);
-    } else {
-      return getHalResponse(prompt);
-    }
-
     // In production, this would be replaced with actual OpenAI API call:
     /*
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -32,7 +28,7 @@ export const callOpenAI = async (prompt, agentId = 'hal') => {
       },
       body: JSON.stringify({
         model: 'gpt-4',
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'system', content: 'You are an AI assistant' }, ...history, { role: 'user', content: prompt }],
         temperature: 0.7,
         max_tokens: 500
       })
@@ -41,6 +37,13 @@ export const callOpenAI = async (prompt, agentId = 'hal') => {
     const data = await response.json();
     return data.choices[0].message.content;
     */
+    
+    // Get agent-specific responses based on agentId
+    if (agentId === 'core-forge') {
+      return getCoreForgeResponse(prompt, history);
+    } else {
+      return getHalResponse(prompt, history);
+    }
   } catch (error) {
     console.error('Error calling OpenAI:', error);
     return "I'm sorry, I encountered an error processing your request. Please try again.";
@@ -48,8 +51,16 @@ export const callOpenAI = async (prompt, agentId = 'hal') => {
 };
 
 // HAL-specific responses
-const getHalResponse = (prompt) => {
+const getHalResponse = (prompt, history = []) => {
   const promptLower = prompt.toLowerCase();
+  
+  // Check if we should reference previous messages
+  if (history.length > 0 && (promptLower.includes('what did i') || promptLower.includes('previous') || promptLower.includes('earlier'))) {
+    const previousUserMessage = history.filter(msg => msg.role === 'user').slice(-1)[0];
+    if (previousUserMessage) {
+      return `You previously said: "${previousUserMessage.content}"`;
+    }
+  }
   
   if (promptLower.includes('hello') || promptLower.includes('hi')) {
     return "Hello! I'm HAL, your personal AI assistant. How can I help you today?";
@@ -68,8 +79,16 @@ const getHalResponse = (prompt) => {
 };
 
 // Core.Forge-specific responses
-const getCoreForgeResponse = (prompt) => {
+const getCoreForgeResponse = (prompt, history = []) => {
   const promptLower = prompt.toLowerCase();
+  
+  // Check if we should reference previous messages
+  if (history.length > 0 && (promptLower.includes('what did i') || promptLower.includes('previous') || promptLower.includes('earlier'))) {
+    const previousUserMessage = history.filter(msg => msg.role === 'user').slice(-1)[0];
+    if (previousUserMessage) {
+      return `Previous user input: "${previousUserMessage.content}"`;
+    }
+  }
   
   if (promptLower.includes('hello') || promptLower.includes('hi')) {
     return "Greetings. Core.Forge online and ready to assist with your task.";

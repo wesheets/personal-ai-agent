@@ -2,9 +2,11 @@ from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from app.core.agent_registry import AGENT_REGISTRY
 from app.providers.openai_provider import OpenAIProvider
+from app.agents.memory_agent import handle_memory_task
 import logging
 import os
 import json
+import uuid
 
 router = APIRouter()
 logger = logging.getLogger("api")
@@ -23,22 +25,37 @@ async def delegate_stream(request: Request):
     agent_id = body.get("agent_id", "core-forge").lower()
     prompt = body.get("prompt", "")
     history = body.get("history", [])
-
+    thread_id = body.get("threadId", str(uuid.uuid4()))
+    
     if agent_id not in AGENT_REGISTRY:
         return JSONResponse(status_code=404, content={"error": f"Agent '{agent_id}' not found"})
-
+    
     if not openai_provider:
         return JSONResponse(status_code=500, content={"error": "OpenAI provider not initialized"})
-
+    
     config = AGENT_REGISTRY[agent_id]
-
     system_prompt = {
         "role": "system",
         "content": config["system_prompt"]
     }
-
-    messages = [system_prompt] + history + [{"role": "user", "content": prompt}]
-
+    
+    # Get recent memory and inject it into the conversation
+    recent_memory = handle_memory_task("SHOW")
+    memory_prompt = {
+        "role": "system",
+        "content": f"Recent system memory:\n{recent_memory}"
+    }
+    
+    # Construct final messages thread
+    messages = [system_prompt, memory_prompt]
+    
+    # Trim history if needed (keep last 10 messages)
+    if history:
+        messages += history[-10:]
+    
+    # Add the current user prompt
+    messages.append({"role": "user", "content": prompt})
+    
     async def stream():
         try:
             # Create a prompt chain for OpenAIProvider
@@ -49,8 +66,7 @@ async def delegate_stream(request: Request):
             }
             
             # Use the OpenAIProvider for streaming
-            # For core-forge, ensure we're using the full conversation history
-            logger.info(f"🔄 Streaming response for agent: {agent_id} with {len(history)} history items")
+            logger.info(f"🔄 Streaming response for agent: {agent_id} with {len(history)} history items and thread ID: {thread_id}")
             
             response = await openai_provider.client.chat.completions.create(
                 model=prompt_chain["model"],
@@ -59,14 +75,20 @@ async def delegate_stream(request: Request):
                 stream=True
             )
             
+            full_response = ""
             async for chunk in response:
                 delta = chunk.choices[0].delta
                 if delta.content:
                     yield delta.content
+                    full_response += delta.content
+            
+            # Log reflection and summary after completion
+            handle_memory_task(f"LOG: {agent_id} replied: {full_response[:60]}")
+            handle_memory_task(f"SUMMARY: {agent_id} reflected: {full_response[:80]}")
                     
         except Exception as e:
             error_msg = f"Error processing request: {str(e)}"
             logger.error(f"🔥 Streaming error for {agent_id}: {error_msg}")
             yield f"[ERROR] {error_msg}"
-
+    
     return StreamingResponse(stream(), media_type="text/plain")

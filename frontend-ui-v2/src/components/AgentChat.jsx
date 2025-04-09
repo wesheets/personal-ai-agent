@@ -30,60 +30,67 @@ import { useAgentTraining } from '../hooks/useAgentTraining';
 import { injectContext } from '../hooks/useMemoryRecall';
 import { callOpenAI } from '../api/callOpenAI';
 
-const AgentChat = ({ agentId = 'hal' }) => {
+const AgentChat = ({ agentId = 'core-forge' }) => {
   const { colorMode } = useColorMode();
   const bg = useColorModeValue('gray.50', 'gray.900');
   const feedBg = useColorModeValue('gray.100', 'gray.800');
   const msgBg = useColorModeValue('white', 'gray.700');
   const agentMsgBg = useColorModeValue('blue.50', 'blue.900');
-
+  
   // Get agent display name
   const getAgentDisplayName = () => {
     if (agentId === 'core-forge') return 'Core.Forge';
     if (agentId === 'hal') return 'HAL';
     return agentId.charAt(0).toUpperCase() + agentId.slice(1);
   };
-
+  
   const agentName = getAgentDisplayName();
-
   const feedRef = useRef(null);
-
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState([]);
+  
+  // Load & store conversationHistory from localStorage
+  const [messages, setMessages] = useState(() => {
+    const stored = localStorage.getItem(`chat_history_${agentId}`);
+    return stored ? JSON.parse(stored) : [];
+  });
+  
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(`chat_history_${agentId}`, JSON.stringify(messages));
+  }, [messages, agentId]);
+  
+  // Create a unique threadId for this conversation
+  const threadId = useRef(Date.now().toString());
+  
   const [showDebug, setShowDebug] = useState(false);
-  const [showMemoryConfirm, setShowMemoryConfirm] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
+  const [showMemoryConfirm, setShowMemoryConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const { payload, memory, logs, logPayload, logMemory } = useAgentDebug();
+  const { logPayload, logs, memory, payload } = useAgentDebug();
   const { addMemory, getAllMemories, memories } = useMemoryStore();
-  const { isTraining, isTrained } = useAgentTraining();
-
+  const { isTraining } = useAgentTraining();
+  
   useEffect(() => {
-    feedRef.current?.scrollTo(0, feedRef.current.scrollHeight);
-  }, [messages]);
-
-  useEffect(() => {
-    if (showMemoryConfirm) {
-      const timer = setTimeout(() => {
-        setShowMemoryConfirm(false);
-      }, 3000);
-      return () => clearTimeout(timer);
+    if (feedRef.current) {
+      feedRef.current.scrollTop = feedRef.current.scrollHeight;
     }
-  }, [showMemoryConfirm]);
-
+  }, [messages]);
+  
+  const handleUpload = (file) => {
+    console.log('File uploaded:', file);
+    setShowFileUpload(false);
+    // Here you would typically process the file
+  };
+  
   const handleSubmit = async () => {
     if (!input.trim()) return;
     setLoading(true);
-
     const newMessage = { role: 'user', content: input };
     setMessages((prev) => [...prev, newMessage]);
     setInput('');
-
     try {
       // Create context-enhanced prompt
       const contextPrompt = injectContext(input, memories);
-
       // Log the payload for debugging
       const taskPayload = {
         task_name: agentName,
@@ -91,9 +98,17 @@ const AgentChat = ({ agentId = 'hal' }) => {
         agent_id: agentId
       };
       logPayload(taskPayload);
-
-      // Call OpenAI to get natural language response
-      const response = await callOpenAI(contextPrompt, agentId);
+      
+      // Call OpenAI to get natural language response with history and threadId
+      const response = await callOpenAI(
+        contextPrompt, 
+        agentId, 
+        messages.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        })),
+        threadId.current
+      );
       
       // Add the response to messages
       setMessages(prev => [...prev, { role: agentId, content: response }]);
@@ -105,70 +120,38 @@ const AgentChat = ({ agentId = 'hal' }) => {
         agent: agentName,
         tags: [agentId, 'task']
       });
+      
       addMemory(memoryEntry);
-
-      // Show memory confirmation and log the response
       setShowMemoryConfirm(true);
-      logMemory(response);
+      setTimeout(() => setShowMemoryConfirm(false), 2000);
     } catch (error) {
-      console.error('Error processing request:', error);
-      setMessages(prev => [...prev, { 
-        role: agentId, 
-        content: "I'm sorry, I encountered an error processing your request. Please try again." 
-      }]);
+      console.error('Error in chat submission:', error);
+      setMessages(prev => [...prev, { role: agentId, content: "I'm sorry, I encountered an error processing your request." }]);
     } finally {
       setLoading(false);
     }
   };
-
-  const handleUpload = (file) => {
-    if (file) {
-      console.log('File uploaded:', file.name);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'system',
-          content: `File uploaded: ${file.name} (${Math.round(file.size / 1024)} KB)`
-        }
-      ]);
-      setShowFileUpload(false);
-    }
-  };
-
+  
   return (
-    <Box bg={bg} h="calc(100vh - 80px)" display="flex" flexDirection="column">
-      {isTraining && (
-        <Box bg="yellow.600" color="white" p={2} textAlign="center">
-          🚧 Training {agentName}... Injecting Core Values
-        </Box>
-      )}
-      {!isTraining && isTrained && messages.length === 0 && (
-        <Box bg="green.600" color="white" p={2} textAlign="center">
-          ✅ Training Complete — {agentName} is aligned
-        </Box>
-      )}
-
-      <Flex justify="space-between" align="center" p={4} borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
-        <Heading size="lg">{agentName} Interface</Heading>
-        <Button colorScheme="red" size="sm" onClick={() => {
-          localStorage.removeItem('isAuthenticated');
-          window.location.href = '/auth';
-        }}>Logout</Button>
-      </Flex>
-
-      <Flex p={4} align="center" borderBottom="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
-        <Text fontWeight="bold" mr={4}>{agentName} GPT-4 Interface</Text>
-        <Tooltip label="Toggle Debug Drawer">
+    <Box h="100%" display="flex" flexDirection="column">
+      <Flex
+        p={4}
+        bg={bg}
+        borderBottom="1px"
+        borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}
+        justify="space-between"
+        align="center"
+      >
+        <Heading size="md">{agentName}</Heading>
+        <Tooltip label="Debug View">
           <IconButton
-            ml={4}
-            icon={<Text>{'</>'}</Text>}
+            icon={<span>🛠️</span>}
             onClick={() => setShowDebug(!showDebug)}
             aria-label="Toggle Debug"
             variant="outline"
           />
         </Tooltip>
       </Flex>
-
       <Box
         flex="1"
         overflow="hidden"
@@ -199,13 +182,11 @@ const AgentChat = ({ agentId = 'hal' }) => {
             </Text>
           )}
         </Box>
-
         {showFileUpload && (
           <Box position="absolute" bottom="70px" left="0" right="0" px={4}>
             <AgentFileUpload onFileUpload={handleUpload} />
           </Box>
         )}
-
         <Flex position="sticky" bottom="0" bg={bg} pt={2}>
           <Input
             placeholder="Enter your task..."
@@ -227,7 +208,6 @@ const AgentChat = ({ agentId = 'hal' }) => {
           </Button>
         </Flex>
       </Box>
-
       <Drawer isOpen={showDebug} placement="right" onClose={() => setShowDebug(false)} size="md">
         <DrawerOverlay />
         <DrawerContent bg="black" color="green.400">
@@ -310,7 +290,6 @@ const AgentChat = ({ agentId = 'hal' }) => {
           </DrawerBody>
         </DrawerContent>
       </Drawer>
-
       <Box p={4} borderTop="1px" borderColor={colorMode === 'light' ? 'gray.200' : 'gray.700'}>
         <MemoryFeed memories={getAllMemories()} />
       </Box>

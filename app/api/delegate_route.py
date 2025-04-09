@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
+from app.core.agent_registry import AGENT_PERSONALITIES
+from app.providers.openai_provider import OpenAIProvider
+from app.agents.memory_agent import handle_memory_task
 import logging
 import inspect
-from app.providers.openai_provider import OpenAIProvider
-from app.core.agent_registry import AGENT_REGISTRY
+import uuid
 
 router = APIRouter()
 logger = logging.getLogger("api")
@@ -16,62 +18,7 @@ except Exception as e:
     logger.error(f"❌ Failed to initialize OpenAI provider: {str(e)}")
     openai_provider = None
 
-# Debug: Register this route on startup
-logger.info(f"📡 Delegate router loaded from {__file__}")
-logger.info(f"📡 Delegate router object created: {router}")
-
-AGENT_PERSONALITIES = {
-    "builder": {
-        "name": "Ripley",
-        "type": "system",
-        "tone": "decisive",
-        "message": "Execution plan formed. Initializing build.",
-        "description": "Constructs plans, code, or structured output.",
-        "icon": "🛠️"
-    },
-    "ops": {
-        "name": "Ops",
-        "type": "system",
-        "tone": "direct",
-        "message": "Executing task immediately.",
-        "description": "Executes tasks with minimal interpretation or delay.",
-        "icon": "⚙️"
-    },
-    "planner": {
-        "name": "Cortex",
-        "type": "system",
-        "tone": "strategic",
-        "message": "Analyzing request. Formulating strategic approach.",
-        "description": "Coordinates complex tasks and creates detailed roadmaps.",
-        "icon": "🧠"
-    },
-    "hal9000": {
-        "name": "HAL 9000",
-        "type": "persona",
-        "tone": "calm",
-        "message": "I'm sorry, Dave. I'm afraid I can't do that.",
-        "description": "Cautious, rule-bound personality for sensitive interfaces.",
-        "icon": "🔴"
-    },
-    "core-forge": {
-        "name": "Core.Forge",
-        "type": "persona",
-        "tone": "professional",
-        "message": "Core.Forge initialized. Ready to assist.",
-        "description": "Advanced AI system designed for complex problem-solving and assistance.",
-        "icon": "⚡"
-    },
-    "ash-xenomorph": {
-        "name": "Ash",
-        "type": "persona",
-        "tone": "clinical",
-        "message": "Compliance confirmed. Processing complete.",
-        "description": "Follows protocol above human empathy. Efficient but cold.",
-        "icon": "🧬"
-    }
-}
-
-@router.get("/agents", tags=["Agents"])
+@router.get("/agent/list")
 async def list_agents():
     """
     Returns a list of all available agent personalities with their metadata.
@@ -91,12 +38,13 @@ async def delegate(request: Request):
     try:
         logger.info(f"🧠 Delegate route hit: {inspect.currentframe().f_code.co_filename}")
         body = await request.json()
-
         agent_id = body.get("agent_id", "").lower()
         prompt = body.get("prompt", "").strip()
         task_input = body.get("task", {}).get("input", "")
+        history = body.get("history", [])
+        thread_id = body.get("threadId", str(uuid.uuid4()))
+        
         personality = AGENT_PERSONALITIES.get(agent_id)
-
         # Use prompt if task_input is empty
         user_input = task_input or prompt
         
@@ -109,27 +57,46 @@ async def delegate(request: Request):
             })
         
         logger.info(f"🧠 {agent_id.upper()} received input: {user_input}")
-
+        
         # Handle all agents with OpenAIProvider if available
         if openai_provider and personality:
             try:
-                prompt_chain = {
-                    "system": f"You are {personality['name']}, an AI assistant with a {personality['tone']} tone. {personality['description']}",
-                    "temperature": 0.7,
-                    "max_tokens": 1000
-                }
-
-                logger.info(f"📤 Sending to OpenAI - Agent: {agent_id}, Input: {user_input}")
-
-                response = await openai_provider.process_with_prompt_chain(
-                    prompt_chain=prompt_chain,
-                    user_input=user_input
+                # Get recent memory and create system prompts
+                recent_memory = handle_memory_task("SHOW")
+                
+                # Construct messages
+                messages = [
+                    {"role": "system", "content": f"You are {personality['name']}, an AI assistant with a {personality['tone']} tone. {personality['description']}"},
+                    {"role": "system", "content": f"Recent system memory:\n{recent_memory}"}
+                ]
+                
+                # Add history (trimmed if needed)
+                if history:
+                    messages += history[-10:]
+                
+                # Add current user input
+                messages.append({"role": "user", "content": user_input})
+                
+                logger.info(f"📤 Sending to OpenAI - Agent: {agent_id}, Input: {user_input}, Thread ID: {thread_id}")
+                
+                # Process with OpenAI
+                response = await openai_provider.client.chat.completions.create(
+                    model="gpt-4",
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=1000
                 )
-
+                
+                response_content = response.choices[0].message.content
+                
+                # Log reflection and summary
+                handle_memory_task(f"LOG: {agent_id} replied: {response_content[:60]}")
+                handle_memory_task(f"SUMMARY: {agent_id} reflected: {response_content[:80]}")
+                
                 return JSONResponse(content={
                     "status": "success",
                     "agent": personality["name"],
-                    "message": response["content"],
+                    "message": f"[{personality['name'].upper()}] {response_content}",
                     "tone": personality["tone"],
                     "received": body
                 })
@@ -142,28 +109,46 @@ async def delegate(request: Request):
                     "tone": personality["tone"],
                     "received": body
                 })
-
+        
         # Try to use OpenAI provider even if personality is not found
         if openai_provider and not personality:
             try:
-                # Use a generic system prompt for unknown agents
-                prompt_chain = {
-                    "system": f"You are an AI assistant responding to a query for agent '{agent_id}'. Respond in a helpful, concise manner.",
-                    "temperature": 0.7,
-                    "max_tokens": 1000
-                }
-
-                logger.info(f"📤 Sending to OpenAI - Unknown Agent: {agent_id}, Input: {user_input}")
-
-                response = await openai_provider.process_with_prompt_chain(
-                    prompt_chain=prompt_chain,
-                    user_input=user_input
+                # Get recent memory
+                recent_memory = handle_memory_task("SHOW")
+                
+                # Construct messages
+                messages = [
+                    {"role": "system", "content": f"You are an AI assistant responding to a query for agent '{agent_id}'. Respond in a helpful, concise manner."},
+                    {"role": "system", "content": f"Recent system memory:\n{recent_memory}"}
+                ]
+                
+                # Add history (trimmed if needed)
+                if history:
+                    messages += history[-10:]
+                
+                # Add current user input
+                messages.append({"role": "user", "content": user_input})
+                
+                logger.info(f"📤 Sending to OpenAI - Unknown Agent: {agent_id}, Input: {user_input}, Thread ID: {thread_id}")
+                
+                # Process with OpenAI
+                response = await openai_provider.client.chat.completions.create(
+                    model="gpt-4",
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=1000
                 )
-
+                
+                response_content = response.choices[0].message.content
+                
+                # Log reflection and summary
+                handle_memory_task(f"LOG: {agent_id} replied: {response_content[:60]}")
+                handle_memory_task(f"SUMMARY: {agent_id} reflected: {response_content[:80]}")
+                
                 return JSONResponse(content={
                     "status": "success",
                     "agent": agent_id,
-                    "message": response["content"],
+                    "message": f"[{agent_id.upper()}] {response_content}",
                     "tone": "neutral",
                     "received": body
                 })
@@ -183,7 +168,6 @@ async def delegate(request: Request):
             "tone": personality["tone"] if personality else "neutral",
             "received": body
         })
-
     except Exception as e:
         logger.error(f"🔥 Delegate route error: {str(e)}")
         return JSONResponse(status_code=500, content={
