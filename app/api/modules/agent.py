@@ -4,19 +4,15 @@ API endpoint for the AgentRunner module.
 This module provides a REST API endpoint for executing agents in isolation,
 without relying on the central agent registry, UI, or delegate-stream system.
 
-MODIFIED: Enhanced error handling and logging to prevent 502 errors
+MODIFIED: Replaced with inline execution debug logging to diagnose 502 errors
 """
 
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
 import logging
-import time
 import traceback
 import os
-
-from app.modules.agent_runner import run_agent
+import time
 
 # Configure logging
 logger = logging.getLogger("api.modules.agent")
@@ -24,120 +20,116 @@ logger = logging.getLogger("api.modules.agent")
 # Create router
 router = APIRouter(prefix="/modules/agent", tags=["Agent Modules"])
 
-# Define request model
-class AgentRunRequest(BaseModel):
-    agent_id: str
-    messages: List[Dict[str, Any]]
-
 @router.post("/run")
-async def agent_run(request: AgentRunRequest):
+async def run_agent_endpoint(request: Request):
     """
     Run an agent with the provided messages.
     
-    This endpoint allows executing agent cognition in isolation,
-    without relying on the central agent registry, UI, or delegate-stream system.
-    
-    MODIFIED: Enhanced error handling and logging to prevent 502 errors
+    MODIFIED: Replaced with inline execution debug logging to diagnose 502 errors
     
     Args:
-        request: AgentRunRequest containing agent_id and messages
+        request: Request object containing the raw request data
         
     Returns:
-        JSONResponse with the agent's response
+        JSONResponse with the agent's response or error details
     """
-    # ADDED: Entry confirmation logging
-    print("🔥 AgentRunner API endpoint invoked")
-    logger.info("🔥 AgentRunner API endpoint invoked")
+    print("🔥 AgentRunner endpoint received a request")
+    logger.info("🔥 AgentRunner endpoint received a request")
     
     start_time = time.time()
     
-    # MODIFIED: Wrapped all logic in global try/except
     try:
-        print(f"🔄 API request received for agent: {request.agent_id}")
-        logger.info(f"Agent run request received for agent: {request.agent_id}")
+        # Parse request body
+        body = await request.json()
+        print("🧠 Parsed body:", body)
+        logger.info(f"Parsed request body with {len(body.get('messages', []))} messages")
+        
+        # Check for required fields
+        if 'messages' not in body:
+            error_msg = "Missing 'messages' in request body"
+            print(f"❌ {error_msg}")
+            logger.error(error_msg)
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "status": "error",
+                    "message": error_msg
+                }
+            )
         
         # Check OpenAI API key
         api_key = os.getenv("OPENAI_API_KEY")
-        print(f"🔑 OpenAI API Key loaded in endpoint: {bool(api_key)}")
+        print(f"🔑 OpenAI API Key loaded: {bool(api_key)}")
+        logger.info(f"OpenAI API Key available: {bool(api_key)}")
         
-        # Validate request
-        if not request.agent_id:
-            error_msg = "Missing agent_id in request"
-            print(f"❌ {error_msg}")
-            logger.error(error_msg)
-            return JSONResponse(
-                status_code=400,
-                content={
-                    "status": "error",
-                    "message": error_msg
-                }
-            )
-        
-        if not request.messages:
-            error_msg = "Missing messages in request"
-            print(f"❌ {error_msg}")
-            logger.error(error_msg)
-            return JSONResponse(
-                status_code=400,
-                content={
-                    "status": "error",
-                    "message": error_msg
-                }
-            )
-        
-        # Run the agent
-        print(f"🏃 Calling run_agent for: {request.agent_id}")
-        result = run_agent(request.agent_id, request.messages)
-        
-        # Check if result is already a JSONResponse (from error handling in run_agent)
-        if isinstance(result, JSONResponse):
-            print("⚠️ Received JSONResponse from run_agent, returning directly")
-            logger.info("Received JSONResponse from run_agent, returning directly")
-            return result
-        
-        # Check if agent execution was successful
-        if result.get("status") == "error":
-            error_msg = f"Agent execution failed: {result.get('response')}"
+        if not api_key:
+            error_msg = "OpenAI API key is not set in environment variables"
             print(f"❌ {error_msg}")
             logger.error(error_msg)
             return JSONResponse(
                 status_code=500,
                 content={
-                    "agent_id": request.agent_id,
-                    "response": result.get("response", "Unknown error"),
                     "status": "error",
-                    "execution_time": time.time() - start_time
+                    "message": error_msg
                 }
             )
         
-        # Log success
-        print(f"✅ Agent execution successful for {request.agent_id} in {time.time() - start_time:.2f}s")
-        logger.info(f"Agent execution successful for {request.agent_id} in {time.time() - start_time:.2f}s")
+        # Import CoreForgeAgent directly
+        try:
+            print("🧠 Attempting to import CoreForgeAgent")
+            from app.modules.agent_runner import CoreForgeAgent
+            print("✅ Successfully imported CoreForgeAgent")
+        except ImportError:
+            try:
+                print("⚠️ First import attempt failed, trying alternate import path")
+                from app.core.forge import CoreForgeAgent
+                print("✅ Successfully imported CoreForgeAgent from alternate path")
+            except ImportError as e:
+                error_msg = f"Failed to import CoreForgeAgent: {str(e)}"
+                print(f"❌ {error_msg}")
+                logger.error(error_msg)
+                logger.error(traceback.format_exc())
+                return JSONResponse(
+                    status_code=500,
+                    content={
+                        "status": "error",
+                        "message": error_msg
+                    }
+                )
+        
+        # Create agent instance
+        print("🧠 Creating CoreForgeAgent instance")
+        agent = CoreForgeAgent()
+        print("✅ Successfully created CoreForgeAgent instance")
+        
+        # Run the agent
+        print(f"🧠 Calling agent.run() with {len(body['messages'])} messages")
+        output = agent.run(body["messages"])
+        print("✅ CoreForgeAgent returned:", output)
         
         # Return successful response
         return JSONResponse(
             content={
-                "agent_id": request.agent_id,
-                "response": result.get("response", ""),
+                "agent_id": "Core.Forge",
+                "response": output.get("content", ""),
                 "status": "ok",
                 "execution_time": time.time() - start_time,
-                "usage": result.get("usage", {})
+                "usage": output.get("usage", {})
             }
         )
     
     except Exception as e:
         # Handle any unexpected errors
-        error_msg = f"Error processing agent run request: {str(e)}"
-        print(f"❌ AgentRunner API failed: {str(e)}")
+        error_msg = f"Error in AgentRunner endpoint: {str(e)}"
+        print(f"❌ AgentRunner exception: {str(e)}")
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         
         return JSONResponse(
             status_code=500,
             content={
-                "agent_id": request.agent_id if hasattr(request, "agent_id") else "unknown",
-                "response": error_msg,
                 "status": "error",
-                "execution_time": time.time() - start_time
+                "message": str(e),
+                "agent_id": "Core.Forge"
             }
         )
