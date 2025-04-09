@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 import logging
 import inspect
 from app.providers.openai_provider import OpenAIProvider
+from app.core.agent_registry import AGENT_REGISTRY
 
 router = APIRouter()
 logger = logging.getLogger("api")
@@ -96,10 +97,13 @@ async def delegate(request: Request):
         task_input = body.get("task", {}).get("input", "")
         personality = AGENT_PERSONALITIES.get(agent_id)
 
-        logger.info(f"🧠 {agent_id.upper()} received task: {task_input or prompt}")
+        # Use prompt if task_input is empty
+        user_input = task_input or prompt
+        
+        logger.info(f"🧠 {agent_id.upper()} received input: {user_input}")
 
-        # Handle Core.Forge with OpenAIProvider if available
-        if openai_provider and task_input and agent_id == "core-forge":
+        # Handle all agents with OpenAIProvider if available
+        if openai_provider and personality:
             try:
                 prompt_chain = {
                     "system": f"You are {personality['name']}, an AI assistant with a {personality['tone']} tone. {personality['description']}",
@@ -107,11 +111,11 @@ async def delegate(request: Request):
                     "max_tokens": 1000
                 }
 
-                logger.info(f"📤 Sending to OpenAI - Agent: {agent_id}, Input: {task_input}")
+                logger.info(f"📤 Sending to OpenAI - Agent: {agent_id}, Input: {user_input}")
 
                 response = await openai_provider.process_with_prompt_chain(
                     prompt_chain=prompt_chain,
-                    user_input=task_input
+                    user_input=user_input
                 )
 
                 return JSONResponse(content={
@@ -131,10 +135,13 @@ async def delegate(request: Request):
                     "received": body
                 })
 
-        # Fallback for static response (non-Core.Forge or no OpenAI fallback)
-        fallback_msg = personality["message"] if personality else "Ready to assist."
+        # Fallback for unknown agent
+        fallback_msg = "Unknown agent requested. Please try again with a valid agent."
+        if personality:
+            fallback_msg = f"Unable to process request with {personality['name']}. OpenAI provider is not available."
+            
         return JSONResponse(content={
-            "status": "success",
+            "status": "error",
             "agent": personality["name"] if personality else agent_id,
             "message": fallback_msg,
             "tone": personality["tone"] if personality else "neutral",
