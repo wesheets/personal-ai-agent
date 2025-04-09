@@ -8,6 +8,7 @@ from app.agents.lifetree_agent import handle_lifetree_task
 from app.agents.sitegen_agent import handle_sitegen_task
 from app.agents.neureal_agent import handle_neureal_task
 from app.agents.observer_agent import handle_observer_task
+from app.core.error_logger import log_agent_error
 
 logger = logging.getLogger("core")
 
@@ -40,6 +41,8 @@ def run_agent(agent_id, task_input, debug=False, **kwargs):
         if agent_id not in AGENT_HANDLERS:
             error_msg = f"Unknown agent: {agent_id}"
             logger.error(f"[ERROR] {error_msg}")
+            # Log the error to memory
+            log_agent_error("Core.run", error_msg)
             return error_msg
             
         # Get the handler function
@@ -49,6 +52,8 @@ def run_agent(agent_id, task_input, debug=False, **kwargs):
         if not callable(handler):
             error_msg = f"Agent handler for {agent_id} is not callable"
             logger.error(f"[ERROR] {error_msg}")
+            # Log the error to memory
+            log_agent_error("Core.run", error_msg)
             return error_msg
             
         # Call the handler
@@ -62,6 +67,8 @@ def run_agent(agent_id, task_input, debug=False, **kwargs):
         if result is None:
             error_msg = f"Agent {agent_id} returned None"
             logger.error(f"[ERROR] {error_msg}")
+            # Log the error to memory
+            log_agent_error(agent_id, error_msg)
             return f"Error: Agent {agent_id} produced no output"
         
         # Add debug mode prefix if debug is enabled
@@ -73,9 +80,13 @@ def run_agent(agent_id, task_input, debug=False, **kwargs):
     except ImportError as e:
         error_msg = f"Failed to import agent {agent_id}: {str(e)}"
         logger.error(f"[ERROR] {error_msg}")
+        # Log the error to memory with the exception object
+        log_agent_error(agent_id, error_msg, e)
         return f"Error: {error_msg}"
         
     except Exception as e:
         error_msg = f"Error running agent {agent_id}: {str(e)}"
         logger.error(f"[ERROR] {error_msg}")
+        # Log the error to memory with the exception object
+        log_agent_error(agent_id, error_msg, e)
         return f"Error: Agent {agent_id} encountered an error: {str(e)}"
