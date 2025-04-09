@@ -22,6 +22,7 @@ import {
 import { FiRefreshCw, FiClock, FiAlertCircle } from 'react-icons/fi';
 import DEBUG_MODE from '../config/debug';
 import { getVisibleAgents } from '../utils/agentUtils';
+import { safeFetch } from '../utils/safeFetch';
 
 // Mock data for activity feed - will be replaced with API calls
 const mockLogs = [
@@ -225,9 +226,49 @@ const ActivityFeed = () => {
 const Dashboard = () => {
   const { colorMode } = useColorMode();
   const [agents, setAgents] = useState([]);
+  const [systemData, setSystemData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [systemError, setSystemError] = useState(false);
   const toast = useToast();
+
+  // Fetch system overview data
+  useEffect(() => {
+    let isMounted = true;
+    
+    const fetchSystemOverview = async () => {
+      try {
+        // Use the safeFetch utility with timeout and error handling
+        await safeFetch('/api/system/overview', (data) => {
+          if (isMounted) {
+            setSystemData(data);
+            setSystemError(false);
+          }
+        }, (hasError) => {
+          if (isMounted && hasError) {
+            setSystemError(true);
+            toast({
+              title: 'Error',
+              description: 'Failed to load system overview. Using fallback data.',
+              status: 'warning',
+              duration: 5000,
+              isClosable: true,
+            });
+          }
+        }, 8000); // 8 second timeout
+      } catch (err) {
+        if (isMounted) {
+          console.error('Error fetching system overview:', err);
+        }
+      }
+    };
+
+    fetchSystemOverview();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [toast]);
 
   // Fetch agents from the API using the centralized utility
   useEffect(() => {
@@ -278,26 +319,30 @@ const Dashboard = () => {
     };
   }, [toast]);
 
-  if (loading) {
+  // Show loading state with timeout
+  useEffect(() => {
+    const loadingTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 8000); // Force loading to end after 8 seconds
+    
+    return () => clearTimeout(loadingTimeout);
+  }, []);
+
+  if (loading && !agents.length) {
     return (
       <Flex justify="center" align="center" height="100%" p={10}>
         <VStack spacing={4}>
           <Spinner size="xl" color="brand.500" thickness="4px" />
-          {agents.length > 0 && (
-            <Box textAlign="center">
-              <Text>Loading latest data...</Text>
-              <Badge colorScheme="yellow" mt={2}>Showing stale data</Badge>
-              <Button size="sm" mt={3} onClick={() => window.location.reload()}>
-                Refresh Page
-              </Button>
-            </Box>
-          )}
+          <Text>Loading dashboard data...</Text>
+          <Button size="sm" onClick={() => window.location.reload()}>
+            Refresh Page
+          </Button>
         </VStack>
       </Flex>
     );
   }
 
-  if (error) {
+  if (error && !agents.length) {
     return (
       <Box p={4}>
         <Heading mb={6} size="lg">Dashboard</Heading>
@@ -315,6 +360,45 @@ const Dashboard = () => {
   return (
     <Box p={4}>
       <Heading mb={6} size="lg">Dashboard</Heading>
+      
+      {/* System Overview Section */}
+      {systemData && !systemError && (
+        <Box mb={6} p={4} borderWidth="1px" borderRadius="lg" bg={colorMode === 'light' ? 'blue.50' : 'blue.900'}>
+          <Heading size="md" mb={3}>System Overview</Heading>
+          <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={4}>
+            <Box>
+              <Text fontWeight="bold">Active Agents</Text>
+              <Text>{systemData.agent_count || 'Unknown'}</Text>
+            </Box>
+            <Box>
+              <Text fontWeight="bold">System Mode</Text>
+              <Badge colorScheme={systemData.system_mode === 'production' ? 'green' : 'orange'}>
+                {systemData.system_mode || 'Unknown'}
+              </Badge>
+            </Box>
+            <Box>
+              <Text fontWeight="bold">Status</Text>
+              <Badge colorScheme={systemData.status === 'healthy' ? 'green' : 'red'}>
+                {systemData.status || 'Unknown'}
+              </Badge>
+            </Box>
+            <Box>
+              <Text fontWeight="bold">Uptime</Text>
+              <Text>{systemData.uptime || 'Unknown'}</Text>
+            </Box>
+          </Grid>
+        </Box>
+      )}
+      
+      {systemError && (
+        <Box mb={6} p={4} borderWidth="1px" borderRadius="lg" bg={colorMode === 'light' ? 'red.50' : 'red.900'}>
+          <Heading size="md" mb={3}>System Overview</Heading>
+          <Text>Unable to load system data. Please try again later.</Text>
+          <Button mt={3} size="sm" onClick={() => window.location.reload()}>
+            Refresh
+          </Button>
+        </Box>
+      )}
       
       <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={6} mb={8}>
         {agents?.length > 0 ? (
