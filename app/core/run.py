@@ -8,6 +8,7 @@ from app.agents.lifetree_agent import handle_lifetree_task
 from app.agents.sitegen_agent import handle_sitegen_task
 from app.agents.neureal_agent import handle_neureal_task
 from app.agents.observer_agent import handle_observer_task
+from app.agents.trainer_agent import handle_trainer_task
 from app.core.error_logger import log_agent_error
 
 logger = logging.getLogger("core")
@@ -20,7 +21,8 @@ AGENT_HANDLERS = {
     "lifetree": handle_lifetree_task,
     "sitegen": handle_sitegen_task,
     "neureal": handle_neureal_task,
-    "observer": handle_observer_task
+    "observer": handle_observer_task,
+    "trainer": handle_trainer_task
 }
 
 def run_agent(agent_id, task_input, debug=False, **kwargs):
