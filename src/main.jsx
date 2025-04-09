@@ -6,7 +6,6 @@ import './index.css'
 import { BrowserRouter } from 'react-router-dom'
 import { ChakraProvider } from '@chakra-ui/react'
 import { AuthProvider } from './context/AuthContext'
-import { worker } from 'msw/browser'
 import { http, HttpResponse } from 'msw'
 
 // Setup mock service worker for API mocking
