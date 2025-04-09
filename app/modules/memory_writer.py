@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 import json
 from pathlib import Path
+from typing import List, Dict, Optional
 
 # Use a file-based storage to persist memories between processes
 MEMORY_FILE = os.path.join(os.path.dirname(__file__), "memory_store.json")
@@ -47,3 +48,19 @@ def write_memory(agent_id: str, type: str, content: str, tags: list):
     _save_memories()  # Save to file after writing
     print(f"🧠 Memory written for {agent_id}: {memory['memory_id']}")
     return memory
+
+def generate_reflection(memories: List[Dict]) -> str:
+    """
+    Generate a reflection based on a list of memories.
+    This is a placeholder implementation that will be AI-powered later.
+    
+    Args:
+        memories: List of memory dictionaries to reflect on
+        
+    Returns:
+        A reflection string based on the memories
+    """
+    if not memories:
+        return "No relevant memories to reflect on."
+    
+    return f"I have processed {len(memories)} memories. A pattern is forming..."

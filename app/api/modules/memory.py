@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Request, Query, HTTPException
 from fastapi.responses import JSONResponse
-from app.modules.memory_writer import write_memory, memory_store
+from app.modules.memory_writer import write_memory, memory_store, generate_reflection
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import datetime
 
 class MemoryEntry(BaseModel):
@@ -10,6 +10,11 @@ class MemoryEntry(BaseModel):
     memory_type: str
     content: str
     tags: List[str] = []
+
+class ReflectionRequest(BaseModel):
+    agent_id: str
+    type: str
+    limit: int = 5
 
 router = APIRouter()
 
@@ -80,4 +85,44 @@ async def read_memory(
         return JSONResponse(status_code=e.status_code, content={"status": "error", "message": e.detail})
     except Exception as e:
         print(f"❌ MemoryReader error: {str(e)}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
+@router.post("/reflect")
+async def reflect_on_memories(request: Request):
+    try:
+        # Parse request body
+        body = await request.json()
+        reflection_request = ReflectionRequest(**body)
+        
+        # Get recent memories using similar logic to /read endpoint
+        filtered_memories = [m for m in memory_store if m["agent_id"] == reflection_request.agent_id]
+        
+        # Apply type filter
+        filtered_memories = [m for m in filtered_memories if m["type"] == reflection_request.type]
+        
+        # Sort by timestamp (newest first)
+        filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
+        
+        # Apply limit
+        filtered_memories = filtered_memories[:reflection_request.limit]
+        
+        # Generate reflection
+        reflection_text = generate_reflection(filtered_memories)
+        
+        # Write reflection as a new memory
+        memory = write_memory(
+            agent_id=reflection_request.agent_id,
+            type="reflection",
+            content=reflection_text,
+            tags=["reflection", f"based_on_{reflection_request.type}"]
+        )
+        
+        # Return response
+        return {
+            "status": "ok",
+            "reflection": reflection_text,
+            "memory_id": memory["memory_id"]
+        }
+    except Exception as e:
+        print(f"❌ Reflection Engine error: {str(e)}")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
