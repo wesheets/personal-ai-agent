@@ -38,7 +38,7 @@ const Sidebar = () => {
   };
   
   const handleAgentChat = (agentId) => {
-    navigate(`/chat/${agentId}`);
+    navigate(`/agent/${agentId}`);
   };
   
   return (
@@ -123,8 +123,8 @@ const Sidebar = () => {
               py={3}
               px={3}
               borderRadius="md"
-              bg={location.pathname === `/chat/${agent.id}` ? activeBg : 'transparent'}
-              color={location.pathname === `/chat/${agent.id}` ? activeColor : 'inherit'}
+              bg={location.pathname === `/agent/${agent.id}` ? activeBg : 'transparent'}
+              color={location.pathname === `/agent/${agent.id}` ? activeColor : 'inherit'}
               _hover={{ bg: hoverBg }}
               leftIcon={
                 <Box

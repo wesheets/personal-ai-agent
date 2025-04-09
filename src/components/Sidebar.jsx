@@ -105,23 +105,23 @@ const Sidebar = () => {
           </Flex>
           
           {systemAgents.map((agent) => (
-            <Link to={`/chat/${agent.id}`} key={agent.id}>
+            <Link to={`/agent/${agent.id}`} key={agent.id}>
               <HStack
                 py={2}
                 spacing={3}
-                bg={location.pathname === `/chat/${agent.id}` ? (colorMode === 'light' ? 'gray.100' : 'gray.700') : 'transparent'}
-                color={location.pathname === `/chat/${agent.id}` ? (colorMode === 'light' ? 'brand.600' : 'brand.300') : (colorMode === 'light' ? 'gray.600' : 'gray.300')}
+                bg={location.pathname === `/agent/${agent.id}` ? (colorMode === 'light' ? 'gray.100' : 'gray.700') : 'transparent'}
+                color={location.pathname === `/agent/${agent.id}` ? (colorMode === 'light' ? 'brand.600' : 'brand.300') : (colorMode === 'light' ? 'gray.600' : 'gray.300')}
                 _hover={{
                   bg: colorMode === 'light' ? 'gray.100' : 'gray.700',
                   color: colorMode === 'light' ? 'brand.600' : 'brand.300',
                 }}
                 transition="all 0.2s"
-                borderLeftWidth={location.pathname === `/chat/${agent.id}` ? '4px' : '0px'}
-                borderColor={location.pathname === `/chat/${agent.id}` ? (colorMode === 'light' ? 'brand.500' : 'brand.300') : 'transparent'}
-                pl={location.pathname === `/chat/${agent.id}` ? 3 : 4}
+                borderLeftWidth={location.pathname === `/agent/${agent.id}` ? '4px' : '0px'}
+                borderColor={location.pathname === `/agent/${agent.id}` ? (colorMode === 'light' ? 'brand.500' : 'brand.300') : 'transparent'}
+                pl={location.pathname === `/agent/${agent.id}` ? 3 : 4}
               >
                 <Text fontSize="lg">{agent.icon || '🤖'}</Text>
-                <Text fontWeight={location.pathname === `/chat/${agent.id}` ? 'medium' : 'normal'} fontSize="sm">
+                <Text fontWeight={location.pathname === `/agent/${agent.id}` ? 'medium' : 'normal'} fontSize="sm">
                   {agent.name}
                 </Text>
                 <Badge 

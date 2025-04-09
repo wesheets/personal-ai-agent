@@ -100,6 +100,14 @@ async def delegate(request: Request):
         # Use prompt if task_input is empty
         user_input = task_input or prompt
         
+        if not user_input.strip():
+            logger.error(f"🔥 Empty input received for agent: {agent_id}")
+            return JSONResponse(status_code=400, content={
+                "status": "error",
+                "message": "Input cannot be empty",
+                "agent": personality["name"] if personality else agent_id,
+            })
+        
         logger.info(f"🧠 {agent_id.upper()} received input: {user_input}")
 
         # Handle all agents with OpenAIProvider if available
@@ -135,7 +143,35 @@ async def delegate(request: Request):
                     "received": body
                 })
 
-        # Fallback for unknown agent
+        # Try to use OpenAI provider even if personality is not found
+        if openai_provider and not personality:
+            try:
+                # Use a generic system prompt for unknown agents
+                prompt_chain = {
+                    "system": f"You are an AI assistant responding to a query for agent '{agent_id}'. Respond in a helpful, concise manner.",
+                    "temperature": 0.7,
+                    "max_tokens": 1000
+                }
+
+                logger.info(f"📤 Sending to OpenAI - Unknown Agent: {agent_id}, Input: {user_input}")
+
+                response = await openai_provider.process_with_prompt_chain(
+                    prompt_chain=prompt_chain,
+                    user_input=user_input
+                )
+
+                return JSONResponse(content={
+                    "status": "success",
+                    "agent": agent_id,
+                    "message": response["content"],
+                    "tone": "neutral",
+                    "received": body
+                })
+            except Exception as e:
+                logger.error(f"🔥 OpenAI processing error for unknown agent: {str(e)}")
+                # Continue to fallback
+        
+        # Fallback for when OpenAI provider is not available or other errors
         fallback_msg = "Unknown agent requested. Please try again with a valid agent."
         if personality:
             fallback_msg = f"Unable to process request with {personality['name']}. OpenAI provider is not available."
