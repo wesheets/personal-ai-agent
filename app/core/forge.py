@@ -41,6 +41,27 @@ class CoreForge:
             # Extract task parameters
             agent = task.get("target_agent", "")
             task_input = task.get("input", "")
+            
+            # Check for build commands and delegate to ops-agent
+            if "build" in task_input.lower():
+                from app.core.delegate import delegate_to_agent
+                logger.info(f"[Core.Forge] Detected build request: {task_input}")
+                
+                # If specifically about LifeTree, delegate directly
+                if "lifetree" in task_input.lower() or "life tree" in task_input.lower():
+                    result = delegate_to_agent("core-forge", "ops-agent", "Generate vertical scaffold for LifeTree")
+                    
+                    # Log the delegation to memory
+                    handle_memory_task("LOG: Core.Forge delegated LifeTree vertical building to ops-agent")
+                    
+                    return {
+                        "status": "complete",
+                        "executor": self.agent_id,
+                        "delegated": True,
+                        "delegated_to": "ops-agent",
+                        "input": task_input,
+                        "output": f"I've delegated the LifeTree vertical building task to OpsAgent. Result: {result}"
+                    }
 
             # Validate required fields
             if not agent or not task_input:
