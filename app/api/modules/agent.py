@@ -7,6 +7,8 @@ without relying on the central agent registry, UI, or delegate-stream system.
 MODIFIED: Replaced with inline execution debug logging to diagnose 502 errors
 """
 
+print("📁 Loaded: agent.py (AgentRunner route file)")
+
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 import logging
@@ -19,6 +21,7 @@ logger = logging.getLogger("api.modules.agent")
 
 # Create router
 router = APIRouter(prefix="/modules/agent", tags=["Agent Modules"])
+print("🧠 Route defined: /api/modules/agent/run -> run_agent_endpoint")
 
 @router.post("/run")
 async def run_agent_endpoint(request: Request):
@@ -33,8 +36,8 @@ async def run_agent_endpoint(request: Request):
     Returns:
         JSONResponse with the agent's response or error details
     """
-    print("🔥 AgentRunner endpoint received a request")
-    logger.info("🔥 AgentRunner endpoint received a request")
+    print("🔥 AgentRunner endpoint HIT")
+    logger.info("🔥 AgentRunner endpoint HIT")
     
     start_time = time.time()
     

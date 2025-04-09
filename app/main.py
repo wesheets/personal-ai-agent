@@ -262,6 +262,7 @@ try:
 
     # Include only the isolated AgentRunner module router
     print("🔄 Including isolated AgentRunner module router...")
+    print("📡 Including AgentRunner module router from /api/modules/agent.py")
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(health_router)  # Include health router without prefix
     print("✅ Isolated AgentRunner module router included")
