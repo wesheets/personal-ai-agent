@@ -4,8 +4,7 @@ AgentRunner Module
 This module provides isolated agent execution functionality, allowing agents to run
 independently from the central agent registry, UI, or delegate-stream system.
 
-It implements a robust mechanism for executing agent cognition with proper fallbacks
-when the registry fails or specific agents are missing.
+MODIFIED: Completely removed registry dependencies to ensure standalone operation
 """
 
 import logging
@@ -18,26 +17,17 @@ import sys
 # Import OpenAI client
 try:
     from openai import OpenAI
-    from app.core.openai_client import get_openai_client
     OPENAI_AVAILABLE = True
 except ImportError:
     OPENAI_AVAILABLE = False
     print("❌ OpenAI client import failed")
-
-# Try to import agent registry
-try:
-    from app.core.agent_loader import get_agent, get_all_agents
-    REGISTRY_AVAILABLE = True
-except ImportError:
-    REGISTRY_AVAILABLE = False
-    print("❌ Agent registry import failed")
 
 # Configure logging
 logger = logging.getLogger("modules.agent_runner")
 
 class CoreForgeAgent:
     """
-    Fallback implementation of CoreForgeAgent when the registry is not available.
+    Standalone implementation of CoreForgeAgent with no registry dependencies.
     """
     def __init__(self):
         self.agent_id = "Core.Forge"
@@ -119,7 +109,9 @@ class CoreForgeAgent:
 
 def run_agent(agent_id: str, messages: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Run an agent with the given messages, with fallback mechanisms for registry failures.
+    Run an agent with the given messages, with no registry dependencies.
+    
+    MODIFIED: Removed all registry dependencies to ensure standalone operation
     
     Args:
         agent_id: The ID of the agent to run
@@ -149,50 +141,22 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]) -> Dict[str, Any]:
                 "execution_time": time.time() - start_time
             }
         
-        # Try to get agent from registry first
-        agent = None
-        registry_available = False
-        
-        try:
-            # Check if agent registry is available
-            if REGISTRY_AVAILABLE:
-                print(f"🔍 Looking for agent in registry: {agent_id}")
-                agent = get_agent(agent_id)
-                registry_available = True
-                
-                if agent:
-                    print(f"✅ Found agent in registry: {agent_id}")
-                    logger.info(f"Found agent in registry: {agent_id}")
-                else:
-                    print(f"⚠️ Agent not found in registry: {agent_id}")
-                    logger.warning(f"Agent not found in registry: {agent_id}")
-            else:
-                print("⚠️ Agent registry not available")
-                logger.warning("Agent registry not available")
-        except Exception as e:
-            error_msg = f"Agent registry access failed: {str(e)}"
-            print(f"⚠️ {error_msg}")
-            logger.warning(error_msg)
-        
-        # If agent not found in registry or registry not available, use fallback
-        if not agent:
-            # Special case for Core.Forge
-            if agent_id.lower() in ["core.forge", "core-forge"]:
-                print("⚠️ Using fallback CoreForgeAgent (registry unavailable)")
-                logger.info("Using fallback CoreForgeAgent")
-                agent = CoreForgeAgent()
-            else:
-                # No fallback available for other agents
-                error_msg = f"Agent {agent_id} not found and no fallback available"
-                print(f"❌ {error_msg}")
-                logger.error(error_msg)
-                return {
-                    "agent_id": agent_id,
-                    "response": error_msg,
-                    "status": "error",
-                    "registry_available": registry_available,
-                    "execution_time": time.time() - start_time
-                }
+        # MODIFIED: Direct CoreForge integration with no registry dependency
+        if agent_id.lower() in ["core.forge", "core-forge"]:
+            print("🔄 Using direct CoreForgeAgent implementation (no registry)")
+            logger.info("Using direct CoreForgeAgent implementation")
+            agent = CoreForgeAgent()
+        else:
+            # No support for other agents in isolated mode
+            error_msg = f"Agent {agent_id} not supported in isolated mode. Only Core.Forge is available."
+            print(f"❌ {error_msg}")
+            logger.error(error_msg)
+            return {
+                "agent_id": agent_id,
+                "response": error_msg,
+                "status": "error",
+                "execution_time": time.time() - start_time
+            }
         
         # Check if agent has run method
         if hasattr(agent, "run") and callable(getattr(agent, "run")):
@@ -209,71 +173,21 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]) -> Dict[str, Any]:
                 "agent_id": agent_id,
                 "response": result.get("content", "No content returned"),
                 "status": "ok",
-                "registry_available": registry_available,
+                "registry_available": False,  # Always false in isolated mode
                 "execution_time": time.time() - start_time,
                 "usage": result.get("usage", {})
             }
         
-        # If agent doesn't have run method, use fallback with OpenAI
-        print(f"⚠️ Agent {agent_id} doesn't have run method, using OpenAI fallback")
-        logger.warning(f"Agent {agent_id} doesn't have run method, using OpenAI fallback")
-        
-        # Get agent metadata for system prompt
-        agent_name = getattr(agent, "name", agent_id)
-        agent_description = getattr(agent, "description", "")
-        agent_tone = getattr(agent, "tone", "professional")
-        
-        # Create system prompt
-        system_prompt = f"You are {agent_name}, an AI assistant with a {agent_tone} tone. {agent_description}"
-        
-        # Add system message to messages if not already present
-        has_system_message = any(msg.get("role") == "system" for msg in messages)
-        if not has_system_message:
-            messages = [{"role": "system", "content": system_prompt}] + messages
-        
-        # Use OpenAI client directly
-        try:
-            print("📡 Using direct OpenAI client")
-            client = OpenAI(api_key=api_key)
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=1000
-            )
-            
-            content = response.choices[0].message.content
-            print(f"✅ OpenAI API call successful, received {len(content)} characters")
-            
-            # Log result
-            logger.info(f"Agent {agent_id} execution completed with OpenAI fallback")
-            
-            # Return result
-            return {
-                "agent_id": agent_id,
-                "response": content,
-                "status": "ok",
-                "registry_available": registry_available,
-                "execution_time": time.time() - start_time,
-                "fallback_used": True,
-                "usage": {
-                    "prompt_tokens": response.usage.prompt_tokens,
-                    "completion_tokens": response.usage.completion_tokens,
-                    "total_tokens": response.usage.total_tokens
-                }
-            }
-        except Exception as e:
-            error_msg = f"OpenAI fallback failed: {str(e)}"
-            print(f"❌ {error_msg}")
-            logger.error(error_msg)
-            logger.error(traceback.format_exc())
-            return {
-                "agent_id": agent_id,
-                "response": f"OpenAI fallback failed: {str(e)}",
-                "status": "error",
-                "registry_available": registry_available,
-                "execution_time": time.time() - start_time
-            }
+        # This should never happen with our CoreForgeAgent implementation
+        error_msg = f"Agent {agent_id} doesn't have run method"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        return {
+            "agent_id": agent_id,
+            "response": error_msg,
+            "status": "error",
+            "execution_time": time.time() - start_time
+        }
     
     except Exception as e:
         # Handle any unexpected errors

@@ -4,6 +4,8 @@ Failsafe Agent Loader
 This module provides a robust, fault-tolerant mechanism for loading agent classes.
 It prevents a single bad agent from crashing the entire backend by wrapping each
 agent initialization in try/except blocks.
+
+MODIFIED: Temporarily disabled problematic agent loading to isolate AgentRunner
 """
 
 import logging
@@ -17,7 +19,7 @@ from typing import Dict, Any, Optional, Type
 # Configure logging
 logger = logging.getLogger("agents")
 
-# Global agent registry
+# Global agent registry - MODIFIED: Empty dictionary to avoid loading problematic agents
 agents = {}
 
 def load_agent_from_module(agent_id: str, module_path: str, class_name: Optional[str] = None) -> bool:
@@ -103,6 +105,8 @@ def initialize_agents() -> Dict[str, Any]:
     """
     Initialize all agents with failsafe error handling.
     
+    MODIFIED: Temporarily disabled problematic agent loading to isolate AgentRunner
+    
     Returns:
         Dict[str, Any]: Dictionary of successfully loaded agents
     """
@@ -120,77 +124,9 @@ def initialize_agents() -> Dict[str, Any]:
         logger.error(f"❌ Failed to load agent manifest: {str(e)}")
         manifest_data = {}
     
-    # Core.Forge agent
-    try:
-        from app.core.forge import CoreForge
-        agents["Core.Forge"] = CoreForge()
-        logger.info("✅ OpenAI provider initialized successfully for Core.Forge agent")
-    except Exception as e:
-        logger.error(f"❌ Failed to load Core.Forge: {str(e)}")
-    
-    # ObserverAgent
-    try:
-        from app.agents.observer_agent import ObserverAgent
-        agents["ObserverAgent"] = ObserverAgent()
-        logger.info("✅ OpenAI provider initialized successfully for ObserverAgent")
-    except Exception as e:
-        logger.error(f"❌ Failed to load ObserverAgent: {str(e)}")
-    
-    # MemoryAgent
-    try:
-        from app.agents.memory_agent import MemoryAgent
-        agents["MemoryAgent"] = MemoryAgent()
-        logger.info("✅ OpenAI provider initialized successfully for MemoryAgent")
-    except Exception as e:
-        logger.error(f"❌ Failed to load MemoryAgent: {str(e)}")
-    
-    # OpsAgent
-    try:
-        from app.agents.ops_agent import OpsAgent
-        agents["OpsAgent"] = OpsAgent()
-        logger.info("✅ OpenAI provider initialized successfully for OpsAgent")
-    except Exception as e:
-        logger.error(f"❌ Failed to load OpsAgent: {str(e)}")
-    
-    # HAL
-    try:
-        from app.agents.hal_agent import HALAgent
-        agents["HAL"] = HALAgent()
-        logger.info("✅ OpenAI provider initialized successfully for HAL")
-    except Exception as e:
-        logger.error(f"❌ Failed to load HAL: {str(e)}")
-    
-    # Ash
-    try:
-        from app.agents.ash_agent import AshAgent
-        agents["Ash"] = AshAgent()
-        logger.info("✅ OpenAI provider initialized successfully for Ash")
-    except Exception as e:
-        logger.error(f"❌ Failed to load Ash: {str(e)}")
-    
-    # LifeTree
-    try:
-        from app.agents.lifetree_agent import LifeTreeAgent
-        agents["LifeTree"] = LifeTreeAgent()
-        logger.info("✅ OpenAI provider initialized successfully for LifeTree")
-    except Exception as e:
-        logger.error(f"❌ Failed to load LifeTree: {str(e)}")
-    
-    # SiteGen
-    try:
-        from app.agents.sitegen_agent import SiteGenAgent
-        agents["SiteGen"] = SiteGenAgent()
-        logger.info("✅ OpenAI provider initialized successfully for SiteGen")
-    except Exception as e:
-        logger.error(f"❌ Failed to load SiteGen: {str(e)}")
-    
-    # NEUREAL
-    try:
-        from app.agents.neureal_agent import NEUREALAgent
-        agents["NEUREAL"] = NEUREALAgent()
-        logger.info("✅ OpenAI provider initialized successfully for NEUREAL")
-    except Exception as e:
-        logger.error(f"❌ Failed to load NEUREAL: {str(e)}")
+    # MODIFIED: Disabled all agent loading to isolate AgentRunner
+    # Only Core.Forge is needed and will be handled directly by AgentRunner
+    logger.info("⚠️ Agent loading disabled to isolate AgentRunner module")
     
     # Log summary
     logger.info(f"✅ Agent initialization complete. Loaded {len(agents)} agents successfully.")
