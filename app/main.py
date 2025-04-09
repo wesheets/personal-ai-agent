@@ -141,10 +141,10 @@ async def log_all_routes():
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
 
-# Production CORS middleware with regex pattern to allow only Vercel deploys and Promethios domain
+# Production CORS middleware with regex pattern to allow Vercel deploys, Railway apps, and local development
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://(.*\.vercel\.app|promethios\.ai)",
+    allow_origin_regex=r"https://(.*\.vercel\.app|.*\.railway\.app|promethios\.ai)|http://localhost:[0-9]+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

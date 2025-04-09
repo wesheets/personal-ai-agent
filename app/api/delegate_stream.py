@@ -17,7 +17,7 @@ except Exception as e:
     logger.error(f"❌ Failed to initialize OpenAI provider for streaming: {str(e)}")
     openai_provider = None
 
-@router.post("/delegate-stream")
+@router.post("/api/delegate-stream")
 async def delegate_stream(request: Request):
     body = await request.json()
     agent_id = body.get("agent_id", "core-forge").lower()
