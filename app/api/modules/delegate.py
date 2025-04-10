@@ -82,6 +82,22 @@ async def delegate_task(request: Request):
             memory_trace_id=delegation_request.memory_trace_id
         )
         
+        # Write delegation memory for the delegating agent (from_agent) if specified
+        if delegation_request.from_agent:
+            delegating_message = f"Delegated task to {delegation_request.agent_name.upper()}: {delegation_request.objective}"
+            from_memory = write_memory(
+                agent_id=delegation_request.from_agent,
+                type="delegation_log",
+                content=delegating_message,
+                tags=[f"to:{delegation_request.agent_name}"],
+                project_id=delegation_request.project_id,
+                status="delegated",
+                task_type="delegation",
+                task_id=delegation_request.task_id,
+                memory_trace_id=delegation_request.memory_trace_id
+            )
+            print(f"✅ Delegation memory written for delegating agent: {delegation_request.from_agent}")
+        
         result_summary = "Agent accepted task."
         
         # Handle auto-execute if enabled
