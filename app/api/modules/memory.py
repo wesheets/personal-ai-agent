@@ -66,8 +66,31 @@ async def read_memory(
     type: Optional[str] = None,
     tag: Optional[str] = None,
     limit: Optional[int] = 10,
-    since: Optional[str] = None
+    since: Optional[str] = None,
+    project_id: Optional[str] = None,
+    task_id: Optional[str] = None,
+    thread_id: Optional[str] = None
 ):
+    """
+    Read memories for a specific agent with various filtering options.
+    
+    This endpoint retrieves memories for the specified agent, with optional filtering
+    by type, tag, timestamp, project_id, task_id, and thread_id.
+    
+    Parameters:
+    - agent_id: ID of the agent whose memories to retrieve (required)
+    - type: (Optional) Filter by memory type
+    - tag: (Optional) Filter by tag
+    - limit: (Optional) Maximum number of memories to return, default is 10
+    - since: (Optional) ISO 8601 timestamp to filter memories after a specific time
+    - project_id: (Optional) Filter by project context
+    - task_id: (Optional) Filter by specific task
+    - thread_id: (Optional) Filter by conversation thread
+    
+    Returns:
+    - status: "ok" if successful
+    - memories: List of memory entries sorted by timestamp (newest first)
+    """
     try:
         if not agent_id:
             raise HTTPException(status_code=400, detail="agent_id is required")
@@ -93,6 +116,27 @@ async def read_memory(
                 ]
             except ValueError:
                 raise HTTPException(status_code=400, detail="Invalid ISO 8601 format for 'since' parameter")
+        
+        # Apply project_id filter if provided
+        if project_id:
+            filtered_memories = [
+                m for m in filtered_memories 
+                if "project_id" in m and m["project_id"] == project_id
+            ]
+        
+        # Apply task_id filter if provided
+        if task_id:
+            filtered_memories = [
+                m for m in filtered_memories 
+                if "task_id" in m and m["task_id"] == task_id
+            ]
+        
+        # Apply thread_id filter if provided
+        if thread_id:
+            filtered_memories = [
+                m for m in filtered_memories 
+                if "thread_id" in m and m["thread_id"] == thread_id
+            ]
         
         # Sort by timestamp (newest first)
         filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
