@@ -118,15 +118,20 @@ def get_action_type(memory: Dict[str, Any]) -> Optional[str]:
         Action type or None if not an action
     """
     memory_type = memory.get("type", "")
+    memory_type_lower = memory_type.lower() if memory_type else ""
     tags = memory.get("tags", [])
     
-    if memory_type == "cognitive_loop":
+    # Check for loop-related memory types
+    if memory_type == "cognitive_loop" or memory_type_lower == "loop":
         return "loop"
-    elif memory_type == "delegation" or "delegation" in tags:
+    # Check for delegation-related memory types
+    elif memory_type == "delegation" or memory_type_lower == "delegate" or "delegation" in tags:
         return "delegate"
-    elif memory_type == "reflection":
+    # Check for reflection-related memory types
+    elif memory_type == "reflection" or memory_type_lower == "reflect":
         return "reflection"
-    elif memory_type == "write" or memory_type == "memory":
+    # Check for write-related memory types
+    elif memory_type == "write" or memory_type == "memory" or memory_type_lower == "write":
         return "write"
     # Return the memory type as a fallback to ensure all memories are captured
     return memory_type
@@ -142,9 +147,11 @@ def get_action_result(memory: Dict[str, Any]) -> str:
         Result or summary of the action
     """
     memory_type = memory.get("type", "")
+    memory_type_lower = memory_type.lower() if memory_type else ""
     content = memory.get("content", "")
     
-    if memory_type == "cognitive_loop":
+    # Handle loop-related memory types
+    if memory_type == "cognitive_loop" or memory_type_lower == "loop":
         # Extract the first line of the reflection as the result
         if "Reflection: " in content and "\n\n" in content:
             reflection_start = content.find("Reflection: ") + 12
@@ -152,20 +159,24 @@ def get_action_result(memory: Dict[str, Any]) -> str:
             return content[reflection_start:reflection_end]
         return "Reflected on system modules and generated plan"
     
-    elif memory_type == "delegation":
+    # Handle delegation-related memory types
+    elif memory_type == "delegation" or memory_type_lower == "delegate":
         if "Received task from" in content:
             return "Received delegation task"
         elif "Executed delegated task from" in content:
             return "Executed delegation task"
         return "Delegation action"
     
-    elif memory_type == "reflection":
+    # Handle reflection-related memory types
+    elif memory_type == "reflection" or memory_type_lower == "reflect":
         # Return first 100 characters of content as summary
         return content[:100] + ("..." if len(content) > 100 else "")
     
-    elif memory_type == "write" or memory_type == "memory":
+    # Handle write-related memory types
+    elif memory_type == "write" or memory_type == "memory" or memory_type_lower == "write":
         return "Wrote memory: " + content[:50] + ("..." if len(content) > 50 else "")
     
+    # Default case for other memory types
     return content[:100] + ("..." if len(content) > 100 else "")
 
 def generate_action_summary(agent_id: str, actions: List[Dict[str, Any]]) -> str:
