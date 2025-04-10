@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, Query, HTTPException
 from fastapi.responses import JSONResponse
 from app.modules.memory_writer import write_memory, memory_store, generate_reflection
+from app.modules.memory_summarizer import summarize_memories
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 from datetime import datetime
@@ -15,6 +16,11 @@ class ReflectionRequest(BaseModel):
     agent_id: str
     type: str
     limit: int = 5
+    
+class SummarizeRequest(BaseModel):
+    agent_id: str
+    type: Optional[str] = None
+    limit: int = 10
 
 router = APIRouter()
 
@@ -125,4 +131,53 @@ async def reflect_on_memories(request: Request):
         }
     except Exception as e:
         print(f"❌ Reflection Engine error: {str(e)}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
+@router.post("/summarize")
+async def summarize_memories_endpoint(request: Request):
+    """
+    Summarize recent memories for an agent into a coherent natural language summary.
+    
+    This endpoint retrieves recent memories for the specified agent, optionally filtered by type,
+    and generates a natural language summary of those memories.
+    
+    Request body:
+    - agent_id: ID of the agent whose memories to summarize
+    - type: (Optional) Filter memories by type
+    - limit: (Optional) Maximum number of memories to summarize, default is 10
+    
+    Returns:
+    - status: "ok" if successful
+    - summary: Natural language summary of the memories
+    - memory_count: Number of memories summarized
+    """
+    try:
+        # Parse request body
+        body = await request.json()
+        summarize_request = SummarizeRequest(**body)
+        
+        # Get recent memories using similar logic to /read endpoint
+        filtered_memories = [m for m in memory_store if m["agent_id"] == summarize_request.agent_id]
+        
+        # Apply type filter if provided
+        if summarize_request.type:
+            filtered_memories = [m for m in filtered_memories if m["type"] == summarize_request.type]
+        
+        # Sort by timestamp (newest first)
+        filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
+        
+        # Apply limit
+        filtered_memories = filtered_memories[:summarize_request.limit]
+        
+        # Generate summary
+        summary_text = summarize_memories(filtered_memories)
+        
+        # Return response
+        return {
+            "status": "ok",
+            "summary": summary_text,
+            "memory_count": len(filtered_memories)
+        }
+    except Exception as e:
+        print(f"❌ Memory Summarization error: {str(e)}")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
