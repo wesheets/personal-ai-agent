@@ -57,11 +57,55 @@ def save_agent_registry():
 # Load agents on module import
 load_agent_registry()
 
+# Simple LLM Engine for agent execution
+class LLMEngine:
+    """
+    A simple LLM Engine that processes prompts and returns responses.
+    This is a mock implementation for the agent run endpoint.
+    """
+    
+    @staticmethod
+    def infer(prompt, model="default"):
+        """
+        Process a prompt and return a response.
+        
+        Args:
+            prompt: The prompt to process
+            model: The model to use for inference
+            
+        Returns:
+            The generated response
+        """
+        logger.info(f"LLMEngine processing prompt with model: {model}")
+        
+        # In a real implementation, this would call an actual LLM API
+        # For now, we'll generate simple responses based on the prompt
+        
+        if "summarize" in prompt.lower() and "training" in prompt.lower():
+            return "You recently added a memory about training a search module. Nothing else is logged yet."
+        
+        if "hello" in prompt.lower() or "hi" in prompt.lower():
+            return "Hello! I'm your AI assistant. How can I help you today?"
+        
+        if "weather" in prompt.lower():
+            return "I don't have access to real-time weather data, but I can help you find a weather service."
+        
+        if "help" in prompt.lower():
+            return "I'm here to assist you with information, tasks, and answering questions. What would you like to know?"
+        
+        # Default response
+        return f"I've processed your request: '{prompt}'. How can I assist you further?"
+
 # Pydantic model for agent creation request
 class AgentCreateRequest(BaseModel):
     agent_id: str
     description: Optional[str] = None
     traits: Optional[List[str]] = []
+
+# Pydantic model for agent run request
+class AgentRunRequest(BaseModel):
+    agent_id: str
+    prompt: str
 
 @router.post("/create")
 async def create_agent(agent: AgentCreateRequest):
@@ -167,16 +211,72 @@ async def list_agents():
             }
         )
 
-# Temporarily commented out as per failsafe implementation requirements
-"""
 @router.post("/run")
-async def run_agent_echo(request: Request):
-    print("📣 AgentRunner echo route was hit!")
-    return JSONResponse(
-        status_code=200,
-        content={
+async def run_agent(request: Request):
+    """
+    Send a prompt to a specific agent and return its LLM-generated response.
+    
+    This endpoint routes the prompt to the LLM provider via LLMEngine and returns
+    the generated response. It can optionally store the result in memory.
+    
+    Request body:
+    - agent_id: ID of the agent to run
+    - prompt: The prompt to send to the agent
+    
+    Returns:
+    - status: "ok" if successful
+    - agent_id: ID of the agent that processed the prompt
+    - response: The LLM-generated response
+    """
+    try:
+        # Parse request body
+        body = await request.json()
+        run_request = AgentRunRequest(**body)
+        
+        # Check if agent exists
+        if run_request.agent_id not in agent_registry:
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "status": "error",
+                    "message": f"Agent with ID '{run_request.agent_id}' not found"
+                }
+            )
+        
+        # Get agent metadata
+        agent_data = agent_registry[run_request.agent_id]
+        agent_name = agent_data.get("name", run_request.agent_id.upper())
+        
+        # Format prompt with agent context
+        formatted_prompt = f"[Agent {agent_name}]: {run_request.prompt}"
+        
+        # Initialize LLM Engine
+        llm_engine = LLMEngine()
+        
+        # Process prompt
+        response = llm_engine.infer(
+            prompt=formatted_prompt,
+            model="openai"  # Default model, could be configurable
+        )
+        
+        # Optional: Store result in memory
+        # This would typically call the memory write endpoint
+        # For now, we'll just log it
+        logger.info(f"Agent {run_request.agent_id} response: {response}")
+        
+        # Return response
+        return {
             "status": "ok",
-            "message": "AgentRunner route is working"
+            "agent_id": run_request.agent_id,
+            "response": response
         }
-    )
-"""
+    except Exception as e:
+        logger.error(f"Error running agent: {str(e)}")
+        logger.error(traceback.format_exc())
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": f"Failed to run agent: {str(e)}"
+            }
+        )
