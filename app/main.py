@@ -159,6 +159,8 @@ try:
         for route in app.routes:
             if isinstance(route, APIRoute):
                 print(f"➡️ {route.path} [{', '.join(route.methods)}] from {inspect.getsourcefile(route.endpoint)}")
+                print(f"🔍 DEBUG ROUTE: {route.path} [{', '.join(route.methods)}]")
+                print(f"🔍 DEBUG ENDPOINT: {route.endpoint.__name__}")
                 logger.info(f"🔍 {route.path} [{','.join(route.methods)}]")
         
         # Log CORS configuration on startup
@@ -272,6 +274,10 @@ try:
     from app.api.modules import delegate  # Import the delegate.py route file
     from app.api.modules import stream  # Import the stream.py route file
     from app.api.modules import train  # Import the train.py route file
+    
+    # Debug print to verify router object
+    print(f"🔍 DEBUG: Memory router object: {memory.router}")
+    print(f"🔍 DEBUG: Memory router routes: {[route.path for route in memory.router.routes]}")
     
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(memory.router, prefix="/api/modules/memory")  # Mount the memory router
