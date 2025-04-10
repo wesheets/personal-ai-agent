@@ -207,8 +207,19 @@ class AgentCreateRequest(BaseModel):
 
 # Pydantic model for agent run request
 class AgentRunRequest(BaseModel):
+    """
+    Agent run request model compliant with Promethios SDK Contract v1.0.0
+    
+    This model defines the schema for agent run requests, including task identification,
+    project context, memory tracing, and structured input/output specifications.
+    """
     agent_id: str
-    prompt: str
+    task_id: str  # UUID for task identification
+    project_id: str  # String for project scope
+    memory_trace_id: Optional[str] = None  # String for memory tracing
+    objective: str  # String describing the task objective
+    input_data: Dict[str, Any] = Field(default_factory=dict)  # Object containing input data
+    expected_output_type: Optional[str] = None  # String specifying expected output format
 
 # Pydantic model for agent loop request
 class AgentLoopRequest(BaseModel):
@@ -323,19 +334,28 @@ async def list_agents():
 @router.post("/run")
 async def run_agent(request: Request):
     """
-    Send a prompt to a specific agent and return its LLM-generated response.
+    Send a task to a specific agent and return a structured response compliant with Promethios SDK Contract v1.0.0.
     
-    This endpoint routes the prompt to the LLM provider via LLMEngine and returns
-    the generated response. It can optionally store the result in memory.
+    This endpoint processes structured task payloads, routes them to the LLM provider via LLMEngine,
+    and returns standardized responses with proper metadata. Results are logged to memory for traceability.
     
     Request body:
     - agent_id: ID of the agent to run
-    - prompt: The prompt to send to the agent
+    - task_id: UUID for task identification
+    - project_id: String for project scope
+    - memory_trace_id: (Optional) String for memory tracing
+    - objective: String describing the task objective
+    - input_data: Object containing input data
+    - expected_output_type: (Optional) String specifying expected output format
     
     Returns:
-    - status: "ok" if successful
-    - agent_id: ID of the agent that processed the prompt
-    - response: The LLM-generated response
+    - status: "success" | "error" | "incomplete"
+    - log: String describing the processing result
+    - output: Object containing result_text and other fields
+    - task_id: UUID for task identification
+    - project_id: String for project scope
+    - memory_trace_id: String for memory tracing
+    - contract_version: String indicating SDK contract version
     """
     try:
         # Parse request body
@@ -351,7 +371,11 @@ async def run_agent(request: Request):
                 status_code=404,
                 content={
                     "status": "error",
-                    "message": f"Agent with ID '{run_request.agent_id}' not found"
+                    "log": f"Agent with ID '{run_request.agent_id}' not found",
+                    "task_id": run_request.task_id,
+                    "project_id": run_request.project_id,
+                    "memory_trace_id": run_request.memory_trace_id,
+                    "contract_version": "v1.0.0"
                 }
             )
         
@@ -364,41 +388,89 @@ async def run_agent(request: Request):
         agent_registry[run_request.agent_id]["last_active"] = datetime.utcnow().isoformat()
         save_agent_registry()
         
-        # Format prompt with agent context
-        formatted_prompt = f"[Agent {agent_name}]: {run_request.prompt}"
+        # Format prompt with agent context and objective
+        formatted_prompt = f"[Agent {agent_name}]: {run_request.objective}"
+        
+        # Add input data to prompt if available
+        if run_request.input_data:
+            formatted_prompt += f"\n\nInput data: {json.dumps(run_request.input_data)}"
         
         # Initialize LLM Engine
         llm_engine = LLMEngine()
         
         # Process prompt
-        response = llm_engine.infer(
+        response_text = llm_engine.infer(
             prompt=formatted_prompt,
             model="openai"  # Default model, could be configurable
         )
         
-        # Optional: Store result in memory
-        # This would typically call the memory write endpoint
-        # For now, we'll just log it
-        logger.info(f"Agent {run_request.agent_id} response: {response}")
+        # Check for empty or null response (fallback logic)
+        if not response_text or response_text.strip() == "":
+            status = "incomplete"
+            log_message = "Agent returned empty response"
+            result_text = "No response generated"
+        else:
+            status = "success"
+            log_message = f"Agent {agent_name} generated a response based on the objective"
+            result_text = response_text
+        
+        # Extract summary points if possible (simple implementation)
+        summary_points = []
+        for line in response_text.split('\n'):
+            line = line.strip()
+            if line.startswith('- ') or line.startswith('* '):
+                summary_points.append(line[2:])
+        
+        # Create structured output
+        output = {
+            "result_text": result_text,
+            "summary_points": summary_points
+        }
+        
+        # Store result in memory
+        from app.modules.memory_writer import write_memory
+        memory_id = write_memory(
+            agent_id=run_request.agent_id,
+            type="agent_response",
+            content=result_text,
+            tags=["agent_run", run_request.expected_output_type] if run_request.expected_output_type else ["agent_run"],
+            project_id=run_request.project_id,
+            task_id=run_request.task_id,
+            status=status,
+            task_type="agent_task"
+        )
+        
+        logger.info(f"Agent {run_request.agent_id} response stored with memory_id: {memory_id}")
         
         # Reset agent state to "idle" after run completes
         agent_registry[run_request.agent_id]["agent_state"] = "idle"
         save_agent_registry()
         
-        # Return response
+        # Return structured response according to SDK Contract v1.0.0
         return {
-            "status": "ok",
-            "agent_id": run_request.agent_id,
-            "response": response
+            "status": status,
+            "log": log_message,
+            "output": output,
+            "task_id": run_request.task_id,
+            "project_id": run_request.project_id,
+            "memory_trace_id": run_request.memory_trace_id,
+            "contract_version": "v1.0.0"
         }
     except Exception as e:
         logger.error(f"Error running agent: {str(e)}")
         logger.error(traceback.format_exc())
+        
+        # Return error response in SDK Contract format
         return JSONResponse(
             status_code=500,
             content={
                 "status": "error",
-                "message": f"Failed to run agent: {str(e)}"
+                "log": f"Failed to run agent: {str(e)}",
+                "output": {"result_text": "", "summary_points": []},
+                "task_id": getattr(run_request, "task_id", "unknown"),
+                "project_id": getattr(run_request, "project_id", "unknown"),
+                "memory_trace_id": getattr(run_request, "memory_trace_id", None),
+                "contract_version": "v1.0.0"
             }
         )
 
