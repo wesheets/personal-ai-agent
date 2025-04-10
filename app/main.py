@@ -270,10 +270,12 @@ try:
     print("📡 Including DelegationEngine module router from /api/modules/delegate.py")
     print("📡 Including StreamModule module router from /api/modules/stream.py")
     print("📡 Including TrainingModule module router from /api/modules/train.py")
+    print("📡 Including SystemStatus module router from /api/modules/system.py")
     from app.api.modules import memory  # Import the memory.py route file
     from app.api.modules import delegate  # Import the delegate.py route file
     from app.api.modules import stream  # Import the stream.py route file
     from app.api.modules import train  # Import the train.py route file
+    from app.api.modules import system  # Import the system.py route file
     
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
@@ -284,6 +286,7 @@ try:
     app.include_router(delegate.router, prefix="/api/modules")  # Mount the delegate router
     app.include_router(stream.router, prefix="/api/modules")  # Mount the stream router
     app.include_router(train.router, prefix="/api/modules")  # Mount the train router
+    app.include_router(system.router, prefix="/api/modules/system")  # Mount the system router
     app.include_router(health_router)  # Include health router without prefix
     print("✅ Module routers included")
 
