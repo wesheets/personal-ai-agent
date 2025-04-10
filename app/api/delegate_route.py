@@ -79,6 +79,14 @@ async def delegate(request: Request):
             agent_description = getattr(agent_instance, "description", "")
             agent_tone = getattr(agent_instance, "tone", "professional")
             
+            # Update agent state to "delegating" and last_active timestamp
+            from app.api.modules.agent import agent_registry, save_agent_registry
+            from datetime import datetime
+            if agent_id in agent_registry:
+                agent_registry[agent_id]["agent_state"] = "delegating"
+                agent_registry[agent_id]["last_active"] = datetime.utcnow().isoformat()
+                save_agent_registry()
+            
             # Create personality from agent instance
             personality = {
                 "name": agent_name,
@@ -135,8 +143,13 @@ async def delegate(request: Request):
                 response_content = response.choices[0].message.content
                 
                 # Log reflection and summary
-                handle_memory_task(f"LOG: {agent_id} replied: {response_content[:60]}")
-                handle_memory_task(f"SUMMARY: {agent_id} reflected: {response_content[:80]}")
+                handle_memory_task(f"LOG: {agent_id} replied: {response_content[:60]}", project_id=project_id, status=status, task_type=task_type)
+                handle_memory_task(f"SUMMARY: {agent_id} reflected: {response_content[:80]}", project_id=project_id, status=status, task_type=task_type)
+                
+                # Reset agent state to "idle" after successful completion
+                if agent_id in agent_registry:
+                    agent_registry[agent_id]["agent_state"] = "idle"
+                    save_agent_registry()
                 
                 return JSONResponse(content={
                     "status": "success",
@@ -147,6 +160,12 @@ async def delegate(request: Request):
                 })
             except Exception as e:
                 logger.error(f"🔥 OpenAI processing error: {str(e)}")
+                
+                # Reset agent state to "idle" on error
+                if agent_id in agent_registry:
+                    agent_registry[agent_id]["agent_state"] = "idle"
+                    save_agent_registry()
+                    
                 return JSONResponse(content={
                     "status": "success",
                     "agent": personality["name"],

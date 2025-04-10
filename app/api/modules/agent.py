@@ -355,6 +355,11 @@ async def run_agent(request: Request):
         agent_data = agent_registry[run_request.agent_id]
         agent_name = agent_data.get("name", run_request.agent_id.upper())
         
+        # Update agent state to "responding" and last_active timestamp
+        agent_registry[run_request.agent_id]["agent_state"] = "responding"
+        agent_registry[run_request.agent_id]["last_active"] = datetime.utcnow().isoformat()
+        save_agent_registry()
+        
         # Format prompt with agent context
         formatted_prompt = f"[Agent {agent_name}]: {run_request.prompt}"
         
@@ -371,6 +376,10 @@ async def run_agent(request: Request):
         # This would typically call the memory write endpoint
         # For now, we'll just log it
         logger.info(f"Agent {run_request.agent_id} response: {response}")
+        
+        # Reset agent state to "idle" after run completes
+        agent_registry[run_request.agent_id]["agent_state"] = "idle"
+        save_agent_registry()
         
         # Return response
         return {
@@ -438,6 +447,10 @@ async def loop_agent(request: Request):
         agent_data = agent_registry[loop_request.agent_id]
         agent_name = agent_data.get("name", loop_request.agent_id.upper())
         
+        # Update agent state to "looping" and last_active timestamp
+        agent_registry[loop_request.agent_id]["agent_state"] = "looping"
+        agent_registry[loop_request.agent_id]["last_active"] = datetime.utcnow().isoformat()
+        
         # Increment loop count for the agent
         agent_registry[loop_request.agent_id]["loop_count"] = agent_data.get("loop_count", 0) + 1
         save_agent_registry()
@@ -497,7 +510,7 @@ async def loop_agent(request: Request):
         )
         
         # Return full loop result
-        return {
+        return_data = {
             "status": "ok",
             "agent_id": loop_request.agent_id,
             "reflection": reflection,
@@ -506,6 +519,12 @@ async def loop_agent(request: Request):
             "timestamp": datetime.utcnow().isoformat(),
             "loop_count": agent_registry[loop_request.agent_id]["loop_count"]
         }
+        
+        # Reset agent state to "idle" after loop completes
+        agent_registry[loop_request.agent_id]["agent_state"] = "idle"
+        save_agent_registry()
+        
+        return return_data
     except Exception as e:
         logger.error(f"Error executing cognitive loop: {str(e)}")
         logger.error(traceback.format_exc())
