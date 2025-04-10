@@ -115,14 +115,15 @@ def save_agent_registry():
 load_agent_registry()
 
 # Helper function to load recent memories for an agent
-def load_recent_memories(agent_id: str, memory_limit: int = 5, memory_type: Optional[str] = None) -> List[Dict[str, Any]]:
+def load_recent_memories(agent_id: str, memory_limit: int = 5, memory_type: Optional[str] = None, project_id: Optional[str] = None) -> List[Dict[str, Any]]:
     """
-    Load recent memories for an agent, optionally filtered by type.
+    Load recent memories for an agent, optionally filtered by type and project_id.
     
     Args:
         agent_id: ID of the agent whose memories to load
         memory_limit: Maximum number of memories to load
         memory_type: Optional type of memories to filter by
+        project_id: Optional project_id to filter by
         
     Returns:
         List of memory dictionaries
@@ -133,6 +134,13 @@ def load_recent_memories(agent_id: str, memory_limit: int = 5, memory_type: Opti
     # Apply type filter if provided
     if memory_type:
         filtered_memories = [m for m in filtered_memories if m["type"] == memory_type]
+    
+    # Apply project_id filter if provided
+    if project_id:
+        filtered_memories = [
+            m for m in filtered_memories 
+            if "project_id" in m and m["project_id"] == project_id
+        ]
     
     # Sort by timestamp (newest first)
     filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
@@ -207,6 +215,9 @@ class AgentLoopRequest(BaseModel):
     agent_id: str
     loop_type: Optional[str] = "reflective"  # "reflective", "task", "planning"
     memory_limit: Optional[int] = 5
+    project_id: Optional[str] = None
+    status: Optional[str] = None
+    task_type: Optional[str] = None
 
 # Pydantic model for agent delegation request
 class AgentDelegateRequest(BaseModel):
@@ -394,6 +405,9 @@ async def loop_agent(request: Request):
     - agent_id: ID of the agent to run the cognitive loop for
     - loop_type: (Optional) Type of loop to run ("reflective", "task", "planning")
     - memory_limit: (Optional) Maximum number of memories to include in context
+    - project_id: (Optional) Project ID to scope memory access and storage
+    - status: (Optional) Status of the loop ("in_progress", "completed", "delegated", etc.)
+    - task_type: (Optional) Type of task ("loop", "reflection", "task", "delegate", etc.)
     
     Returns:
     - status: "ok" if successful
@@ -430,9 +444,16 @@ async def loop_agent(request: Request):
         
         # Load recent memories
         memory_limit = loop_request.memory_limit if loop_request.memory_limit is not None else 5
+        
+        # Apply project_id filter if provided
+        project_id_filter = None
+        if hasattr(loop_request, 'project_id') and loop_request.project_id:
+            project_id_filter = loop_request.project_id
+            
         recent_memories = load_recent_memories(
             agent_id=loop_request.agent_id,
-            memory_limit=memory_limit
+            memory_limit=memory_limit,
+            project_id=project_id_filter
         )
         
         # Format memories for reflection
@@ -469,7 +490,10 @@ async def loop_agent(request: Request):
             agent_id=loop_request.agent_id,
             type="cognitive_loop",
             content=loop_summary,
-            tags=["reflection", "planning", loop_request.loop_type]
+            tags=["reflection", "planning", loop_request.loop_type],
+            project_id=loop_request.project_id,
+            status=loop_request.status,
+            task_type=loop_request.task_type if loop_request.task_type else "loop"
         )
         
         # Return full loop result

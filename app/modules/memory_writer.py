@@ -36,14 +36,17 @@ def _save_memories():
 # Load memories on module import
 _load_memories()
 
-def write_memory(agent_id: str, type: str, content: str, tags: list):
+def write_memory(agent_id: str, type: str, content: str, tags: list, project_id: Optional[str] = None, status: Optional[str] = None, task_type: Optional[str] = None):
     memory = {
         "memory_id": str(uuid.uuid4()),
         "agent_id": agent_id,
         "type": type,
         "content": content,
         "tags": tags,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
+        "project_id": project_id,
+        "status": status,
+        "task_type": task_type
     }
     
     # Add to local memory store

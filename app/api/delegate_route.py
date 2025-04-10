@@ -67,6 +67,9 @@ async def delegate(request: Request):
         task_input = body.get("task", {}).get("input", "")
         history = body.get("history", [])
         thread_id = body.get("threadId", str(uuid.uuid4()))
+        project_id = body.get("project_id")
+        status = body.get("status")
+        task_type = body.get("task_type", "delegate")
         
         # Try to get agent from registry first
         agent_instance = get_agent(agent_id)

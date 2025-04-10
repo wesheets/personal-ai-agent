@@ -64,7 +64,7 @@ def parse_log_message(message: str) -> Dict[str, Any]:
     
     return structured_log
 
-def handle_memory_task(task_input: str) -> str:
+def handle_memory_task(task_input: str, project_id: Optional[str] = None, status: Optional[str] = None, task_type: Optional[str] = None) -> str:
     """
     Handle memory-related tasks with structured logging.
     
@@ -80,6 +80,14 @@ def handle_memory_task(task_input: str) -> str:
         
         # Parse the log message to extract structured information
         structured_entry = parse_log_message(entry)
+        
+        # Add project_id, status, and task_type if provided
+        if project_id is not None:
+            structured_entry["project_id"] = project_id
+        if status is not None:
+            structured_entry["status"] = status
+        if task_type is not None:
+            structured_entry["task_type"] = task_type
         
         # Store both the structured entry and the original message for backward compatibility
         structured_entry["raw_message"] = entry
@@ -97,6 +105,14 @@ def handle_memory_task(task_input: str) -> str:
             # Ensure timestamp exists
             if "timestamp" not in structured_entry:
                 structured_entry["timestamp"] = datetime.datetime.now().isoformat()
+            
+            # Add project_id, status, and task_type if provided
+            if project_id is not None:
+                structured_entry["project_id"] = project_id
+            if status is not None:
+                structured_entry["status"] = status
+            if task_type is not None:
+                structured_entry["task_type"] = task_type
                 
             # Store the structured entry
             memory_log.append(structured_entry)

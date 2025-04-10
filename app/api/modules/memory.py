@@ -11,6 +11,9 @@ class MemoryEntry(BaseModel):
     memory_type: str
     content: str
     tags: List[str] = []
+    project_id: Optional[str] = None
+    status: Optional[str] = None
+    task_type: Optional[str] = None
 
 class ReflectionRequest(BaseModel):
     agent_id: str
@@ -25,6 +28,7 @@ class SummarizeRequest(BaseModel):
 class ThreadRequest(BaseModel):
     agent_id: str
     limit: Optional[int] = 100
+    project_id: Optional[str] = None
 
 class SearchRequest(BaseModel):
     agent_id: str
@@ -32,6 +36,7 @@ class SearchRequest(BaseModel):
     role: Optional[str] = None
     memory_type: Optional[str] = None
     limit: Optional[int] = 25
+    project_id: Optional[str] = None
 
 router = APIRouter()
 
@@ -45,7 +50,10 @@ async def memory_write(request: Request):
             agent_id=memory_entry.agent_id,
             type=memory_entry.memory_type,  # Pass memory_type to type parameter
             content=memory_entry.content,
-            tags=memory_entry.tags
+            tags=memory_entry.tags,
+            project_id=memory_entry.project_id,
+            status=memory_entry.status,
+            task_type=memory_entry.task_type
         )
         return JSONResponse(status_code=200, content={"status": "ok", "memory_id": memory["memory_id"]})
     except Exception as e:
@@ -204,6 +212,7 @@ async def memory_thread_endpoint(request: Request):
     Request body:
     - agent_id: ID of the agent whose memory thread to retrieve
     - limit: (Optional) Maximum number of memories to return, default is 100
+    - project_id: (Optional) Filter by project_id
     
     Returns:
     - status: "ok" if successful
@@ -218,6 +227,13 @@ async def memory_thread_endpoint(request: Request):
         # Filter memories by agent_id
         filtered_memories = [m for m in memory_store if m["agent_id"] == thread_request.agent_id]
         
+        # Apply project_id filter if provided
+        if thread_request.project_id:
+            filtered_memories = [
+                m for m in filtered_memories 
+                if "project_id" in m and m["project_id"] == thread_request.project_id
+            ]
+        
         # Transform memories to the expected format
         memory_thread = []
         for memory in filtered_memories:
@@ -228,7 +244,10 @@ async def memory_thread_endpoint(request: Request):
             thread_entry = {
                 "timestamp": memory["timestamp"],
                 "role": role,
-                "content": memory["content"]
+                "content": memory["content"],
+                "project_id": memory.get("project_id"),
+                "status": memory.get("status"),
+                "task_type": memory.get("task_type")
             }
             memory_thread.append(thread_entry)
         
@@ -243,6 +262,7 @@ async def memory_thread_endpoint(request: Request):
         return {
             "status": "ok",
             "agent_id": thread_request.agent_id,
+            "project_id": thread_request.project_id,
             "memory_thread": memory_thread
         }
     except Exception as e:
@@ -255,7 +275,7 @@ async def memory_search_endpoint(request: Request):
     Search an agent's memory for matching entries based on keywords, tags, roles, or memory type.
     
     This endpoint searches the content of memories for the specified agent and returns
-    matches based on the provided query, optionally filtered by role and memory type.
+    matches based on the provided query, optionally filtered by role, memory type, and project_id.
     
     Request body:
     - agent_id: ID of the agent whose memories to search
@@ -263,6 +283,7 @@ async def memory_search_endpoint(request: Request):
     - role: (Optional) Filter by role (e.g., "user", "hal")
     - memory_type: (Optional) Filter by memory type
     - limit: (Optional) Maximum number of results to return, default is 25
+    - project_id: (Optional) Filter by project_id
     
     Returns:
     - status: "ok" if successful
@@ -294,6 +315,13 @@ async def memory_search_endpoint(request: Request):
         if search_request.memory_type:
             filtered_memories = [m for m in filtered_memories if m["type"] == search_request.memory_type]
         
+        # Apply project_id filter if provided
+        if search_request.project_id:
+            filtered_memories = [
+                m for m in filtered_memories 
+                if "project_id" in m and m["project_id"] == search_request.project_id
+            ]
+        
         # Sort by timestamp (newest first)
         filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
         
@@ -312,7 +340,10 @@ async def memory_search_endpoint(request: Request):
                 "timestamp": memory["timestamp"],
                 "role": role,
                 "memory_type": memory["type"],
-                "content": memory["content"]
+                "content": memory["content"],
+                "project_id": memory.get("project_id"),
+                "status": memory.get("status"),
+                "task_type": memory.get("task_type")
             }
             results.append(result_entry)
         

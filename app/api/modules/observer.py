@@ -8,6 +8,7 @@ from datetime import datetime
 class ReportRequest(BaseModel):
     agent_id: str
     limit: int = 5
+    project_id: Optional[str] = None
 
 router = APIRouter()
 
@@ -22,6 +23,7 @@ async def observer_report(request: Request):
     Request body:
     - agent_id: ID of the agent whose actions to report
     - limit: (Optional) Maximum number of actions to include, default is 5
+    - project_id: (Optional) Filter by project_id
     
     Returns:
     - status: "ok" if successful
@@ -35,7 +37,7 @@ async def observer_report(request: Request):
         report_request = ReportRequest(**body)
         
         # Get agent actions from memory store
-        agent_actions = get_agent_actions(report_request.agent_id, report_request.limit)
+        agent_actions = get_agent_actions(report_request.agent_id, report_request.limit, report_request.project_id)
         
         # Generate summary
         summary = generate_action_summary(report_request.agent_id, agent_actions)
@@ -54,13 +56,14 @@ async def observer_report(request: Request):
         print(f"❌ Observer Report error: {str(e)}")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
-def get_agent_actions(agent_id: str, limit: int) -> List[Dict[str, Any]]:
+def get_agent_actions(agent_id: str, limit: int, project_id: Optional[str] = None) -> List[Dict[str, Any]]:
     """
     Retrieve recent actions for the specified agent from the memory store.
     
     Args:
         agent_id: ID of the agent whose actions to retrieve
         limit: Maximum number of actions to retrieve
+        project_id: Optional project_id to filter by
         
     Returns:
         List of action entries with type, result, and timestamp
@@ -70,6 +73,13 @@ def get_agent_actions(agent_id: str, limit: int) -> List[Dict[str, Any]]:
     
     # Filter memories by agent_id
     agent_memories = [m for m in memory_store if m["agent_id"] == agent_id]
+    
+    # Apply project_id filter if provided
+    if project_id:
+        agent_memories = [
+            m for m in agent_memories 
+            if "project_id" in m and m["project_id"] == project_id
+        ]
     
     # Sort by timestamp (newest first)
     agent_memories.sort(key=lambda m: m["timestamp"], reverse=True)
