@@ -83,6 +83,13 @@ load_training_queue()
 
 # Pydantic model for training request
 class TrainingRequest(BaseModel):
+    """
+    Training request model compliant with Promethios SDK Contract v1.0.0
+    
+    This model defines the schema for training requests, including agent identification,
+    project context, task tracking, persona customization, knowledge domain categorization,
+    and access control.
+    """
     agent_id: str
     dataset: List[Dict[str, Any]]
     goal: str
@@ -91,9 +98,42 @@ class TrainingRequest(BaseModel):
     repeat_interval: Optional[str] = None
     preview: Optional[bool] = False
     staged: Optional[bool] = False
+    
+    # SDK Contract v1.0.0 fields
+    project_id: Optional[str] = None
+    task_id: Optional[str] = None
+    memory_trace_id: Optional[str] = None
+    persona_profile: Optional[str] = None
+    knowledge_domain: Optional[str] = None
+    access_permissions: Optional[List[str]] = None
 
 # Function to generate memory entries from dataset
-def generate_memory_entries(agent_id: str, dataset: List[Dict[str, Any]]):
+def generate_memory_entries(
+    agent_id: str, 
+    dataset: List[Dict[str, Any]], 
+    project_id: Optional[str] = None,
+    task_id: Optional[str] = None,
+    memory_trace_id: Optional[str] = None,
+    persona_profile: Optional[str] = None,
+    knowledge_domain: Optional[str] = None,
+    access_permissions: Optional[List[str]] = None
+):
+    """
+    Generate memory entries from training dataset with SDK Contract v1.0.0 support
+    
+    Args:
+        agent_id: Identifier for the agent
+        dataset: List of data items to be converted to memory entries
+        project_id: Optional project context identifier
+        task_id: Optional task identifier
+        memory_trace_id: Optional memory trace identifier for linking related memories
+        persona_profile: Optional persona/tone metadata for the agent
+        knowledge_domain: Optional knowledge domain categorization
+        access_permissions: Optional list of agents/users with access permissions
+        
+    Returns:
+        Tuple containing list of memory entries and total word count
+    """
     memory_entries = []
     total_words = 0
     
@@ -102,11 +142,25 @@ def generate_memory_entries(agent_id: str, dataset: List[Dict[str, Any]]):
         memory_entry = {
             "memory_id": str(uuid.uuid4()),
             "agent_id": agent_id,
-            "type": item.get("type", "training"),
+            "type": "training",  # Ensure memory_type is always "training" per SDK Contract
             "content": item.get("content", ""),
             "tags": item.get("tags", []),
             "timestamp": item.get("timestamp", datetime.now().isoformat())
         }
+        
+        # Add SDK Contract v1.0.0 fields if provided
+        if project_id:
+            memory_entry["project_id"] = project_id
+        if task_id:
+            memory_entry["task_id"] = task_id
+        if memory_trace_id:
+            memory_entry["memory_trace_id"] = memory_trace_id
+        if persona_profile:
+            memory_entry["persona_profile"] = persona_profile
+        if knowledge_domain:
+            memory_entry["knowledge_domain"] = knowledge_domain
+        if access_permissions:
+            memory_entry["access_permissions"] = access_permissions
         
         # Count words in content
         if "content" in item:
@@ -167,13 +221,35 @@ async def train_agent(
     request: TrainingRequest,
     preview: Optional[bool] = Query(None)
 ):
+    """
+    Train an agent with dataset and metadata compliant with Promethios SDK Contract v1.0.0
+    
+    This endpoint processes training requests, stores training data in memory with
+    appropriate metadata, and returns a structured response with tracking information.
+    
+    Args:
+        request: Training request containing dataset and metadata
+        preview: Optional query parameter to preview memory entries without saving
+        
+    Returns:
+        JSON response with status, memory_id, and metadata according to SDK Contract
+    """
     try:
         # Use query parameter if provided, otherwise use body parameter
         is_preview = preview if preview is not None else request.preview
         is_staged = request.staged
         
-        # Generate memory entries from dataset
-        memory_entries, total_words = generate_memory_entries(request.agent_id, request.dataset)
+        # Generate memory entries from dataset with SDK Contract v1.0.0 fields
+        memory_entries, total_words = generate_memory_entries(
+            agent_id=request.agent_id, 
+            dataset=request.dataset,
+            project_id=request.project_id,
+            task_id=request.task_id,
+            memory_trace_id=request.memory_trace_id,
+            persona_profile=request.persona_profile,
+            knowledge_domain=request.knowledge_domain,
+            access_permissions=request.access_permissions
+        )
         
         # Create training log entry
         training_log_id = str(uuid.uuid4())
@@ -188,6 +264,20 @@ async def train_agent(
             "timestamp": timestamp,
             "total_words": total_words
         }
+        
+        # Add SDK Contract v1.0.0 fields to training log
+        if request.project_id:
+            training_log["project_id"] = request.project_id
+        if request.task_id:
+            training_log["task_id"] = request.task_id
+        if request.memory_trace_id:
+            training_log["memory_trace_id"] = request.memory_trace_id
+        if request.persona_profile:
+            training_log["persona_profile"] = request.persona_profile
+        if request.knowledge_domain:
+            training_log["knowledge_domain"] = request.knowledge_domain
+        if request.access_permissions:
+            training_log["access_permissions"] = request.access_permissions
         
         # Add scheduled training fields if provided
         if request.repeat_interval:
@@ -214,7 +304,10 @@ async def train_agent(
                 "memory_entries": memory_entries,
                 "estimated_chunks": len(memory_entries),
                 "total_words": total_words,
-                "tags": request.tags
+                "tags": request.tags,
+                "project_id": request.project_id,
+                "task_id": request.task_id,
+                "memory_trace_id": request.memory_trace_id
             }
         
         # If staged mode, save to training queue
@@ -229,6 +322,20 @@ async def train_agent(
                 "memory_preview": memory_entries[:5]  # Include first 5 memories as preview
             }
             
+            # Add SDK Contract v1.0.0 fields to queue item
+            if request.project_id:
+                queue_item["project_id"] = request.project_id
+            if request.task_id:
+                queue_item["task_id"] = request.task_id
+            if request.memory_trace_id:
+                queue_item["memory_trace_id"] = request.memory_trace_id
+            if request.persona_profile:
+                queue_item["persona_profile"] = request.persona_profile
+            if request.knowledge_domain:
+                queue_item["knowledge_domain"] = request.knowledge_domain
+            if request.access_permissions:
+                queue_item["access_permissions"] = request.access_permissions
+            
             training_queue.append(queue_item)
             save_training_queue()
             
@@ -236,25 +343,35 @@ async def train_agent(
             training_logs.append(training_log)
             save_training_logs()
             
+            # Return SDK Contract v1.0.0 compliant response
             return {
                 "status": "staged",
-                "training_log_id": training_log_id,
+                "memory_id": training_log_id,
                 "agent_id": request.agent_id,
-                "queued_memories": len(memory_entries),
-                "message": "Training data staged for later execution"
+                "task_id": request.task_id,
+                "project_id": request.project_id,
+                "memory_trace_id": request.memory_trace_id,
+                "log": "Training data staged for later execution"
             }
         
         # Otherwise, inject memories using memory_writer
         from app.modules.memory_writer import write_memory
         
         # Write each memory entry to both local and shared memory store
+        memory_ids = []
         for memory_entry in memory_entries:
-            write_memory(
+            # Extract fields for write_memory function
+            memory_id = write_memory(
                 agent_id=memory_entry["agent_id"],
                 type=memory_entry["type"],
                 content=memory_entry["content"],
-                tags=memory_entry["tags"]
+                tags=memory_entry["tags"],
+                project_id=memory_entry.get("project_id"),
+                task_id=memory_entry.get("task_id"),
+                status=None,
+                task_type=None
             )
+            memory_ids.append(memory_id)
             
         print(f"🧠 Training agent {request.agent_id} with {len(memory_entries)} memories written to memory stores")
         
@@ -269,12 +386,14 @@ async def train_agent(
             training_log["summary"] = reflection_result
             save_training_logs()
         
+        # Return SDK Contract v1.0.0 compliant response
         return {
-            "status": "ok",
-            "training_log_id": training_log_id,
-            "agent_id": request.agent_id,
-            "memories_written": len(memory_entries),
-            "reflection": reflection_result
+            "status": "success",
+            "memory_id": memory_ids[0] if memory_ids else training_log_id,
+            "task_id": request.task_id,
+            "project_id": request.project_id,
+            "memory_trace_id": request.memory_trace_id,
+            "log": f"Memory stored with domain and persona metadata"
         }
     except Exception as e:
         logger.error(f"Error training agent: {str(e)}")
@@ -283,7 +402,10 @@ async def train_agent(
             status_code=500,
             content={
                 "status": "error",
-                "message": f"Failed to train agent: {str(e)}"
+                "message": f"Failed to train agent: {str(e)}",
+                "task_id": getattr(request, "task_id", None),
+                "project_id": getattr(request, "project_id", None),
+                "memory_trace_id": getattr(request, "memory_trace_id", None)
             }
         )
 
