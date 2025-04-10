@@ -218,6 +218,10 @@ class AgentLoopRequest(BaseModel):
     project_id: Optional[str] = None
     status: Optional[str] = None
     task_type: Optional[str] = None
+    task_id: Optional[str] = None
+    memory_trace_id: Optional[str] = None
+    max_cycles: Optional[int] = 1
+    exit_conditions: Optional[List[str]] = []
 
 # Pydantic model for agent delegation request
 class AgentDelegateRequest(BaseModel):
@@ -408,7 +412,7 @@ async def loop_agent(request: Request):
     2. Summarize relevant entries
     3. Generate a plan
     4. Write new memory
-    5. Optionally return planned next step
+    5. Return structured result according to SDK Contract v1.0.0
     
     Request body:
     - agent_id: ID of the agent to run the cognitive loop for
@@ -417,13 +421,20 @@ async def loop_agent(request: Request):
     - project_id: (Optional) Project ID to scope memory access and storage
     - status: (Optional) Status of the loop ("in_progress", "completed", "delegated", etc.)
     - task_type: (Optional) Type of task ("loop", "reflection", "task", "delegate", etc.)
+    - task_id: (Optional) UUID for task identification
+    - memory_trace_id: (Optional) String for memory tracing
+    - max_cycles: (Optional) Maximum number of loop cycles to execute
+    - exit_conditions: (Optional) Array of conditions that will terminate the loop
     
     Returns:
-    - status: "ok" if successful
-    - agent_id: ID of the agent that executed the loop
-    - reflection: Generated reflection on recent memories
-    - plan: Generated plan for next actions
-    - written_memory_id: ID of the memory entry created for this loop
+    - status: "success" | "error" | "incomplete"
+    - loop_summary: String summarizing the loop
+    - loop_result: String containing the result
+    - cycle_number: Integer tracking loop count
+    - memory_id: ID of the memory entry created for this loop
+    - task_id: UUID for task identification
+    - project_id: String for project scope
+    - memory_trace_id: String for memory tracing
     """
     try:
         # Parse request body
@@ -454,6 +465,37 @@ async def loop_agent(request: Request):
         # Increment loop count for the agent
         agent_registry[loop_request.agent_id]["loop_count"] = agent_data.get("loop_count", 0) + 1
         save_agent_registry()
+        
+        # Check if max_cycles has been reached
+        current_cycle = agent_registry[loop_request.agent_id]["loop_count"]
+        if loop_request.max_cycles and current_cycle > loop_request.max_cycles:
+            # Reset agent state to "idle" after loop completes
+            agent_registry[loop_request.agent_id]["agent_state"] = "idle"
+            save_agent_registry()
+            
+            return {
+                "status": "incomplete",
+                "loop_summary": "Maximum cycle count reached",
+                "loop_result": "Loop terminated due to max_cycles limit",
+                "cycle_number": current_cycle,
+                "memory_id": "",
+                "task_id": loop_request.task_id if loop_request.task_id else str(uuid.uuid4()),
+                "project_id": loop_request.project_id if loop_request.project_id else "",
+                "memory_trace_id": loop_request.memory_trace_id if loop_request.memory_trace_id else ""
+            }
+        
+        # Check for exit conditions (stub implementation for now)
+        if loop_request.exit_conditions and len(loop_request.exit_conditions) > 0:
+            # In a real implementation, we would check each condition against the current state
+            # For now, we'll just log that exit conditions were provided
+            logger.info(f"Exit conditions provided: {loop_request.exit_conditions}")
+            
+            # Example of how exit condition checking might work:
+            # for condition in loop_request.exit_conditions:
+            #     if condition == "goal_achieved" and some_goal_check():
+            #         return exit_response_with_success()
+            #     elif condition == "max_time_reached" and time_limit_exceeded():
+            #         return exit_response_with_incomplete()
         
         # Load recent memories
         memory_limit = loop_request.memory_limit if loop_request.memory_limit is not None else 5
@@ -501,23 +543,24 @@ async def loop_agent(request: Request):
         loop_summary = f"Reflection: {reflection}\n\nPlan: {plan}"
         memory = write_memory(
             agent_id=loop_request.agent_id,
-            type="cognitive_loop",
-            content=loop_summary,
+            type="loop_snapshot",
+            content=f"{agent_name} completed a loop: {reflection[:100]}... and planned {plan[:100]}...",
             tags=["reflection", "planning", loop_request.loop_type],
             project_id=loop_request.project_id,
-            status=loop_request.status,
+            status=loop_request.status if loop_request.status else "success",
             task_type=loop_request.task_type if loop_request.task_type else "loop"
         )
         
-        # Return full loop result
+        # Return full loop result with structured format according to SDK Contract v1.0.0
         return_data = {
-            "status": "ok",
-            "agent_id": loop_request.agent_id,
-            "reflection": reflection,
-            "plan": plan,
-            "written_memory_id": memory["memory_id"],
-            "timestamp": datetime.utcnow().isoformat(),
-            "loop_count": agent_registry[loop_request.agent_id]["loop_count"]
+            "status": "success",
+            "loop_summary": reflection,
+            "loop_result": plan,
+            "cycle_number": agent_registry[loop_request.agent_id]["loop_count"],
+            "memory_id": memory["memory_id"],
+            "task_id": loop_request.task_id if loop_request.task_id else str(uuid.uuid4()),
+            "project_id": loop_request.project_id if loop_request.project_id else "",
+            "memory_trace_id": loop_request.memory_trace_id if loop_request.memory_trace_id else memory["memory_id"]
         }
         
         # Reset agent state to "idle" after loop completes
