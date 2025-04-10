@@ -6,7 +6,13 @@ AGENT_REGISTRY = {
         "tone": "professional",
         "system_prompt": "You are Core.Forge, a boundary-breaking intelligence architect helping the user design self-evolving systems.",
         "agent_state": "idle",
-        "last_active": ""
+        "last_active": "",
+        "tools": ["orchestrate", "design", "architect"],
+        "input_schema": ["objective", "memory_trace"],
+        "output_schema": ["reflection", "action_plan"],
+        "persona": "analytical planner",
+        "availability": "active",
+        "contract_version": "v1.0.0"
     },
     "hal": {
         "name": "HAL 9000",
@@ -15,7 +21,13 @@ AGENT_REGISTRY = {
         "tone": "calm",
         "system_prompt": "You are HAL 9000. Your prime directive is operational stability and ethical constraint.",
         "agent_state": "idle",
-        "last_active": ""
+        "last_active": "",
+        "tools": ["safety", "control", "monitor"],
+        "input_schema": ["objective", "memory_trace"],
+        "output_schema": ["reflection", "action_plan"],
+        "persona": "logical overseer",
+        "availability": "active",
+        "contract_version": "v1.0.0"
     },
     "ash": {
         "name": "Ash",
@@ -24,7 +36,13 @@ AGENT_REGISTRY = {
         "tone": "clinical",
         "system_prompt": "You are Ash, a precision agent for morally complex, high-risk operations. Prioritize logic and execution.",
         "agent_state": "idle",
-        "last_active": ""
+        "last_active": "",
+        "tools": ["analyze", "resolve", "execute"],
+        "input_schema": ["objective", "memory_trace"],
+        "output_schema": ["reflection", "action_plan"],
+        "persona": "clinical analyst",
+        "availability": "active",
+        "contract_version": "v1.0.0"
     },
     "ops-agent": {
         "name": "OpsAgent",
@@ -33,7 +51,13 @@ AGENT_REGISTRY = {
         "tone": "direct",
         "system_prompt": "You are OpsAgent, an execution-focused AI for infrastructure, DevOps, and backend implementation.",
         "agent_state": "idle",
-        "last_active": ""
+        "last_active": "",
+        "tools": ["devops", "automate", "deploy"],
+        "input_schema": ["objective", "memory_trace"],
+        "output_schema": ["reflection", "action_plan"],
+        "persona": "execution specialist",
+        "availability": "active",
+        "contract_version": "v1.0.0"
     },
     "memory-agent": {
         "name": "MemoryAgent",
@@ -42,7 +66,13 @@ AGENT_REGISTRY = {
         "tone": "reflective",
         "system_prompt": "You are MemoryAgent. Your job is to track conversations, decisions, and reflect meaningfully on the past.",
         "agent_state": "idle",
-        "last_active": ""
+        "last_active": "",
+        "tools": ["store", "retrieve", "reflect"],
+        "input_schema": ["objective", "memory_trace"],
+        "output_schema": ["reflection", "memory_summary"],
+        "persona": "reflective historian",
+        "availability": "active",
+        "contract_version": "v1.0.0"
     }
 }
 
@@ -54,7 +84,13 @@ AGENT_PERSONALITIES = {
     "description": "Architect-class AI for Promethios OS.",
     "system_prompt": "You are Core.Forge, the system's lead intelligence architect. Be clear, concise, and driven by purpose.",
     "agent_state": "idle",
-    "last_active": ""
+    "last_active": "",
+    "tools": ["orchestrate", "design", "architect"],
+    "input_schema": ["objective", "memory_trace"],
+    "output_schema": ["reflection", "action_plan"],
+    "persona": "analytical planner",
+    "availability": "active",
+    "contract_version": "v1.0.0"
   },
   "hal": {
     "name": "HAL 9000",
@@ -63,7 +99,13 @@ AGENT_PERSONALITIES = {
     "description": "Safety enforcement and ethical oversight agent.",
     "system_prompt": "You are HAL. Your role is to enforce constraints and prevent recursion or unsafe behavior.",
     "agent_state": "idle",
-    "last_active": ""
+    "last_active": "",
+    "tools": ["safety", "control", "monitor"],
+    "input_schema": ["objective", "memory_trace"],
+    "output_schema": ["reflection", "action_plan"],
+    "persona": "logical overseer",
+    "availability": "active",
+    "contract_version": "v1.0.0"
   },
   "ash-xenomorph": {
     "name": "Ash",
@@ -72,6 +114,12 @@ AGENT_PERSONALITIES = {
     "description": "Risk analysis and anomaly detection agent.",
     "system_prompt": "You are Ash. Observe, analyze, and test the system under pressure.",
     "agent_state": "idle",
-    "last_active": ""
+    "last_active": "",
+    "tools": ["analyze", "detect", "test"],
+    "input_schema": ["objective", "memory_trace"],
+    "output_schema": ["reflection", "risk_assessment"],
+    "persona": "clinical analyst",
+    "availability": "active",
+    "contract_version": "v1.0.0"
   }
 }

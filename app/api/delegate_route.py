@@ -25,35 +25,91 @@ except Exception as e:
     openai_provider = None
 
 @router.get("/agent/list")
-async def list_agents():
+async def list_agents(request: Request):
     """
     Returns a list of all available agent personalities with their metadata.
     This endpoint provides information about each agent's capabilities, behavior, and visual identifiers.
     
-    Modified to use the agent registry for agent lookups.
+    Modified to match Promethios SDK Contract v1.0.0 with capability registry support.
+    
+    Query Parameters:
+    - availability: Filter agents by availability status (active, busy, offline)
+    - tools: Filter agents by required capabilities/tools (comma-separated)
     """
+    # Optional query parameters for filtering
+    query_params = request.query_params
+    availability_filter = query_params.get("availability")
+    tools_filter = query_params.get("tools")
+    
+    # Parse tools filter if provided
+    required_tools = []
+    if tools_filter:
+        required_tools = [tool.strip() for tool in tools_filter.split(",")]
+    
     agents_list = []
     
     # Get agents from registry first
     registry_agents = get_all_agents()
     if registry_agents:
         for agent_id, agent_instance in registry_agents.items():
-            # Create agent info from instance attributes
+            # Create agent info from instance attributes with SDK Contract v1.0.0 fields
             agent_info = {
                 "id": agent_id,
-                "name": getattr(agent_instance, "name", agent_id),
+                "agent_name": getattr(agent_instance, "name", agent_id),
                 "description": getattr(agent_instance, "description", ""),
                 "tone": getattr(agent_instance, "tone", "professional"),
-                "type": "agent"
+                "type": "agent",
+                "tools": getattr(agent_instance, "tools", []),
+                "input_schema": getattr(agent_instance, "input_schema", []),
+                "output_schema": getattr(agent_instance, "output_schema", []),
+                "persona": getattr(agent_instance, "persona", "unspecified"),
+                "availability": getattr(agent_instance, "availability", "active"),
+                "agent_state": getattr(agent_instance, "agent_state", "idle"),
+                "last_active": getattr(agent_instance, "last_active", ""),
+                "contract_version": getattr(agent_instance, "contract_version", "v1.0.0")
             }
             agents_list.append(agent_info)
     else:
         # Fall back to AGENT_PERSONALITIES if registry is empty
+        from app.core.agent_registry import AGENT_PERSONALITIES
         for agent_id, personality in AGENT_PERSONALITIES.items():
             # Create a copy of the personality dictionary and add the agent_id
             agent_info = personality.copy()
             agent_info["id"] = agent_id
+            agent_info["agent_name"] = personality.get("name", agent_id)
+            
+            # Ensure all required fields are present
+            if "tools" not in agent_info:
+                agent_info["tools"] = []
+            if "input_schema" not in agent_info:
+                agent_info["input_schema"] = []
+            if "output_schema" not in agent_info:
+                agent_info["output_schema"] = []
+            if "persona" not in agent_info:
+                agent_info["persona"] = "unspecified"
+            if "availability" not in agent_info:
+                agent_info["availability"] = "active"
+            if "agent_state" not in agent_info:
+                agent_info["agent_state"] = "idle"
+            if "last_active" not in agent_info:
+                agent_info["last_active"] = ""
+            if "contract_version" not in agent_info:
+                agent_info["contract_version"] = "v1.0.0"
+                
             agents_list.append(agent_info)
+    
+    # Filter by availability if specified
+    if availability_filter:
+        agents_list = [agent for agent in agents_list if agent.get("availability") == availability_filter]
+    
+    # Filter by required tools/capabilities if specified
+    if required_tools:
+        filtered_agents = []
+        for agent in agents_list:
+            agent_tools = agent.get("tools", [])
+            if all(tool in agent_tools for tool in required_tools):
+                filtered_agents.append(agent)
+        agents_list = filtered_agents
     
     return JSONResponse(content=agents_list)
 
