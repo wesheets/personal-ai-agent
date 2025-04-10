@@ -273,6 +273,7 @@ try:
     print("📡 Including SystemStatus module router from /api/modules/system.py")
     print("📡 Including ObserverModule module router from /api/modules/observer.py")
     print("📡 Including AgentContext module router from /api/modules/agent_context.py")
+    print("📡 Including PlanGenerator module router from /api/modules/plan.py")
     from app.api.modules import memory  # Import the memory.py route file
     from app.api.modules import delegate  # Import the delegate.py route file
     from app.api.modules import stream  # Import the stream.py route file
@@ -280,6 +281,7 @@ try:
     from app.api.modules import system  # Import the system.py route file
     from app.api.modules import observer  # Import the observer.py route file
     from app.api.modules import agent_context  # Import the agent_context.py route file
+    from app.api.modules import plan  # Import the plan.py route file
     
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
@@ -293,6 +295,7 @@ try:
     app.include_router(system.router, prefix="/api/modules/system")  # Mount the system router
     app.include_router(observer.router, prefix="/api/modules")  # Mount the observer router
     app.include_router(agent_context.router, prefix="/api/modules")  # Mount the agent context router
+    app.include_router(plan.router, prefix="/api/modules")  # Mount the plan generator router
     app.include_router(health_router)  # Include health router without prefix
     print("✅ Module routers included")
 
