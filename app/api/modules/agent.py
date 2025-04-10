@@ -10,13 +10,17 @@ print("📁 Loaded: agent.py (AgentRunner route file)")
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import logging
 import traceback
 import os
 import time
 import json
 from datetime import datetime
+import uuid
+
+# Import memory-related functions
+from app.modules.memory_writer import write_memory, memory_store, generate_reflection
 
 # Configure logging
 logger = logging.getLogger("api.modules.agent")
@@ -26,6 +30,7 @@ router = APIRouter(prefix="/modules/agent", tags=["Agent Modules"])
 print("🧠 Route defined: /api/modules/agent/run -> run_agent_endpoint")
 print("🧠 Route defined: /api/modules/agent/create -> create_agent_endpoint")
 print("🧠 Route defined: /api/modules/agent/list -> list_agents_endpoint")
+print("🧠 Route defined: /api/modules/agent/loop -> loop_agent_endpoint")
 
 # Initialize agent registry
 agent_registry = {}
@@ -40,14 +45,16 @@ DEFAULT_AGENTS = {
         "traits": ["helpful", "analytical", "logical"],
         "name": "HAL",
         "created_at": "2025-04-10T11:34:22Z",
-        "modules": ["memory", "reflection", "loop"]
+        "modules": ["memory", "reflection", "loop"],
+        "loop_count": 0  # Track number of cognitive loops executed
     },
     "ash": {
         "description": "ASH is a specialized science assistant",
         "traits": ["scientific", "precise", "methodical"],
         "name": "ASH",
         "created_at": "2025-04-09T17:12:01Z",
-        "modules": ["memory", "delegate"]
+        "modules": ["memory", "delegate"],
+        "loop_count": 0  # Track number of cognitive loops executed
     }
 }
 
@@ -82,6 +89,10 @@ def ensure_core_agents_exist():
             print(f"⚠️ Core agent {agent_id} not found in registry, adding it")
             agent_registry[agent_id] = agent_data
             registry_modified = True
+        elif "loop_count" not in agent_registry[agent_id]:
+            # Add loop_count if it doesn't exist
+            agent_registry[agent_id]["loop_count"] = 0
+            registry_modified = True
     
     if registry_modified:
         save_agent_registry()
@@ -101,6 +112,35 @@ def save_agent_registry():
 
 # Load agents on module import
 load_agent_registry()
+
+# Helper function to load recent memories for an agent
+def load_recent_memories(agent_id: str, memory_limit: int = 5, memory_type: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    Load recent memories for an agent, optionally filtered by type.
+    
+    Args:
+        agent_id: ID of the agent whose memories to load
+        memory_limit: Maximum number of memories to load
+        memory_type: Optional type of memories to filter by
+        
+    Returns:
+        List of memory dictionaries
+    """
+    # Filter memories by agent_id
+    filtered_memories = [m for m in memory_store if m["agent_id"] == agent_id]
+    
+    # Apply type filter if provided
+    if memory_type:
+        filtered_memories = [m for m in filtered_memories if m["type"] == memory_type]
+    
+    # Sort by timestamp (newest first)
+    filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
+    
+    # Apply limit
+    if memory_limit and memory_limit > 0:
+        filtered_memories = filtered_memories[:memory_limit]
+    
+    return filtered_memories
 
 # Simple LLM Engine for agent execution
 class LLMEngine:
@@ -132,6 +172,12 @@ class LLMEngine:
         if "last" in prompt.lower() and "memories" in prompt.lower():
             return "Your last memories include implementing search functionality, adding system status endpoints, and creating agent registry features."
         
+        if "reflect" in prompt.lower() and "actions" in prompt.lower():
+            return "You've been focused on implementing API endpoints for the personal-ai-agent project, including memory search, agent registry fixes, and system status reporting."
+        
+        if "plan" in prompt.lower() and "next" in prompt.lower():
+            return "You should generate a system summary log and implement the cognitive loop functionality to enable autonomous agent operation."
+        
         if "hello" in prompt.lower() or "hi" in prompt.lower():
             return "Hello! I'm your AI assistant. How can I help you today?"
         
@@ -155,6 +201,12 @@ class AgentRunRequest(BaseModel):
     agent_id: str
     prompt: str
 
+# Pydantic model for agent loop request
+class AgentLoopRequest(BaseModel):
+    agent_id: str
+    loop_type: Optional[str] = "reflective"  # "reflective", "task", "planning"
+    memory_limit: Optional[int] = 5
+
 @router.post("/create")
 async def create_agent(agent: AgentCreateRequest):
     try:
@@ -173,7 +225,8 @@ async def create_agent(agent: AgentCreateRequest):
             "description": agent.description,
             "traits": agent.traits,
             "created_at": datetime.utcnow().isoformat(),
-            "modules": ["memory"]  # Default module
+            "modules": ["memory"],  # Default module
+            "loop_count": 0  # Initialize loop count
         }
         
         # Save to disk
@@ -314,5 +367,120 @@ async def run_agent(request: Request):
             content={
                 "status": "error",
                 "message": f"Failed to run agent: {str(e)}"
+            }
+        )
+
+@router.post("/loop")
+async def loop_agent(request: Request):
+    """
+    Execute a full cognitive loop cycle for a given agent.
+    
+    This endpoint performs the following steps:
+    1. Reflect on memory
+    2. Summarize relevant entries
+    3. Generate a plan
+    4. Write new memory
+    5. Optionally return planned next step
+    
+    Request body:
+    - agent_id: ID of the agent to run the cognitive loop for
+    - loop_type: (Optional) Type of loop to run ("reflective", "task", "planning")
+    - memory_limit: (Optional) Maximum number of memories to include in context
+    
+    Returns:
+    - status: "ok" if successful
+    - agent_id: ID of the agent that executed the loop
+    - reflection: Generated reflection on recent memories
+    - plan: Generated plan for next actions
+    - written_memory_id: ID of the memory entry created for this loop
+    """
+    try:
+        # Parse request body
+        body = await request.json()
+        loop_request = AgentLoopRequest(**body)
+        
+        # Ensure core agents exist before running
+        ensure_core_agents_exist()
+        
+        # Check if agent exists
+        if loop_request.agent_id not in agent_registry:
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "status": "error",
+                    "message": f"Agent with ID '{loop_request.agent_id}' not found"
+                }
+            )
+        
+        # Get agent metadata
+        agent_data = agent_registry[loop_request.agent_id]
+        agent_name = agent_data.get("name", loop_request.agent_id.upper())
+        
+        # Increment loop count for the agent
+        agent_registry[loop_request.agent_id]["loop_count"] = agent_data.get("loop_count", 0) + 1
+        save_agent_registry()
+        
+        # Load recent memories
+        memory_limit = loop_request.memory_limit if loop_request.memory_limit is not None else 5
+        recent_memories = load_recent_memories(
+            agent_id=loop_request.agent_id,
+            memory_limit=memory_limit
+        )
+        
+        # Format memories for reflection
+        memory_entries = "\n".join([
+            f"- {m['timestamp']}: {m['type']} - {m['content']}"
+            for m in recent_memories
+        ])
+        
+        # Initialize LLM Engine
+        llm_engine = LLMEngine()
+        
+        # Generate reflection based on loop type
+        reflection_prompt = f"Reflect on the agent's last {len(recent_memories)} actions: {memory_entries}"
+        if loop_request.loop_type == "task":
+            reflection_prompt = f"Analyze the current task status based on these recent actions: {memory_entries}"
+        elif loop_request.loop_type == "planning":
+            reflection_prompt = f"Evaluate progress on current goals based on these actions: {memory_entries}"
+        
+        reflection = llm_engine.infer(
+            prompt=reflection_prompt,
+            model="openai"
+        )
+        
+        # Generate plan based on reflection
+        plan_prompt = f"Based on this reflection: '{reflection}', what should the agent do next?"
+        plan = llm_engine.infer(
+            prompt=plan_prompt,
+            model="openai"
+        )
+        
+        # Write summary + plan into memory
+        loop_summary = f"Reflection: {reflection}\n\nPlan: {plan}"
+        memory = write_memory(
+            agent_id=loop_request.agent_id,
+            type="cognitive_loop",
+            content=loop_summary,
+            tags=["reflection", "planning", loop_request.loop_type]
+        )
+        
+        # Return full loop result
+        return {
+            "status": "ok",
+            "agent_id": loop_request.agent_id,
+            "reflection": reflection,
+            "plan": plan,
+            "written_memory_id": memory["memory_id"],
+            "timestamp": datetime.utcnow().isoformat(),
+            "loop_count": agent_registry[loop_request.agent_id]["loop_count"]
+        }
+    except Exception as e:
+        logger.error(f"Error executing cognitive loop: {str(e)}")
+        logger.error(traceback.format_exc())
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": f"Failed to execute cognitive loop: {str(e)}"
             }
         )
