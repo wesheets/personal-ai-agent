@@ -4,6 +4,7 @@ import os
 import json
 from pathlib import Path
 from typing import List, Dict, Optional
+import asyncio
 
 # Use a file-based storage to persist memories between processes
 MEMORY_FILE = os.path.join(os.path.dirname(__file__), "memory_store.json")
@@ -44,8 +45,48 @@ def write_memory(agent_id: str, type: str, content: str, tags: list):
         "tags": tags,
         "timestamp": datetime.utcnow().isoformat()
     }
+    
+    # Add to local memory store
     memory_store.append(memory)
     _save_memories()  # Save to file after writing
+    
+    # Also store in shared memory layer
+    try:
+        # Import here to avoid circular imports
+        from app.core.shared_memory import get_shared_memory
+        
+        # Create async function to store in shared memory
+        async def store_in_shared_memory():
+            shared_memory = get_shared_memory()
+            await shared_memory.store_memory(
+                content=content,
+                metadata={
+                    "agent_name": agent_id,
+                    "type": type,
+                    "memory_id": memory["memory_id"]
+                },
+                scope="agent",
+                agent_name=agent_id,
+                topics=tags
+            )
+        
+        # Run the async function in a new event loop if we're not in an async context
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # We're in an async context, create a task
+                asyncio.create_task(store_in_shared_memory())
+            else:
+                # We're not in an async context, run in a new loop
+                asyncio.run(store_in_shared_memory())
+        except RuntimeError:
+            # No event loop, run in a new one
+            asyncio.run(store_in_shared_memory())
+            
+        print(f"🧠 Memory also stored in shared memory layer for {agent_id}")
+    except Exception as e:
+        print(f"⚠️ Error storing in shared memory: {str(e)}")
+    
     print(f"🧠 Memory written for {agent_id}: {memory['memory_id']}")
     return memory
 

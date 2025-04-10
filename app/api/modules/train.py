@@ -124,11 +124,19 @@ async def trigger_reflection(agent_id: str, memory_type: str = "training", limit
         # Import memory module to access memory_store
         from app.modules.memory_writer import memory_store, write_memory
         
-        # Filter memories by agent_id and type
-        filtered_memories = [
-            memory for memory in memory_store.values()
-            if memory["agent_id"] == agent_id and memory["type"] == memory_type
-        ]
+        # Check if memory_store is a list or a dictionary
+        if isinstance(memory_store, list):
+            # If it's a list, filter directly
+            filtered_memories = [
+                memory for memory in memory_store
+                if memory["agent_id"] == agent_id and memory["type"] == memory_type
+            ]
+        else:
+            # If it's a dictionary, use values() method
+            filtered_memories = [
+                memory for memory in memory_store.values()
+                if memory["agent_id"] == agent_id and memory["type"] == memory_type
+            ]
         
         # Sort by timestamp (newest first) and limit
         filtered_memories.sort(key=lambda x: x["timestamp"], reverse=True)
@@ -236,10 +244,19 @@ async def train_agent(
                 "message": "Training data staged for later execution"
             }
         
-        # Otherwise, inject memories
-        # In a real implementation, this would call the memory_writer module
-        # For now, we'll simulate this by just logging
-        print(f"🧠 Training agent {request.agent_id} with {len(memory_entries)} memories")
+        # Otherwise, inject memories using memory_writer
+        from app.modules.memory_writer import write_memory
+        
+        # Write each memory entry to both local and shared memory store
+        for memory_entry in memory_entries:
+            write_memory(
+                agent_id=memory_entry["agent_id"],
+                type=memory_entry["type"],
+                content=memory_entry["content"],
+                tags=memory_entry["tags"]
+            )
+            
+        print(f"🧠 Training agent {request.agent_id} with {len(memory_entries)} memories written to memory stores")
         
         # Add to training logs
         training_logs.append(training_log)
