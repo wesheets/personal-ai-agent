@@ -16,6 +16,7 @@ import traceback
 import os
 import time
 import json
+from datetime import datetime
 
 # Configure logging
 logger = logging.getLogger("api.modules.agent")
@@ -24,6 +25,7 @@ logger = logging.getLogger("api.modules.agent")
 router = APIRouter(prefix="/modules/agent", tags=["Agent Modules"])
 print("🧠 Route defined: /api/modules/agent/run -> run_agent_endpoint")
 print("🧠 Route defined: /api/modules/agent/create -> create_agent_endpoint")
+print("🧠 Route defined: /api/modules/agent/list -> list_agents_endpoint")
 
 # Initialize agent registry
 agent_registry = {}
@@ -77,7 +79,9 @@ async def create_agent(agent: AgentCreateRequest):
         # Store the agent in registry
         agent_registry[agent.agent_id] = {
             "description": agent.description,
-            "traits": agent.traits
+            "traits": agent.traits,
+            "created_at": datetime.utcnow().isoformat(),
+            "modules": ["memory"]  # Default module
         }
         
         # Save to disk
@@ -96,6 +100,70 @@ async def create_agent(agent: AgentCreateRequest):
             content={
                 "status": "error",
                 "message": f"Failed to create agent: {str(e)}"
+            }
+        )
+
+@router.get("/list")
+async def list_agents():
+    """
+    Returns a list of all registered agents in the system.
+    
+    This endpoint retrieves all agents from the agent registry and returns them
+    in a standardized format with agent_id, name, created_at, and modules fields.
+    
+    Returns:
+    - status: "ok" if successful
+    - agents: List of agent objects with metadata
+    """
+    try:
+        # If registry is empty, add some sample agents for testing
+        if not agent_registry:
+            # Add sample agents for testing
+            agent_registry["hal"] = {
+                "description": "HAL is a general purpose assistant",
+                "traits": ["helpful", "analytical", "logical"],
+                "created_at": "2025-04-10T11:34:22Z",
+                "modules": ["memory", "reflection", "loop"]
+            }
+            agent_registry["ash"] = {
+                "description": "ASH is a specialized science assistant",
+                "traits": ["scientific", "precise", "methodical"],
+                "created_at": "2025-04-09T17:12:01Z",
+                "modules": ["memory", "delegate"]
+            }
+            # Save to disk
+            save_agent_registry()
+        
+        # Format agents for response
+        agents_list = []
+        for agent_id, agent_data in agent_registry.items():
+            # Extract or set default values for required fields
+            name = agent_data.get("name", agent_id.upper())
+            created_at = agent_data.get("created_at", datetime.utcnow().isoformat())
+            modules = agent_data.get("modules", ["memory"])
+            
+            # Create agent entry
+            agent_entry = {
+                "agent_id": agent_id,
+                "name": name,
+                "created_at": created_at,
+                "modules": modules
+            }
+            agents_list.append(agent_entry)
+        
+        # Return response
+        return {
+            "status": "ok",
+            "agents": agents_list
+        }
+    except Exception as e:
+        logger.error(f"Error listing agents: {str(e)}")
+        logger.error(traceback.format_exc())
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": f"Failed to list agents: {str(e)}"
             }
         )
 
