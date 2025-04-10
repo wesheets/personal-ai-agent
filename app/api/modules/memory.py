@@ -22,6 +22,10 @@ class SummarizeRequest(BaseModel):
     type: Optional[str] = None
     limit: int = 10
 
+class ThreadRequest(BaseModel):
+    agent_id: str
+    limit: Optional[int] = 100
+
 router = APIRouter()
 
 @router.post("/write")
@@ -180,4 +184,60 @@ async def summarize_memories_endpoint(request: Request):
         }
     except Exception as e:
         print(f"❌ Memory Summarization error: {str(e)}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
+@router.post("/thread")
+async def memory_thread_endpoint(request: Request):
+    """
+    Return a full chronological list of all memory entries for a given agent.
+    
+    This endpoint retrieves all memories for the specified agent and returns them
+    in chronological order (oldest to newest).
+    
+    Request body:
+    - agent_id: ID of the agent whose memory thread to retrieve
+    - limit: (Optional) Maximum number of memories to return, default is 100
+    
+    Returns:
+    - status: "ok" if successful
+    - agent_id: ID of the agent whose memory thread was retrieved
+    - memory_thread: List of memory entries in chronological order
+    """
+    try:
+        # Parse request body
+        body = await request.json()
+        thread_request = ThreadRequest(**body)
+        
+        # Filter memories by agent_id
+        filtered_memories = [m for m in memory_store if m["agent_id"] == thread_request.agent_id]
+        
+        # Transform memories to the expected format
+        memory_thread = []
+        for memory in filtered_memories:
+            # Extract role from memory type or use default
+            role = "user" if memory["type"] == "user_message" else memory["agent_id"]
+            
+            # Create thread entry
+            thread_entry = {
+                "timestamp": memory["timestamp"],
+                "role": role,
+                "content": memory["content"]
+            }
+            memory_thread.append(thread_entry)
+        
+        # Sort by timestamp (oldest first for chronological order)
+        memory_thread.sort(key=lambda m: m["timestamp"])
+        
+        # Apply limit if specified
+        if thread_request.limit and thread_request.limit > 0:
+            memory_thread = memory_thread[:thread_request.limit]
+        
+        # Return response
+        return {
+            "status": "ok",
+            "agent_id": thread_request.agent_id,
+            "memory_thread": memory_thread
+        }
+    except Exception as e:
+        print(f"❌ Memory Thread error: {str(e)}")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
