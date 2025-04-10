@@ -26,6 +26,13 @@ class ThreadRequest(BaseModel):
     agent_id: str
     limit: Optional[int] = 100
 
+class SearchRequest(BaseModel):
+    agent_id: str
+    query: str
+    role: Optional[str] = None
+    memory_type: Optional[str] = None
+    limit: Optional[int] = 25
+
 router = APIRouter()
 
 @router.post("/write")
@@ -240,4 +247,81 @@ async def memory_thread_endpoint(request: Request):
         }
     except Exception as e:
         print(f"❌ Memory Thread error: {str(e)}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
+@router.post("/search")
+async def memory_search_endpoint(request: Request):
+    """
+    Search an agent's memory for matching entries based on keywords, tags, roles, or memory type.
+    
+    This endpoint searches the content of memories for the specified agent and returns
+    matches based on the provided query, optionally filtered by role and memory type.
+    
+    Request body:
+    - agent_id: ID of the agent whose memories to search
+    - query: Search term to match in memory content
+    - role: (Optional) Filter by role (e.g., "user", "hal")
+    - memory_type: (Optional) Filter by memory type
+    - limit: (Optional) Maximum number of results to return, default is 25
+    
+    Returns:
+    - status: "ok" if successful
+    - agent_id: ID of the agent whose memories were searched
+    - results: List of matching memory entries sorted by most recent first
+    """
+    try:
+        # Parse request body
+        body = await request.json()
+        search_request = SearchRequest(**body)
+        
+        # Filter memories by agent_id
+        filtered_memories = [m for m in memory_store if m["agent_id"] == search_request.agent_id]
+        
+        # Filter by query (basic substring match)
+        if search_request.query:
+            filtered_memories = [m for m in filtered_memories if search_request.query.lower() in m["content"].lower()]
+        
+        # Apply role filter if provided
+        if search_request.role:
+            # Extract role from memory type or use default
+            filtered_memories = [
+                m for m in filtered_memories 
+                if (m["type"] == "user_message" and search_request.role == "user") or 
+                   (m["type"] != "user_message" and search_request.role == m["agent_id"])
+            ]
+        
+        # Apply memory_type filter if provided
+        if search_request.memory_type:
+            filtered_memories = [m for m in filtered_memories if m["type"] == search_request.memory_type]
+        
+        # Sort by timestamp (newest first)
+        filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
+        
+        # Apply limit (default to 25 if not provided)
+        limit = search_request.limit if search_request.limit is not None else 25
+        filtered_memories = filtered_memories[:limit]
+        
+        # Transform memories to the expected format
+        results = []
+        for memory in filtered_memories:
+            # Extract role from memory type or use default
+            role = "user" if memory["type"] == "user_message" else memory["agent_id"]
+            
+            # Create result entry
+            result_entry = {
+                "timestamp": memory["timestamp"],
+                "role": role,
+                "memory_type": memory["type"],
+                "content": memory["content"]
+            }
+            results.append(result_entry)
+        
+        # Return response
+        return {
+            "status": "ok",
+            "agent_id": search_request.agent_id,
+            "results": results
+        }
+    except Exception as e:
+        print(f"❌ Memory Search error: {str(e)}")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
