@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 logger = logging.getLogger("api.modules.train")
 
 # Create router
-router = APIRouter(prefix="/train", tags=["Training Modules"])
+router = APIRouter(tags=["Training Modules"])
 print("🧠 Route defined: /api/modules/train -> train_agent_endpoint")
 print("🧠 Route defined: /api/modules/train/history -> get_training_history_endpoint")
 
