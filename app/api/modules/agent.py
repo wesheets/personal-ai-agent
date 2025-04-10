@@ -10,7 +10,7 @@ print("📁 Loaded: agent.py (AgentRunner route file)")
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 import logging
 import traceback
 import os
@@ -31,6 +31,7 @@ print("🧠 Route defined: /api/modules/agent/run -> run_agent_endpoint")
 print("🧠 Route defined: /api/modules/agent/create -> create_agent_endpoint")
 print("🧠 Route defined: /api/modules/agent/list -> list_agents_endpoint")
 print("🧠 Route defined: /api/modules/agent/loop -> loop_agent_endpoint")
+print("🧠 Route defined: /api/modules/agent/delegate -> delegate_task_endpoint")
 
 # Initialize agent registry
 agent_registry = {}
@@ -206,6 +207,13 @@ class AgentLoopRequest(BaseModel):
     agent_id: str
     loop_type: Optional[str] = "reflective"  # "reflective", "task", "planning"
     memory_limit: Optional[int] = 5
+
+# Pydantic model for agent delegation request
+class AgentDelegateRequest(BaseModel):
+    from_agent: str
+    to_agent: str
+    task: str
+    auto_execute: Optional[bool] = False
 
 @router.post("/create")
 async def create_agent(agent: AgentCreateRequest):
@@ -482,5 +490,132 @@ async def loop_agent(request: Request):
             content={
                 "status": "error",
                 "message": f"Failed to execute cognitive loop: {str(e)}"
+            }
+        )
+
+@router.post("/delegate")
+async def delegate_task(request: Request):
+    """
+    Send a task from one agent to another.
+    
+    This endpoint allows agents to delegate tasks to other agents. It validates
+    both agents, logs the task into the target agent's memory, and optionally
+    executes the task immediately.
+    
+    Request body:
+    - from_agent: ID of the agent delegating the task
+    - to_agent: ID of the agent receiving the task
+    - task: The task to delegate
+    - auto_execute: (Optional) Whether to execute the task immediately
+    
+    Returns:
+    - status: "ok" if successful
+    - delegation_id: Unique identifier for the delegation
+    - task: The delegated task
+    - from_agent: ID of the agent that delegated the task
+    - to_agent: ID of the agent that received the task
+    - written_to_memory: Whether the task was written to memory
+    - execution_result: (Optional) Result of task execution if auto_execute is true
+    """
+    try:
+        # Parse request body
+        body = await request.json()
+        delegate_request = AgentDelegateRequest(**body)
+        
+        # Ensure core agents exist
+        ensure_core_agents_exist()
+        
+        # Validate from_agent exists
+        if delegate_request.from_agent not in agent_registry:
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "status": "error",
+                    "message": f"Source agent with ID '{delegate_request.from_agent}' not found"
+                }
+            )
+        
+        # Validate to_agent exists
+        if delegate_request.to_agent not in agent_registry:
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "status": "error",
+                    "message": f"Target agent with ID '{delegate_request.to_agent}' not found"
+                }
+            )
+        
+        # Generate delegation ID
+        delegation_id = str(uuid.uuid4())
+        
+        # Get agent metadata
+        from_agent_data = agent_registry[delegate_request.from_agent]
+        from_agent_name = from_agent_data.get("name", delegate_request.from_agent.upper())
+        
+        to_agent_data = agent_registry[delegate_request.to_agent]
+        to_agent_name = to_agent_data.get("name", delegate_request.to_agent.upper())
+        
+        # Format delegation content
+        delegation_content = f"Task delegated from {from_agent_name}: {delegate_request.task}"
+        
+        # Write to target agent's memory
+        memory = write_memory(
+            agent_id=delegate_request.to_agent,
+            type="delegated_task",
+            content=delegation_content,
+            tags=["delegation", f"from_{delegate_request.from_agent}"]
+        )
+        
+        # Prepare response
+        response = {
+            "status": "ok",
+            "delegation_id": delegation_id,
+            "task": delegate_request.task,
+            "from_agent": delegate_request.from_agent,
+            "to_agent": delegate_request.to_agent,
+            "written_to_memory": True,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        # Auto-execute if requested
+        if delegate_request.auto_execute:
+            try:
+                # Initialize LLM Engine
+                llm_engine = LLMEngine()
+                
+                # Format prompt with agent context
+                formatted_prompt = f"[Agent {to_agent_name}]: {delegate_request.task}"
+                
+                # Process prompt
+                execution_result = llm_engine.infer(
+                    prompt=formatted_prompt,
+                    model="openai"
+                )
+                
+                # Write execution result to memory
+                execution_memory = write_memory(
+                    agent_id=delegate_request.to_agent,
+                    type="task_execution",
+                    content=f"Executed delegated task from {from_agent_name}: {execution_result}",
+                    tags=["execution", f"from_{delegate_request.from_agent}", f"delegation_{delegation_id}"]
+                )
+                
+                # Add execution result to response
+                response["execution_result"] = execution_result
+                response["execution_memory_id"] = execution_memory["memory_id"]
+            except Exception as exec_error:
+                logger.error(f"Error auto-executing task: {str(exec_error)}")
+                response["execution_error"] = str(exec_error)
+        
+        # Return response
+        return response
+    except Exception as e:
+        logger.error(f"Error delegating task: {str(e)}")
+        logger.error(traceback.format_exc())
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": f"Failed to delegate task: {str(e)}"
             }
         )
