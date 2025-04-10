@@ -33,6 +33,24 @@ agent_registry = {}
 # Path for persistent storage
 AGENTS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "agents.json")
 
+# Default core agents to ensure they always exist
+DEFAULT_AGENTS = {
+    "hal": {
+        "description": "HAL is a general purpose assistant",
+        "traits": ["helpful", "analytical", "logical"],
+        "name": "HAL",
+        "created_at": "2025-04-10T11:34:22Z",
+        "modules": ["memory", "reflection", "loop"]
+    },
+    "ash": {
+        "description": "ASH is a specialized science assistant",
+        "traits": ["scientific", "precise", "methodical"],
+        "name": "ASH",
+        "created_at": "2025-04-09T17:12:01Z",
+        "modules": ["memory", "delegate"]
+    }
+}
+
 # Load existing agents if file exists
 def load_agent_registry():
     global agent_registry
@@ -41,13 +59,40 @@ def load_agent_registry():
             with open(AGENTS_FILE, 'r') as f:
                 agent_registry = json.load(f)
             print(f"📚 Loaded {len(agent_registry)} agents from registry")
+        else:
+            print(f"⚠️ Agents file not found at {AGENTS_FILE}, initializing with default agents")
+            agent_registry = DEFAULT_AGENTS.copy()
+            save_agent_registry()
     except Exception as e:
         print(f"⚠️ Error loading agent registry: {str(e)}")
-        agent_registry = {}
+        print(f"⚠️ Initializing with default agents")
+        agent_registry = DEFAULT_AGENTS.copy()
+        save_agent_registry()
+    
+    # Ensure core agents always exist
+    ensure_core_agents_exist()
+
+# Ensure core agents always exist in the registry
+def ensure_core_agents_exist():
+    global agent_registry
+    registry_modified = False
+    
+    for agent_id, agent_data in DEFAULT_AGENTS.items():
+        if agent_id not in agent_registry:
+            print(f"⚠️ Core agent {agent_id} not found in registry, adding it")
+            agent_registry[agent_id] = agent_data
+            registry_modified = True
+    
+    if registry_modified:
+        save_agent_registry()
+        print(f"📚 Updated agent registry with core agents")
 
 # Save agent registry to file
 def save_agent_registry():
     try:
+        # Create directory if it doesn't exist
+        os.makedirs(os.path.dirname(AGENTS_FILE), exist_ok=True)
+        
         with open(AGENTS_FILE, 'w') as f:
             json.dump(agent_registry, f, indent=2)
         print(f"💾 Saved {len(agent_registry)} agents to registry")
@@ -83,6 +128,9 @@ class LLMEngine:
         
         if "summarize" in prompt.lower() and "training" in prompt.lower():
             return "You recently added a memory about training a search module. Nothing else is logged yet."
+        
+        if "last" in prompt.lower() and "memories" in prompt.lower():
+            return "Your last memories include implementing search functionality, adding system status endpoints, and creating agent registry features."
         
         if "hello" in prompt.lower() or "hi" in prompt.lower():
             return "Hello! I'm your AI assistant. How can I help you today?"
@@ -160,23 +208,8 @@ async def list_agents():
     - agents: List of agent objects with metadata
     """
     try:
-        # If registry is empty, add some sample agents for testing
-        if not agent_registry:
-            # Add sample agents for testing
-            agent_registry["hal"] = {
-                "description": "HAL is a general purpose assistant",
-                "traits": ["helpful", "analytical", "logical"],
-                "created_at": "2025-04-10T11:34:22Z",
-                "modules": ["memory", "reflection", "loop"]
-            }
-            agent_registry["ash"] = {
-                "description": "ASH is a specialized science assistant",
-                "traits": ["scientific", "precise", "methodical"],
-                "created_at": "2025-04-09T17:12:01Z",
-                "modules": ["memory", "delegate"]
-            }
-            # Save to disk
-            save_agent_registry()
+        # Ensure core agents exist before listing
+        ensure_core_agents_exist()
         
         # Format agents for response
         agents_list = []
@@ -232,6 +265,9 @@ async def run_agent(request: Request):
         # Parse request body
         body = await request.json()
         run_request = AgentRunRequest(**body)
+        
+        # Ensure core agents exist before running
+        ensure_core_agents_exist()
         
         # Check if agent exists
         if run_request.agent_id not in agent_registry:
