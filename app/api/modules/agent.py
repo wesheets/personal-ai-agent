@@ -9,7 +9,7 @@ print("📁 Loaded: agent.py (AgentRunner route file)")
 
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any, Union
 import logging
 import traceback

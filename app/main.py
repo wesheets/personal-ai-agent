@@ -429,11 +429,13 @@ except Exception as e:
     
     @app.get("/health")
     async def health_degraded():
-        return {"status": "degraded", "error": str(e)}
+        error_message = str(e) if 'e' in locals() else "Unknown startup error"
+        return {"status": "degraded", "error": error_message}
     
     @app.get("/")
     async def root_health_degraded():
-        return {"status": "degraded", "error": str(e)}
+        error_message = str(e) if 'e' in locals() else "Unknown startup error"
+        return {"status": "degraded", "error": error_message}
     
     print("⚠️ Started in degraded mode with minimal health endpoints")
 
