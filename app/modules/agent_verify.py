@@ -256,7 +256,7 @@ def generate_justification(qualified: bool, matching_skills: List[str], missing_
         else:
             return "Agent qualification could not be determined due to insufficient information."
 
-@router.post("/agent/verify_task", response_model=VerifyTaskResponse)
+@router.post("/verify_task", response_model=VerifyTaskResponse)
 async def verify_task(request: VerifyTaskRequest):
     """
     Verify if an agent is qualified for a task based on their skills.
@@ -304,3 +304,6 @@ async def verify_task(request: VerifyTaskRequest):
         justification=justification,
         suggested_agents=suggested_agents
     )
+
+# Add a print statement to confirm the route is defined
+print("🧠 Route defined: /verify_task -> verify_task")

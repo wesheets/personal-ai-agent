@@ -394,8 +394,8 @@ try:
     # Mount the agent create router
     app.include_router(agent_create_router)  # Mount the agent create router (no prefix needed as path is already /agent/create)
     
-    # Mount the agent verify router
-    app.include_router(agent_verify_router)  # Mount the agent verify router (no prefix needed as path is already /agent/verify_task)
+    # Mount the agent verify router with the correct prefix
+    app.include_router(agent_verify_router, prefix="/api/modules/agent")  # Mount the agent verify router with prefix to make it available at /api/modules/agent/verify_task
     
     print("✅ Module routers included")
 
