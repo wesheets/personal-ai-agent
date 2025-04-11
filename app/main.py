@@ -274,7 +274,7 @@ try:
     print("📡 Including Loop module router from /app/modules/loop.py")
     print("📡 Including Delegate module router from /app/modules/delegate.py")
     print("📡 Including Reflect module router from /app/modules/reflect.py")
-    print("📡 Including Orchestrator Scope module router from /app/api/orchestrator/scope.py")
+    print("📡 Including Orchestrator Scope module router from /app/modules/orchestrator_scope.py")
     
     from app.api.modules import memory  # Import the memory.py route file
     # REMOVED: Conflicting import for delegate router
@@ -294,8 +294,8 @@ try:
     from app.modules.delegate import router as delegate_router  # Import the delegate router
     from app.modules.reflect import router as reflect_router  # Import the reflect router
     
-    # Import the orchestrator scope router
-    from app.api.orchestrator.scope import router as orchestrator_scope_router  # Import the orchestrator scope router
+    # Import the orchestrator scope router from the new location
+    from app.modules.orchestrator_scope import router as scope_router  # Import the orchestrator scope router
     
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
@@ -306,7 +306,7 @@ try:
     print(f"🔍 DEBUG: Loop router routes: {[route.path for route in loop_router.routes]}")
     print(f"🔍 DEBUG: Delegate router object: {delegate_router}")
     print(f"🔍 DEBUG: Reflect router object: {reflect_router}")
-    print(f"🔍 DEBUG: Orchestrator Scope router object: {orchestrator_scope_router}")
+    print(f"🔍 DEBUG: Orchestrator Scope router object: {scope_router}")
     
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(memory.router, prefix="/app/modules")  # Mount the memory router
@@ -328,8 +328,8 @@ try:
     app.include_router(delegate_router, prefix="/app/modules/delegate")  # Mount the delegate router
     app.include_router(reflect_router, prefix="/app/modules/reflect")  # Mount the reflect router
     
-    # Mount the orchestrator scope router
-    app.include_router(orchestrator_scope_router, prefix="/orchestrator/scope")  # Mount the orchestrator scope router
+    # Mount the orchestrator scope router with the correct prefix
+    app.include_router(scope_router, prefix="/orchestrator")  # Mount the orchestrator scope router
     
     print("✅ Module routers included")
 
