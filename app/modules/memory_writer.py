@@ -9,8 +9,14 @@ import asyncio
 # Use a file-based storage to persist memories between processes
 MEMORY_FILE = os.path.join(os.path.dirname(__file__), "memory_store.json")
 
+# Path to agent manifest file
+AGENT_MANIFEST_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "agent_manifest.json")
+
 # Initialize memory_store
 memory_store = []
+
+# Initialize agent_manifest cache
+agent_manifest = {}
 
 # Load existing memories if file exists
 def _load_memories():
@@ -23,6 +29,17 @@ def _load_memories():
         print(f"Error loading memories: {str(e)}")
         memory_store = []
 
+# Load agent manifest
+def _load_agent_manifest():
+    global agent_manifest
+    try:
+        if os.path.exists(AGENT_MANIFEST_FILE):
+            with open(AGENT_MANIFEST_FILE, 'r') as f:
+                agent_manifest = json.load(f)
+    except Exception as e:
+        print(f"Error loading agent manifest: {str(e)}")
+        agent_manifest = {}
+
 # Save memories to file
 def _save_memories():
     try:
@@ -33,10 +50,35 @@ def _save_memories():
     except Exception as e:
         print(f"Error saving memories: {str(e)}")
 
-# Load memories on module import
+# Get agent tone profile from manifest
+def get_agent_tone_profile(agent_id: str) -> Optional[Dict]:
+    # Ensure agent manifest is loaded
+    if not agent_manifest:
+        _load_agent_manifest()
+    
+    # Normalize agent_id for lookup (handle both formats: "hal-agent" and "hal_agent")
+    normalized_id = agent_id.replace('_', '-')
+    
+    # Look up agent in manifest
+    if normalized_id in agent_manifest and "tone_profile" in agent_manifest[normalized_id]:
+        return agent_manifest[normalized_id]["tone_profile"]
+    
+    # Try alternative format
+    alternative_id = agent_id.replace('-', '_')
+    if alternative_id in agent_manifest and "tone_profile" in agent_manifest[alternative_id]:
+        return agent_manifest[alternative_id]["tone_profile"]
+    
+    # If agent not found or no tone profile, return None
+    return None
+
+# Load memories and agent manifest on module import
 _load_memories()
+_load_agent_manifest()
 
 def write_memory(agent_id: str, type: str, content: str, tags: list, project_id: Optional[str] = None, status: Optional[str] = None, task_type: Optional[str] = None, task_id: Optional[str] = None, memory_trace_id: Optional[str] = None):
+    # Get agent tone profile
+    agent_tone = get_agent_tone_profile(agent_id)
+    
     memory = {
         "memory_id": str(uuid.uuid4()),
         "agent_id": agent_id,
@@ -51,6 +93,11 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         "memory_trace_id": memory_trace_id
     }
     
+    # Add agent tone if available
+    if agent_tone:
+        memory["agent_tone"] = agent_tone
+        print(f"🎭 Added tone profile for {agent_id}")
+    
     # Add to local memory store
     memory_store.append(memory)
     _save_memories()  # Save to file after writing
@@ -63,13 +110,20 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         # Create async function to store in shared memory
         async def store_in_shared_memory():
             shared_memory = get_shared_memory()
+            
+            # Include agent_tone in metadata if available
+            metadata = {
+                "agent_name": agent_id,
+                "type": type,
+                "memory_id": memory["memory_id"]
+            }
+            
+            if agent_tone:
+                metadata["agent_tone"] = agent_tone
+            
             await shared_memory.store_memory(
                 content=content,
-                metadata={
-                    "agent_name": agent_id,
-                    "type": type,
-                    "memory_id": memory["memory_id"]
-                },
+                metadata=metadata,
                 scope="agent",
                 agent_name=agent_id,
                 topics=tags
