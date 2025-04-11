@@ -1,8 +1,5 @@
 """
-Modified main.py to integrate the failsafe agent loader and ensure the backend
-doesn't crash even if some agents fail to initialize.
-
-MODIFIED: Temporarily commented out problematic API routes to isolate AgentRunner
+Modified main.py to include the project_summary router.
 """
 
 from fastapi import FastAPI, APIRouter, Response, Request
@@ -274,6 +271,7 @@ try:
     print("📡 Including ObserverModule module router from /api/modules/observer.py")
     print("📡 Including AgentContext module router from /api/modules/agent_context.py")
     print("📡 Including PlanGenerator module router from /api/modules/plan.py")
+    print("📡 Including ProjectSummary module router from /api/modules/project_summary.py")
     from app.api.modules import memory  # Import the memory.py route file
     from app.api.modules import delegate  # Import the delegate.py route file
     from app.api.modules import stream  # Import the stream.py route file
@@ -282,12 +280,15 @@ try:
     from app.api.modules import observer  # Import the observer.py route file
     from app.api.modules import agent_context  # Import the agent_context.py route file
     from app.api.modules import plan  # Import the plan.py route file
+    from app.api.modules import project_summary  # Import the project_summary.py route file
     from app.api.task import router as task_router  # Import the task router
     from app.api.projects import router as projects_router  # Import the projects router
     
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
     print(f"🔍 DEBUG: Memory router routes: {[route.path for route in memory.router.routes]}")
+    print(f"🔍 DEBUG: ProjectSummary router object: {project_summary.router}")
+    print(f"🔍 DEBUG: ProjectSummary router routes: {[route.path for route in project_summary.router.routes]}")
     
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(memory.router, prefix="/app/modules")  # Mount the memory router
@@ -298,6 +299,7 @@ try:
     app.include_router(observer.router, prefix="/api/modules")  # Mount the observer router
     app.include_router(agent_context.router, prefix="/api/modules")  # Mount the agent context router
     app.include_router(plan.router, prefix="/api/modules")  # Mount the plan generator router
+    app.include_router(project_summary.router, prefix="/app/modules")  # Mount the project summary router
     app.include_router(task_router, prefix="/app/task")  # Mount the task status router
     app.include_router(projects_router, prefix="/app/projects")  # Mount the projects router
     app.include_router(health_router)  # Include health router without prefix
@@ -356,94 +358,21 @@ try:
                 }
             )
 
-    # MODIFIED: Commented out other routers
-    """
-    # Include all routers in the app
-    print("🔄 Including API routers...")
-    app.include_router(agent_router, prefix="/api")
-    app.include_router(memory_router, prefix="/api")
-    app.include_router(goals_router, prefix="/api")
-    app.include_router(memory_viewer_router, prefix="/api")
-    app.include_router(control_router, prefix="/api")
-    app.include_router(logs_router, prefix="/api")
-    app.include_router(delegate_router, prefix="/api")
-    app.include_router(hal_debug_router, prefix="/api")
-    app.include_router(debug_router, prefix="/api")
-    app.include_router(performance_router, prefix="/api")
-    app.include_router(streaming_router, prefix="/api")
-    app.include_router(system_routes, prefix="/api")
-    app.include_router(agent_status_router, prefix="/api")  # Add agent status router
-    app.include_router(health_router)  # Include health router without prefix
-    print("✅ All API routers included")
-
-    # Initialize providers
-    print("🔄 Initializing model providers...")
-    initialize_model_providers()
-    print("✅ Model providers initialized")
-
-    # System routes
-    system_router = APIRouter(prefix="/system", tags=["System"])
-
-    @system_router.get("/models")
-    async def get_models():
-        models = get_available_models()
-        return models
-
-    @system_router.get("/status")
-    async def get_system_status():
-        try:
-            prompt_manager = PromptManager()
-            task_state_manager = get_task_state_manager()
-            seeding_manager = get_seeding_manager()
-            agents_seeded = await seeding_manager.seed_default_agents(prompt_manager)
-            goals_seeded = await seeding_manager.seed_default_goals(task_state_manager)
-            return {
-                "status": "operational",
-                "version": "1.0.0",
-                "uptime": "N/A",
-                "agents_count": len(prompt_manager.get_available_agents()),
-                "goals_count": len(task_state_manager.goals),
-                "tasks_count": len(task_state_manager.tasks),
-                "seeding": {
-                    "agents_seeded": agents_seeded,
-                    "goals_seeded": goals_seeded
-                }
-            }
-        except Exception as e:
-            return {"status": "degraded", "error": str(e), "version": "1.0.0"}
-
-    # Include system router
-    app.include_router(system_router, prefix="/api")
-    """
-
-    print("✅ Isolated mode startup complete")
-
 except Exception as e:
-    # Global exception handler to prevent complete startup failure
-    print(f"❌ Error during startup: {str(e)}")
+    print(f"❌ CRITICAL ERROR DURING STARTUP: {str(e)}")
     import traceback
     traceback.print_exc()
     
-    # Create minimal app that responds to health checks
-    app = FastAPI(
-        title="Enhanced AI Agent System (Degraded Mode)",
-        description="Running in degraded mode due to startup error",
-        version="1.0.0"
-    )
-    
-    @app.get("/health")
-    async def health_degraded():
-        error_message = str(e) if 'e' in locals() else "Unknown startup error"
-        return {"status": "degraded", "error": error_message}
+    # Create a minimal FastAPI app for health checks
+    app = FastAPI(title="Promethios OS (Recovery Mode)")
     
     @app.get("/")
-    async def root_health_degraded():
-        error_message = str(e) if 'e' in locals() else "Unknown startup error"
-        return {"status": "degraded", "error": error_message}
+    async def root_health_recovery():
+        return {"status": "error", "message": "System in recovery mode due to startup failure"}
     
-    print("⚠️ Started in degraded mode with minimal health endpoints")
+    @app.get("/health")
+    async def health_recovery():
+        return {"status": "error", "message": "System in recovery mode due to startup failure"}
 
-# This is used when running the app directly with Python
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
