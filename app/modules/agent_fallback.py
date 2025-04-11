@@ -15,11 +15,13 @@ import uuid
 from typing import Dict, List, Optional, Any
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
-import httpx
 import asyncio
 
 # Import memory-related functions
 from app.modules.memory_writer import write_memory
+
+# Import delegate_task function directly instead of using HTTP requests
+from app.modules.delegate import delegate_task, AgentDelegateRequest
 
 # Configure logging
 logger = logging.getLogger("api.modules.agent_fallback")
@@ -90,9 +92,9 @@ def get_agent_info(agent_id: str) -> Dict[str, Any]:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to load agent information: {str(e)}")
 
-async def delegate_task(from_agent: str, to_agent: str, task_id: str, notes: str, project_id: Optional[str] = None) -> Dict[str, Any]:
+async def delegate_task_internal(from_agent: str, to_agent: str, task_id: str, notes: str, project_id: Optional[str] = None) -> Dict[str, Any]:
     """
-    Delegate a task from one agent to another using the delegate endpoint.
+    Delegate a task from one agent to another using the delegate_task function directly.
     
     Args:
         from_agent (str): The ID of the agent delegating the task
@@ -118,30 +120,42 @@ async def delegate_task(from_agent: str, to_agent: str, task_id: str, notes: str
             "delegation_depth": 0  # Start with 0 as this is a new delegation chain
         }
         
-        # Call the delegate endpoint
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "http://localhost:8000/app/modules/delegate",  # Local endpoint
-                json=delegation_request
-            )
+        # Create a mock Request object with the delegation request as JSON
+        class MockRequest:
+            async def json(self):
+                return delegation_request
+        
+        # Call the delegate_task function directly
+        response = await delegate_task(MockRequest())
         
         # Check if delegation was successful
-        if response.status_code != 200:
-            error_detail = response.json().get("message", "Unknown error")
+        if isinstance(response, dict) and response.get("status") == "ok":
+            return response
+        else:
+            # Handle error response from delegate_task
+            error_detail = response.get("message", "Unknown error") if isinstance(response, dict) else "Delegation failed"
+            status_code = 500
+            
+            # If response is a JSONResponse, extract status code and content
+            if hasattr(response, "status_code") and hasattr(response, "body"):
+                status_code = response.status_code
+                try:
+                    content = json.loads(response.body)
+                    error_detail = content.get("message", error_detail)
+                except:
+                    pass
+            
             raise HTTPException(
-                status_code=response.status_code,
+                status_code=status_code,
                 detail=f"Delegation failed: {error_detail}"
             )
         
-        return response.json()
-    except httpx.RequestError as e:
-        # Handle request errors
-        raise HTTPException(
-            status_code=500,
-            detail=f"Delegation request failed: {str(e)}"
-        )
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
         # Handle other errors
+        logger.error(f"Delegation failed: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Delegation failed: {str(e)}"
@@ -209,8 +223,8 @@ async def fallback(request: FallbackRequest):
     delegation_task_id = f"{request.task_id}-delegated"
     
     try:
-        # Delegate the task to the suggested agent
-        delegation_response = await delegate_task(
+        # Delegate the task to the suggested agent using direct function call
+        delegation_response = await delegate_task_internal(
             from_agent=request.agent_id,
             to_agent=request.suggested_agent,
             task_id=delegation_task_id,
