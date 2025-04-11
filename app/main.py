@@ -288,7 +288,7 @@ try:
     print(f"🔍 DEBUG: Memory router routes: {[route.path for route in memory.router.routes]}")
     
     app.include_router(agent_module_router, prefix="/api")
-    app.include_router(memory.router, prefix="/api/modules/memory")  # Mount the memory router
+    app.include_router(memory.router, prefix="/app/modules")  # Mount the memory router
     app.include_router(delegate.router, prefix="/api/modules")  # Mount the delegate router
     app.include_router(stream.router, prefix="/api/modules")  # Mount the stream router
     app.include_router(train.router, prefix="/api/modules")  # Mount the train router
