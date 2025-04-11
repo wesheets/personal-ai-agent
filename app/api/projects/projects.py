@@ -42,10 +42,7 @@ class ProjectInput(BaseModel):
 
 class ProjectOutput(BaseModel):
     status: str = "success"
-    project_id: str
-    created_at: str
-    log_id: str
-    stored: bool = True
+    project: Dict[str, Any]
 
 @router.post("/")
 async def create_project(request: Request):
@@ -110,13 +107,13 @@ async def create_project(request: Request):
         # Log success
         logger.info(f"✅ Project created: {project_input.project_id} for user {project_input.user_id}")
         
-        # Return response
+        # Add log_id to project entry for traceability
+        project_entry["log_id"] = log_id
+        
+        # Return response with complete project data
         return ProjectOutput(
             status="success",
-            project_id=project_input.project_id,
-            created_at=created_at,
-            log_id=log_id,
-            stored=True
+            project=project_entry
         )
     except Exception as e:
         # Log error
@@ -127,11 +124,12 @@ async def create_project(request: Request):
             status_code=500,
             content={
                 "status": "failure",
-                "project_id": body.get("project_id", "unknown"),
-                "created_at": datetime.utcnow().isoformat(),
-                "log_id": str(uuid.uuid4()),
-                "stored": False,
-                "error": str(e)
+                "error": str(e),
+                "project": {
+                    "project_id": body.get("project_id", "unknown"),
+                    "created_at": datetime.utcnow().isoformat(),
+                    "log_id": str(uuid.uuid4())
+                }
             }
         )
 
