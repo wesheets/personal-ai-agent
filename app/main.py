@@ -283,6 +283,7 @@ try:
     from app.api.modules import agent_context  # Import the agent_context.py route file
     from app.api.modules import plan  # Import the plan.py route file
     from app.api.task import router as task_router  # Import the task router
+    from app.api.projects import router as projects_router  # Import the projects router
     
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
@@ -298,6 +299,7 @@ try:
     app.include_router(agent_context.router, prefix="/api/modules")  # Mount the agent context router
     app.include_router(plan.router, prefix="/api/modules")  # Mount the plan generator router
     app.include_router(task_router, prefix="/app/task")  # Mount the task status router
+    app.include_router(projects_router, prefix="/app")  # Mount the projects router
     app.include_router(health_router)  # Include health router without prefix
     print("✅ Module routers included")
 
