@@ -17,7 +17,12 @@ class MemoryEntry(BaseModel):
 
 class ReflectionRequest(BaseModel):
     agent_id: str
-    type: str
+    goal: str
+    context: Optional[Dict] = None
+    task_id: str
+    project_id: str
+    memory_trace_id: str
+    type: Optional[str] = "memory"
     limit: int = 5
     
 class SummarizeRequest(BaseModel):
@@ -158,6 +163,33 @@ async def read_memory(
 
 @router.post("/reflect")
 async def reflect_on_memories(request: Request):
+    """
+    Generate a reflection based on agent memories and store it with SDK-compliant metadata.
+    
+    This endpoint complies with Promethios_Module_Contract_v1.0.0 by:
+    - Validating required input fields (agent_id, goal, task_id, project_id, memory_trace_id)
+    - Returning a structured response with all required fields
+    - Writing memory with memory_type="reflection" and all trace fields
+    - Providing proper logging for failures or validation errors
+    
+    Request body:
+    - agent_id: ID of the agent to generate reflection for (required)
+    - goal: Purpose of the reflection (required)
+    - context: Optional additional context for reflection
+    - task_id: Task identifier for tracing (required)
+    - project_id: Project identifier for context (required)
+    - memory_trace_id: Memory trace identifier for linking (required)
+    - type: Memory type to reflect on (optional, defaults to "memory")
+    - limit: Maximum number of memories to consider (optional, defaults to 5)
+    
+    Returns:
+    - status: "success" if successful, "failure" if error occurred
+    - reflection: Generated reflection text
+    - task_id: Task identifier (echoed from request)
+    - project_id: Project identifier (echoed from request)
+    - memory_trace_id: Memory trace identifier (echoed from request)
+    - agent_id: Agent identifier (echoed from request)
+    """
     try:
         # Parse request body
         body = await request.json()
@@ -166,8 +198,9 @@ async def reflect_on_memories(request: Request):
         # Get recent memories using similar logic to /read endpoint
         filtered_memories = [m for m in memory_store if m["agent_id"] == reflection_request.agent_id]
         
-        # Apply type filter
-        filtered_memories = [m for m in filtered_memories if m["type"] == reflection_request.type]
+        # Apply type filter if type is provided
+        if reflection_request.type:
+            filtered_memories = [m for m in filtered_memories if m["type"] == reflection_request.type]
         
         # Sort by timestamp (newest first)
         filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
@@ -178,23 +211,43 @@ async def reflect_on_memories(request: Request):
         # Generate reflection
         reflection_text = generate_reflection(filtered_memories)
         
-        # Write reflection as a new memory
+        # Write reflection as a new memory with all trace fields
         memory = write_memory(
             agent_id=reflection_request.agent_id,
             type="reflection",
             content=reflection_text,
-            tags=["reflection", f"based_on_{reflection_request.type}"]
+            tags=["reflection", f"based_on_{reflection_request.type}", "sdk_compliant"],
+            project_id=reflection_request.project_id,
+            task_id=reflection_request.task_id,
+            memory_trace_id=reflection_request.memory_trace_id,
+            status="completed"
         )
         
-        # Return response
+        # Log successful reflection generation
+        print(f"✅ Reflection generated for agent {reflection_request.agent_id} with task_id {reflection_request.task_id}")
+        
+        # Return SDK-compliant structured response
         return {
-            "status": "ok",
+            "status": "success",
             "reflection": reflection_text,
-            "memory_id": memory["memory_id"]
+            "task_id": reflection_request.task_id,
+            "project_id": reflection_request.project_id,
+            "memory_trace_id": reflection_request.memory_trace_id,
+            "agent_id": reflection_request.agent_id
         }
     except Exception as e:
+        # Log error details
         print(f"❌ Reflection Engine error: {str(e)}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+        
+        # Return SDK-compliant error response
+        return JSONResponse(status_code=500, content={
+            "status": "failure",
+            "reflection": f"Error generating reflection: {str(e)}",
+            "task_id": body.get("task_id", "unknown"),
+            "project_id": body.get("project_id", "unknown"),
+            "memory_trace_id": body.get("memory_trace_id", "unknown"),
+            "agent_id": body.get("agent_id", "unknown")
+        })
 
 @router.post("/summarize")
 async def summarize_memories_endpoint(request: Request):
