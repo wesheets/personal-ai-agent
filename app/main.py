@@ -134,6 +134,53 @@ try:
         
         # MODIFIED: Always return ok status to ensure health checks pass
         return {"status": "ok", "mode": "isolated"}
+        
+    @app.get("/control/registry")
+    async def control_registry():
+        """
+        Control Room registry endpoint that returns information about available modules
+        and their UI integration status. This powers dynamic UI menus, dev dashboards,
+        and Control Room builder screens.
+        """
+        logger.info("Control Room registry endpoint accessed")
+        
+        # Use standard library for timestamp to avoid import issues
+        import datetime as dt
+        current_time = dt.datetime.now().isoformat()
+        
+        return {
+            "modules": [
+                {"name": "Scope Planner", "route": "/orchestrator/scope", "ui": "markdown", "status": "needs_ui"},
+                {"name": "Delegate Executor", "route": "/delegate", "ui": "payload_button", "status": "needs_ui"},
+                {"name": "Summary Viewer", "route": "/summarize", "ui": "markdown_panel", "status": "needs_ui"},
+                {"name": "Project Selector", "route": "/projects", "ui": "sidebar_dropdown", "status": "built"},
+                {"name": "Tone Configurator", "route": "/agent/tone", "ui": "editable_table", "status": "future"},
+                {"name": "Loop Controller", "route": "/loop", "ui": "status_panel", "status": "needs_ui"},
+                {"name": "Reflection Viewer", "route": "/reflect", "ui": "text_panel", "status": "needs_ui"},
+                {"name": "Memory Browser", "route": "/read", "ui": "searchable_table", "status": "in_progress"},
+                {"name": "Agent Registry", "route": "/agents", "ui": "card_grid", "status": "needs_ui"},
+                {"name": "System Caps Monitor", "route": "/system/caps", "ui": "settings_panel", "status": "future"}
+            ],
+            "ui_components": [
+                {"type": "markdown", "description": "Markdown content viewer with code highlighting"},
+                {"type": "payload_button", "description": "JSON payload editor with request/response handling"},
+                {"type": "markdown_panel", "description": "Formatted text display with copy functionality"},
+                {"type": "sidebar_dropdown", "description": "Hierarchical organization with search"},
+                {"type": "editable_table", "description": "Inline editing with validation"},
+                {"type": "status_panel", "description": "Visual status display with metrics"},
+                {"type": "text_panel", "description": "Plain text display with search"},
+                {"type": "searchable_table", "description": "Data table with filtering and sorting"},
+                {"type": "card_grid", "description": "Visual card layout for entity display"},
+                {"type": "settings_panel", "description": "Configuration interface with save/reset"}
+            ],
+            "integration_status": {
+                "needs_ui": "Component needs UI implementation",
+                "in_progress": "UI implementation in progress",
+                "built": "UI component is implemented and functional",
+                "future": "Planned for future implementation"
+            },
+            "last_updated": current_time
+        }
 
     # Add startup delay to ensure FastAPI is fully initialized before healthcheck
     import asyncio
