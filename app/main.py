@@ -346,6 +346,7 @@ try:
     from app.modules.orchestrator_scope import router as scope_router  # Import the orchestrator scope router
     from app.modules.orchestrator_present import router as present_router  # Import the orchestrator present router
     from app.modules.agent_present import router as agent_present_router  # Import the agent present router
+    from app.modules.agent_create import router as agent_create_router  # Import the agent create router
     
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
@@ -384,6 +385,9 @@ try:
     
     # Mount the agent present router
     app.include_router(agent_present_router)  # Mount the agent present router (no prefix needed as path is already /agent/present)
+    
+    # Mount the agent create router
+    app.include_router(agent_create_router)  # Mount the agent create router (no prefix needed as path is already /agent/create)
     
     print("✅ Module routers included")
 
