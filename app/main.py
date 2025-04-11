@@ -297,7 +297,7 @@ try:
     app.include_router(observer.router, prefix="/api/modules")  # Mount the observer router
     app.include_router(agent_context.router, prefix="/api/modules")  # Mount the agent context router
     app.include_router(plan.router, prefix="/api/modules")  # Mount the plan generator router
-    app.include_router(task_router, prefix="/app")  # Mount the task status router
+    app.include_router(task_router, prefix="/app/task")  # Mount the task status router
     app.include_router(health_router)  # Include health router without prefix
     print("✅ Module routers included")
 
