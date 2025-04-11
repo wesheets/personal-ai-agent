@@ -15,6 +15,8 @@ import logging
 
 # Import memory-related functions
 from app.modules.memory_writer import write_memory, memory_store, generate_reflection
+# Import task supervisor
+from app.modules.task_supervisor import monitor_reflection, halt_task
 
 # Configure logging
 logger = logging.getLogger("api.modules.reflect")
@@ -94,34 +96,29 @@ async def reflect(request: Request):
         body = await request.json()
         reflection_request = ReflectionRequest(**body)
         
-        # Check if this reflection is part of a loop and enforce loop cap
+        # Check if this reflection is part of a loop and enforce reflection monitoring
         current_loop_count = reflection_request.loop_count if reflection_request.loop_count is not None else 0
         
-        # Check if max_loops_per_task has been reached
-        if current_loop_count >= system_caps["max_loops_per_task"]:
-            # Log the failure to memory
-            memory = write_memory(
-                agent_id=reflection_request.agent_id,
-                type="system_halt",
-                content=f"Reflection loop limit exceeded: {current_loop_count} loops reached for task {reflection_request.task_id}",
-                tags=["error", "loop_limit", "system_halt", "reflection"],
-                project_id=reflection_request.project_id,
-                status="error",
-                task_id=reflection_request.task_id,
-                memory_trace_id=reflection_request.memory_trace_id
-            )
-            
+        # Use task supervisor to monitor reflection
+        monitor_result = monitor_reflection(
+            agent_id=reflection_request.agent_id,
+            reflection_count=current_loop_count
+        )
+        
+        # Check if task should be halted
+        if monitor_result["status"] != "ok":
             # Return error response
             return JSONResponse(
                 status_code=429,  # Too Many Requests
                 content={
                     "status": "error",
-                    "reason": "Loop limit exceeded",
-                    "loop_count": current_loop_count,
+                    "reason": monitor_result["reason"],
+                    "reflection_count": current_loop_count,
                     "task_id": reflection_request.task_id,
                     "project_id": reflection_request.project_id,
                     "memory_trace_id": reflection_request.memory_trace_id,
-                    "agent_id": reflection_request.agent_id
+                    "agent_id": reflection_request.agent_id,
+                    "event": monitor_result["event"]
                 }
             )
         

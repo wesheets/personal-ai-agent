@@ -17,6 +17,8 @@ from datetime import datetime
 
 # Import memory-related functions
 from app.modules.memory_writer import write_memory
+# Import task supervisor
+from app.modules.task_supervisor import monitor_loop, halt_task
 
 # Configure logging
 logger = logging.getLogger("api.modules.loop")
@@ -199,29 +201,23 @@ async def loop_agent(request: Request):
         # Get current loop count for this task
         current_loop_count = loop_request.loop_count if loop_request.loop_count is not None else 0
         
-        # Check if max_loops_per_task has been reached
-        if current_loop_count >= system_caps["max_loops_per_task"]:
-            # Log the failure to memory
-            memory = write_memory(
-                agent_id=loop_request.agent_id,
-                type="system_halt",
-                content=f"Loop limit exceeded: {current_loop_count} loops reached for task {loop_request.task_id}",
-                tags=["error", "loop_limit", "system_halt"],
-                project_id=loop_request.project_id,
-                status="error",
-                task_type=loop_request.task_type if loop_request.task_type else "loop",
-                task_id=loop_request.task_id,
-                memory_trace_id=loop_request.memory_trace_id
-            )
-            
+        # Use task supervisor to monitor loop count
+        monitor_result = monitor_loop(
+            task_id=loop_request.task_id if loop_request.task_id else str(uuid.uuid4()),
+            loop_count=current_loop_count
+        )
+        
+        # Check if task should be halted
+        if monitor_result["status"] != "ok":
             # Return error response
             return JSONResponse(
                 status_code=429,  # Too Many Requests
                 content={
                     "status": "error",
-                    "reason": "Loop limit exceeded",
+                    "reason": monitor_result["reason"],
                     "loop_count": current_loop_count,
-                    "task_id": loop_request.task_id if loop_request.task_id else "unknown"
+                    "task_id": loop_request.task_id if loop_request.task_id else "unknown",
+                    "event": monitor_result["event"]
                 }
             )
         

@@ -17,6 +17,8 @@ import logging
 
 # Import memory-related functions
 from app.modules.memory_writer import write_memory
+# Import task supervisor
+from app.modules.task_supervisor import monitor_delegation, halt_task
 
 # Configure logging
 logger = logging.getLogger("api.modules.delegate")
@@ -120,29 +122,23 @@ async def delegate_task(request: Request):
         # Get current delegation depth
         current_delegation_depth = delegate_request.delegation_depth if delegate_request.delegation_depth is not None else 0
         
-        # Check if max_delegation_depth has been reached
-        if current_delegation_depth >= system_caps["max_delegation_depth"]:
-            # Log the failure to memory
-            memory = write_memory(
-                agent_id=delegate_request.from_agent,
-                type="system_halt",
-                content=f"Delegation depth exceeded: {current_delegation_depth} levels reached for delegation to {delegate_request.to_agent}",
-                tags=["error", "delegation_limit", "system_halt"],
-                project_id=delegate_request.project_id,
-                status="error",
-                task_type="delegate",
-                task_id=delegate_request.task_id,
-                memory_trace_id=delegate_request.memory_trace_id
-            )
-            
+        # Use task supervisor to monitor delegation depth
+        monitor_result = monitor_delegation(
+            agent_id=delegate_request.from_agent,
+            delegation_depth=current_delegation_depth
+        )
+        
+        # Check if task should be halted
+        if monitor_result["status"] != "ok":
             # Return error response
             return JSONResponse(
                 status_code=429,  # Too Many Requests
                 content={
                     "status": "error",
-                    "reason": "Delegation depth exceeded",
+                    "reason": monitor_result["reason"],
                     "delegation_depth": current_delegation_depth,
-                    "agent_id": delegate_request.to_agent
+                    "agent_id": delegate_request.to_agent,
+                    "event": monitor_result["event"]
                 }
             )
         

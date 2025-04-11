@@ -25,6 +25,8 @@ logger = logging.getLogger("task_status")
 # Import memory writer
 sys.path.append('/home/ubuntu/personal-ai-agent')
 from app.modules.memory_writer import write_memory
+# Import task supervisor
+from app.modules.task_supervisor import get_supervision_status
 
 # Create router
 router = APIRouter()
@@ -152,6 +154,47 @@ async def log_task_status(request: Request):
                 "task_id": body.get("task_id", "unknown"),
                 "timestamp": datetime.utcnow().isoformat(),
                 "stored": False,
+                "error": str(e)
+            }
+        )
+
+@router.get("/supervision")
+async def get_supervision_status_endpoint():
+    """
+    Get the current status of the task supervision system.
+    
+    This endpoint provides information about the task supervisor, including:
+    - Current supervision status (active/inactive)
+    - Lockdown mode status
+    - System caps configuration
+    - Event counts by type
+    - Log file location
+    
+    Returns:
+    - status: "success" if successful, "failure" if error occurred
+    - supervision_status: Detailed supervision status information
+    """
+    try:
+        # Get supervision status
+        supervision_status = get_supervision_status()
+        
+        # Log query
+        logger.info(f"📊 Task supervision status queried")
+        
+        # Return response
+        return {
+            "status": "success",
+            "supervision_status": supervision_status
+        }
+    except Exception as e:
+        # Log error
+        logger.error(f"❌ Error getting supervision status: {str(e)}")
+        
+        # Return error response
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "failure",
                 "error": str(e)
             }
         )
