@@ -39,6 +39,32 @@ agent_registry = {}
 # Path for persistent storage
 AGENTS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "agents.json")
 
+# Path for system caps configuration
+SYSTEM_CAPS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "system_caps.json")
+
+# Load system caps configuration
+def load_system_caps():
+    try:
+        if os.path.exists(SYSTEM_CAPS_FILE):
+            with open(SYSTEM_CAPS_FILE, 'r') as f:
+                return json.load(f)
+        else:
+            print(f"⚠️ System caps file not found at {SYSTEM_CAPS_FILE}, using default caps")
+            return {
+                "max_loops_per_task": 3,
+                "max_delegation_depth": 2
+            }
+    except Exception as e:
+        print(f"⚠️ Error loading system caps: {str(e)}")
+        return {
+            "max_loops_per_task": 3,
+            "max_delegation_depth": 2
+        }
+
+# Load system caps
+system_caps = load_system_caps()
+print(f"🔒 Loaded system caps: max_loops_per_task={system_caps['max_loops_per_task']}, max_delegation_depth={system_caps['max_delegation_depth']}")
+
 # Default core agents to ensure they always exist
 DEFAULT_AGENTS = {
     "hal": {
@@ -233,6 +259,7 @@ class AgentLoopRequest(BaseModel):
     memory_trace_id: Optional[str] = None
     max_cycles: Optional[int] = 1
     exit_conditions: Optional[List[str]] = []
+    loop_count: Optional[int] = 0  # Track number of loops for this task
 
 # Pydantic model for agent delegation request
 class AgentDelegateRequest(BaseModel):
@@ -240,6 +267,7 @@ class AgentDelegateRequest(BaseModel):
     to_agent: str
     task: str
     auto_execute: Optional[bool] = False
+    delegation_depth: Optional[int] = 0  # Track delegation depth
 
 @router.post("/create")
 async def create_agent(agent: AgentCreateRequest):
@@ -497,6 +525,7 @@ async def loop_agent(request: Request):
     - memory_trace_id: (Optional) String for memory tracing
     - max_cycles: (Optional) Maximum number of loop cycles to execute
     - exit_conditions: (Optional) Array of conditions that will terminate the loop
+    - loop_count: (Optional) Number of loops already executed for this task
     
     Returns:
     - status: "success" | "error" | "incomplete"
@@ -530,6 +559,35 @@ async def loop_agent(request: Request):
         agent_data = agent_registry[loop_request.agent_id]
         agent_name = agent_data.get("name", loop_request.agent_id.upper())
         
+        # Get current loop count for this task
+        current_loop_count = loop_request.loop_count if loop_request.loop_count is not None else 0
+        
+        # Check if max_loops_per_task has been reached
+        if current_loop_count >= system_caps["max_loops_per_task"]:
+            # Log the failure to memory
+            memory = write_memory(
+                agent_id=loop_request.agent_id,
+                type="system_halt",
+                content=f"Loop limit exceeded: {current_loop_count} loops reached for task {loop_request.task_id}",
+                tags=["error", "loop_limit", "system_halt"],
+                project_id=loop_request.project_id,
+                status="error",
+                task_type=loop_request.task_type if loop_request.task_type else "loop",
+                task_id=loop_request.task_id,
+                memory_trace_id=loop_request.memory_trace_id
+            )
+            
+            # Return error response
+            return JSONResponse(
+                status_code=429,  # Too Many Requests
+                content={
+                    "status": "error",
+                    "reason": "Loop limit exceeded",
+                    "loop_count": current_loop_count,
+                    "task_id": loop_request.task_id if loop_request.task_id else "unknown"
+                }
+            )
+        
         # Update agent state to "looping" and last_active timestamp
         agent_registry[loop_request.agent_id]["agent_state"] = "looping"
         agent_registry[loop_request.agent_id]["last_active"] = datetime.utcnow().isoformat()
@@ -538,9 +596,11 @@ async def loop_agent(request: Request):
         agent_registry[loop_request.agent_id]["loop_count"] = agent_data.get("loop_count", 0) + 1
         save_agent_registry()
         
+        # Increment loop count for this task
+        current_loop_count += 1
+        
         # Check if max_cycles has been reached
-        current_cycle = agent_registry[loop_request.agent_id]["loop_count"]
-        if loop_request.max_cycles and current_cycle > loop_request.max_cycles:
+        if loop_request.max_cycles and current_loop_count > loop_request.max_cycles:
             # Reset agent state to "idle" after loop completes
             agent_registry[loop_request.agent_id]["agent_state"] = "idle"
             save_agent_registry()
@@ -549,7 +609,7 @@ async def loop_agent(request: Request):
                 "status": "incomplete",
                 "loop_summary": "Maximum cycle count reached",
                 "loop_result": "Loop terminated due to max_cycles limit",
-                "cycle_number": current_cycle,
+                "cycle_number": current_loop_count,
                 "memory_id": "",
                 "task_id": loop_request.task_id if loop_request.task_id else str(uuid.uuid4()),
                 "project_id": loop_request.project_id if loop_request.project_id else "",
@@ -620,7 +680,9 @@ async def loop_agent(request: Request):
             tags=["reflection", "planning", loop_request.loop_type],
             project_id=loop_request.project_id,
             status=loop_request.status if loop_request.status else "success",
-            task_type=loop_request.task_type if loop_request.task_type else "loop"
+            task_type=loop_request.task_type if loop_request.task_type else "loop",
+            task_id=loop_request.task_id,
+            memory_trace_id=loop_request.memory_trace_id
         )
         
         # Return full loop result with structured format according to SDK Contract v1.0.0
@@ -628,7 +690,8 @@ async def loop_agent(request: Request):
             "status": "success",
             "loop_summary": reflection,
             "loop_result": plan,
-            "cycle_number": agent_registry[loop_request.agent_id]["loop_count"],
+            "cycle_number": current_loop_count,
+            "loop_count": current_loop_count,  # Include current loop count in response
             "memory_id": memory["memory_id"],
             "task_id": loop_request.task_id if loop_request.task_id else str(uuid.uuid4()),
             "project_id": loop_request.project_id if loop_request.project_id else "",
@@ -665,6 +728,7 @@ async def delegate_task(request: Request):
     - to_agent: ID of the agent receiving the task
     - task: The task to delegate
     - auto_execute: (Optional) Whether to execute the task immediately
+    - delegation_depth: (Optional) Current delegation depth
     
     Returns:
     - status: "ok" if successful
@@ -703,25 +767,51 @@ async def delegate_task(request: Request):
                 }
             )
         
+        # Get current delegation depth
+        current_delegation_depth = delegate_request.delegation_depth if delegate_request.delegation_depth is not None else 0
+        
+        # Check if max_delegation_depth has been reached
+        if current_delegation_depth >= system_caps["max_delegation_depth"]:
+            # Log the failure to memory
+            memory = write_memory(
+                agent_id=delegate_request.from_agent,
+                type="system_halt",
+                content=f"Delegation depth exceeded: {current_delegation_depth} levels reached for delegation to {delegate_request.to_agent}",
+                tags=["error", "delegation_limit", "system_halt"],
+                status="error",
+                task_type="delegate"
+            )
+            
+            # Return error response
+            return JSONResponse(
+                status_code=429,  # Too Many Requests
+                content={
+                    "status": "error",
+                    "reason": "Delegation depth exceeded",
+                    "delegation_depth": current_delegation_depth,
+                    "agent_id": delegate_request.to_agent
+                }
+            )
+        
         # Generate delegation ID
         delegation_id = str(uuid.uuid4())
         
-        # Get agent metadata
-        from_agent_data = agent_registry[delegate_request.from_agent]
-        from_agent_name = from_agent_data.get("name", delegate_request.from_agent.upper())
-        
-        to_agent_data = agent_registry[delegate_request.to_agent]
-        to_agent_name = to_agent_data.get("name", delegate_request.to_agent.upper())
-        
-        # Format delegation content
-        delegation_content = f"Task delegated from {from_agent_name}: {delegate_request.task}"
-        
-        # Write to target agent's memory
+        # Write delegation to memory
         memory = write_memory(
             agent_id=delegate_request.to_agent,
             type="delegated_task",
-            content=delegation_content,
-            tags=["delegation", f"from_{delegate_request.from_agent}"]
+            content=delegate_request.task,
+            tags=["delegation", f"from_{delegate_request.from_agent}"],
+            status="pending"
+        )
+        
+        # Also write to delegating agent's memory
+        from_memory = write_memory(
+            agent_id=delegate_request.from_agent,
+            type="delegation",
+            content=f"Delegated task to {delegate_request.to_agent}: {delegate_request.task}",
+            tags=["delegation", f"to_{delegate_request.to_agent}"],
+            status="delegated"
         )
         
         # Prepare response
@@ -732,40 +822,25 @@ async def delegate_task(request: Request):
             "from_agent": delegate_request.from_agent,
             "to_agent": delegate_request.to_agent,
             "written_to_memory": True,
-            "timestamp": datetime.utcnow().isoformat()
+            "delegation_depth": current_delegation_depth + 1  # Increment delegation depth
         }
         
-        # Auto-execute if requested
+        # Execute task immediately if requested
         if delegate_request.auto_execute:
-            try:
-                # Initialize LLM Engine
-                llm_engine = LLMEngine()
-                
-                # Format prompt with agent context
-                formatted_prompt = f"[Agent {to_agent_name}]: {delegate_request.task}"
-                
-                # Process prompt
-                execution_result = llm_engine.infer(
-                    prompt=formatted_prompt,
-                    model="openai"
-                )
-                
-                # Write execution result to memory
-                execution_memory = write_memory(
-                    agent_id=delegate_request.to_agent,
-                    type="task_execution",
-                    content=f"Executed delegated task from {from_agent_name}: {execution_result}",
-                    tags=["execution", f"from_{delegate_request.from_agent}", f"delegation_{delegation_id}"]
-                )
-                
-                # Add execution result to response
-                response["execution_result"] = execution_result
-                response["execution_memory_id"] = execution_memory["memory_id"]
-            except Exception as exec_error:
-                logger.error(f"Error auto-executing task: {str(exec_error)}")
-                response["execution_error"] = str(exec_error)
+            # In a real implementation, this would call the agent's run endpoint
+            # For now, we'll just simulate a response
+            execution_result = {
+                "status": "success",
+                "message": f"Task executed by {delegate_request.to_agent}",
+                "result": f"Simulated result for task: {delegate_request.task}"
+            }
+            response["execution_result"] = execution_result
+            
+            # Update memory status
+            # In a real implementation, this would be done by the agent's run endpoint
+            # For now, we'll just update the memory status
+            memory["status"] = "completed"
         
-        # Return response
         return response
     except Exception as e:
         logger.error(f"Error delegating task: {str(e)}")

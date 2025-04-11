@@ -5,6 +5,34 @@ from app.modules.memory_summarizer import summarize_memories
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 from datetime import datetime
+import os
+import json
+
+# Path for system caps configuration
+SYSTEM_CAPS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "system_caps.json")
+
+# Load system caps configuration
+def load_system_caps():
+    try:
+        if os.path.exists(SYSTEM_CAPS_FILE):
+            with open(SYSTEM_CAPS_FILE, 'r') as f:
+                return json.load(f)
+        else:
+            print(f"⚠️ System caps file not found at {SYSTEM_CAPS_FILE}, using default caps")
+            return {
+                "max_loops_per_task": 3,
+                "max_delegation_depth": 2
+            }
+    except Exception as e:
+        print(f"⚠️ Error loading system caps: {str(e)}")
+        return {
+            "max_loops_per_task": 3,
+            "max_delegation_depth": 2
+        }
+
+# Load system caps
+system_caps = load_system_caps()
+print(f"🔒 Memory module loaded system caps: max_loops_per_task={system_caps['max_loops_per_task']}, max_delegation_depth={system_caps['max_delegation_depth']}")
 
 class MemoryEntry(BaseModel):
     agent_id: str
@@ -24,6 +52,7 @@ class ReflectionRequest(BaseModel):
     memory_trace_id: str
     type: Optional[str] = "memory"
     limit: int = 5
+    loop_count: Optional[int] = 0  # Track number of loops for this task
     
 class SummarizeRequest(BaseModel):
     agent_id: str
@@ -187,6 +216,7 @@ async def reflect_on_memories(request: Request):
     - memory_trace_id: Memory trace identifier for linking (required)
     - type: Memory type to reflect on (optional, defaults to "memory")
     - limit: Maximum number of memories to consider (optional, defaults to 5)
+    - loop_count: Number of loops already executed for this task (optional, defaults to 0)
     
     Returns:
     - status: "success" if successful, "failure" if error occurred
@@ -200,6 +230,37 @@ async def reflect_on_memories(request: Request):
         # Parse request body
         body = await request.json()
         reflection_request = ReflectionRequest(**body)
+        
+        # Check if this reflection is part of a loop and enforce loop cap
+        current_loop_count = reflection_request.loop_count if reflection_request.loop_count is not None else 0
+        
+        # Check if max_loops_per_task has been reached
+        if current_loop_count >= system_caps["max_loops_per_task"]:
+            # Log the failure to memory
+            memory = write_memory(
+                agent_id=reflection_request.agent_id,
+                type="system_halt",
+                content=f"Reflection loop limit exceeded: {current_loop_count} loops reached for task {reflection_request.task_id}",
+                tags=["error", "loop_limit", "system_halt", "reflection"],
+                project_id=reflection_request.project_id,
+                status="error",
+                task_id=reflection_request.task_id,
+                memory_trace_id=reflection_request.memory_trace_id
+            )
+            
+            # Return error response
+            return JSONResponse(
+                status_code=429,  # Too Many Requests
+                content={
+                    "status": "error",
+                    "reason": "Loop limit exceeded",
+                    "loop_count": current_loop_count,
+                    "task_id": reflection_request.task_id,
+                    "project_id": reflection_request.project_id,
+                    "memory_trace_id": reflection_request.memory_trace_id,
+                    "agent_id": reflection_request.agent_id
+                }
+            )
         
         # Get recent memories using similar logic to /read endpoint
         filtered_memories = [m for m in memory_store if m["agent_id"] == reflection_request.agent_id]
@@ -239,7 +300,8 @@ async def reflect_on_memories(request: Request):
             "task_id": reflection_request.task_id,
             "project_id": reflection_request.project_id,
             "memory_trace_id": reflection_request.memory_trace_id,
-            "agent_id": reflection_request.agent_id
+            "agent_id": reflection_request.agent_id,
+            "loop_count": current_loop_count + 1  # Increment loop count in response
         }
     except Exception as e:
         # Log error details
