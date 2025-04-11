@@ -304,8 +304,20 @@ async def summarize_memories_endpoint(request: Request):
         # Use context if provided
         if summarize_request.context:
             # If context is provided, use it instead of filtered memories
-            context_content = [item.get("content", str(item)) for item in summarize_request.context if item]
-            summary_text = summarize_memories(context_content)
+            context_content = []
+            for item in summarize_request.context:
+                if item:
+                    if isinstance(item, dict) and "content" in item:
+                        context_content.append(item["content"])
+                    else:
+                        # If item is not a dict or doesn't have content key, use string representation
+                        context_content.append(str(item))
+            
+            # Only attempt to summarize if we have content
+            if context_content:
+                summary_text = summarize_memories(context_content)
+            else:
+                summary_text = "No valid content found in provided context."
         else:
             # Generate summary from filtered memories
             summary_text = summarize_memories(filtered_memories)
