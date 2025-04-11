@@ -312,7 +312,7 @@ def halt_task(task_id_or_agent: str, reason: str) -> Dict[str, Any]:
             tags=["error", reason, "system_halt", "security"],
             status="error",
             task_id=task_id_or_agent if "task" in reason else None,
-            agent_id=task_id_or_agent if "agent" in task_id_or_agent else None
+            target_agent_id=task_id_or_agent if "agent" in task_id_or_agent else None
         )
         
         event["memory_id"] = memory.get("memory_id")
