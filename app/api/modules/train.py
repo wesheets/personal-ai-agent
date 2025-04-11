@@ -233,7 +233,7 @@ async def trigger_reflection(agent_id: str, memory_type: str = "training", limit
         logger.error(traceback.format_exc())
         return f"Error triggering reflection: {str(e)}"
 
-@router.post("")
+@router.post("/")
 async def train_agent(
     request: TrainingRequest,
     preview: Optional[bool] = Query(None)
