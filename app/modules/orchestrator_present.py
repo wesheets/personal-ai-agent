@@ -15,7 +15,7 @@ import os
 
 # Create router
 router = APIRouter()
-print("🧠 Route defined: /orchestrator/present -> generate_architecture_deck")
+print("🧠 Route defined: /api/modules/orchestrator/present -> generate_architecture_deck")
 
 class PresentRequest(BaseModel):
     """Request model for the present endpoint"""

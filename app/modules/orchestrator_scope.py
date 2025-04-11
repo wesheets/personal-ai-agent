@@ -20,7 +20,7 @@ from app.modules.memory_writer import write_memory
 
 # Create router
 router = APIRouter()
-print("🧠 Route defined: /orchestrator/scope -> generate_project_scope")
+print("🧠 Route defined: /api/modules/orchestrator/scope -> generate_project_scope")
 
 class ScopeRequest(BaseModel):
     """Request model for the scope endpoint"""

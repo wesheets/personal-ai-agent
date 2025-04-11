@@ -306,4 +306,4 @@ async def verify_task(request: VerifyTaskRequest):
     )
 
 # Add a print statement to confirm the route is defined
-print("🧠 Route defined: /verify_task -> verify_task")
+print("🧠 Route defined: /api/modules/agent/verify_task -> verify_task")
