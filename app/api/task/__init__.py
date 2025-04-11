@@ -9,4 +9,5 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-from . import status
+from .status import router as status_router
+router.include_router(status_router)
