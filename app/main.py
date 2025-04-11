@@ -264,7 +264,6 @@ try:
     print("🔄 Including module routers...")
     print("📡 Including AgentRunner module router from /api/modules/agent.py")
     print("📡 Including MemoryWriter module router from /api/modules/memory.py")
-    print("📡 Including DelegationEngine module router from /api/modules/delegate.py")
     print("📡 Including StreamModule module router from /api/modules/stream.py")
     print("📡 Including TrainingModule module router from /api/modules/train.py")
     print("📡 Including SystemStatus module router from /api/modules/system.py")
@@ -277,7 +276,8 @@ try:
     print("📡 Including Reflect module router from /app/modules/reflect.py")
     
     from app.api.modules import memory  # Import the memory.py route file
-    from app.api.modules import delegate  # Import the delegate.py route file
+    # REMOVED: Conflicting import for delegate router
+    # from app.api.modules import delegate  # Import the delegate.py route file
     from app.api.modules import stream  # Import the stream.py route file
     from app.api.modules import train  # Import the train.py route file
     from app.api.modules import system  # Import the system.py route file
@@ -305,7 +305,8 @@ try:
     
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(memory.router, prefix="/app/modules")  # Mount the memory router
-    app.include_router(delegate.router, prefix="/api/modules")  # Mount the delegate router
+    # REMOVED: Conflicting router registration
+    # app.include_router(delegate.router, prefix="/api/modules")  # Mount the delegate router
     app.include_router(stream.router, prefix="/api/modules")  # Mount the stream router
     app.include_router(train.router, prefix="/api/modules")  # Mount the train router
     app.include_router(system.router, prefix="/api/modules/system")  # Mount the system router
