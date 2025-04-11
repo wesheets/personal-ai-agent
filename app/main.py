@@ -323,6 +323,7 @@ try:
     print("📡 Including Reflect module router from /app/modules/reflect.py")
     print("📡 Including Orchestrator Scope module router from /app/modules/orchestrator_scope.py")
     print("📡 Including Orchestrator Present module router from /app/modules/orchestrator_present.py")
+    print("📡 Including Orchestrator Build module router from /app/modules/orchestrator_build.py")
     print("📡 Including Agent Present module router from /app/modules/agent_present.py")
     print("📡 Including Agent Create module router from /app/modules/agent_create.py")
     print("📡 Including Agent Verify module router from /app/modules/agent_verify.py")
@@ -350,6 +351,7 @@ try:
     # Import the orchestrator routers from the new location
     from app.modules.orchestrator_scope import router as scope_router  # Import the orchestrator scope router
     from app.modules.orchestrator_present import router as present_router  # Import the orchestrator present router
+    from app.modules.orchestrator_build import router as build_router  # Import the orchestrator build router
     from app.modules.agent_present import router as agent_present_router  # Import the agent present router
     from app.modules.agent_create import router as agent_create_router  # Import the agent create router
     from app.modules.agent_verify import router as agent_verify_router  # Import the agent verify router
@@ -366,6 +368,7 @@ try:
     print(f"🔍 DEBUG: Delegate router object: {delegate_router}")
     print(f"🔍 DEBUG: Reflect router object: {reflect_router}")
     print(f"🔍 DEBUG: Orchestrator Scope router object: {scope_router}")
+    print(f"🔍 DEBUG: Orchestrator Build router object: {build_router}")
     print(f"🔍 DEBUG: Agent Verify router object: {agent_verify_router}")
     print(f"🔍 DEBUG: Agent Reflect router object: {agent_reflect_router}")
     print(f"🔍 DEBUG: Agent Fallback router object: {agent_fallback_router}")
@@ -393,6 +396,7 @@ try:
     # Mount the orchestrator routers with the correct prefix
     app.include_router(scope_router, prefix="/orchestrator")  # Mount the orchestrator scope router
     app.include_router(present_router, prefix="/orchestrator")  # Mount the orchestrator present router
+    app.include_router(build_router, prefix="/api/modules/orchestrator")  # Mount the orchestrator build router
     
     # Mount the agent present router
     app.include_router(agent_present_router)  # Mount the agent present router (no prefix needed as path is already /agent/present)
@@ -400,50 +404,76 @@ try:
     # Mount the agent create router
     app.include_router(agent_create_router)  # Mount the agent create router (no prefix needed as path is already /agent/create)
     
-    # Mount the agent verify router with the correct prefix
+    # Mount the agent verify router
     app.include_router(agent_verify_router, prefix="/api/modules/agent")  # Mount the agent verify router with prefix to make it available at /api/modules/agent/verify_task
     
-    # Mount the agent reflect router with the correct prefix
+    # Mount the agent reflect router
     app.include_router(agent_reflect_router, prefix="/api/modules/agent")  # Mount the agent reflect router with prefix to make it available at /api/modules/agent/reflect
     
-    # Mount the agent fallback router with the correct prefix
+    # Mount the agent fallback router
     app.include_router(agent_fallback_router, prefix="/api/modules/agent")  # Mount the agent fallback router with prefix to make it available at /api/modules/agent/fallback
     
-    # Log route registration for agent fallback
-    print("🧠 Route defined: /api/modules/agent/fallback -> fallback_task")
+    # Print route defined message for orchestrator build
+    print("🧠 Route defined: /api/modules/orchestrator/build -> build_execution_plan")
     
-    print("✅ Module routers included")
-
-    # Simple GET echo route for production health check
-    @app.get("/echo")
-    async def echo():
-        print("📡 /echo route was hit!")
-        return {"echo": "success", "timestamp": datetime.datetime.now().isoformat()}
-
+    # MODIFIED: Commented out problematic routes
+    """
+    # Include the other routers
+    app.include_router(agent_router, prefix="/api")
+    app.include_router(memory_router, prefix="/api")
+    app.include_router(goals_router, prefix="/api")
+    app.include_router(memory_viewer_router, prefix="/api")
+    app.include_router(control_router, prefix="/api")
+    app.include_router(logs_router, prefix="/api")
+    app.include_router(delegate_router, prefix="/api")
+    app.include_router(hal_debug_router, prefix="/api")
+    app.include_router(debug_router, prefix="/api")
+    app.include_router(performance_router, prefix="/api")
+    app.include_router(streaming_router, prefix="/api")
+    app.include_router(system_routes, prefix="/api")
+    app.include_router(agent_status_router, prefix="/api")
+    """
+    
+    # Mount static files for the UI
+    app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    
+    # Custom Swagger UI with dark mode
+    @app.get("/docs", include_in_schema=False)
+    async def custom_swagger_ui_html():
+        return get_swagger_ui_html(
+            openapi_url=app.openapi_url,
+            title=app.title + " - API Documentation",
+            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+            swagger_js_url="/static/swagger-ui-bundle.js",
+            swagger_css_url="/static/swagger-ui.css",
+            swagger_favicon_url="/static/favicon.png",
+        )
+    
+    # Print startup complete message
+    print("✅ FastAPI app startup complete")
+    
 except Exception as e:
-    # Catch any startup errors and log them
+    # Log any startup errors
     print(f"❌ ERROR DURING STARTUP: {str(e)}")
     import traceback
     traceback.print_exc()
     
-    # Create a minimal app that can respond to health checks
+    # Create a minimal FastAPI app that returns error for all routes
     app = FastAPI(
-        title="Enhanced AI Agent System [ERROR MODE]",
-        description="Error mode - application failed to start properly",
+        title="Enhanced AI Agent System - ERROR MODE",
+        description="The application encountered an error during startup. Please check the logs.",
         version="1.0.0"
     )
     
-    @app.get("/")
-    async def root_health_error():
-        """Root health check that still returns OK for Railway deployment"""
-        return {"status": "ok", "mode": "error", "message": "Application in error mode"}
+    @app.get("/{path:path}")
+    async def error_response(path: str):
+        return {
+            "status": "error",
+            "message": "The application encountered an error during startup. Please check the logs.",
+            "error": str(e)
+        }
     
+    # Add health check endpoint to prevent continuous restarts
     @app.get("/health")
-    async def health_error():
-        """Health check that still returns OK for Railway deployment"""
-        return {"status": "ok", "mode": "error", "message": "Application in error mode"}
-    
-    @app.get("/error")
-    async def error_details():
-        """Endpoint to get error details"""
-        return {"status": "error", "error": str(e), "traceback": traceback.format_exc()}
+    async def health():
+        return {"status": "error", "message": "Application in error mode", "error": str(e)}
