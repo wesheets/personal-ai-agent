@@ -47,7 +47,7 @@ class ProjectOutput(BaseModel):
     log_id: str
     stored: bool = True
 
-@router.post("")
+@router.post("/")
 async def create_project(request: Request):
     """
     Create a new project container for orchestrated goals.
@@ -135,7 +135,7 @@ async def create_project(request: Request):
             }
         )
 
-@router.get("")
+@router.get("/")
 async def get_projects(
     project_id: Optional[str] = Query(None, description="Filter by project ID"),
     user_id: Optional[str] = Query(None, description="Filter by user ID"),
