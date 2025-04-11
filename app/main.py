@@ -327,6 +327,7 @@ try:
     print("📡 Including Agent Create module router from /app/modules/agent_create.py")
     print("📡 Including Agent Verify module router from /app/modules/agent_verify.py")
     print("📡 Including Agent Reflect module router from /app/modules/agent_reflect.py")
+    print("📡 Including Agent Fallback module router from /app/modules/agent_fallback.py")
     
     from app.api.modules import memory  # Import the memory.py route file
     # REMOVED: Conflicting import for delegate router
@@ -353,6 +354,7 @@ try:
     from app.modules.agent_create import router as agent_create_router  # Import the agent create router
     from app.modules.agent_verify import router as agent_verify_router  # Import the agent verify router
     from app.modules.agent_reflect import router as agent_reflect_router  # Import the agent reflect router
+    from app.modules.agent_fallback import router as agent_fallback_router  # Import the agent fallback router
     
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
@@ -366,6 +368,7 @@ try:
     print(f"🔍 DEBUG: Orchestrator Scope router object: {scope_router}")
     print(f"🔍 DEBUG: Agent Verify router object: {agent_verify_router}")
     print(f"🔍 DEBUG: Agent Reflect router object: {agent_reflect_router}")
+    print(f"🔍 DEBUG: Agent Fallback router object: {agent_fallback_router}")
     
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(memory.router, prefix="/app/modules")  # Mount the memory router
@@ -402,6 +405,12 @@ try:
     
     # Mount the agent reflect router with the correct prefix
     app.include_router(agent_reflect_router, prefix="/api/modules/agent")  # Mount the agent reflect router with prefix to make it available at /api/modules/agent/reflect
+    
+    # Mount the agent fallback router with the correct prefix
+    app.include_router(agent_fallback_router, prefix="/api/modules/agent")  # Mount the agent fallback router with prefix to make it available at /api/modules/agent/fallback
+    
+    # Log route registration for agent fallback
+    print("🧠 Route defined: /api/modules/agent/fallback -> fallback_task")
     
     print("✅ Module routers included")
 
