@@ -1,7 +1,7 @@
 """
 Orchestrator Build Module - Task Plan Executor
 
-This module provides the /orchestrator/build endpoint for executing pre-generated task plans
+This module provides the /api/modules/orchestrator/build endpoint for executing pre-generated task plans
 by dynamically assigning each task to an agent based on skill match and availability.
 """
 
@@ -29,7 +29,7 @@ logger = logging.getLogger("api.modules.orchestrator_build")
 
 # Create router
 router = APIRouter()
-print("🧠 Route defined: /orchestrator/build -> execute_task_plan")
+print("🧠 Route defined: /api/modules/orchestrator/build -> execute_task_plan")
 
 # Define the models
 class TaskDefinition(BaseModel):

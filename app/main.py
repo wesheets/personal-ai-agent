@@ -414,7 +414,7 @@ try:
     app.include_router(agent_fallback_router, prefix="/api/modules/agent")  # Mount the agent fallback router with prefix to make it available at /api/modules/agent/fallback
     
     # Print route defined message for orchestrator build
-    print("🧠 Route defined: /api/modules/orchestrator/build -> build_execution_plan")
+    print("🧠 Route defined: /api/modules/orchestrator/build -> execute_task_plan")
     
     # MODIFIED: Commented out problematic routes
     """
@@ -434,8 +434,8 @@ try:
     app.include_router(agent_status_router, prefix="/api")
     """
     
-    # Mount static files for the UI
-    app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    # MODIFIED: Commented out static files mount to prevent crash in container deployment
+    # app.mount("/static", StaticFiles(directory="app/static"), name="static")
     
     # Custom Swagger UI with dark mode
     @app.get("/docs", include_in_schema=False)
