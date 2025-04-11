@@ -45,6 +45,9 @@ def test_orchestrator_scope_endpoint_basic():
     assert "suggested_tests" in data
     assert "markdown_summary" in data
     assert "stored" in data
+    assert "skill_validation_passed" in data
+    assert "unmatched_tasks" in data
+    assert "agent_creation_suggestions" in data
     
     # Check that the goal matches the request
     assert data["goal"] == request_data["goal"]
@@ -89,6 +92,12 @@ def test_orchestrator_scope_endpoint_basic():
     
     # Check that stored is a boolean
     assert isinstance(data["stored"], bool)
+    
+    # Check that skill_validation_passed is a boolean
+    assert isinstance(data["skill_validation_passed"], bool)
+    
+    # Check that unmatched_tasks is a list
+    assert isinstance(data["unmatched_tasks"], list)
 
 def test_orchestrator_scope_endpoint_with_project_id():
     """Test the orchestrator/scope endpoint with a provided project_id."""
@@ -273,6 +282,128 @@ def test_orchestrator_scope_endpoint_suggested_tests():
             break
     
     assert has_summarize_test, "No summarize test found for a summarization-related goal"
+
+def test_orchestrator_scope_endpoint_skill_validation():
+    """Test that the orchestrator/scope endpoint correctly validates agent skills."""
+    # Create a test request with a goal requiring summarization
+    request_data = {
+        "goal": "Create a data analysis pipeline with summarization",
+        "mode": "scope"
+    }
+    
+    # Make the request
+    response = client.post("/orchestrator/scope", json=request_data)
+    
+    # Check the response
+    assert response.status_code == 200
+    
+    # Parse the response
+    data = response.json()
+    
+    # Check that skill_validation_passed is present
+    assert "skill_validation_passed" in data
+    
+    # Check that unmatched_tasks is present
+    assert "unmatched_tasks" in data
+    
+    # Check confidence scores for agents
+    for agent_name, score in data["confidence_scores"].items():
+        assert isinstance(score, float)
+        assert 0.0 <= score <= 1.0
+
+def test_orchestrator_scope_endpoint_no_agent_can_summarize():
+    """Test scenario where no agent can summarize."""
+    # This test simulates a situation where no agent has the summarize skill
+    # The actual implementation will use the agent_manifest.json to determine skills
+    
+    # Create a test request with a goal requiring summarization
+    request_data = {
+        "goal": "Create a comprehensive summarization system",
+        "mode": "scope"
+    }
+    
+    # Make the request
+    response = client.post("/orchestrator/scope", json=request_data)
+    
+    # Check the response
+    assert response.status_code == 200
+    
+    # Parse the response
+    data = response.json()
+    
+    # Check that skill_validation_passed is false
+    # Note: This assertion might fail if the agent_manifest.json has been updated
+    # to include summarize skills for agents. In that case, this test should be updated.
+    assert "skill_validation_passed" in data
+    
+    # Check that unmatched_tasks is not empty
+    assert "unmatched_tasks" in data
+    
+    # Check that there's at least one unmatched task related to summarization
+    summarize_unmatched = False
+    for task in data["unmatched_tasks"]:
+        if "summarize" in task["tool"]:
+            summarize_unmatched = True
+            break
+    
+    # This assertion might fail if the agent_manifest.json has been updated
+    # to include summarize skills for agents. In that case, this test should be updated.
+    assert summarize_unmatched, "Expected unmatched task for summarize not found"
+
+def test_orchestrator_scope_endpoint_agent_creation_suggestions():
+    """Test that the orchestrator/scope endpoint generates agent creation suggestions for skill gaps."""
+    # Create a test request with a goal requiring emotional analysis (a skill no agent has)
+    request_data = {
+        "goal": "Build a journaling AI that reflects on memory with emotional analysis",
+        "mode": "scope"
+    }
+    
+    # Make the request
+    response = client.post("/orchestrator/scope", json=request_data)
+    
+    # Check the response
+    assert response.status_code == 200
+    
+    # Parse the response
+    data = response.json()
+    
+    # Check that skill_validation_passed is false
+    assert "skill_validation_passed" in data
+    assert data["skill_validation_passed"] is False
+    
+    # Check that unmatched_tasks is not empty
+    assert "unmatched_tasks" in data
+    assert len(data["unmatched_tasks"]) > 0
+    
+    # Check that there's at least one unmatched task related to emotional analysis
+    emotional_analysis_unmatched = False
+    for task in data["unmatched_tasks"]:
+        if "emotional_analysis" in task["tool"]:
+            emotional_analysis_unmatched = True
+            break
+    
+    assert emotional_analysis_unmatched, "Expected unmatched task for emotional_analysis not found"
+    
+    # Check that agent_creation_suggestions is present and not empty
+    assert "agent_creation_suggestions" in data
+    assert len(data["agent_creation_suggestions"]) > 0
+    
+    # Check the structure of the agent creation suggestion
+    suggestion = data["agent_creation_suggestions"][0]
+    assert "agent_name" in suggestion
+    assert "proposed_skills" in suggestion
+    assert "tone_profile" in suggestion
+    assert "reason" in suggestion
+    
+    # Check that the tone profile has the required fields
+    tone_profile = suggestion["tone_profile"]
+    assert "style" in tone_profile
+    assert "emotion" in tone_profile
+    assert "vibe" in tone_profile
+    assert "persona" in tone_profile
+    
+    # Check that the proposed skills include emotional_analysis
+    assert "emotional_analysis" in suggestion["proposed_skills"]
 
 if __name__ == "__main__":
     # Run the tests

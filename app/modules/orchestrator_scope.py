@@ -52,6 +52,20 @@ class UnmatchedTask(BaseModel):
     tool: str
     reason: str
 
+class ToneProfile(BaseModel):
+    """Model for agent tone profile in agent creation suggestions"""
+    style: str
+    emotion: str
+    vibe: str
+    persona: str
+
+class AgentCreationSuggestion(BaseModel):
+    """Model for agent creation suggestions in the scope response"""
+    agent_name: str
+    proposed_skills: List[str]
+    tone_profile: ToneProfile
+    reason: str
+
 class ScopeResponse(BaseModel):
     """Response model for the scope endpoint"""
     project_id: str
@@ -71,6 +85,7 @@ class ScopeResponse(BaseModel):
     stored: bool = False
     skill_validation_passed: bool = True
     unmatched_tasks: Optional[List[UnmatchedTask]] = None
+    agent_creation_suggestions: Optional[List[AgentCreationSuggestion]] = None
 
 @router.post("/scope")
 async def generate_project_scope(request: Request):
@@ -163,7 +178,7 @@ def generate_scope(goal: str, project_id: str) -> Dict[str, Any]:
     required_modules = analyze_goal_for_modules(goal)
     
     # Determine suggested agents based on the goal and required modules
-    suggested_agents, skill_validation_passed, unmatched_tasks = determine_suggested_agents(goal, required_modules)
+    suggested_agents, skill_validation_passed, unmatched_tasks, agent_creation_suggestions = determine_suggested_agents(goal, required_modules)
     
     # Generate recommended schema
     recommended_schema = generate_recommended_schema(goal, required_modules)
@@ -223,6 +238,10 @@ def generate_scope(goal: str, project_id: str) -> Dict[str, Any]:
         scope["unmatched_tasks"] = [task.dict() for task in unmatched_tasks]
     else:
         scope["unmatched_tasks"] = []
+    
+    # Add agent_creation_suggestions if there are any
+    if agent_creation_suggestions:
+        scope["agent_creation_suggestions"] = [suggestion.dict() for suggestion in agent_creation_suggestions]
     
     return scope
 
@@ -290,20 +309,22 @@ def get_agent_skills() -> Dict[str, List[str]]:
         print(f"Error loading agent skills: {str(e)}")
         return {}
 
-def determine_suggested_agents(goal: str, required_modules: List[str]) -> tuple[List[AgentConfig], bool, List[UnmatchedTask]]:
+def determine_suggested_agents(goal: str, required_modules: List[str]) -> tuple[List[AgentConfig], bool, List[UnmatchedTask], List[AgentCreationSuggestion]]:
     """
     Determine suggested agents based on the goal and required modules.
     Validates that agents have the required skills for the tools they're assigned.
+    When skill gaps are detected, suggests new agents that could fill those gaps.
     
     Args:
         goal: High-level user goal
         required_modules: List of required modules
         
     Returns:
-        Tuple of (suggested_agents, skill_validation_passed, unmatched_tasks)
+        Tuple of (suggested_agents, skill_validation_passed, unmatched_tasks, agent_creation_suggestions)
     """
     suggested_agents = []
     unmatched_tasks = []
+    agent_creation_suggestions = []
     skill_validation_passed = True
     
     # Get agent skills from agent_manifest.json
@@ -319,11 +340,15 @@ def determine_suggested_agents(goal: str, required_modules: List[str]) -> tuple[
         "read": ["memory", "hal"],
         "train": ["neureal"],
         "loop": ["core-forge"],
-        "task/status": ["ops"]
+        "task/status": ["ops"],
+        "emotional_analysis": []  # No existing agent has this skill
     }
     
     # Track which required modules have a qualified agent
     module_has_qualified_agent = {module: False for module in required_modules}
+    
+    # Track unmatched skills for agent creation suggestions
+    unmatched_skills = []
     
     # Define required tools for each agent
     hal_tools = ["reflect", "summarize"]
@@ -341,6 +366,7 @@ def determine_suggested_agents(goal: str, required_modules: List[str]) -> tuple[
             # Mark this tool as unmatched
             if tool in module_has_qualified_agent:
                 module_has_qualified_agent[tool] = False
+                unmatched_skills.append(tool)
     
     # Add HAL with appropriate confidence score
     hal = AgentConfig(
@@ -368,6 +394,7 @@ def determine_suggested_agents(goal: str, required_modules: List[str]) -> tuple[
             # Mark this tool as unmatched
             if tool in module_has_qualified_agent:
                 module_has_qualified_agent[tool] = False
+                unmatched_skills.append(tool)
     
     # Add ASH with appropriate confidence score
     ash = AgentConfig(
@@ -407,13 +434,228 @@ def determine_suggested_agents(goal: str, required_modules: List[str]) -> tuple[
                 reason=f"No agent declared capability for {module}"
             ))
             module_has_qualified_agent[module] = False
+            unmatched_skills.append(module)
     
     # Check if all required modules have a qualified agent
     for module, has_agent in module_has_qualified_agent.items():
         if not has_agent:
             skill_validation_passed = False
     
-    return suggested_agents, skill_validation_passed, unmatched_tasks
+    # Generate agent creation suggestions if there are unmatched skills
+    if unmatched_skills:
+        agent_creation_suggestions = generate_agent_suggestions(goal, unmatched_skills)
+    
+    return suggested_agents, skill_validation_passed, unmatched_tasks, agent_creation_suggestions
+
+def generate_agent_suggestions(goal: str, unmatched_skills: List[str]) -> List[AgentCreationSuggestion]:
+    """
+    Generate agent creation suggestions based on unmatched skills.
+    
+    Args:
+        goal: High-level user goal
+        unmatched_skills: List of skills that don't have matching agents
+        
+    Returns:
+        List of agent creation suggestions
+    """
+    suggestions = []
+    
+    # Group related skills for more coherent agent suggestions
+    skill_groups = group_related_skills(unmatched_skills)
+    
+    # Generate a suggestion for each skill group
+    for skill_group in skill_groups:
+        # Generate agent name based on skills
+        agent_name = generate_agent_name(skill_group)
+        
+        # Generate tone profile based on skills and goal
+        tone_profile = generate_tone_profile(skill_group, goal)
+        
+        # Generate reason for agent creation
+        reason = generate_agent_reason(skill_group, goal)
+        
+        # Create agent creation suggestion
+        suggestion = AgentCreationSuggestion(
+            agent_name=agent_name,
+            proposed_skills=skill_group,
+            tone_profile=tone_profile,
+            reason=reason
+        )
+        
+        suggestions.append(suggestion)
+    
+    return suggestions
+
+def group_related_skills(skills: List[str]) -> List[List[str]]:
+    """
+    Group related skills together for more coherent agent suggestions.
+    
+    Args:
+        skills: List of skills
+        
+    Returns:
+        List of skill groups
+    """
+    # Define skill relationships
+    skill_relationships = {
+        "reflect": ["summarize", "emotional_analysis"],
+        "summarize": ["reflect", "emotional_analysis"],
+        "emotional_analysis": ["reflect", "summarize"],
+        "delegate": ["execute"],
+        "execute": ["delegate"],
+        "write": ["read"],
+        "read": ["write"],
+        "train": [],
+        "loop": [],
+        "task/status": []
+    }
+    
+    # Initialize groups
+    groups = []
+    remaining_skills = skills.copy()
+    
+    # Process skills
+    while remaining_skills:
+        # Take the first skill
+        current_skill = remaining_skills.pop(0)
+        current_group = [current_skill]
+        
+        # Find related skills
+        related_skills = skill_relationships.get(current_skill, [])
+        
+        # Add related skills to the group if they're in the remaining skills
+        for skill in related_skills:
+            if skill in remaining_skills:
+                current_group.append(skill)
+                remaining_skills.remove(skill)
+        
+        # Add the group to the list of groups
+        groups.append(current_group)
+    
+    return groups
+
+def generate_agent_name(skills: List[str]) -> str:
+    """
+    Generate an agent name based on skills.
+    
+    Args:
+        skills: List of skills
+        
+    Returns:
+        Agent name
+    """
+    # Define name mappings for common skill combinations
+    name_mappings = {
+        frozenset(["reflect", "summarize"]): "echo",
+        frozenset(["reflect", "emotional_analysis"]): "empathy",
+        frozenset(["summarize", "emotional_analysis"]): "sentiment",
+        frozenset(["reflect", "summarize", "emotional_analysis"]): "echo",
+        frozenset(["delegate", "execute"]): "taskmaster",
+        frozenset(["write", "read"]): "scribe",
+        frozenset(["train"]): "mentor",
+        frozenset(["loop"]): "cycle",
+        frozenset(["task/status"]): "tracker"
+    }
+    
+    # Try to find a name for the exact skill set
+    skills_set = frozenset(skills)
+    if skills_set in name_mappings:
+        return name_mappings[skills_set]
+    
+    # If no exact match, use the first skill to generate a name
+    primary_skill = skills[0]
+    
+    # Define fallback names for individual skills
+    skill_names = {
+        "reflect": "mirror",
+        "summarize": "digest",
+        "emotional_analysis": "empathy",
+        "delegate": "director",
+        "execute": "performer",
+        "write": "author",
+        "read": "reader",
+        "train": "coach",
+        "loop": "cycle",
+        "task/status": "monitor"
+    }
+    
+    return skill_names.get(primary_skill, f"{primary_skill}_agent")
+
+def generate_tone_profile(skills: List[str], goal: str) -> ToneProfile:
+    """
+    Generate a tone profile based on skills and goal.
+    
+    Args:
+        skills: List of skills
+        goal: High-level user goal
+        
+    Returns:
+        Tone profile
+    """
+    # Define tone profiles for common skill combinations
+    if "emotional_analysis" in skills:
+        return ToneProfile(
+            style="gentle",
+            emotion="empathetic",
+            vibe="therapist",
+            persona="A compassionate presence for emotional understanding tasks"
+        )
+    elif "reflect" in skills and "summarize" in skills:
+        return ToneProfile(
+            style="thoughtful",
+            emotion="contemplative",
+            vibe="mentor",
+            persona="A reflective guide for synthesizing information and insights"
+        )
+    elif "delegate" in skills or "execute" in skills:
+        return ToneProfile(
+            style="direct",
+            emotion="confident",
+            vibe="coordinator",
+            persona="An efficient organizer for task management and execution"
+        )
+    elif "train" in skills:
+        return ToneProfile(
+            style="instructive",
+            emotion="encouraging",
+            vibe="teacher",
+            persona="A patient educator for knowledge transfer and skill development"
+        )
+    else:
+        # Default tone profile
+        return ToneProfile(
+            style="balanced",
+            emotion="neutral",
+            vibe="assistant",
+            persona="A helpful specialist focused on specific task domains"
+        )
+
+def generate_agent_reason(skills: List[str], goal: str) -> str:
+    """
+    Generate a reason for agent creation based on skills and goal.
+    
+    Args:
+        skills: List of skills
+        goal: High-level user goal
+        
+    Returns:
+        Reason for agent creation
+    """
+    # Define reasons for common skill combinations
+    if "emotional_analysis" in skills:
+        return "This agent is needed for tone-aware memory reflection and emotional context processing"
+    elif "reflect" in skills and "summarize" in skills:
+        return "This agent specializes in deep reflection and concise summarization of complex information"
+    elif "delegate" in skills and "execute" in skills:
+        return "This agent is required for effective task delegation and execution coordination"
+    elif "train" in skills:
+        return "This agent provides specialized training and knowledge transfer capabilities"
+    elif "loop" in skills:
+        return "This agent manages iterative processes and feedback loops"
+    else:
+        # Generate a reason based on the skills
+        skills_text = ", ".join(skills)
+        return f"No existing agent supports the required skills: {skills_text}"
 
 def generate_recommended_schema(goal: str, required_modules: List[str]) -> SchemaConfig:
     """
