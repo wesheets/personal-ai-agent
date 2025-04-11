@@ -81,6 +81,24 @@ def save_training_queue():
 load_training_logs()
 load_training_queue()
 
+# Pydantic model for train memory
+class TrainMemory(BaseModel):
+    """
+    Train memory model compliant with Promethios SDK Contract v1.0.0
+    
+    This model defines the schema for a single training memory block,
+    including content and metadata fields.
+    """
+    project_id: Optional[str] = None
+    task_id: Optional[str] = None
+    memory_trace_id: Optional[str] = None
+    persona_profile: Optional[str] = None
+    knowledge_domain: Optional[str] = None
+    access_permissions: Optional[List[str]] = None
+    content: str
+    tags: Optional[List[str]] = []
+    timestamp: Optional[str] = None
+
 # Pydantic model for training request
 class TrainingRequest(BaseModel):
     """
@@ -91,7 +109,7 @@ class TrainingRequest(BaseModel):
     and access control.
     """
     agent_id: str
-    dataset: List[Dict[str, Any]]
+    dataset: TrainMemory
     goal: str
     tags: Optional[List[str]] = []
     auto_reflect: Optional[bool] = False
@@ -110,7 +128,7 @@ class TrainingRequest(BaseModel):
 # Function to generate memory entries from dataset
 def generate_memory_entries(
     agent_id: str, 
-    dataset: List[Dict[str, Any]], 
+    dataset: TrainMemory,
     project_id: Optional[str] = None,
     task_id: Optional[str] = None,
     memory_trace_id: Optional[str] = None,
@@ -123,7 +141,7 @@ def generate_memory_entries(
     
     Args:
         agent_id: Identifier for the agent
-        dataset: List of data items to be converted to memory entries
+        dataset: Single TrainMemory object containing content and metadata
         project_id: Optional project context identifier
         task_id: Optional task identifier
         memory_trace_id: Optional memory trace identifier for linking related memories
@@ -137,36 +155,35 @@ def generate_memory_entries(
     memory_entries = []
     total_words = 0
     
-    for item in dataset:
-        # Create a memory entry for each item in the dataset
-        memory_entry = {
-            "memory_id": str(uuid.uuid4()),
-            "agent_id": agent_id,
-            "type": "training",  # Ensure memory_type is always "training" per SDK Contract
-            "content": item.get("content", ""),
-            "tags": item.get("tags", []),
-            "timestamp": item.get("timestamp", datetime.now().isoformat())
-        }
-        
-        # Add SDK Contract v1.0.0 fields if provided
-        if project_id:
-            memory_entry["project_id"] = project_id
-        if task_id:
-            memory_entry["task_id"] = task_id
-        if memory_trace_id:
-            memory_entry["memory_trace_id"] = memory_trace_id
-        if persona_profile:
-            memory_entry["persona_profile"] = persona_profile
-        if knowledge_domain:
-            memory_entry["knowledge_domain"] = knowledge_domain
-        if access_permissions:
-            memory_entry["access_permissions"] = access_permissions
-        
-        # Count words in content
-        if "content" in item:
-            total_words += len(item["content"].split())
-        
-        memory_entries.append(memory_entry)
+    # Create a memory entry from the dataset
+    memory_entry = {
+        "memory_id": str(uuid.uuid4()),
+        "agent_id": agent_id,
+        "type": "training",  # Ensure memory_type is always "training" per SDK Contract
+        "content": dataset.content,
+        "tags": dataset.tags if dataset.tags else [],
+        "timestamp": dataset.timestamp if dataset.timestamp else datetime.now().isoformat()
+    }
+    
+    # Add SDK Contract v1.0.0 fields from dataset if provided, otherwise use function parameters
+    memory_entry["project_id"] = dataset.project_id if dataset.project_id else project_id
+    memory_entry["task_id"] = dataset.task_id if dataset.task_id else task_id
+    memory_entry["memory_trace_id"] = dataset.memory_trace_id if dataset.memory_trace_id else memory_trace_id
+    
+    if dataset.persona_profile or persona_profile:
+        memory_entry["persona_profile"] = dataset.persona_profile if dataset.persona_profile else persona_profile
+    
+    if dataset.knowledge_domain or knowledge_domain:
+        memory_entry["knowledge_domain"] = dataset.knowledge_domain if dataset.knowledge_domain else knowledge_domain
+    
+    if dataset.access_permissions or access_permissions:
+        memory_entry["access_permissions"] = dataset.access_permissions if dataset.access_permissions else access_permissions
+    
+    # Count words in content
+    if dataset.content:
+        total_words += len(dataset.content.split())
+    
+    memory_entries.append(memory_entry)
     
     return memory_entries, total_words
 
