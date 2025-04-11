@@ -47,6 +47,11 @@ class TestPayload(BaseModel):
     description: str
     example: Dict[str, Any]
 
+class UnmatchedTask(BaseModel):
+    """Model for unmatched tasks in the scope response"""
+    tool: str
+    reason: str
+
 class ScopeResponse(BaseModel):
     """Response model for the scope endpoint"""
     project_id: str
@@ -64,6 +69,8 @@ class ScopeResponse(BaseModel):
     suggested_tests: List[TestPayload]
     markdown_summary: str
     stored: bool = False
+    skill_validation_passed: bool = True
+    unmatched_tasks: Optional[List[UnmatchedTask]] = None
 
 @router.post("/scope")
 async def generate_project_scope(request: Request):
@@ -96,6 +103,8 @@ async def generate_project_scope(request: Request):
     - suggested_tests: List of suggested tests
     - markdown_summary: Markdown summary of the project scope
     - stored: Whether the scope was stored in memory
+    - skill_validation_passed: Whether all required tools have matching agent skills
+    - unmatched_tasks: List of tools that don't have matching agent skills
     """
     try:
         # Parse request body
@@ -154,7 +163,7 @@ def generate_scope(goal: str, project_id: str) -> Dict[str, Any]:
     required_modules = analyze_goal_for_modules(goal)
     
     # Determine suggested agents based on the goal and required modules
-    suggested_agents = determine_suggested_agents(goal, required_modules)
+    suggested_agents, skill_validation_passed, unmatched_tasks = determine_suggested_agents(goal, required_modules)
     
     # Generate recommended schema
     recommended_schema = generate_recommended_schema(goal, required_modules)
@@ -166,7 +175,7 @@ def generate_scope(goal: str, project_id: str) -> Dict[str, Any]:
     known_risks = identify_known_risks(goal, required_modules, suggested_agents)
     
     # Calculate confidence scores
-    confidence_scores = calculate_confidence_scores(suggested_agents)
+    confidence_scores = calculate_confidence_scores(suggested_agents, skill_validation_passed)
     
     # Determine project dependencies
     project_dependencies = determine_project_dependencies(required_modules)
@@ -205,8 +214,15 @@ def generate_scope(goal: str, project_id: str) -> Dict[str, Any]:
         "execution_blueprint_id": execution_blueprint_id,
         "simulate_pathways": None,  # Null for scope mode
         "suggested_tests": [test.dict() for test in suggested_tests],
-        "markdown_summary": markdown_summary
+        "markdown_summary": markdown_summary,
+        "skill_validation_passed": skill_validation_passed
     }
+    
+    # Add unmatched_tasks if there are any
+    if unmatched_tasks:
+        scope["unmatched_tasks"] = [task.dict() for task in unmatched_tasks]
+    else:
+        scope["unmatched_tasks"] = []
     
     return scope
 
@@ -249,24 +265,84 @@ def analyze_goal_for_modules(goal: str) -> List[str]:
     
     return required_modules
 
-def determine_suggested_agents(goal: str, required_modules: List[str]) -> List[AgentConfig]:
+def get_agent_skills() -> Dict[str, List[str]]:
+    """
+    Get agent skills from agent_manifest.json.
+    
+    Returns:
+        Dictionary of agent skills
+    """
+    try:
+        # Load agent manifest
+        manifest_path = os.path.join(os.path.dirname(__file__), '../../config/agent_manifest.json')
+        with open(manifest_path, 'r') as f:
+            manifest = json.load(f)
+        
+        # Extract agent skills
+        agent_skills = {}
+        for agent_key, agent_data in manifest.items():
+            agent_id = agent_key.split('-')[0]  # Extract agent_id from key (e.g., "hal-agent" -> "hal")
+            if "skills" in agent_data:
+                agent_skills[agent_id] = agent_data["skills"]
+        
+        return agent_skills
+    except Exception as e:
+        print(f"Error loading agent skills: {str(e)}")
+        return {}
+
+def determine_suggested_agents(goal: str, required_modules: List[str]) -> tuple[List[AgentConfig], bool, List[UnmatchedTask]]:
     """
     Determine suggested agents based on the goal and required modules.
+    Validates that agents have the required skills for the tools they're assigned.
     
     Args:
         goal: High-level user goal
         required_modules: List of required modules
         
     Returns:
-        List of suggested agents
+        Tuple of (suggested_agents, skill_validation_passed, unmatched_tasks)
     """
     suggested_agents = []
+    unmatched_tasks = []
+    skill_validation_passed = True
     
-    # HAL is good for analytical and reflective tasks
+    # Get agent skills from agent_manifest.json
+    agent_skills = get_agent_skills()
+    
+    # Map of required tools to potential agents
+    tool_to_agents = {
+        "reflect": ["hal", "lifetree"],
+        "summarize": ["hal"],
+        "delegate": ["ash"],
+        "execute": ["ash"],
+        "write": ["memory", "hal"],
+        "read": ["memory", "hal"],
+        "train": ["neureal"],
+        "loop": ["core-forge"],
+        "task/status": ["ops"]
+    }
+    
+    # Track which required modules have a qualified agent
+    module_has_qualified_agent = {module: False for module in required_modules}
+    
+    # Define required tools for each agent
     hal_tools = ["reflect", "summarize"]
-    if "summarize" in required_modules:
-        hal_tools.append("summarize")
+    ash_tools = ["delegate", "execute"]
     
+    # Check if HAL has the required skills
+    hal_has_skills = True
+    for tool in hal_tools:
+        if "hal" not in agent_skills or tool not in agent_skills["hal"]:
+            hal_has_skills = False
+            unmatched_tasks.append(UnmatchedTask(
+                tool=tool,
+                reason=f"HAL does not have the required skill for {tool}"
+            ))
+            # Mark this tool as unmatched
+            if tool in module_has_qualified_agent:
+                module_has_qualified_agent[tool] = False
+    
+    # Add HAL with appropriate confidence score
     hal = AgentConfig(
         agent_name="hal",
         tools=hal_tools,
@@ -274,11 +350,26 @@ def determine_suggested_agents(goal: str, required_modules: List[str]) -> List[A
     )
     suggested_agents.append(hal)
     
-    # ASH is good for action-oriented tasks
-    ash_tools = ["delegate", "execute"]
-    if "delegate" in required_modules:
-        ash_tools.append("delegate")
+    # If HAL has skills, mark its tools as having a qualified agent
+    if hal_has_skills:
+        for tool in hal_tools:
+            if tool in module_has_qualified_agent:
+                module_has_qualified_agent[tool] = True
     
+    # Check if ASH has the required skills
+    ash_has_skills = True
+    for tool in ash_tools:
+        if "ash" not in agent_skills or tool not in agent_skills["ash"]:
+            ash_has_skills = False
+            unmatched_tasks.append(UnmatchedTask(
+                tool=tool,
+                reason=f"ASH does not have the required skill for {tool}"
+            ))
+            # Mark this tool as unmatched
+            if tool in module_has_qualified_agent:
+                module_has_qualified_agent[tool] = False
+    
+    # Add ASH with appropriate confidence score
     ash = AgentConfig(
         agent_name="ash",
         tools=ash_tools,
@@ -286,7 +377,43 @@ def determine_suggested_agents(goal: str, required_modules: List[str]) -> List[A
     )
     suggested_agents.append(ash)
     
-    return suggested_agents
+    # If ASH has skills, mark its tools as having a qualified agent
+    if ash_has_skills:
+        for tool in ash_tools:
+            if tool in module_has_qualified_agent:
+                module_has_qualified_agent[tool] = True
+    
+    # Check if any required modules don't have matching agent skills
+    for module in required_modules:
+        # Skip modules we've already checked
+        if module in hal_tools and hal_has_skills:
+            continue
+        if module in ash_tools and ash_has_skills:
+            continue
+            
+        # Find potential agents for this module
+        potential_agents = tool_to_agents.get(module, [])
+        has_qualified_agent = False
+        
+        for agent_id in potential_agents:
+            if agent_id in agent_skills and module in agent_skills[agent_id]:
+                has_qualified_agent = True
+                module_has_qualified_agent[module] = True
+                break
+        
+        if not has_qualified_agent:
+            unmatched_tasks.append(UnmatchedTask(
+                tool=module,
+                reason=f"No agent declared capability for {module}"
+            ))
+            module_has_qualified_agent[module] = False
+    
+    # Check if all required modules have a qualified agent
+    for module, has_agent in module_has_qualified_agent.items():
+        if not has_agent:
+            skill_validation_passed = False
+    
+    return suggested_agents, skill_validation_passed, unmatched_tasks
 
 def generate_recommended_schema(goal: str, required_modules: List[str]) -> SchemaConfig:
     """
@@ -380,18 +507,20 @@ def identify_known_risks(goal: str, required_modules: List[str], suggested_agent
     
     return known_risks
 
-def calculate_confidence_scores(suggested_agents: List[AgentConfig]) -> Dict[str, float]:
+def calculate_confidence_scores(suggested_agents: List[AgentConfig], skill_validation_passed: bool) -> Dict[str, float]:
     """
     Calculate confidence scores for suggested agents.
     
     Args:
         suggested_agents: List of suggested agents
+        skill_validation_passed: Whether skill validation passed
         
     Returns:
         Dictionary of agent confidence scores
     """
-    # For now, use static confidence scores
-    # In the future, this could be based on agent capabilities and goal alignment
+    # Get agent skills from agent_manifest.json
+    agent_skills = get_agent_skills()
+    
     confidence_scores = {}
     
     for agent in suggested_agents:
@@ -405,8 +534,29 @@ def calculate_confidence_scores(suggested_agents: List[AgentConfig]) -> Dict[str
         # Adjust based on number of tools
         tool_bonus = min(len(agent.tools) * 0.01, 0.05)
         
-        # Calculate final score
-        final_score = min(base_score + tool_bonus, 0.98)  # Cap at 0.98
+        # Calculate initial score
+        initial_score = base_score + tool_bonus
+        
+        # Check if agent has all required skills
+        has_all_skills = True
+        missing_skills = []
+        for tool in agent.tools:
+            if agent.agent_name not in agent_skills or tool not in agent_skills[agent.agent_name]:
+                has_all_skills = False
+                missing_skills.append(tool)
+        
+        # Adjust score based on skill validation
+        if not has_all_skills:
+            # Set to 0.0 if agent doesn't have required skills
+            initial_score = 0.0
+            print(f"Agent {agent.agent_name} lacks skills for: {', '.join(missing_skills)}, setting confidence to 0.0")
+        elif not skill_validation_passed:
+            # Reduce score if overall validation failed but this agent has its skills
+            initial_score = max(initial_score * 0.7, 0.5)
+            print(f"Overall skill validation failed, reducing {agent.agent_name}'s confidence to {initial_score:.2f}")
+        
+        # Cap at 0.98
+        final_score = min(initial_score, 0.98)
         
         confidence_scores[agent.agent_name] = round(final_score, 2)
     
@@ -474,23 +624,19 @@ def generate_suggested_tests(goal: str, required_modules: List[str], suggested_a
     """
     suggested_tests = []
     
-    # Generate train test if train module is required
-    if "train" in required_modules:
-        # Find an agent that would benefit from training
-        for agent in suggested_agents:
-            if agent.agent_name == "hal":
-                train_test = TestPayload(
-                    endpoint="/train",
-                    description="Train HAL on tone and journaling",
-                    example={
-                        "agent_id": "hal",
-                        "goal": "Train HAL to support reflective journaling",
-                        "project_id": "proj-journal",
-                        "content": "HAL should use a warm, supportive tone."
-                    }
-                )
-                suggested_tests.append(train_test)
-                break
+    # Generate reflect test if reflect module is required
+    if "reflect" in required_modules:
+        reflect_test = TestPayload(
+            endpoint="/reflect",
+            description="Test reflection capability",
+            example={
+                "agent_id": "hal",
+                "goal": "Reflect on journal entries",
+                "project_id": "proj-journal",
+                "memory_trace_id": "trace-123"
+            }
+        )
+        suggested_tests.append(reflect_test)
     
     # Generate summarize test if summarize module is required
     if "summarize" in required_modules:
@@ -506,45 +652,23 @@ def generate_suggested_tests(goal: str, required_modules: List[str], suggested_a
         )
         suggested_tests.append(summarize_test)
     
-    # Generate reflect test if reflect module is required
-    if "reflect" in required_modules:
-        reflect_test = TestPayload(
-            endpoint="/reflect",
-            description="Test reflection capability",
-            example={
-                "agent_id": "hal",
-                "goal": "Reflect on journal entries",
-                "project_id": "proj-journal",
-                "memory_trace_id": "trace-123"
-            }
-        )
-        suggested_tests.append(reflect_test)
-    
     # Generate delegate test if delegate module is required
     if "delegate" in required_modules:
         delegate_test = TestPayload(
             endpoint="/delegate",
             description="Test delegation capability",
             example={
-                "from_agent": "hal",
-                "to_agent": "ash",
-                "goal": "Delegate task execution",
-                "project_id": "proj-journal",
-                "task": "Execute journal entry analysis"
+                "from_agent": "ash",
+                "to_agent": "hal",
+                "task": "Reflect on journal entries",
+                "project_id": "proj-journal"
             }
         )
         suggested_tests.append(delegate_test)
     
     return suggested_tests
 
-def generate_markdown_summary(
-    goal: str, 
-    project_id: str, 
-    required_modules: List[str], 
-    suggested_agents: List[AgentConfig], 
-    execution_tasks: List[str], 
-    known_risks: List[str]
-) -> str:
+def generate_markdown_summary(goal: str, project_id: str, required_modules: List[str], suggested_agents: List[AgentConfig], execution_tasks: List[str], known_risks: List[str]) -> str:
     """
     Generate a markdown summary of the project scope.
     
@@ -559,38 +683,30 @@ def generate_markdown_summary(
     Returns:
         Markdown summary
     """
-    # Generate the markdown summary
-    markdown = f"# Project Scope: {project_id}\n\n"
-    
-    # Add goal
-    markdown += f"## Goal\n{goal}\n\n"
-    
-    # Add required modules
-    markdown += "## Required Modules\n"
-    for module in required_modules:
-        markdown += f"- {module}\n"
-    markdown += "\n"
-    
-    # Add suggested agents
-    markdown += "## Suggested Agents\n"
+    # Generate agent section
+    agent_section = ""
     for agent in suggested_agents:
-        markdown += f"- **{agent.agent_name.upper()}**: {agent.persona}\n"
-        markdown += f"  - Tools: {', '.join(agent.tools)}\n"
-    markdown += "\n"
+        agent_section += f"- **{agent.agent_name.upper()}**: {agent.persona}\n"
+        agent_section += f"  - Tools: {', '.join(agent.tools)}\n"
     
-    # Add execution tasks
-    markdown += "## Execution Tasks\n"
-    for task in execution_tasks:
-        markdown += f"- {task}\n"
-    markdown += "\n"
-    
-    # Add known risks
-    markdown += "## Known Risks\n"
-    for risk in known_risks:
-        markdown += f"- {risk}\n"
-    markdown += "\n"
-    
-    # Add footer
-    markdown += "---\nGenerated by Orchestrator Scope Module"
+    # Generate markdown
+    markdown = f"""# Project Scope: {project_id}
+
+## Goal
+{goal}
+
+## Required Modules
+{chr(10).join([f"- {module}" for module in required_modules])}
+
+## Suggested Agents
+{agent_section}
+## Execution Tasks
+{chr(10).join([f"- {task}" for task in execution_tasks])}
+
+## Known Risks
+{chr(10).join([f"- {risk}" for risk in known_risks])}
+
+---
+Generated by Orchestrator Scope Module"""
     
     return markdown
