@@ -323,6 +323,9 @@ try:
     print("📡 Including Reflect module router from /app/modules/reflect.py")
     print("📡 Including Orchestrator Scope module router from /app/modules/orchestrator_scope.py")
     print("📡 Including Orchestrator Present module router from /app/modules/orchestrator_present.py")
+    print("📡 Including Agent Present module router from /app/modules/agent_present.py")
+    print("📡 Including Agent Create module router from /app/modules/agent_create.py")
+    print("📡 Including Agent Verify module router from /app/modules/agent_verify.py")
     
     from app.api.modules import memory  # Import the memory.py route file
     # REMOVED: Conflicting import for delegate router
@@ -347,6 +350,7 @@ try:
     from app.modules.orchestrator_present import router as present_router  # Import the orchestrator present router
     from app.modules.agent_present import router as agent_present_router  # Import the agent present router
     from app.modules.agent_create import router as agent_create_router  # Import the agent create router
+    from app.modules.agent_verify import router as agent_verify_router  # Import the agent verify router
     
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
@@ -358,6 +362,7 @@ try:
     print(f"🔍 DEBUG: Delegate router object: {delegate_router}")
     print(f"🔍 DEBUG: Reflect router object: {reflect_router}")
     print(f"🔍 DEBUG: Orchestrator Scope router object: {scope_router}")
+    print(f"🔍 DEBUG: Agent Verify router object: {agent_verify_router}")
     
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(memory.router, prefix="/app/modules")  # Mount the memory router
@@ -388,6 +393,9 @@ try:
     
     # Mount the agent create router
     app.include_router(agent_create_router)  # Mount the agent create router (no prefix needed as path is already /agent/create)
+    
+    # Mount the agent verify router
+    app.include_router(agent_verify_router)  # Mount the agent verify router (no prefix needed as path is already /agent/verify_task)
     
     print("✅ Module routers included")
 
