@@ -375,7 +375,7 @@ try:
     app.include_router(health_router)  # Include health router without prefix
     
     # Mount the new dedicated module routers
-    app.include_router(loop_router, prefix="/app/modules/loop")  # Mount the loop router
+    app.include_router(loop_router, prefix="/api/modules")  # Mount the loop router
     app.include_router(delegate_router, prefix="/app/modules/delegate")  # Mount the delegate router
     app.include_router(reflect_router, prefix="/app/modules/reflect")  # Mount the reflect router
     

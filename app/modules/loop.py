@@ -138,7 +138,7 @@ def load_recent_memories(agent_id: str, memory_limit: int = 5, memory_type: Opti
     
     return filtered_memories
 
-@router.post("/")
+@router.post("/loop")
 async def loop_agent(request: Request):
     """
     Execute a full cognitive loop cycle for a given agent.
