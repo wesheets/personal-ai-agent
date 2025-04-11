@@ -1,5 +1,5 @@
 """
-Modified main.py to include the project_summary router.
+Modified main.py to include the loop, delegate, and reflect routers.
 """
 
 from fastapi import FastAPI, APIRouter, Response, Request
@@ -272,6 +272,10 @@ try:
     print("📡 Including AgentContext module router from /api/modules/agent_context.py")
     print("📡 Including PlanGenerator module router from /api/modules/plan.py")
     print("📡 Including ProjectSummary module router from /api/modules/project_summary.py")
+    print("📡 Including Loop module router from /app/modules/loop.py")
+    print("📡 Including Delegate module router from /app/modules/delegate.py")
+    print("📡 Including Reflect module router from /app/modules/reflect.py")
+    
     from app.api.modules import memory  # Import the memory.py route file
     from app.api.modules import delegate  # Import the delegate.py route file
     from app.api.modules import stream  # Import the stream.py route file
@@ -284,11 +288,20 @@ try:
     from app.api.task import router as task_router  # Import the task router
     from app.api.projects import router as projects_router  # Import the projects router
     
+    # Import the new dedicated module routers
+    from app.modules.loop import router as loop_router  # Import the loop router
+    from app.modules.delegate import router as delegate_router  # Import the delegate router
+    from app.modules.reflect import router as reflect_router  # Import the reflect router
+    
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
     print(f"🔍 DEBUG: Memory router routes: {[route.path for route in memory.router.routes]}")
     print(f"🔍 DEBUG: ProjectSummary router object: {project_summary.router}")
     print(f"🔍 DEBUG: ProjectSummary router routes: {[route.path for route in project_summary.router.routes]}")
+    print(f"🔍 DEBUG: Loop router object: {loop_router}")
+    print(f"🔍 DEBUG: Loop router routes: {[route.path for route in loop_router.routes]}")
+    print(f"🔍 DEBUG: Delegate router object: {delegate_router}")
+    print(f"🔍 DEBUG: Reflect router object: {reflect_router}")
     
     app.include_router(agent_module_router, prefix="/api")
     app.include_router(memory.router, prefix="/app/modules")  # Mount the memory router
@@ -303,6 +316,12 @@ try:
     app.include_router(task_router, prefix="/app/task")  # Mount the task status router
     app.include_router(projects_router, prefix="/app/projects")  # Mount the projects router
     app.include_router(health_router)  # Include health router without prefix
+    
+    # Mount the new dedicated module routers
+    app.include_router(loop_router, prefix="/app/modules/loop")  # Mount the loop router
+    app.include_router(delegate_router, prefix="/app/modules/delegate")  # Mount the delegate router
+    app.include_router(reflect_router, prefix="/app/modules/reflect")  # Mount the reflect router
+    
     print("✅ Module routers included")
 
     # Simple GET echo route for production health check
@@ -351,28 +370,30 @@ try:
             print(f"❌ AgentRunner error: {str(e)}")
             traceback.print_exc()
             return JSONResponse(
-                status_code=500, 
+                status_code=500,
                 content={
                     "status": "error",
-                    "message": str(e)
+                    "message": f"Failed to run agent: {str(e)}"
                 }
             )
 
+    # Start the application
+    if __name__ == "__main__":
+        print("🚀 Starting FastAPI application...")
+        uvicorn.run(app, host="0.0.0.0", port=3000)
+        
 except Exception as e:
     print(f"❌ CRITICAL ERROR DURING STARTUP: {str(e)}")
     import traceback
     traceback.print_exc()
     
     # Create a minimal FastAPI app for health checks
-    app = FastAPI(title="Promethios OS (Recovery Mode)")
+    app = FastAPI()
     
     @app.get("/")
-    async def root_health_recovery():
-        return {"status": "error", "message": "System in recovery mode due to startup failure"}
+    async def root():
+        return {"status": "error", "message": "Application failed to start properly"}
     
     @app.get("/health")
-    async def health_recovery():
-        return {"status": "error", "message": "System in recovery mode due to startup failure"}
-
-if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    async def health():
+        return {"status": "error", "message": "Application failed to start properly"}
