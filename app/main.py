@@ -36,11 +36,11 @@ try:
     
     # Import modules for API routes
     from app.api.modules.agent import router as agent_module_router  # AgentRunner module router
+    from app.api.modules.memory import router as memory_router  # Memory module router
     
     # MODIFIED: Commented out problematic routes
     """
     from app.api.agent import router as agent_router
-    from app.api.memory import router as memory_router
     from app.api.goals import goals_router
     from app.api.memory_viewer import router as memory_viewer_router
     from app.api.control import control_router
@@ -329,151 +329,124 @@ try:
     print("📡 Including Agent Verify module router from /app/modules/agent_verify.py")
     print("📡 Including Agent Reflect module router from /app/modules/agent_reflect.py")
     print("📡 Including Agent Fallback module router from /app/modules/agent_fallback.py")
+    print("📡 Including Task Supervisor module router from /app/modules/task_supervisor.py")
     
-    from app.api.modules import memory  # Import the memory.py route file
-    # REMOVED: Conflicting import for delegate router
-    # from app.api.modules import delegate  # Import the delegate.py route file
-    from app.api.modules import stream  # Import the stream.py route file
-    from app.api.modules import train  # Import the train.py route file
-    from app.api.modules import system  # Import the system.py route file
-    from app.api.modules import observer  # Import the observer.py route file
-    from app.api.modules import agent_context  # Import the agent_context.py route file
-    from app.api.modules import plan  # Import the plan.py route file
-    from app.api.modules import project_summary  # Import the project_summary.py route file
-    from app.api.task import router as task_router  # Import the task router
-    from app.api.projects import router as projects_router  # Import the projects router
+    # Mount the AgentRunner module router
+    print(f"🔍 DEBUG: AgentRunner module router object: {agent_module_router}")
+    app.include_router(agent_module_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/run -> run_agent")
     
-    # Import the new dedicated module routers
-    from app.modules.loop import router as loop_router  # Import the loop router
-    from app.modules.delegate import router as delegate_router  # Import the delegate router
-    from app.modules.reflect import router as reflect_router  # Import the reflect router
+    # Mount the Memory module router
+    print(f"🔍 DEBUG: Memory module router object: {memory_router}")
+    # Ensure memory router is properly mounted with correct prefix
+    app.include_router(memory_router, prefix="/api/modules")
+    # Log all memory endpoints for debugging
+    print("🧠 Route defined: /api/modules/read -> read_memory")
+    print("🧠 Route defined: /api/modules/write -> memory_write")
+    print("🧠 Route defined: /api/modules/reflect -> reflect_on_memories")
+    print("🧠 Route defined: /api/modules/summarize -> summarize_memories_endpoint")
     
-    # Import the orchestrator routers from the new location
-    from app.modules.orchestrator_scope import router as scope_router  # Import the orchestrator scope router
-    from app.modules.orchestrator_present import router as present_router  # Import the orchestrator present router
-    from app.modules.orchestrator_build import router as build_router  # Import the orchestrator build router
-    from app.modules.agent_present import router as agent_present_router  # Import the agent present router
-    from app.modules.agent_create import router as agent_create_router  # Import the agent create router
-    from app.modules.agent_verify import router as agent_verify_router  # Import the agent verify router
-    from app.modules.agent_reflect import router as agent_reflect_router  # Import the agent reflect router
-    from app.modules.agent_fallback import router as agent_fallback_router  # Import the agent fallback router
-    
-    # Debug print to verify router object
-    print(f"🔍 DEBUG: Memory router object: {memory.router}")
-    print(f"🔍 DEBUG: Memory router routes: {[route.path for route in memory.router.routes]}")
-    print(f"🔍 DEBUG: ProjectSummary router object: {project_summary.router}")
-    print(f"🔍 DEBUG: ProjectSummary router routes: {[route.path for route in project_summary.router.routes]}")
-    print(f"🔍 DEBUG: Loop router object: {loop_router}")
-    print(f"🔍 DEBUG: Loop router routes: {[route.path for route in loop_router.routes]}")
-    print(f"🔍 DEBUG: Delegate router object: {delegate_router}")
-    print(f"🔍 DEBUG: Reflect router object: {reflect_router}")
+    # Import and mount the orchestrator scope router
+    from app.modules.orchestrator_scope import router as scope_router
     print(f"🔍 DEBUG: Orchestrator Scope router object: {scope_router}")
+    app.include_router(scope_router, prefix="/api/modules/orchestrator")
+    print("🧠 Route defined: /api/modules/orchestrator/scope -> determine_suggested_agents")
+    
+    # Import and mount the orchestrator present router
+    from app.modules.orchestrator_present import router as present_router
+    print(f"🔍 DEBUG: Orchestrator Present router object: {present_router}")
+    app.include_router(present_router, prefix="/api/modules/orchestrator")
+    print("🧠 Route defined: /api/modules/orchestrator/present -> present_task_results")
+    
+    # Import and mount the orchestrator build router
+    from app.modules.orchestrator_build import router as build_router
     print(f"🔍 DEBUG: Orchestrator Build router object: {build_router}")
-    print(f"🔍 DEBUG: Agent Verify router object: {agent_verify_router}")
-    print(f"🔍 DEBUG: Agent Reflect router object: {agent_reflect_router}")
-    print(f"🔍 DEBUG: Agent Fallback router object: {agent_fallback_router}")
-    
-    app.include_router(agent_module_router, prefix="/api")
-    app.include_router(memory.router, prefix="/app/modules")  # Mount the memory router
-    # REMOVED: Conflicting router registration
-    # app.include_router(delegate.router, prefix="/api/modules")  # Mount the delegate router
-    app.include_router(stream.router, prefix="/api/modules")  # Mount the stream router
-    app.include_router(train.router, prefix="/api/modules")  # Mount the train router
-    app.include_router(system.router, prefix="/api/modules/system")  # Mount the system router
-    app.include_router(observer.router, prefix="/api/modules")  # Mount the observer router
-    app.include_router(agent_context.router, prefix="/api/modules")  # Mount the agent context router
-    app.include_router(plan.router, prefix="/api/modules")  # Mount the plan generator router
-    app.include_router(project_summary.router, prefix="/app/modules")  # Mount the project summary router
-    app.include_router(task_router, prefix="/app/task")  # Mount the task status router
-    app.include_router(projects_router, prefix="/app/projects")  # Mount the projects router
-    app.include_router(health_router)  # Include health router without prefix
-    
-    # Mount the new dedicated module routers
-    app.include_router(loop_router, prefix="/api/modules")  # Mount the loop router
-    app.include_router(delegate_router, prefix="/app/modules/delegate")  # Mount the delegate router
-    app.include_router(reflect_router, prefix="/app/modules/reflect")  # Mount the reflect router
-    
-    # Mount the orchestrator routers with the correct prefix
-    app.include_router(scope_router, prefix="/orchestrator")  # Mount the orchestrator scope router
-    app.include_router(present_router, prefix="/orchestrator")  # Mount the orchestrator present router
-    app.include_router(build_router, prefix="/api/modules/orchestrator")  # Mount the orchestrator build router
-    
-    # Mount the agent present router
-    app.include_router(agent_present_router)  # Mount the agent present router (no prefix needed as path is already /agent/present)
-    
-    # Mount the agent create router
-    app.include_router(agent_create_router)  # Mount the agent create router (no prefix needed as path is already /agent/create)
-    
-    # Mount the agent verify router
-    app.include_router(agent_verify_router, prefix="/api/modules/agent")  # Mount the agent verify router with prefix to make it available at /api/modules/agent/verify_task
-    
-    # Mount the agent reflect router
-    app.include_router(agent_reflect_router, prefix="/api/modules/agent")  # Mount the agent reflect router with prefix to make it available at /api/modules/agent/reflect
-    
-    # Mount the agent fallback router
-    app.include_router(agent_fallback_router, prefix="/api/modules/agent")  # Mount the agent fallback router with prefix to make it available at /api/modules/agent/fallback
-    
-    # Print route defined message for orchestrator build
+    app.include_router(build_router, prefix="/api/modules/orchestrator")
     print("🧠 Route defined: /api/modules/orchestrator/build -> execute_task_plan")
     
-    # MODIFIED: Commented out problematic routes
-    """
-    # Include the other routers
-    app.include_router(agent_router, prefix="/api")
-    app.include_router(memory_router, prefix="/api")
-    app.include_router(goals_router, prefix="/api")
-    app.include_router(memory_viewer_router, prefix="/api")
-    app.include_router(control_router, prefix="/api")
-    app.include_router(logs_router, prefix="/api")
-    app.include_router(delegate_router, prefix="/api")
-    app.include_router(hal_debug_router, prefix="/api")
-    app.include_router(debug_router, prefix="/api")
-    app.include_router(performance_router, prefix="/api")
-    app.include_router(streaming_router, prefix="/api")
-    app.include_router(system_routes, prefix="/api")
-    app.include_router(agent_status_router, prefix="/api")
-    """
+    # Import and mount the agent present router
+    from app.modules.agent_present import router as agent_present_router
+    print(f"🔍 DEBUG: Agent Present router object: {agent_present_router}")
+    app.include_router(agent_present_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/present -> present_agent_results")
     
-    # MODIFIED: Commented out static files mount to prevent crash in container deployment
+    # Import and mount the agent create router
+    from app.modules.agent_create import router as agent_create_router
+    print(f"🔍 DEBUG: Agent Create router object: {agent_create_router}")
+    app.include_router(agent_create_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/create -> create_agent")
+    
+    # Import and mount the agent verify router
+    from app.modules.agent_verify import router as agent_verify_router
+    print(f"🔍 DEBUG: Agent Verify router object: {agent_verify_router}")
+    app.include_router(agent_verify_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/verify_task -> verify_task")
+    
+    # Import and mount the agent reflect router
+    from app.modules.agent_reflect import router as agent_reflect_router
+    print(f"🔍 DEBUG: Agent Reflect router object: {agent_reflect_router}")
+    app.include_router(agent_reflect_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/reflect -> reflect")
+    
+    # Import and mount the agent fallback router
+    from app.modules.agent_fallback import router as agent_fallback_router
+    print(f"🔍 DEBUG: Agent Fallback router object: {agent_fallback_router}")
+    app.include_router(agent_fallback_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/fallback -> fallback_task")
+    
+    # Import and mount the task supervisor router
+    from app.modules.task_supervisor import router as task_supervisor_router
+    print(f"🔍 DEBUG: Task Supervisor router object: {task_supervisor_router}")
+    app.include_router(task_supervisor_router, prefix="/api/modules/task")
+    print("🧠 Route defined: /api/modules/task/status -> get_task_status")
+    
+    # Import and mount the loop router
+    from app.modules.loop import router as loop_router
+    print(f"🔍 DEBUG: Loop router object: {loop_router}")
+    app.include_router(loop_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/loop -> loop_task")
+    
+    # Import and mount the delegate router
+    from app.modules.delegate import router as delegate_router
+    print(f"🔍 DEBUG: Delegate router object: {delegate_router}")
+    app.include_router(delegate_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/delegate -> delegate_task")
+    
+    # Import and mount the reflect router
+    from app.modules.reflect import router as reflect_router
+    print(f"🔍 DEBUG: Reflect router object: {reflect_router}")
+    app.include_router(reflect_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/reflect -> reflect_on_task")
+    
+    # Mount health router
+    app.include_router(health_router)
+    
+    # Commented out static files mount to prevent crash in container deployment
     # app.mount("/static", StaticFiles(directory="app/static"), name="static")
     
-    # Custom Swagger UI with dark mode
-    @app.get("/docs", include_in_schema=False)
-    async def custom_swagger_ui_html():
-        return get_swagger_ui_html(
-            openapi_url=app.openapi_url,
-            title=app.title + " - API Documentation",
-            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
-            swagger_js_url="/static/swagger-ui-bundle.js",
-            swagger_css_url="/static/swagger-ui.css",
-            swagger_favicon_url="/static/favicon.png",
-        )
-    
-    # Print startup complete message
-    print("✅ FastAPI app startup complete")
+    # Log successful startup
+    print("✅ All routes registered successfully")
+    print("✅ API is ready to accept requests")
     
 except Exception as e:
-    # Log any startup errors
+    # Log the error
     print(f"❌ ERROR DURING STARTUP: {str(e)}")
-    import traceback
-    traceback.print_exc()
     
-    # Create a minimal FastAPI app that returns error for all routes
+    # Create a minimal FastAPI app that can respond to health checks
     app = FastAPI(
-        title="Enhanced AI Agent System - ERROR MODE",
-        description="The application encountered an error during startup. Please check the logs.",
+        title="Enhanced AI Agent System [ERROR MODE]",
+        description="Error occurred during startup. Only health endpoints are available.",
         version="1.0.0"
     )
     
-    @app.get("/{path:path}")
-    async def error_response(path: str):
-        return {
-            "status": "error",
-            "message": "The application encountered an error during startup. Please check the logs.",
-            "error": str(e)
-        }
-    
-    # Add health check endpoint to prevent continuous restarts
+    # Add health endpoints that still return OK to prevent container restarts
     @app.get("/health")
-    async def health():
-        return {"status": "error", "message": "Application in error mode", "error": str(e)}
+    async def health_error_mode():
+        return {"status": "error", "message": f"Error during startup: {str(e)}"}
+    
+    @app.get("/")
+    async def root_health_error_mode():
+        return {"status": "error", "message": f"Error during startup: {str(e)}"}
+    
+    # Log the fallback mode
+    print("⚠️ Started in ERROR MODE with minimal health endpoints")
