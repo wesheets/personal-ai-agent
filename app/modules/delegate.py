@@ -23,6 +23,7 @@ logger = logging.getLogger("api.modules.delegate")
 
 # Create router
 router = APIRouter()
+print("🧠 Route defined: /app/modules/delegate -> delegate_task")
 
 # Path for system caps configuration
 SYSTEM_CAPS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "system_caps.json")

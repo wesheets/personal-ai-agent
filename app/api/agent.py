@@ -365,57 +365,57 @@ class DelegationResponse(BaseModel):
     message: str
     task_id: str
 
-# Add a dedicated endpoint for task delegation
-@router.post("/delegate", response_model=DelegationResponse)
-async def delegate_task(delegation: DelegationRequest):
-    """
-    Delegate a task to an agent
-    
-    This endpoint allows delegating tasks to specific agents.
-    """
-    logger.info(f"Received task delegation request: {delegation.dict()}")
-    try:
-        # Extract task information
-        task_description = delegation.task.description
-        target_agent = delegation.agent_name
-        
-        if not task_description:
-            logger.error("Task description is required")
-            raise HTTPException(status_code=400, detail="Task description is required")
-        
-        # Get orchestrator and task manager
-        orchestrator = get_orchestrator()
-        task_manager = get_task_persistence_manager()
-        
-        # Validate target agent
-        available_agents = orchestrator.prompt_manager.get_available_agents()
-        if target_agent not in available_agents and available_agents:
-            logger.warning(f"Invalid target agent: {target_agent}, using first available agent")
-            target_agent = available_agents[0]
-        
-        # Create a new task
-        task_id = str(uuid.uuid4())
-        
-        # Log task details to /logs/latest
-        logger.info(f"Task details - Goal ID: {delegation.task.goal_id}, Category: {delegation.task.task_category}")
-        logger.info(f"Creating task with ID: {task_id} for agent: {target_agent}")
-        
-        # In a real implementation, this would save to a database
-        # For now, we're just returning a success response
-        response = DelegationResponse(
-            status="success",
-            message=f"Task delegated to {target_agent}",
-            task_id=task_id
-        )
-        
-        logger.info(f"Task delegation successful: {response.dict()}")
-        return response
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error delegating task: {str(e)}")
-        # Return a proper HTTP exception with status code
-        raise HTTPException(status_code=500, detail=f"Failed to delegate task: {str(e)}")
+# REMOVED: Conflicting delegate route
+# @router.post("/delegate", response_model=DelegationResponse)
+# async def delegate_task(delegation: DelegationRequest):
+#     """
+#     Delegate a task to an agent
+#     
+#     This endpoint allows delegating tasks to specific agents.
+#     """
+#     logger.info(f"Received task delegation request: {delegation.dict()}")
+#     try:
+#         # Extract task information
+#         task_description = delegation.task.description
+#         target_agent = delegation.agent_name
+#         
+#         if not task_description:
+#             logger.error("Task description is required")
+#             raise HTTPException(status_code=400, detail="Task description is required")
+#         
+#         # Get orchestrator and task manager
+#         orchestrator = get_orchestrator()
+#         task_manager = get_task_persistence_manager()
+#         
+#         # Validate target agent
+#         available_agents = orchestrator.prompt_manager.get_available_agents()
+#         if target_agent not in available_agents and available_agents:
+#             logger.warning(f"Invalid target agent: {target_agent}, using first available agent")
+#             target_agent = available_agents[0]
+#         
+#         # Create a new task
+#         task_id = str(uuid.uuid4())
+#         
+#         # Log task details to /logs/latest
+#         logger.info(f"Task details - Goal ID: {delegation.task.goal_id}, Category: {delegation.task.task_category}")
+#         logger.info(f"Creating task with ID: {task_id} for agent: {target_agent}")
+#         
+#         # In a real implementation, this would save to a database
+#         # For now, we're just returning a success response
+#         response = DelegationResponse(
+#             status="success",
+#             message=f"Task delegated to {target_agent}",
+#             task_id=task_id
+#         )
+#         
+#         logger.info(f"Task delegation successful: {response.dict()}")
+#         return response
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         logger.error(f"Error delegating task: {str(e)}")
+#         # Return a proper HTTP exception with status code
+#         raise HTTPException(status_code=500, detail=f"Failed to delegate task: {str(e)}")
 
 async def process_agent_request(
     agent_type: str,
@@ -456,196 +456,211 @@ async def process_agent_request(
     escalation_manager = get_escalation_manager()
     behavior_manager = get_behavior_manager()
     
-    # Get the prompt chain for the agent
+    # Generate a unique request ID
+    request_id = str(uuid.uuid4())
+    logger.info(f"Request ID: {request_id}")
+    
+    # Get agent prompt template
     try:
-        prompt_chain = prompt_manager.get_prompt_chain(agent_type)
-        if not prompt_chain:
-            logger.error(f"Agent type not found: {agent_type}")
-            raise HTTPException(status_code=404, detail=f"Agent type not found: {agent_type}")
+        agent_prompt = prompt_manager.get_agent_prompt(agent_type)
+        logger.info(f"Retrieved prompt template for agent: {agent_type}")
     except Exception as e:
-        logger.error(f"Error getting prompt chain: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error getting prompt chain: {str(e)}")
+        logger.error(f"Error retrieving agent prompt: {str(e)}")
+        raise HTTPException(status_code=404, detail=f"Agent type not found: {agent_type}")
     
-    # Determine which model to use
-    model = request.model or prompt_chain.get("model", "gpt-4")
-    logger.info(f"Using model: {model}")
+    # Retrieve relevant memories
+    try:
+        memory_context = await memory_manager.get_relevant_memories(
+            agent_type=agent_type,
+            query=request.input,
+            limit=5
+        )
+        logger.info(f"Retrieved {len(memory_context)} relevant memories")
+    except Exception as e:
+        logger.error(f"Error retrieving memories: {str(e)}")
+        memory_context = []
     
-    # Get relevant memories
-    memory_context = ""
-    if supabase_client:
-        try:
-            memories = await vector_memory.search_memories(
+    # Review memory context for relevance
+    try:
+        if memory_context:
+            memory_context = memory_reviewer.review_context(
                 query=request.input,
-                agent_type=agent_type,
-                limit=5,
-                supabase_client=supabase_client
+                memories=memory_context
             )
-            
-            # Review memories for relevance to current task
-            if memories:
-                memory_context = await memory_reviewer.review_memories(
-                    memories=memories,
-                    current_query=request.input
-                )
-                logger.info(f"Retrieved {len(memories)} memories for context")
-        except Exception as e:
-            logger.error(f"Error retrieving memories: {str(e)}")
-    
-    # Construct the prompt
-    system_prompt = prompt_chain.get("system_prompt", "")
-    if memory_context:
-        system_prompt += f"\n\nRELEVANT MEMORIES:\n{memory_context}"
-    
-    # Add behavior guidance if available
-    try:
-        behavior_guidance = behavior_manager.get_behavior_guidance(agent_type)
-        if behavior_guidance:
-            system_prompt += f"\n\nBEHAVIOR GUIDANCE:\n{behavior_guidance}"
+            logger.info(f"Reviewed memory context, kept {len(memory_context)} memories")
     except Exception as e:
-        logger.error(f"Error getting behavior guidance: {str(e)}")
+        logger.error(f"Error reviewing memory context: {str(e)}")
     
-    # Process with the model
+    # Construct full prompt with context
     try:
-        logger.info(f"Sending request to model: {model}")
+        full_prompt = prompt_manager.construct_prompt(
+            agent_type=agent_type,
+            input_text=request.input,
+            memory_context=memory_context,
+            additional_context=request.context
+        )
+        logger.info("Constructed full prompt with context")
+    except Exception as e:
+        logger.error(f"Error constructing prompt: {str(e)}")
+        full_prompt = f"You are {agent_type}. Please respond to: {request.input}"
+    
+    # Apply behavior adjustments
+    try:
+        full_prompt = behavior_manager.apply_behavior_adjustments(
+            agent_type=agent_type,
+            prompt=full_prompt
+        )
+        logger.info("Applied behavior adjustments to prompt")
+    except Exception as e:
+        logger.error(f"Error applying behavior adjustments: {str(e)}")
+    
+    # Process with model
+    try:
+        model_name = request.model or prompt_manager.get_default_model(agent_type)
+        logger.info(f"Using model: {model_name}")
+        
         response_text = await model_router.process(
-            model=model,
-            system_prompt=system_prompt,
-            user_prompt=request.input,
-            context=request.context
+            prompt=full_prompt,
+            model=model_name
         )
         logger.info("Received response from model")
     except Exception as e:
         logger.error(f"Error processing with model: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error processing with model: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Model processing error: {str(e)}")
     
-    # Create response object
-    response = AgentResponse(
-        output=response_text,
-        metadata={
-            "agent_type": agent_type,
-            "model": model,
-            "timestamp": datetime.now().isoformat(),
-            "input_length": len(request.input),
-            "output_length": len(response_text)
-        }
-    )
+    # Log rationale
+    try:
+        rationale = rationale_logger.log_rationale(
+            agent_type=agent_type,
+            input_text=request.input,
+            output_text=response_text,
+            prompt=full_prompt
+        )
+        logger.info("Logged rationale")
+    except Exception as e:
+        logger.error(f"Error logging rationale: {str(e)}")
+        rationale = None
     
-    # Save to memory if requested
-    if request.save_to_memory and supabase_client:
-        try:
-            memory_id = await vector_memory.store_memory(
-                content=f"USER: {request.input}\n\nAGENT: {response_text}",
-                metadata={
-                    "agent_type": agent_type,
-                    "timestamp": datetime.now().isoformat(),
-                    "input": request.input,
-                    "priority": request.priority_memory
-                },
-                supabase_client=supabase_client
-            )
-            response.metadata["memory_id"] = memory_id
-            logger.info(f"Saved to memory with ID: {memory_id}")
-        except Exception as e:
-            # Log error but don't fail the request
-            logger.error(f"Error saving to memory: {str(e)}")
-    
-    # Add reflection if not skipped
+    # Generate reflection if not skipped
+    reflection_data = None
     if not request.skip_reflection:
         try:
-            reflection = await rationale_logger.get_rationale(
+            reflection_data = await self_evaluation.generate_reflection(
                 agent_type=agent_type,
                 input_text=request.input,
                 output_text=response_text,
-                model=model
+                prompt=full_prompt
             )
-            response.reflection = reflection
-            logger.info("Added reflection to response")
+            logger.info("Generated reflection")
         except Exception as e:
-            # Log error but don't fail the request
             logger.error(f"Error generating reflection: {str(e)}")
     
-    # Add task tagging
+    # Tag task
     try:
-        tags = await task_tagger.tag_task(
+        tags = task_tagger.tag_task(
             input_text=request.input,
             output_text=response_text
         )
-        response.metadata["tags"] = tags
-        logger.info(f"Tagged task with: {tags}")
+        logger.info(f"Tagged task with {len(tags)} tags")
     except Exception as e:
-        # Log error but don't fail the request
         logger.error(f"Error tagging task: {str(e)}")
+        tags = []
+    
+    # Save to memory if requested
+    if request.save_to_memory:
+        try:
+            memory_id = await memory_manager.save_memory(
+                agent_type=agent_type,
+                input_text=request.input,
+                output_text=response_text,
+                tags=tags,
+                priority=request.priority_memory
+            )
+            logger.info(f"Saved to memory with ID: {memory_id}")
+        except Exception as e:
+            logger.error(f"Error saving to memory: {str(e)}")
     
     # Check confidence and retry if needed
+    retry_data = None
     if request.enable_retry_loop:
         try:
             retry_result = await confidence_retry_manager.check_and_retry(
                 agent_type=agent_type,
                 input_text=request.input,
                 output_text=response_text,
-                model=model
+                model=model_name
             )
             
-            if retry_result["retry_needed"]:
-                # Update response with retry data
-                response.retry_data = retry_result
-                logger.info("Retry needed, updated response with retry data")
-                
-                # If retry was performed, update output
-                if retry_result.get("retry_output"):
-                    response.output = retry_result["retry_output"]
-                    logger.info("Updated output with retry result")
+            if retry_result and retry_result.get("retry_performed"):
+                logger.info("Performed confidence-based retry")
+                response_text = retry_result.get("new_output", response_text)
+                retry_data = retry_result
         except Exception as e:
-            # Log error but don't fail the request
             logger.error(f"Error in confidence retry: {str(e)}")
     
     # Check for nudges
+    nudge_data = None
     try:
-        nudge = await nudge_manager.check_for_nudge(
+        nudge_data = nudge_manager.check_for_nudges(
             agent_type=agent_type,
             input_text=request.input,
-            output_text=response.output
+            output_text=response_text
         )
         
-        if nudge:
-            response.nudge = nudge
-            logger.info("Added nudge to response")
+        if nudge_data and nudge_data.get("nudge_detected"):
+            logger.info(f"Detected nudge: {nudge_data.get('nudge_type')}")
     except Exception as e:
-        # Log error but don't fail the request
-        logger.error(f"Error checking for nudge: {str(e)}")
+        logger.error(f"Error checking for nudges: {str(e)}")
     
     # Check for escalation
+    escalation_data = None
     try:
-        escalation = await escalation_manager.check_for_escalation(
+        escalation_data = escalation_manager.check_for_escalation(
             agent_type=agent_type,
             input_text=request.input,
-            output_text=response.output
+            output_text=response_text
         )
         
-        if escalation:
-            response.escalation = escalation
-            logger.info("Added escalation to response")
+        if escalation_data and escalation_data.get("escalation_needed"):
+            logger.info(f"Escalation needed: {escalation_data.get('reason')}")
+            
+            # Create a task for the escalation if needed
+            if escalation_data.get("create_task"):
+                try:
+                    task_id = await task_persistence_manager.create_task(
+                        origin_agent=agent_type,
+                        suggested_agent=escalation_data.get("target_agent", "supervisor"),
+                        task_description=f"Escalation: {escalation_data.get('reason')}",
+                        original_input=request.input,
+                        original_output=response_text,
+                        metadata={
+                            "escalation_reason": escalation_data.get("reason"),
+                            "priority": escalation_data.get("priority", "medium")
+                        }
+                    )
+                    logger.info(f"Created escalation task with ID: {task_id}")
+                    escalation_data["task_id"] = task_id
+                except Exception as e:
+                    logger.error(f"Error creating escalation task: {str(e)}")
     except Exception as e:
-        # Log error but don't fail the request
         logger.error(f"Error checking for escalation: {str(e)}")
     
-    # Handle orchestration if requested
-    if request.auto_orchestrate and response.metadata.get("suggested_next_step"):
-        try:
-            # Create a pending task
-            task_id = await task_persistence_manager.create_task(
-                origin_agent=agent_type,
-                suggested_agent=response.metadata["suggested_next_agent"],
-                original_input=request.input,
-                original_output=response.output,
-                task_description=response.metadata["suggested_next_step"]
-            )
-            
-            response.metadata["pending_task_id"] = task_id
-            logger.info(f"Created pending task with ID: {task_id}")
-        except Exception as e:
-            # Log error but don't fail the request
-            logger.error(f"Error creating pending task: {str(e)}")
+    # Construct metadata
+    metadata = {
+        "request_id": request_id,
+        "agent_type": agent_type,
+        "model": model_name,
+        "timestamp": datetime.now().isoformat(),
+        "tags": tags,
+        "rationale": rationale
+    }
     
-    logger.info(f"Completed processing agent request for {agent_type}")
-    return response
+    # Return response
+    return AgentResponse(
+        output=response_text,
+        metadata=metadata,
+        reflection=reflection_data,
+        retry_data=retry_data,
+        nudge=nudge_data,
+        escalation=escalation_data
+    )
