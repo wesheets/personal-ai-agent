@@ -72,7 +72,7 @@ async def memory_write(request: Request):
 
 @router.get("/read")
 async def read_memory(
-    agent_id: str,
+    agent_id: Optional[str] = None,
     type: Optional[str] = None,
     tag: Optional[str] = None,
     limit: Optional[int] = 10,
@@ -82,13 +82,13 @@ async def read_memory(
     thread_id: Optional[str] = None
 ):
     """
-    Read memories for a specific agent with various filtering options.
+    Read memories with flexible filtering options.
     
-    This endpoint retrieves memories for the specified agent, with optional filtering
-    by type, tag, timestamp, project_id, task_id, and thread_id.
+    This endpoint retrieves memories with optional filtering by agent_id, type, tag,
+    timestamp, project_id, task_id, and thread_id. Any combination of filters can be used.
     
     Parameters:
-    - agent_id: ID of the agent whose memories to retrieve (required)
+    - agent_id: (Optional) ID of the agent whose memories to retrieve
     - type: (Optional) Filter by memory type
     - tag: (Optional) Filter by tag
     - limit: (Optional) Maximum number of memories to return, default is 10
@@ -102,11 +102,12 @@ async def read_memory(
     - memories: List of memory entries sorted by timestamp (newest first)
     """
     try:
-        if not agent_id:
-            raise HTTPException(status_code=400, detail="agent_id is required")
+        # Start with all memories
+        filtered_memories = memory_store.copy()
         
-        # Filter memories by agent_id
-        filtered_memories = [m for m in memory_store if m["agent_id"] == agent_id]
+        # Apply agent_id filter if provided
+        if agent_id:
+            filtered_memories = [m for m in filtered_memories if m["agent_id"] == agent_id]
         
         # Apply type filter if provided
         if type:
