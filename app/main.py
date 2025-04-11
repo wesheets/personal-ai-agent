@@ -322,6 +322,7 @@ try:
     print("📡 Including Delegate module router from /app/modules/delegate.py")
     print("📡 Including Reflect module router from /app/modules/reflect.py")
     print("📡 Including Orchestrator Scope module router from /app/modules/orchestrator_scope.py")
+    print("📡 Including Orchestrator Present module router from /app/modules/orchestrator_present.py")
     
     from app.api.modules import memory  # Import the memory.py route file
     # REMOVED: Conflicting import for delegate router
@@ -341,8 +342,9 @@ try:
     from app.modules.delegate import router as delegate_router  # Import the delegate router
     from app.modules.reflect import router as reflect_router  # Import the reflect router
     
-    # Import the orchestrator scope router from the new location
+    # Import the orchestrator routers from the new location
     from app.modules.orchestrator_scope import router as scope_router  # Import the orchestrator scope router
+    from app.modules.orchestrator_present import router as present_router  # Import the orchestrator present router
     
     # Debug print to verify router object
     print(f"🔍 DEBUG: Memory router object: {memory.router}")
@@ -375,8 +377,9 @@ try:
     app.include_router(delegate_router, prefix="/app/modules/delegate")  # Mount the delegate router
     app.include_router(reflect_router, prefix="/app/modules/reflect")  # Mount the reflect router
     
-    # Mount the orchestrator scope router with the correct prefix
+    # Mount the orchestrator routers with the correct prefix
     app.include_router(scope_router, prefix="/orchestrator")  # Mount the orchestrator scope router
+    app.include_router(present_router, prefix="/orchestrator")  # Mount the orchestrator present router
     
     print("✅ Module routers included")
 
