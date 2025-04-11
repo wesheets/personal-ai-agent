@@ -27,6 +27,11 @@ class ReflectionRequest(BaseModel):
     
 class SummarizeRequest(BaseModel):
     agent_id: str
+    goal: str
+    task_id: str
+    project_id: str
+    memory_trace_id: str
+    context: Optional[List[Dict]] = None
     type: Optional[str] = None
     limit: int = 10
 
@@ -254,18 +259,29 @@ async def summarize_memories_endpoint(request: Request):
     """
     Summarize recent memories for an agent into a coherent natural language summary.
     
-    This endpoint retrieves recent memories for the specified agent, optionally filtered by type,
-    and generates a natural language summary of those memories.
+    This endpoint complies with Promethios_Module_Contract_v1.0.0 by:
+    - Validating required input fields (agent_id, goal, task_id, project_id, memory_trace_id)
+    - Returning a structured response with all required fields
+    - Writing memory with memory_type="summary" and all trace fields
+    - Providing proper logging for failures or validation errors
     
     Request body:
-    - agent_id: ID of the agent whose memories to summarize
-    - type: (Optional) Filter memories by type
-    - limit: (Optional) Maximum number of memories to summarize, default is 10
+    - agent_id: ID of the agent to generate summary for (required)
+    - goal: Purpose of the summary (required)
+    - task_id: Task identifier for tracing (required)
+    - project_id: Project identifier for context (required)
+    - memory_trace_id: Memory trace identifier for linking (required)
+    - context: Optional list of memory or raw notes
+    - type: Memory type to summarize (optional)
+    - limit: Maximum number of memories to consider (optional, defaults to 10)
     
     Returns:
-    - status: "ok" if successful
-    - summary: Natural language summary of the memories
-    - memory_count: Number of memories summarized
+    - status: "success" if successful, "failure" if error occurred
+    - summary: Generated summary text
+    - task_id: Task identifier (echoed from request)
+    - project_id: Project identifier (echoed from request)
+    - memory_trace_id: Memory trace identifier (echoed from request)
+    - agent_id: Agent identifier (echoed from request)
     """
     try:
         # Parse request body
@@ -285,18 +301,52 @@ async def summarize_memories_endpoint(request: Request):
         # Apply limit
         filtered_memories = filtered_memories[:summarize_request.limit]
         
-        # Generate summary
-        summary_text = summarize_memories(filtered_memories)
+        # Use context if provided
+        if summarize_request.context:
+            # If context is provided, use it instead of filtered memories
+            context_content = [item.get("content", str(item)) for item in summarize_request.context if item]
+            summary_text = summarize_memories(context_content)
+        else:
+            # Generate summary from filtered memories
+            summary_text = summarize_memories(filtered_memories)
         
-        # Return response
+        # Write summary to memory with all trace fields
+        memory = write_memory(
+            agent_id=summarize_request.agent_id,
+            type="summary",
+            content=summary_text,
+            tags=["summary", "compressed", "sdk_compliant"],
+            project_id=summarize_request.project_id,
+            task_id=summarize_request.task_id,
+            memory_trace_id=summarize_request.memory_trace_id,
+            status="completed"
+        )
+        
+        # Log successful summary generation
+        print(f"✅ Summary generated for agent {summarize_request.agent_id} with task_id {summarize_request.task_id}")
+        
+        # Return SDK-compliant structured response
         return {
-            "status": "ok",
+            "status": "success",
             "summary": summary_text,
-            "memory_count": len(filtered_memories)
+            "task_id": summarize_request.task_id,
+            "project_id": summarize_request.project_id,
+            "memory_trace_id": summarize_request.memory_trace_id,
+            "agent_id": summarize_request.agent_id
         }
     except Exception as e:
+        # Log error details
         print(f"❌ Memory Summarization error: {str(e)}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+        
+        # Return SDK-compliant error response
+        return JSONResponse(status_code=500, content={
+            "status": "failure",
+            "summary": f"Error generating summary: {str(e)}",
+            "task_id": body.get("task_id", "unknown"),
+            "project_id": body.get("project_id", "unknown"),
+            "memory_trace_id": body.get("memory_trace_id", "unknown"),
+            "agent_id": body.get("agent_id", "unknown")
+        })
 
 @router.post("/thread")
 async def memory_thread_endpoint(request: Request):
