@@ -39,7 +39,7 @@ class FeedbackRequest(BaseModel):
     result_content: str
     confidence_delta: Optional[float] = None
 
-@router.post("/write")
+@router.post("/feedback/write")
 async def write_feedback(request: Request):
     """
     Write feedback based on audit results.
@@ -142,7 +142,7 @@ async def write_feedback(request: Request):
             }
         )
 
-@router.get("/write")
+@router.get("/feedback/write")
 async def auto_write_feedback_from_audit(
     agent_id: str,
     task_id: str,
