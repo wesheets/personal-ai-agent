@@ -225,7 +225,7 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
             memory["agent_tone"] = agent_tone
             logger.info(f"🎭 Added tone profile for {agent_id}")
         
-        # Write to SQLite database
+        # Write to SQLite database using the singleton memory_db instance
         try:
             # First, ensure we have a fresh connection
             memory_db.close()  # Close any existing connection
@@ -430,8 +430,7 @@ async def memory_thread(
     - status: "ok" if successful
     - thread: List of memory entries sorted chronologically
     """
-    # PROM-247.8 Fix: Simplified implementation that reads directly from database
-    # and bypasses memory_store completely to avoid desynchronization issues
+    # Updated implementation to use the singleton memory_db instance
     try:
         # Validate that at least one of goal_id, task_id, or memory_trace_id is provided
         if not debug_mode and not goal_id and not task_id and not memory_trace_id:
@@ -455,12 +454,21 @@ async def memory_thread(
                 }
             )
         
-        # Initialize memory_db to ensure fresh connection
-        db = MemoryDB()
-        logger.info(f"✅ Initialized fresh MemoryDB instance for memory_thread request")
+        # Use the singleton memory_db instance instead of creating a new one
+        logger.info(f"✅ Using singleton memory_db instance for memory_thread request")
+        
+        # Ensure we have a fresh connection
+        try:
+            memory_db.close()  # Close any existing connection
+        except Exception as close_error:
+            logger.warning(f"⚠️ Non-critical error during connection close: {str(close_error)}")
+            pass
+            
+        # Get a new connection
+        conn = memory_db._get_connection()
         
         # Read fresh memories directly from DB with a high limit
-        all_memories = db.read_memories(limit=1000)
+        all_memories = memory_db.read_memories(limit=1000)
         logger.info(f"Retrieved {len(all_memories)} memories from database")
         
         # In debug mode, skip filtering and use all memories
@@ -477,8 +485,9 @@ async def memory_thread(
             # Filter memories based on provided criteria
             filtered_memories = []
             for m in all_memories:
-                # Convert SQLite Row to dict
-                m = dict(m)
+                # Convert SQLite Row to dict if needed
+                if not isinstance(m, dict):
+                    m = dict(m)
                 
                 # Filter by goal_id if provided
                 if goal_id:
@@ -621,14 +630,6 @@ async def memory_thread(
                 "message": f"Failed to retrieve memory thread: {str(e)}"
             }
         )
-    finally:
-        # Always ensure connection is properly closed after request completes
-        try:
-            db.close()
-            logger.info("✅ Database connection properly closed after memory_thread request")
-        except Exception as close_error:
-            logger.warning(f"⚠️ Non-critical error during final connection close: {str(close_error)}")
-            pass
 
 @router.get("/read")
 async def read_memory(
@@ -697,6 +698,17 @@ async def read_memory(
             print(f"📦 [READ] Memory not in memory_store. Checking DB...")
             print(f"[READ] Memory not found in memory_store, checking database: {memory_id}")
             logger.info(f"⚠️ Memory not found in memory_store, checking database: {memory_id}")
+            
+            # Ensure we have a fresh connection
+            try:
+                memory_db.close()  # Close any existing connection
+            except Exception as close_error:
+                logger.warning(f"⚠️ Non-critical error during connection close: {str(close_error)}")
+                pass
+                
+            # Get a new connection
+            conn = memory_db._get_connection()
+            
             memory = memory_db.read_memory_by_id(memory_id)
             print(f"📦 [READ] DB result: {memory}")
             
@@ -739,6 +751,16 @@ async def read_memory(
         if limit:
             filters["limit"] = limit
         
+        # Ensure we have a fresh connection
+        try:
+            memory_db.close()  # Close any existing connection
+        except Exception as close_error:
+            logger.warning(f"⚠️ Non-critical error during connection close: {str(close_error)}")
+            pass
+            
+        # Get a new connection
+        conn = memory_db._get_connection()
+        
         # Query memories from database
         memories = memory_db.read_memories(**filters)
         
@@ -762,72 +784,73 @@ async def read_memory(
         }
 
 @router.post("/reflect")
-async def memory_reflect_endpoint(request: ReflectionRequest):
+async def memory_reflect(request: ReflectionRequest):
     """
     Generate a reflection based on recent memories.
     
-    This endpoint retrieves recent memories for the specified agent and generates
-    a reflection based on those memories.
+    This endpoint retrieves recent memories based on the provided filters
+    and generates a reflection based on those memories.
     
     Parameters:
     - agent_id: ID of the agent (required)
-    - goal: Goal of the task (required)
-    - context: Additional context for reflection (optional)
+    - goal: Goal or objective for the reflection (required)
+    - context: Additional context for the reflection (optional)
     - task_id: ID of the task (required)
-    - project_id: Project context (required)
+    - project_id: ID of the project (required)
     - memory_trace_id: ID for memory tracing (required)
-    - type: Type of reflection (optional, default is "memory")
-    - limit: Maximum number of memories to consider (optional, default is 5)
-    - loop_count: Number of loops for this task (optional, default is 0)
+    - type: Type of memories to reflect on (optional, defaults to "memory")
+    - limit: Maximum number of memories to consider (optional, defaults to 5)
+    - loop_count: Number of loops for this task (optional, defaults to 0)
     
     Returns:
     - status: "ok" if successful
-    - reflection: Generated reflection
+    - reflection: Generated reflection based on memories
+    - memories: List of memories used for the reflection
     """
     try:
-        logger.info(f"🧠 Generating reflection for {request.agent_id}")
+        logger.info(f"🧠 Generating reflection for {request.agent_id} with goal: {request.goal}")
         
-        # Check if we've exceeded the maximum number of loops
+        # Check if we've exceeded the maximum number of loops for this task
         if request.loop_count >= system_caps["max_loops_per_task"]:
-            logger.warning(f"⚠️ Maximum loop count reached for task {request.task_id}")
+            logger.warning(f"⚠️ Maximum loop count ({system_caps['max_loops_per_task']}) exceeded for task {request.task_id}")
             return JSONResponse(status_code=200, content={
                 "status": "ok",
-                "reflection": "I've been reflecting on this task for a while. Let me try a different approach.",
-                "loop_count": request.loop_count
+                "reflection": f"I've reached the maximum number of reflection loops ({system_caps['max_loops_per_task']}) for this task. Let me finalize my approach based on what I've learned so far.",
+                "memories": []
             })
         
-        # Get recent memories for the agent
+        # Get recent memories for the agent with the specified memory_trace_id
         memories = memory_db.read_memories(
             agent_id=request.agent_id,
-            project_id=request.project_id,
-            task_id=request.task_id,
+            memory_type=request.type,
+            thread_id=request.memory_trace_id,
             limit=request.limit
         )
         
-        # Generate reflection
+        # Generate reflection based on memories
         reflection = generate_reflection(memories)
         
         # Write reflection to memory
-        memory = write_memory(
+        reflection_memory = write_memory(
             agent_id=request.agent_id,
             type="reflection",
             content=reflection,
-            tags=["reflection", f"task:{request.task_id}", f"project:{request.project_id}"],
+            tags=["reflection", f"task:{request.task_id}"],
             project_id=request.project_id,
             task_id=request.task_id,
             memory_trace_id=request.memory_trace_id,
             metadata={
                 "goal": request.goal,
+                "context": request.context,
                 "loop_count": request.loop_count + 1
             }
         )
         
-        logger.info(f"✅ Reflection generated for {request.agent_id}")
+        logger.info(f"✅ Reflection generated: {reflection_memory['memory_id']}")
         return JSONResponse(status_code=200, content={
             "status": "ok",
             "reflection": reflection,
-            "memory_id": memory["memory_id"],
-            "loop_count": request.loop_count + 1
+            "memories": memories
         })
     except Exception as e:
         logger.error(f"❌ Error generating reflection: {str(e)}")
@@ -836,65 +859,66 @@ async def memory_reflect_endpoint(request: ReflectionRequest):
             "message": str(e)
         })
 
-@router.post("/memory/summarize")
-async def memory_summarize_endpoint(request: SummarizeRequest):
+@router.post("/summarize")
+async def memory_summarize(request: SummarizeRequest):
     """
-    Summarize memories for a specific task or goal.
+    Generate a summary based on memories.
     
-    This endpoint retrieves memories for the specified agent and task, and generates
-    a summary based on those memories.
+    This endpoint retrieves memories based on the provided filters
+    and generates a summary based on those memories.
     
     Parameters:
     - agent_id: ID of the agent (required)
-    - goal: Goal of the task (required)
+    - goal: Goal or objective for the summary (required)
     - task_id: ID of the task (required)
-    - project_id: Project context (required)
+    - project_id: ID of the project (required)
     - memory_trace_id: ID for memory tracing (required)
-    - context: Additional context for summarization (optional)
-    - type: Type of summary (optional)
-    - limit: Maximum number of memories to consider (optional, default is 10)
+    - context: Additional context for the summary (optional)
+    - type: Type of memories to summarize (optional)
+    - limit: Maximum number of memories to consider (optional, defaults to 10)
     
     Returns:
     - status: "ok" if successful
-    - summary: Generated summary
+    - summary: Generated summary based on memories
+    - memories: List of memories used for the summary
     """
     try:
-        logger.info(f"🧠 Generating summary for {request.agent_id}")
+        logger.info(f"🧠 Generating summary for {request.agent_id} with goal: {request.goal}")
         
-        # Get memories for the agent and task
+        # Get memories for the agent with the specified memory_trace_id
         memories = memory_db.read_memories(
             agent_id=request.agent_id,
-            project_id=request.project_id,
-            task_id=request.task_id,
+            memory_type=request.type,
+            thread_id=request.memory_trace_id,
             limit=request.limit
         )
         
-        # Generate summary (placeholder implementation)
+        # Generate summary based on memories (placeholder implementation)
         if not memories:
-            summary = "No memories to summarize."
+            summary = "No relevant memories to summarize."
         else:
-            summary = f"Summary of {len(memories)} memories for task {request.task_id}."
+            summary = f"Based on {len(memories)} memories, the key points are: [1] First point, [2] Second point, [3] Third point."
         
         # Write summary to memory
-        memory = write_memory(
+        summary_memory = write_memory(
             agent_id=request.agent_id,
             type="summary",
             content=summary,
-            tags=["summary", f"task:{request.task_id}", f"project:{request.project_id}"],
+            tags=["summary", f"task:{request.task_id}"],
             project_id=request.project_id,
             task_id=request.task_id,
             memory_trace_id=request.memory_trace_id,
             metadata={
                 "goal": request.goal,
-                "summary_type": request.type
+                "context": request.context
             }
         )
         
-        logger.info(f"✅ Summary generated for {request.agent_id}")
+        logger.info(f"✅ Summary generated: {summary_memory['memory_id']}")
         return JSONResponse(status_code=200, content={
             "status": "ok",
             "summary": summary,
-            "memory_id": memory["memory_id"]
+            "memories": memories
         })
     except Exception as e:
         logger.error(f"❌ Error generating summary: {str(e)}")
@@ -903,112 +927,49 @@ async def memory_summarize_endpoint(request: SummarizeRequest):
             "message": str(e)
         })
 
-@router.get("/memory/recent")
-async def memory_recent(
-    agent_id: str,
-    limit: Optional[int] = 10,
-    memory_type: Optional[str] = None,
-    project_id: Optional[str] = None
-):
+@router.post("/search")
+async def memory_search(request: SearchRequest):
     """
-    Get recent memories for an agent.
+    Search memories based on a query.
     
-    This endpoint retrieves the most recent memories for the specified agent,
-    with optional filtering by memory type and project.
-    
-    Parameters:
-    - agent_id: ID of the agent (required)
-    - limit: Maximum number of memories to return (optional, default is 10)
-    - memory_type: Filter by memory type (optional)
-    - project_id: Filter by project ID (optional)
-    
-    Returns:
-    - status: "ok" if successful
-    - memories: List of recent memories
-    """
-    try:
-        logger.info(f"🧠 Getting recent memories for {agent_id}")
-        
-        # Build filters
-        filters = {
-            "agent_id": agent_id,
-            "limit": limit
-        }
-        
-        if memory_type:
-            filters["memory_type"] = memory_type
-        
-        if project_id:
-            filters["project_id"] = project_id
-        
-        # Query memories from database
-        memories = memory_db.read_memories(**filters)
-        
-        logger.info(f"✅ Retrieved {len(memories)} recent memories for {agent_id}")
-        return JSONResponse(status_code=200, content={
-            "status": "ok",
-            "memories": memories
-        })
-    except Exception as e:
-        logger.error(f"❌ Error getting recent memories: {str(e)}")
-        return JSONResponse(status_code=500, content={
-            "status": "error",
-            "message": str(e)
-        })
-
-@router.post("/memory/search")
-async def memory_search_endpoint(request: SearchRequest):
-    """
-    Search memories by content.
-    
-    This endpoint searches memories for the specified agent based on a query string.
+    This endpoint searches memories based on the provided query and filters.
     
     Parameters:
     - agent_id: ID of the agent (required)
     - query: Search query (required)
     - role: Filter by role (optional)
     - memory_type: Filter by memory type (optional)
-    - limit: Maximum number of memories to return (optional, default is 25)
-    - project_id: Filter by project ID (optional)
+    - limit: Maximum number of results to return (optional, defaults to 25)
+    - project_id: Filter by project context (optional)
     
     Returns:
     - status: "ok" if successful
-    - memories: List of matching memories
+    - results: List of matching memories
     """
     try:
         logger.info(f"🧠 Searching memories for {request.agent_id} with query: {request.query}")
         
-        # Get all memories for the agent
-        filters = {
-            "agent_id": request.agent_id,
-            "limit": 1000  # Get a large number to search through
-        }
+        # Get memories for the agent
+        memories = memory_db.read_memories(
+            agent_id=request.agent_id,
+            memory_type=request.memory_type,
+            project_id=request.project_id,
+            limit=100  # Get more than needed for filtering
+        )
         
-        if request.memory_type:
-            filters["memory_type"] = request.memory_type
-        
-        if request.project_id:
-            filters["project_id"] = request.project_id
-        
-        # Query memories from database
-        memories = memory_db.read_memories(**filters)
-        
-        # Simple search implementation (case-insensitive substring match)
-        query_lower = request.query.lower()
-        matching_memories = []
-        
+        # Filter memories based on query (placeholder implementation)
+        # In a real implementation, this would use vector search or other advanced techniques
+        results = []
         for memory in memories:
-            if query_lower in memory.get("content", "").lower():
-                matching_memories.append(memory)
-                
-                # Break if we've reached the limit
-                if len(matching_memories) >= request.limit:
+            if request.query.lower() in memory["content"].lower():
+                results.append(memory)
+                if len(results) >= request.limit:
                     break
         
-        logger.info(f"✅ Found {len(matching_memories)} matching memories for {request.agent_id}")
+        logger.info(f"✅ Search completed: {len(results)} results found")
         return JSONResponse(status_code=200, content={
             "status": "ok",
-            "memories": matching_memories
+            "results": results
         })
     except Exception as e:
         logger.error(f"❌ Error searching memories: {str(e)}")
