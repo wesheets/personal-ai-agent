@@ -34,6 +34,37 @@ SYSTEM_CAPS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
 # Initialize global memory_store for in-memory access
 memory_store = []
 
+# Function to initialize memory_store from SQLite database
+def initialize_memory_store():
+    """
+    Initialize the in-memory store from SQLite database on startup
+    to ensure persistence across app restarts.
+    """
+    global memory_store
+    try:
+        # Clear the current memory_store to avoid duplicates
+        memory_store.clear()
+        
+        # Get recent memories from SQLite database (limit to a reasonable number)
+        recent_memories = memory_db.read_memories(limit=1000)
+        
+        # Add memories to in-memory store
+        memory_store.extend(recent_memories)
+        
+        logger.info(f"✅ Initialized memory_store with {len(memory_store)} memories from SQLite database")
+        print(f"🧠 [INIT] Loaded {len(memory_store)} memories from SQLite database into memory_store")
+        print(f"🧠 [INIT] Memory IDs: {[m['memory_id'] for m in memory_store]}")
+        
+        return len(memory_store)
+    except Exception as e:
+        logger.error(f"❌ Error initializing memory_store from SQLite: {str(e)}")
+        print(f"❌ [INIT] Error loading memories from SQLite: {str(e)}")
+        return 0
+
+# Initialize memory_store on module import
+initialized_count = initialize_memory_store()
+logger.info(f"🧠 Memory module loaded with {initialized_count} memories from SQLite database")
+
 # Load system caps configuration
 def load_system_caps():
     try:
@@ -396,38 +427,23 @@ async def get_recent_memories(
     - memories: List of memory entries sorted by timestamp (newest first)
     """
     try:
-        # Explicitly declare memory_store as global to prevent shadowing
-        global memory_store
-        
         # Log request details
         logger.info(f"🔍 Retrieving recent memories: agent_id={agent_id}, memory_type={memory_type}, limit={limit}")
         print(f"🔍 [RECENT] Retrieving recent memories: agent_id={agent_id}, memory_type={memory_type}, limit={limit}")
         
-        # Create a copy of memory_store to avoid modifying the original
-        filtered_memories = memory_store.copy()
+        # Query directly from SQLite database for complete and persistent results
+        memories = memory_db.read_memories(
+            agent_id=agent_id,
+            memory_type=memory_type,
+            limit=limit
+        )
         
-        # Apply filters if provided
-        if agent_id:
-            filtered_memories = [m for m in filtered_memories if m.get("agent_id") == agent_id]
-            print(f"🔍 [RECENT] Filtered by agent_id={agent_id}, {len(filtered_memories)} memories remaining")
+        print(f"🔍 [RECENT] Found {len(memories)} memories in SQLite database")
         
-        if memory_type:
-            filtered_memories = [m for m in filtered_memories if m.get("type") == memory_type]
-            print(f"🔍 [RECENT] Filtered by memory_type={memory_type}, {len(filtered_memories)} memories remaining")
-        
-        # Sort by timestamp in descending order (newest first)
-        filtered_memories.sort(key=lambda m: m.get("timestamp", ""), reverse=True)
-        
-        # Limit the number of results
-        limited_memories = filtered_memories[:limit]
-        
-        # Log result summary
-        logger.info(f"✅ Retrieved {len(limited_memories)} recent memories")
-        print(f"✅ [RECENT] Retrieved {len(limited_memories)} recent memories")
-        
+        # Return the filtered memories
         return {
             "status": "ok",
-            "memories": limited_memories
+            "memories": memories
         }
     except Exception as e:
         logger.error(f"❌ Error retrieving recent memories: {str(e)}")

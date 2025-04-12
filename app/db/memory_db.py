@@ -51,16 +51,21 @@ class MemoryDB:
             # Configure connection to return rows as dictionaries
             self.conn.row_factory = sqlite3.Row
             logger.info(f"✅ Connected to SQLite database at {DB_FILE}")
+            print(f"🔌 [DB] Connected to SQLite database at {DB_FILE}")
         except Exception as e:
-            logger.error(f"❌ Error connecting to SQLite database: {str(e)}")
+            error_msg = f"❌ Error connecting to SQLite database: {str(e)}"
+            logger.error(error_msg)
+            print(f"❌ [DB] {error_msg}")
             raise
     
     def init_schema(self):
         """Initialize the database schema if it doesn't exist"""
         try:
             if not os.path.exists(SCHEMA_FILE):
-                logger.error(f"❌ Schema file not found at {SCHEMA_FILE}")
-                raise FileNotFoundError(f"Schema file not found at {SCHEMA_FILE}")
+                error_msg = f"Schema file not found at {SCHEMA_FILE}"
+                logger.error(f"❌ {error_msg}")
+                print(f"❌ [DB] {error_msg}")
+                raise FileNotFoundError(error_msg)
             
             with open(SCHEMA_FILE, 'r') as f:
                 schema_sql = f.read()
@@ -69,8 +74,11 @@ class MemoryDB:
             self.conn.executescript(schema_sql)
             self.conn.commit()
             logger.info("✅ Database schema initialized")
+            print(f"🏗️ [DB] Database schema initialized successfully")
         except Exception as e:
-            logger.error(f"❌ Error initializing database schema: {str(e)}")
+            error_msg = f"Error initializing database schema: {str(e)}"
+            logger.error(f"❌ {error_msg}")
+            print(f"❌ [DB] {error_msg}")
             raise
     
     def close(self):
@@ -119,9 +127,12 @@ class MemoryDB:
             ))
             self.conn.commit()
             logger.info(f"✅ Memory written to database: {memory['memory_id']}")
+            print(f"💾 [DB] Memory written to database: {memory['memory_id']} (agent: {memory['agent_id']}, type: {memory['type']})")
             return memory
         except Exception as e:
-            logger.error(f"❌ Error writing memory to database: {str(e)}")
+            error_msg = f"Error writing memory to database: {str(e)}"
+            logger.error(f"❌ {error_msg}")
+            print(f"❌ [DB] {error_msg} (memory_id: {memory.get('memory_id', 'unknown')})")
             self.conn.rollback()
             raise
     
@@ -143,6 +154,7 @@ class MemoryDB:
             row = cursor.fetchone()
             
             if not row:
+                print(f"🔍 [DB] Memory not found in database: {memory_id}")
                 return None
             
             # Convert row to dictionary
@@ -155,9 +167,12 @@ class MemoryDB:
             if memory.get("agent_tone"):
                 memory["agent_tone"] = json.loads(memory["agent_tone"])
             
+            print(f"📖 [DB] Memory retrieved from database: {memory_id} (agent: {memory.get('agent_id')}, type: {memory.get('type')})")
             return memory
         except Exception as e:
-            logger.error(f"❌ Error reading memory from database: {str(e)}")
+            error_msg = f"Error reading memory from database: {str(e)}"
+            logger.error(f"❌ {error_msg}")
+            print(f"❌ [DB] {error_msg} (memory_id: {memory_id})")
             raise
     
     def read_memories(self, 
@@ -227,6 +242,18 @@ class MemoryDB:
                 query += " LIMIT ?"
                 params.append(limit)
             
+            # Log the query being executed
+            filter_desc = ", ".join([f"{k}={v}" for k, v in {
+                "agent_id": agent_id,
+                "memory_type": memory_type,
+                "since": since,
+                "project_id": project_id,
+                "task_id": task_id,
+                "thread_id": thread_id,
+                "limit": limit
+            }.items() if v is not None])
+            print(f"🔍 [DB] Querying memories with filters: {filter_desc}")
+            
             # Execute the query
             cursor = self.conn.cursor()
             cursor.execute(query, params)
@@ -248,9 +275,12 @@ class MemoryDB:
             if tag:
                 memories = [m for m in memories if tag in m["tags"]]
             
+            print(f"📚 [DB] Retrieved {len(memories)} memories from database")
             return memories
         except Exception as e:
-            logger.error(f"❌ Error reading memories from database: {str(e)}")
+            error_msg = f"Error reading memories from database: {str(e)}"
+            logger.error(f"❌ {error_msg}")
+            print(f"❌ [DB] {error_msg} (filters: {filter_desc if 'filter_desc' in locals() else 'unknown'})")
             raise
     
     def migrate_from_json(self) -> int:
