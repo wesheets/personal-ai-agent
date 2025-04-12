@@ -612,7 +612,6 @@ async def memory_thread(
                     "thread": thread
                 }
             )
-        )
     except Exception as e:
         logger.error(f"❌ Error retrieving memory thread: {str(e)}")
         return JSONResponse(
