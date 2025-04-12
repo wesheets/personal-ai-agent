@@ -515,11 +515,16 @@ async def memory_thread(
             # Ensure metadata is properly parsed from JSON
             filtered_memories = []
             for m in memories:
-                # Debug log to see what's in the metadata
-                logger.debug(f"Memory {m.get('memory_id')} metadata type: {type(m.get('metadata'))}")
-                logger.debug(f"Memory {m.get('memory_id')} metadata: {m.get('metadata')}")
+                # Debug log to see what's in the memory
+                logger.debug(f"Memory {m.get('memory_id')} checking for goal_id match")
                 
-                # Check if metadata exists
+                # Check if goal_id exists at the top level first
+                if m.get("goal_id") == goal_id:
+                    filtered_memories.append(m)
+                    logger.debug(f"Memory {m.get('memory_id')} matched top-level goal_id {goal_id}")
+                    continue
+                
+                # If not found at top level, check in metadata
                 if m.get("metadata"):
                     # Handle both string and dict metadata (ensure it's parsed)
                     metadata = m.get("metadata")
@@ -537,7 +542,7 @@ async def memory_thread(
                     # Now check for goal_id in the parsed metadata
                     if metadata.get("goal_id") == goal_id:
                         filtered_memories.append(m)
-                        logger.debug(f"Memory {m.get('memory_id')} matched goal_id {goal_id}")
+                        logger.debug(f"Memory {m.get('memory_id')} matched metadata goal_id {goal_id}")
             
             # Replace with filtered memories
             memories = filtered_memories
@@ -579,8 +584,11 @@ async def memory_thread(
             if memory.get("task_id"):
                 memory_entry["task_id"] = memory.get("task_id")
             
-            # Add goal_id if present in metadata
-            if memory.get("metadata") and memory.get("metadata").get("goal_id"):
+            # Add goal_id if present at top level
+            if memory.get("goal_id"):
+                memory_entry["goal_id"] = memory.get("goal_id")
+            # Or if present in metadata
+            elif memory.get("metadata") and memory.get("metadata").get("goal_id"):
                 memory_entry["goal_id"] = memory.get("metadata").get("goal_id")
             
             # Add result if present in metadata (for task_result type)
