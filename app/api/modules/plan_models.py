@@ -14,13 +14,11 @@ class TaskPlan(BaseModel):
     A single task in a generated plan.
     
     Attributes:
-        day: The day or sequence number for this task
-        title: The title or description of the task
-        type: The type or category of the task
+        task_id: Unique identifier for this task
+        description: The description of the task
     """
-    day: int = Field(..., description="Day or sequence number for this task")
-    title: str = Field(..., description="Title or description of the task")
-    type: str = Field(..., description="Type or category of the task")
+    task_id: str = Field(..., description="Unique identifier for this task")
+    description: str = Field(..., description="Description of the task")
 
 class PlanGenerateRequest(BaseModel):
     """
@@ -61,3 +59,42 @@ class PlanGenerateResponse(BaseModel):
     task_id: str = Field(..., description="ID of the generated plan")
     project_id: str = Field(..., description="ID of the project context")
     memory_trace_id: str = Field(..., description="ID for memory tracing")
+
+# New models for user goal-based plan generation
+
+class UserGoalPlanTask(BaseModel):
+    """
+    A single task in a user goal-based plan.
+    
+    Attributes:
+        task_id: Unique identifier for this task
+        description: The description of the task
+    """
+    task_id: str = Field(..., description="Unique identifier for this task")
+    description: str = Field(..., description="Description of the task")
+
+class UserGoalPlanRequest(BaseModel):
+    """
+    Request model for generating a plan from a user goal.
+    
+    Attributes:
+        user_id: ID of the user requesting the plan
+        goal: The user's goal or objective
+        project_id: ID of the project context
+        goal_id: Optional ID for the goal
+    """
+    user_id: str = Field(..., description="ID of the user requesting the plan")
+    goal: str = Field(..., description="The user's goal or objective")
+    project_id: str = Field(..., description="ID of the project context")
+    goal_id: Optional[str] = Field(None, description="Optional ID for the goal")
+
+class UserGoalPlanResponse(BaseModel):
+    """
+    Response model for a generated user goal-based plan.
+    
+    Attributes:
+        status: Status of the plan generation (ok, error)
+        plan: List of tasks in the plan
+    """
+    status: str = Field(..., description="Status of the plan generation (ok, error)")
+    plan: List[UserGoalPlanTask] = Field(..., description="List of tasks in the plan")

@@ -41,6 +41,7 @@ try:
     from app.api.modules.feedback import router as feedback_router  # Feedback module router
     from app.api.modules.user_context import router as user_context_router  # User Context module router
     from app.api.modules.respond import router as respond_router  # Respond module router
+    from app.api.modules.plan import router as plan_router  # Plan Generator module router
     
     # MODIFIED: Commented out problematic routes
     """
@@ -447,6 +448,12 @@ try:
     # Import and mount the respond router
     print(f"🔍 DEBUG: Respond router object: {respond_router}")
     app.include_router(respond_router, prefix="/api/modules/respond")
+    
+    # Import and mount the plan router
+    print(f"🔍 DEBUG: Plan router object: {plan_router}")
+    app.include_router(plan_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/plan/generate -> generate_task_plan")
+    print("🧠 Route defined: /api/modules/plan/user-goal -> generate_user_goal_plan")
     print("🧠 Route defined: /api/modules/respond -> respond_endpoint")
     
     # Mount health router

@@ -13,17 +13,22 @@ from typing import List, Dict, Any, Optional
 import logging
 import traceback
 import uuid
+import json
 from datetime import datetime
 
 # Import agent registry and memory-related functions
-from app.api.modules.agent import agent_registry, ensure_core_agents_exist
-from app.modules.memory_writer import write_memory, memory_store
+from app.api.modules.agent import agent_registry, ensure_core_agents_exist, LLMEngine
+from app.api.modules.memory import write_memory, memory_store
+from app.api.modules.user_context import read_user_context
 
 # Import plan models
 from app.api.modules.plan_models import (
     PlanGenerateRequest,
     PlanGenerateResponse,
-    TaskPlan
+    TaskPlan,
+    UserGoalPlanRequest,
+    UserGoalPlanResponse,
+    UserGoalPlanTask
 )
 
 # Configure logging
@@ -32,6 +37,7 @@ logger = logging.getLogger("api.modules.plan")
 # Create router
 router = APIRouter(prefix="/modules/plan", tags=["Plan Generator"])
 print("🧠 Route defined: /api/modules/plan/generate -> generate_task_plan")
+print("🧠 Route defined: /api/modules/plan/user-goal -> generate_user_goal_plan")
 
 @router.post("/generate")
 async def generate_task_plan(request: Request):
@@ -131,6 +137,204 @@ async def generate_task_plan(request: Request):
             content={
                 "status": "error",
                 "log": f"Failed to generate task plan: {str(e)}"
+            }
+        )
+
+@router.post("/user-goal")
+async def generate_user_goal_plan(request: Request):
+    """
+    Generate a structured task plan from a user goal and store each step as a memory entry.
+    
+    This endpoint converts user goals into a structured list of task_plan memory entries.
+    It retrieves the user's context to get their agent_id and preferences, uses LLM to
+    generate a sequenced plan, and writes each item to memory with appropriate metadata.
+    
+    Request body:
+    - user_id: ID of the user requesting the plan
+    - goal: The user's goal or objective
+    - project_id: ID of the project context
+    - goal_id: Optional ID for the goal
+    
+    Returns:
+    - status: "ok" if successful
+    - plan: List of tasks in the plan, each with task_id and description
+    """
+    try:
+        # Parse request body
+        body = await request.json()
+        plan_request = UserGoalPlanRequest(**body)
+        
+        # Generate goal_id if not provided
+        goal_id = plan_request.goal_id if plan_request.goal_id else f"goal-{uuid.uuid4()}"
+        
+        # Retrieve user context
+        user_context = read_user_context(plan_request.user_id)
+        if not user_context:
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "status": "error",
+                    "message": f"User context not found for user_id: {plan_request.user_id}"
+                }
+            )
+        
+        # Extract user context information
+        agent_id = user_context["agent_id"]
+        memory_scope = user_context["memory_scope"]
+        preferences = user_context["preferences"]
+        
+        # Check if agent exists
+        if agent_id not in agent_registry:
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "status": "error",
+                    "message": f"Agent with ID '{agent_id}' not found"
+                }
+            )
+        
+        # Get agent metadata
+        agent_data = agent_registry[agent_id]
+        
+        # Format prompt for LLM to generate a task plan
+        prompt = f"""
+        Generate a structured task plan for the following user goal:
+        
+        GOAL: {plan_request.goal}
+        
+        Break this down into a sequenced list of specific, actionable tasks.
+        Each task should have a clear description and a unique task_id.
+        
+        Format the response as a JSON array of tasks, where each task has:
+        - task_id: A unique identifier (e.g., TASK_001, TASK_002)
+        - description: A clear, specific description of what needs to be done
+        
+        Example format:
+        [
+          {{ "task_id": "TASK_001", "description": "Create school list" }},
+          {{ "task_id": "TASK_002", "description": "Write personal statement" }}
+        ]
+        
+        Ensure tasks are:
+        1. Specific and actionable
+        2. Logically sequenced
+        3. Comprehensive (covering all aspects of the goal)
+        4. Appropriate for the goal context
+        """
+        
+        # Add personalization based on preferences
+        if preferences:
+            # Adjust tone based on mode preference
+            if "mode" in preferences:
+                mode = preferences["mode"]
+                if mode == "reflective":
+                    prompt += "\nGenerate tasks with a thoughtful, reflective approach.\n"
+                elif mode == "analytical":
+                    prompt += "\nGenerate tasks with analytical precision and detail.\n"
+                elif mode == "creative":
+                    prompt += "\nGenerate tasks with creative and innovative approaches.\n"
+            
+            # Adjust persona based on persona preference
+            if "persona" in preferences:
+                persona = preferences["persona"]
+                prompt += f"\nAdopt the {persona} persona when generating tasks.\n"
+        
+        # Process the prompt with LLMEngine
+        logger.info(f"Generating plan for goal: {plan_request.goal}")
+        response_text = LLMEngine.infer(prompt)
+        
+        # Parse the response to extract the task plan
+        try:
+            # Find JSON array in the response
+            start_idx = response_text.find('[')
+            end_idx = response_text.rfind(']') + 1
+            
+            if start_idx == -1 or end_idx == 0:
+                # If no JSON array found, try to parse the entire response
+                tasks_json = response_text
+            else:
+                # Extract the JSON array
+                tasks_json = response_text[start_idx:end_idx]
+            
+            # Parse the JSON
+            tasks_data = json.loads(tasks_json)
+            
+            # Convert to UserGoalPlanTask objects
+            tasks = []
+            for i, task_data in enumerate(tasks_data):
+                # Ensure task_id is present, generate if missing
+                if "task_id" not in task_data or not task_data["task_id"]:
+                    task_data["task_id"] = f"TASK_{(i+1):03d}"
+                
+                # Create task object
+                task = UserGoalPlanTask(
+                    task_id=task_data["task_id"],
+                    description=task_data["description"]
+                )
+                tasks.append(task)
+            
+        except Exception as e:
+            logger.error(f"Error parsing LLM response: {str(e)}")
+            logger.error(f"Response text: {response_text}")
+            
+            # Fallback: Create a simple task plan
+            tasks = [
+                UserGoalPlanTask(
+                    task_id="TASK_001",
+                    description=f"Plan and organize approach for: {plan_request.goal}"
+                ),
+                UserGoalPlanTask(
+                    task_id="TASK_002",
+                    description=f"Research resources needed for: {plan_request.goal}"
+                ),
+                UserGoalPlanTask(
+                    task_id="TASK_003",
+                    description=f"Execute initial steps for: {plan_request.goal}"
+                )
+            ]
+        
+        # Write each task to memory
+        for task in tasks:
+            # Create metadata for the task
+            metadata = {
+                "project_id": plan_request.project_id,
+                "goal": plan_request.goal,
+                "goal_id": goal_id,
+                "task_id": task.task_id,
+                "user_id": plan_request.user_id
+            }
+            
+            # Write task to memory
+            memory = write_memory(
+                agent_id=agent_id,
+                type="task_plan",
+                content=task.description,
+                tags=[memory_scope, "task_plan", goal_id, task.task_id],
+                project_id=plan_request.project_id,
+                status="pending",
+                task_type="plan_item",
+                task_id=task.task_id,
+                memory_trace_id=goal_id,
+                metadata=metadata
+            )
+            
+            logger.info(f"Task plan item written to memory: {task.task_id}")
+        
+        # Create response
+        response = UserGoalPlanResponse(
+            status="ok",
+            plan=tasks
+        )
+        
+        return response.dict()
+    except Exception as e:
+        logger.error(f"Error generating user goal plan: {str(e)}")
+        logger.error(traceback.format_exc())
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": f"Failed to generate user goal plan: {str(e)}"
             }
         )
 
@@ -344,7 +548,7 @@ def generate_generic_tasks(objective: str, theme: str, days: int) -> List[TaskPl
         TaskPlan(day=11, title=f"Share your progress with others", type="sharing"),
         TaskPlan(day=12, title=f"Integrate new insights about {theme}", type="integration"),
         TaskPlan(day=13, title=f"Overcome obstacles to {objective}", type="problem-solving"),
-        TaskPlan(day=14, title=f"Celebrate progress and set new goals", type="celebration")
+        TaskPlan(day=14, title=f"Celebrate achievements and set new goals", type="celebration")
     ]
     
     # Add additional tasks if needed
@@ -352,7 +556,7 @@ def generate_generic_tasks(objective: str, theme: str, days: int) -> List[TaskPl
         next_task = additional_tasks[(len(generic_tasks) - 7) % len(additional_tasks)]
         generic_tasks.append(TaskPlan(
             day=len(generic_tasks) + 1,
-            title=next_task.title.replace("{theme}", theme).replace("{objective}", objective),
+            title=next_task.title,
             type=next_task.type
         ))
     
