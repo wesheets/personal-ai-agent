@@ -31,9 +31,18 @@ def push_to_github():
         subprocess.run(["git", "commit", "-m", "feat: deploy memory system fixes with schema + regression tests"], check=True)
         print("Changes committed successfully")
         
-        # Add remote
+        # Set remote URL (update if exists, add if doesn't)
         remote_url = f"https://{github_username}:{github_token}@github.com/{github_username}/{repo_name}.git"
-        subprocess.run(["git", "remote", "add", "origin", remote_url], check=True)
+        try:
+            # Check if remote exists
+            subprocess.run(["git", "remote", "get-url", "origin"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            # If it exists, set the URL
+            subprocess.run(["git", "remote", "set-url", "origin", remote_url], check=True)
+            print("Updated existing remote origin URL")
+        except subprocess.CalledProcessError:
+            # If it doesn't exist, add it
+            subprocess.run(["git", "remote", "add", "origin", remote_url], check=True)
+            print("Added new remote origin")
         print("Remote added successfully")
         
         # Push to GitHub
