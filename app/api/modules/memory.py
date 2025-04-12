@@ -152,17 +152,19 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         # Write to SQLite database
         memory = memory_db.write_memory(memory)
         
+        # Add diagnostic logging as requested
+        print(f"🧠 [WRITE_MEMORY] memory_id: {memory['memory_id']}")
+        print(f"🧠 [WRITE_MEMORY] Appending to store.")
+        
         # IMPORTANT: Add to in-memory store for immediate access
         memory_store.append(memory)
         
-        # Enhanced debug logging to verify memory is being appended
+        print(f"🧠 [WRITE_MEMORY] Store now has {len(memory_store)} entries.")
+        
+        # Keep existing debug logging for backward compatibility
         print(f"[WRITE] Appending to memory_store: {memory['memory_id']}")
         print(f"[WRITE] Store now has {len(memory_store)} memories")
         print(f"[WRITE] Memory store IDs: {[m['memory_id'] for m in memory_store]}")
-        
-        # Additional debug logging as requested for final confirmation
-        print(f"🧠 [MEMORY WRITE] Appending to store: {memory['memory_id']}")
-        print(f"🧠 [MEMORY WRITE] Current store length: {len(memory_store)}")
         
         logger.info(f"🧠 Memory added to in-memory store, current count: {len(memory_store)}")
         
@@ -304,6 +306,11 @@ async def read_memory(
         
         # If memory_id is provided, first check in-memory store for immediate access
         if memory_id:
+            # Add diagnostic logging as requested
+            print(f"🔍 [READ] Looking for memory_id: {memory_id}")
+            print(f"🔍 [READ] memory_store: {[m['memory_id'] for m in memory_store]}")
+            
+            # Keep existing debug logging for backward compatibility
             print(f"[READ] Looking for memory_id: {memory_id}")
             
             # Check in-memory store first
@@ -317,9 +324,11 @@ async def read_memory(
                     }
             
             # If not found in memory_store, try SQLite database
+            print(f"📦 [READ] Memory not in memory_store. Checking DB...")
             print(f"[READ] Memory not found in memory_store, checking database: {memory_id}")
             logger.info(f"⚠️ Memory not found in memory_store, checking database: {memory_id}")
             memory = memory_db.read_memory_by_id(memory_id)
+            print(f"📦 [READ] DB result: {memory}")
             
             if memory:
                 # Add to memory_store for future in-memory access
