@@ -14,8 +14,9 @@ from typing import Dict, List, Optional, Any
 from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel, Field, validator
 
-# Import memory-related functions
-from app.modules.memory_writer import write_memory
+# Import memory-related functions from memory.py instead of memory_writer.py
+# This ensures memories are stored in both SQLite database and in-memory store
+from app.api.modules.memory import write_memory
 
 # Configure logging
 logger = logging.getLogger("api.modules.task_result")

@@ -1,94 +1,120 @@
+"""
+Test script to verify memory persistence between task_result and memory endpoints.
+
+This script tests:
+1. Writing a memory through the /task/result endpoint
+2. Retrieving the memory through the /read endpoint
+3. Verifying the memory is correctly stored in both SQLite and memory_store
+"""
+
 import requests
 import json
 import sys
 import time
+import uuid
 
-def test_memory_write_read_cycle(base_url):
-    """
-    Test the memory write-read cycle with enhanced logging.
+# Base URL for API endpoints
+BASE_URL = "http://localhost:8000"  # Change this if testing against a different environment
+
+def test_task_result_memory_persistence():
+    """Test memory persistence between task_result and memory endpoints"""
+    print("🧪 Starting task_result memory persistence test...")
     
-    This test:
-    1. Writes a new memory using the /write endpoint
-    2. Captures the returned memory_id
-    3. Immediately reads the memory using the /read endpoint
-    4. Verifies the memory is found in memory_store
+    # Generate unique IDs for this test
+    test_agent_id = f"test_agent_{uuid.uuid4().hex[:8]}"
+    test_task_id = f"test_task_{uuid.uuid4().hex[:8]}"
     
-    Args:
-        base_url: Base URL for the API endpoints
-    """
-    print(f"🧪 Starting memory write-read validation test with enhanced logging on {base_url}...")
-    
-    # Step 1: Write a new memory
-    write_url = f"{base_url}/write"
-    write_payload = {
-        "agent_id": "test_agent",
-        "memory_type": "test",
-        "content": "Testing global memory_store with enhanced logging",
-        "tags": ["test", "global", "memory_store", "logging"],
+    # Create test data for task_result endpoint
+    task_result_data = {
+        "agent_id": test_agent_id,
+        "task_id": test_task_id,
+        "outcome": "success",
+        "confidence_score": 0.95,
+        "output": "Test memory persistence between task_result and memory endpoints",
+        "notes": "This is a test to verify memory persistence",
         "project_id": "test_project"
     }
     
-    print(f"📤 Writing new memory...")
-    write_response = requests.post(write_url, json=write_payload)
+    # Step 1: Write memory through task_result endpoint
+    print(f"📤 Writing test memory through /task/result endpoint...")
+    try:
+        task_result_response = requests.post(
+            f"{BASE_URL}/api/modules/task/result",
+            json=task_result_data
+        )
+        
+        # Check if request was successful
+        task_result_response.raise_for_status()
+        
+        # Parse response
+        result = task_result_response.json()
+        print(f"✅ Successfully wrote memory through task_result endpoint")
+        print(f"Response: {json.dumps(result, indent=2)}")
+        
+        # Extract memory_id
+        memory_id = result.get("memory_id")
+        if not memory_id:
+            print(f"❌ No memory_id returned from task_result endpoint")
+            return False
+        
+        print(f"🔑 Captured memory_id: {memory_id}")
+        
+        # Step 2: Wait a moment to ensure memory is persisted
+        print(f"⏱️ Waiting for memory to be persisted...")
+        time.sleep(1)
+        
+        # Step 3: Read memory through read endpoint
+        print(f"📥 Reading memory with memory_id={memory_id}...")
+        read_response = requests.get(
+            f"{BASE_URL}/api/modules/read?memory_id={memory_id}"
+        )
+        
+        # Check if request was successful
+        read_response.raise_for_status()
+        
+        # Parse response
+        read_result = read_response.json()
+        
+        # Check if memory was found
+        if read_result.get("status") != "ok" or not read_result.get("memories"):
+            print(f"❌ Memory not found in read endpoint response")
+            print(f"Response: {json.dumps(read_result, indent=2)}")
+            return False
+        
+        # Extract memory from response
+        memory = read_result["memories"][0]
+        
+        # Verify memory content
+        if memory["agent_id"] != test_agent_id:
+            print(f"❌ Memory agent_id mismatch: {memory['agent_id']} != {test_agent_id}")
+            return False
+        
+        if memory["task_id"] != test_task_id:
+            print(f"❌ Memory task_id mismatch: {memory['task_id']} != {test_task_id}")
+            return False
+        
+        if memory["type"] != "task_result":
+            print(f"❌ Memory type mismatch: {memory['type']} != task_result")
+            return False
+        
+        print(f"✅ Successfully read memory through read endpoint")
+        print(f"✅ Memory content matches expected values")
+        print(f"✅ Memory persistence between task_result and memory endpoints verified")
+        
+        return True
     
-    if write_response.status_code != 200:
-        print(f"❌ Failed to write memory: {write_response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Error during API request: {str(e)}")
         return False
-    
-    print(f"✅ Successfully wrote memory")
-    write_data = write_response.json()
-    print(f"Response: {json.dumps(write_data, indent=2)}")
-    
-    # Step 2: Capture the memory_id
-    memory_id = write_data.get("memory_id")
-    if not memory_id:
-        print(f"❌ No memory_id returned from write operation")
+    except Exception as e:
+        print(f"❌ Unexpected error: {str(e)}")
         return False
-    
-    print(f"🔑 Captured memory_id: {memory_id}")
-    
-    # Step 3: Read the memory back
-    read_url = f"{base_url}/read?memory_id={memory_id}"
-    print(f"📥 Reading memory with memory_id={memory_id}...")
-    
-    # Small delay to ensure logs are visible
-    time.sleep(1)
-    
-    read_response = requests.get(read_url)
-    
-    if read_response.status_code != 200:
-        print(f"❌ Failed to read memory: {read_response.text}")
-        return False
-    
-    print(f"✅ Successfully read memory")
-    read_data = read_response.json()
-    
-    # Step 4: Verify the memory content
-    if read_data.get("status") != "ok" or not read_data.get("memories"):
-        print(f"❌ Invalid response format: {json.dumps(read_data, indent=2)}")
-        return False
-    
-    memory = read_data["memories"][0]
-    if memory["memory_id"] != memory_id:
-        print(f"❌ Memory ID mismatch: expected {memory_id}, got {memory['memory_id']}")
-        return False
-    
-    if memory["content"] != write_payload["content"]:
-        print(f"❌ Memory content mismatch")
-        return False
-    
-    if memory["type"] != write_payload["memory_type"]:
-        print(f"❌ Memory type mismatch: expected {write_payload['memory_type']}, got {memory['type']}")
-        return False
-    
-    # Success!
-    print(f"✅ Memory write-read validation test passed!")
-    print(f"✅ Memory successfully written and retrieved using its memory_id")
-    print(f"✅ Write → read flow works correctly with global memory_store")
-    print(f"✅ Enhanced logging confirms memory_store is properly global")
-    return True
 
 if __name__ == "__main__":
-    # Use command line argument for base URL if provided, otherwise use default
-    base_url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000/api/modules"
-    test_memory_write_read_cycle(base_url)
+    success = test_task_result_memory_persistence()
+    if success:
+        print("✅ Task result memory persistence test passed!")
+        sys.exit(0)
+    else:
+        print("❌ Task result memory persistence test failed!")
+        sys.exit(1)
