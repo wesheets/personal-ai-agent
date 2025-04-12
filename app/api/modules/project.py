@@ -5,9 +5,10 @@ This module provides REST API endpoints for managing projects, including:
 - Initiating new projects with goals and agent assignments
 - Storing project metadata in memory
 - Triggering plan generation for project goals
+- Retrieving project history and memory entries
 """
 
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Query
 from fastapi.responses import JSONResponse
 from typing import List, Dict, Any, Optional
 import logging
@@ -22,6 +23,7 @@ from app.api.modules.project_models import ProjectInitiateRequest, ProjectInitia
 
 # Import memory and plan modules for integration
 from app.api.modules.memory import write_memory
+from app.db.memory_db import memory_db
 from app.api.modules.plan_models import UserGoalPlanRequest
 
 # Configure logging
@@ -127,6 +129,115 @@ async def project_initiate(request: ProjectInitiateRequest):
     except Exception as e:
         logger.error(f"❌ Error initiating project: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error initiating project: {str(e)}")
+
+@router.get("/history")
+async def project_history(
+    project_id: str = Query(..., description="ID of the project to retrieve history for"),
+    memory_type: Optional[str] = Query(None, description="Filter by memory type (e.g., task_plan, task_result, feedback_summary)"),
+    agent_id: Optional[str] = Query(None, description="Filter by agent ID"),
+    user_id: Optional[str] = Query(None, description="Filter by user ID"),
+    limit: Optional[int] = Query(100, description="Maximum number of memories to return"),
+    sort: Optional[str] = Query("timestamp", description="Field to sort by"),
+    order: Optional[str] = Query("asc", description="Sort order (asc or desc)")
+):
+    """
+    Retrieve all memory entries linked to a specific project_id.
+    
+    This endpoint returns a chronological list of memory entries associated with a project,
+    with optional filtering by memory type, agent ID, user ID, and other parameters.
+    
+    Parameters:
+    - project_id: (Required) ID of the project to retrieve history for
+    - memory_type: (Optional) Filter by memory type (e.g., task_plan, task_result, feedback_summary)
+    - agent_id: (Optional) Filter by agent ID
+    - user_id: (Optional) Filter by user ID
+    - limit: (Optional) Maximum number of memories to return, default is 100
+    - sort: (Optional) Field to sort by, default is "timestamp"
+    - order: (Optional) Sort order (asc or desc), default is "asc"
+    
+    Returns:
+    - status: "ok" if successful
+    - project_id: ID of the project
+    - memories: List of memory entries in chronological order
+    """
+    try:
+        logger.info(f"📚 Retrieving history for project {project_id}")
+        
+        # Validate sort field
+        valid_sort_fields = ["timestamp", "type", "memory_id"]
+        if sort not in valid_sort_fields:
+            sort = "timestamp"  # Default to timestamp if invalid sort field
+        
+        # Validate order
+        valid_orders = ["asc", "desc"]
+        if order not in valid_orders:
+            order = "asc"  # Default to ascending if invalid order
+        
+        # Query memories from database
+        try:
+            # First, ensure we have a fresh connection
+            memory_db.close()  # Close any existing connection
+            # Get a new connection
+            conn = memory_db._get_connection()
+            
+            # Query memories by project_id
+            memories = memory_db.read_memories(
+                project_id=project_id,
+                memory_type=memory_type,
+                agent_id=agent_id,
+                limit=limit
+            )
+            
+            # Filter by user_id if provided (since user_id is stored in tags)
+            if user_id:
+                user_tag = f"user:{user_id}"
+                memories = [m for m in memories if any(user_tag in tag for tag in m.get("tags", []))]
+            
+            # Sort memories
+            if sort == "timestamp":
+                memories.sort(key=lambda x: x.get("timestamp", ""), reverse=(order == "desc"))
+            elif sort == "type":
+                memories.sort(key=lambda x: x.get("type", ""), reverse=(order == "desc"))
+            elif sort == "memory_id":
+                memories.sort(key=lambda x: x.get("memory_id", ""), reverse=(order == "desc"))
+            
+            # Format memories for response
+            formatted_memories = []
+            for memory in memories:
+                formatted_memory = {
+                    "type": memory.get("type"),
+                    "timestamp": memory.get("timestamp"),
+                    "content": memory.get("content")
+                }
+                
+                # Add task_id if available
+                if memory.get("task_id"):
+                    formatted_memory["task_id"] = memory.get("task_id")
+                
+                # Add result if available in metadata
+                if memory.get("metadata") and "result" in memory.get("metadata"):
+                    formatted_memory["result"] = memory.get("metadata").get("result")
+                
+                # Add metadata if available
+                if memory.get("metadata"):
+                    formatted_memory["metadata"] = memory.get("metadata")
+                
+                formatted_memories.append(formatted_memory)
+            
+            logger.info(f"✅ Retrieved {len(formatted_memories)} memories for project {project_id}")
+            
+            # Return response
+            return JSONResponse(status_code=200, content={
+                "status": "ok",
+                "project_id": project_id,
+                "memories": formatted_memories
+            })
+        except Exception as e:
+            logger.error(f"❌ Error querying memories: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Error querying memories: {str(e)}")
+    except Exception as e:
+        logger.error(f"❌ Error retrieving project history: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving project history: {str(e)}")
 
 async def trigger_plan_generation(user_id: str, goal: str, project_id: str, goal_id: str):
     """
