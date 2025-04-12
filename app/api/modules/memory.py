@@ -123,6 +123,9 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         The memory with its memory_id
     """
     try:
+        # Explicitly declare memory_store as global to prevent shadowing
+        global memory_store
+        
         # Get agent tone profile (placeholder - would need to be implemented)
         agent_tone = None  # get_agent_tone_profile(agent_id)
         
@@ -150,8 +153,12 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         memory = memory_db.write_memory(memory)
         
         # IMPORTANT: Add to in-memory store for immediate access
-        global memory_store
         memory_store.append(memory)
+        
+        # Enhanced debug logging to verify memory is being appended
+        print(f"[WRITE] Memory written: {memory['memory_id']}")
+        print(f"[READ] Current memory store: {[m['memory_id'] for m in memory_store]}")
+        
         logger.info(f"🧠 Memory added to in-memory store, current count: {len(memory_store)}")
         
         # Also store in shared memory layer (placeholder - would need to be implemented)
@@ -280,16 +287,24 @@ async def read_memory(
     - memories: List of memory entries sorted by timestamp (newest first)
     """
     try:
-        # Debug: Print all memory_ids in memory_store
+        # Explicitly declare memory_store as global to prevent shadowing
         global memory_store
+        
+        # Enhanced debug logging to verify memory_store contents at read time
+        print(f"[READ] Current memory store: {[m['memory_id'] for m in memory_store]}")
+        
+        # Debug: Print all memory_ids in memory_store
         memory_ids = [m["memory_id"] for m in memory_store]
         logger.info(f"🔍 DEBUG: memory_store contains {len(memory_ids)} memories: {memory_ids}")
         
         # If memory_id is provided, first check in-memory store for immediate access
         if memory_id:
+            print(f"[READ] Looking for memory_id: {memory_id}")
+            
             # Check in-memory store first
             for memory in memory_store:
                 if memory["memory_id"] == memory_id:
+                    print(f"[READ] Memory found in memory_store: {memory_id}")
                     logger.info(f"✅ Memory found in memory_store: {memory_id}")
                     return {
                         "status": "ok",
@@ -297,18 +312,22 @@ async def read_memory(
                     }
             
             # If not found in memory_store, try SQLite database
+            print(f"[READ] Memory not found in memory_store, checking database: {memory_id}")
             logger.info(f"⚠️ Memory not found in memory_store, checking database: {memory_id}")
             memory = memory_db.read_memory_by_id(memory_id)
             
             if memory:
                 # Add to memory_store for future in-memory access
                 memory_store.append(memory)
+                print(f"[READ] Memory found in database and added to memory_store: {memory_id}")
+                print(f"[READ] Updated memory store: {[m['memory_id'] for m in memory_store]}")
                 logger.info(f"✅ Memory found in database and added to memory_store: {memory_id}")
                 return {
                     "status": "ok",
                     "memories": [memory]
                 }
             else:
+                print(f"[READ] Memory not found in memory_store or database: {memory_id}")
                 logger.error(f"❌ Memory not found in memory_store or database: {memory_id}")
                 return JSONResponse(
                     status_code=404,
