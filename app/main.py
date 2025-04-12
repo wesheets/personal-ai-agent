@@ -39,6 +39,7 @@ try:
     from app.api.modules.memory import router as memory_router  # Memory module router
     from app.api.modules.orchestrator import router as orchestrator_router  # Orchestrator module router
     from app.api.modules.feedback import router as feedback_router  # Feedback module router
+    from app.api.modules.user_context import router as user_context_router  # User Context module router
     
     # MODIFIED: Commented out problematic routes
     """
@@ -435,6 +436,12 @@ try:
     print(f"🔍 DEBUG: Feedback router object: {feedback_router}")
     app.include_router(feedback_router, prefix="/api/modules")
     print("🧠 Route defined: /api/modules/feedback/write -> write_feedback")
+    
+    # Import and mount the user_context router
+    print(f"🔍 DEBUG: User Context router object: {user_context_router}")
+    app.include_router(user_context_router, prefix="/api/modules/user_context")
+    print("🧠 Route defined: /api/modules/user_context/register -> register_user")
+    print("🧠 Route defined: /api/modules/user_context/get -> get_user_context")
     
     # Mount health router
     app.include_router(health_router)
