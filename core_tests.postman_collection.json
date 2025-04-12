@@ -1,0 +1,143 @@
+{
+    "info": {
+        "name": "Promethios Core Memory Tests",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "Tests for /memory/write, /memory/read, /memory/thread"
+    },
+    "item": [
+        {
+            "name": "Write Memory",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"agent_id\": \"hal\",\n    \"user_id\": \"final_test_user\",\n    \"memory_type\": \"goal_definition\",\n    \"goal_id\": \"goal_final_001\",\n    \"content\": \"Victory lap for PROM-247.6\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/memory/write",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "memory",
+                        "write"
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "pm.test(\"Persistence Verified is true\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.persistence_verified).to.eql(true);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Read Memory",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{base_url}}/api/memory/read?agent_id=hal&goal_id=goal_final_001",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "memory",
+                        "read"
+                    ],
+                    "query": [
+                        {
+                            "key": "agent_id",
+                            "value": "hal"
+                        },
+                        {
+                            "key": "goal_id",
+                            "value": "goal_final_001"
+                        }
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "pm.test(\"Memory read returns at least one entry\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.memories.length).to.be.above(0);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Thread Memory",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{base_url}}/api/memory/thread?goal_id=goal_final_001",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "memory",
+                        "thread"
+                    ],
+                    "query": [
+                        {
+                            "key": "goal_id",
+                            "value": "goal_final_001"
+                        }
+                    ]
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () {",
+                            "    pm.response.to.have.status(200);",
+                            "});",
+                            "pm.test(\"Thread returns at least one memory\", function () {",
+                            "    var jsonData = pm.response.json();",
+                            "    pm.expect(jsonData.thread.length).to.be.above(0);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000"
+        }
+    ]
+}
