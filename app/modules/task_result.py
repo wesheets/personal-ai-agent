@@ -66,18 +66,17 @@ async def log_task_result(request: Request):
         output = data["output"]
         notes = data["notes"]
 
+        # Merge everything into the content field for now
+        full_content = f"Output: {output}\n\nNotes: {notes}\n\nConfidence: {confidence_score}\nTask ID: {task_id}"
+
         memory = write_memory(
             agent_id=agent_id,
             type="task_result",
-            content=output,
+            content=full_content,
             project_id="agent-feedback",
             tags=["task_result", outcome, f"confidence_{confidence_score}"],
             status="success",
-            task_id=task_id,
-            extra_fields={
-                "confidence_score": confidence_score,
-                "notes": notes
-            }
+            task_id=task_id
         )
 
         print(f"✅ [TASK RESULT] Logged memory: {memory['memory_id']}")
