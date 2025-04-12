@@ -37,6 +37,7 @@ try:
     # Import modules for API routes
     from app.api.modules.agent import router as agent_module_router  # AgentRunner module router
     from app.api.modules.memory import router as memory_router  # Memory module router
+    from app.api.modules.orchestrator import router as orchestrator_router  # Orchestrator module router
     
     # MODIFIED: Commented out problematic routes
     """
@@ -423,6 +424,11 @@ try:
     print(f"🔍 DEBUG: Reflect router object: {reflect_router}")
     app.include_router(reflect_router, prefix="/api/modules")
     print("🧠 Route defined: /api/modules/reflect -> reflect_on_task")
+    
+    # Import and mount the orchestrator router
+    print(f"🔍 DEBUG: Orchestrator router object: {orchestrator_router}")
+    app.include_router(orchestrator_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/orchestrator/audit -> audit_agent_performance")
     
     # Mount health router
     app.include_router(health_router)
