@@ -71,6 +71,9 @@ class MemoryDB:
         if not os.path.exists(DB_DIR):
             os.makedirs(DB_DIR)
             
+        # Store the database path as an instance attribute
+        self.db_path = DB_FILE
+            
         # Initialize database
         self._init_db()
         
@@ -78,8 +81,17 @@ class MemoryDB:
         self._initialized = True
         
         # Log initialization with absolute path
-        logger.info(f"✅ MemoryDB initialized with database file: {os.path.abspath(DB_FILE)}")
-        print(f"🧠 [INIT] MemoryDB initialized with database file: {os.path.abspath(DB_FILE)}")
+        logger.info(f"✅ MemoryDB initialized with database file: {os.path.abspath(self.db_path)}")
+        print(f"🧠 [INIT] MemoryDB initialized with database file: {os.path.abspath(self.db_path)}")
+    
+    def get_path(self):
+        """
+        Get the absolute path to the database file.
+        
+        Returns:
+            str: Absolute path to the database file
+        """
+        return os.path.abspath(self.db_path)
     
     def _init_db(self):
         """
@@ -123,9 +135,9 @@ class MemoryDB:
             # Create a new connection
             try:
                 # Log the absolute path when creating a new connection
-                logger.info(f"💾 DB PATH: Creating connection to {os.path.abspath(DB_FILE)}")
+                logger.info(f"💾 DB PATH: Creating connection to {self.get_path()}")
                 
-                thread_local.connection = sqlite3.connect(DB_FILE)
+                thread_local.connection = sqlite3.connect(self.db_path)
                 thread_local.connection.row_factory = sqlite3.Row
                 logger.info(f"✅ New database connection created in thread {threading.get_ident()}")
                 print(f"🧠 [DB] New database connection created in thread {threading.get_ident()}")
@@ -165,7 +177,7 @@ class MemoryDB:
             conn = self._get_connection()
             
             # Log the database path for this write operation
-            logger.info(f"💾 DB PATH: Writing to {os.path.abspath(DB_FILE)}")
+            logger.info(f"💾 DB PATH: Writing to {self.get_path()}")
             
             # Prepare memory for database
             memory_db = memory.copy()
@@ -279,7 +291,7 @@ class MemoryDB:
             conn = self._get_connection()
             
             # Log the database path for this read operation
-            logger.info(f"💾 DB PATH: Reading from {os.path.abspath(DB_FILE)}")
+            logger.info(f"💾 DB PATH: Reading from {self.get_path()}")
             
             # Execute SQL
             cursor = conn.cursor()
@@ -348,7 +360,7 @@ class MemoryDB:
             conn = self._get_connection()
             
             # Log the database path for this read operation
-            logger.info(f"💾 DB PATH: Reading from {os.path.abspath(DB_FILE)}")
+            logger.info(f"💾 DB PATH: Reading from {self.get_path()}")
             
             # Build SQL query
             sql = "SELECT * FROM memory_view"
@@ -393,21 +405,12 @@ class MemoryDB:
             
             # Add LIMIT clause if limit is provided
             if limit:
-                sql += " LIMIT ?"
-                params.append(limit)
-            
-            # Log query
-            print(f"🔍 [DB] Querying memories with filters: {', '.join([f'{k}={v}' for k, v in locals().items() if k in ['agent_id', 'memory_type', 'since', 'project_id', 'task_id', 'thread_id', 'goal_id', 'limit'] and v is not None])}")
-            logger.info(f"🔍 Executing query: {sql} with params: {params}")
+                sql += f" LIMIT {limit}"
             
             # Execute SQL
             cursor = conn.cursor()
             cursor.execute(sql, params)
             rows = cursor.fetchall()
-            
-            # Log result count
-            logger.info(f"✅ ROWS FETCHED: {len(rows)} rows returned from database")
-            print(f"✅ [DB] ROWS FETCHED: {len(rows)} rows returned from database")
             
             # Convert rows to dicts and parse JSON fields
             memories = []
@@ -435,14 +438,8 @@ class MemoryDB:
                 
                 memories.append(memory)
             
-            # Check if a specific memory is in the results (for verification)
-            if len(memories) > 0 and "memory_id" in locals() and locals()["memory_id"]:
-                memory_id = locals()["memory_id"]
-                if any(m["memory_id"] == memory_id for m in memories):
-                    logger.info(f"✅ VERIFIED: Memory {memory_id} found in recent memories list")
-                    print(f"✅ [DB] VERIFIED: Memory {memory_id} found in recent memories list")
-            
             # Log success
+            logger.info(f"📚 [DB] Retrieved {len(memories)} memories from database")
             print(f"📚 [DB] Retrieved {len(memories)} memories from database")
             
             # Return the memories
@@ -470,18 +467,20 @@ class MemoryDB:
             # Execute SQL
             cursor = conn.cursor()
             cursor.execute("DELETE FROM memories WHERE memory_id = ?", (memory_id,))
+            
+            # Commit the transaction
             conn.commit()
             
             # Check if a row was deleted
             if cursor.rowcount > 0:
-                logger.info(f"✅ Memory deleted: {memory_id}")
-                print(f"🗑️ [DB] Memory deleted: {memory_id}")
+                logger.info(f"✅ Memory deleted from database: {memory_id}")
+                print(f"🗑️ [DB] Memory deleted from database: {memory_id}")
                 return True
             else:
                 logger.warning(f"⚠️ Memory not found for deletion: {memory_id}")
                 print(f"⚠️ [DB] Memory not found for deletion: {memory_id}")
                 return False
-            
+                
         except Exception as e:
             logger.error(f"❌ Error deleting memory: {str(e)}")
             print(f"❌ [DB] Error deleting memory: {str(e)}")
@@ -494,15 +493,22 @@ class MemoryDB:
                 
             raise
     
-    def clear_memories(self, agent_id: Optional[str] = None) -> int:
+    def delete_memories(self, agent_id: Optional[str] = None, memory_type: Optional[str] = None,
+                       project_id: Optional[str] = None, task_id: Optional[str] = None,
+                       thread_id: Optional[str] = None, goal_id: Optional[str] = None) -> int:
         """
-        Clear memories from the database.
+        Delete memories from the database with optional filtering.
         
         Args:
-            agent_id: If provided, only clear memories for this agent
+            agent_id: Filter by agent ID
+            memory_type: Filter by memory type
+            project_id: Filter by project ID
+            task_id: Filter by task ID
+            thread_id: Filter by thread ID (memory_trace_id)
+            goal_id: Filter by goal ID
             
         Returns:
-            The number of memories cleared
+            The number of memories deleted
         """
         try:
             # Get a database connection
@@ -511,34 +517,62 @@ class MemoryDB:
             # Build SQL query
             sql = "DELETE FROM memories"
             params = []
+            where_clauses = []
             
-            # Add agent_id filter if provided
+            # Add filters
             if agent_id:
-                sql += " WHERE agent_id = ?"
+                where_clauses.append("agent_id = ?")
                 params.append(agent_id)
+            
+            if memory_type:
+                where_clauses.append("memory_type = ?")
+                params.append(memory_type)
+            
+            if project_id:
+                where_clauses.append("project_id = ?")
+                params.append(project_id)
+            
+            if task_id:
+                where_clauses.append("task_id = ?")
+                params.append(task_id)
+            
+            if thread_id:
+                where_clauses.append("memory_trace_id = ?")
+                params.append(thread_id)
+                
+            if goal_id:
+                where_clauses.append("goal_id = ?")
+                params.append(goal_id)
+            
+            # Add WHERE clause if filters are present
+            if where_clauses:
+                sql += " WHERE " + " AND ".join(where_clauses)
+            else:
+                # Prevent accidental deletion of all memories
+                logger.error("❌ Attempted to delete all memories without filters")
+                print("❌ [DB] Attempted to delete all memories without filters")
+                return 0
             
             # Execute SQL
             cursor = conn.cursor()
             cursor.execute(sql, params)
+            
+            # Commit the transaction
             conn.commit()
             
-            # Get number of rows deleted
+            # Get the number of deleted rows
             deleted_count = cursor.rowcount
             
             # Log success
-            if agent_id:
-                logger.info(f"✅ Cleared {deleted_count} memories for agent {agent_id}")
-                print(f"🧹 [DB] Cleared {deleted_count} memories for agent {agent_id}")
-            else:
-                logger.info(f"✅ Cleared {deleted_count} memories from database")
-                print(f"🧹 [DB] Cleared {deleted_count} memories from database")
+            logger.info(f"✅ Deleted {deleted_count} memories from database")
+            print(f"🗑️ [DB] Deleted {deleted_count} memories from database")
             
-            # Return the number of memories cleared
+            # Return the number of deleted rows
             return deleted_count
-            
+                
         except Exception as e:
-            logger.error(f"❌ Error clearing memories: {str(e)}")
-            print(f"❌ [DB] Error clearing memories: {str(e)}")
+            logger.error(f"❌ Error deleting memories: {str(e)}")
+            print(f"❌ [DB] Error deleting memories: {str(e)}")
             
             # Try to rollback if possible
             try:
@@ -546,50 +580,6 @@ class MemoryDB:
             except:
                 pass
                 
-            raise
-    
-    def get_memory_count(self, agent_id: Optional[str] = None) -> int:
-        """
-        Get the number of memories in the database.
-        
-        Args:
-            agent_id: If provided, only count memories for this agent
-            
-        Returns:
-            The number of memories
-        """
-        try:
-            # Get a database connection
-            conn = self._get_connection()
-            
-            # Build SQL query
-            sql = "SELECT COUNT(*) FROM memories"
-            params = []
-            
-            # Add agent_id filter if provided
-            if agent_id:
-                sql += " WHERE agent_id = ?"
-                params.append(agent_id)
-            
-            # Execute SQL
-            cursor = conn.cursor()
-            cursor.execute(sql, params)
-            count = cursor.fetchone()[0]
-            
-            # Log success
-            if agent_id:
-                logger.info(f"✅ Found {count} memories for agent {agent_id}")
-                print(f"🔢 [DB] Found {count} memories for agent {agent_id}")
-            else:
-                logger.info(f"✅ Found {count} memories in database")
-                print(f"🔢 [DB] Found {count} memories in database")
-            
-            # Return the count
-            return count
-            
-        except Exception as e:
-            logger.error(f"❌ Error getting memory count: {str(e)}")
-            print(f"❌ [DB] Error getting memory count: {str(e)}")
             raise
 
 # Create a singleton instance

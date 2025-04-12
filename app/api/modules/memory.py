@@ -51,7 +51,7 @@ def initialize_memory_store():
             conn = memory_db._get_connection()
             
             # Log the absolute database path
-            logger.info(f"💾 DB PATH: {os.path.abspath(memory_db.DB_FILE)}")
+            logger.info(f"💾 DB PATH: {memory_db.get_path()}")
             
             # Get recent memories from SQLite database (limit to a reasonable number)
             recent_memories = memory_db.read_memories(limit=1000)
@@ -235,7 +235,7 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
             # Get a new connection
             conn = memory_db._get_connection()
             # Log the absolute database path
-            logger.info(f"💾 DB PATH: Writing to {os.path.abspath(memory_db.DB_FILE)}")
+            logger.info(f"💾 DB PATH: Writing to {memory_db.get_path()}")
             # Now attempt the write with the fresh connection
             memory = memory_db.write_memory(memory)
         except sqlite3.ProgrammingError as e:
@@ -482,7 +482,7 @@ async def memory_read_endpoint(
         logger.info(f"🧠 Reading memories with filters: agent_id={agent_id}, memory_type={memory_type}, goal_id={goal_id}")
         
         # Log the absolute database path
-        logger.info(f"💾 DB PATH: Reading from {os.path.abspath(memory_db.DB_FILE)}")
+        logger.info(f"💾 DB PATH: Reading from {memory_db.get_path()}")
         
         # Ensure we have a fresh connection
         try:
@@ -577,7 +577,7 @@ async def memory_thread(
         logger.info(f"✅ Using singleton memory_db instance for memory_thread request")
         
         # Log the absolute database path
-        logger.info(f"💾 DB PATH: Reading from {os.path.abspath(memory_db.DB_FILE)}")
+        logger.info(f"💾 DB PATH: Reading from {memory_db.get_path()}")
         
         # Ensure we have a fresh connection
         try:
