@@ -621,7 +621,7 @@ async def memory_thread(
             logger.warning(f"⚠️ Non-critical error during final connection close: {str(close_error)}")
             pass
 
-@router.get("/read")
+@router.get("/memory/read")
 async def read_memory(
     agent_id: Optional[str] = None,
     type: Optional[str] = None,
