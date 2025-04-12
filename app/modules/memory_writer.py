@@ -75,7 +75,7 @@ def get_agent_tone_profile(agent_id: str) -> Optional[Dict]:
 _load_memories()
 _load_agent_manifest()
 
-def write_memory(agent_id: str, type: str, content: str, tags: list, project_id: Optional[str] = None, status: Optional[str] = None, task_type: Optional[str] = None, task_id: Optional[str] = None, memory_trace_id: Optional[str] = None):
+def write_memory(agent_id: str, type: str, content: str, tags: list, project_id: Optional[str] = None, status: Optional[str] = None, task_type: Optional[str] = None, task_id: Optional[str] = None, memory_trace_id: Optional[str] = None, metadata: Optional[Dict] = None):
     # Get agent tone profile
     agent_tone = get_agent_tone_profile(agent_id)
     
@@ -90,7 +90,8 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         "status": status,
         "task_type": task_type,
         "task_id": task_id,
-        "memory_trace_id": memory_trace_id
+        "memory_trace_id": memory_trace_id,
+        "metadata": metadata
     }
     
     # Add agent tone if available

@@ -69,6 +69,13 @@ async def log_task_result(request: Request):
         # Merge everything into the content field for now
         full_content = f"Output: {output}\n\nNotes: {notes}\n\nConfidence: {confidence_score}\nTask ID: {task_id}"
 
+        # Create metadata with structured information
+        metadata = {
+            "confidence_score": confidence_score,
+            "outcome": outcome,
+            "notes": notes
+        }
+
         memory = write_memory(
             agent_id=agent_id,
             type="task_result",
@@ -76,7 +83,8 @@ async def log_task_result(request: Request):
             project_id="agent-feedback",
             tags=["task_result", outcome, f"confidence_{confidence_score}"],
             status="success",
-            task_id=task_id
+            task_id=task_id,
+            metadata=metadata
         )
 
         print(f"✅ [TASK RESULT] Logged memory: {memory['memory_id']}")

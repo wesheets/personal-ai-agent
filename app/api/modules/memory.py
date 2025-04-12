@@ -135,7 +135,7 @@ router = APIRouter()
 
 def write_memory(agent_id: str, type: str, content: str, tags: list, project_id: Optional[str] = None, 
                 status: Optional[str] = None, task_type: Optional[str] = None, task_id: Optional[str] = None, 
-                memory_trace_id: Optional[str] = None) -> Dict[str, Any]:
+                memory_trace_id: Optional[str] = None, metadata: Optional[Dict] = None) -> Dict[str, Any]:
     """
     Write a memory to both the SQLite database and in-memory store
     
@@ -149,6 +149,7 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         task_type: Optional task type
         task_id: Optional task ID
         memory_trace_id: Optional memory trace ID
+        metadata: Optional metadata dictionary for additional structured data
         
     Returns:
         The memory with its memory_id
@@ -172,7 +173,8 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
             "status": status,
             "task_type": task_type,
             "task_id": task_id,
-            "memory_trace_id": memory_trace_id
+            "memory_trace_id": memory_trace_id,
+            "metadata": metadata
         }
         
         # Add agent tone if available
@@ -208,19 +210,23 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
             async def store_in_shared_memory():
                 shared_memory = get_shared_memory()
                 
-                # Include agent_tone in metadata if available
-                metadata = {
+                # Include agent_tone and custom metadata if available
+                shared_metadata = {
                     "agent_name": agent_id,
                     "type": type,
                     "memory_id": memory["memory_id"]
                 }
                 
                 if agent_tone:
-                    metadata["agent_tone"] = agent_tone
+                    shared_metadata["agent_tone"] = agent_tone
+                    
+                # Include any custom metadata provided by the caller
+                if metadata:
+                    shared_metadata.update(metadata)
                 
                 await shared_memory.store_memory(
                     content=content,
-                    metadata=metadata,
+                    metadata=shared_metadata,
                     scope="agent",
                     agent_name=agent_id,
                     topics=tags

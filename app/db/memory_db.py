@@ -104,13 +104,16 @@ class MemoryDB:
             # Convert agent_tone to JSON string if present
             agent_tone_json = json.dumps(memory.get("agent_tone")) if "agent_tone" in memory else None
             
+            # Convert metadata to JSON string if present
+            metadata_json = json.dumps(memory.get("metadata")) if "metadata" in memory else None
+            
             # Insert the memory into the database
             cursor = self.conn.cursor()
             cursor.execute("""
                 INSERT INTO memories (
                     memory_id, agent_id, memory_type, content, tags, timestamp,
-                    project_id, status, task_type, task_id, memory_trace_id, agent_tone
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    project_id, status, task_type, task_id, memory_trace_id, agent_tone, metadata
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 memory["memory_id"],
                 memory["agent_id"],
@@ -123,7 +126,8 @@ class MemoryDB:
                 memory.get("task_type"),
                 memory.get("task_id"),
                 memory.get("memory_trace_id"),
-                agent_tone_json
+                agent_tone_json,
+                metadata_json
             ))
             self.conn.commit()
             logger.info(f"✅ Memory written to database: {memory['memory_id']}")
@@ -166,6 +170,10 @@ class MemoryDB:
             # Parse agent_tone from JSON string if present and not null
             if memory.get("agent_tone"):
                 memory["agent_tone"] = json.loads(memory["agent_tone"])
+            
+            # Parse metadata from JSON string if present and not null
+            if memory.get("metadata"):
+                memory["metadata"] = json.loads(memory["metadata"])
             
             print(f"📖 [DB] Memory retrieved from database: {memory_id} (agent: {memory.get('agent_id')}, type: {memory.get('type')})")
             return memory
@@ -270,6 +278,10 @@ class MemoryDB:
                 # Parse agent_tone from JSON string if present and not null
                 if memory.get("agent_tone"):
                     memory["agent_tone"] = json.loads(memory["agent_tone"])
+                
+                # Parse metadata from JSON string if present and not null
+                if memory.get("metadata"):
+                    memory["metadata"] = json.loads(memory["metadata"])
             
             # Additional filtering for tags (needs to be done after JSON parsing)
             if tag:

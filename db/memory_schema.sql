@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS memories (
     task_id TEXT,
     memory_trace_id TEXT,
     agent_tone TEXT,  -- Stored as JSON object
+    metadata TEXT,    -- Stored as JSON object
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
