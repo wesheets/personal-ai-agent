@@ -79,20 +79,54 @@ async def audit_agent_performance(
         
         # Process each task plan
         for plan in task_plans:
-            # Extract task_id from metadata
+            # Extract task_id from metadata or directly from task_id field
+            # First try to get from metadata (new format)
             task_id = plan.get("metadata", {}).get("task_id")
             
+            # If not found in metadata, try to get from top-level task_id field (old format)
             if not task_id:
-                logger.warning(f"⚠️ Task plan missing task_id in metadata: {plan.get('memory_id')}")
+                task_id = plan.get("task_id")
+            
+            if not task_id:
+                logger.warning(f"⚠️ Task plan missing task_id in both metadata and top-level fields: {plan.get('memory_id')}")
                 continue
             
+            logger.info(f"🔍 Looking for task_result with task_id: {task_id}")
+            
             # Look up matching task_result with same agent_id and task_id
+            # First try direct query using task_id parameter
             task_results = memory_db.read_memories(
                 agent_id=agent_id,
                 memory_type="task_result",
                 task_id=task_id,
                 limit=1
             )
+            
+            # If no results found, try a broader search and filter manually
+            if not task_results:
+                logger.info(f"🔍 No direct match found, trying broader search for task_id: {task_id}")
+                # Get all task results for this agent
+                all_task_results = memory_db.read_memories(
+                    agent_id=agent_id,
+                    memory_type="task_result",
+                    limit=10  # Reasonable limit to avoid performance issues
+                )
+                
+                # Filter manually by checking metadata
+                task_results = [
+                    result for result in all_task_results
+                    if (result.get("metadata", {}).get("task_id", "").lower() == task_id.lower() or 
+                        (result.get("task_id") and result.get("task_id").lower() == task_id.lower()))
+                ]
+                
+                # Take only the first result if multiple found
+                if task_results:
+                    task_results = [task_results[0]]
+                    logger.info(f"✅ Found match in metadata for task_id: {task_id}")
+                else:
+                    logger.info(f"❌ No match found in broader search for task_id: {task_id}")
+            else:
+                logger.info(f"✅ Found direct match for task_id: {task_id}")
             
             # Determine status based on result
             status = "unattempted"
