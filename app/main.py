@@ -40,6 +40,7 @@ try:
     from app.api.modules.orchestrator import router as orchestrator_router  # Orchestrator module router
     from app.api.modules.feedback import router as feedback_router  # Feedback module router
     from app.api.modules.user_context import router as user_context_router  # User Context module router
+    from app.api.modules.respond import router as respond_router  # Respond module router
     
     # MODIFIED: Commented out problematic routes
     """
@@ -442,6 +443,11 @@ try:
     app.include_router(user_context_router, prefix="/api/modules/user_context")
     print("🧠 Route defined: /api/modules/user_context/register -> register_user")
     print("🧠 Route defined: /api/modules/user_context/get -> get_user_context")
+    
+    # Import and mount the respond router
+    print(f"🔍 DEBUG: Respond router object: {respond_router}")
+    app.include_router(respond_router, prefix="/api/modules/respond")
+    print("🧠 Route defined: /api/modules/respond -> respond_endpoint")
     
     # Mount health router
     app.include_router(health_router)
