@@ -374,6 +374,72 @@ async def read_memory(
         logger.error(f"❌ MemoryReader error: {str(e)}")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
+@router.get("/memory/recent")
+async def get_recent_memories(
+    agent_id: Optional[str] = None,
+    memory_type: Optional[str] = None,
+    limit: int = 5
+):
+    """
+    Retrieve the most recent memories matching the specified criteria.
+    
+    This endpoint provides a simple way to get the latest memories without needing
+    to know specific memory IDs. It's useful for agent dashboards and memory stream views.
+    
+    Parameters:
+    - agent_id: (Optional) Filter by agent ID
+    - memory_type: (Optional) Filter by memory type
+    - limit: Maximum number of memories to return, default is 5
+    
+    Returns:
+    - status: "ok" if successful
+    - memories: List of memory entries sorted by timestamp (newest first)
+    """
+    try:
+        # Explicitly declare memory_store as global to prevent shadowing
+        global memory_store
+        
+        # Log request details
+        logger.info(f"🔍 Retrieving recent memories: agent_id={agent_id}, memory_type={memory_type}, limit={limit}")
+        print(f"🔍 [RECENT] Retrieving recent memories: agent_id={agent_id}, memory_type={memory_type}, limit={limit}")
+        
+        # Create a copy of memory_store to avoid modifying the original
+        filtered_memories = memory_store.copy()
+        
+        # Apply filters if provided
+        if agent_id:
+            filtered_memories = [m for m in filtered_memories if m.get("agent_id") == agent_id]
+            print(f"🔍 [RECENT] Filtered by agent_id={agent_id}, {len(filtered_memories)} memories remaining")
+        
+        if memory_type:
+            filtered_memories = [m for m in filtered_memories if m.get("type") == memory_type]
+            print(f"🔍 [RECENT] Filtered by memory_type={memory_type}, {len(filtered_memories)} memories remaining")
+        
+        # Sort by timestamp in descending order (newest first)
+        filtered_memories.sort(key=lambda m: m.get("timestamp", ""), reverse=True)
+        
+        # Limit the number of results
+        limited_memories = filtered_memories[:limit]
+        
+        # Log result summary
+        logger.info(f"✅ Retrieved {len(limited_memories)} recent memories")
+        print(f"✅ [RECENT] Retrieved {len(limited_memories)} recent memories")
+        
+        return {
+            "status": "ok",
+            "memories": limited_memories
+        }
+    except Exception as e:
+        logger.error(f"❌ Error retrieving recent memories: {str(e)}")
+        print(f"❌ [RECENT] Error retrieving recent memories: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": f"Error retrieving recent memories: {str(e)}"
+            }
+        )
+
 @router.post("/reflect")
 async def reflect_on_memories(request: Request):
     """
@@ -408,9 +474,6 @@ async def reflect_on_memories(request: Request):
         # Parse request body
         body = await request.json()
         reflection_request = ReflectionRequest(**body)
-        
-        # Check if this reflection is part of a loop and enforce loop cap
-        current_loop_count = reflection_request.loop_count if reflection_request.loop_count is not None else 0
         
         # Check if max_loops_per_task has been reached
         if current_loop_count >= system_caps["max_loops_per_task"]:
