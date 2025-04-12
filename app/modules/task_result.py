@@ -55,68 +55,34 @@ class TaskResultResponse(BaseModel):
     status: str = "logged"
     memory_id: str
 
-@router.post("/result", response_model=TaskResultResponse)
-async def task_result(request: Request):
-    """
-    Record the outcome, confidence, and reasoning for a completed task.
-    
-    Args:
-        request (Request): The HTTP request containing task result data
-        
-    Returns:
-        TaskResultResponse: The response with status and memory_id
-        
-    Raises:
-        HTTPException: If required fields are missing or other errors occur
-    """
+@router.post("/result")
+async def log_task_result(request: Request):
     try:
-        # Parse request body
-        body = await request.json()
-        task_result_request = TaskResultRequest(**body)
-        
-        # Generate tags based on outcome and confidence
-        tags = ["task_result", f"outcome_{task_result_request.outcome}"]
-        
-        # Add confidence level tag
-        if task_result_request.confidence_score >= 0.8:
-            tags.append("high_confidence")
-        elif task_result_request.confidence_score >= 0.5:
-            tags.append("medium_confidence")
-        else:
-            tags.append("low_confidence")
-            
-        # Format content to include all relevant information
-        content = f"Task Result: {task_result_request.output}\n\n"
-        content += f"Confidence: {task_result_request.confidence_score:.2f}\n\n"
-        
-        if task_result_request.notes:
-            content += f"Notes: {task_result_request.notes}"
-        
-        # Write result to memory
+        data = await request.json()
+        agent_id = data["agent_id"]
+        task_id = data["task_id"]
+        outcome = data["outcome"]
+        confidence_score = data["confidence_score"]
+        output = data["output"]
+        notes = data["notes"]
+
         memory = write_memory(
-            agent_id=task_result_request.agent_id,
+            agent_id=agent_id,
             type="task_result",
-            content=content,
-            tags=tags,
-            project_id=task_result_request.project_id,
-            status=task_result_request.outcome,
-            task_id=task_result_request.task_id,
-            memory_trace_id=task_result_request.memory_trace_id
+            content=output,
+            project_id="agent-feedback",
+            tags=["task_result", outcome, f"confidence_{confidence_score}"],
+            status="success",
+            task_id=task_id,
+            extra_fields={
+                "confidence_score": confidence_score,
+                "notes": notes
+            }
         )
-        
-        # Log successful result recording
-        logger.info(f"✅ Task result recorded for agent {task_result_request.agent_id} on task {task_result_request.task_id}")
-        
-        # Return the response
-        return TaskResultResponse(
-            status="logged",
-            memory_id=memory["memory_id"]
-        )
-    except ValueError as e:
-        # Handle validation errors
-        logger.error(f"❌ Validation error in task result: {str(e)}")
-        raise HTTPException(status_code=422, detail=str(e))
+
+        print(f"✅ [TASK RESULT] Logged memory: {memory['memory_id']}")
+        return {"status": "logged", "memory_id": memory["memory_id"]}
+
     except Exception as e:
-        # Handle other errors
-        logger.error(f"❌ Error recording task result: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error recording task result: {str(e)}")
+        print(f"❌ [TASK RESULT] Logging failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))

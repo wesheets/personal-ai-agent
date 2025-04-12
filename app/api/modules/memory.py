@@ -156,8 +156,13 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         memory_store.append(memory)
         
         # Enhanced debug logging to verify memory is being appended
-        print(f"[WRITE] Memory written: {memory['memory_id']}")
-        print(f"[READ] Current memory store: {[m['memory_id'] for m in memory_store]}")
+        print(f"[WRITE] Appending to memory_store: {memory['memory_id']}")
+        print(f"[WRITE] Store now has {len(memory_store)} memories")
+        print(f"[WRITE] Memory store IDs: {[m['memory_id'] for m in memory_store]}")
+        
+        # Additional debug logging as requested for final confirmation
+        print(f"🧠 [MEMORY WRITE] Appending to store: {memory['memory_id']}")
+        print(f"🧠 [MEMORY WRITE] Current store length: {len(memory_store)}")
         
         logger.info(f"🧠 Memory added to in-memory store, current count: {len(memory_store)}")
         
