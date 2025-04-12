@@ -411,21 +411,9 @@ async def memory_thread(
     - status: "ok" if successful
     - thread: List of memory entries sorted chronologically
     """
-    # Ensure we have a fresh database connection for this request
+    # PROM-247.8 Fix: Simplified implementation that reads directly from database
+    # and bypasses memory_store completely to avoid desynchronization issues
     try:
-        # First, close any existing connection to ensure we get a fresh one
-        try:
-            memory_db.close()
-            logger.info("Closed existing database connection")
-        except Exception as close_error:
-            # Ignore errors during close, we'll get a fresh connection anyway
-            logger.warning(f"⚠️ Non-critical error closing DB connection: {str(close_error)}")
-            pass
-        
-        # Get a fresh connection for this request
-        conn = memory_db._get_connection()
-        logger.info(f"✅ Obtained fresh DB connection for memory_thread request")
-        
         # Validate that at least one of goal_id, task_id, or memory_trace_id is provided
         if not goal_id and not task_id and not memory_trace_id:
             logger.error("Missing required filter: At least one of goal_id, task_id, or memory_trace_id is required")
@@ -448,140 +436,67 @@ async def memory_thread(
                 }
             )
         
-        # Build filters for memory query
-        filters = {}
+        # Initialize memory_db to ensure fresh connection
+        db = MemoryDB()
+        logger.info(f"✅ Initialized fresh MemoryDB instance for memory_thread request")
         
-        # Add primary filters
-        if task_id:
-            filters["task_id"] = task_id
-            logger.info(f"Added task_id filter: {task_id}")
+        # Read fresh memories directly from DB with a high limit
+        all_memories = db.read_memories(limit=1000)
+        logger.info(f"Retrieved {len(all_memories)} memories from database")
         
-        if memory_trace_id:
-            filters["thread_id"] = memory_trace_id
-            logger.info(f"Added thread_id filter: {memory_trace_id}")
-        
-        if agent_id:
-            filters["agent_id"] = agent_id
-            logger.info(f"Added agent_id filter: {agent_id}")
-        
-        # Set a high limit to get all matching memories, we'll filter and limit later
-        filters["limit"] = 1000
-        
-        # Query memories from database with retry logic for closed database errors
-        memories = []
-        max_retries = 3
-        retry_count = 0
-        
-        while retry_count < max_retries:
-            try:
-                # Verify connection is still open before using it
-                conn.execute("SELECT 1")
-                logger.info("Database connection verified as open")
-                
-                # Connection is valid, proceed with query
-                logger.info(f"Executing read_memories with filters: {filters}")
-                memories = memory_db.read_memories(**filters)
-                logger.info(f"Initial query returned {len(memories)} memories")
-                break  # Success, exit retry loop
-                
-            except sqlite3.ProgrammingError as e:
-                if "closed database" in str(e) and retry_count < max_retries - 1:
-                    # Database connection was closed, retry with a fresh connection
-                    retry_count += 1
-                    logger.warning(f"⚠️ Encountered closed database on attempt {retry_count}, retrying...")
-                    
-                    # Close and get a fresh connection
-                    try:
-                        memory_db.close()
-                    except:
-                        pass  # Ignore errors during close
-                    
-                    conn = memory_db._get_connection()
-                    continue
-                else:
-                    # Either not a closed database error or we've exhausted retries
-                    logger.error(f"Database error: {str(e)}")
-                    raise
-            except Exception as e:
-                # For other exceptions, just raise them
-                logger.error(f"Unexpected error during memory query: {str(e)}")
-                raise
-        
-        # Additional filtering for goal_id (not directly supported by memory_db.read_memories)
-        if goal_id:
-            # Add debug logging to help diagnose the issue
-            logger.info(f"Filtering for goal_id: {goal_id}, found {len(memories)} memories before filtering")
+        # Filter memories based on provided criteria
+        filtered_memories = []
+        for m in all_memories:
+            # Convert SQLite Row to dict
+            m = dict(m)
             
-            # Ensure metadata is properly parsed from JSON
-            filtered_memories = []
-            for m in memories:
-                # Convert SQLite Row to dict if needed
-                m = dict(m)  # Ensure we're working with a dictionary, not sqlite3.Row or RowProxy
-                
-                # Enhanced debug logging to see the full memory object and comparison values
-                print("🔍 Thread memory check:", m)
-                print(f"Checking memory goal_id: {m.get('goal_id')} vs {goal_id}")
-                logger.debug(f"Memory object: {json.dumps(m, default=str)}")
-                logger.debug(f"Comparing: '{m.get('goal_id')}' (type: {type(m.get('goal_id'))}) with '{goal_id}' (type: {type(goal_id)})")
-                
-                # Check if goal_id exists at the top level first with explicit string casting and fallback
-                if str(m.get("goal_id", "")).strip() == str(goal_id).strip():
-                    filtered_memories.append(m)
-                    print(f"✅ MATCH FOUND: Memory {m.get('memory_id')} matched top-level goal_id {goal_id}")
-                    logger.debug(f"Memory {m.get('memory_id')} matched top-level goal_id {goal_id}")
-                    continue
-                
-                # If not found at top level, check in metadata
-                if m.get("metadata"):
-                    # Handle both string and dict metadata (ensure it's parsed)
-                    metadata = m.get("metadata")
-                    
-                    # If metadata is a string, parse it to a dictionary
-                    if isinstance(metadata, str):
-                        try:
-                            metadata = json.loads(metadata)
-                            m["metadata"] = metadata  # Update with parsed version
-                            logger.info(f"Parsed metadata from string for memory {m.get('memory_id')}")
-                        except json.JSONDecodeError:
-                            logger.warning(f"Failed to parse metadata JSON for memory {m.get('memory_id')}")
-                            continue
-                    
-                    # Now check for goal_id in the parsed metadata with explicit string casting and fallback
-                    print(f"Checking metadata goal_id: {metadata.get('goal_id')} vs {goal_id}")
-                    logger.debug(f"Comparing metadata: '{metadata.get('goal_id')}' (type: {type(metadata.get('goal_id'))}) with '{goal_id}' (type: {type(goal_id)})")
-                    if str(metadata.get("goal_id", "")).strip() == str(goal_id).strip():
-                        filtered_memories.append(m)
-                        print(f"✅ MATCH FOUND: Memory {m.get('memory_id')} matched metadata goal_id {goal_id}")
-                        logger.debug(f"Memory {m.get('memory_id')} matched metadata goal_id {goal_id}")
+            # Filter by goal_id if provided
+            if goal_id and not (
+                str(m.get("goal_id", "")).strip() == str(goal_id).strip() or
+                (m.get("metadata") and isinstance(m.get("metadata"), dict) and 
+                 str(m.get("metadata", {}).get("goal_id", "")).strip() == str(goal_id).strip())
+            ):
+                continue
             
-            # Replace with filtered memories
-            memories = filtered_memories
-            logger.info(f"After goal_id filtering: found {len(memories)} matching memories")
+            # Filter by task_id if provided
+            if task_id and str(m.get("task_id", "")).strip() != str(task_id).strip():
+                continue
+                
+            # Filter by memory_trace_id if provided
+            if memory_trace_id and str(m.get("memory_trace_id", "")).strip() != str(memory_trace_id).strip():
+                continue
+                
+            # Filter by agent_id if provided
+            if agent_id and str(m.get("agent_id", "")).strip() != str(agent_id).strip():
+                continue
+                
+            # Filter by user_id if provided (using tags)
+            if user_id:
+                user_tag = f"user:{user_id}"
+                if "tags" not in m or user_tag not in m["tags"]:
+                    continue
+            
+            # If we got here, the memory passed all filters
+            filtered_memories.append(m)
         
-        # Filter by user_id if provided (using tags)
-        if user_id:
-            user_tag = f"user:{user_id}"
-            before_count = len(memories)
-            memories = [m for m in memories if "tags" in m and user_tag in m["tags"]]
-            logger.info(f"Filtered by user_id {user_id}: {before_count} -> {len(memories)} memories")
+        logger.info(f"After filtering: found {len(filtered_memories)} matching memories")
         
         # Sort memories by timestamp
         if order and order.lower() == "asc":
-            memories.sort(key=lambda m: m.get("timestamp", ""))
+            filtered_memories.sort(key=lambda m: m.get("timestamp", ""))
             logger.info("Sorted memories in ascending order")
         else:
-            memories.sort(key=lambda m: m.get("timestamp", ""), reverse=True)
+            filtered_memories.sort(key=lambda m: m.get("timestamp", ""), reverse=True)
             logger.info("Sorted memories in descending order")
         
         # Apply limit
-        if limit and limit > 0:
-            if len(memories) > limit:
-                logger.info(f"Limiting results from {len(memories)} to {limit}")
-                memories = memories[:limit]
+        if limit and limit > 0 and len(filtered_memories) > limit:
+            filtered_memories = filtered_memories[:limit]
+            logger.info(f"Limited results to {limit} memories")
         
         # Format memories for response
         thread = []
-        for memory in memories:
+        for memory in filtered_memories:
             # Extract relevant fields for the response
             memory_entry = {
                 "memory_type": memory.get("type"),
@@ -633,7 +548,7 @@ async def memory_thread(
     finally:
         # Always ensure connection is properly closed after request completes
         try:
-            memory_db.close()
+            db.close()
             logger.info("✅ Database connection properly closed after memory_thread request")
         except Exception as close_error:
             logger.warning(f"⚠️ Non-critical error during final connection close: {str(close_error)}")
