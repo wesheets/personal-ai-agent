@@ -24,7 +24,7 @@ import asyncio
 import sqlite3
 
 # Import the SQLite memory database
-from app.db.memory_db import memory_db
+from app.db.memory_db import memory_db, MemoryDB
 
 # Configure logging
 logger = logging.getLogger("api.modules.memory")
