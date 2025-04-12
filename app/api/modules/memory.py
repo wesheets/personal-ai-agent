@@ -515,15 +515,19 @@ async def memory_thread(
             # Ensure metadata is properly parsed from JSON
             filtered_memories = []
             for m in memories:
+                # Convert SQLite Row to dict if needed
+                m = dict(m)  # Ensure we're working with a dictionary, not sqlite3.Row or RowProxy
+                
                 # Enhanced debug logging to see the full memory object and comparison values
                 print("🔍 Thread memory check:", m)
-                print("Goal ID match?", m.get("goal_id"), "==", goal_id)
+                print(f"Checking memory goal_id: {m.get('goal_id')} vs {goal_id}")
                 logger.debug(f"Memory object: {json.dumps(m, default=str)}")
                 logger.debug(f"Comparing: '{m.get('goal_id')}' (type: {type(m.get('goal_id'))}) with '{goal_id}' (type: {type(goal_id)})")
                 
-                # Check if goal_id exists at the top level first with explicit string casting
-                if str(m.get("goal_id")) == str(goal_id):
+                # Check if goal_id exists at the top level first with explicit string casting and fallback
+                if str(m.get("goal_id", "")).strip() == str(goal_id).strip():
                     filtered_memories.append(m)
+                    print(f"✅ MATCH FOUND: Memory {m.get('memory_id')} matched top-level goal_id {goal_id}")
                     logger.debug(f"Memory {m.get('memory_id')} matched top-level goal_id {goal_id}")
                     continue
                 
@@ -542,11 +546,12 @@ async def memory_thread(
                             logger.warning(f"Failed to parse metadata JSON for memory {m.get('memory_id')}")
                             continue
                     
-                    # Now check for goal_id in the parsed metadata with explicit string casting
-                    print("Metadata goal ID match?", metadata.get("goal_id"), "==", goal_id)
+                    # Now check for goal_id in the parsed metadata with explicit string casting and fallback
+                    print(f"Checking metadata goal_id: {metadata.get('goal_id')} vs {goal_id}")
                     logger.debug(f"Comparing metadata: '{metadata.get('goal_id')}' (type: {type(metadata.get('goal_id'))}) with '{goal_id}' (type: {type(goal_id)})")
-                    if str(metadata.get("goal_id")) == str(goal_id):
+                    if str(metadata.get("goal_id", "")).strip() == str(goal_id).strip():
                         filtered_memories.append(m)
+                        print(f"✅ MATCH FOUND: Memory {m.get('memory_id')} matched metadata goal_id {goal_id}")
                         logger.debug(f"Memory {m.get('memory_id')} matched metadata goal_id {goal_id}")
             
             # Replace with filtered memories
