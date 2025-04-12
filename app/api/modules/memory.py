@@ -1,13 +1,14 @@
 """
-Memory Module with SQLite Backend
+Memory Module with SQLite Backend and In-Memory Store
 
 This module provides memory-related functionality for agents, including:
-- Writing memories to SQLite database
+- Writing memories to SQLite database and in-memory store
 - Reading memories with flexible filtering
 - Generating reflections based on memories
 - Summarizing memories
 
-The module uses a SQLite database for persistent storage across deployments.
+The module uses both a SQLite database for persistent storage across deployments
+and an in-memory store for immediate access within the same runtime.
 """
 
 from fastapi import APIRouter, Request, Query, HTTPException
@@ -18,6 +19,8 @@ from datetime import datetime
 import os
 import json
 import logging
+import uuid
+import asyncio
 
 # Import the SQLite memory database
 from app.db.memory_db import memory_db
@@ -27,6 +30,9 @@ logger = logging.getLogger("api.modules.memory")
 
 # Path for system caps configuration
 SYSTEM_CAPS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "system_caps.json")
+
+# Initialize global memory_store for in-memory access
+memory_store = []
 
 # Load system caps configuration
 def load_system_caps():
@@ -100,7 +106,7 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
                 status: Optional[str] = None, task_type: Optional[str] = None, task_id: Optional[str] = None, 
                 memory_trace_id: Optional[str] = None) -> Dict[str, Any]:
     """
-    Write a memory to the SQLite database
+    Write a memory to both the SQLite database and in-memory store
     
     Args:
         agent_id: ID of the agent
@@ -142,6 +148,11 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         
         # Write to SQLite database
         memory = memory_db.write_memory(memory)
+        
+        # IMPORTANT: Add to in-memory store for immediate access
+        global memory_store
+        memory_store.append(memory)
+        logger.info(f"🧠 Memory added to in-memory store, current count: {len(memory_store)}")
         
         # Also store in shared memory layer (placeholder - would need to be implemented)
         try:
@@ -225,6 +236,11 @@ async def memory_write(request: Request):
             task_type=memory_entry.task_type
         )
         
+        # Debug: Print all memory_ids in memory_store
+        global memory_store
+        memory_ids = [m["memory_id"] for m in memory_store]
+        logger.info(f"🔍 DEBUG: memory_store contains {len(memory_ids)} memories: {memory_ids}")
+        
         return JSONResponse(status_code=200, content={"status": "ok", "memory_id": memory["memory_id"]})
     except Exception as e:
         logger.error(f"❌ MemoryWriter error: {str(e)}")
@@ -264,17 +280,36 @@ async def read_memory(
     - memories: List of memory entries sorted by timestamp (newest first)
     """
     try:
-        # If memory_id is provided, return that specific memory
+        # Debug: Print all memory_ids in memory_store
+        global memory_store
+        memory_ids = [m["memory_id"] for m in memory_store]
+        logger.info(f"🔍 DEBUG: memory_store contains {len(memory_ids)} memories: {memory_ids}")
+        
+        # If memory_id is provided, first check in-memory store for immediate access
         if memory_id:
-            # Find memory with the specified ID
+            # Check in-memory store first
+            for memory in memory_store:
+                if memory["memory_id"] == memory_id:
+                    logger.info(f"✅ Memory found in memory_store: {memory_id}")
+                    return {
+                        "status": "ok",
+                        "memories": [memory]
+                    }
+            
+            # If not found in memory_store, try SQLite database
+            logger.info(f"⚠️ Memory not found in memory_store, checking database: {memory_id}")
             memory = memory_db.read_memory_by_id(memory_id)
             
             if memory:
+                # Add to memory_store for future in-memory access
+                memory_store.append(memory)
+                logger.info(f"✅ Memory found in database and added to memory_store: {memory_id}")
                 return {
                     "status": "ok",
                     "memories": [memory]
                 }
             else:
+                logger.error(f"❌ Memory not found in memory_store or database: {memory_id}")
                 return JSONResponse(
                     status_code=404,
                     content={
@@ -511,6 +546,4 @@ async def summarize_memories_endpoint(request: Request):
         })
 
 # Import missing dependencies
-import uuid
-import asyncio
 from app.modules.memory_summarizer import summarize_memories
