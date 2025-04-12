@@ -6,8 +6,13 @@ import sys
 def push_to_github():
     """Push the memory system fixes to GitHub on the main branch"""
     
-    # Get the GitHub token from environment variable or use the latest provided token
-    github_token = os.environ.get('GITHUB_TOKEN', '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')
+    # Get the GitHub token from environment variable only - more secure approach
+    github_token = os.environ.get('GITHUB_TOKEN')
+    if not github_token:
+        print("ERROR: GitHub token not found in environment variables.")
+        print("Please set the GITHUB_TOKEN environment variable and try again.")
+        print("Example: export GITHUB_TOKEN=your_token_here")
+        return False
     github_username = "wesheets"
     repo_name = "personal-ai-agent"
     branch_name = "main"
