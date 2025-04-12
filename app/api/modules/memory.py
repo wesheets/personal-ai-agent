@@ -8,6 +8,9 @@ from datetime import datetime
 import os
 import json
 
+# Path for memory.json file at the app root level
+MEMORY_JSON_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "memory.json")
+
 # Path for system caps configuration
 SYSTEM_CAPS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "system_caps.json")
 
@@ -29,6 +32,34 @@ def load_system_caps():
             "max_loops_per_task": 3,
             "max_delegation_depth": 2
         }
+
+# Function to save memory_store to memory.json
+def save_memory_to_json():
+    try:
+        with open(MEMORY_JSON_FILE, "w") as f:
+            json.dump(memory_store, f, indent=2)
+        print(f"🧠 Saved {len(memory_store)} memories to memory.json")
+    except Exception as e:
+        print(f"❌ Error saving memories to memory.json: {str(e)}")
+
+# Function to load memory_store from memory.json
+def load_memory_from_json():
+    global memory_store
+    try:
+        if os.path.exists(MEMORY_JSON_FILE):
+            with open(MEMORY_JSON_FILE, "r") as f:
+                loaded_memories = json.load(f)
+                # Only update memory_store if we successfully loaded memories
+                if loaded_memories:
+                    memory_store = loaded_memories
+                    print(f"🧠 Loaded {len(memory_store)} memories from memory.json")
+        else:
+            print("⚠️ memory.json not found, starting with empty memory_store")
+    except Exception as e:
+        print(f"❌ Error loading memories from memory.json: {str(e)}")
+
+# Load memory from memory.json on module import
+load_memory_from_json()
 
 # Load system caps
 system_caps = load_system_caps()
@@ -94,6 +125,10 @@ async def memory_write(request: Request):
             status=memory_entry.status,
             task_type=memory_entry.task_type
         )
+        
+        # Save to memory.json after writing to memory_store
+        save_memory_to_json()
+        
         return JSONResponse(status_code=200, content={"status": "ok", "memory_id": memory["memory_id"]})
     except Exception as e:
         print(f"❌ MemoryWriter error: {str(e)}")
@@ -269,6 +304,9 @@ async def reflect_on_memories(request: Request):
                 memory_trace_id=reflection_request.memory_trace_id
             )
             
+            # Save to memory.json after writing to memory_store
+            save_memory_to_json()
+            
             # Return error response
             return JSONResponse(
                 status_code=429,  # Too Many Requests
@@ -310,6 +348,9 @@ async def reflect_on_memories(request: Request):
             memory_trace_id=reflection_request.memory_trace_id,
             status="completed"
         )
+        
+        # Save to memory.json after writing to memory_store
+        save_memory_to_json()
         
         # Log successful reflection generation
         print(f"✅ Reflection generated for agent {reflection_request.agent_id} with task_id {reflection_request.task_id}")
@@ -419,6 +460,9 @@ async def summarize_memories_endpoint(request: Request):
             memory_trace_id=summarize_request.memory_trace_id,
             status="completed"
         )
+        
+        # Save to memory.json after writing to memory_store
+        save_memory_to_json()
         
         # Log successful summary generation
         print(f"✅ Summary generated for agent {summarize_request.agent_id} with task_id {summarize_request.task_id}")
