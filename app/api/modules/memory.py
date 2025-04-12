@@ -515,11 +515,14 @@ async def memory_thread(
             # Ensure metadata is properly parsed from JSON
             filtered_memories = []
             for m in memories:
-                # Debug log to see what's in the memory
-                logger.debug(f"Memory {m.get('memory_id')} checking for goal_id match")
+                # Enhanced debug logging to see the full memory object and comparison values
+                print("🔍 Thread memory check:", m)
+                print("Goal ID match?", m.get("goal_id"), "==", goal_id)
+                logger.debug(f"Memory object: {json.dumps(m, default=str)}")
+                logger.debug(f"Comparing: '{m.get('goal_id')}' (type: {type(m.get('goal_id'))}) with '{goal_id}' (type: {type(goal_id)})")
                 
-                # Check if goal_id exists at the top level first
-                if m.get("goal_id") == goal_id:
+                # Check if goal_id exists at the top level first with explicit string casting
+                if str(m.get("goal_id")) == str(goal_id):
                     filtered_memories.append(m)
                     logger.debug(f"Memory {m.get('memory_id')} matched top-level goal_id {goal_id}")
                     continue
@@ -539,8 +542,10 @@ async def memory_thread(
                             logger.warning(f"Failed to parse metadata JSON for memory {m.get('memory_id')}")
                             continue
                     
-                    # Now check for goal_id in the parsed metadata
-                    if metadata.get("goal_id") == goal_id:
+                    # Now check for goal_id in the parsed metadata with explicit string casting
+                    print("Metadata goal ID match?", metadata.get("goal_id"), "==", goal_id)
+                    logger.debug(f"Comparing metadata: '{metadata.get('goal_id')}' (type: {type(metadata.get('goal_id'))}) with '{goal_id}' (type: {type(goal_id)})")
+                    if str(metadata.get("goal_id")) == str(goal_id):
                         filtered_memories.append(m)
                         logger.debug(f"Memory {m.get('memory_id')} matched metadata goal_id {goal_id}")
             
