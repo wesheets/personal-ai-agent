@@ -342,10 +342,10 @@ try:
     app.include_router(agent_module_router, prefix="/api/modules/agent")
     print("🧠 Route defined: /api/modules/agent/run -> run_agent")
     
-    # Mount the Memory module router with simplified prefix to avoid double-prefixing
+    # Mount the Memory module router with correct prefix
     print(f"🔍 DEBUG: Memory module router object: {memory_router}")
-    # Use simplified prefix "/api" to avoid path conflicts with the "/memory/" prefix in the routes
-    app.include_router(memory_router, prefix="/api")
+    # Use "/api/memory" prefix as per checklist
+    app.include_router(memory_router, prefix="/api/memory")
     # Log all memory endpoints for debugging
     print("🧠 Route defined: /api/memory/read -> read_memory")
     print("🧠 Route defined: /api/memory/write -> memory_write")
@@ -359,13 +359,26 @@ try:
         print("📋 Using enhanced route logging for deployment diagnostics")
     except ImportError:
         print("⚠️ Enhanced route logger not available, using basic logging")
-        log_registered_routes = lambda app: print("⚠️ Enhanced route logging not available")
+        # Define a simple route logger function if the enhanced one is not available
+        def log_registered_routes(app):
+            print("🔍 BASIC ROUTE REGISTRATION DIAGNOSTIC 🔍")
+            print("=" * 50)
+            for route in app.routes:
+                path = getattr(route, "path", "Unknown path")
+                methods = getattr(route, "methods", ["Unknown method"])
+                methods_str = ", ".join(methods) if methods else "No methods"
+                print(f"📍 ROUTE: {path} [{methods_str}]")
+                # Highlight memory routes
+                if "/memory/" in path:
+                    print(f"🧠 MEMORY ROUTE: {path} [{methods_str}]")
+            print("=" * 50)
         
     # Add route registration logging at the end of startup
     @app.on_event("startup")
     async def log_routes_on_startup():
         """Log all registered routes after startup for debugging."""
         try:
+            print("🔍 Running route registration diagnostic...")
             log_registered_routes(app)
         except Exception as e:
             print(f"⚠️ Error logging routes: {str(e)}")

@@ -318,7 +318,7 @@ def generate_reflection(memories: List[Dict]) -> str:
     
     return f"I have processed {len(memories)} memories. A pattern is forming..."
 
-@router.post("/memory/write")
+@router.post("/write")
 async def memory_write_endpoint(request: MemoryWriteRequest):
     """
     Write a memory entry with full metadata and scope support.
@@ -382,7 +382,7 @@ async def memory_write_endpoint(request: MemoryWriteRequest):
             "message": str(e)
         })
 
-@router.get("/memory/thread")
+@router.get("/thread")
 async def memory_thread(
     goal_id: Optional[str] = None,
     task_id: Optional[str] = None,
@@ -621,7 +621,7 @@ async def memory_thread(
             logger.warning(f"⚠️ Non-critical error during final connection close: {str(close_error)}")
             pass
 
-@router.get("/memory/read")
+@router.get("/read")
 async def read_memory(
     agent_id: Optional[str] = None,
     type: Optional[str] = None,
@@ -752,7 +752,7 @@ async def read_memory(
             "message": f"Error reading memories: {str(e)}"
         }
 
-@router.post("/memory/reflect")
+@router.post("/reflect")
 async def memory_reflect_endpoint(request: ReflectionRequest):
     """
     Generate a reflection based on recent memories.
