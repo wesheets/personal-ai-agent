@@ -342,16 +342,34 @@ try:
     app.include_router(agent_module_router, prefix="/api/modules/agent")
     print("🧠 Route defined: /api/modules/agent/run -> run_agent")
     
-    # Mount the Memory module router
+    # Mount the Memory module router with simplified prefix to avoid double-prefixing
     print(f"🔍 DEBUG: Memory module router object: {memory_router}")
-    # Ensure memory router is properly mounted with correct prefix
-    app.include_router(memory_router, prefix="/api/modules")
+    # Use simplified prefix "/api" to avoid path conflicts with the "/memory/" prefix in the routes
+    app.include_router(memory_router, prefix="/api")
     # Log all memory endpoints for debugging
-    print("🧠 Route defined: /api/modules/memory/read -> read_memory")
-    print("🧠 Route defined: /api/modules/memory/write -> memory_write")
-    print("🧠 Route defined: /api/modules/memory/thread -> memory_thread")
-    print("🧠 Route defined: /api/modules/memory/reflect -> reflect_on_memories")
-    print("🧠 Route defined: /api/modules/memory/summarize -> summarize_memories_endpoint")
+    print("🧠 Route defined: /api/memory/read -> read_memory")
+    print("🧠 Route defined: /api/memory/write -> memory_write")
+    print("🧠 Route defined: /api/memory/thread -> memory_thread")
+    print("🧠 Route defined: /api/memory/reflect -> reflect_on_memories")
+    print("🧠 Route defined: /api/memory/summarize -> summarize_memories_endpoint")
+    
+    # Import and use the enhanced route logger for detailed diagnostics
+    try:
+        from app.utils.route_logger import log_registered_routes
+        print("📋 Using enhanced route logging for deployment diagnostics")
+    except ImportError:
+        print("⚠️ Enhanced route logger not available, using basic logging")
+        log_registered_routes = lambda app: print("⚠️ Enhanced route logging not available")
+        
+    # Add route registration logging at the end of startup
+    @app.on_event("startup")
+    async def log_routes_on_startup():
+        """Log all registered routes after startup for debugging."""
+        try:
+            log_registered_routes(app)
+        except Exception as e:
+            print(f"⚠️ Error logging routes: {str(e)}")
+            logger.error(f"⚠️ Error logging routes: {str(e)}")
     
     # Import and mount the orchestrator scope router
     from app.modules.orchestrator_scope import router as scope_router
