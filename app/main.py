@@ -486,11 +486,11 @@ except Exception as e:
     # Add health endpoints that still return OK to prevent container restarts
     @app.get("/health")
     async def health_error_mode():
-        return {"status": "error", "message": f"Error during startup: {str(e)}"}
+        return {"status": "error", "message": "Error during startup"}
     
     @app.get("/")
     async def root_health_error_mode():
-        return {"status": "error", "message": f"Error during startup: {str(e)}"}
+        return {"status": "error", "message": "Error during startup"}
     
     # Log the fallback mode
     print("⚠️ Started in ERROR MODE with minimal health endpoints")

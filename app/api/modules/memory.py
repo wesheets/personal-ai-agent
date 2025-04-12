@@ -21,6 +21,7 @@ import json
 import logging
 import uuid
 import asyncio
+import sqlite3
 
 # Import the SQLite memory database
 from app.db.memory_db import memory_db
@@ -45,17 +46,28 @@ def initialize_memory_store():
         # Clear the current memory_store to avoid duplicates
         memory_store.clear()
         
-        # Get recent memories from SQLite database (limit to a reasonable number)
-        recent_memories = memory_db.read_memories(limit=1000)
-        
-        # Add memories to in-memory store
-        memory_store.extend(recent_memories)
-        
-        logger.info(f"✅ Initialized memory_store with {len(memory_store)} memories from SQLite database")
-        print(f"🧠 [INIT] Loaded {len(memory_store)} memories from SQLite database into memory_store")
-        print(f"🧠 [INIT] Memory IDs: {[m['memory_id'] for m in memory_store]}")
-        
-        return len(memory_store)
+        try:
+            # Ensure DB connection is open before attempting to read
+            conn = memory_db._get_connection()
+            
+            # Get recent memories from SQLite database (limit to a reasonable number)
+            recent_memories = memory_db.read_memories(limit=1000)
+            
+            # Add memories to in-memory store
+            memory_store.extend(recent_memories)
+            
+            logger.info(f"✅ Initialized memory_store with {len(memory_store)} memories from SQLite database")
+            print(f"🧠 [INIT] Loaded {len(memory_store)} memories from SQLite database into memory_store")
+            print(f"🧠 [INIT] Memory IDs: {[m['memory_id'] for m in memory_store]}")
+            
+            return len(memory_store)
+        except sqlite3.ProgrammingError as e:
+            if "closed database" in str(e):
+                logger.error(f"❌ Memory read failed: DB closed during initialization")
+                print(f"❌ [INIT] Memory read failed: DB closed during initialization")
+                return 0
+            else:
+                raise
     except Exception as e:
         logger.error(f"❌ Error initializing memory_store from SQLite: {str(e)}")
         print(f"❌ [INIT] Error loading memories from SQLite: {str(e)}")
