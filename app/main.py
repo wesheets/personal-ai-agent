@@ -400,6 +400,12 @@ try:
     app.include_router(task_supervisor_router, prefix="/api/modules/task")
     print("🧠 Route defined: /api/modules/task/status -> get_task_status")
     
+    # Import and mount the task result router
+    from app.modules.task_result import router as task_result_router
+    print(f"🔍 DEBUG: Task Result router object: {task_result_router}")
+    app.include_router(task_result_router, prefix="/api/modules/task")
+    print("🧠 Route defined: /api/modules/task/result -> log_task_result")
+    
     # Import and mount the loop router
     from app.modules.loop import router as loop_router
     print(f"🔍 DEBUG: Loop router object: {loop_router}")
