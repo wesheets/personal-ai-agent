@@ -4,13 +4,13 @@ import subprocess
 import sys
 
 def push_to_github():
-    """Push the Phase 3.4 files to GitHub on a clean branch"""
+    """Push the memory system fixes to GitHub on the main branch"""
     
     # Get the GitHub token from environment variable or use the latest provided token
     github_token = os.environ.get('GITHUB_TOKEN', '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')
     github_username = "wesheets"
     repo_name = "personal-ai-agent"
-    branch_name = "feature/phase-3.4-parallel-execution"
+    branch_name = "main"
     
     try:
         # Configure Git
@@ -18,9 +18,17 @@ def push_to_github():
         subprocess.run(["git", "config", "user.email", "manus-agent@example.com"], check=True)
         
         # Commit the changes
-        subprocess.run(["git", "checkout", "-b", branch_name], check=True)
+        try:
+            # Try to checkout existing branch
+            subprocess.run(["git", "checkout", branch_name], check=True)
+            print(f"Checked out existing branch: {branch_name}")
+        except subprocess.CalledProcessError:
+            # If branch doesn't exist, create it
+            subprocess.run(["git", "checkout", "-b", branch_name], check=True)
+            print(f"Created and checked out new branch: {branch_name}")
+            
         subprocess.run(["git", "add", "."], check=True)
-        subprocess.run(["git", "commit", "-m", "Add Phase 3.4 Multi-Agent Parallel Workflow Execution implementation"], check=True)
+        subprocess.run(["git", "commit", "-m", "feat: deploy memory system fixes with schema + regression tests"], check=True)
         print("Changes committed successfully")
         
         # Add remote
