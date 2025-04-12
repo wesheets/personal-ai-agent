@@ -416,6 +416,7 @@ async def memory_thread(
         # First, close any existing connection to ensure we get a fresh one
         try:
             memory_db.close()
+            logger.info("Closed existing database connection")
         except Exception as close_error:
             # Ignore errors during close, we'll get a fresh connection anyway
             logger.warning(f"⚠️ Non-critical error closing DB connection: {str(close_error)}")
@@ -427,6 +428,7 @@ async def memory_thread(
         
         # Validate that at least one of goal_id, task_id, or memory_trace_id is provided
         if not goal_id and not task_id and not memory_trace_id:
+            logger.error("Missing required filter: At least one of goal_id, task_id, or memory_trace_id is required")
             return JSONResponse(
                 status_code=400,
                 content={
@@ -437,6 +439,7 @@ async def memory_thread(
         
         # Validate order parameter
         if order and order.lower() not in ["asc", "desc"]:
+            logger.error(f"Invalid order parameter: {order}")
             return JSONResponse(
                 status_code=400,
                 content={
@@ -451,9 +454,15 @@ async def memory_thread(
         # Add primary filters
         if task_id:
             filters["task_id"] = task_id
+            logger.info(f"Added task_id filter: {task_id}")
         
         if memory_trace_id:
             filters["thread_id"] = memory_trace_id
+            logger.info(f"Added thread_id filter: {memory_trace_id}")
+        
+        if agent_id:
+            filters["agent_id"] = agent_id
+            logger.info(f"Added agent_id filter: {agent_id}")
         
         # Set a high limit to get all matching memories, we'll filter and limit later
         filters["limit"] = 1000
@@ -467,9 +476,12 @@ async def memory_thread(
             try:
                 # Verify connection is still open before using it
                 conn.execute("SELECT 1")
+                logger.info("Database connection verified as open")
                 
                 # Connection is valid, proceed with query
+                logger.info(f"Executing read_memories with filters: {filters}")
                 memories = memory_db.read_memories(**filters)
+                logger.info(f"Initial query returned {len(memories)} memories")
                 break  # Success, exit retry loop
                 
             except sqlite3.ProgrammingError as e:
@@ -488,9 +500,11 @@ async def memory_thread(
                     continue
                 else:
                     # Either not a closed database error or we've exhausted retries
+                    logger.error(f"Database error: {str(e)}")
                     raise
             except Exception as e:
                 # For other exceptions, just raise them
+                logger.error(f"Unexpected error during memory query: {str(e)}")
                 raise
         
         # Additional filtering for goal_id (not directly supported by memory_db.read_memories)
@@ -502,13 +516,15 @@ async def memory_thread(
             filtered_memories = []
             for m in memories:
                 # Debug log to see what's in the metadata
-                if m.get("metadata"):
-                    logger.debug(f"Memory {m.get('memory_id')} metadata: {m.get('metadata')}")
+                logger.debug(f"Memory {m.get('memory_id')} metadata type: {type(m.get('metadata'))}")
+                logger.debug(f"Memory {m.get('memory_id')} metadata: {m.get('metadata')}")
                 
-                # Check if metadata exists and contains goal_id
+                # Check if metadata exists
                 if m.get("metadata"):
                     # Handle both string and dict metadata (ensure it's parsed)
                     metadata = m.get("metadata")
+                    
+                    # If metadata is a string, parse it to a dictionary
                     if isinstance(metadata, str):
                         try:
                             metadata = json.loads(metadata)
@@ -530,21 +546,23 @@ async def memory_thread(
         # Filter by user_id if provided (using tags)
         if user_id:
             user_tag = f"user:{user_id}"
+            before_count = len(memories)
             memories = [m for m in memories if "tags" in m and user_tag in m["tags"]]
-        
-        # Filter by agent_id if provided
-        if agent_id:
-            memories = [m for m in memories if m.get("agent_id") == agent_id]
+            logger.info(f"Filtered by user_id {user_id}: {before_count} -> {len(memories)} memories")
         
         # Sort memories by timestamp
         if order and order.lower() == "asc":
             memories.sort(key=lambda m: m.get("timestamp", ""))
+            logger.info("Sorted memories in ascending order")
         else:
             memories.sort(key=lambda m: m.get("timestamp", ""), reverse=True)
+            logger.info("Sorted memories in descending order")
         
         # Apply limit
         if limit and limit > 0:
-            memories = memories[:limit]
+            if len(memories) > limit:
+                logger.info(f"Limiting results from {len(memories)} to {limit}")
+                memories = memories[:limit]
         
         # Format memories for response
         thread = []
@@ -574,6 +592,8 @@ async def memory_thread(
                 memory_entry["confidence_delta"] = memory.get("metadata").get("confidence_delta")
             
             thread.append(memory_entry)
+        
+        logger.info(f"Returning {len(thread)} formatted memory entries")
         
         # Return the thread
         return JSONResponse(
