@@ -15,9 +15,14 @@ import time
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import uuid
+from fastapi import APIRouter, Request, HTTPException
 
 # Configure logging
 logger = logging.getLogger("app.modules.task_supervisor")
+
+# Create router
+router = APIRouter()
+print("🧠 Route defined: /api/modules/task/status -> get_task_status")
 
 # Path for system caps configuration
 SYSTEM_CAPS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "system_caps.json")
@@ -31,6 +36,37 @@ os.makedirs(os.path.dirname(TASK_LOG_FILE), exist_ok=True)
 # Global lockdown mode flag (will be imported from lockdown_mode.py in the future)
 # For now, we'll set it to False by default
 lockdown_mode = False
+
+# Ensure system caps file exists with default values
+def ensure_system_caps_file_exists():
+    """
+    Ensure the system caps file exists with default values.
+    Creates the file if it doesn't exist.
+    """
+    try:
+        if not os.path.exists(SYSTEM_CAPS_FILE):
+            # Create config directory if it doesn't exist
+            os.makedirs(os.path.dirname(SYSTEM_CAPS_FILE), exist_ok=True)
+            
+            # Default system caps
+            default_caps = {
+                "max_loops_per_task": 3,
+                "max_delegation_depth": 2
+            }
+            
+            # Write to file
+            with open(SYSTEM_CAPS_FILE, 'w') as f:
+                json.dump(default_caps, f, indent=2)
+            
+            logger.info(f"✅ Created system caps file at {SYSTEM_CAPS_FILE} with default values")
+            return True
+        return False
+    except Exception as e:
+        logger.error(f"❌ Error creating system caps file: {str(e)}")
+        return False
+
+# Create system caps file on module initialization
+ensure_system_caps_file_exists()
 
 # Load system caps configuration
 def load_system_caps() -> Dict[str, Any]:
@@ -60,6 +96,71 @@ def load_system_caps() -> Dict[str, Any]:
 # Load system caps
 system_caps = load_system_caps()
 logger.info(f"🔒 Task Supervisor loaded system caps: max_loops_per_task={system_caps['max_loops_per_task']}, max_delegation_depth={system_caps['max_delegation_depth']}")
+
+# Add endpoint to get task supervision status
+@router.get("/status")
+async def get_task_status():
+    """
+    Get the current status of the task supervision system.
+    
+    Returns:
+        Dict[str, Any]: The current supervision status
+    """
+    return get_supervision_status()
+
+@router.post("/update_caps")
+async def update_system_caps(request: Request):
+    """
+    Update the system caps configuration.
+    
+    Request body:
+    - max_loops_per_task: Maximum number of loops allowed per task
+    - max_delegation_depth: Maximum delegation depth allowed
+    
+    Returns:
+        Dict[str, Any]: The updated system caps configuration
+    """
+    try:
+        # Parse request body
+        body = await request.json()
+        
+        # Validate required fields
+        if "max_loops_per_task" not in body or "max_delegation_depth" not in body:
+            raise HTTPException(status_code=400, content={
+                "status": "error",
+                "message": "Missing required fields: max_loops_per_task, max_delegation_depth"
+            })
+        
+        # Create config directory if it doesn't exist
+        os.makedirs(os.path.dirname(SYSTEM_CAPS_FILE), exist_ok=True)
+        
+        # Update system caps
+        new_caps = {
+            "max_loops_per_task": body["max_loops_per_task"],
+            "max_delegation_depth": body["max_delegation_depth"]
+        }
+        
+        # Write to file
+        with open(SYSTEM_CAPS_FILE, 'w') as f:
+            json.dump(new_caps, f, indent=2)
+        
+        # Reload system caps
+        global system_caps
+        system_caps = load_system_caps()
+        
+        logger.info(f"✅ System caps updated: max_loops_per_task={system_caps['max_loops_per_task']}, max_delegation_depth={system_caps['max_delegation_depth']}")
+        
+        return {
+            "status": "success",
+            "message": "System caps updated successfully",
+            "system_caps": system_caps
+        }
+    except Exception as e:
+        logger.error(f"❌ Error updating system caps: {str(e)}")
+        raise HTTPException(status_code=500, content={
+            "status": "error",
+            "message": f"Error updating system caps: {str(e)}"
+        })
 
 def monitor_loop(task_id: str, loop_count: int) -> Dict[str, Any]:
     """
