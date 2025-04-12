@@ -97,6 +97,20 @@ class MemoryEntry(BaseModel):
     status: Optional[str] = None
     task_type: Optional[str] = None
 
+class MemoryWriteRequest(BaseModel):
+    agent_id: str
+    user_id: Optional[str] = None
+    memory_type: str
+    content: str
+    metadata: Optional[Dict[str, Any]] = None
+    tags: List[str] = []
+    project_id: Optional[str] = None
+    status: Optional[str] = None
+    task_type: Optional[str] = None
+    task_id: Optional[str] = None
+    session_id: Optional[str] = None
+    memory_trace_id: Optional[str] = None
+
 class ReflectionRequest(BaseModel):
     agent_id: str
     goal: str
@@ -271,31 +285,69 @@ def generate_reflection(memories: List[Dict]) -> str:
     
     return f"I have processed {len(memories)} memories. A pattern is forming..."
 
-@router.post("/write")
-async def memory_write(request: Request):
+@router.post("/memory/write")
+async def memory_write_endpoint(request: MemoryWriteRequest):
+    """
+    Write a memory entry with full metadata and scope support.
+    
+    This endpoint allows agents, developers, or external systems to write structured 
+    memories directly for debugging, manual inserts, admin overrides, or scripting.
+    
+    Parameters:
+    - agent_id: ID of the agent (required)
+    - user_id: ID of the user (optional, for scoping)
+    - memory_type: Type of memory (required)
+    - content: Content of the memory (required)
+    - metadata: Additional structured data (optional)
+    - tags: List of tags (optional)
+    - project_id: Project context (optional)
+    - status: Status of the memory (optional)
+    - task_type: Type of task (optional)
+    - task_id: ID of the task (optional)
+    - session_id: ID of the session (optional)
+    - memory_trace_id: ID for memory tracing (optional)
+    
+    Returns:
+    - status: "ok" if successful
+    - memory_id: ID of the created memory
+    """
     try:
-        body = await request.json()
-        memory_entry = MemoryEntry(**body)
+        logger.info(f"🧠 Writing memory for {request.agent_id}: type={request.memory_type}")
         
+        # Create tags list, including user_id as a scope if provided
+        tags = request.tags.copy() if request.tags else []
+        
+        # Add user scope tag if user_id is provided
+        if request.user_id:
+            user_scope = f"user:{request.user_id}"
+            if user_scope not in tags:
+                tags.append(user_scope)
+        
+        # Write memory with all provided parameters
         memory = write_memory(
-            agent_id=memory_entry.agent_id,
-            type=memory_entry.memory_type,  # Pass memory_type to type parameter
-            content=memory_entry.content,
-            tags=memory_entry.tags,
-            project_id=memory_entry.project_id,
-            status=memory_entry.status,
-            task_type=memory_entry.task_type
+            agent_id=request.agent_id,
+            type=request.memory_type,
+            content=request.content,
+            tags=tags,
+            project_id=request.project_id,
+            status=request.status,
+            task_type=request.task_type,
+            task_id=request.task_id,
+            memory_trace_id=request.memory_trace_id,
+            metadata=request.metadata
         )
         
-        # Debug: Print all memory_ids in memory_store
-        global memory_store
-        memory_ids = [m["memory_id"] for m in memory_store]
-        logger.info(f"🔍 DEBUG: memory_store contains {len(memory_ids)} memories: {memory_ids}")
-        
-        return JSONResponse(status_code=200, content={"status": "ok", "memory_id": memory["memory_id"]})
+        logger.info(f"✅ Memory written: {memory['memory_id']}")
+        return JSONResponse(status_code=200, content={
+            "status": "ok", 
+            "memory_id": memory["memory_id"]
+        })
     except Exception as e:
-        logger.error(f"❌ MemoryWriter error: {str(e)}")
-        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+        logger.error(f"❌ Error writing memory: {str(e)}")
+        return JSONResponse(status_code=500, content={
+            "status": "error", 
+            "message": str(e)
+        })
 
 @router.get("/read")
 async def read_memory(

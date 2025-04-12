@@ -431,7 +431,7 @@ try:
     
     # Import and mount the orchestrator router
     print(f"🔍 DEBUG: Orchestrator router object: {orchestrator_router}")
-    app.include_router(orchestrator_router, prefix="/api/modules")
+    app.include_router(orchestrator_router, prefix="/api/modules/orchestrator")
     print("🧠 Route defined: /api/modules/orchestrator/audit -> audit_agent_performance")
     
     # Import and mount the feedback router

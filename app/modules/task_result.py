@@ -29,24 +29,27 @@ print("🧠 Route defined: /api/modules/task/result -> task_result")
 class TaskResultRequest(BaseModel):
     """Request model for the task result endpoint"""
     agent_id: str
+    user_id: Optional[str] = None
     task_id: str
-    outcome: str  # "success", "failure", or "partial"
-    confidence_score: float
-    output: str
-    notes: Optional[str] = None
+    result: str  # "success", "failure", or "partial"
+    content: str
     project_id: Optional[str] = None
+    goal_id: Optional[str] = None
+    status: Optional[str] = None
+    confidence_score: Optional[float] = None
+    notes: Optional[str] = None
     memory_trace_id: Optional[str] = None
     
-    @validator('outcome')
-    def validate_outcome(cls, v):
+    @validator('result')
+    def validate_result(cls, v):
         allowed_values = ["success", "failure", "partial"]
         if v.lower() not in allowed_values:
-            raise ValueError(f"outcome must be one of: {', '.join(allowed_values)}")
+            raise ValueError(f"result must be one of: {', '.join(allowed_values)}")
         return v.lower()
     
     @validator('confidence_score')
     def validate_confidence_score(cls, v):
-        if v < 0 or v > 1:
+        if v is not None and (v < 0 or v > 1):
             raise ValueError("confidence_score must be between 0 and 1")
         return v
 
@@ -57,39 +60,68 @@ class TaskResultResponse(BaseModel):
 
 @router.post("/result")
 async def log_task_result(request: Request):
+    """
+    Log the result of a previously planned task with success/failure status.
+    
+    This endpoint stores task results as memory entries with structured metadata,
+    enabling future auditing against the original plan.
+    
+    The task result is stored with memory_type: task_result and includes metadata
+    such as task_id, result, project_id, status, and goal_id if available.
+    """
     try:
         data = await request.json()
-        agent_id = data["agent_id"]
-        task_id = data["task_id"]
-        outcome = data["outcome"]
-        confidence_score = data["confidence_score"]
-        output = data["output"]
-        notes = data["notes"]
-
-        # Merge everything into the content field for now
-        full_content = f"Output: {output}\n\nNotes: {notes}\n\nConfidence: {confidence_score}\nTask ID: {task_id}"
-
+        logger.info(f"🔄 Received task result for task_id: {data.get('task_id')}")
+        
+        # Create TaskResultRequest object for validation
+        task_result = TaskResultRequest(**data)
+        
+        # Create tags list, including user_id as a scope if provided
+        tags = ["task_result", task_result.result]
+        
+        # Add user scope tag if user_id is provided
+        if task_result.user_id:
+            user_scope = f"user:{task_result.user_id}"
+            if user_scope not in tags:
+                tags.append(user_scope)
+        
         # Create metadata with structured information
         metadata = {
-            "confidence_score": confidence_score,
-            "outcome": outcome,
-            "notes": notes
+            "task_id": task_result.task_id,
+            "result": task_result.result,
+            "project_id": task_result.project_id
         }
+        
+        # Add optional fields to metadata if provided
+        if task_result.goal_id:
+            metadata["goal_id"] = task_result.goal_id
+        
+        if task_result.status:
+            metadata["status"] = task_result.status
+            
+        if task_result.confidence_score is not None:
+            metadata["confidence_score"] = task_result.confidence_score
+            tags.append(f"confidence_{task_result.confidence_score}")
+            
+        if task_result.notes:
+            metadata["notes"] = task_result.notes
 
+        # Write memory with all provided parameters
         memory = write_memory(
-            agent_id=agent_id,
+            agent_id=task_result.agent_id,
             type="task_result",
-            content=full_content,
-            project_id="agent-feedback",
-            tags=["task_result", outcome, f"confidence_{confidence_score}"],
-            status="success",
-            task_id=task_id,
+            content=task_result.content,
+            tags=tags,
+            project_id=task_result.project_id,
+            status=task_result.status,
+            task_id=task_result.task_id,
+            memory_trace_id=task_result.memory_trace_id,
             metadata=metadata
         )
 
-        print(f"✅ [TASK RESULT] Logged memory: {memory['memory_id']}")
+        logger.info(f"✅ Task result logged: memory_id={memory['memory_id']}, task_id={task_result.task_id}")
         return {"status": "logged", "memory_id": memory["memory_id"]}
 
     except Exception as e:
-        print(f"❌ [TASK RESULT] Logging failed: {str(e)}")
+        logger.error(f"❌ Task result logging failed: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
