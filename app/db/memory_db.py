@@ -63,6 +63,33 @@ class MemoryDB:
                 logger.error(error_msg)
                 print(f"❌ [DB] {error_msg}")
                 raise
+        else:
+            # Verify connection is still valid
+            try:
+                # Simple query to check if connection is still open
+                local.conn.execute("SELECT 1").fetchone()
+            except sqlite3.ProgrammingError as e:
+                if "closed database" in str(e):
+                    # Connection was closed, create a new one
+                    logger.warning(f"⚠️ Found closed database connection in thread {threading.get_ident()}, reconnecting...")
+                    print(f"⚠️ [DB] Found closed database connection, reconnecting...")
+                    local.conn = sqlite3.connect(DB_FILE)
+                    # Enable foreign keys
+                    local.conn.execute("PRAGMA foreign_keys = ON")
+                    # Configure connection to return rows as dictionaries
+                    local.conn.row_factory = sqlite3.Row
+                    logger.info(f"✅ Reconnected to SQLite database at {DB_FILE} in thread {threading.get_ident()}")
+                    print(f"🔌 [DB] Reconnected to SQLite database at {DB_FILE} in thread {threading.get_ident()}")
+                else:
+                    # Some other SQLite error
+                    raise
+            except Exception as e:
+                # Some other error
+                error_msg = f"❌ Error verifying database connection: {str(e)}"
+                logger.error(error_msg)
+                print(f"❌ [DB] {error_msg}")
+                raise
+                
         return local.conn
     
     def _init_schema(self, conn):
@@ -141,6 +168,34 @@ class MemoryDB:
             conn.commit()
             logger.info(f"✅ Memory written to database: {memory['memory_id']} in thread {threading.get_ident()}")
             print(f"💾 [DB] Memory written to database: {memory['memory_id']} (agent: {memory['agent_id']}, type: {memory['type']})")
+            
+            # VERIFICATION: Verify the memory was actually written by reading it back
+            try:
+                verification = self.read_memory_by_id(memory["memory_id"])
+                if verification:
+                    logger.info(f"✅ VERIFIED: Memory {memory['memory_id']} successfully persisted and retrievable")
+                    print(f"✅ [DB] VERIFIED: Memory {memory['memory_id']} successfully persisted and retrievable")
+                else:
+                    logger.warning(f"⚠️ VERIFICATION FAILED: Memory {memory['memory_id']} not found after write!")
+                    print(f"⚠️ [DB] VERIFICATION FAILED: Memory {memory['memory_id']} not found after write!")
+            except Exception as e:
+                logger.error(f"❌ VERIFICATION ERROR: Failed to verify memory {memory['memory_id']}: {str(e)}")
+                print(f"❌ [DB] VERIFICATION ERROR: Failed to verify memory {memory['memory_id']}: {str(e)}")
+            
+            # VERIFICATION: Test read_memories to ensure it's also retrievable that way
+            try:
+                recent_memories = self.read_memories(limit=5)
+                found = any(m.get("memory_id") == memory["memory_id"] for m in recent_memories)
+                if found:
+                    logger.info(f"✅ VERIFIED: Memory {memory['memory_id']} found in recent memories list")
+                    print(f"✅ [DB] VERIFIED: Memory {memory['memory_id']} found in recent memories list")
+                else:
+                    logger.warning(f"⚠️ VERIFICATION FAILED: Memory {memory['memory_id']} not found in recent memories!")
+                    print(f"⚠️ [DB] VERIFICATION FAILED: Memory {memory['memory_id']} not found in recent memories!")
+            except Exception as e:
+                logger.error(f"❌ VERIFICATION ERROR: Failed to check recent memories: {str(e)}")
+                print(f"❌ [DB] VERIFICATION ERROR: Failed to check recent memories: {str(e)}")
+            
             return memory
         except Exception as e:
             error_msg = f"Error writing memory to database: {str(e)}"
