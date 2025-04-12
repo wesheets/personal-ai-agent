@@ -35,7 +35,7 @@ from app.api.modules.plan_models import (
 logger = logging.getLogger("api.modules.plan")
 
 # Create router
-router = APIRouter(prefix="/modules/plan", tags=["Plan Generator"])
+router = APIRouter(tags=["Plan Generator"])
 print("🧠 Route defined: /api/modules/plan/generate -> generate_task_plan")
 print("🧠 Route defined: /api/modules/plan/user-goal -> generate_user_goal_plan")
 
