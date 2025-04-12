@@ -411,7 +411,20 @@ async def memory_thread(
     - status: "ok" if successful
     - thread: List of memory entries sorted chronologically
     """
+    # Ensure we have a fresh database connection for this request
     try:
+        # First, close any existing connection to ensure we get a fresh one
+        try:
+            memory_db.close()
+        except Exception as close_error:
+            # Ignore errors during close, we'll get a fresh connection anyway
+            logger.warning(f"⚠️ Non-critical error closing DB connection: {str(close_error)}")
+            pass
+        
+        # Get a fresh connection for this request
+        conn = memory_db._get_connection()
+        logger.info(f"✅ Obtained fresh DB connection for memory_thread request")
+        
         # Validate that at least one of goal_id, task_id, or memory_trace_id is provided
         if not goal_id and not task_id and not memory_trace_id:
             return JSONResponse(
@@ -445,8 +458,40 @@ async def memory_thread(
         # Set a high limit to get all matching memories, we'll filter and limit later
         filters["limit"] = 1000
         
-        # Query memories from database
-        memories = memory_db.read_memories(**filters)
+        # Query memories from database with retry logic for closed database errors
+        memories = []
+        max_retries = 3
+        retry_count = 0
+        
+        while retry_count < max_retries:
+            try:
+                # Verify connection is still open before using it
+                conn.execute("SELECT 1")
+                
+                # Connection is valid, proceed with query
+                memories = memory_db.read_memories(**filters)
+                break  # Success, exit retry loop
+                
+            except sqlite3.ProgrammingError as e:
+                if "closed database" in str(e) and retry_count < max_retries - 1:
+                    # Database connection was closed, retry with a fresh connection
+                    retry_count += 1
+                    logger.warning(f"⚠️ Encountered closed database on attempt {retry_count}, retrying...")
+                    
+                    # Close and get a fresh connection
+                    try:
+                        memory_db.close()
+                    except:
+                        pass  # Ignore errors during close
+                    
+                    conn = memory_db._get_connection()
+                    continue
+                else:
+                    # Either not a closed database error or we've exhausted retries
+                    raise
+            except Exception as e:
+                # For other exceptions, just raise them
+                raise
         
         # Additional filtering for goal_id (not directly supported by memory_db.read_memories)
         if goal_id:
@@ -517,6 +562,14 @@ async def memory_thread(
                 "message": f"Failed to retrieve memory thread: {str(e)}"
             }
         )
+    finally:
+        # Always ensure connection is properly closed after request completes
+        try:
+            memory_db.close()
+            logger.info("✅ Database connection properly closed after memory_thread request")
+        except Exception as close_error:
+            logger.warning(f"⚠️ Non-critical error during final connection close: {str(close_error)}")
+            pass
 
 @router.get("/read")
 async def read_memory(
