@@ -82,11 +82,13 @@ class UserGoalPlanRequest(BaseModel):
         goal: The user's goal or objective
         project_id: ID of the project context
         goal_id: Optional ID for the goal
+        agent_id: Optional agent ID to use as fallback when user_context is not found
     """
     user_id: str = Field(..., description="ID of the user requesting the plan")
     goal: str = Field(..., description="The user's goal or objective")
     project_id: str = Field(..., description="ID of the project context")
     goal_id: Optional[str] = Field(None, description="Optional ID for the goal")
+    agent_id: Optional[str] = Field(None, description="Optional agent ID to use as fallback when user_context is not found")
 
 class UserGoalPlanResponse(BaseModel):
     """

@@ -169,19 +169,42 @@ async def generate_user_goal_plan(request: Request):
         
         # Retrieve user context
         user_context = read_user_context(plan_request.user_id)
-        if not user_context:
-            return JSONResponse(
-                status_code=404,
-                content={
-                    "status": "error",
-                    "message": f"User context not found for user_id: {plan_request.user_id}"
-                }
-            )
         
-        # Extract user context information
-        agent_id = user_context["agent_id"]
-        memory_scope = user_context["memory_scope"]
-        preferences = user_context["preferences"]
+        # Initialize variables for fallback case
+        agent_id = None
+        memory_scope = None
+        preferences = None
+        
+        if not user_context:
+            # Check if fallback agent_id is provided
+            if plan_request.agent_id:
+                logger.warning(f"⚠️ No user_context found for {plan_request.user_id}, using fallback agent + defaults")
+                
+                # Use fallback agent_id
+                agent_id = plan_request.agent_id
+                
+                # Create default memory scope
+                memory_scope = f"user:{plan_request.user_id}:fallback"
+                
+                # Set default preferences
+                preferences = {
+                    "mode": "reflective",
+                    "persona": "default"
+                }
+            else:
+                # No fallback agent_id provided, return error
+                return JSONResponse(
+                    status_code=404,
+                    content={
+                        "status": "error",
+                        "message": f"User context not found for user_id: {plan_request.user_id}"
+                    }
+                )
+        else:
+            # Extract user context information
+            agent_id = user_context["agent_id"]
+            memory_scope = user_context["memory_scope"]
+            preferences = user_context["preferences"]
         
         # Check if agent exists
         if agent_id not in agent_registry:
