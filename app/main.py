@@ -451,7 +451,7 @@ try:
     
     # Import and mount the plan router
     print(f"🔍 DEBUG: Plan router object: {plan_router}")
-    app.include_router(plan_router, prefix="/api/modules")
+    app.include_router(plan_router, prefix="/api")
     print("🧠 Route defined: /api/modules/plan/generate -> generate_task_plan")
     print("🧠 Route defined: /api/modules/plan/user-goal -> generate_user_goal_plan")
     print("🧠 Route defined: /api/modules/respond -> respond_endpoint")
