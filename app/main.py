@@ -42,6 +42,7 @@ try:
     from app.api.modules.user_context import router as user_context_router  # User Context module router
     from app.api.modules.respond import router as respond_router  # Respond module router
     from app.api.modules.plan import router as plan_router  # Plan Generator module router
+    from app.api.modules.project import router as project_router  # Project Management module router
     
     # MODIFIED: Commented out problematic routes
     """
@@ -451,10 +452,15 @@ try:
     
     # Import and mount the plan router
     print(f"🔍 DEBUG: Plan router object: {plan_router}")
-    app.include_router(plan_router, prefix="/api")
+    app.include_router(plan_router, prefix="/api/modules")
     print("🧠 Route defined: /api/modules/plan/generate -> generate_task_plan")
     print("🧠 Route defined: /api/modules/plan/user-goal -> generate_user_goal_plan")
     print("🧠 Route defined: /api/modules/respond -> respond_endpoint")
+    
+    # Import and mount the project router
+    print(f"🔍 DEBUG: Project router object: {project_router}")
+    app.include_router(project_router, prefix="/api/modules/project")
+    print("🧠 Route defined: /api/modules/project/initiate -> project_initiate")
     
     # Mount health router
     app.include_router(health_router)
