@@ -161,7 +161,7 @@ router = APIRouter()
 
 def write_memory(agent_id: str, type: str, content: str, tags: list, project_id: Optional[str] = None, 
                 status: Optional[str] = None, task_type: Optional[str] = None, task_id: Optional[str] = None, 
-                memory_trace_id: Optional[str] = None, metadata: Optional[Dict] = None) -> Dict[str, Any]:
+                memory_trace_id: Optional[str] = None, metadata: Optional[Dict] = None, goal_id: Optional[str] = None) -> Dict[str, Any]:
     """
     Write a memory to both the SQLite database and in-memory store
     
@@ -176,6 +176,7 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
         task_id: Optional task ID
         memory_trace_id: Optional memory trace ID
         metadata: Optional metadata dictionary for additional structured data
+        goal_id: Optional goal ID (stored at top level for efficient retrieval)
         
     Returns:
         The memory with its memory_id
@@ -202,6 +203,22 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
             "memory_trace_id": memory_trace_id,
             "metadata": metadata
         }
+        
+        # Add goal_id at top level if provided
+        if goal_id:
+            memory["goal_id"] = goal_id
+            logger.info(f"🎯 Added top-level goal_id: {goal_id} for memory {memory['memory_id']}")
+            
+            # Also ensure it's in metadata for backward compatibility
+            if metadata is None:
+                memory["metadata"] = {"goal_id": goal_id}
+            elif isinstance(metadata, dict) and "goal_id" not in metadata:
+                memory["metadata"]["goal_id"] = goal_id
+        
+        # Extract goal_id from metadata if not provided directly but exists in metadata
+        elif metadata and isinstance(metadata, dict) and "goal_id" in metadata:
+            memory["goal_id"] = metadata["goal_id"]
+            logger.info(f"🎯 Extracted goal_id from metadata: {metadata['goal_id']} for memory {memory['memory_id']}")
         
         # Add agent tone if available
         if agent_tone:
