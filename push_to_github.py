@@ -7,7 +7,7 @@ def push_to_github():
     """Push the memory system fixes to GitHub on the main branch"""
     
     # Get the GitHub token from environment variable or use the latest provided token
-    github_token = os.environ.get('GITHUB_TOKEN', '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')
+    github_token = os.environ.get('GITHUB_TOKEN', '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')
     github_username = "wesheets"
     repo_name = "personal-ai-agent"
     branch_name = "main"
