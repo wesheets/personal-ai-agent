@@ -495,7 +495,37 @@ async def memory_thread(
         
         # Additional filtering for goal_id (not directly supported by memory_db.read_memories)
         if goal_id:
-            memories = [m for m in memories if m.get("metadata") and m.get("metadata").get("goal_id") == goal_id]
+            # Add debug logging to help diagnose the issue
+            logger.info(f"Filtering for goal_id: {goal_id}, found {len(memories)} memories before filtering")
+            
+            # Ensure metadata is properly parsed from JSON
+            filtered_memories = []
+            for m in memories:
+                # Debug log to see what's in the metadata
+                if m.get("metadata"):
+                    logger.debug(f"Memory {m.get('memory_id')} metadata: {m.get('metadata')}")
+                
+                # Check if metadata exists and contains goal_id
+                if m.get("metadata"):
+                    # Handle both string and dict metadata (ensure it's parsed)
+                    metadata = m.get("metadata")
+                    if isinstance(metadata, str):
+                        try:
+                            metadata = json.loads(metadata)
+                            m["metadata"] = metadata  # Update with parsed version
+                            logger.info(f"Parsed metadata from string for memory {m.get('memory_id')}")
+                        except json.JSONDecodeError:
+                            logger.warning(f"Failed to parse metadata JSON for memory {m.get('memory_id')}")
+                            continue
+                    
+                    # Now check for goal_id in the parsed metadata
+                    if metadata.get("goal_id") == goal_id:
+                        filtered_memories.append(m)
+                        logger.debug(f"Memory {m.get('memory_id')} matched goal_id {goal_id}")
+            
+            # Replace with filtered memories
+            memories = filtered_memories
+            logger.info(f"After goal_id filtering: found {len(memories)} matching memories")
         
         # Filter by user_id if provided (using tags)
         if user_id:
