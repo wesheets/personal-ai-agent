@@ -209,7 +209,28 @@ def write_memory(agent_id: str, type: str, content: str, tags: list, project_id:
             logger.info(f"🎭 Added tone profile for {agent_id}")
         
         # Write to SQLite database
-        memory = memory_db.write_memory(memory)
+        try:
+            # First, ensure we have a fresh connection
+            memory_db.close()  # Close any existing connection
+            # Get a new connection
+            conn = memory_db._get_connection()
+            # Now attempt the write with the fresh connection
+            memory = memory_db.write_memory(memory)
+        except sqlite3.ProgrammingError as e:
+            if "closed database" in str(e):
+                logger.warning(f"⚠️ Reinitializing connection due to closed DB")
+                print(f"⚠️ [WRITE_MEMORY] Reinitializing connection due to closed DB")
+                # Force close and get a completely new connection
+                try:
+                    memory_db.close()
+                except:
+                    pass  # Ignore errors during close
+                
+                # Get a fresh connection and retry
+                conn = memory_db._get_connection()
+                memory = memory_db.write_memory(memory)
+            else:
+                raise
         
         # Add diagnostic logging as requested
         print(f"🧠 [WRITE_MEMORY] memory_id: {memory['memory_id']}")
