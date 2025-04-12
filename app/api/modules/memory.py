@@ -407,7 +407,8 @@ async def memory_thread(
     user_id: Optional[str] = None,
     agent_id: Optional[str] = None,
     order: Optional[str] = "asc",
-    limit: Optional[int] = 50
+    limit: Optional[int] = 50,
+    debug_mode: Optional[bool] = False
 ):
     """
     Retrieve a sequence of connected memory entries, logically threaded by shared context.
@@ -423,6 +424,7 @@ async def memory_thread(
     - agent_id: (Optional) Scope to a specific agent
     - order: (Optional) Sort direction, "asc" or "desc", default is "asc"
     - limit: (Optional) Maximum number of memories to return, default is 50
+    - debug_mode: (Optional) If true, returns all memories without filtering, default is false
     
     Returns:
     - status: "ok" if successful
@@ -432,7 +434,7 @@ async def memory_thread(
     # and bypasses memory_store completely to avoid desynchronization issues
     try:
         # Validate that at least one of goal_id, task_id, or memory_trace_id is provided
-        if not goal_id and not task_id and not memory_trace_id:
+        if not debug_mode and not goal_id and not task_id and not memory_trace_id:
             logger.error("Missing required filter: At least one of goal_id, task_id, or memory_trace_id is required")
             return JSONResponse(
                 status_code=400,
@@ -461,42 +463,78 @@ async def memory_thread(
         all_memories = db.read_memories(limit=1000)
         logger.info(f"Retrieved {len(all_memories)} memories from database")
         
-        # Filter memories based on provided criteria
-        filtered_memories = []
-        for m in all_memories:
-            # Convert SQLite Row to dict
-            m = dict(m)
+        # In debug mode, skip filtering and use all memories
+        if debug_mode:
+            filtered_memories = [dict(m) for m in all_memories]
+            logger.info(f"🔍 DEBUG MODE: Returning all {len(filtered_memories)} memories without filtering")
             
-            # Filter by goal_id if provided
-            if goal_id and not (
-                str(m.get("goal_id", "")).strip() == str(goal_id).strip() or
-                (m.get("metadata") and isinstance(m.get("metadata"), dict) and 
-                 str(m.get("metadata", {}).get("goal_id", "")).strip() == str(goal_id).strip())
-            ):
-                continue
-            
-            # Filter by task_id if provided
-            if task_id and str(m.get("task_id", "")).strip() != str(task_id).strip():
-                continue
+            # Add debug info for each memory
+            for m in filtered_memories:
+                logger.info(f"🔍 DEBUG: Memory ID: {m.get('memory_id')}, Type: {m.get('type')}, Goal ID: {m.get('goal_id')}")
+                if m.get("metadata") and isinstance(m.get("metadata"), dict) and "goal_id" in m.get("metadata", {}):
+                    logger.info(f"🔍 DEBUG: Memory {m.get('memory_id')} has goal_id in metadata: {m.get('metadata', {}).get('goal_id')}")
+        else:
+            # Filter memories based on provided criteria
+            filtered_memories = []
+            for m in all_memories:
+                # Convert SQLite Row to dict
+                m = dict(m)
                 
-            # Filter by memory_trace_id if provided
-            if memory_trace_id and str(m.get("memory_trace_id", "")).strip() != str(memory_trace_id).strip():
-                continue
+                # Filter by goal_id if provided
+                if goal_id:
+                    goal_id_match = False
+                    
+                    # Check top-level goal_id
+                    top_level_goal_id = m.get("goal_id")
+                    if top_level_goal_id is not None:
+                        logger.info(f"🔍 Comparing top-level goal_id: '{top_level_goal_id}' with filter: '{goal_id}'")
+                        if str(top_level_goal_id).strip() == str(goal_id).strip():
+                            logger.info(f"✅ MATCH: Top-level goal_id matched for memory {m.get('memory_id')}")
+                            goal_id_match = True
+                    
+                    # Check metadata goal_id if no match at top level
+                    if not goal_id_match and m.get("metadata"):
+                        metadata = m.get("metadata")
+                        if isinstance(metadata, str):
+                            try:
+                                metadata = json.loads(metadata)
+                            except:
+                                logger.warning(f"⚠️ Failed to parse metadata as JSON for memory {m.get('memory_id')}")
+                        
+                        if isinstance(metadata, dict) and "goal_id" in metadata:
+                            metadata_goal_id = metadata.get("goal_id")
+                            logger.info(f"🔍 Comparing metadata goal_id: '{metadata_goal_id}' with filter: '{goal_id}'")
+                            if str(metadata_goal_id).strip() == str(goal_id).strip():
+                                logger.info(f"✅ MATCH: Metadata goal_id matched for memory {m.get('memory_id')}")
+                                goal_id_match = True
+                    
+                    # Skip this memory if no goal_id match
+                    if not goal_id_match:
+                        logger.info(f"❌ NO MATCH: goal_id filter did not match for memory {m.get('memory_id')}")
+                        continue
                 
-            # Filter by agent_id if provided
-            if agent_id and str(m.get("agent_id", "")).strip() != str(agent_id).strip():
-                continue
-                
-            # Filter by user_id if provided (using tags)
-            if user_id:
-                user_tag = f"user:{user_id}"
-                if "tags" not in m or user_tag not in m["tags"]:
+                # Filter by task_id if provided
+                if task_id and str(m.get("task_id", "")).strip() != str(task_id).strip():
                     continue
+                    
+                # Filter by memory_trace_id if provided
+                if memory_trace_id and str(m.get("memory_trace_id", "")).strip() != str(memory_trace_id).strip():
+                    continue
+                    
+                # Filter by agent_id if provided
+                if agent_id and str(m.get("agent_id", "")).strip() != str(agent_id).strip():
+                    continue
+                    
+                # Filter by user_id if provided (using tags)
+                if user_id:
+                    user_tag = f"user:{user_id}"
+                    if "tags" not in m or user_tag not in m["tags"]:
+                        continue
+                
+                # If we got here, the memory passed all filters
+                filtered_memories.append(m)
             
-            # If we got here, the memory passed all filters
-            filtered_memories.append(m)
-        
-        logger.info(f"After filtering: found {len(filtered_memories)} matching memories")
+            logger.info(f"After filtering: found {len(filtered_memories)} matching memories")
         
         # Sort memories by timestamp
         if order and order.lower() == "asc":
@@ -545,13 +583,35 @@ async def memory_thread(
         
         logger.info(f"Returning {len(thread)} formatted memory entries")
         
-        # Return the thread
-        return JSONResponse(
-            status_code=200,
-            content={
-                "status": "ok",
-                "thread": thread
-            }
+        # Add debug info to response if in debug mode
+        if debug_mode:
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "status": "ok",
+                    "debug_info": {
+                        "total_memories_retrieved": len(all_memories),
+                        "memories_after_filtering": len(filtered_memories),
+                        "filters_applied": {
+                            "goal_id": goal_id,
+                            "task_id": task_id,
+                            "memory_trace_id": memory_trace_id,
+                            "agent_id": agent_id,
+                            "user_id": user_id
+                        }
+                    },
+                    "thread": thread
+                }
+            )
+        else:
+            # Return the thread
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "status": "ok",
+                    "thread": thread
+                }
+            )
         )
     except Exception as e:
         logger.error(f"❌ Error retrieving memory thread: {str(e)}")
