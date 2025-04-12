@@ -10,6 +10,7 @@ import sqlite3
 import os
 import json
 import uuid
+import threading
 from datetime import datetime
 from typing import List, Dict, Optional, Any, Union
 import logging
@@ -28,37 +29,43 @@ MEMORY_JSON_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
 # Path for memory_store.json file (for migration)
 MEMORY_STORE_FILE = os.path.join(os.path.dirname(__file__), "memory_store.json")
 
+# Thread-local storage for database connections
+local = threading.local()
+
 class MemoryDB:
     """SQLite database connection manager for memory storage"""
     
     def __init__(self):
-        """Initialize the database connection and ensure schema exists"""
-        self.conn = None
+        """Initialize the database and ensure schema exists"""
         self.ensure_db_directory()
-        self.connect()
-        self.init_schema()
+        # Initialize the schema using a temporary connection
+        temp_conn = self._get_connection()
+        self._init_schema(temp_conn)
+        temp_conn.close()
     
     def ensure_db_directory(self):
         """Ensure the database directory exists"""
         os.makedirs(DB_DIR, exist_ok=True)
     
-    def connect(self):
-        """Connect to the SQLite database"""
-        try:
-            self.conn = sqlite3.connect(DB_FILE)
-            # Enable foreign keys
-            self.conn.execute("PRAGMA foreign_keys = ON")
-            # Configure connection to return rows as dictionaries
-            self.conn.row_factory = sqlite3.Row
-            logger.info(f"✅ Connected to SQLite database at {DB_FILE}")
-            print(f"🔌 [DB] Connected to SQLite database at {DB_FILE}")
-        except Exception as e:
-            error_msg = f"❌ Error connecting to SQLite database: {str(e)}"
-            logger.error(error_msg)
-            print(f"❌ [DB] {error_msg}")
-            raise
+    def _get_connection(self):
+        """Get a thread-local database connection"""
+        if not hasattr(local, 'conn') or local.conn is None:
+            try:
+                local.conn = sqlite3.connect(DB_FILE)
+                # Enable foreign keys
+                local.conn.execute("PRAGMA foreign_keys = ON")
+                # Configure connection to return rows as dictionaries
+                local.conn.row_factory = sqlite3.Row
+                logger.info(f"✅ Connected to SQLite database at {DB_FILE} in thread {threading.get_ident()}")
+                print(f"🔌 [DB] Connected to SQLite database at {DB_FILE} in thread {threading.get_ident()}")
+            except Exception as e:
+                error_msg = f"❌ Error connecting to SQLite database: {str(e)}"
+                logger.error(error_msg)
+                print(f"❌ [DB] {error_msg}")
+                raise
+        return local.conn
     
-    def init_schema(self):
+    def _init_schema(self, conn):
         """Initialize the database schema if it doesn't exist"""
         try:
             if not os.path.exists(SCHEMA_FILE):
@@ -71,8 +78,8 @@ class MemoryDB:
                 schema_sql = f.read()
             
             # Execute the schema SQL
-            self.conn.executescript(schema_sql)
-            self.conn.commit()
+            conn.executescript(schema_sql)
+            conn.commit()
             logger.info("✅ Database schema initialized")
             print(f"🏗️ [DB] Database schema initialized successfully")
         except Exception as e:
@@ -82,10 +89,11 @@ class MemoryDB:
             raise
     
     def close(self):
-        """Close the database connection"""
-        if self.conn:
-            self.conn.close()
-            logger.info("✅ Database connection closed")
+        """Close the thread-local database connection"""
+        if hasattr(local, 'conn') and local.conn:
+            local.conn.close()
+            local.conn = None
+            logger.info(f"✅ Database connection closed in thread {threading.get_ident()}")
     
     def write_memory(self, memory: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -97,6 +105,7 @@ class MemoryDB:
         Returns:
             The memory with its memory_id
         """
+        conn = self._get_connection()
         try:
             # Convert tags list to JSON string
             tags_json = json.dumps(memory.get("tags", []))
@@ -108,7 +117,7 @@ class MemoryDB:
             metadata_json = json.dumps(memory.get("metadata")) if "metadata" in memory else None
             
             # Insert the memory into the database
-            cursor = self.conn.cursor()
+            cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO memories (
                     memory_id, agent_id, memory_type, content, tags, timestamp,
@@ -129,15 +138,15 @@ class MemoryDB:
                 agent_tone_json,
                 metadata_json
             ))
-            self.conn.commit()
-            logger.info(f"✅ Memory written to database: {memory['memory_id']}")
+            conn.commit()
+            logger.info(f"✅ Memory written to database: {memory['memory_id']} in thread {threading.get_ident()}")
             print(f"💾 [DB] Memory written to database: {memory['memory_id']} (agent: {memory['agent_id']}, type: {memory['type']})")
             return memory
         except Exception as e:
             error_msg = f"Error writing memory to database: {str(e)}"
             logger.error(f"❌ {error_msg}")
             print(f"❌ [DB] {error_msg} (memory_id: {memory.get('memory_id', 'unknown')})")
-            self.conn.rollback()
+            conn.rollback()
             raise
     
     def read_memory_by_id(self, memory_id: str) -> Optional[Dict[str, Any]]:
@@ -150,8 +159,9 @@ class MemoryDB:
         Returns:
             The memory as a dictionary, or None if not found
         """
+        conn = self._get_connection()
         try:
-            cursor = self.conn.cursor()
+            cursor = conn.cursor()
             cursor.execute("""
                 SELECT * FROM memory_view WHERE memory_id = ?
             """, (memory_id,))
@@ -208,6 +218,7 @@ class MemoryDB:
         Returns:
             List of memories as dictionaries
         """
+        conn = self._get_connection()
         try:
             # Build the query dynamically based on provided filters
             query = "SELECT * FROM memory_view"
@@ -263,7 +274,7 @@ class MemoryDB:
             print(f"🔍 [DB] Querying memories with filters: {filter_desc}")
             
             # Execute the query
-            cursor = self.conn.cursor()
+            cursor = conn.cursor()
             cursor.execute(query, params)
             rows = cursor.fetchall()
             
@@ -302,6 +313,7 @@ class MemoryDB:
         Returns:
             Number of memories migrated
         """
+        conn = self._get_connection()
         migrated_count = 0
         
         try:
@@ -341,7 +353,7 @@ class MemoryDB:
             return migrated_count
         except Exception as e:
             logger.error(f"❌ Error during migration: {str(e)}")
-            self.conn.rollback()
+            conn.rollback()
             raise
 
 # Create a singleton instance
