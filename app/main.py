@@ -345,12 +345,13 @@ try:
     # Mount the Memory module router
     print(f"🔍 DEBUG: Memory module router object: {memory_router}")
     # Ensure memory router is properly mounted with correct prefix
-    app.include_router(memory_router, prefix="/api/modules")
+    app.include_router(memory_router, prefix="/api/modules/memory")
     # Log all memory endpoints for debugging
-    print("🧠 Route defined: /api/modules/read -> read_memory")
-    print("🧠 Route defined: /api/modules/write -> memory_write")
-    print("🧠 Route defined: /api/modules/reflect -> reflect_on_memories")
-    print("🧠 Route defined: /api/modules/summarize -> summarize_memories_endpoint")
+    print("🧠 Route defined: /api/modules/memory/read -> read_memory")
+    print("🧠 Route defined: /api/modules/memory/write -> memory_write")
+    print("🧠 Route defined: /api/modules/memory/reflect -> reflect_on_memories")
+    print("🧠 Route defined: /api/modules/memory/summarize -> summarize_memories_endpoint")
+    print("🧠 Route defined: /api/modules/memory/thread -> memory_thread")
     
     # Import and mount the orchestrator scope router
     from app.modules.orchestrator_scope import router as scope_router
