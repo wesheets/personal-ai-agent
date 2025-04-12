@@ -26,6 +26,10 @@ DB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))
 DB_FILE = os.path.join(DB_DIR, "memory.db")
 SCHEMA_FILE = os.path.join(os.path.dirname(__file__), "memory_schema.sql")
 
+# Log absolute database path for debugging
+logger.info(f"💾 DB PATH: {os.path.abspath(DB_FILE)}")
+print(f"💾 [DB] Absolute database path: {os.path.abspath(DB_FILE)}")
+
 # Thread-local storage for database connections
 thread_local = threading.local()
 
@@ -73,9 +77,9 @@ class MemoryDB:
         # Set initialized flag
         self._initialized = True
         
-        # Log initialization
-        logger.info(f"✅ MemoryDB initialized with database file: {DB_FILE}")
-        print(f"🧠 [INIT] MemoryDB initialized with database file: {DB_FILE}")
+        # Log initialization with absolute path
+        logger.info(f"✅ MemoryDB initialized with database file: {os.path.abspath(DB_FILE)}")
+        print(f"🧠 [INIT] MemoryDB initialized with database file: {os.path.abspath(DB_FILE)}")
     
     def _init_db(self):
         """
@@ -118,6 +122,9 @@ class MemoryDB:
         if not hasattr(thread_local, "connection") or thread_local.connection is None:
             # Create a new connection
             try:
+                # Log the absolute path when creating a new connection
+                logger.info(f"💾 DB PATH: Creating connection to {os.path.abspath(DB_FILE)}")
+                
                 thread_local.connection = sqlite3.connect(DB_FILE)
                 thread_local.connection.row_factory = sqlite3.Row
                 logger.info(f"✅ New database connection created in thread {threading.get_ident()}")
@@ -157,6 +164,9 @@ class MemoryDB:
             # Get a database connection
             conn = self._get_connection()
             
+            # Log the database path for this write operation
+            logger.info(f"💾 DB PATH: Writing to {os.path.abspath(DB_FILE)}")
+            
             # Prepare memory for database
             memory_db = memory.copy()
             
@@ -195,13 +205,16 @@ class MemoryDB:
             # Execute SQL
             cursor = conn.cursor()
             cursor.execute(f"INSERT OR REPLACE INTO memories ({columns}) VALUES ({placeholders})", values)
+            
+            # Explicitly commit the transaction
             conn.commit()
+            logger.info(f"✅ Transaction committed for memory {memory_db['memory_id']}")
             
             # Log success
             logger.info(f"✅ Memory written to database: {memory_db['memory_id']} in thread {threading.get_ident()}")
             print(f"💾 [DB] Memory written to database: {memory_db['memory_id']} (agent: {memory_db['agent_id']}, type: {memory_db['type'] if 'type' in memory_db else memory_db.get('memory_type')})")
             
-            # Verify memory was written
+            # Verify memory was written by immediately reading it back
             retrieved_memory = self.read_memory_by_id(memory_db["memory_id"])
             if retrieved_memory:
                 logger.info(f"✅ VERIFIED: Memory {memory_db['memory_id']} successfully persisted and retrievable")
@@ -218,6 +231,21 @@ class MemoryDB:
             except sqlite3.ProgrammingError:
                 logger.warning(f"⚠️ CONNECTION STATUS: Database connection is CLOSED in thread {threading.get_ident()}")
                 print(f"⚠️ [DB] CONNECTION STATUS: Database connection is CLOSED in thread {threading.get_ident()}")
+            
+            # Additional verification: read recent memories to confirm the write is visible
+            recent_memories = self.read_memories(limit=10)
+            logger.info(f"✅ VISIBILITY CHECK: Found {len(recent_memories)} recent memories after write")
+            
+            # Check if our memory is in the recent memories
+            memory_found = False
+            for m in recent_memories:
+                if m.get("memory_id") == memory_db["memory_id"]:
+                    memory_found = True
+                    logger.info(f"✅ VISIBILITY CONFIRMED: Memory {memory_db['memory_id']} found in recent memories list")
+                    break
+            
+            if not memory_found:
+                logger.warning(f"⚠️ VISIBILITY ISSUE: Memory {memory_db['memory_id']} not found in recent memories list")
             
             # Return the memory
             return memory
@@ -249,6 +277,9 @@ class MemoryDB:
         try:
             # Get a database connection
             conn = self._get_connection()
+            
+            # Log the database path for this read operation
+            logger.info(f"💾 DB PATH: Reading from {os.path.abspath(DB_FILE)}")
             
             # Execute SQL
             cursor = conn.cursor()
@@ -315,6 +346,9 @@ class MemoryDB:
         try:
             # Get a database connection
             conn = self._get_connection()
+            
+            # Log the database path for this read operation
+            logger.info(f"💾 DB PATH: Reading from {os.path.abspath(DB_FILE)}")
             
             # Build SQL query
             sql = "SELECT * FROM memory_view"
