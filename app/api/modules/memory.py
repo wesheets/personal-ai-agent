@@ -1,15 +1,29 @@
+"""
+Memory Module with SQLite Backend
+
+This module provides memory-related functionality for agents, including:
+- Writing memories to SQLite database
+- Reading memories with flexible filtering
+- Generating reflections based on memories
+- Summarizing memories
+
+The module uses a SQLite database for persistent storage across deployments.
+"""
+
 from fastapi import APIRouter, Request, Query, HTTPException
 from fastapi.responses import JSONResponse
-from app.modules.memory_writer import write_memory, memory_store, generate_reflection
-from app.modules.memory_summarizer import summarize_memories
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 import os
 import json
+import logging
 
-# Path for memory.json file at the app root level
-MEMORY_JSON_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "memory.json")
+# Import the SQLite memory database
+from app.db.memory_db import memory_db
+
+# Configure logging
+logger = logging.getLogger("api.modules.memory")
 
 # Path for system caps configuration
 SYSTEM_CAPS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "system_caps.json")
@@ -21,49 +35,21 @@ def load_system_caps():
             with open(SYSTEM_CAPS_FILE, 'r') as f:
                 return json.load(f)
         else:
-            print(f"⚠️ System caps file not found at {SYSTEM_CAPS_FILE}, using default caps")
+            logger.warning(f"⚠️ System caps file not found at {SYSTEM_CAPS_FILE}, using default caps")
             return {
                 "max_loops_per_task": 3,
                 "max_delegation_depth": 2
             }
     except Exception as e:
-        print(f"⚠️ Error loading system caps: {str(e)}")
+        logger.error(f"⚠️ Error loading system caps: {str(e)}")
         return {
             "max_loops_per_task": 3,
             "max_delegation_depth": 2
         }
 
-# Function to save memory_store to memory.json
-def save_memory_to_json():
-    try:
-        with open(MEMORY_JSON_FILE, "w") as f:
-            json.dump(memory_store, f, indent=2)
-        print(f"🧠 Saved {len(memory_store)} memories to memory.json")
-    except Exception as e:
-        print(f"❌ Error saving memories to memory.json: {str(e)}")
-
-# Function to load memory_store from memory.json
-def load_memory_from_json():
-    global memory_store
-    try:
-        if os.path.exists(MEMORY_JSON_FILE):
-            with open(MEMORY_JSON_FILE, "r") as f:
-                loaded_memories = json.load(f)
-                # Only update memory_store if we successfully loaded memories
-                if loaded_memories:
-                    memory_store = loaded_memories
-                    print(f"🧠 Loaded {len(memory_store)} memories from memory.json")
-        else:
-            print("⚠️ memory.json not found, starting with empty memory_store")
-    except Exception as e:
-        print(f"❌ Error loading memories from memory.json: {str(e)}")
-
-# Load memory from memory.json on module import
-load_memory_from_json()
-
 # Load system caps
 system_caps = load_system_caps()
-print(f"🔒 Memory module loaded system caps: max_loops_per_task={system_caps['max_loops_per_task']}, max_delegation_depth={system_caps['max_delegation_depth']}")
+logger.info(f"🔒 Memory module loaded system caps: max_loops_per_task={system_caps['max_loops_per_task']}, max_delegation_depth={system_caps['max_delegation_depth']}")
 
 class MemoryEntry(BaseModel):
     agent_id: str
@@ -110,6 +96,119 @@ class SearchRequest(BaseModel):
 
 router = APIRouter()
 
+def write_memory(agent_id: str, type: str, content: str, tags: list, project_id: Optional[str] = None, 
+                status: Optional[str] = None, task_type: Optional[str] = None, task_id: Optional[str] = None, 
+                memory_trace_id: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Write a memory to the SQLite database
+    
+    Args:
+        agent_id: ID of the agent
+        type: Type of memory
+        content: Content of the memory
+        tags: List of tags
+        project_id: Optional project ID
+        status: Optional status
+        task_type: Optional task type
+        task_id: Optional task ID
+        memory_trace_id: Optional memory trace ID
+        
+    Returns:
+        The memory with its memory_id
+    """
+    try:
+        # Get agent tone profile (placeholder - would need to be implemented)
+        agent_tone = None  # get_agent_tone_profile(agent_id)
+        
+        # Create memory object
+        memory = {
+            "memory_id": str(uuid.uuid4()),
+            "agent_id": agent_id,
+            "type": type,
+            "content": content,
+            "tags": tags,
+            "timestamp": datetime.utcnow().isoformat(),
+            "project_id": project_id,
+            "status": status,
+            "task_type": task_type,
+            "task_id": task_id,
+            "memory_trace_id": memory_trace_id
+        }
+        
+        # Add agent tone if available
+        if agent_tone:
+            memory["agent_tone"] = agent_tone
+            logger.info(f"🎭 Added tone profile for {agent_id}")
+        
+        # Write to SQLite database
+        memory = memory_db.write_memory(memory)
+        
+        # Also store in shared memory layer (placeholder - would need to be implemented)
+        try:
+            # Import here to avoid circular imports
+            from app.core.shared_memory import get_shared_memory
+            
+            # Create async function to store in shared memory
+            async def store_in_shared_memory():
+                shared_memory = get_shared_memory()
+                
+                # Include agent_tone in metadata if available
+                metadata = {
+                    "agent_name": agent_id,
+                    "type": type,
+                    "memory_id": memory["memory_id"]
+                }
+                
+                if agent_tone:
+                    metadata["agent_tone"] = agent_tone
+                
+                await shared_memory.store_memory(
+                    content=content,
+                    metadata=metadata,
+                    scope="agent",
+                    agent_name=agent_id,
+                    topics=tags
+                )
+            
+            # Run the async function in a new event loop if we're not in an async context
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # We're in an async context, create a task
+                    asyncio.create_task(store_in_shared_memory())
+                else:
+                    # We're not in an async context, run in a new loop
+                    asyncio.run(store_in_shared_memory())
+            except RuntimeError:
+                # No event loop, run in a new one
+                asyncio.run(store_in_shared_memory())
+                
+            logger.info(f"🧠 Memory also stored in shared memory layer for {agent_id}")
+        except Exception as e:
+            logger.warning(f"⚠️ Error storing in shared memory: {str(e)}")
+        
+        logger.info(f"🧠 Memory written for {agent_id}: {memory['memory_id']}")
+        return memory
+    except Exception as e:
+        logger.error(f"❌ Error writing memory: {str(e)}")
+        raise
+
+def generate_reflection(memories: List[Dict]) -> str:
+    """
+    Generate a reflection based on a list of memories.
+    This is a placeholder implementation that will be AI-powered later.
+    
+    Args:
+        memories: List of memory dictionaries to reflect on
+        
+    Returns:
+        A reflection string based on the memories
+    """
+    if not memories:
+        return "No relevant memories to reflect on."
+    
+    return f"I have processed {len(memories)} memories. A pattern is forming..."
+
 @router.post("/write")
 async def memory_write(request: Request):
     try:
@@ -126,12 +225,9 @@ async def memory_write(request: Request):
             task_type=memory_entry.task_type
         )
         
-        # Save to memory.json after writing to memory_store
-        save_memory_to_json()
-        
         return JSONResponse(status_code=200, content={"status": "ok", "memory_id": memory["memory_id"]})
     except Exception as e:
-        print(f"❌ MemoryWriter error: {str(e)}")
+        logger.error(f"❌ MemoryWriter error: {str(e)}")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
 @router.get("/read")
@@ -171,7 +267,7 @@ async def read_memory(
         # If memory_id is provided, return that specific memory
         if memory_id:
             # Find memory with the specified ID
-            memory = next((m for m in memory_store if m["memory_id"] == memory_id), None)
+            memory = memory_db.read_memory_by_id(memory_id)
             
             if memory:
                 return {
@@ -187,69 +283,27 @@ async def read_memory(
                     }
                 )
         
-        # Start with all memories
-        filtered_memories = memory_store.copy()
-        
-        # Apply agent_id filter if provided
-        if agent_id:
-            filtered_memories = [m for m in filtered_memories if m["agent_id"] == agent_id]
-        
-        # Apply type filter if provided
-        if type:
-            filtered_memories = [m for m in filtered_memories if m["type"] == type]
-        
-        # Apply tag filter if provided
-        if tag:
-            filtered_memories = [m for m in filtered_memories if tag in m["tags"]]
-        
-        # Apply since filter if provided
-        if since:
-            try:
-                since_dt = datetime.fromisoformat(since)
-                filtered_memories = [
-                    m for m in filtered_memories 
-                    if datetime.fromisoformat(m["timestamp"]) > since_dt
-                ]
-            except ValueError:
-                raise HTTPException(status_code=400, detail="Invalid ISO 8601 format for 'since' parameter")
-        
-        # Apply project_id filter if provided
-        if project_id:
-            filtered_memories = [
-                m for m in filtered_memories 
-                if "project_id" in m and m["project_id"] == project_id
-            ]
-        
-        # Apply task_id filter if provided
-        if task_id:
-            filtered_memories = [
-                m for m in filtered_memories 
-                if "task_id" in m and m["task_id"] == task_id
-            ]
-        
-        # Apply thread_id filter if provided
-        if thread_id:
-            filtered_memories = [
-                m for m in filtered_memories 
-                if "thread_id" in m and m["thread_id"] == thread_id
-            ]
-        
-        # Sort by timestamp (newest first)
-        filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
-        
-        # Apply limit
-        if limit and limit > 0:
-            filtered_memories = filtered_memories[:limit]
+        # Otherwise, use flexible filtering
+        memories = memory_db.read_memories(
+            agent_id=agent_id,
+            memory_type=type,
+            tag=tag,
+            limit=limit,
+            since=since,
+            project_id=project_id,
+            task_id=task_id,
+            thread_id=thread_id
+        )
         
         return {
             "status": "ok",
-            "memories": filtered_memories
+            "memories": memories
         }
     except HTTPException as e:
-        print(f"❌ MemoryReader error: {str(e.detail)}")
+        logger.error(f"❌ MemoryReader error: {str(e.detail)}")
         return JSONResponse(status_code=e.status_code, content={"status": "error", "message": e.detail})
     except Exception as e:
-        print(f"❌ MemoryReader error: {str(e)}")
+        logger.error(f"❌ MemoryReader error: {str(e)}")
         return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
 
 @router.post("/reflect")
@@ -304,9 +358,6 @@ async def reflect_on_memories(request: Request):
                 memory_trace_id=reflection_request.memory_trace_id
             )
             
-            # Save to memory.json after writing to memory_store
-            save_memory_to_json()
-            
             # Return error response
             return JSONResponse(
                 status_code=429,  # Too Many Requests
@@ -321,21 +372,15 @@ async def reflect_on_memories(request: Request):
                 }
             )
         
-        # Get recent memories using similar logic to /read endpoint
-        filtered_memories = [m for m in memory_store if m["agent_id"] == reflection_request.agent_id]
-        
-        # Apply type filter if type is provided
-        if reflection_request.type:
-            filtered_memories = [m for m in filtered_memories if m["type"] == reflection_request.type]
-        
-        # Sort by timestamp (newest first)
-        filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
-        
-        # Apply limit
-        filtered_memories = filtered_memories[:reflection_request.limit]
+        # Get recent memories using the SQLite database
+        memories = memory_db.read_memories(
+            agent_id=reflection_request.agent_id,
+            memory_type=reflection_request.type,
+            limit=reflection_request.limit
+        )
         
         # Generate reflection
-        reflection_text = generate_reflection(filtered_memories)
+        reflection_text = generate_reflection(memories)
         
         # Write reflection as a new memory with all trace fields
         memory = write_memory(
@@ -349,11 +394,8 @@ async def reflect_on_memories(request: Request):
             status="completed"
         )
         
-        # Save to memory.json after writing to memory_store
-        save_memory_to_json()
-        
         # Log successful reflection generation
-        print(f"✅ Reflection generated for agent {reflection_request.agent_id} with task_id {reflection_request.task_id}")
+        logger.info(f"✅ Reflection generated for agent {reflection_request.agent_id} with task_id {reflection_request.task_id}")
         
         # Return SDK-compliant structured response
         return {
@@ -367,7 +409,7 @@ async def reflect_on_memories(request: Request):
         }
     except Exception as e:
         # Log error details
-        print(f"❌ Reflection Engine error: {str(e)}")
+        logger.error(f"❌ Reflection Engine error: {str(e)}")
         
         # Return SDK-compliant error response
         return JSONResponse(status_code=500, content={
@@ -413,59 +455,37 @@ async def summarize_memories_endpoint(request: Request):
         body = await request.json()
         summarize_request = SummarizeRequest(**body)
         
-        # Get recent memories using similar logic to /read endpoint
-        filtered_memories = [m for m in memory_store if m["agent_id"] == summarize_request.agent_id]
+        # Get memories to summarize
+        memories = []
         
-        # Apply type filter if provided
-        if summarize_request.type:
-            filtered_memories = [m for m in filtered_memories if m["type"] == summarize_request.type]
-        
-        # Sort by timestamp (newest first)
-        filtered_memories.sort(key=lambda m: m["timestamp"], reverse=True)
-        
-        # Apply limit
-        filtered_memories = filtered_memories[:summarize_request.limit]
-        
-        # Use context if provided
+        # If context is provided, use it directly
         if summarize_request.context:
-            # If context is provided, use it instead of filtered memories
-            safe_inputs = []
-            for item in summarize_request.context:
-                if item:
-                    if isinstance(item, dict) and "content" in item:
-                        safe_inputs.append(item["content"])
-                    else:
-                        # If item is not a dict or doesn't have content key, use string representation
-                        safe_inputs.append(str(item))
-            
-            # Only attempt to summarize if we have content
-            if safe_inputs:
-                # Convert string content into dictionary format expected by summarize_memories
-                formatted_memories = [{"content": content} for content in safe_inputs]
-                summary_text = summarize_memories(formatted_memories)
-            else:
-                summary_text = "No valid content found in provided context."
+            memories = summarize_request.context
         else:
-            # Generate summary from filtered memories
-            summary_text = summarize_memories(filtered_memories)
+            # Otherwise, fetch memories from the database
+            memories = memory_db.read_memories(
+                agent_id=summarize_request.agent_id,
+                memory_type=summarize_request.type,
+                limit=summarize_request.limit
+            )
         
-        # Write summary to memory with all trace fields
+        # Generate summary
+        summary_text = summarize_memories(memories)
+        
+        # Write summary as a new memory with all trace fields
         memory = write_memory(
             agent_id=summarize_request.agent_id,
             type="summary",
             content=summary_text,
-            tags=["summary", f"based_on_{summarize_request.type or 'memory'}", "sdk_compliant"],
+            tags=["summary", "sdk_compliant"],
             project_id=summarize_request.project_id,
             task_id=summarize_request.task_id,
             memory_trace_id=summarize_request.memory_trace_id,
             status="completed"
         )
         
-        # Save to memory.json after writing to memory_store
-        save_memory_to_json()
-        
         # Log successful summary generation
-        print(f"✅ Summary generated for agent {summarize_request.agent_id} with task_id {summarize_request.task_id}")
+        logger.info(f"✅ Summary generated for agent {summarize_request.agent_id} with task_id {summarize_request.task_id}")
         
         # Return SDK-compliant structured response
         return {
@@ -478,7 +498,7 @@ async def summarize_memories_endpoint(request: Request):
         }
     except Exception as e:
         # Log error details
-        print(f"❌ Summary Engine error: {str(e)}")
+        logger.error(f"❌ Summary Engine error: {str(e)}")
         
         # Return SDK-compliant error response
         return JSONResponse(status_code=500, content={
@@ -489,3 +509,8 @@ async def summarize_memories_endpoint(request: Request):
             "memory_trace_id": body.get("memory_trace_id", "unknown"),
             "agent_id": body.get("agent_id", "unknown")
         })
+
+# Import missing dependencies
+import uuid
+import asyncio
+from app.modules.memory_summarizer import summarize_memories
