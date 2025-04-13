@@ -6,10 +6,12 @@ import {
   Flex,
   useColorModeValue,
   Image,
-  Link as ChakraLink,
-  VStack
+  VStack,
+  Heading,
+  Text,
+  Container
 } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import SidebarNavigation from '../components/SidebarNavigation';
 import AgentChat from '../components/AgentChat';
 import AgentSandboxCard from '../components/AgentSandboxCard';
@@ -18,6 +20,15 @@ import CheckpointApprovalPanel from '../components/CheckpointApprovalPanel';
 import InputUI from '../components/InputUI';
 
 const Dashboard = () => {
+  // Check if user is authenticated
+  const isAuthenticated = localStorage.getItem('authToken') === 'operator-authenticated' || 
+                          localStorage.getItem('authToken') === 'architect-special-access';
+  
+  // Redirect to splash page if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   
@@ -91,7 +102,7 @@ const Dashboard = () => {
         borderBottomWidth="1px"
         borderColor={borderColor}
       >
-        <ChakraLink as={Link} to="/dashboard">
+        <Container maxW="1800px">
           <Image 
             src="/promethioslogo.png" 
             alt="Promethios Logo" 
@@ -99,7 +110,7 @@ const Dashboard = () => {
             transition="all 0.2s"
             _hover={{ transform: 'scale(1.05)' }}
           />
-        </ChakraLink>
+        </Container>
       </Flex>
       
       {/* Main content with 3-panel layout */}
@@ -131,16 +142,21 @@ const Dashboard = () => {
             <VStack spacing={4} align="stretch">
               {/* Agent Sandbox Cards */}
               <Box>
+                <Heading size="md" mb={3}>Agent Sandbox</Heading>
                 {agents.map(agent => (
                   <AgentSandboxCard key={agent.id} agent={agent} />
                 ))}
               </Box>
               
               {/* Checkpoint Approval Panel */}
-              <CheckpointApprovalPanel />
+              <Box mt={4}>
+                <Heading size="md" mb={3}>Checkpoints</Heading>
+                <CheckpointApprovalPanel />
+              </Box>
               
               {/* Tool Output Cards */}
-              <Box>
+              <Box mt={4}>
+                <Heading size="md" mb={3}>Tool Outputs</Heading>
                 {toolOutputs.map(output => (
                   <ToolOutputCard key={output.id} output={output} />
                 ))}
