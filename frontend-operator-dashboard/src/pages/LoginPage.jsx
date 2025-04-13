@@ -9,13 +9,26 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
+  // Get environment variables with fallback to default values
+  const validUsername = import.meta.env.VITE_OPERATOR_USERNAME || 'admin'
+  const validPassword = import.meta.env.VITE_OPERATOR_PASSWORD || 'securekey'
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (email === 'admin@promethios.ai' && password === 'ignite') {
+    
+    // Easter egg override
+    if (password === 'I AM PROMETHIOS') {
       login()
-      navigate('/hal')
+      navigate('/dashboard')
+      return
+    }
+    
+    // Regular authentication
+    if (email === validUsername && password === validPassword) {
+      login()
+      navigate('/dashboard')
     } else {
-      setError('Invalid login credentials')
+      setError('Access Denied')
     }
   }
 
@@ -26,8 +39,8 @@ export default function LoginPage() {
         <h2 className="text-xl font-semibold text-center">Login to Promethios</h2>
         {error && <p className="text-red-600 text-sm text-center">{error}</p>}
         <input
-          type="email"
-          placeholder="Email"
+          type="text"
+          placeholder="Username"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full p-2 border rounded"

@@ -48,12 +48,12 @@ export default function LoginPage() {
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
-            Operator ID
+            Username
           </label>
           <input
             id="username"
             type="text"
-            placeholder="Enter operator ID"
+            placeholder="Enter username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"
@@ -62,12 +62,12 @@ export default function LoginPage() {
         </div>
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-            Access Key
+            Password
           </label>
           <input
             id="password"
             type="password"
-            placeholder="Enter access key"
+            placeholder="Enter password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-white"

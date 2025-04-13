@@ -1,59 +1,29 @@
-# Promethios Phase 2 — UI & Agent Loop Stabilization Todo List
+# Phase 8.0.B Operator Dashboard Implementation
 
-## Sprint 1: manus-task-ui-recovery
+## Tasks
+- [x] Check current repository state
+- [x] Fix login system with environment variables
+  - [x] Replace hardcoded credentials with environment variables
+  - [x] Set default values (admin/securekey)
+  - [x] Update redirect to /dashboard
+  - [x] Maintain "I AM PROMETHIOS" easter egg
+- [x] Implement three-panel dashboard layout
+  - [x] Create SidebarNavigation component (left panel)
+  - [x] Create AgentChat component (center panel)
+  - [x] Create AgentSandboxCard component (right panel)
+- [x] Add Tool Output Panel
+  - [x] Create ToolOutputCard component with syntax highlighting
+  - [x] Support markdown and code preview
+- [x] Add Checkpoint Approval Panel
+  - [x] Create CheckpointApprovalPanel component
+  - [x] Implement approve/reject/comment functionality
+  - [x] Support hard/soft checkpoint handling
+- [x] Create InputUI component for fixed input bar
+- [x] Integrate all components into Dashboard layout
+- [ ] Commit and push changes
+- [ ] Notify operator of completion
 
-### Fix AgentChat Logic
-- [x] Replace static agent_id references with dynamic useParams() in AgentChat.jsx
-- [x] Scope conversationHistory to: chat_history_${agentId}
-- [x] Ensure agent.name renders from loaded agent object (not hardcoded)
-
-### Add UI Feedback States
-- [x] Add loading spinner on agent fetch
-- [x] Add error fallback: "⚠️ Agent response failed. Try again or switch agents."
-- [x] Use AbortController to prevent infinite hangs during fetch
-
-### Handle 502+ API Failures
-- [x] Detect 502, 504, or undefined responses from /api/delegate-stream
-- [x] Display UI-friendly fallback: "⚠️ This agent is temporarily unavailable. Please try again or switch agents."
-- [x] Implement retry once before showing error
-- [x] Confirm payload includes valid agent_id (LifeTree, SiteGen, NEUREAL, etc.)
-
-### Agent Mapping Fix (Critical)
-- [x] Add agent name → backend ID mapping logic
-- [x] Implement mapping using agentNameMap[displayName] || displayName to resolve all delegate calls
-
-### Route Handling
-- [x] Confirm sidebar + /agent/:id loads dynamically
-- [x] Ensure unknown agent IDs fail gracefully
-
-## Sprint 2: manus-task-agent-loop-test
-
-### Validate Agent Loop Functionality
-- [x] Test Core Promethios OS Agents
-- [x] Test Life Tree Agent
-- [x] Test Site Plan Agent
-- [x] Test NEUREAL Agent
-- [x] Verify loop validation criteria
-
-## Sprint 3: manus-task-dashboard-stabilize
-
-### Memory Browser
-- [x] Fix infinite spinner issues
-- [x] Add pagination
-- [x] Add fallback on empty/fail states
-
-### Dashboard View
-- [x] Add "Loading system metrics..." fallback
-- [x] Throttle or debounce heavy API calls
-
-### Agent Activity Map
-- [x] Validate /api/agent/status returns clean JSON
-- [x] Display health: uptime, response rate, error %
-
-### Diagnostic: Agent Manifest Route
-- [x] Call and expose results from GET /api/system/agents/manifest
-- [x] Use this for live verification of available agent IDs
-
-### Optional: GPT Usage Debug Route
-- [x] Implement /api/debug/gpt-usage route
-- [x] Display token use, agent ID, latency, failures
+## Notes
+- The dashboard follows the Phase 8.0.B design specifications with a three-panel layout
+- All components use Chakra UI for styling and responsive design
+- Mock data is used for demonstration purposes and would be replaced with API calls in production
