@@ -145,3 +145,12 @@ async def reset_memory_db():
         return {"status": "ok", "message": "DB already deleted"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+@router.get("/thread")
+async def memory_thread(goal_id: str):
+    try:
+        filtered = [m for m in memory_store if m.get("goal_id") == goal_id]
+        return {"status": "ok", "thread": filtered}
+    except Exception as e:
+        print(f"❌ MemoryThread error: {str(e)}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
