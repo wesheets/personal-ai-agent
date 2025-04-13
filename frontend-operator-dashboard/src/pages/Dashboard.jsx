@@ -72,7 +72,7 @@ const Dashboard = () => {
   ];
   
   // Handle sending a message
-  const handleSendMessage = (message: string) => {
+  const handleSendMessage = (message) => {
     console.log('Message sent:', message);
     // In a real implementation, this would add the message to the chat
   };
