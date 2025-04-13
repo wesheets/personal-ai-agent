@@ -1,16 +1,3 @@
-"""
-Memory Module with SQLite Backend and In-Memory Store
-
-This module provides memory-related functionality for agents, including:
-- Writing memories to SQLite database and in-memory store
-- Reading memories with flexible filtering
-- Generating reflections based on memories
-- Summarizing memories
-
-The module uses both a SQLite database for persistent storage across deployments
-and an in-memory store for immediate access within the same runtime.
-"""
-
 from fastapi import APIRouter, Request, Query, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -699,174 +686,175 @@ async def memory_thread(
         )
 
 @router.post("/reflect")
-async def memory_reflect_endpoint(request: ReflectionRequest):
+async def reflect_on_memories(request: ReflectionRequest):
     """
-    Generate a reflection based on recent memories.
+    Generate a reflection based on memories matching specific criteria.
     
-    This endpoint analyzes recent memories and generates a reflection
-    that summarizes patterns, insights, or conclusions.
+    This endpoint analyzes memories related to a specific goal, task, or context
+    and generates a reflection that captures patterns, insights, or summaries.
     
     Parameters:
     - agent_id: ID of the agent (required)
-    - goal: Current goal or objective (required)
-    - context: Additional context for reflection (optional)
-    - task_id: ID of the current task (required)
-    - project_id: ID of the current project (required)
+    - goal: Goal or objective for the reflection (required)
+    - context: Additional context for the reflection (optional)
+    - task_id: ID of the task (required)
+    - project_id: ID of the project (required)
     - memory_trace_id: ID for memory tracing (required)
     - type: Type of memories to reflect on (optional, default "memory")
     - limit: Maximum number of memories to consider (optional, default 5)
-    - loop_count: Current loop count for this task (optional, default 0)
+    - loop_count: Number of reflection loops already performed for this task (optional)
     
     Returns:
     - status: "ok" if successful
     - reflection: Generated reflection text
-    - memories_used: List of memories used for reflection
+    - memory_id: ID of the reflection memory
+    - loop_count: Updated loop count
     """
     try:
-        logger.info(f"🧠 Generating reflection for {request.agent_id}")
-        
         # Check if we've exceeded the maximum loops for this task
         if request.loop_count >= system_caps["max_loops_per_task"]:
-            logger.warning(f"⚠️ Maximum loop count reached for task {request.task_id}")
-            return JSONResponse(status_code=200, content={
-                "status": "ok",
-                "reflection": "I've reached my maximum reflection depth for this task. Let me proceed with what I know.",
-                "memories_used": []
-            })
+            return JSONResponse(
+                status_code=429,
+                content={
+                    "status": "error",
+                    "message": f"Maximum reflection loops ({system_caps['max_loops_per_task']}) exceeded for this task",
+                    "loop_count": request.loop_count
+                }
+            )
         
-        # Get relevant memories for reflection
+        # Increment loop count
+        loop_count = request.loop_count + 1
+        
+        # Get memories to reflect on
         memories = memory_db.read_memories(
             agent_id=request.agent_id,
             memory_type=request.type,
-            project_id=request.project_id,
             task_id=request.task_id,
+            project_id=request.project_id,
             thread_id=request.memory_trace_id,
             limit=request.limit
         )
         
         # Generate reflection
-        reflection = generate_reflection(memories)
+        reflection_text = generate_reflection(memories)
         
-        logger.info(f"✅ Generated reflection based on {len(memories)} memories")
-        return JSONResponse(status_code=200, content={
-            "status": "ok",
-            "reflection": reflection,
-            "memories_used": memories
-        })
+        # Create metadata with context and loop information
+        metadata = {
+            "goal": request.goal,
+            "loop_count": loop_count,
+            "memory_count": len(memories),
+            "goal_id": request.goal  # Store goal as goal_id for threading
+        }
+        
+        # Add any additional context
+        if request.context:
+            metadata["context"] = request.context
+        
+        # Write reflection as a new memory
+        memory = write_memory(
+            agent_id=request.agent_id,
+            type="reflection",
+            content=reflection_text,
+            tags=["reflection", f"based_on_{request.type}", f"loop_{loop_count}"],
+            project_id=request.project_id,
+            task_id=request.task_id,
+            memory_trace_id=request.memory_trace_id,
+            metadata=metadata,
+            goal_id=request.goal  # Store goal as goal_id for threading
+        )
+        
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": "ok",
+                "reflection": reflection_text,
+                "memory_id": memory["memory_id"],
+                "loop_count": loop_count
+            }
+        )
     except Exception as e:
         logger.error(f"❌ Error generating reflection: {str(e)}")
-        return JSONResponse(status_code=500, content={
-            "status": "error",
-            "message": str(e)
-        })
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": str(e)
+            }
+        )
 
 @router.post("/summarize")
-async def memory_summarize_endpoint(request: SummarizeRequest):
+async def summarize_memory(request: SummarizeRequest):
     """
-    Summarize a collection of memories.
+    Generate a summary of memories related to a specific goal or task.
     
-    This endpoint analyzes a set of memories and generates a concise summary
-    that captures the key points and insights.
+    This endpoint analyzes memories related to a specific goal, task, or context
+    and generates a concise summary that captures key information.
     
     Parameters:
     - agent_id: ID of the agent (required)
-    - goal: Current goal or objective (required)
-    - task_id: ID of the current task (required)
-    - project_id: ID of the current project (required)
+    - goal: Goal or objective for the summary (required)
+    - task_id: ID of the task (required)
+    - project_id: ID of the project (required)
     - memory_trace_id: ID for memory tracing (required)
-    - context: Additional context for summarization (optional)
+    - context: Additional context for the summary (optional)
     - type: Type of memories to summarize (optional)
     - limit: Maximum number of memories to consider (optional, default 10)
     
     Returns:
     - status: "ok" if successful
     - summary: Generated summary text
-    - memories_used: List of memories used for summarization
+    - memory_count: Number of memories summarized
     """
     try:
-        logger.info(f"🧠 Generating summary for {request.agent_id}")
-        
-        # Get relevant memories for summarization
+        # Get memories to summarize
         memories = memory_db.read_memories(
             agent_id=request.agent_id,
             memory_type=request.type,
-            project_id=request.project_id,
             task_id=request.task_id,
+            project_id=request.project_id,
             thread_id=request.memory_trace_id,
             limit=request.limit
         )
         
-        # Generate summary (placeholder implementation)
-        if not memories:
-            summary = "No relevant memories to summarize."
-        else:
-            summary = f"Summary of {len(memories)} memories: This task involved several steps..."
+        # Generate summary (placeholder - would need to be implemented)
+        summary = f"Summary of {len(memories)} memories related to {request.goal}"
         
-        logger.info(f"✅ Generated summary based on {len(memories)} memories")
-        return JSONResponse(status_code=200, content={
-            "status": "ok",
-            "summary": summary,
-            "memories_used": memories
-        })
+        return JSONResponse(
+            status_code=200,
+            content={
+                "status": "ok",
+                "summary": summary,
+                "memory_count": len(memories)
+            }
+        )
     except Exception as e:
         logger.error(f"❌ Error generating summary: {str(e)}")
-        return JSONResponse(status_code=500, content={
-            "status": "error",
-            "message": str(e)
-        })
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": str(e)
+            }
+        )
 
-@router.post("/search")
-async def memory_search_endpoint(request: SearchRequest):
+@router.post("/admin/reset-memory-db")
+async def reset_memory_db():
     """
-    Search memories using a query string.
+    Administrative endpoint to delete the memory database file.
     
-    This endpoint allows searching memories using a query string,
-    with optional filters for role, memory type, and project.
-    
-    Parameters:
-    - agent_id: ID of the agent (required)
-    - query: Search query string (required)
-    - role: Filter by role (optional)
-    - memory_type: Filter by memory type (optional)
-    - limit: Maximum number of results (optional, default 25)
-    - project_id: Filter by project ID (optional)
+    This endpoint is used for maintenance, testing, or resetting the system.
+    It deletes the memory.db file, which will be recreated with the schema
+    on the next startup or database access.
     
     Returns:
     - status: "ok" if successful
-    - results: List of matching memories
+    - message: Description of the action taken
     """
     try:
-        logger.info(f"🧠 Searching memories for {request.agent_id} with query: {request.query}")
-        
-        # This is a placeholder implementation
-        # In a real implementation, this would use full-text search or vector search
-        
-        # Get all memories for the agent
-        memories = memory_db.read_memories(
-            agent_id=request.agent_id,
-            memory_type=request.memory_type,
-            project_id=request.project_id,
-            limit=1000  # Get a large number to search through
-        )
-        
-        # Filter memories that contain the query string (case-insensitive)
-        query_lower = request.query.lower()
-        results = []
-        for memory in memories:
-            content = memory.get("content", "").lower()
-            if query_lower in content:
-                results.append(memory)
-                if len(results) >= request.limit:
-                    break
-        
-        logger.info(f"✅ Found {len(results)} memories matching query: {request.query}")
-        return JSONResponse(status_code=200, content={
-            "status": "ok",
-            "results": results
-        })
+        os.remove("/app/db/memory.db")
+        print("🧨 memory.db deleted from /app/db/")
+        return {"status": "ok", "message": "Memory DB deleted. Restart app to rebuild schema."}
+    except FileNotFoundError:
+        return {"status": "ok", "message": "DB already deleted"}
     except Exception as e:
-        logger.error(f"❌ Error searching memories: {str(e)}")
-        return JSONResponse(status_code=500, content={
-            "status": "error",
-            "message": str(e)
-        })
+        return {"status": "error", "message": str(e)}
