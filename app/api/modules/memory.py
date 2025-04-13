@@ -125,6 +125,7 @@ class MemoryWriteRequest(BaseModel):
     task_id: Optional[str] = None
     session_id: Optional[str] = None
     memory_trace_id: Optional[str] = None
+    goal_id: Optional[str] = None
 
 class ReflectionRequest(BaseModel):
     agent_id: str
@@ -379,9 +380,9 @@ async def memory_write_endpoint(request: MemoryWriteRequest):
             if user_scope not in tags:
                 tags.append(user_scope)
         
-        # Extract goal_id from metadata if present
-        goal_id = None
-        if request.metadata and "goal_id" in request.metadata:
+        # Extract goal_id from request or metadata if present
+        goal_id = request.goal_id
+        if not goal_id and request.metadata and "goal_id" in request.metadata:
             goal_id = request.metadata["goal_id"]
         
         # Write memory with all provided parameters
