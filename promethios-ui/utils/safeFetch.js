@@ -1,36 +1,88 @@
-/**
- * Safe fetch utility with timeout, abort controller, and error handling
- * For use across Dashboard, Memory, and Agent pages
- */
+// Safe fetch utility for Promethios UI
+// Provides error handling and timeout functionality
 
 /**
- * Performs a fetch request with timeout and error handling
- * 
+ * Enhanced fetch with timeout and error handling
  * @param {string} url - The URL to fetch
- * @param {Function} setData - State setter function for successful data
- * @param {Function} setError - State setter function for error state
- * @param {number} timeout - Timeout in milliseconds (default: 8000)
- * @returns {Promise<void>}
+ * @param {Object} options - Fetch options
+ * @param {number} timeout - Timeout in milliseconds
+ * @returns {Promise} - Promise that resolves to the fetch response
  */
-export async function safeFetch(url, setData, setError, timeout = 8000) {
+const safeFetch = async (url, options = {}, timeout = 30000) => {
+  // Create abort controller for timeout
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeout);
-
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  
   try {
-    const res = await fetch(url, { signal: controller.signal });
+    // Add signal to options
+    const fetchOptions = {
+      ...options,
+      signal: controller.signal
+    };
     
-    if (!res.ok) {
-      throw new Error(`Server responded with status: ${res.status}`);
+    // Perform fetch
+    const response = await fetch(url, fetchOptions);
+    
+    // Clear timeout
+    clearTimeout(timeoutId);
+    
+    // Check if response is ok
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
     }
     
-    const data = await res.json();
-    setData(data);
-  } catch (err) {
-    console.error("Fetch error:", err);
-    setError(true);
-  } finally {
-    clearTimeout(timer);
+    // Return response
+    return response;
+  } catch (error) {
+    // Clear timeout
+    clearTimeout(timeoutId);
+    
+    // Handle specific errors
+    if (error.name === 'AbortError') {
+      console.error(`Request timeout after ${timeout}ms: ${url}`);
+      throw new Error(`Request timeout after ${timeout}ms`);
+    }
+    
+    // Log and rethrow other errors
+    console.error(`Fetch error for ${url}:`, error);
+    throw error;
   }
-}
+};
+
+/**
+ * Safe JSON fetch with error handling
+ * @param {string} url - The URL to fetch
+ * @param {Object} options - Fetch options
+ * @param {number} timeout - Timeout in milliseconds
+ * @returns {Promise} - Promise that resolves to the parsed JSON
+ */
+safeFetch.json = async (url, options = {}, timeout = 30000) => {
+  try {
+    const response = await safeFetch(url, options, timeout);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(`JSON parse error for ${url}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Safe text fetch with error handling
+ * @param {string} url - The URL to fetch
+ * @param {Object} options - Fetch options
+ * @param {number} timeout - Timeout in milliseconds
+ * @returns {Promise} - Promise that resolves to the text content
+ */
+safeFetch.text = async (url, options = {}, timeout = 30000) => {
+  try {
+    const response = await safeFetch(url, options, timeout);
+    const text = await response.text();
+    return text;
+  } catch (error) {
+    console.error(`Text fetch error for ${url}:`, error);
+    throw error;
+  }
+};
 
 export default safeFetch;

@@ -22,7 +22,7 @@ import {
 import { FiRefreshCw, FiClock, FiAlertCircle } from 'react-icons/fi';
 import DEBUG_MODE from '../config/debug';
 import { getVisibleAgents } from '../utils/agentUtils';
-import { safeFetch } from '../utils/safeFetch';
+import safeFetch from '../utils/safeFetch';
 
 // Mock data for activity feed - will be replaced with API calls
 const mockLogs = [
@@ -239,26 +239,22 @@ const Dashboard = () => {
     const fetchSystemOverview = async () => {
       try {
         // Use the safeFetch utility with timeout and error handling
-        await safeFetch('/api/system/overview', (data) => {
-          if (isMounted) {
-            setSystemData(data);
-            setSystemError(false);
-          }
-        }, (hasError) => {
-          if (isMounted && hasError) {
-            setSystemError(true);
-            toast({
-              title: 'Error',
-              description: 'Failed to load system overview. Using fallback data.',
-              status: 'warning',
-              duration: 5000,
-              isClosable: true,
-            });
-          }
-        }, 8000); // 8 second timeout
+        const response = await safeFetch('/api/system/overview', {}, 8000);
+        if (isMounted) {
+          setSystemData(response);
+          setSystemError(false);
+        }
       } catch (err) {
         if (isMounted) {
           console.error('Error fetching system overview:', err);
+          setSystemError(true);
+          toast({
+            title: 'Error',
+            description: 'Failed to load system overview. Using fallback data.',
+            status: 'warning',
+            duration: 5000,
+            isClosable: true,
+          });
         }
       }
     };

@@ -11,22 +11,63 @@ export const useAuth = () => useContext(AuthContext);
 // Helper for safely accessing browser APIs
 const isBrowser = typeof window !== 'undefined';
 
-// Safe localStorage functions
+// Safe localStorage functions with fallbacks
 const safeLocalStorage = {
   getItem: (key) => {
     if (isBrowser) {
-      return localStorage.getItem(key);
+      try {
+        const item = localStorage.getItem(key);
+        return item !== null ? item : null;
+      } catch (error) {
+        console.log(`Error getting ${key} from localStorage:`, error);
+        return null;
+      }
     }
     return null;
   },
   setItem: (key, value) => {
     if (isBrowser) {
-      localStorage.setItem(key, value);
+      try {
+        localStorage.setItem(key, value);
+      } catch (error) {
+        console.log(`Error setting ${key} in localStorage:`, error);
+      }
     }
   },
   removeItem: (key) => {
     if (isBrowser) {
-      localStorage.removeItem(key);
+      try {
+        localStorage.removeItem(key);
+      } catch (error) {
+        console.log(`Error removing ${key} from localStorage:`, error);
+      }
+    }
+  },
+  // Safe JSON parse with fallback
+  getJSON: (key) => {
+    if (isBrowser) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item || "{}") : null;
+      } catch (error) {
+        console.log(`Error parsing ${key} from localStorage:`, error);
+        return null;
+      }
+    }
+    return null;
+  },
+  // Set default session if missing
+  ensureSession: () => {
+    if (isBrowser) {
+      try {
+        const session = localStorage.getItem('session');
+        if (!session) {
+          localStorage.setItem('session', JSON.stringify({}));
+          console.log('Created default empty session in localStorage');
+        }
+      } catch (error) {
+        console.log('Error ensuring session exists:', error);
+      }
     }
   }
 };
@@ -37,6 +78,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // Ensure session exists on initial load
+  useEffect(() => {
+    if (isBrowser) {
+      safeLocalStorage.ensureSession();
+    }
+  }, []);
 
   // Check if user is authenticated on initial load
   useEffect(() => {
@@ -55,7 +103,7 @@ export const AuthProvider = ({ children }) => {
           // Verify token and get user data
           try {
             const userData = await authService.getCurrentUser();
-            setCurrentUser(userData);
+            setCurrentUser(userData || null);
           } catch (err) {
             // If token is invalid or expired, clear it and redirect to login
             console.error('Authentication error:', err);
@@ -83,16 +131,21 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.login(email, password);
       
       // Store token in localStorage
-      safeLocalStorage.setItem('token', data.token);
-      
-      // Set current user
-      setCurrentUser(data.user);
-      
-      // Redirect to dashboard
-      navigate('/dashboard');
+      if (data && data.token) {
+        safeLocalStorage.setItem('token', data.token);
+        
+        // Set current user
+        setCurrentUser(data.user || {});
+        
+        // Redirect to dashboard
+        navigate('/dashboard');
+      } else {
+        throw new Error('Invalid login response');
+      }
       
       return data;
     } catch (err) {
+      console.log('Login error:', err);
       setError(err.message || 'Failed to login');
       throw err;
     } finally {
@@ -108,16 +161,21 @@ export const AuthProvider = ({ children }) => {
       const data = await authService.register(email, password, name);
       
       // Store token in localStorage
-      safeLocalStorage.setItem('token', data.token);
-      
-      // Set current user
-      setCurrentUser(data.user);
-      
-      // Redirect to dashboard
-      navigate('/dashboard');
+      if (data && data.token) {
+        safeLocalStorage.setItem('token', data.token);
+        
+        // Set current user
+        setCurrentUser(data.user || {});
+        
+        // Redirect to dashboard
+        navigate('/dashboard');
+      } else {
+        throw new Error('Invalid registration response');
+      }
       
       return data;
     } catch (err) {
+      console.log('Registration error:', err);
       setError(err.message || 'Failed to register');
       throw err;
     } finally {
@@ -127,22 +185,26 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = () => {
-    // Clear token from localStorage
-    safeLocalStorage.removeItem('token');
-    
-    // Clear current user
-    setCurrentUser(null);
-    
-    // Redirect to login
-    navigate('/login');
+    try {
+      // Clear token from localStorage
+      safeLocalStorage.removeItem('token');
+      
+      // Clear current user
+      setCurrentUser(null);
+      
+      // Redirect to login
+      navigate('/login');
+    } catch (error) {
+      console.log('Logout error:', error);
+    }
   };
 
   // Check if token is expired
   const isTokenExpired = () => {
-    const token = safeLocalStorage.getItem('token');
-    if (!token) return true;
-    
     try {
+      const token = safeLocalStorage.getItem('token');
+      if (!token) return true;
+      
       // In a real implementation, we would decode the JWT and check expiration
       // For now, we'll just return false (not expired)
       return false;
@@ -154,7 +216,7 @@ export const AuthProvider = ({ children }) => {
 
   // Value object that will be passed to consumers
   const value = {
-    currentUser,
+    currentUser: currentUser || null,
     loading,
     error,
     login,

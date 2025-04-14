@@ -1,64 +1,103 @@
-/**
- * Agent Utilities
- * 
- * Centralized utilities for agent management and status retrieval
- */
-import { controlService } from '../api/ApiService';
-
-/**
- * Get visible agents from the agent status API
- * Single source of truth for agent dropdown across the application
- * 
- * @param {Object} options - Configuration options
- * @param {boolean} options.includeInactive - Whether to include inactive agents (default: false)
- * @param {string[]} options.filterTypes - Filter agents by type (default: include all types)
- * @returns {Promise<Array>} - Array of agent objects with id, name, icon, and status
- */
-export const getVisibleAgents = async (options = {}) => {
-  const { includeInactive = false, filterTypes = null } = options;
+// Agent utilities for Promethios UI
+const agentUtils = {
+  // Format agent status for display
+  formatStatus: (status) => {
+    if (!status) return 'unknown';
+    return status.toLowerCase();
+  },
   
-  try {
-    // Fetch agents from the status API
-    const response = await controlService.getAgentStatus();
+  // Get color for agent status
+  getStatusColor: (status) => {
+    if (!status) return 'gray.500';
     
-    if (!response || !Array.isArray(response.agents)) {
-      return getFallbackAgents();
+    const statusMap = {
+      active: 'green.500',
+      thinking: 'blue.500',
+      idle: 'gray.500',
+      error: 'red.500',
+      waiting: 'orange.500'
+    };
+    
+    return statusMap[status.toLowerCase()] || 'gray.500';
+  },
+  
+  // Format timestamp for display
+  formatTimestamp: (timestamp) => {
+    if (!timestamp) return '';
+    
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString();
+    } catch (error) {
+      console.log('Error formatting timestamp:', error);
+      return '';
+    }
+  },
+  
+  // Truncate text with ellipsis
+  truncateText: (text, maxLength = 100) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    
+    return text.substring(0, maxLength) + '...';
+  },
+  
+  // Safe JSON parse with fallback
+  safeJsonParse: (jsonString, fallback = {}) => {
+    if (!jsonString) return fallback;
+    
+    try {
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.log('Error parsing JSON:', error);
+      return fallback;
+    }
+  },
+  
+  // Get visible agents (mock implementation)
+  getVisibleAgents: async (options = {}) => {
+    // Mock implementation that returns sample agents
+    const mockAgents = [
+      {
+        id: 'orchestrator',
+        name: 'Orchestrator',
+        type: 'system',
+        description: 'System orchestration agent',
+        icon: '🔄'
+      },
+      {
+        id: 'hal',
+        name: 'HAL',
+        type: 'persona',
+        description: 'Research and information agent',
+        icon: '🔍',
+        tone: 'analytical'
+      },
+      {
+        id: 'builder',
+        name: 'Builder',
+        type: 'persona',
+        description: 'Code and development agent',
+        icon: '🛠️',
+        tone: 'technical'
+      },
+      {
+        id: 'ops',
+        name: 'Ops',
+        type: 'system',
+        description: 'Operations and deployment agent',
+        icon: '🚀'
+      }
+    ];
+    
+    // If includeInactive is false, filter out inactive agents
+    if (!options.includeInactive) {
+      return mockAgents.filter(agent => agent.status !== 'inactive');
     }
     
-    // Filter agents based on options
-    let visibleAgents = response.agents;
-    
-    // Filter out inactive agents if not explicitly included
-    if (!includeInactive) {
-      visibleAgents = visibleAgents.filter(agent => agent.status === 'active');
-    }
-    
-    // Filter by agent types if specified
-    if (filterTypes && Array.isArray(filterTypes) && filterTypes.length > 0) {
-      visibleAgents = visibleAgents.filter(agent => 
-        agent.type && filterTypes.includes(agent.type)
-      );
-    }
-    
-    return visibleAgents;
-  } catch (error) {
-    return getFallbackAgents();
+    return mockAgents;
   }
 };
 
-/**
- * Get fallback agents when API fails
- * This ensures the UI remains functional even when the API is unavailable
- * 
- * @returns {Array} - Array of fallback agent objects
- */
-const getFallbackAgents = () => {
-  return [
-    { id: 'hal9000', name: 'HAL 9000', icon: '🔴', status: 'active', type: 'system' },
-    { id: 'ash-xenomorph', name: 'Ash', icon: '🧬', status: 'active', type: 'persona' }
-  ];
-};
-
-export default {
-  getVisibleAgents
-};
+export default agentUtils;
+export const { getVisibleAgents } = agentUtils;

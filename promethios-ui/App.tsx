@@ -1,53 +1,42 @@
-import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
+import './App.css';
 
-// Extend the theme to include custom colors, fonts, etc.
-const theme = extendTheme({
-  colors: {
-    brand: {
-      50: '#e6f6ff',
-      100: '#b3e0ff',
-      200: '#80cbff',
-      300: '#4db6ff',
-      400: '#1aa1ff',
-      500: '#0088e6',
-      600: '#006bb3',
-      700: '#004d80',
-      800: '#00304d',
-      900: '#00121a',
-    },
-    purple: {
-      50: '#f5f3ff',
-      100: '#ede9fe',
-      200: '#ddd6fe',
-      300: '#c4b5fd',
-      400: '#a78bfa',
-      500: '#8b5cf6',
-      600: '#7c3aed',
-      700: '#6d28d9',
-      800: '#5b21b6',
-      900: '#4c1d95',
-    }
-  },
-  fonts: {
-    heading: 'Inter, system-ui, sans-serif',
-    body: 'Inter, system-ui, sans-serif',
-  },
-  styles: {
-    global: {
-      body: {
-        bg: 'gray.50',
-        color: 'gray.800',
-      },
-    },
-  },
-});
+// Protected route component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  // Show loading state if auth is still being checked
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // Render children if authenticated
+  return children;
+};
 
 function App() {
   return (
-    <ChakraProvider theme={theme}>
-      <Dashboard />
-    </ChakraProvider>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route 
+        path="/dashboard/*" 
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
 }
 

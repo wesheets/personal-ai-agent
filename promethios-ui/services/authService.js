@@ -1,94 +1,73 @@
-import axios from 'axios';
-
-// Create axios instance with base URL
-const api = axios.create({
-  baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Add request interceptor to add auth token to requests
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor to handle token expiration
-api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    // Handle 401 Unauthorized errors (expired or invalid token)
-    if (error.response && error.response.status === 401) {
-      // Clear token and redirect to login
-      localStorage.removeItem('token');
-      
-      // Store current path for redirect after login
-      const currentPath = window.location.pathname + window.location.search + window.location.hash;
-      if (currentPath !== '/login' && currentPath !== '/register') {
-        sessionStorage.setItem('redirectAfterLogin', currentPath);
-      }
-      
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
+// Simple auth service for Promethios UI
 const authService = {
-  // Login user
+  // Login function (mock implementation)
   login: async (email, password) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to login');
-    }
+    // In a real implementation, this would call an API
+    return {
+      token: 'mock-token',
+      user: {
+        username: email,
+        role: 'operator'
+      }
+    };
   },
 
-  // Register user
+  // Register function (mock implementation)
   register: async (email, password, name) => {
-    try {
-      const response = await api.post('/auth/register', { email, password, name });
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to register');
-    }
+    // In a real implementation, this would call an API
+    return {
+      token: 'mock-token',
+      user: {
+        username: email,
+        name,
+        role: 'operator'
+      }
+    };
   },
 
-  // Get current user
+  // Get current user function (mock implementation)
   getCurrentUser: async () => {
+    // In a real implementation, this would validate the token and get user data
     try {
-      const response = await api.get('/auth/me');
-      return response.data;
+      const token = localStorage.getItem('token');
+      if (!token) return null;
+      
+      // Parse token if it's JSON
+      try {
+        const userData = JSON.parse(token);
+        return {
+          username: userData.user || 'operator',
+          role: 'operator'
+        };
+      } catch (e) {
+        // If token is not JSON, just return a default user
+        return {
+          username: 'operator',
+          role: 'operator'
+        };
+      }
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to get user data');
+      console.error('Error getting current user:', error);
+      return null;
     }
   },
 
-  // Logout user
-  logout: async () => {
+  // Logout function
+  logout: () => {
     try {
-      await api.post('/auth/logout');
       localStorage.removeItem('token');
-      
-      // Redirect to login page after logout
-      window.location.href = '/login';
     } catch (error) {
-      console.error('Logout error:', error);
-      // Still remove token and redirect even if API call fails
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      console.error('Error during logout:', error);
+    }
+  },
+
+  // Check if user is authenticated
+  isAuthenticated: () => {
+    try {
+      return !!localStorage.getItem('token');
+    } catch (error) {
+      console.error('Error checking authentication:', error);
+      return false;
     }
   }
 };

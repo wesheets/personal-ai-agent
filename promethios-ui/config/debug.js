@@ -1,29 +1,49 @@
-// Debug mode configuration
-// Set to false for production, true for development
-// This controls polling behavior across the application
-const DEBUG_MODE = process.env.NODE_ENV === 'development';
-
-// Console debug logging function that only logs in debug mode
-export const debugLog = (component, message, type = 'info') => {
-  if (!DEBUG_MODE) return;
+// Debug configuration for Promethios UI
+const debug = {
+  enabled: false,
+  logLevel: 'info',
+  showDevTools: false,
   
-  const timestamp = new Date().toLocaleTimeString();
-  const prefix = `[${timestamp}][${component}]`;
+  // Enable debug mode
+  enable: () => {
+    debug.enabled = true;
+    console.log('Debug mode enabled');
+    return debug;
+  },
   
-  switch (type) {
-    case 'error':
-      console.error(`${prefix} ❌ ${message}`);
-      break;
-    case 'warn':
-      console.warn(`${prefix} ⚠️ ${message}`);
-      break;
-    case 'success':
-      console.log(`${prefix} ✅ ${message}`);
-      break;
-    case 'info':
-    default:
-      console.debug(`${prefix} ℹ️ ${message}`);
+  // Disable debug mode
+  disable: () => {
+    debug.enabled = false;
+    console.log('Debug mode disabled');
+    return debug;
+  },
+  
+  // Set log level
+  setLogLevel: (level) => {
+    debug.logLevel = level;
+    console.log(`Log level set to: ${level}`);
+    return debug;
+  },
+  
+  // Toggle dev tools
+  toggleDevTools: () => {
+    debug.showDevTools = !debug.showDevTools;
+    console.log(`Dev tools ${debug.showDevTools ? 'enabled' : 'disabled'}`);
+    return debug;
+  },
+  
+  // Log message with level
+  log: (message, level = 'info') => {
+    if (!debug.enabled) return;
+    
+    if (level === 'error') {
+      console.error(`[PROMETHIOS:ERROR] ${message}`);
+    } else if (level === 'warn') {
+      console.warn(`[PROMETHIOS:WARN] ${message}`);
+    } else {
+      console.log(`[PROMETHIOS:INFO] ${message}`);
+    }
   }
 };
 
-export default DEBUG_MODE;
+export default debug;
