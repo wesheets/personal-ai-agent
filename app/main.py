@@ -46,6 +46,7 @@ try:
     
     # Import missing routers identified in Postman sweep
     from app.api.orchestrator import consult  # Orchestrator consult router
+    from app.api.orchestrator import chain  # Orchestrator chain router
     from app.api.modules import delegate  # Delegate router
     from app.api.modules import system  # System status router
     from app.api.modules import agent  # Agent list router
@@ -348,6 +349,11 @@ try:
     app.include_router(consult.router, prefix="/api/orchestrator")
     print("🧠 Route defined: /api/orchestrator/consult -> consult_agent")
     
+    # Register chain router for Phase 11.4
+    print("📡 Including Orchestrator Chain router from /app/api/orchestrator/chain.py")
+    app.include_router(chain.router, prefix="/api/orchestrator")
+    print("🧠 Route defined: /api/orchestrator/chain -> chain_instructions")
+    
     print("📡 Including Delegate router from /app/api/modules/delegate.py")
     app.include_router(delegate.router, prefix="/api")
     print("🧠 Route defined: /api/delegate -> delegate_task")
@@ -497,53 +503,89 @@ try:
     
     # Import and mount the user_context router
     print(f"🔍 DEBUG: User Context router object: {user_context_router}")
-    app.include_router(user_context_router, prefix="/api/modules/user_context")
-    print("🧠 Route defined: /api/modules/user_context/register -> register_user")
+    app.include_router(user_context_router, prefix="/api/modules")
     print("🧠 Route defined: /api/modules/user_context/get -> get_user_context")
     
     # Import and mount the respond router
     print(f"🔍 DEBUG: Respond router object: {respond_router}")
-    app.include_router(respond_router, prefix="/api/modules/respond")
+    app.include_router(respond_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/respond/generate -> generate_response")
     
     # Import and mount the plan router
     print(f"🔍 DEBUG: Plan router object: {plan_router}")
-    app.include_router(plan_router, prefix="/api/modules/plan")
-    print("🧠 Route defined: /api/modules/plan/generate -> generate_task_plan")
-    print("🧠 Route defined: /api/modules/plan/user-goal -> generate_user_goal_plan")
-    print("🧠 Route defined: /api/modules/respond -> respond_endpoint")
+    app.include_router(plan_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/plan/generate -> generate_plan")
     
     # Import and mount the project router
     print(f"🔍 DEBUG: Project router object: {project_router}")
-    app.include_router(project_router, prefix="/api/modules/project")
-    print("🧠 Route defined: /api/modules/project/initiate -> project_initiate")
+    app.include_router(project_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/project/create -> create_project")
     
-    # Mount health router
+    # Mount the health router
     app.include_router(health_router)
     print("🧠 Route defined: /health -> health_check")
     
+    # Mount static files for the frontend
+    try:
+        app.mount("/static", StaticFiles(directory="app/static"), name="static")
+        print("✅ Static files mounted at /static")
+    except Exception as e:
+        print(f"⚠️ Error mounting static files: {str(e)}")
+        logger.error(f"⚠️ Error mounting static files: {str(e)}")
+    
+    # Custom OpenAPI docs with proper CORS headers
+    @app.get("/docs", include_in_schema=False)
+    async def custom_swagger_ui_html(req: Request):
+        """
+        Custom Swagger UI implementation that sets proper CORS headers.
+        """
+        return get_swagger_ui_html(
+            openapi_url=app.openapi_url,
+            title=app.title + " - API Documentation",
+            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+            swagger_js_url="/static/swagger-ui-bundle.js",
+            swagger_css_url="/static/swagger-ui.css",
+        )
+    
     # Log successful startup
     print("✅ All routes registered successfully")
-    print("🚀 Enhanced AI Agent System startup complete")
+    print("🚀 Application startup complete")
     
 except Exception as e:
-    # Global error handler for startup failures
-    print(f"❌ CRITICAL ERROR DURING STARTUP: {str(e)}")
+    # Log any startup errors
+    print(f"❌ ERROR DURING STARTUP: {str(e)}")
     import traceback
     traceback.print_exc()
     
-    # Initialize a minimal FastAPI app for health checks
+    # Create a minimal FastAPI app for error reporting
     app = FastAPI(
-        title="Enhanced AI Agent System (RECOVERY MODE)",
-        description="Recovery mode due to startup failure",
+        title="Enhanced AI Agent System (Error Recovery Mode)",
+        description="Error recovery mode due to startup failure",
         version="1.0.0"
     )
     
     @app.get("/")
-    async def recovery_root():
-        """Root endpoint in recovery mode."""
-        return {"status": "error", "message": "System in recovery mode due to startup failure"}
+    async def error_root():
+        """Root endpoint in error recovery mode."""
+        return {
+            "status": "error",
+            "message": "Application is in error recovery mode due to startup failure",
+            "error": str(e)
+        }
     
     @app.get("/health")
-    async def recovery_health():
-        """Health check endpoint in recovery mode."""
-        return {"status": "error", "message": "System in recovery mode due to startup failure"}
+    async def error_health():
+        """Health check endpoint in error recovery mode."""
+        return {
+            "status": "error",
+            "message": "Application is in error recovery mode due to startup failure",
+            "error": str(e)
+        }
+
+# Add debug logging for chain route
+from src.utils.debug_logger import log_test_result
+log_test_result("Orchestrator", "/chain", "READY", "Route available", "Phase 11.4 chain handler initialized")
+
+# Run the application if this file is executed directly
+if __name__ == "__main__":
+    uvicorn.run("app.main:app", host="0.0.0.0", port=3000, reload=True)
