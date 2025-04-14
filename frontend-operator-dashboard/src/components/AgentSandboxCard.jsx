@@ -11,7 +11,8 @@ import {
   Icon,
   Divider
 } from '@chakra-ui/react';
-import { FiCpu, FiActivity, FiTool, FiBookOpen, FiThumbsUp } from 'react-icons/fi';
+import { FiCpu, FiActivity, FiTool, FiBookOpen, FiThumbsUp, FiGrid, FiTarget } from 'react-icons/fi';
+import orchestratorAgent from '../data/orchestratorAgent';
 
 const AgentSandboxCard = ({ agent }) => {
   const bgColor = useColorModeValue('white', 'gray.800');
@@ -40,13 +41,18 @@ const AgentSandboxCard = ({ agent }) => {
       case 'hal':
         return 'blue';
       case 'ash':
-        return 'purple';
+        return 'teal';
       case 'nova':
         return 'orange';
+      case 'orchestrator':
+        return 'purple';
       default:
         return 'gray';
     }
   };
+
+  // Check if agent is system agent (Orchestrator)
+  const isSystemAgent = agent.id.toLowerCase() === 'orchestrator';
 
   return (
     <Box
@@ -82,10 +88,15 @@ const AgentSandboxCard = ({ agent }) => {
             justifyContent="center"
             mr={2}
           >
-            <Icon as={FiCpu} />
+            <Icon as={isSystemAgent ? FiGrid : FiCpu} />
           </Box>
           <Box>
-            <Text fontWeight="bold">{agent.name}</Text>
+            <Flex align="center">
+              <Text fontWeight="bold">{agent.name}</Text>
+              {isSystemAgent && (
+                <Badge ml={2} colorScheme="purple" variant="subtle">System</Badge>
+              )}
+            </Flex>
             <Badge colorScheme={getStatusColor(agent.status)}>
               {agent.status.toUpperCase()}
             </Badge>
@@ -96,12 +107,12 @@ const AgentSandboxCard = ({ agent }) => {
       {/* Agent content */}
       <Box p={3}>
         <VStack align="stretch" spacing={3}>
-          {/* Active Task */}
+          {/* Active Task or Goal Processing for Orchestrator */}
           <Box>
             <HStack mb={1}>
-              <Icon as={FiActivity} color="gray.500" />
+              <Icon as={isSystemAgent ? FiTarget : FiActivity} color="gray.500" />
               <Text fontSize="sm" fontWeight="medium" color="gray.500">
-                ACTIVE TASK
+                {isSystemAgent ? "GOAL PROCESSING" : "ACTIVE TASK"}
               </Text>
             </HStack>
             <Text fontSize="sm">{agent.activeTask}</Text>
@@ -112,7 +123,7 @@ const AgentSandboxCard = ({ agent }) => {
             <HStack mb={1}>
               <Icon as={FiBookOpen} color="gray.500" />
               <Text fontSize="sm" fontWeight="medium" color="gray.500">
-                LAST MEMORY
+                {isSystemAgent ? "LATEST ACTIVITY" : "LAST MEMORY"}
               </Text>
             </HStack>
             <Text fontSize="sm">{agent.lastMemoryEntry}</Text>
@@ -137,15 +148,15 @@ const AgentSandboxCard = ({ agent }) => {
           
           <Divider />
           
-          {/* Reflection */}
+          {/* Reflection or Thinking State for Orchestrator */}
           <Box>
             <HStack mb={1}>
               <Icon as={FiThumbsUp} color="gray.500" />
               <Text fontSize="sm" fontWeight="medium" color="gray.500">
-                REFLECTION
+                {isSystemAgent ? "THINKING STATE" : "REFLECTION"}
               </Text>
             </HStack>
-            <Text fontSize="sm" fontStyle="italic">
+            <Text fontSize="sm" fontStyle="italic" color={isSystemAgent ? "purple.500" : "inherit"}>
               "{agent.reflection}"
             </Text>
           </Box>
@@ -155,4 +166,38 @@ const AgentSandboxCard = ({ agent }) => {
   );
 };
 
-export default AgentSandboxCard;
+// Component to display both regular agents and the Orchestrator
+const AgentSandboxPanel = () => {
+  // Mock agents - would be replaced with actual data from API
+  const agents = [
+    orchestratorAgent,
+    {
+      id: 'hal',
+      name: 'HAL',
+      status: 'active',
+      activeTask: 'Researching React state management',
+      lastMemoryEntry: 'User requested comparison of Context API and Redux',
+      tools: ['search.web', 'copy.generate', 'code.analyze'],
+      reflection: 'The user seems to be building a React application and needs guidance on state management approaches.'
+    },
+    {
+      id: 'ash',
+      name: 'ASH',
+      status: 'idle',
+      activeTask: 'None',
+      lastMemoryEntry: 'Completed data analysis task',
+      tools: ['data.analyze', 'chart.create', 'file.read'],
+      reflection: 'Ready for new data processing tasks.'
+    }
+  ];
+
+  return (
+    <Box>
+      {agents.map((agent) => (
+        <AgentSandboxCard key={agent.id} agent={agent} />
+      ))}
+    </Box>
+  );
+};
+
+export default AgentSandboxPanel;

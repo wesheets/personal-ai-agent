@@ -10,6 +10,7 @@ import {
   Badge,
   Divider
 } from '@chakra-ui/react';
+import orchestratorAgent from '../data/orchestratorAgent';
 
 const AgentChat = ({ agentId = 'hal' }) => {
   const bgColor = useColorModeValue('white', 'gray.800');
@@ -19,31 +20,52 @@ const AgentChat = ({ agentId = 'hal' }) => {
   const messages = [
     {
       id: '1',
+      sender: 'orchestrator',
+      content: 'Consultation received.',
+      timestamp: new Date(Date.now() - 1000 * 60 * 10),
+      agentName: 'Orchestrator'
+    },
+    {
+      id: '2',
+      sender: 'orchestrator',
+      content: 'Assigning HAL to onboarding sequence...',
+      timestamp: new Date(Date.now() - 1000 * 60 * 9),
+      agentName: 'Orchestrator'
+    },
+    {
+      id: '3',
       sender: 'system',
       content: 'HAL is running: tool.search.web',
       timestamp: new Date(Date.now() - 1000 * 60 * 5)
     },
     {
-      id: '2',
+      id: '4',
       sender: 'agent',
       content: 'I found several relevant articles about React state management. Would you like me to summarize the key points?',
       timestamp: new Date(Date.now() - 1000 * 60 * 4),
       agentName: 'HAL'
     },
     {
-      id: '3',
+      id: '5',
       sender: 'operator',
       content: 'Yes, please focus on the differences between Context API and Redux.',
       timestamp: new Date(Date.now() - 1000 * 60 * 3)
     },
     {
-      id: '4',
+      id: '6',
+      sender: 'orchestrator',
+      content: 'Checkpoint created: agent_onboarding_complete',
+      timestamp: new Date(Date.now() - 1000 * 60 * 2.5),
+      agentName: 'Orchestrator'
+    },
+    {
+      id: '7',
       sender: 'system',
       content: 'HAL is running: tool.copy.generate',
       timestamp: new Date(Date.now() - 1000 * 60 * 2)
     },
     {
-      id: '5',
+      id: '8',
       sender: 'agent',
       content: 'Here\'s a comparison of Context API and Redux:\n\n**Context API**:\n- Built into React\n- Simpler setup\n- Good for low-frequency updates\n- Less boilerplate\n- No middleware support\n\n**Redux**:\n- External library\n- More structured approach\n- Better for complex state logic\n- Developer tools\n- Middleware support\n\nContext API is generally better for smaller applications or when you need to share state between a few components. Redux shines in larger applications with complex state management needs.',
       timestamp: new Date(Date.now() - 1000 * 60),
@@ -62,8 +84,9 @@ const AgentChat = ({ agentId = 'hal' }) => {
     
     switch(name.toLowerCase()) {
       case 'hal': return 'blue';
-      case 'ash': return 'purple';
-      case 'nova': return 'green';
+      case 'ash': return 'teal';
+      case 'nova': return 'orange';
+      case 'orchestrator': return 'purple';
       default: return 'gray';
     }
   };
@@ -123,6 +146,36 @@ const AgentChat = ({ agentId = 'hal' }) => {
                   borderTopRightRadius="0"
                 >
                   <Text>{message.content}</Text>
+                  <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.300')} textAlign="right" mt={1}>
+                    {formatTime(message.timestamp)}
+                  </Text>
+                </Box>
+              </Flex>
+            ) : message.sender === 'orchestrator' ? (
+              // Orchestrator message (left-aligned with special styling)
+              <Flex>
+                <Avatar 
+                  size="sm" 
+                  name={message.agentName} 
+                  bg={`${getAgentColor(message.agentName)}.500`}
+                  color="white"
+                  mr={2}
+                  icon={<Box as="span" fontSize="xs">🔄</Box>}
+                />
+                <Box
+                  maxW="80%"
+                  bg={useColorModeValue('purple.50', 'purple.900')}
+                  p={3}
+                  borderRadius="lg"
+                  borderTopLeftRadius="0"
+                  borderLeftWidth="2px"
+                  borderLeftColor="purple.500"
+                >
+                  <HStack mb={1}>
+                    <Text fontWeight="bold" fontSize="sm" color="purple.500">{message.agentName}</Text>
+                    <Badge colorScheme="purple" variant="subtle" size="sm">System</Badge>
+                  </HStack>
+                  <Text whiteSpace="pre-wrap" fontStyle="italic">{message.content}</Text>
                   <Text fontSize="xs" color={useColorModeValue('gray.600', 'gray.300')} textAlign="right" mt={1}>
                     {formatTime(message.timestamp)}
                   </Text>

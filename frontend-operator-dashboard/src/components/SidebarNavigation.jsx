@@ -8,7 +8,8 @@ import {
   Divider,
   useColorModeValue,
   Collapse,
-  Image
+  Image,
+  Badge
 } from '@chakra-ui/react';
 import { 
   FiUsers, 
@@ -21,8 +22,11 @@ import {
   FiCpu,
   FiMessageSquare,
   FiSettings,
-  FiHelpCircle
+  FiHelpCircle,
+  FiBriefcase,
+  FiGrid
 } from 'react-icons/fi';
+import orchestratorAgent from '../data/orchestratorAgent';
 
 const SidebarNavigation = () => {
   const [openSections, setOpenSections] = useState({
@@ -78,7 +82,7 @@ const SidebarNavigation = () => {
     </Box>
   );
   
-  const NavItem = ({ text, icon, isActive = false }) => (
+  const NavItem = ({ text, icon, isActive = false, color, isSystem = false }) => (
     <Flex
       py={2}
       px={4}
@@ -89,8 +93,28 @@ const SidebarNavigation = () => {
       color={isActive ? activeTextColor : 'inherit'}
       _hover={{ bg: isActive ? activeBgColor : hoverBgColor }}
     >
-      {icon && <Icon as={icon} mr={3} />}
+      {icon && (
+        <Box position="relative" mr={3}>
+          <Icon as={icon} color={color ? `${color}.500` : undefined} />
+          {isSystem && (
+            <Box 
+              position="absolute" 
+              bottom="-2px" 
+              right="-2px" 
+              w="6px" 
+              h="6px" 
+              borderRadius="full" 
+              bg={color ? `${color}.500` : "purple.500"} 
+            />
+          )}
+        </Box>
+      )}
       <Text fontSize="sm">{text}</Text>
+      {isSystem && (
+        <Badge ml={2} colorScheme={color || "purple"} fontSize="xs" variant="subtle">
+          System
+        </Badge>
+      )}
     </Flex>
   );
 
@@ -146,9 +170,16 @@ const SidebarNavigation = () => {
           isOpen={openSections.agents}
           onToggle={() => toggleSection('agents')}
         >
-          <NavItem text="HAL" icon={FiCpu} isActive={true} />
-          <NavItem text="ASH" icon={FiCpu} />
-          <NavItem text="NOVA" icon={FiCpu} />
+          {/* Orchestrator - System Agent */}
+          <NavItem 
+            text="Orchestrator" 
+            icon={FiGrid} 
+            color="purple" 
+            isSystem={true} 
+          />
+          <NavItem text="HAL" icon={FiCpu} isActive={true} color="blue" />
+          <NavItem text="ASH" icon={FiCpu} color="teal" />
+          <NavItem text="NOVA" icon={FiCpu} color="orange" />
           <NavItem text="All Agents" icon={FiUsers} />
         </NavSection>
         
