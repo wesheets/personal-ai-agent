@@ -1,43 +1,28 @@
-# Phase 10.0: Orchestrator Instruction Schema Engine Implementation
+# Debug Tracker System Implementation
 
-## Backend Structure
-- [ ] Create `/backend` directory at project root
-- [ ] Create `instruction_engine.ts` file with Instruction interface
-- [ ] Implement instruction_registry data structure
+## Tasks
+- [x] Step 1: Create Markdown Debug Tracker
+  - [x] Add new file: `debug_tracker.md` to `/logs` directory
+  - [x] Format it as a live table to track test status, agent routes, and results
 
-## Data Models
-- [ ] Define Instruction interface with all required properties:
-  - instruction_id, goal_id, thread_id, agent_id, task_summary, tools_required
-  - expected_outputs, loop_enforcement, allow_retry, escalate_on_failure
-  - status, last_updated
-- [ ] Implement methods for creating instructions
-- [ ] Implement methods for updating instruction status
-- [ ] Implement validation methods for instructions
+- [x] Step 2: Add Diagnostic Logger Utility
+  - [x] Create file: `/utils/debug_logger.py`
+  - [x] Implement log_test_result function
 
-## UI Components
-- [ ] Create `InstructionPreviewCard.tsx` component
-- [ ] Update `AgentSandboxCard.tsx` to include Active Instruction panel
-- [ ] Enhance `AgentChat.tsx` to log instruction assignments
-- [ ] Add progress indicators for instruction outputs
+- [x] Step 3: Add Tracking to Memory and Delegation
+  - [x] Import and use debug_logger in delegate.py
+  - [x] Import and use debug_logger in memory.py
+  - [x] Import and use debug_logger in system.py
 
-## Orchestrator Integration
-- [ ] Add functionality to generate goal_id
-- [ ] Implement instruction object generation
-- [ ] Add delegation mechanism to assign instructions to agents
-- [ ] Implement logging for instruction creation in chat
+- [x] Step 4: Add Placeholder Tests for Each Module
+  - [x] Create script: `/tests/run_debug_sequence.py`
+  - [x] Implement tests for critical routes
 
-## Validation Logic
-- [ ] Implement checkpoint enforcement
-- [ ] Add reflection enforcement
-- [ ] Implement escalation logic for failed validations
-- [ ] Add validation for expected outputs
+- [x] Step 5: Test Implementation
+  - [x] Verify debug_tracker.md is populated with logs
+  - [x] Test with sample tasks
 
-## Testing and Deployment
-- [ ] Test instruction creation and assignment
-- [ ] Test validation and escalation logic
-- [ ] Push changes to GitHub
-- [ ] Verify deployment functionality
-
-## Documentation
-- [ ] Document instruction schema and usage
-- [ ] Notify operator of completed implementation
+- [ ] Step 6: Commit and Push Changes
+  - [ ] Create feature branch
+  - [ ] Commit changes
+  - [ ] Push to GitHub

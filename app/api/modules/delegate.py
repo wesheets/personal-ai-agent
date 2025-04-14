@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any, Union
 import uuid
 from datetime import datetime
+from src.utils.debug_logger import log_test_result
 
 class DelegationRequest(BaseModel):
     task_id: Optional[str] = None
@@ -49,6 +50,7 @@ router = APIRouter()
 #             
 #             # Check if agent exists
 #             if delegation_request.agent_name not in agent_registry:
+#                 log_test_result("Delegation", "/api/delegate", "FAIL", f"Agent '{delegation_request.agent_name}' not found", "Agent not in registry")
 #                 return JSONResponse(content={
 #                     "status": "error",
 #                     "log": f"Agent '{delegation_request.agent_name}' not found."
@@ -61,6 +63,7 @@ router = APIRouter()
 #             # Check if agent has all required capabilities
 #             missing_capabilities = [cap for cap in delegation_request.required_capabilities if cap not in agent_capabilities]
 #             if missing_capabilities:
+#                 log_test_result("Delegation", "/api/delegate", "FAIL", f"Missing capabilities: {', '.join(missing_capabilities)}", f"Agent '{delegation_request.agent_name}' lacks required capabilities")
 #                 return JSONResponse(content={
 #                     "status": "error",
 #                     "log": f"Agent '{delegation_request.agent_name}' lacks required capability: {', '.join(missing_capabilities)}."
@@ -83,6 +86,9 @@ router = APIRouter()
 #             memory_trace_id=delegation_request.memory_trace_id
 #         )
 #         
+#         # Log successful memory write
+#         log_test_result("Delegation", "/api/delegate", "PASS", f"Agent {delegation_request.agent_name} assigned task", f"Task ID: {delegation_request.task_id}")
+#         
 #         # Write delegation memory for the delegating agent (from_agent) if specified
 #         if delegation_request.from_agent:
 #             delegating_message = f"Delegated task to {delegation_request.agent_name.upper()}: {delegation_request.objective}"
@@ -98,6 +104,7 @@ router = APIRouter()
 #                 memory_trace_id=delegation_request.memory_trace_id
 #             )
 #             print(f"✅ Delegation memory written for delegating agent: {delegation_request.from_agent}")
+#             log_test_result("Delegation", "/api/delegate/from", "PASS", f"Delegation memory written for {delegation_request.from_agent}", f"To: {delegation_request.agent_name}")
 #         
 #         result_summary = "Agent accepted task."
 #         
@@ -138,6 +145,7 @@ router = APIRouter()
 #                                 task_id=delegation_request.task_id,
 #                                 memory_trace_id=delegation_request.memory_trace_id
 #                             )
+#                             log_test_result("Delegation", "/api/modules/agent/loop", "PASS", "Loop execution completed", f"Agent: {delegation_request.agent_name}")
 #                 else:
 #                     # Use run for simpler tasks
 #                     async with httpx.AsyncClient() as client:
@@ -165,9 +173,11 @@ router = APIRouter()
 #                                 task_id=delegation_request.task_id,
 #                                 memory_trace_id=delegation_request.memory_trace_id
 #                             )
+#                             log_test_result("Delegation", "/api/modules/agent/run", "PASS", "Run execution completed", f"Agent: {delegation_request.agent_name}")
 #             except Exception as e:
 #                 print(f"❌ Auto-execute error: {str(e)}")
 #                 result_summary = f"Task accepted but auto-execute failed: {str(e)}"
+#                 log_test_result("Delegation", "/api/delegate/auto-execute", "FAIL", f"Auto-execute failed: {str(e)}", f"Agent: {delegation_request.agent_name}")
 #         
 #         # Return structured response
 #         return {
@@ -180,12 +190,14 @@ router = APIRouter()
 #         }
 #     except HTTPException as e:
 #         print(f"❌ Delegation Engine error: {str(e.detail)}")
+#         log_test_result("Delegation", "/api/delegate", "FAIL", f"HTTP Exception: {str(e.detail)}", "Check request format")
 #         return JSONResponse(status_code=e.status_code, content={
 #             "status": "error",
 #             "log": e.detail
 #         })
 #     except Exception as e:
 #         print(f"❌ Delegation Engine error: {str(e)}")
+#         log_test_result("Delegation", "/api/delegate", "FAIL", f"Exception: {str(e)}", "Unexpected error")
 #         return JSONResponse(status_code=500, content={
 #             "status": "error",
 #             "log": str(e)
