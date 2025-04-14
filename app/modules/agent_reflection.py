@@ -6,10 +6,34 @@ and tag them to specific goals.
 """
 
 from src.utils.debug_logger import log_test_result
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import json
 import uuid
 from datetime import datetime
+
+def generate_reflection(goal: str, success: bool, output_summary: str) -> Dict[str, Any]:
+    """
+    Generate a reflection for an agent based on task completion status.
+    
+    Args:
+        goal: The goal that was attempted
+        success: Whether the goal was successfully completed
+        output_summary: Summary of the output
+        
+    Returns:
+        Dictionary containing the reflection data
+    """
+    return {
+        "type": "reflection",
+        "goal": goal,
+        "status": "complete" if success else "failed",
+        "tags": [
+            f"instruction.goal:{goal}",
+            "reflection",
+            "phase:11.2"
+        ],
+        "content": f"Based on the output, I {'successfully' if success else 'unsuccessfully'} completed the goal: {goal}. Summary: {output_summary}"
+    }
 
 def generate_agent_reflection(agent_id: str, goal: str, tool_result: Dict[str, Any]) -> str:
     """

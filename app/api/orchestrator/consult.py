@@ -6,17 +6,19 @@ import uuid
 from datetime import datetime
 from src.utils.debug_logger import log_test_result
 
-# Import stubs (to be implemented)
-# These will be replaced with actual implementations later
+# Import modules
 from app.modules.agent_tool_runner import run_agent_tool
-from app.modules.agent_reflection import generate_agent_reflection
+from app.modules.agent_reflection import generate_reflection
 from app.modules.instruction_validator import validate_instruction_outputs
+from app.modules.memory_writer import write_memory
 
 class InstructionSchema(BaseModel):
     agent: str
     goal: str
     expected_outputs: List[str]
     checkpoints: Optional[List[str]] = []
+    goal_id: Optional[str] = None
+    instruction_id: Optional[str] = None
     
 router = APIRouter()
 
@@ -72,31 +74,6 @@ async def consult_agent(request: Request):
             )
             raise HTTPException(status_code=500, detail=f"Agent tool execution failed: {str(e)}")
         
-        # Generate reflection
-        try:
-            reflection = generate_agent_reflection(
-                agent_id=instruction.agent,
-                goal=instruction.goal,
-                tool_result=tool_result
-            )
-            
-            log_test_result(
-                "Agent", 
-                f"/api/agent/{instruction.agent}/reflect", 
-                "PASS", 
-                "Agent reflection generated", 
-                f"Goal: {instruction.goal}"
-            )
-        except Exception as e:
-            log_test_result(
-                "Agent", 
-                f"/api/agent/{instruction.agent}/reflect", 
-                "FAIL", 
-                f"Agent reflection failed: {str(e)}", 
-                f"Goal: {instruction.goal}"
-            )
-            raise HTTPException(status_code=500, detail=f"Agent reflection failed: {str(e)}")
-        
         # Validate outputs against expected outputs
         try:
             validation_result = validate_instruction_outputs(
@@ -125,13 +102,57 @@ async def consult_agent(request: Request):
             )
             raise HTTPException(status_code=500, detail=f"Instruction validation failed: {str(e)}")
         
+        # Generate reflection using the new function
+        try:
+            # Create a summary of the output
+            summary_output = details if isinstance(details, str) else str(details)
+            
+            # Generate reflection
+            reflection_data = generate_reflection(
+                goal=instruction.goal,
+                success=(status == "complete"),
+                output_summary=summary_output
+            )
+            
+            # Add thread_id if goal_id or instruction_id is available
+            if instruction.goal_id:
+                reflection_data["thread_id"] = instruction.goal_id
+            elif instruction.instruction_id:
+                reflection_data["thread_id"] = instruction.instruction_id
+            
+            # Write reflection to memory
+            memory_result = write_memory(
+                agent_id=instruction.agent,
+                type=reflection_data["type"],
+                content=reflection_data["content"],
+                tags=reflection_data["tags"],
+                goal_id=instruction.goal_id if instruction.goal_id else instruction.instruction_id
+            )
+            
+            log_test_result(
+                "Reflection", 
+                "/consult", 
+                status.upper(), 
+                "Tagged reflection written", 
+                f"Goal: {instruction.goal}"
+            )
+        except Exception as e:
+            log_test_result(
+                "Reflection", 
+                "/consult", 
+                "FAIL", 
+                f"Reflection generation failed: {str(e)}", 
+                f"Goal: {instruction.goal}"
+            )
+            raise HTTPException(status_code=500, detail=f"Reflection generation failed: {str(e)}")
+        
         # Return response
         return {
             "status": status,
             "consultation_id": consultation_id,
             "agent": instruction.agent,
             "goal": instruction.goal,
-            "reflection": reflection,
+            "reflection": reflection_data["content"],
             "validation_details": details
         }
     except HTTPException as e:
