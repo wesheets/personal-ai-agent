@@ -1,49 +1,105 @@
 // src/pages/LoginPage.jsx
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { isAuthenticated, login } from '../hooks/useAuth'
+import { Box, Button, Flex, Heading, Input, Text, VStack, useToast } from '@chakra-ui/react'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const toast = useToast()
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (email === 'admin@promethios.ai' && password === 'ignite') {
-      login()
-      navigate('/hal')
+    
+    const operatorUsername = import.meta.env.VITE_OPERATOR_USERNAME || 'admin'
+    const operatorPassword = import.meta.env.VITE_OPERATOR_PASSWORD || 'password'
+    
+    if (username === operatorUsername && password === operatorPassword) {
+      // Set auth in localStorage or context
+      localStorage.setItem('isAuthenticated', 'true')
+      
+      // Show success toast
+      toast({
+        title: 'Login successful',
+        description: 'Welcome, Operator.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      })
+      
+      // Redirect to dashboard
+      navigate('/dashboard')
     } else {
-      setError('Invalid login credentials')
+      setError('Invalid operator credentials')
     }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
-      <img src="/promethioslogo.png" alt="Promethios Logo" className="w-72 mb-6 animate-pulse" />
-      <form onSubmit={handleSubmit} className="bg-white text-black p-6 rounded-md w-96 space-y-4">
-        <h2 className="text-xl font-semibold text-center">Login to Promethios</h2>
-        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        <button type="submit" className="w-full bg-black text-white p-2 rounded hover:bg-gray-800">
-          Login
-        </button>
-      </form>
-      <p className="text-xs mt-10 opacity-20">The fire was stolen for a reason.</p>
-    </div>
+    <Flex 
+      direction="column" 
+      align="center" 
+      justify="center" 
+      minH="100vh" 
+      bg="black" 
+      color="white"
+      p={4}
+    >
+      <Box 
+        w={["90%", "80%", "60%", "450px"]} 
+        p={8} 
+        borderRadius="md" 
+        bg="gray.900" 
+        boxShadow="lg"
+      >
+        <VStack spacing={6}>
+          <Heading size="lg" textAlign="center">Promethios Operator Interface</Heading>
+          
+          <Text fontSize="md" color="orange.400" textAlign="center" fontStyle="italic">
+            The fire has been lit. Operator input required.
+          </Text>
+          
+          {error && <Text color="red.400" fontSize="sm">{error}</Text>}
+          
+          <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+            <VStack spacing={4} w="100%">
+              <Input
+                placeholder="Operator ID"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                bg="gray.800"
+                border="none"
+                _focus={{ borderColor: "orange.400" }}
+              />
+              
+              <Input
+                type="password"
+                placeholder="Access Code"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                bg="gray.800"
+                border="none"
+                _focus={{ borderColor: "orange.400" }}
+              />
+              
+              <Button 
+                type="submit" 
+                w="100%" 
+                colorScheme="orange" 
+                variant="solid"
+                _hover={{ bg: "orange.500" }}
+              >
+                Authenticate
+              </Button>
+            </VStack>
+          </form>
+        </VStack>
+      </Box>
+      
+      <Text fontSize="xs" mt={10} opacity={0.3}>
+        Promethios Orchestration System v10.0
+      </Text>
+    </Flex>
   )
 }
