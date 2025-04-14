@@ -44,6 +44,12 @@ try:
     from app.api.modules.plan import router as plan_router  # Plan Generator module router
     from app.api.modules.project import router as project_router  # Project Management module router
     
+    # Import missing routers identified in Postman sweep
+    from app.api.orchestrator import consult  # Orchestrator consult router
+    from app.api.modules import delegate  # Delegate router
+    from app.api.modules import system  # System status router
+    from app.api.modules import agent  # Agent list router
+    
     # MODIFIED: Commented out problematic routes
     """
     from app.api.agent import router as agent_router
@@ -337,6 +343,23 @@ try:
     print("📡 Including Agent Fallback module router from /app/modules/agent_fallback.py")
     print("📡 Including Task Supervisor module router from /app/modules/task_supervisor.py")
     
+    # Register missing routers identified in Postman sweep
+    print("📡 Including Orchestrator Consult router from /app/api/orchestrator/consult.py")
+    app.include_router(consult.router, prefix="/api/orchestrator")
+    print("🧠 Route defined: /api/orchestrator/consult -> consult_agent")
+    
+    print("📡 Including Delegate router from /app/api/modules/delegate.py")
+    app.include_router(delegate.router, prefix="/api")
+    print("🧠 Route defined: /api/delegate -> delegate_task")
+    
+    print("📡 Including System Status router from /app/api/modules/system.py")
+    app.include_router(system.router, prefix="/api/system")
+    print("🧠 Route defined: /api/system/status -> get_system_status")
+    
+    print("📡 Including Agent List router from /app/api/modules/agent.py")
+    app.include_router(agent.router, prefix="/api/agent")
+    print("🧠 Route defined: /api/agent/list -> list_agents")
+    
     # Mount the AgentRunner module router
     print(f"🔍 DEBUG: AgentRunner module router object: {agent_module_router}")
     app.include_router(agent_module_router, prefix="/api/modules/agent")
@@ -496,33 +519,31 @@ try:
     
     # Mount health router
     app.include_router(health_router)
-    
-    # Commented out static files mount to prevent crash in container deployment
-    # app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    print("🧠 Route defined: /health -> health_check")
     
     # Log successful startup
     print("✅ All routes registered successfully")
-    print("✅ API is ready to accept requests")
+    print("🚀 Enhanced AI Agent System startup complete")
     
 except Exception as e:
-    # Log the error
-    print(f"❌ ERROR DURING STARTUP: {str(e)}")
+    # Global error handler for startup failures
+    print(f"❌ CRITICAL ERROR DURING STARTUP: {str(e)}")
+    import traceback
+    traceback.print_exc()
     
-    # Create a minimal FastAPI app that can respond to health checks
+    # Initialize a minimal FastAPI app for health checks
     app = FastAPI(
-        title="Enhanced AI Agent System [ERROR MODE]",
-        description="Error occurred during startup. Only health endpoints are available.",
+        title="Enhanced AI Agent System (RECOVERY MODE)",
+        description="Recovery mode due to startup failure",
         version="1.0.0"
     )
     
-    # Add health endpoints that still return OK to prevent container restarts
-    @app.get("/health")
-    async def health_error_mode():
-        return {"status": "error", "message": "Error during startup"}
-    
     @app.get("/")
-    async def root_health_error_mode():
-        return {"status": "error", "message": "Error during startup"}
+    async def recovery_root():
+        """Root endpoint in recovery mode."""
+        return {"status": "error", "message": "System in recovery mode due to startup failure"}
     
-    # Log the fallback mode
-    print("⚠️ Started in ERROR MODE with minimal health endpoints")
+    @app.get("/health")
+    async def recovery_health():
+        """Health check endpoint in recovery mode."""
+        return {"status": "error", "message": "System in recovery mode due to startup failure"}
