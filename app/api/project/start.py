@@ -3,11 +3,10 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any, Union
 import uuid
-import httpx
 import asyncio
 from datetime import datetime
 from src.utils.debug_logger import log_test_result
-from app.main import app  # Import the FastAPI app instance for internal routing
+from app.utils.chain_runner import run_internal_chain  # Import the chain runner helper
 
 router = APIRouter()
 
@@ -86,108 +85,67 @@ async def start_project(request: Request):
         
         # Execute the chain by calling /api/orchestrator/chain internally
         try:
-            # Use internal FastAPI routing with httpx.AsyncClient and app parameter
-            # This avoids external HTTP requests that fail in Railway deployment
-            async with httpx.AsyncClient(app=app, base_url="http://testserver") as client:
-                chain_response = await client.post(
-                    "/api/orchestrator/chain",  # Use relative path for internal routing
-                    json=instruction_chain,
-                    timeout=300.0  # 5 minute timeout for the entire chain execution
-                )
-                
-                # Check if the request was successful
-                if chain_response.status_code != 200:
-                    error_detail = chain_response.text
-                    log_test_result(
-                        "Project", 
-                        "/api/project/start", 
-                        "ERROR", 
-                        f"Chain execution failed with status {chain_response.status_code}", 
-                        error_detail
-                    )
-                    return JSONResponse(
-                        status_code=500,
-                        content={
-                            "status": "error",
-                            "message": f"Chain execution failed: {error_detail}"
-                        }
-                    )
-                
-                # Parse the chain response
-                chain_result = chain_response.json()
-                
-                # Extract chain_id
-                chain_id = chain_result.get("chain_id", "unknown")
-                
-                # Format the response
-                response = {
-                    "project_id": project_id,
-                    "chain_id": chain_id,
-                    "agents": []
-                }
-                
-                # Extract agent results
-                for step in chain_result.get("steps", []):
-                    agent_result = {
-                        "agent": step.get("agent"),
-                        "status": step.get("status"),
-                        "reflection": step.get("reflection"),
-                        "outputs": step.get("outputs", [])
-                    }
-                    
-                    # Add retry information if available
-                    if step.get("retry_attempted"):
-                        agent_result["retry_attempted"] = True
-                        agent_result["retry_status"] = step.get("retry_status")
-                        agent_result["redeemed"] = step.get("redeemed")
-                        agent_result["redemption_reflection"] = step.get("redemption_reflection")
-                    
-                    response["agents"].append(agent_result)
-                
-                # Log successful chain execution
+            # Use the chain runner helper to avoid circular imports
+            # Pass request.app as the app reference instead of importing app directly
+            chain_result = await run_internal_chain(instruction_chain, request.app)
+            
+            # Check if the request was successful
+            if chain_result.get("status") == "error":
+                error_detail = chain_result.get("message", "Unknown error")
                 log_test_result(
                     "Project", 
                     "/api/project/start", 
-                    "SUCCESS", 
-                    f"Chain execution completed", 
-                    f"Project ID: {project_id}, Chain ID: {chain_id}, Agents: {len(response['agents'])}"
+                    "ERROR", 
+                    f"Chain execution failed", 
+                    error_detail
+                )
+                return JSONResponse(
+                    status_code=500,
+                    content={
+                        "status": "error",
+                        "message": f"Chain execution failed: {error_detail}"
+                    }
                 )
                 
-                return response
+            # Extract chain_id
+            chain_id = chain_result.get("chain_id", "unknown")
                 
-        except httpx.RequestError as e:
-            # Log connection error
+            # Format the response
+            response = {
+                "project_id": project_id,
+                "chain_id": chain_id,
+                "agents": []
+            }
+            
+            # Extract agent results
+            for step in chain_result.get("steps", []):
+                agent_result = {
+                    "agent": step.get("agent"),
+                    "status": step.get("status"),
+                    "reflection": step.get("reflection"),
+                    "outputs": step.get("outputs", [])
+                }
+                
+                # Add retry information if available
+                if step.get("retry_attempted"):
+                    agent_result["retry_attempted"] = True
+                    agent_result["retry_status"] = step.get("retry_status")
+                    agent_result["redeemed"] = step.get("redeemed")
+                    agent_result["redemption_reflection"] = step.get("redemption_reflection")
+                
+                response["agents"].append(agent_result)
+            
+            # Log successful chain execution
             log_test_result(
                 "Project", 
                 "/api/project/start", 
-                "ERROR", 
-                f"Connection error during chain execution", 
-                f"Error: {str(e)}"
+                "SUCCESS", 
+                f"Chain execution completed", 
+                f"Project ID: {project_id}, Chain ID: {chain_id}, Agents: {len(response['agents'])}"
             )
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "status": "error",
-                    "message": f"Connection error during chain execution: {str(e)}"
-                }
-            )
-        except httpx.TimeoutException as e:
-            # Log timeout error
-            log_test_result(
-                "Project", 
-                "/api/project/start", 
-                "ERROR", 
-                f"Timeout during chain execution", 
-                f"Error: {str(e)}"
-            )
-            return JSONResponse(
-                status_code=504,
-                content={
-                    "status": "error",
-                    "message": f"Timeout during chain execution: {str(e)}",
-                    "project_id": project_id
-                }
-            )
+            
+            return response
+                
         except Exception as e:
             # Log unexpected errors during chain execution
             log_test_result(
