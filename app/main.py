@@ -460,6 +460,14 @@ try:
             print(f"⚠️ Error logging routes: {str(e)}")
             logger.error(f"⚠️ Error logging routes: {str(e)}")
     
+    # Add dedicated route debug logger for troubleshooting 404 issues
+    @app.on_event("startup")
+    async def log_registered_routes():
+        print("\n🔍 [ROUTE DEBUG] Registered routes:")
+        for route in app.routes:
+            print(f"📍 {route.path} -> {route.name}")
+        print("✅ [ROUTE DEBUG] Route listing complete\n")
+    
     # Import and mount the orchestrator scope router
     from app.modules.orchestrator_scope import router as scope_router
     print(f"🔍 DEBUG: Orchestrator Scope router object: {scope_router}")
