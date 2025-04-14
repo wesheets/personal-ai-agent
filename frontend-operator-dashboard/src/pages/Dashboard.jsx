@@ -14,7 +14,7 @@ import {
 import { Navigate } from 'react-router-dom';
 import SidebarNavigation from '../components/SidebarNavigation';
 import AgentChat from '../components/AgentChat';
-import AgentSandboxCard from '../components/AgentSandboxCard';
+import AgentSandboxPanel from '../components/AgentSandboxCard'; // Import AgentSandboxPanel instead of AgentSandboxCard
 import ToolOutputCard from '../components/ToolOutputCard';
 import CheckpointApprovalPanel from '../components/CheckpointApprovalPanel';
 import InputUI from '../components/InputUI';
@@ -32,38 +32,6 @@ const Dashboard = () => {
 
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
-  
-  // Mock data for agent sandbox cards - now including Orchestrator
-  const agents = [
-    orchestratorAgent, // Add Orchestrator as the first agent
-    {
-      id: 'hal',
-      name: 'HAL',
-      status: 'executing',
-      activeTask: 'Researching React state management',
-      lastMemoryEntry: 'Found 5 articles about Redux vs Context API',
-      tools: ['search.web', 'code.generate', 'copy.write'],
-      reflection: 'Current task requires deep technical knowledge. Will focus on practical examples.'
-    },
-    {
-      id: 'ash',
-      name: 'ASH',
-      status: 'idle',
-      activeTask: 'Waiting for new instructions',
-      lastMemoryEntry: 'Completed API documentation task',
-      tools: ['code.review', 'api.test', 'docs.generate'],
-      reflection: 'Ready for next assignment. Previous task completed with 98% accuracy.'
-    },
-    {
-      id: 'nova',
-      name: 'NOVA',
-      status: 'paused',
-      activeTask: 'Content generation for blog post',
-      lastMemoryEntry: 'Draft created, awaiting operator approval',
-      tools: ['copy.write', 'image.generate', 'seo.analyze'],
-      reflection: 'Content draft needs technical review before proceeding.'
-    }
-  ];
   
   // Mock data for tool outputs
   const toolOutputs = [
@@ -142,12 +110,10 @@ const Dashboard = () => {
         <GridItem>
           <Box position="sticky" top="70px" maxH="calc(100vh - 70px)" overflowY="auto">
             <VStack spacing={4} align="stretch">
-              {/* Agent Sandbox Cards */}
+              {/* Agent Sandbox Panel - Use the panel component instead of individual cards */}
               <Box>
                 <Heading size="md" mb={3}>Agent Sandbox</Heading>
-                {agents.map(agent => (
-                  <AgentSandboxCard key={agent.id} agent={agent} />
-                ))}
+                <AgentSandboxPanel />
               </Box>
               
               {/* Checkpoint Approval Panel */}
