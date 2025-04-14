@@ -1,42 +1,43 @@
-# Phase 9.0 + 9.1 Threaded Conversation Architecture Implementation
+# Phase 10.0: Orchestrator Instruction Schema Engine Implementation
 
-## Tasks
-- [x] Examine current project state
-- [x] Examine existing component implementations
-- [x] Verify integration in Dashboard UI
-- [ ] Enhance Dashboard layout for threaded UI
-  - [ ] Update Dashboard.tsx to include proper three-panel layout
-  - [ ] Ensure ThreadedChat is properly integrated in center panel
-  - [ ] Add proper input component at bottom of chat
-- [ ] Implement thread permissions and attachments
-  - [ ] Implement thread-based permissions for agent execution
-  - [ ] Enhance message bubbles to display attachments
-  - [ ] Add attachment upload/preview functionality
-- [ ] Add thread export functionality
-  - [ ] Implement Markdown export
-  - [ ] Implement PDF export
-- [ ] Test and debug threaded UI
-  - [ ] Create comprehensive test data
-  - [ ] Test all thread operations (reply, expand/collapse, resolve)
-  - [ ] Test advanced features (summarize, export, permissions)
-- [ ] Document implementation and usage
-- [ ] Deploy and verify functionality
+## Backend Structure
+- [ ] Create `/backend` directory at project root
+- [ ] Create `instruction_engine.ts` file with Instruction interface
+- [ ] Implement instruction_registry data structure
 
-## Notes
-- Most of the required components for threaded conversations already exist
-- The Message.ts model already includes thread_parent_id and other required fields
-- ThreadedChat, AgentMessageBubble, ThreadReplyInput, ThreadSummaryCard, and ThreadToolbar components are implemented
-- Need to enhance Dashboard layout to better integrate these components
-- Need to implement actual export functionality and thread permissions
-- Need to ensure proper attachment support in message bubbles
+## Data Models
+- [ ] Define Instruction interface with all required properties:
+  - instruction_id, goal_id, thread_id, agent_id, task_summary, tools_required
+  - expected_outputs, loop_enforcement, allow_retry, escalate_on_failure
+  - status, last_updated
+- [ ] Implement methods for creating instructions
+- [ ] Implement methods for updating instruction status
+- [ ] Implement validation methods for instructions
 
-## Previous Phase 8.0.B Tasks (Completed)
-- [x] Check current repository state
-- [x] Fix login system with environment variables
-- [x] Implement three-panel dashboard layout
-- [x] Add Tool Output Panel
-- [x] Add Checkpoint Approval Panel
-- [x] Create InputUI component for fixed input bar
-- [x] Integrate all components into Dashboard layout
-- [x] Commit and push changes
-- [x] Notify operator of completion
+## UI Components
+- [ ] Create `InstructionPreviewCard.tsx` component
+- [ ] Update `AgentSandboxCard.tsx` to include Active Instruction panel
+- [ ] Enhance `AgentChat.tsx` to log instruction assignments
+- [ ] Add progress indicators for instruction outputs
+
+## Orchestrator Integration
+- [ ] Add functionality to generate goal_id
+- [ ] Implement instruction object generation
+- [ ] Add delegation mechanism to assign instructions to agents
+- [ ] Implement logging for instruction creation in chat
+
+## Validation Logic
+- [ ] Implement checkpoint enforcement
+- [ ] Add reflection enforcement
+- [ ] Implement escalation logic for failed validations
+- [ ] Add validation for expected outputs
+
+## Testing and Deployment
+- [ ] Test instruction creation and assignment
+- [ ] Test validation and escalation logic
+- [ ] Push changes to GitHub
+- [ ] Verify deployment functionality
+
+## Documentation
+- [ ] Document instruction schema and usage
+- [ ] Notify operator of completed implementation
