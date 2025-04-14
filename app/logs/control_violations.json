@@ -1,0 +1,23 @@
+{
+  "violations": [
+    {
+      "id": "violation-1743294350.253763",
+      "timestamp": "2025-03-29T20:25:50.253750",
+      "agent": "research",
+      "tool": "github_commit",
+      "action": "attempted_use",
+      "status": "blocked",
+      "reason": "Tool 'github_commit' is not in the allowed tools list for agent 'research'",
+      "suggested_override": {
+        "type": "temporary",
+        "justification": "For diagnostic testing purposes",
+        "expiration": "2025-03-29T21:25:50.253793"
+      },
+      "context": {
+        "user_request": "Simulate control violation for diagnostic testing",
+        "agent_goal": "Complete system diagnostic",
+        "simulation": true
+      }
+    }
+  ]
+}

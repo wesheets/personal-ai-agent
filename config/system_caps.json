@@ -1,0 +1,4 @@
+{
+  "max_loops_per_task": 3,
+  "max_delegation_depth": 2
+}

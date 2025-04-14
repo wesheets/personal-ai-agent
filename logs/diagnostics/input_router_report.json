@@ -1,0 +1,54 @@
+{
+  "timestamp": "2025-03-29T20:55:00.175236",
+  "tests": [
+    {
+      "name": "test_text_input",
+      "description": "Test routing of text input",
+      "status": "passed",
+      "error": null,
+      "result": {
+        "routed_successfully": true,
+        "input_type": "text",
+        "log_file": "/home/ubuntu/personal-ai-agent/app/logs/input_logs/input_router_20250329_205500.json"
+      }
+    },
+    {
+      "name": "test_audio_input",
+      "description": "Test routing of audio input",
+      "status": "passed",
+      "error": null,
+      "result": {
+        "routed_successfully": true,
+        "input_type": "audio",
+        "file_path": "/tmp/tmp8g4_ag54/test_audio.wav",
+        "log_file": "/home/ubuntu/personal-ai-agent/app/logs/input_logs/input_router_20250329_205500.json"
+      }
+    },
+    {
+      "name": "test_file_upload",
+      "description": "Test routing of file uploads",
+      "status": "passed",
+      "error": null,
+      "result": {
+        "pdf_routed_successfully": true,
+        "pdf_input_type": "pdf",
+        "pdf_log_file": "/home/ubuntu/personal-ai-agent/app/logs/input_logs/input_router_20250329_205500.json"
+      }
+    },
+    {
+      "name": "test_auto_detection",
+      "description": "Test auto-detection of input types",
+      "status": "passed",
+      "error": null,
+      "result": {
+        "text_detected_as": "document",
+        "audio_detected_as": "audio"
+      }
+    }
+  ],
+  "summary": {
+    "total_tests": 4,
+    "passed_tests": 4,
+    "failed_tests": 0
+  }
+}

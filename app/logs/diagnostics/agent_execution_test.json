@@ -1,0 +1,162 @@
+{
+  "timestamp": "2025-03-29T20:25:11.134832",
+  "total_agents": 5,
+  "successful_agents": 4,
+  "agent_details": [
+    {
+      "name": "builder",
+      "config_loaded": true,
+      "tool_called": true,
+      "memory_stored": true,
+      "execution_logged": true,
+      "errors": [],
+      "config_summary": {
+        "name": "Builder Agent",
+        "role": "Create and optimize backend systems and architecture",
+        "tools": [
+          "code_executor",
+          "test_runner",
+          "refactor_suggester"
+        ]
+      },
+      "tool_result": {
+        "status": "success",
+        "tool": "code_executor",
+        "timestamp": "2025-03-29T20:25:11.135063",
+        "result": "Mocked result from code_executor"
+      },
+      "memory_result": {
+        "status": "success",
+        "agent": "builder",
+        "timestamp": "2025-03-29T20:25:11.135071",
+        "memory_id": "mock-memory-1743294311.135073"
+      },
+      "log_result": {
+        "status": "success",
+        "agent": "builder",
+        "timestamp": "2025-03-29T20:25:11.135102",
+        "log_id": "mock-log-1743294311.135104"
+      },
+      "status": "success"
+    },
+    {
+      "name": "research",
+      "config_loaded": true,
+      "tool_called": true,
+      "memory_stored": true,
+      "execution_logged": true,
+      "errors": [],
+      "config_summary": {
+        "name": "Research Agent",
+        "role": "Gather, analyze, and synthesize information to support decision-making",
+        "tools": [
+          "web_search",
+          "news_fetcher",
+          "url_summarizer"
+        ]
+      },
+      "tool_result": {
+        "status": "success",
+        "tool": "web_search",
+        "timestamp": "2025-03-29T20:25:11.135181",
+        "result": "Mocked result from web_search"
+      },
+      "memory_result": {
+        "status": "success",
+        "agent": "research",
+        "timestamp": "2025-03-29T20:25:11.135184",
+        "memory_id": "mock-memory-1743294311.135186"
+      },
+      "log_result": {
+        "status": "success",
+        "agent": "research",
+        "timestamp": "2025-03-29T20:25:11.135190",
+        "log_id": "mock-log-1743294311.135192"
+      },
+      "status": "success"
+    },
+    {
+      "name": "memory",
+      "config_loaded": true,
+      "tool_called": true,
+      "memory_stored": true,
+      "execution_logged": true,
+      "errors": [],
+      "config_summary": {
+        "name": "Memory Agent",
+        "role": "Organize, retrieve, and connect information across the agent system",
+        "tools": [
+          "web_search",
+          "pdf_ingest",
+          "url_summarizer"
+        ]
+      },
+      "tool_result": {
+        "status": "success",
+        "tool": "web_search",
+        "timestamp": "2025-03-29T20:25:11.135249",
+        "result": "Mocked result from web_search"
+      },
+      "memory_result": {
+        "status": "success",
+        "agent": "memory",
+        "timestamp": "2025-03-29T20:25:11.135253",
+        "memory_id": "mock-memory-1743294311.135254"
+      },
+      "log_result": {
+        "status": "success",
+        "agent": "memory",
+        "timestamp": "2025-03-29T20:25:11.135258",
+        "log_id": "mock-log-1743294311.135259"
+      },
+      "status": "success"
+    },
+    {
+      "name": "planner",
+      "config_loaded": false,
+      "tool_called": false,
+      "memory_stored": false,
+      "execution_logged": false,
+      "errors": [
+        "Config file not found: /home/ubuntu/personal-ai-agent/app/prompts/planner.json"
+      ]
+    },
+    {
+      "name": "ops",
+      "config_loaded": true,
+      "tool_called": true,
+      "memory_stored": true,
+      "execution_logged": true,
+      "errors": [],
+      "config_summary": {
+        "name": "Ops Agent",
+        "role": "Deploy, monitor, and maintain infrastructure and systems",
+        "tools": [
+          "code_executor",
+          "test_runner",
+          "github_commit"
+        ]
+      },
+      "tool_result": {
+        "status": "success",
+        "tool": "code_executor",
+        "timestamp": "2025-03-29T20:25:11.135336",
+        "result": "Mocked result from code_executor"
+      },
+      "memory_result": {
+        "status": "success",
+        "agent": "ops",
+        "timestamp": "2025-03-29T20:25:11.135339",
+        "memory_id": "mock-memory-1743294311.135341"
+      },
+      "log_result": {
+        "status": "success",
+        "agent": "ops",
+        "timestamp": "2025-03-29T20:25:11.135344",
+        "log_id": "mock-log-1743294311.135346"
+      },
+      "status": "success"
+    }
+  ],
+  "success_rate": 80.0
+}
