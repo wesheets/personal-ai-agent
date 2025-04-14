@@ -7,6 +7,7 @@ import httpx
 import asyncio
 from datetime import datetime
 from src.utils.debug_logger import log_test_result
+from app.main import app  # Import the FastAPI app instance for internal routing
 
 router = APIRouter()
 
@@ -83,11 +84,13 @@ async def start_project(request: Request):
             f"Chain length: {len(instruction_chain)}, Agents: hal → ash → nova"
         )
         
-        # Execute the chain by calling /api/orchestrator/chain
+        # Execute the chain by calling /api/orchestrator/chain internally
         try:
-            async with httpx.AsyncClient() as client:
+            # Use internal FastAPI routing with httpx.AsyncClient and app parameter
+            # This avoids external HTTP requests that fail in Railway deployment
+            async with httpx.AsyncClient(app=app, base_url="http://testserver") as client:
                 chain_response = await client.post(
-                    "http://localhost:3000/api/orchestrator/chain",
+                    "/api/orchestrator/chain",  # Use relative path for internal routing
                     json=instruction_chain,
                     timeout=300.0  # 5 minute timeout for the entire chain execution
                 )
@@ -166,6 +169,40 @@ async def start_project(request: Request):
                 content={
                     "status": "error",
                     "message": f"Connection error during chain execution: {str(e)}"
+                }
+            )
+        except httpx.TimeoutException as e:
+            # Log timeout error
+            log_test_result(
+                "Project", 
+                "/api/project/start", 
+                "ERROR", 
+                f"Timeout during chain execution", 
+                f"Error: {str(e)}"
+            )
+            return JSONResponse(
+                status_code=504,
+                content={
+                    "status": "error",
+                    "message": f"Timeout during chain execution: {str(e)}",
+                    "project_id": project_id
+                }
+            )
+        except Exception as e:
+            # Log unexpected errors during chain execution
+            log_test_result(
+                "Project", 
+                "/api/project/start", 
+                "ERROR", 
+                f"Unexpected error during chain execution", 
+                f"Error: {str(e)}"
+            )
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "status": "error",
+                    "message": f"Unexpected error during chain execution: {str(e)}",
+                    "project_id": project_id
                 }
             )
             
