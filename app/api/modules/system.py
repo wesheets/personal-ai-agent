@@ -32,12 +32,39 @@ logger = logging.getLogger("api.modules.system")
 # Create router
 router = APIRouter()
 print("🧠 Route defined: /api/modules/system/status -> get_system_status")
+print("🧠 Route defined: /api/system/health -> healthcheck")
 
 # Store server start time
 SERVER_START_TIME = datetime.datetime.now()
 
 # Track loaded modules
 LOADED_MODULES = ["memory", "agent", "system"]
+
+@router.get("/health")
+async def healthcheck():
+    """
+    Simple health check endpoint that returns a 200 OK status.
+    
+    This endpoint is used by Railway to verify the container is healthy.
+    It has no dependencies on database, agent registry, or memory systems
+    to ensure it always returns a 200 OK status.
+    
+    Returns:
+        dict: {"ok": True}
+    """
+    try:
+        # Log health check
+        logger.info("Health check endpoint accessed")
+        
+        # Return simple response with no dependencies
+        return {"ok": True}
+    except Exception as e:
+        # Log error but still return success to ensure healthcheck passes
+        logger.error(f"Error in health check endpoint: {str(e)}")
+        logger.error(traceback.format_exc())
+        
+        # Always return success for Railway healthcheck
+        return {"ok": True}
 
 def format_uptime():
     """
