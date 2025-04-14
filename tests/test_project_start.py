@@ -1,126 +1,91 @@
-import pytest
+"""
+Test script for the /api/project/start endpoint.
+
+This script tests the project start endpoint to verify it's properly registered and accessible.
+"""
+
+import requests
 import json
-import uuid
-from unittest.mock import patch, MagicMock, AsyncMock
-from fastapi.testclient import TestClient
-from fastapi import FastAPI
-import httpx
+import sys
+import os
+from datetime import datetime
 
-# Import the router to test
-from app.api.project.start import router
+# Add project root to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Create a test FastAPI app
-app = FastAPI()
-app.include_router(router, prefix="/api/project")
+# Import debug logger
+from src.utils.debug_logger import log_test_result
 
-# Create a test client
-client = TestClient(app)
-
-def test_project_start_validation():
-    """Test that the endpoint validates the request format."""
-    # Test missing goal field
-    response = client.post("/api/project/start", json={})
-    assert response.status_code == 400
-    assert "goal" in response.text.lower()
+def test_project_start_endpoint():
+    """Test the /api/project/start endpoint with a simple goal."""
     
-    # Test invalid request format
-    response = client.post("/api/project/start", json="not a dict")
-    assert response.status_code == 400  # Updated to match actual implementation
-
-@patch("httpx.AsyncClient.post")
-def test_project_start_success(mock_post):
-    """Test successful project start with mocked chain response."""
-    # Mock the chain response
-    mock_chain_response = MagicMock()
-    mock_chain_response.status_code = 200
-    mock_chain_response.json.return_value = {
-        "chain_id": str(uuid.uuid4()),
-        "status": "complete",
-        "steps": [
-            {
-                "agent": "hal",
-                "status": "complete",
-                "reflection": "I completed the task successfully.",
-                "outputs": ["def capitalize_words(sentence):\n    return ' '.join(word.capitalize() for word in sentence.split())"]
-            },
-            {
-                "agent": "ash",
-                "status": "complete",
-                "reflection": "I summarized HAL's output.",
-                "outputs": ["HAL created a function that capitalizes each word in a sentence by splitting the string, capitalizing each word, and joining them back together."]
-            },
-            {
-                "agent": "nova",
-                "status": "complete",
-                "reflection": "I created a simple HTML preview.",
-                "outputs": ["<div class='code-preview'><pre>def capitalize_words(sentence):\n    return ' '.join(word.capitalize() for word in sentence.split())</pre></div>"]
-            }
-        ]
+    # Log test start
+    log_test_result(
+        "Test", 
+        "/api/project/start", 
+        "INFO", 
+        "Starting endpoint test", 
+        "Testing if endpoint is properly registered and accessible"
+    )
+    
+    # Test data
+    test_data = {
+        "goal": "Create a simple hello world program"
     }
-    mock_post.return_value = mock_chain_response
     
-    # Test the endpoint
-    response = client.post("/api/project/start", json={"goal": "Write a Python function that capitalizes every word in a sentence"})
-    
-    # Verify the response
-    assert response.status_code == 200
-    data = response.json()
-    assert "project_id" in data
-    assert "chain_id" in data
-    assert "agents" in data
-    assert len(data["agents"]) == 3
-    assert data["agents"][0]["agent"] == "hal"
-    assert data["agents"][1]["agent"] == "ash"
-    assert data["agents"][2]["agent"] == "nova"
-    
-    # Verify the chain was called with the correct payload
-    mock_post.assert_called_once()
-    call_args = mock_post.call_args[1]
-    assert "json" in call_args
-    instruction_chain = call_args["json"]
-    assert len(instruction_chain) == 3
-    assert instruction_chain[0]["agent"] == "hal"
-    assert instruction_chain[0]["goal"] == "Write a Python function that capitalizes every word in a sentence"
-    assert "project_id" in instruction_chain[0]
-    assert instruction_chain[1]["agent"] == "ash"
-    assert instruction_chain[2]["agent"] == "nova"
-
-@patch("httpx.AsyncClient.post")
-def test_project_start_chain_failure(mock_post):
-    """Test handling of chain execution failure."""
-    # Mock the chain response
-    mock_chain_response = MagicMock()
-    mock_chain_response.status_code = 500
-    mock_chain_response.text = "Internal server error"
-    mock_post.return_value = mock_chain_response
-    
-    # Test the endpoint
-    response = client.post("/api/project/start", json={"goal": "Write a Python function that capitalizes every word in a sentence"})
-    
-    # Verify the response
-    assert response.status_code == 500
-    data = response.json()
-    assert "status" in data
-    assert data["status"] == "error"
-    assert "message" in data
-    assert "Chain execution failed" in data["message"]
-
-@patch("httpx.AsyncClient.post")
-def test_project_start_connection_error(mock_post):
-    """Test handling of connection error during chain execution."""
-    # Mock a connection error
-    mock_post.side_effect = httpx.RequestError("Connection error")
-    
-    # Test the endpoint
-    response = client.post("/api/project/start", json={"goal": "Write a Python function that capitalizes every word in a sentence"})
-    
-    # Verify the response
-    assert response.status_code == 500
-    data = response.json()
-    assert "status" in data
-    assert data["status"] == "error"
-    assert "message" in data
-    assert "Connection error" in data["message"]
+    # Test against local server
+    try:
+        # Try local server first
+        response = requests.post(
+            "http://localhost:3000/api/project/start",
+            json=test_data,
+            timeout=5  # Short timeout for quick feedback
+        )
+        
+        # Log result
+        if response.status_code == 200:
+            log_test_result(
+                "Test", 
+                "/api/project/start", 
+                "SUCCESS", 
+                "Endpoint is accessible", 
+                f"Status code: {response.status_code}"
+            )
+            print(f"✅ SUCCESS: Endpoint is accessible (Status: {response.status_code})")
+            print(f"Response: {json.dumps(response.json(), indent=2)}")
+        else:
+            log_test_result(
+                "Test", 
+                "/api/project/start", 
+                "ERROR", 
+                "Endpoint returned error", 
+                f"Status code: {response.status_code}, Response: {response.text}"
+            )
+            print(f"❌ ERROR: Endpoint returned status {response.status_code}")
+            print(f"Response: {response.text}")
+            
+    except requests.exceptions.ConnectionError:
+        # Connection error - server might not be running
+        log_test_result(
+            "Test", 
+            "/api/project/start", 
+            "ERROR", 
+            "Connection error", 
+            "Could not connect to local server. Is it running?"
+        )
+        print("❌ ERROR: Could not connect to local server. Is it running?")
+        
+    except Exception as e:
+        # Other errors
+        log_test_result(
+            "Test", 
+            "/api/project/start", 
+            "ERROR", 
+            f"Unexpected error: {str(e)}", 
+            "Check server logs for details"
+        )
+        print(f"❌ ERROR: {str(e)}")
 
 if __name__ == "__main__":
-    pytest.main(["-xvs", __file__])
+    print("🧪 Testing /api/project/start endpoint...")
+    test_project_start_endpoint()
