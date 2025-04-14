@@ -1,43 +1,38 @@
-# Phase 10.0: Orchestrator Instruction Schema Engine Implementation
+# Agent Debug & Cognition Tracker Suite Implementation
 
-## Backend Structure
-- [ ] Create `/backend` directory at project root
-- [ ] Create `instruction_engine.ts` file with Instruction interface
-- [ ] Implement instruction_registry data structure
+## Tasks
+- [x] Step 1: Confirm `debug_tracker.md` and `debug_logger.py` from the previous task are active.
 
-## Data Models
-- [ ] Define Instruction interface with all required properties:
-  - instruction_id, goal_id, thread_id, agent_id, task_summary, tools_required
-  - expected_outputs, loop_enforcement, allow_retry, escalate_on_failure
-  - status, last_updated
-- [ ] Implement methods for creating instructions
-- [ ] Implement methods for updating instruction status
-- [ ] Implement validation methods for instructions
+- [x] Step 2: Create `/api/orchestrator/consult` route
+  - [x] Add `consult.py` route file
+  - [x] Implement InstructionSchema handling
+  - [x] Trigger agent tool.run() logic
+  - [x] Write outputs to memory
+  - [x] Write reflection tagged to goal
+  - [x] Return appropriate status
 
-## UI Components
-- [ ] Create `InstructionPreviewCard.tsx` component
-- [ ] Update `AgentSandboxCard.tsx` to include Active Instruction panel
-- [ ] Enhance `AgentChat.tsx` to log instruction assignments
-- [ ] Add progress indicators for instruction outputs
+- [x] Step 3: Create `/modules/instruction_validator.py`
+  - [x] Implement validation of expected outputs
+  - [x] Return "complete" or "failed" status
+  - [x] Log validation results
 
-## Orchestrator Integration
-- [ ] Add functionality to generate goal_id
-- [ ] Implement instruction object generation
-- [ ] Add delegation mechanism to assign instructions to agents
-- [ ] Implement logging for instruction creation in chat
+- [x] Step 4: Create stubs
+  - [x] Create `agent_tool_runner.py`
+  - [x] Create `agent_reflection.py`
+  - [x] Create `extract_outputs_from_memory` function
 
-## Validation Logic
-- [ ] Implement checkpoint enforcement
-- [ ] Add reflection enforcement
-- [ ] Implement escalation logic for failed validations
-- [ ] Add validation for expected outputs
+- [x] Step 5: Enhance `/tests/run_debug_sequence.py`
+  - [x] Add test for sample instruction to HAL
+  - [x] Log response and memory to debug_tracker.md
 
-## Testing and Deployment
-- [ ] Test instruction creation and assignment
-- [ ] Test validation and escalation logic
-- [ ] Push changes to GitHub
-- [ ] Verify deployment functionality
+- [x] Step 6: Wire `log_test_result()` into components
+  - [x] Agent tool execution step
+  - [x] Reflection writing step
+  - [x] Instruction validation result
+  - [x] Failure/exception traces
 
-## Documentation
-- [ ] Document instruction schema and usage
-- [ ] Notify operator of completed implementation
+- [ ] Step 7: Push to branch `feature/phase-11-tracker`
+  - [ ] Create branch
+  - [ ] Commit changes
+  - [ ] Push to GitHub
+  - [ ] Notify when ready

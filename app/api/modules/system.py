@@ -18,6 +18,7 @@ import time
 import json
 import datetime
 import importlib
+from src.utils.debug_logger import log_test_result
 
 # Import agent registry
 from app.api.modules.agent import agent_registry
@@ -122,6 +123,11 @@ async def get_system_status():
         memory_store_size = get_memory_store_size()
         modules_loaded = get_modules_loaded()
         
+        # Log successful system status check
+        log_test_result("System", "/api/system/status", "PASS", 
+                       f"System running for {uptime}", 
+                       f"Agents: {agent_count}, Memories: {memory_store_size}, Modules: {len(modules_loaded)}")
+        
         # Return response
         return {
             "status": "ok",
@@ -134,6 +140,12 @@ async def get_system_status():
     except Exception as e:
         logger.error(f"Error getting system status: {str(e)}")
         logger.error(traceback.format_exc())
+        
+        # Log system status check failure
+        log_test_result("System", "/api/system/status", "FAIL", 
+                       f"Error: {str(e)}", 
+                       f"Check system logs for details")
+        
         return JSONResponse(
             status_code=500,
             content={
