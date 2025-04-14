@@ -1,0 +1,2 @@
+# This file exists to ensure Git tracks the empty static directory
+# The directory is required for FastAPI to mount static files at startup
