@@ -18,6 +18,7 @@ import AgentSandboxCard from '../components/AgentSandboxCard';
 import ToolOutputCard from '../components/ToolOutputCard';
 import CheckpointApprovalPanel from '../components/CheckpointApprovalPanel';
 import InputUI from '../components/InputUI';
+import orchestratorAgent from '../data/orchestratorAgent';
 
 const Dashboard = () => {
   // Check if user is authenticated
@@ -32,8 +33,9 @@ const Dashboard = () => {
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   
-  // Mock data for agent sandbox cards
+  // Mock data for agent sandbox cards - now including Orchestrator
   const agents = [
+    orchestratorAgent, // Add Orchestrator as the first agent
     {
       id: 'hal',
       name: 'HAL',
