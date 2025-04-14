@@ -1,28 +1,38 @@
-# Debug Tracker System Implementation
+# Agent Debug & Cognition Tracker Suite Implementation
 
 ## Tasks
-- [x] Step 1: Create Markdown Debug Tracker
-  - [x] Add new file: `debug_tracker.md` to `/logs` directory
-  - [x] Format it as a live table to track test status, agent routes, and results
+- [x] Step 1: Confirm `debug_tracker.md` and `debug_logger.py` from the previous task are active.
 
-- [x] Step 2: Add Diagnostic Logger Utility
-  - [x] Create file: `/utils/debug_logger.py`
-  - [x] Implement log_test_result function
+- [x] Step 2: Create `/api/orchestrator/consult` route
+  - [x] Add `consult.py` route file
+  - [x] Implement InstructionSchema handling
+  - [x] Trigger agent tool.run() logic
+  - [x] Write outputs to memory
+  - [x] Write reflection tagged to goal
+  - [x] Return appropriate status
 
-- [x] Step 3: Add Tracking to Memory and Delegation
-  - [x] Import and use debug_logger in delegate.py
-  - [x] Import and use debug_logger in memory.py
-  - [x] Import and use debug_logger in system.py
+- [x] Step 3: Create `/modules/instruction_validator.py`
+  - [x] Implement validation of expected outputs
+  - [x] Return "complete" or "failed" status
+  - [x] Log validation results
 
-- [x] Step 4: Add Placeholder Tests for Each Module
-  - [x] Create script: `/tests/run_debug_sequence.py`
-  - [x] Implement tests for critical routes
+- [x] Step 4: Create stubs
+  - [x] Create `agent_tool_runner.py`
+  - [x] Create `agent_reflection.py`
+  - [x] Create `extract_outputs_from_memory` function
 
-- [x] Step 5: Test Implementation
-  - [x] Verify debug_tracker.md is populated with logs
-  - [x] Test with sample tasks
+- [x] Step 5: Enhance `/tests/run_debug_sequence.py`
+  - [x] Add test for sample instruction to HAL
+  - [x] Log response and memory to debug_tracker.md
 
-- [ ] Step 6: Commit and Push Changes
-  - [ ] Create feature branch
+- [x] Step 6: Wire `log_test_result()` into components
+  - [x] Agent tool execution step
+  - [x] Reflection writing step
+  - [x] Instruction validation result
+  - [x] Failure/exception traces
+
+- [ ] Step 7: Push to branch `feature/phase-11-tracker`
+  - [ ] Create branch
   - [ ] Commit changes
   - [ ] Push to GitHub
+  - [ ] Notify when ready

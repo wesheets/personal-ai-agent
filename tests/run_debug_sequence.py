@@ -256,6 +256,57 @@ def test_system_status_route():
                        "Connection error or server not running")
         print(f"❌ System status test error: {str(e)}")
 
+def test_orchestrator_consult_route():
+    """Test the orchestrator consult route with HAL agent"""
+    print("Testing /api/orchestrator/consult route...")
+    
+    try:
+        url = f"{BASE_URL}/api/orchestrator/consult"
+        payload = {
+            "agent": "hal",
+            "goal": "Write POST /login route for FastAPI",
+            "expected_outputs": ["login.route", "login.handler"],
+            "checkpoints": ["reflection"]
+        }
+        
+        log_test_result("Orchestrator", "/api/orchestrator/consult", "INFO", 
+                       "Sending test instruction to HAL agent", 
+                       f"Goal: {payload['goal']}")
+        
+        response = requests.post(url, json=payload)
+        
+        if response.status_code == 200:
+            result = response.json()
+            status = result.get("status", "unknown")
+            
+            if status == "complete":
+                log_test_result("Orchestrator", "/api/orchestrator/consult", "PASS", 
+                               f"HAL agent completed task successfully", 
+                               f"Goal: {payload['goal']}")
+                print(f"✅ Orchestrator consult test passed: {result}")
+                
+                # Log the reflection if available
+                if "reflection" in result:
+                    reflection = result["reflection"]
+                    log_test_result("Agent", "/api/agent/hal/reflect", "INFO", 
+                                   "Agent reflection", 
+                                   reflection[:100] + "..." if len(reflection) > 100 else reflection)
+            else:
+                log_test_result("Orchestrator", "/api/orchestrator/consult", "FAIL", 
+                               f"HAL agent task status: {status}", 
+                               f"Details: {result.get('validation_details', 'No details provided')}")
+                print(f"❌ Orchestrator consult test failed: {result}")
+        else:
+            log_test_result("Orchestrator", "/api/orchestrator/consult", "FAIL", 
+                           f"Status code: {response.status_code}", 
+                           f"Response: {response.text}")
+            print(f"❌ Orchestrator consult test failed: {response.text}")
+    except Exception as e:
+        log_test_result("Orchestrator", "/api/orchestrator/consult", "FAIL", 
+                       f"Exception: {str(e)}", 
+                       "Connection error or server not running")
+        print(f"❌ Orchestrator consult test error: {str(e)}")
+
 def run_all_tests():
     """Run all test sequences"""
     print("Starting debug sequence tests...")
@@ -274,6 +325,9 @@ def run_all_tests():
     test_memory_thread_route()
     test_agent_list_route()
     test_system_status_route()
+    
+    # Run new Phase 11 tests
+    test_orchestrator_consult_route()
     
     # Log test sequence completion
     log_test_result("Debug", "/tests/run_debug_sequence", "INFO", 
