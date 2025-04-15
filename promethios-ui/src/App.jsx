@@ -2,7 +2,6 @@ import React from 'react';
 import { Box, Flex, useColorMode } from '@chakra-ui/react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthGuard from './components/auth/AuthGuard';
-import LoginPage from './pages/LoginPage';
 import ColorModeToggle from './components/ColorModeToggle';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
@@ -86,16 +85,9 @@ function App() {
       <SettingsProvider>
         <StatusProvider>
           <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<LoginPage isRegister={true} />} />
-            
-            {/* Auth route */}
-            <Route path="/auth" element={<LoginPage />} />
-            
             {/* Root path redirect based on auth status */}
             <Route path="/" element={
-              isAuthenticated() ? <Navigate to="/agent/hal" /> : <Navigate to="/auth" />
+              isAuthenticated() ? <Navigate to="/agent/hal" /> : <Navigate to="/dashboard" />
             } />
             
             {/* HAL Agent Chat - default interface after authentication */}
@@ -106,7 +98,7 @@ function App() {
                     <AgentChat />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
+              ) : <Navigate to="/dashboard" />
             } />
             
             {/* Protected routes */}
@@ -117,7 +109,7 @@ function App() {
                     <Dashboard />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
+              ) : <Dashboard />
             } />
             
             <Route path="/memory-browser" element={
@@ -127,7 +119,7 @@ function App() {
                     <MemoryBrowser />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
+              ) : <Navigate to="/dashboard" />
             } />
             
             <Route path="/activity" element={
@@ -137,7 +129,7 @@ function App() {
                     <MainActivityFeed />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
+              ) : <Navigate to="/dashboard" />
             } />
             
             <Route path="/agent-activity" element={
@@ -147,7 +139,7 @@ function App() {
                     <AgentActivityPage />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
+              ) : <Navigate to="/dashboard" />
             } />
             
             <Route path="/settings" element={
@@ -157,7 +149,7 @@ function App() {
                     <SettingsPage />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
+              ) : <Navigate to="/dashboard" />
             } />
             
             <Route path="/agents" element={
@@ -167,7 +159,7 @@ function App() {
                     <AgentListPage />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
+              ) : <Navigate to="/dashboard" />
             } />
             
             {/* Agent detail routes - unified under /agent/:agentId */}
@@ -178,7 +170,7 @@ function App() {
                     <AgentChat />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
+              ) : <Navigate to="/dashboard" />
             } />
             
             {/* Improved fallback redirect for unknown routes - now renders AgentChat with error message */}
@@ -192,7 +184,7 @@ function App() {
                     <AgentChat />
                   </ErrorBoundary>
                 </AuthenticatedLayout>
-              ) : <Navigate to="/auth" />
+              ) : <Navigate to="/dashboard" />
             } />
           </Routes>
           
