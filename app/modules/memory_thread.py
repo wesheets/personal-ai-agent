@@ -3,7 +3,7 @@ Memory Thread Module
 
 This module provides functionality to store and retrieve memory threads.
 
-MODIFIED: Added enhanced logging for debugging memory thread issues
+MODIFIED: Added support for batched thread writing and expanded step types
 """
 
 import json
@@ -11,7 +11,10 @@ import datetime
 import logging
 import traceback
 from typing import Dict, List, Any, Optional
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Body
+
+# Import schemas
+from app.schemas.memory import StepType, ThreadRequest, MemoryItem
 
 # Configure logging
 logger = logging.getLogger("modules.memory_thread")
@@ -31,10 +34,59 @@ def get_current_timestamp() -> str:
     """
     return datetime.datetime.now().isoformat() + "Z"
 
+@router.post("/api/memory/thread")
+async def thread_memory(request: ThreadRequest) -> Dict[str, Any]:
+    """
+    Add multiple memory entries to a thread in a single call.
+    
+    Args:
+        request: ThreadRequest containing project_id, chain_id, agent_id, and memories
+        
+    Returns:
+        Dict[str, Any]: Status and updated thread length
+    """
+    # Enhanced logging for debugging
+    logger.info(f"📝 Memory Thread: Batch endpoint called with {len(request.memories)} memories")
+    
+    try:
+        # Create the thread key
+        thread_key = f"{request.project_id}::{request.chain_id}"
+        
+        # Create a new thread if it doesn't exist
+        if thread_key not in THREAD_DB:
+            THREAD_DB[thread_key] = []
+        
+        # Add each memory entry to the thread
+        for memory in request.memories:
+            THREAD_DB[thread_key].append({
+                "agent": memory.agent,
+                "role": memory.role,
+                "content": memory.content,
+                "step_type": memory.step_type,
+                "timestamp": get_current_timestamp(),
+                "project_id": request.project_id,
+                "chain_id": request.chain_id
+            })
+        
+        logger.info(f"📝 Memory Thread: Stored {len(request.memories)} memories under key {thread_key}")
+        
+        # Return status and updated thread length
+        return {
+            "status": "added",
+            "thread_length": len(THREAD_DB[thread_key])
+        }
+    
+    except Exception as e:
+        # Log unexpected errors
+        error_msg = f"Unexpected error in thread_memory: {str(e)}"
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=error_msg)
+
 @router.post("/memory/thread")
 async def add_memory_thread(memory_entry: Dict[str, Any], request: Request = None) -> Dict[str, Any]:
     """
-    Add a memory entry to a thread.
+    Add a single memory entry to a thread (legacy endpoint).
     
     Args:
         memory_entry: Dictionary containing memory entry data
@@ -44,13 +96,7 @@ async def add_memory_thread(memory_entry: Dict[str, Any], request: Request = Non
         Dict[str, Any]: Status and updated thread length
     """
     # Enhanced logging for debugging
-    print(f"🔍 DEBUG: POST /memory/thread endpoint called")
-    print(f"🔍 DEBUG: Received memory_entry: {json.dumps(memory_entry, indent=2)}")
-    logger.info(f"DEBUG: POST /memory/thread endpoint called")
-    
-    if request:
-        print(f"🔍 DEBUG: Request headers: {request.headers}")
-        print(f"🔍 DEBUG: Request client: {request.client}")
+    logger.info(f"DEBUG: Legacy POST /memory/thread endpoint called")
     
     try:
         # Validate required fields
@@ -62,51 +108,42 @@ async def add_memory_thread(memory_entry: Dict[str, Any], request: Request = Non
         
         if missing_fields:
             error_msg = f"Missing required fields: {', '.join(missing_fields)}"
-            print(f"❌ ERROR: {error_msg}")
             logger.error(error_msg)
             raise HTTPException(status_code=400, detail=error_msg)
         
         # Validate agent value
-        valid_agents = ["hal", "ash", "nova"]
+        valid_agents = ["hal", "ash", "nova", "critic", "orchestrator"]
         if memory_entry["agent"] not in valid_agents:
-            error_msg = f"Invalid agent value: {memory_entry['agent']}. Must be one of: {', '.join(valid_agents)}"
-            print(f"❌ ERROR: {error_msg}")
-            logger.error(error_msg)
-            raise HTTPException(status_code=400, detail=error_msg)
+            logger.warning(f"Non-standard agent value: {memory_entry['agent']}. Proceeding anyway.")
         
-        # Validate step_type value
-        valid_step_types = ["task", "summary", "reflection", "ui"]
-        if memory_entry["step_type"] not in valid_step_types:
-            error_msg = f"Invalid step_type value: {memory_entry['step_type']}. Must be one of: {', '.join(valid_step_types)}"
-            print(f"❌ ERROR: {error_msg}")
+        # Validate step_type value and convert to enum if possible
+        try:
+            step_type = StepType(memory_entry["step_type"])
+            memory_entry["step_type"] = step_type
+        except ValueError:
+            error_msg = f"Invalid step_type value: {memory_entry['step_type']}. Must be one of: {', '.join([t.value for t in StepType])}"
             logger.error(error_msg)
             raise HTTPException(status_code=400, detail=error_msg)
         
         # Add timestamp if not provided
         if "timestamp" not in memory_entry:
             memory_entry["timestamp"] = get_current_timestamp()
-            print(f"🔍 DEBUG: Added timestamp: {memory_entry['timestamp']}")
         
         # Create the thread key
         thread_key = f"{memory_entry['project_id']}:{memory_entry['chain_id']}"
-        print(f"🔍 DEBUG: Thread key: {thread_key}")
         
         # Create a new thread if it doesn't exist
         if thread_key not in THREAD_DB:
-            print(f"🔍 DEBUG: Creating new thread for key: {thread_key}")
             THREAD_DB[thread_key] = []
         
         # Add the memory entry to the thread
         THREAD_DB[thread_key].append(memory_entry)
-        print(f"🔍 DEBUG: Added entry to thread. New length: {len(THREAD_DB[thread_key])}")
-        print(f"🔍 DEBUG: THREAD_DB now contains {len(THREAD_DB)} threads")
         
         # Return status and updated thread length
         result = {
             "status": "added",
             "thread_length": len(THREAD_DB[thread_key])
         }
-        print(f"✅ SUCCESS: Memory entry added to thread: {result}")
         return result
     
     except HTTPException:
@@ -116,8 +153,6 @@ async def add_memory_thread(memory_entry: Dict[str, Any], request: Request = Non
     except Exception as e:
         # Log unexpected errors
         error_msg = f"Unexpected error in add_memory_thread: {str(e)}"
-        print(f"❌ ERROR: {error_msg}")
-        print(f"🔍 DEBUG: Exception traceback: {traceback.format_exc()}")
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=error_msg)
@@ -134,31 +169,27 @@ async def get_memory_thread(project_id: str, chain_id: str) -> List[Dict[str, An
     Returns:
         List[Dict[str, Any]]: List of memory entries in the thread
     """
-    # Enhanced logging for debugging
-    print(f"🔍 DEBUG: GET /memory/thread/{project_id}/{chain_id} endpoint called")
     logger.info(f"DEBUG: GET /memory/thread/{project_id}/{chain_id} endpoint called")
     
     try:
-        # Create the thread key
+        # Try both separator formats for backward compatibility
         thread_key = f"{project_id}:{chain_id}"
-        print(f"🔍 DEBUG: Thread key: {thread_key}")
+        thread_key_alt = f"{project_id}::{chain_id}"
         
-        # Check if thread exists
-        if thread_key not in THREAD_DB:
-            print(f"🔍 DEBUG: Thread not found for key: {thread_key}")
-            print(f"🔍 DEBUG: Available thread keys: {list(THREAD_DB.keys())}")
+        # Check if thread exists with either key format
+        if thread_key in THREAD_DB:
+            thread = THREAD_DB[thread_key]
+        elif thread_key_alt in THREAD_DB:
+            thread = THREAD_DB[thread_key_alt]
+        else:
             return []
         
         # Return the thread
-        thread = THREAD_DB.get(thread_key, [])
-        print(f"🔍 DEBUG: Found thread with {len(thread)} entries")
         return thread
     
     except Exception as e:
         # Log unexpected errors
         error_msg = f"Unexpected error in get_memory_thread: {str(e)}"
-        print(f"❌ ERROR: {error_msg}")
-        print(f"🔍 DEBUG: Exception traceback: {traceback.format_exc()}")
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=error_msg)
@@ -169,6 +200,6 @@ def clear_all_threads() -> None:
     Clear all memory threads from the database.
     Used primarily for testing purposes.
     """
-    print(f"🔍 DEBUG: Clearing all threads. Current count: {len(THREAD_DB)}")
+    logger.debug(f"Clearing all threads. Current count: {len(THREAD_DB)}")
     THREAD_DB.clear()
-    print(f"🔍 DEBUG: All threads cleared. New count: {len(THREAD_DB)}")
+    logger.debug(f"All threads cleared. New count: {len(THREAD_DB)}")
