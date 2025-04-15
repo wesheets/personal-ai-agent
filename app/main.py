@@ -51,6 +51,10 @@ try:
     from app.api.modules import system  # System status router
     from app.api.modules import agent  # Agent list router
     
+    # Import memory thread and summarize routers
+    from app.modules.memory_thread import router as memory_thread_router
+    from app.modules.memory_summarize import router as memory_summarize_router
+    
     # Import project start router for Phase 12.0 - CRITICAL for Agent Playground
     print("🔄 Importing project start router for Phase 12.0 (Agent Playground)")
     try:
@@ -210,6 +214,41 @@ try:
             "last_updated": current_time
         }
 
+    # Add debug endpoint for memory verification
+    @app.get("/api/debug/memory/log")
+    async def debug_memory_log():
+        """
+        Debug endpoint to verify memory thread database state.
+        Returns thread counts and recent entries.
+        """
+        from app.modules.memory_thread import THREAD_DB
+        import datetime
+
+        thread_counts = {}
+        for key, entries in THREAD_DB.items():
+            project_id, chain_id = key.split(":")
+            if project_id not in thread_counts:
+                thread_counts[project_id] = {}
+            thread_counts[project_id][chain_id] = len(entries)
+
+        recent_entries = []
+        for key, entries in THREAD_DB.items():
+            for entry in entries[-5:]:
+                entry_with_key = entry.copy()
+                entry_with_key["thread_key"] = key
+                recent_entries.append(entry_with_key)
+
+        recent_entries.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+        recent_entries = recent_entries[:10]
+
+        return {
+            "status": "ok",
+            "thread_count": len(THREAD_DB),
+            "thread_counts_by_project": thread_counts,
+            "recent_entries": recent_entries,
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+
     # Add startup delay to ensure FastAPI is fully initialized before healthcheck
     import asyncio
 
@@ -358,6 +397,8 @@ try:
     print("📡 Including Agent Reflect module router from /app/modules/agent_reflect.py")
     print("📡 Including Agent Fallback module router from /app/modules/agent_fallback.py")
     print("📡 Including Task Supervisor module router from /app/modules/task_supervisor.py")
+    print("📡 Including MemoryThread module router from /app/modules/memory_thread.py")
+    print("📡 Including MemorySummarize module router from /app/modules/memory_summarize.py")
     
     # Register missing routers identified in Postman sweep
     print("📡 Including Orchestrator Consult router from /app/api/orchestrator/consult.py")
@@ -428,6 +469,16 @@ try:
     print("🧠 Route defined: /api/memory/thread -> memory_thread")
     print("🧠 Route defined: /api/memory/reflect -> reflect_on_memories")
     print("🧠 Route defined: /api/memory/summarize -> summarize_memories_endpoint")
+    
+    # Mount the MemoryThread module router
+    print(f"🔍 DEBUG: MemoryThread module router object: {memory_thread_router}")
+    app.include_router(memory_thread_router, prefix="/api/memory")
+    print("🧠 Route defined: /api/memory/thread/{project_id}/{chain_id}")
+    
+    # Mount the MemorySummarize module router
+    print(f"🔍 DEBUG: MemorySummarize module router object: {memory_summarize_router}")
+    app.include_router(memory_summarize_router, prefix="/api/memory")
+    print("🧠 Route defined: /api/memory/summarize")
     
     # Import and use the enhanced route logger for detailed diagnostics
     try:
@@ -594,267 +645,68 @@ try:
     # Mount static files for Swagger UI
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
     
-    # Add version info endpoint
-    @app.get("/api/version")
-    async def get_version():
-        """Return version information about the API."""
-        return {
-            "version": "1.0.0",
-            "name": "Enhanced AI Agent System",
-            "mode": "isolated",
-            "timestamp": datetime.datetime.now().isoformat()
-        }
-    
-    # Add debug endpoint for CORS testing
-    @app.options("/api/cors-test")
-    @app.get("/api/cors-test")
-    async def cors_test():
-        """Test endpoint for CORS configuration."""
-        return {"status": "ok", "cors": "enabled", "timestamp": datetime.datetime.now().isoformat()}
-    
-    # Add debug endpoint for error testing
-    @app.get("/api/error-test")
-    async def error_test():
-        """Test endpoint for error handling."""
-        # Simulate an error
-        try:
-            raise ValueError("This is a test error")
-        except ValueError as e:
-            logger.error(f"Test error triggered: {str(e)}")
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "status": "error",
-                    "message": "Test error triggered",
-                    "error": str(e)
-                }
-            )
-    
-    # Add debug endpoint for timeout testing
-    @app.get("/api/timeout-test")
-    async def timeout_test():
-        """Test endpoint for timeout handling."""
-        # Simulate a timeout
-        await asyncio.sleep(12)  # This should trigger the timeout middleware
-        return {"status": "ok", "timeout": "not triggered"}
-    
-    # Add debug endpoint for memory testing
-    @app.get("/api/memory-test")
-    async def memory_test():
-        """Test endpoint for memory system."""
-        # Return a simple response
-        return {"status": "ok", "memory": "system available"}
-    
-    # Add debug endpoint for agent testing
-    @app.get("/api/agent-test")
-    async def agent_test():
-        """Test endpoint for agent system."""
-        # Return a simple response with agent count
-        return {"status": "ok", "agents": len(agents), "mode": "isolated"}
-    
-    # Add debug endpoint for system testing
-    @app.get("/api/system-test")
-    async def system_test():
-        """Test endpoint for system status."""
-        # Return a simple response
-        return {"status": "ok", "system": "operational", "mode": "isolated"}
-    
-    # Add debug endpoint for orchestrator testing
-    @app.get("/api/orchestrator-test")
-    async def orchestrator_test():
-        """Test endpoint for orchestrator system."""
-        # Return a simple response
-        return {"status": "ok", "orchestrator": "operational", "mode": "isolated"}
-    
-    # Add debug endpoint for project testing
-    @app.get("/api/project-test")
-    async def project_test():
-        """Test endpoint for project system."""
-        # Return a simple response
-        return {"status": "ok", "project": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for feedback testing
-    @app.get("/api/feedback-test")
-    async def feedback_test():
-        """Test endpoint for feedback system."""
-        # Return a simple response
-        return {"status": "ok", "feedback": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for user context testing
-    @app.get("/api/user-context-test")
-    async def user_context_test():
-        """Test endpoint for user context system."""
-        # Return a simple response
-        return {"status": "ok", "user_context": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for respond testing
-    @app.get("/api/respond-test")
-    async def respond_test():
-        """Test endpoint for respond system."""
-        # Return a simple response
-        return {"status": "ok", "respond": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for plan testing
-    @app.get("/api/plan-test")
-    async def plan_test():
-        """Test endpoint for plan system."""
-        # Return a simple response
-        return {"status": "ok", "plan": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for loop testing
-    @app.get("/api/loop-test")
-    async def loop_test():
-        """Test endpoint for loop system."""
-        # Return a simple response
-        return {"status": "ok", "loop": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for delegate testing
-    @app.get("/api/delegate-test")
-    async def delegate_test():
-        """Test endpoint for delegate system."""
-        # Return a simple response
-        return {"status": "ok", "delegate": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for reflect testing
-    @app.get("/api/reflect-test")
-    async def reflect_test():
-        """Test endpoint for reflect system."""
-        # Return a simple response
-        return {"status": "ok", "reflect": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for task testing
-    @app.get("/api/task-test")
-    async def task_test():
-        """Test endpoint for task system."""
-        # Return a simple response
-        return {"status": "ok", "task": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for agent create testing
-    @app.get("/api/agent-create-test")
-    async def agent_create_test():
-        """Test endpoint for agent create system."""
-        # Return a simple response
-        return {"status": "ok", "agent_create": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for agent verify testing
-    @app.get("/api/agent-verify-test")
-    async def agent_verify_test():
-        """Test endpoint for agent verify system."""
-        # Return a simple response
-        return {"status": "ok", "agent_verify": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for agent reflect testing
-    @app.get("/api/agent-reflect-test")
-    async def agent_reflect_test():
-        """Test endpoint for agent reflect system."""
-        # Return a simple response
-        return {"status": "ok", "agent_reflect": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for agent fallback testing
-    @app.get("/api/agent-fallback-test")
-    async def agent_fallback_test():
-        """Test endpoint for agent fallback system."""
-        # Return a simple response
-        return {"status": "ok", "agent_fallback": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for task supervisor testing
-    @app.get("/api/task-supervisor-test")
-    async def task_supervisor_test():
-        """Test endpoint for task supervisor system."""
-        # Return a simple response
-        return {"status": "ok", "task_supervisor": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for task result testing
-    @app.get("/api/task-result-test")
-    async def task_result_test():
-        """Test endpoint for task result system."""
-        # Return a simple response
-        return {"status": "ok", "task_result": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for orchestrator scope testing
-    @app.get("/api/orchestrator-scope-test")
-    async def orchestrator_scope_test():
-        """Test endpoint for orchestrator scope system."""
-        # Return a simple response
-        return {"status": "ok", "orchestrator_scope": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for orchestrator present testing
-    @app.get("/api/orchestrator-present-test")
-    async def orchestrator_present_test():
-        """Test endpoint for orchestrator present system."""
-        # Return a simple response
-        return {"status": "ok", "orchestrator_present": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for orchestrator build testing
-    @app.get("/api/orchestrator-build-test")
-    async def orchestrator_build_test():
-        """Test endpoint for orchestrator build system."""
-        # Return a simple response
-        return {"status": "ok", "orchestrator_build": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for agent present testing
-    @app.get("/api/agent-present-test")
-    async def agent_present_test():
-        """Test endpoint for agent present system."""
-        # Return a simple response
-        return {"status": "ok", "agent_present": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for orchestrator consult testing
-    @app.get("/api/orchestrator-consult-test")
-    async def orchestrator_consult_test():
-        """Test endpoint for orchestrator consult system."""
-        # Return a simple response
-        return {"status": "ok", "orchestrator_consult": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for orchestrator chain testing
-    @app.get("/api/orchestrator-chain-test")
-    async def orchestrator_chain_test():
-        """Test endpoint for orchestrator chain system."""
-        # Return a simple response
-        return {"status": "ok", "orchestrator_chain": "system available", "mode": "isolated"}
-    
-    # Add debug endpoint for project start testing
-    @app.get("/api/project-start-test")
-    async def project_start_test():
-        """Test endpoint for project start system."""
-        # Return a simple response
-        return {"status": "ok", "project_start": "system available", "mode": "isolated"}
+    # Add a catch-all route for debugging 404 errors
+    @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"])
+    async def catch_all(request: Request, path: str):
+        """
+        Catch-all route for debugging 404 errors.
+        This helps identify missing routes during development.
+        """
+        logger.warning(f"404 Not Found: {request.method} {request.url}")
+        logger.warning(f"Path: {path}")
+        logger.warning(f"Headers: {request.headers}")
+        
+        # Return a more detailed 404 response for debugging
+        return JSONResponse(
+            status_code=404,
+            content={
+                "status": "error",
+                "message": f"Route not found: {request.method} {path}",
+                "timestamp": datetime.datetime.now().isoformat(),
+                "available_routes": [
+                    {"path": route.path, "methods": list(route.methods) if hasattr(route, "methods") else []} 
+                    for route in app.routes if isinstance(route, APIRoute)
+                ]
+            }
+        )
     
     # Final startup message
-    print("✅ All routes registered")
-    print("✅ API ready to serve requests")
+    print("✅ All routes registered successfully")
+    print("🚀 Enhanced AI Agent System is ready to serve requests")
     
 except Exception as e:
-    # Global error handler for startup
-    print(f"❌ ERROR DURING STARTUP: {str(e)}")
+    # Global error handler for startup failures
     import traceback
-    traceback.print_exc()
+    print(f"❌ CRITICAL ERROR during startup: {str(e)}")
+    print(f"❌ Traceback: {traceback.format_exc()}")
     
-    # Create a minimal FastAPI app that can still respond to health checks
+    # Create a minimal FastAPI app for error reporting
     app = FastAPI(
-        title="Enhanced AI Agent System (Recovery Mode)",
-        description="Recovery mode due to startup error",
+        title="Enhanced AI Agent System (ERROR MODE)",
+        description="Error recovery mode due to startup failure",
         version="1.0.0"
     )
     
-    # Add health check endpoint that still returns OK for Railway
-    @app.get("/health")
-    async def health_recovery():
-        """Health check endpoint in recovery mode."""
-        return {"status": "ok", "mode": "recovery", "error": str(e)}
-    
     @app.get("/")
-    async def root_health_recovery():
-        """Root health check endpoint in recovery mode."""
-        return {"status": "ok", "mode": "recovery", "error": str(e)}
-    
-    # Add error details endpoint
-    @app.get("/error")
-    async def error_details():
-        """Error details endpoint in recovery mode."""
+    async def error_root():
+        """Root endpoint in error mode."""
         return {
             "status": "error",
-            "mode": "recovery",
-            "error": str(e),
-            "traceback": traceback.format_exc()
+            "message": f"Application failed to start: {str(e)}",
+            "timestamp": datetime.datetime.now().isoformat()
         }
+    
+    @app.get("/health")
+    async def error_health():
+        """Health check endpoint in error mode."""
+        return {
+            "status": "error",
+            "message": f"Application failed to start: {str(e)}",
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+    
+    print("⚠️ Created minimal error reporting API")
+
+# If this file is run directly, start the server
+if __name__ == "__main__":
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
