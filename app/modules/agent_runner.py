@@ -5,6 +5,7 @@ This module provides isolated agent execution functionality, allowing agents to 
 independently from the central agent registry, UI, or delegate-stream system.
 
 MODIFIED: Added full runtime logging and error protection to prevent 502 errors
+MODIFIED: Added memory thread logging for agent steps
 """
 
 import logging
@@ -13,6 +14,8 @@ from typing import List, Dict, Any, Optional
 import time
 import traceback
 import sys
+import uuid
+import asyncio
 from fastapi.responses import JSONResponse
 
 # Import OpenAI client
@@ -22,6 +25,9 @@ try:
 except ImportError:
     OPENAI_AVAILABLE = False
     print("❌ OpenAI client import failed")
+
+# Import memory thread module
+from app.modules.memory_thread import add_memory_thread
 
 # Configure logging
 logger = logging.getLogger("modules.agent_runner")
@@ -108,24 +114,81 @@ class CoreForgeAgent:
                 "status": "error"
             }
 
-def run_agent(agent_id: str, messages: List[Dict[str, Any]]):
+async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: str, step_type: str, content: str) -> None:
     """
-    Run an agent with the given messages, with no registry dependencies.
+    Log a memory thread entry for an agent step.
     
-    MODIFIED: Added full runtime logging and error protection to prevent 502 errors
+    Args:
+        project_id: The project identifier
+        chain_id: The chain identifier
+        agent: The agent type (hal, ash, nova)
+        role: The agent role (thinker, explainer, designer)
+        step_type: The step type (task, summary, ui, reflection)
+        content: The content of the step
+    """
+    try:
+        # Create memory entry
+        memory_entry = {
+            "project_id": project_id,
+            "chain_id": chain_id,
+            "agent": agent,
+            "role": role,
+            "step_type": step_type,
+            "content": content
+        }
+        
+        # Log memory entry
+        print(f"📝 Logging memory thread for {agent} agent, {step_type} step")
+        logger.info(f"Logging memory thread for {agent} agent, {step_type} step")
+        
+        # Add memory entry to thread
+        result = await add_memory_thread(memory_entry)
+        
+        # Log result
+        print(f"✅ Memory thread logged successfully: {result}")
+        logger.info(f"Memory thread logged successfully: {result}")
+    except Exception as e:
+        # Log error but don't fail the main process
+        error_msg = f"Error logging memory thread: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+
+async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None):
+    """
+    Async version of run_agent function.
     
     Args:
         agent_id: The ID of the agent to run
         messages: List of message dictionaries with role and content
+        project_id: Optional project identifier for memory logging
+        chain_id: Optional chain identifier for memory logging
         
     Returns:
         Dict containing the response and metadata or JSONResponse with error details
     """
-    # ADDED: Entry confirmation logging
-    print("🔥 AgentRunner route invoked")
-    logger.info("🔥 AgentRunner route invoked")
+    # Generate project_id and chain_id if not provided
+    if not project_id:
+        project_id = f"project_{uuid.uuid4().hex[:8]}"
+        print(f"🆔 Generated project_id: {project_id}")
     
-    # MODIFIED: Wrapped all logic in global try/except
+    if not chain_id:
+        chain_id = f"chain_{uuid.uuid4().hex[:8]}"
+        print(f"🔗 Generated chain_id: {chain_id}")
+    
+    # Map agent_id to standard agent types and roles
+    agent_mapping = {
+        "hal": {"agent": "hal", "role": "thinker"},
+        "ash": {"agent": "ash", "role": "explainer"},
+        "nova": {"agent": "nova", "role": "designer"},
+        "Core.Forge": {"agent": "hal", "role": "thinker"}  # Default to HAL for CoreForge
+    }
+    
+    # Get agent type and role
+    agent_info = agent_mapping.get(agent_id.lower(), {"agent": "hal", "role": "thinker"})
+    agent_type = agent_info["agent"]
+    agent_role = agent_info["role"]
+    
     try:
         print("🧠 Attempting to run CoreForgeAgent fallback")
         logger.info("Attempting to run CoreForgeAgent fallback")
@@ -139,6 +202,17 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]):
             error_msg = "OpenAI API key is not set in environment variables"
             print(f"❌ {error_msg}")
             logger.error(error_msg)
+            
+            # Log error to memory thread
+            await log_memory_thread(
+                project_id=project_id,
+                chain_id=chain_id,
+                agent=agent_type,
+                role=agent_role,
+                step_type="task",
+                content=f"Error: {error_msg}"
+            )
+            
             return JSONResponse(
                 status_code=500,
                 content={
@@ -161,6 +235,17 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]):
             error_msg = f"CoreForgeAgent execution failed: {result.get('content')}"
             print(f"❌ {error_msg}")
             logger.error(error_msg)
+            
+            # Log error to memory thread
+            await log_memory_thread(
+                project_id=project_id,
+                chain_id=chain_id,
+                agent=agent_type,
+                role=agent_role,
+                step_type="task",
+                content=f"Error: {result.get('content', 'Unknown error')}"
+            )
+            
             return JSONResponse(
                 status_code=500,
                 content={
@@ -174,12 +259,24 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]):
         print("✅ AgentRunner success, returning response")
         logger.info("AgentRunner success, returning response")
         
+        # Log successful response to memory thread
+        await log_memory_thread(
+            project_id=project_id,
+            chain_id=chain_id,
+            agent=agent_type,
+            role=agent_role,
+            step_type="task",
+            content=result.get("content", "")
+        )
+        
         # Return successful response
         return {
             "agent_id": "Core.Forge",
             "response": result.get("content", ""),
             "status": "ok",
-            "usage": result.get("usage", {})
+            "usage": result.get("usage", {}),
+            "project_id": project_id,
+            "chain_id": chain_id
         }
     
     except Exception as e:
@@ -189,6 +286,19 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]):
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         
+        # Log error to memory thread
+        try:
+            await log_memory_thread(
+                project_id=project_id,
+                chain_id=chain_id,
+                agent=agent_type,
+                role=agent_role,
+                step_type="task",
+                content=f"Error: {str(e)}"
+            )
+        except Exception as log_error:
+            print(f"❌ Failed to log error to memory thread: {str(log_error)}")
+        
         # Return structured error response
         return JSONResponse(
             status_code=500,
@@ -196,9 +306,40 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]):
                 "agent_id": agent_id,
                 "response": error_msg,
                 "status": "error",
-                "message": str(e)
+                "message": str(e),
+                "project_id": project_id,
+                "chain_id": chain_id
             }
         )
+
+def run_agent(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None):
+    """
+    Run an agent with the given messages, with no registry dependencies.
+    
+    MODIFIED: Added full runtime logging and error protection to prevent 502 errors
+    MODIFIED: Added memory thread logging for agent steps
+    
+    Args:
+        agent_id: The ID of the agent to run
+        messages: List of message dictionaries with role and content
+        project_id: Optional project identifier for memory logging
+        chain_id: Optional chain identifier for memory logging
+        
+    Returns:
+        Dict containing the response and metadata or JSONResponse with error details
+    """
+    # ADDED: Entry confirmation logging
+    print("🔥 AgentRunner route invoked")
+    logger.info("🔥 AgentRunner route invoked")
+    
+    # Run the async version in a new event loop
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        result = loop.run_until_complete(run_agent_async(agent_id, messages, project_id, chain_id))
+        return result
+    finally:
+        loop.close()
 
 def test_core_forge_isolation():
     """
