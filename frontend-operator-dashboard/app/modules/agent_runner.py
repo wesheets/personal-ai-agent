@@ -5,6 +5,7 @@ This module provides isolated agent execution functionality, allowing agents to 
 independently from the central agent registry, UI, or delegate-stream system.
 
 MODIFIED: Added full runtime logging and error protection to prevent 502 errors
+MODIFIED: Added toolkit registry integration for specialized agent tools
 """
 
 import logging
@@ -22,6 +23,9 @@ try:
 except ImportError:
     OPENAI_AVAILABLE = False
     print("❌ OpenAI client import failed")
+
+# Import toolkit registry
+from toolkit.registry import get_toolkit, get_agent_role, format_tools_prompt
 
 # Configure logging
 logger = logging.getLogger("modules.agent_runner")
@@ -53,12 +57,14 @@ class CoreForgeAgent:
             logger.error(error_msg)
             self.client = None
     
-    def run(self, messages: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def run(self, messages: List[Dict[str, Any]], agent_id: str = None, domain: str = "saas") -> Dict[str, Any]:
         """
         Run the agent with the given messages.
         
         Args:
             messages: List of message dictionaries with role and content
+            agent_id: Optional agent identifier for toolkit selection
+            domain: Optional domain for toolkit selection, defaults to "saas"
             
         Returns:
             Dict containing the response and metadata
@@ -73,6 +79,48 @@ class CoreForgeAgent:
                     "content": error_msg,
                     "status": "error"
                 }
+            
+            # Prepare system message with agent role and tools if agent_id is provided
+            if agent_id and agent_id.lower() in ["hal", "ash", "nova"]:
+                # Get agent role
+                role = get_agent_role(agent_id.lower())
+                
+                # Get toolkit for agent and domain
+                tools = get_toolkit(agent_id.lower(), domain)
+                
+                # Format tools prompt
+                tools_prompt = format_tools_prompt(tools)
+                
+                # Check if first message is system message
+                if messages and messages[0].get("role") == "system":
+                    # Update existing system message
+                    system_content = messages[0].get("content", "")
+                    
+                    # Add role and tools information
+                    if role:
+                        system_content = f"You are a {role}.\n\n{system_content}"
+                    
+                    if tools_prompt:
+                        system_content = f"{system_content}\n\n{tools_prompt}"
+                    
+                    # Update system message
+                    messages[0]["content"] = system_content
+                else:
+                    # Create new system message
+                    system_content = ""
+                    
+                    if role:
+                        system_content = f"You are a {role}."
+                    
+                    if tools_prompt:
+                        if system_content:
+                            system_content = f"{system_content}\n\n{tools_prompt}"
+                        else:
+                            system_content = tools_prompt
+                    
+                    # Add system message at the beginning
+                    if system_content:
+                        messages.insert(0, {"role": "system", "content": system_content})
             
             # Call OpenAI API
             print("📡 Calling OpenAI API...")
@@ -108,21 +156,24 @@ class CoreForgeAgent:
                 "status": "error"
             }
 
-def run_agent(agent_id: str, messages: List[Dict[str, Any]]):
+def run_agent(agent_id: str, messages: List[Dict[str, Any]], domain: str = "saas"):
     """
     Run an agent with the given messages, with no registry dependencies.
     
     MODIFIED: Added full runtime logging and error protection to prevent 502 errors
+    MODIFIED: Added toolkit registry integration for specialized agent tools
     
     Args:
         agent_id: The ID of the agent to run
         messages: List of message dictionaries with role and content
+        domain: Optional domain for toolkit selection, defaults to "saas"
         
     Returns:
         Dict containing the response and metadata or JSONResponse with error details
     """
     # ADDED: Entry confirmation logging
     print("🔥 AgentRunner route invoked")
+    print(f"🔍 DEBUG: run_agent called with agent_id={agent_id}, domain={domain}")
     logger.info("🔥 AgentRunner route invoked")
     
     # MODIFIED: Wrapped all logic in global try/except
@@ -152,9 +203,9 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]]):
         print(f"🔄 Creating CoreForgeAgent instance for: {agent_id}")
         agent = CoreForgeAgent()
         
-        # Call agent's run method
+        # Call agent's run method with agent_id and domain for toolkit selection
         print(f"🏃 Calling CoreForgeAgent.run() method with {len(messages)} messages")
-        result = agent.run(messages)
+        result = agent.run(messages, agent_id=agent_id, domain=domain)
         
         # Check if agent execution was successful
         if result.get("status") == "error":
