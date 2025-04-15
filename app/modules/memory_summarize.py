@@ -30,7 +30,7 @@ class SummarizationRequest(BaseModel):
     chain_id: str
     agent_id: Optional[str] = "orchestrator"
 
-@router.post("/memory/summarize")
+@router.post("/summarize")
 async def summarize_memory_thread(request_data: SummarizationRequest, request: Request = None) -> Dict[str, str]:
     """
     Generate a summary of a memory thread.
@@ -43,9 +43,12 @@ async def summarize_memory_thread(request_data: SummarizationRequest, request: R
         Dict[str, str]: Summary of the memory thread
     """
     # Enhanced logging for debugging
+    logger.info(f"🧠 Memory Summarize: Received request for project_id={request_data.project_id}, chain_id={request_data.chain_id}")
+    logger.info(f"🧠 Memory Summarize: Using agent_id={request_data.agent_id}")
+    logger.debug(f"🧠 Memory Summarize: Full request={request_data.dict()}")
+    
     print(f"🔍 DEBUG: POST /memory/summarize endpoint called")
     print(f"🔍 DEBUG: Received request_data: {request_data.dict()}")
-    logger.info(f"DEBUG: POST /memory/summarize endpoint called")
     
     if request:
         print(f"🔍 DEBUG: Request headers: {request.headers}")
@@ -57,27 +60,34 @@ async def summarize_memory_thread(request_data: SummarizationRequest, request: R
         agent_id = request_data.agent_id  # This will use the default value if not provided
         
         print(f"🔍 DEBUG: Processing request with project_id={project_id}, chain_id={chain_id}, agent_id={agent_id}")
+        logger.info(f"🧠 Memory Summarize: Processing request with project_id={project_id}, chain_id={chain_id}, agent_id={agent_id}")
         
         # Create the thread key
         thread_key = f"{project_id}:{chain_id}"
         print(f"🔍 DEBUG: Thread key: {thread_key}")
+        logger.info(f"🧠 Memory Summarize: Using thread key: {thread_key}")
         
         # Check if the thread exists
         if thread_key not in THREAD_DB or not THREAD_DB[thread_key]:
             error_msg = f"No memory thread found for project_id: {project_id}, chain_id: {chain_id}"
             print(f"❌ ERROR: {error_msg}")
             print(f"🔍 DEBUG: Available thread keys: {list(THREAD_DB.keys())}")
-            logger.error(error_msg)
+            logger.error(f"🧠 Memory Summarize: Error - {error_msg}")
+            logger.debug(f"🧠 Memory Summarize: Available thread keys: {list(THREAD_DB.keys())}")
             raise HTTPException(status_code=404, detail=error_msg)
         
         # Get the thread
         thread = THREAD_DB[thread_key]
         print(f"🔍 DEBUG: Found thread with {len(thread)} entries")
+        logger.info(f"🧠 Memory Summarize: Found thread with {len(thread)} entries")
         
         # Generate summary
         print(f"🔍 DEBUG: Generating summary for thread")
+        logger.info(f"🧠 Memory Summarize: Generating summary for thread")
         summary = generate_thread_summary(thread)
         print(f"🔍 DEBUG: Summary generated: {summary[:100]}...")
+        logger.info(f"🧠 Memory Summarize: Summary generated successfully")
+        logger.debug(f"🧠 Memory Summarize: Summary content: {summary[:100]}...")
         
         # Return the summary
         result = {
@@ -85,6 +95,7 @@ async def summarize_memory_thread(request_data: SummarizationRequest, request: R
             "agent_id": agent_id  # Include agent_id in response for clarity
         }
         print(f"✅ SUCCESS: Memory thread summary generated: {result}")
+        logger.info(f"🧠 Memory Summarize: Successfully generated memory thread summary")
         return result
     
     except HTTPException:
@@ -96,8 +107,8 @@ async def summarize_memory_thread(request_data: SummarizationRequest, request: R
         error_msg = f"Unexpected error in summarize_memory_thread: {str(e)}"
         print(f"❌ ERROR: {error_msg}")
         print(f"🔍 DEBUG: Exception traceback: {traceback.format_exc()}")
-        logger.error(error_msg)
-        logger.error(traceback.format_exc())
+        logger.error(f"🧠 Memory Summarize: Unexpected error: {error_msg}")
+        logger.error(f"🧠 Memory Summarize: Exception traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=error_msg)
 
 def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
@@ -112,6 +123,7 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
     """
     # Enhanced logging for debugging
     print(f"🔍 DEBUG: generate_thread_summary called with {len(thread)} entries")
+    logger.debug(f"🧠 Memory Summarize: Generating thread summary with {len(thread)} entries")
     
     try:
         # Track agents and their activities
@@ -128,10 +140,12 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
             content = entry["content"]
             
             print(f"🔍 DEBUG: Processing entry - agent: {agent}, step_type: {step_type}")
+            logger.debug(f"🧠 Memory Summarize: Processing entry - agent: {agent}, step_type: {step_type}")
             
             # Skip if agent is not recognized
             if agent not in agents_activities:
                 print(f"🔍 DEBUG: Skipping unrecognized agent: {agent}")
+                logger.debug(f"🧠 Memory Summarize: Skipping unrecognized agent: {agent}")
                 continue
             
             # Map step_type to the correct key in agents_activities
@@ -145,11 +159,13 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
                 key = "uis"
             else:
                 print(f"🔍 DEBUG: Skipping unrecognized step_type: {step_type}")
+                logger.debug(f"🧠 Memory Summarize: Skipping unrecognized step_type: {step_type}")
                 continue
             
             # Add the entry to the appropriate category
             agents_activities[agent][key].append(content)
             print(f"🔍 DEBUG: Added content to {agent}'s {key}")
+            logger.debug(f"🧠 Memory Summarize: Added content to {agent}'s {key}")
         
         # Hardcode the project description to match test expectations
         project_description = "This project involved implementing a function"
@@ -171,6 +187,7 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
         if hal_parts:
             summary_parts.append(f"HAL {', '.join(hal_parts)}")
             print(f"🔍 DEBUG: Added HAL summary: {hal_parts}")
+            logger.debug(f"🧠 Memory Summarize: Added HAL summary: {hal_parts}")
         
         # ASH summary
         ash_parts = []
@@ -186,6 +203,7 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
         if ash_parts:
             summary_parts.append(f"ASH {', '.join(ash_parts)}")
             print(f"🔍 DEBUG: Added ASH summary: {ash_parts}")
+            logger.debug(f"🧠 Memory Summarize: Added ASH summary: {ash_parts}")
         
         # NOVA summary
         nova_parts = []
@@ -201,6 +219,7 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
         if nova_parts:
             summary_parts.append(f"NOVA {', '.join(nova_parts)}")
             print(f"🔍 DEBUG: Added NOVA summary: {nova_parts}")
+            logger.debug(f"🧠 Memory Summarize: Added NOVA summary: {nova_parts}")
         
         # Check for failures (if any agent has no activities)
         for agent in agents_activities:
@@ -211,6 +230,7 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
             if not all_activities and agent.upper() not in ' '.join(summary_parts):
                 summary_parts.append(f"{agent.upper()} did not contribute")
                 print(f"🔍 DEBUG: Added note that {agent.upper()} did not contribute")
+                logger.debug(f"🧠 Memory Summarize: Added note that {agent.upper()} did not contribute")
         
         # Combine all parts into a final summary
         if summary_parts:
@@ -219,6 +239,8 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
             final_summary = f"{project_description}, but no specific agent activities were recorded."
         
         print(f"🔍 DEBUG: Generated final summary: {final_summary}")
+        logger.info(f"🧠 Memory Summarize: Generated final summary")
+        logger.debug(f"🧠 Memory Summarize: Final summary content: {final_summary}")
         return final_summary
         
     except Exception as e:
@@ -226,7 +248,7 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
         error_msg = f"Error in generate_thread_summary: {str(e)}"
         print(f"❌ ERROR: {error_msg}")
         print(f"🔍 DEBUG: Exception traceback: {traceback.format_exc()}")
-        logger.error(error_msg)
-        logger.error(traceback.format_exc())
+        logger.error(f"🧠 Memory Summarize: Error in generate_thread_summary: {error_msg}")
+        logger.error(f"🧠 Memory Summarize: Exception traceback: {traceback.format_exc()}")
         # Return a basic summary in case of error
         return "Unable to generate summary due to an error."
