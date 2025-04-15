@@ -7,6 +7,7 @@ independently from the central agent registry, UI, or delegate-stream system.
 MODIFIED: Added full runtime logging and error protection to prevent 502 errors
 MODIFIED: Added memory thread logging for agent steps
 MODIFIED: Added enhanced logging for debugging memory thread issues
+MODIFIED: Added toolkit registry integration for specialized agent tools
 """
 
 import logging
@@ -29,6 +30,9 @@ except ImportError:
 
 # Import memory thread module
 from app.modules.memory_thread import add_memory_thread
+
+# Import toolkit registry
+from toolkit.registry import get_toolkit, get_agent_role, format_tools_prompt
 
 # Configure logging
 logger = logging.getLogger("modules.agent_runner")
@@ -60,12 +64,14 @@ class CoreForgeAgent:
             logger.error(error_msg)
             self.client = None
     
-    def run(self, messages: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def run(self, messages: List[Dict[str, Any]], agent_id: str = None, domain: str = "saas") -> Dict[str, Any]:
         """
         Run the agent with the given messages.
         
         Args:
             messages: List of message dictionaries with role and content
+            agent_id: Optional agent identifier for toolkit selection
+            domain: Optional domain for toolkit selection, defaults to "saas"
             
         Returns:
             Dict containing the response and metadata
@@ -80,6 +86,48 @@ class CoreForgeAgent:
                     "content": error_msg,
                     "status": "error"
                 }
+            
+            # Prepare system message with agent role and tools if agent_id is provided
+            if agent_id and agent_id.lower() in ["hal", "ash", "nova"]:
+                # Get agent role
+                role = get_agent_role(agent_id.lower())
+                
+                # Get toolkit for agent and domain
+                tools = get_toolkit(agent_id.lower(), domain)
+                
+                # Format tools prompt
+                tools_prompt = format_tools_prompt(tools)
+                
+                # Check if first message is system message
+                if messages and messages[0].get("role") == "system":
+                    # Update existing system message
+                    system_content = messages[0].get("content", "")
+                    
+                    # Add role and tools information
+                    if role:
+                        system_content = f"You are a {role}.\n\n{system_content}"
+                    
+                    if tools_prompt:
+                        system_content = f"{system_content}\n\n{tools_prompt}"
+                    
+                    # Update system message
+                    messages[0]["content"] = system_content
+                else:
+                    # Create new system message
+                    system_content = ""
+                    
+                    if role:
+                        system_content = f"You are a {role}."
+                    
+                    if tools_prompt:
+                        if system_content:
+                            system_content = f"{system_content}\n\n{tools_prompt}"
+                        else:
+                            system_content = tools_prompt
+                    
+                    # Add system message at the beginning
+                    if system_content:
+                        messages.insert(0, {"role": "system", "content": system_content})
             
             # Call OpenAI API
             print("📡 Calling OpenAI API...")
@@ -163,7 +211,7 @@ async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: st
         logger.error(error_msg)
         logger.error(traceback.format_exc())
 
-async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None):
+async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None, domain: str = "saas"):
     """
     Async version of run_agent function.
     
@@ -172,6 +220,7 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
         messages: List of message dictionaries with role and content
         project_id: Optional project identifier for memory logging
         chain_id: Optional chain identifier for memory logging
+        domain: Optional domain for toolkit selection, defaults to "saas"
         
     Returns:
         Dict containing the response and metadata or JSONResponse with error details
@@ -186,8 +235,8 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
         print(f"🔗 Generated chain_id: {chain_id}")
     
     # Enhanced logging for debugging
-    print(f"🔍 DEBUG: run_agent_async called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}")
-    logger.info(f"DEBUG: run_agent_async called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}")
+    print(f"🔍 DEBUG: run_agent_async called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}, domain={domain}")
+    logger.info(f"DEBUG: run_agent_async called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}, domain={domain}")
     
     # Map agent_id to standard agent types and roles
     agent_mapping = {
@@ -243,9 +292,9 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
         print(f"🔄 Creating CoreForgeAgent instance for: {agent_id}")
         agent = CoreForgeAgent()
         
-        # Call agent's run method
+        # Call agent's run method with agent_id and domain for toolkit selection
         print(f"🏃 Calling CoreForgeAgent.run() method with {len(messages)} messages")
-        result = agent.run(messages)
+        result = agent.run(messages, agent_id=agent_id, domain=domain)
         
         # Check if agent execution was successful
         if result.get("status") == "error":
@@ -336,26 +385,28 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
             }
         )
 
-def run_agent(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None):
+def run_agent(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None, domain: str = "saas"):
     """
     Run an agent with the given messages, with no registry dependencies.
     
     MODIFIED: Added full runtime logging and error protection to prevent 502 errors
     MODIFIED: Added memory thread logging for agent steps
     MODIFIED: Added enhanced logging for debugging memory thread issues
+    MODIFIED: Added toolkit registry integration for specialized agent tools
     
     Args:
         agent_id: The ID of the agent to run
         messages: List of message dictionaries with role and content
         project_id: Optional project identifier for memory logging
         chain_id: Optional chain identifier for memory logging
+        domain: Optional domain for toolkit selection, defaults to "saas"
         
     Returns:
         Dict containing the response and metadata or JSONResponse with error details
     """
     # ADDED: Entry confirmation logging
     print("🔥 AgentRunner route invoked")
-    print(f"🔍 DEBUG: run_agent called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}")
+    print(f"🔍 DEBUG: run_agent called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}, domain={domain}")
     logger.info("🔥 AgentRunner route invoked")
     
     # Run the async version in a new event loop
@@ -363,7 +414,7 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]], project_id: str = N
     asyncio.set_event_loop(loop)
     try:
         print(f"🔍 DEBUG: Creating new event loop and running run_agent_async")
-        result = loop.run_until_complete(run_agent_async(agent_id, messages, project_id, chain_id))
+        result = loop.run_until_complete(run_agent_async(agent_id, messages, project_id, chain_id, domain))
         print(f"🔍 DEBUG: run_agent_async completed successfully")
         return result
     except Exception as e:
