@@ -1,4 +1,10 @@
-# /app/modules/memory_summarize.py
+"""
+Memory Summarize Module
+
+This module provides functionality to generate summaries of memory threads.
+
+MODIFIED: Updated schema to make agent_id optional or provide a default value
+"""
 
 import json
 from typing import Dict, List, Any, Optional
@@ -16,7 +22,7 @@ async def summarize_memory_thread(request: Dict[str, str]) -> Dict[str, str]:
     Generate a summary of a memory thread.
     
     Args:
-        request: Dictionary containing project_id and chain_id
+        request: Dictionary containing project_id, chain_id, and optional agent_id
         
     Returns:
         Dict[str, str]: Summary of the memory thread
@@ -29,6 +35,9 @@ async def summarize_memory_thread(request: Dict[str, str]) -> Dict[str, str]:
     
     project_id = request["project_id"]
     chain_id = request["chain_id"]
+    
+    # Use default agent_id if not provided
+    agent_id = request.get("agent_id", "orchestrator")
     
     # Create the thread key
     thread_key = f"{project_id}:{chain_id}"
@@ -48,7 +57,8 @@ async def summarize_memory_thread(request: Dict[str, str]) -> Dict[str, str]:
     
     # Return the summary
     return {
-        "summary": summary
+        "summary": summary,
+        "agent_id": agent_id  # Include agent_id in response for clarity
     }
 
 def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:

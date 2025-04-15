@@ -1,4 +1,8 @@
-# /app/modules/memory_thread.py
+"""
+Memory Thread Module
+
+This module provides functionality to store and retrieve memory threads.
+"""
 
 import json
 import datetime
