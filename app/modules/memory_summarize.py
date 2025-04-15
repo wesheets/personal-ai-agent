@@ -12,8 +12,8 @@ MODIFIED: Fixed thread key format to use double colons
 import json
 import logging
 import traceback
-from typing import Dict, List, Any, Optional
-from fastapi import APIRouter, HTTPException, Request, Body
+from typing import Dict, List, Any, Optional, Union
+from fastapi import APIRouter, HTTPException, Request, Body, Depends
 from pydantic import BaseModel, Field
 
 # Import THREAD_DB from memory_thread module
@@ -29,40 +29,48 @@ router = APIRouter()
 class SummarizationRequest(BaseModel):
     project_id: str
     chain_id: str
-    agent_id: str = Field(default="orchestrator")  # Using Field with default instead of Optional
+    agent_id: Optional[str] = "orchestrator"  # Using Optional with default value
+
+    class Config:
+        # Make extra fields forbidden to ensure strict validation
+        extra = "forbid"
+
+# Define a function to extract request data
+def get_request_data(
+    project_id: str,
+    chain_id: str,
+    agent_id: Optional[str] = "orchestrator"
+) -> Dict[str, str]:
+    return {
+        "project_id": project_id,
+        "chain_id": chain_id,
+        "agent_id": agent_id
+    }
 
 @router.post("/summarize")
-async def summarize_memory_thread(request_data: dict = Body(...)) -> Dict[str, str]:
+async def summarize_memory_thread(
+    project_id: str = Body(..., description="Project identifier"),
+    chain_id: str = Body(..., description="Chain identifier"),
+    agent_id: Optional[str] = Body("orchestrator", description="Agent identifier, defaults to orchestrator")
+) -> Dict[str, str]:
     """
     Generate a summary of a memory thread.
     
     Args:
-        request_data: Dictionary containing project_id, chain_id, and optional agent_id
+        project_id: Project identifier
+        chain_id: Chain identifier
+        agent_id: Optional agent identifier, defaults to "orchestrator"
         
     Returns:
         Dict[str, str]: Summary of the memory thread
     """
-    # Parse request data manually to handle missing fields
-    project_id = request_data.get("project_id")
-    chain_id = request_data.get("chain_id")
-    agent_id = request_data.get("agent_id", "orchestrator")  # Default to "orchestrator" if not provided
-    
-    # Validate required fields
-    if not project_id or not chain_id:
-        error_msg = "Missing required fields: project_id and chain_id are required"
-        logger.error(f"🧠 Memory Summarize: Error - {error_msg}")
-        raise HTTPException(status_code=400, detail=error_msg)
-    
     # Enhanced logging for debugging
+    print(f"🧠 /memory/summarize hit with project_id={project_id}, chain_id={chain_id}, agent_id={agent_id}")
     logger.info(f"🧠 Memory Summarize: Received request for project_id={project_id}, chain_id={chain_id}")
     logger.info(f"🧠 Memory Summarize: Using agent_id={agent_id}")
-    logger.debug(f"🧠 Memory Summarize: Full request={request_data}")
     
     # Add specific logging for summarize route hit
     logger.info(f"🧠 Summarize route hit: {project_id} / {chain_id}")
-    
-    print(f"🔍 DEBUG: POST /memory/summarize endpoint called")
-    print(f"🔍 DEBUG: Received request_data: {request_data}")
     
     try:
         # Create the thread key with double colons
