@@ -8,6 +8,8 @@ MODIFIED: Added full runtime logging and error protection to prevent 502 errors
 MODIFIED: Added memory thread logging for agent steps
 MODIFIED: Added enhanced logging for debugging memory thread issues
 MODIFIED: Added toolkit registry integration for specialized agent tools
+MODIFIED: Added product strategist logic for HAL in saas domain
+MODIFIED: Added structured output for ASH documentation and onboarding
 """
 
 import logging
@@ -18,6 +20,7 @@ import traceback
 import sys
 import uuid
 import asyncio
+import json
 from fastapi.responses import JSONResponse
 
 # Import OpenAI client
@@ -32,7 +35,7 @@ except ImportError:
 from app.modules.memory_thread import add_memory_thread
 
 # Import toolkit registry
-from toolkit.registry import get_toolkit, get_agent_role, format_tools_prompt
+from toolkit.registry import get_toolkit, get_agent_role, format_tools_prompt, format_nova_prompt, get_agent_themes
 
 # Configure logging
 logger = logging.getLogger("modules.agent_runner")
@@ -87,6 +90,14 @@ class CoreForgeAgent:
                     "status": "error"
                 }
             
+            # Set response format based on agent
+            response_format = None
+            if agent_id:
+                if agent_id.lower() == "hal" and domain == "saas":
+                    response_format = {"type": "json_object"}
+                elif agent_id.lower() == "ash" and domain == "saas":
+                    response_format = {"type": "json_object"}
+            
             # Prepare system message with agent role and tools if agent_id is provided
             if agent_id and agent_id.lower() in ["hal", "ash", "nova"]:
                 # Get agent role
@@ -95,8 +106,13 @@ class CoreForgeAgent:
                 # Get toolkit for agent and domain
                 tools = get_toolkit(agent_id.lower(), domain)
                 
-                # Format tools prompt
-                tools_prompt = format_tools_prompt(tools)
+                # Format tools prompt based on agent
+                tools_prompt = ""
+                if agent_id.lower() == "nova":
+                    themes = get_agent_themes(agent_id.lower())
+                    tools_prompt = format_nova_prompt(tools, themes)
+                else:
+                    tools_prompt = format_tools_prompt(tools)
                 
                 # Check if first message is system message
                 if messages and messages[0].get("role") == "system":
@@ -109,6 +125,49 @@ class CoreForgeAgent:
                     
                     if tools_prompt:
                         system_content = f"{system_content}\n\n{tools_prompt}"
+                    
+                    # Add specialized logic based on agent and domain
+                    if agent_id.lower() == "hal" and domain == "saas":
+                        # Add product strategist logic for HAL in saas domain
+                        product_strategist_prompt = """
+As a Product Strategist, your task is to create structured SaaS product plans.
+
+Your responses for SaaS planning should include:
+1. Core features (essential functionality)
+2. MVP features (minimum viable product)
+3. Premium features (for monetization)
+4. Monetization strategy (pricing model)
+5. Implementation task steps
+
+Format your response as a structured JSON object with these exact keys:
+- core_features: array of strings
+- mvp_features: array of strings
+- premium_features: array of strings
+- monetization: string
+- task_steps: array of strings
+
+Be specific, realistic, and focused on creating a monetizable SaaS product.
+"""
+                        system_content = f"{system_content}\n\n{product_strategist_prompt}"
+                    
+                    elif agent_id.lower() == "ash" and domain == "saas":
+                        # Add UX Docifier logic for ASH in saas domain
+                        ux_docifier_prompt = """
+As a UX Docifier, your task is to create comprehensive documentation for SaaS products.
+
+Your responses should include:
+1. API documentation with endpoints, methods, and payloads
+2. User onboarding instructions with clear steps
+3. Third-party service integration suggestions
+
+Format your response as a structured JSON object with these exact keys:
+- docs.api: string containing API endpoints with methods and payloads
+- docs.onboarding: string containing user onboarding copy with steps
+- docs.integration: string containing third-party service suggestions
+
+Be clear, comprehensive, and focused on creating documentation that enhances user experience.
+"""
+                        system_content = f"{system_content}\n\n{ux_docifier_prompt}"
                     
                     # Update system message
                     messages[0]["content"] = system_content
@@ -125,6 +184,55 @@ class CoreForgeAgent:
                         else:
                             system_content = tools_prompt
                     
+                    # Add specialized logic based on agent and domain
+                    if agent_id.lower() == "hal" and domain == "saas":
+                        # Add product strategist logic for HAL in saas domain
+                        product_strategist_prompt = """
+As a Product Strategist, your task is to create structured SaaS product plans.
+
+Your responses for SaaS planning should include:
+1. Core features (essential functionality)
+2. MVP features (minimum viable product)
+3. Premium features (for monetization)
+4. Monetization strategy (pricing model)
+5. Implementation task steps
+
+Format your response as a structured JSON object with these exact keys:
+- core_features: array of strings
+- mvp_features: array of strings
+- premium_features: array of strings
+- monetization: string
+- task_steps: array of strings
+
+Be specific, realistic, and focused on creating a monetizable SaaS product.
+"""
+                        if system_content:
+                            system_content = f"{system_content}\n\n{product_strategist_prompt}"
+                        else:
+                            system_content = product_strategist_prompt
+                    
+                    elif agent_id.lower() == "ash" and domain == "saas":
+                        # Add UX Docifier logic for ASH in saas domain
+                        ux_docifier_prompt = """
+As a UX Docifier, your task is to create comprehensive documentation for SaaS products.
+
+Your responses should include:
+1. API documentation with endpoints, methods, and payloads
+2. User onboarding instructions with clear steps
+3. Third-party service integration suggestions
+
+Format your response as a structured JSON object with these exact keys:
+- docs.api: string containing API endpoints with methods and payloads
+- docs.onboarding: string containing user onboarding copy with steps
+- docs.integration: string containing third-party service suggestions
+
+Be clear, comprehensive, and focused on creating documentation that enhances user experience.
+"""
+                        if system_content:
+                            system_content = f"{system_content}\n\n{ux_docifier_prompt}"
+                        else:
+                            system_content = ux_docifier_prompt
+                    
                     # Add system message at the beginning
                     if system_content:
                         messages.insert(0, {"role": "system", "content": system_content})
@@ -135,7 +243,8 @@ class CoreForgeAgent:
                 model="gpt-4",
                 messages=messages,
                 temperature=0.7,
-                max_tokens=1000
+                max_tokens=1000,
+                response_format=response_format
             )
             
             # Extract content from response
@@ -163,7 +272,7 @@ class CoreForgeAgent:
                 "status": "error"
             }
 
-async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: str, step_type: str, content: str) -> None:
+async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: str, step_type: str, content: str, structured_data: Dict = None) -> None:
     """
     Log a memory thread entry for an agent step.
     
@@ -174,6 +283,7 @@ async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: st
         role: The agent role (thinker, explainer, designer)
         step_type: The step type (task, summary, ui, reflection)
         content: The content of the step
+        structured_data: Optional structured data for specialized agents
     """
     try:
         # Create memory entry
@@ -185,6 +295,36 @@ async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: st
             "step_type": step_type,
             "content": content
         }
+        
+        # Add structured data if available
+        if structured_data:
+            memory_entry["structured_data"] = structured_data
+            
+            # For ASH, break down documentation into separate memory entries
+            if agent == "ash" and structured_data:
+                # Process API docs
+                if "docs.api" in structured_data:
+                    api_memory = memory_entry.copy()
+                    api_memory["step_type"] = "docs.api"
+                    api_memory["content"] = structured_data["docs.api"]
+                    await add_memory_thread(api_memory)
+                    print(f"✅ Memory thread logged for API docs")
+                
+                # Process onboarding docs
+                if "docs.onboarding" in structured_data:
+                    onboarding_memory = memory_entry.copy()
+                    onboarding_memory["step_type"] = "docs.onboarding"
+                    onboarding_memory["content"] = structured_data["docs.onboarding"]
+                    await add_memory_thread(onboarding_memory)
+                    print(f"✅ Memory thread logged for onboarding docs")
+                
+                # Process integration docs
+                if "docs.integration" in structured_data:
+                    integration_memory = memory_entry.copy()
+                    integration_memory["step_type"] = "docs.integration"
+                    integration_memory["content"] = structured_data["docs.integration"]
+                    await add_memory_thread(integration_memory)
+                    print(f"✅ Memory thread logged for integration docs")
         
         # Enhanced logging for debugging
         print(f"🔍 DEBUG: Memory thread entry created with project_id={project_id}, chain_id={chain_id}")
@@ -323,6 +463,51 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
                 }
             )
         
+        # Process agent-specific responses
+        structured_data = None
+        
+        # Process HAL's response for saas domain
+        if agent_id.lower() == "hal" and domain == "saas":
+            try:
+                # Parse JSON response
+                content = result.get("content", "")
+                parsed_content = json.loads(content)
+                
+                # Check for required fields
+                required_fields = ["core_features", "mvp_features", "premium_features", "monetization", "task_steps"]
+                for field in required_fields:
+                    if field not in parsed_content:
+                        parsed_content[field] = []
+                
+                # Update content with structured data
+                result["content"] = json.dumps(parsed_content)
+                structured_data = parsed_content
+            except Exception as e:
+                print(f"❌ Error parsing HAL's JSON response: {str(e)}")
+                logger.error(f"Error parsing HAL's JSON response: {str(e)}")
+                # Continue with original content
+        
+        # Process ASH's response for saas domain
+        elif agent_id.lower() == "ash" and domain == "saas":
+            try:
+                # Parse JSON response
+                content = result.get("content", "")
+                parsed_content = json.loads(content)
+                
+                # Check for required fields
+                required_fields = ["docs.api", "docs.onboarding", "docs.integration"]
+                for field in required_fields:
+                    if field not in parsed_content:
+                        parsed_content[field] = ""
+                
+                # Update content with structured data
+                result["content"] = json.dumps(parsed_content)
+                structured_data = parsed_content
+            except Exception as e:
+                print(f"❌ Error parsing ASH's JSON response: {str(e)}")
+                logger.error(f"Error parsing ASH's JSON response: {str(e)}")
+                # Continue with original content
+        
         # Log success
         print("✅ AgentRunner success, returning response")
         logger.info("AgentRunner success, returning response")
@@ -335,7 +520,8 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
             agent=agent_type,
             role=agent_role,
             step_type="task",
-            content=result.get("content", "")
+            content=result.get("content", ""),
+            structured_data=structured_data
         )
         print(f"🔍 DEBUG: Finished logging successful response to memory thread")
         
@@ -346,7 +532,8 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
             "status": "ok",
             "usage": result.get("usage", {}),
             "project_id": project_id,
-            "chain_id": chain_id
+            "chain_id": chain_id,
+            "structured_data": structured_data
         }
     
     except Exception as e:
@@ -393,6 +580,8 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]], project_id: str = N
     MODIFIED: Added memory thread logging for agent steps
     MODIFIED: Added enhanced logging for debugging memory thread issues
     MODIFIED: Added toolkit registry integration for specialized agent tools
+    MODIFIED: Added product strategist logic for HAL in saas domain
+    MODIFIED: Added structured output for ASH documentation and onboarding
     
     Args:
         agent_id: The ID of the agent to run
