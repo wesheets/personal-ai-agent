@@ -1,10 +1,13 @@
 """
-Memory schemas for the personal AI agent.
+Memory Schema Module
 
-This module defines the schema models for memory operations including:
+This module defines the schema models for memory-related operations in the application.
+
+Includes:
 - StepType enum for categorizing memory entries
 - MemoryItem model for individual memory entries
 - ThreadRequest model for batch memory operations
+- SummarizationRequest model for summarization input
 """
 
 from enum import Enum
@@ -14,7 +17,7 @@ from pydantic import BaseModel
 class StepType(str, Enum):
     """
     Enum defining the types of steps in a memory thread.
-    
+
     Expanded to include all agent chain step types to prevent 400 errors
     when agents submit memory logs from their specific roles.
     """
@@ -28,7 +31,7 @@ class StepType(str, Enum):
 class MemoryItem(BaseModel):
     """
     Model for an individual memory item in a thread.
-    
+
     Each memory item represents a single entry in a memory thread,
     containing the agent, role, content, and step type.
     """
@@ -40,7 +43,7 @@ class MemoryItem(BaseModel):
 class ThreadRequest(BaseModel):
     """
     Model for a batch memory thread request.
-    
+
     Allows submitting multiple memory items in a single request
     to improve efficiency and reduce API calls.
     """
@@ -52,7 +55,7 @@ class ThreadRequest(BaseModel):
 class SummarizationRequest(BaseModel):
     """
     Model for a memory thread summarization request.
-    
+
     Includes optional agent_id with default value to prevent validation errors
     when the field is not provided.
     """
