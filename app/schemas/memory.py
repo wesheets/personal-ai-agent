@@ -31,3 +31,9 @@ class ThreadRequest(BaseModel):
     chain_id: str
     agent_id: str
     memories: List[MemoryItem]
+
+class SummarizationRequest(BaseModel):
+    """Model for a memory summarization request."""
+    project_id: str
+    chain_id: str
+    agent_id: Optional[str] = "orchestrator"

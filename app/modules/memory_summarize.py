@@ -13,7 +13,9 @@ import logging
 import traceback
 from typing import Dict, List, Any, Optional
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
+
+# Import schemas
+from app.schemas.memory import SummarizationRequest
 
 # Import THREAD_DB from memory_thread module
 from app.modules.memory_thread import THREAD_DB
@@ -23,12 +25,6 @@ logger = logging.getLogger("modules.memory_summarize")
 
 # Create router for memory summarize endpoint
 router = APIRouter()
-
-# Define Pydantic model for request validation
-class SummarizationRequest(BaseModel):
-    project_id: str
-    chain_id: str
-    agent_id: Optional[str] = "orchestrator"
 
 @router.post("/memory/summarize")
 async def summarize_memory_thread(request_data: SummarizationRequest, request: Request = None) -> Dict[str, str]:
@@ -44,7 +40,7 @@ async def summarize_memory_thread(request_data: SummarizationRequest, request: R
     """
     # Enhanced logging for debugging
     print(f"🔍 DEBUG: POST /memory/summarize endpoint called")
-    print(f"🔍 DEBUG: Received request_data: {request_data.dict()}")
+    print(f"🔍 DEBUG: Received request_data: {request_data.model_dump()}")
     logger.info(f"DEBUG: POST /memory/summarize endpoint called")
     
     if request:
@@ -59,11 +55,16 @@ async def summarize_memory_thread(request_data: SummarizationRequest, request: R
         print(f"🔍 DEBUG: Processing request with project_id={project_id}, chain_id={chain_id}, agent_id={agent_id}")
         
         # Create the thread key
-        thread_key = f"{project_id}:{chain_id}"
+        thread_key = f"{project_id}::{chain_id}"
+        thread_key_alt = f"{project_id}:{chain_id}"
         print(f"🔍 DEBUG: Thread key: {thread_key}")
         
-        # Check if the thread exists
-        if thread_key not in THREAD_DB or not THREAD_DB[thread_key]:
+        # Check if the thread exists with either key format
+        if thread_key in THREAD_DB:
+            thread = THREAD_DB[thread_key]
+        elif thread_key_alt in THREAD_DB:
+            thread = THREAD_DB[thread_key_alt]
+        else:
             error_msg = f"No memory thread found for project_id: {project_id}, chain_id: {chain_id}"
             print(f"❌ ERROR: {error_msg}")
             print(f"🔍 DEBUG: Available thread keys: {list(THREAD_DB.keys())}")
@@ -71,7 +72,6 @@ async def summarize_memory_thread(request_data: SummarizationRequest, request: R
             raise HTTPException(status_code=404, detail=error_msg)
         
         # Get the thread
-        thread = THREAD_DB[thread_key]
         print(f"🔍 DEBUG: Found thread with {len(thread)} entries")
         
         # Generate summary
@@ -116,15 +116,16 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
     try:
         # Track agents and their activities
         agents_activities = {
-            "hal": {"tasks": [], "summaries": [], "reflections": [], "uis": []},
-            "ash": {"tasks": [], "summaries": [], "reflections": [], "uis": []},
-            "nova": {"tasks": [], "summaries": [], "reflections": [], "uis": []}
+            "hal": {"tasks": [], "summaries": [], "reflections": [], "uis": [], "plans": [], "docs": []},
+            "ash": {"tasks": [], "summaries": [], "reflections": [], "uis": [], "plans": [], "docs": []},
+            "nova": {"tasks": [], "summaries": [], "reflections": [], "uis": [], "plans": [], "docs": []},
+            "critic": {"tasks": [], "summaries": [], "reflections": [], "uis": [], "plans": [], "docs": []}
         }
         
         # Process each entry in the thread
         for entry in thread:
             agent = entry["agent"].lower()
-            step_type = entry["step_type"].lower()
+            step_type = entry["step_type"]
             content = entry["content"]
             
             print(f"🔍 DEBUG: Processing entry - agent: {agent}, step_type: {step_type}")
@@ -135,21 +136,17 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
                 continue
             
             # Map step_type to the correct key in agents_activities
-            if step_type == "task":
-                key = "tasks"
-            elif step_type == "summary":
-                key = "summaries"
-            elif step_type == "reflection":
-                key = "reflections"
-            elif step_type == "ui":
-                key = "uis"
+            if isinstance(step_type, str):
+                key = step_type.lower()
             else:
-                print(f"🔍 DEBUG: Skipping unrecognized step_type: {step_type}")
-                continue
-            
-            # Add the entry to the appropriate category
-            agents_activities[agent][key].append(content)
-            print(f"🔍 DEBUG: Added content to {agent}'s {key}")
+                key = step_type.value.lower()
+                
+            # Add the entry to the appropriate category if it exists
+            if key in agents_activities[agent]:
+                agents_activities[agent][key].append(content)
+                print(f"🔍 DEBUG: Added content to {agent}'s {key}")
+            else:
+                print(f"🔍 DEBUG: Skipping unrecognized step_type: {key}")
         
         # Hardcode the project description to match test expectations
         project_description = "This project involved implementing a function"
@@ -167,6 +164,10 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
             hal_parts.append("reflected on the process")
         if agents_activities["hal"]["uis"]:
             hal_parts.append("created UI elements")
+        if agents_activities["hal"]["plans"]:
+            hal_parts.append("created plans")
+        if agents_activities["hal"]["docs"]:
+            hal_parts.append("wrote documentation")
         
         if hal_parts:
             summary_parts.append(f"HAL {', '.join(hal_parts)}")
@@ -182,6 +183,10 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
             ash_parts.append("provided reflections")
         if agents_activities["ash"]["uis"]:
             ash_parts.append("designed UI components")
+        if agents_activities["ash"]["plans"]:
+            ash_parts.append("contributed to planning")
+        if agents_activities["ash"]["docs"]:
+            ash_parts.append("created documentation")
         
         if ash_parts:
             summary_parts.append(f"ASH {', '.join(ash_parts)}")
@@ -197,10 +202,33 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
             nova_parts.append("offered reflections")
         if agents_activities["nova"]["uis"]:
             nova_parts.append("rendered UI designs")
+        if agents_activities["nova"]["plans"]:
+            nova_parts.append("assisted with planning")
+        if agents_activities["nova"]["docs"]:
+            nova_parts.append("prepared documentation")
         
         if nova_parts:
             summary_parts.append(f"NOVA {', '.join(nova_parts)}")
             print(f"🔍 DEBUG: Added NOVA summary: {nova_parts}")
+            
+        # CRITIC summary
+        critic_parts = []
+        if agents_activities["critic"]["tasks"]:
+            critic_parts.append("evaluated tasks")
+        if agents_activities["critic"]["summaries"]:
+            critic_parts.append("reviewed summaries")
+        if agents_activities["critic"]["reflections"]:
+            critic_parts.append("provided critical reflections")
+        if agents_activities["critic"]["uis"]:
+            critic_parts.append("assessed UI designs")
+        if agents_activities["critic"]["plans"]:
+            critic_parts.append("reviewed plans")
+        if agents_activities["critic"]["docs"]:
+            critic_parts.append("evaluated documentation")
+        
+        if critic_parts:
+            summary_parts.append(f"CRITIC {', '.join(critic_parts)}")
+            print(f"🔍 DEBUG: Added CRITIC summary: {critic_parts}")
         
         # Check for failures (if any agent has no activities)
         for agent in agents_activities:

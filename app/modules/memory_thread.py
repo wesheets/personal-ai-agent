@@ -10,7 +10,7 @@ import json
 import datetime
 import logging
 import traceback
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from fastapi import APIRouter, HTTPException, Request, Body
 
 # Import schemas
@@ -35,45 +35,88 @@ def get_current_timestamp() -> str:
     return datetime.datetime.now().isoformat() + "Z"
 
 @router.post("/api/memory/thread")
-async def thread_memory(request: ThreadRequest) -> Dict[str, Any]:
+async def thread_memory(request: Union[ThreadRequest, Dict[str, Any]]) -> Dict[str, Any]:
     """
     Add multiple memory entries to a thread in a single call.
     
     Args:
         request: ThreadRequest containing project_id, chain_id, agent_id, and memories
+               or a dictionary with the same structure
         
     Returns:
         Dict[str, Any]: Status and updated thread length
     """
     # Enhanced logging for debugging
-    logger.info(f"📝 Memory Thread: Batch endpoint called with {len(request.memories)} memories")
+    logger.info(f"📝 Memory Thread: Batch endpoint called")
     
     try:
+        # Convert dict to ThreadRequest if needed
+        if isinstance(request, dict):
+            # Extract required fields
+            project_id = request.get("project_id")
+            chain_id = request.get("chain_id")
+            agent_id = request.get("agent_id")
+            memories = request.get("memories", [])
+            
+            if not project_id or not chain_id or not agent_id or not memories:
+                error_msg = "Missing required fields in request"
+                logger.error(error_msg)
+                raise HTTPException(status_code=400, detail=error_msg)
+                
+            logger.info(f"📝 Memory Thread: Processing dictionary with {len(memories)} memories")
+        else:
+            # Use the ThreadRequest object directly
+            project_id = request.project_id
+            chain_id = request.chain_id
+            agent_id = request.agent_id
+            memories = request.memories
+            logger.info(f"📝 Memory Thread: Processing ThreadRequest with {len(memories)} memories")
+        
         # Create the thread key
-        thread_key = f"{request.project_id}::{request.chain_id}"
+        thread_key = f"{project_id}::{chain_id}"
         
         # Create a new thread if it doesn't exist
         if thread_key not in THREAD_DB:
             THREAD_DB[thread_key] = []
         
         # Add each memory entry to the thread
-        for memory in request.memories:
+        memory_ids = []
+        for memory in memories:
+            # Handle both dict and MemoryItem objects
+            if isinstance(memory, dict):
+                agent = memory.get("agent")
+                role = memory.get("role")
+                content = memory.get("content")
+                step_type = memory.get("step_type")
+            else:
+                agent = memory.agent
+                role = memory.role
+                content = memory.content
+                step_type = memory.step_type
+            
+            # Generate a unique memory ID
+            memory_id = f"mem-{datetime.datetime.now().timestamp()}-{len(THREAD_DB[thread_key])}"
+            memory_ids.append(memory_id)
+            
+            # Add the memory to the thread
             THREAD_DB[thread_key].append({
-                "agent": memory.agent,
-                "role": memory.role,
-                "content": memory.content,
-                "step_type": memory.step_type,
+                "memory_id": memory_id,
+                "agent": agent,
+                "role": role,
+                "content": content,
+                "step_type": step_type,
                 "timestamp": get_current_timestamp(),
-                "project_id": request.project_id,
-                "chain_id": request.chain_id
+                "project_id": project_id,
+                "chain_id": chain_id
             })
         
-        logger.info(f"📝 Memory Thread: Stored {len(request.memories)} memories under key {thread_key}")
+        logger.info(f"📝 Memory Thread: Stored {len(memories)} memories under key {thread_key}")
         
         # Return status and updated thread length
         return {
             "status": "added",
-            "thread_length": len(THREAD_DB[thread_key])
+            "thread_length": len(THREAD_DB[thread_key]),
+            "memory_ids": memory_ids
         }
     
     except Exception as e:
@@ -130,11 +173,15 @@ async def add_memory_thread(memory_entry: Dict[str, Any], request: Request = Non
             memory_entry["timestamp"] = get_current_timestamp()
         
         # Create the thread key
-        thread_key = f"{memory_entry['project_id']}:{memory_entry['chain_id']}"
+        thread_key = f"{memory_entry['project_id']}::{memory_entry['chain_id']}"
         
         # Create a new thread if it doesn't exist
         if thread_key not in THREAD_DB:
             THREAD_DB[thread_key] = []
+        
+        # Generate a unique memory ID
+        memory_id = f"mem-{datetime.datetime.now().timestamp()}-{len(THREAD_DB[thread_key])}"
+        memory_entry["memory_id"] = memory_id
         
         # Add the memory entry to the thread
         THREAD_DB[thread_key].append(memory_entry)
@@ -142,7 +189,8 @@ async def add_memory_thread(memory_entry: Dict[str, Any], request: Request = Non
         # Return status and updated thread length
         result = {
             "status": "added",
-            "thread_length": len(THREAD_DB[thread_key])
+            "thread_length": len(THREAD_DB[thread_key]),
+            "memory_id": memory_id
         }
         return result
     
@@ -173,8 +221,8 @@ async def get_memory_thread(project_id: str, chain_id: str) -> List[Dict[str, An
     
     try:
         # Try both separator formats for backward compatibility
-        thread_key = f"{project_id}:{chain_id}"
-        thread_key_alt = f"{project_id}::{chain_id}"
+        thread_key = f"{project_id}::{chain_id}"
+        thread_key_alt = f"{project_id}:{chain_id}"
         
         # Check if thread exists with either key format
         if thread_key in THREAD_DB:
