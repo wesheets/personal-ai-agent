@@ -39,12 +39,27 @@ def extract_outputs_from_memory(agent_id: str) -> List[Dict[str, Any]]:
             },
             {
                 "type": "output",
-                "content": "Python function that reverses a string",
+                "content": "def capitalize_words(s): return ' '.join(word.capitalize() for word in s.split())",
                 "tags": ["output", "task.output"]
             },
             {
                 "type": "reflection",
                 "content": "I've implemented the login route and handler according to best practices",
+                "tags": ["reflection"]
+            }
+        ]
+    
+    # For ASH agent, return outputs including summary.task.output and reflection
+    elif agent_id.lower() == "ash":
+        return [
+            {
+                "type": "output",
+                "content": "This function capitalizes each word by splitting the string and applying capitalize() to each word.",
+                "tags": ["output", "summary.task.output"]
+            },
+            {
+                "type": "reflection",
+                "content": "HAL's implementation is correct.",
                 "tags": ["reflection"]
             }
         ]
