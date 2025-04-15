@@ -13,7 +13,7 @@ MODIFIED: Imported SummarizationRequest from schemas to ensure agent_id is truly
 import json
 import logging
 import traceback
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from fastapi import APIRouter, HTTPException, Request
 
 # Import THREAD_DB from memory_thread module
