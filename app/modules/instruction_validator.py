@@ -24,7 +24,7 @@ def extract_outputs_from_memory(agent_id: str) -> List[Dict[str, Any]]:
     # Simulate memory extraction - this would be replaced with actual implementation
     # that queries the memory store for the agent's outputs
     
-    # For HAL agent, return some mock outputs for testing
+    # For HAL agent, return outputs including task.output
     if agent_id.lower() == "hal":
         return [
             {
@@ -36,6 +36,11 @@ def extract_outputs_from_memory(agent_id: str) -> List[Dict[str, Any]]:
                 "type": "output",
                 "content": "login.handler implementation",
                 "tags": ["output", "login.handler"]
+            },
+            {
+                "type": "output",
+                "content": "Python function that reverses a string",
+                "tags": ["output", "task.output"]
             },
             {
                 "type": "reflection",

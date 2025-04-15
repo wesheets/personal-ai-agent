@@ -94,9 +94,94 @@ def generate_token(user):
     
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
                     """
+                },
+                {
+                    "name": "task.output",
+                    "content": """
+# Login Route and Handler Implementation
+
+## Login Route
+```python
+@app.post("/login")
+async def login(request: Request):
+    data = await request.json()
+    username = data.get("username")
+    password = data.get("password")
+    
+    # Validate credentials
+    if not username or not password:
+        return JSONResponse(status_code=400, content={"error": "Missing username or password"})
+    
+    # Authenticate user
+    user = authenticate_user(username, password)
+    if not user:
+        return JSONResponse(status_code=401, content={"error": "Invalid credentials"})
+    
+    # Generate token
+    token = generate_token(user)
+    
+    return {"token": token, "user_id": user.id}
+```
+
+## Authentication Handler
+```python
+def authenticate_user(username: str, password: str):
+    # Query user from database
+    user = User.query.filter_by(username=username).first()
+    
+    # Check if user exists and password is correct
+    if user and verify_password(password, user.password_hash):
+        return user
+    
+    return None
+
+def generate_token(user):
+    # Generate JWT token
+    payload = {
+        "sub": user.id,
+        "exp": datetime.utcnow() + timedelta(hours=24),
+        "iat": datetime.utcnow(),
+        "scope": user.role
+    }
+    
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+```
+                    """
                 }
             ],
             "execution_time": 2.5  # seconds
+        }
+    elif "reverse" in goal.lower() and "string" in goal.lower():
+        # Simulate string reversal function implementation
+        result = {
+            "run_id": run_id,
+            "agent_id": agent_id,
+            "goal": goal,
+            "status": "success",
+            "outputs": [
+                {
+                    "name": "task.output",
+                    "content": """
+def reverse_string(s):
+    \"\"\"
+    Reverses a string.
+    
+    Args:
+        s (str): The input string to reverse
+        
+    Returns:
+        str: The reversed string
+    \"\"\"
+    return s[::-1]
+
+# Example usage:
+# original = "Hello, world!"
+# reversed_string = reverse_string(original)
+# print(reversed_string)  # Output: "!dlrow ,olleH"
+                    """
+                }
+            ],
+            "execution_time": 1.5  # seconds
         }
     else:
         # Generic response for other goals
@@ -109,6 +194,23 @@ def generate_token(user):
                 {
                     "name": "generic.output",
                     "content": f"Implementation for {goal}"
+                },
+                {
+                    "name": "task.output",
+                    "content": f"""
+# Implementation for {goal}
+
+```python
+def solve_{goal.lower().replace(' ', '_')}():
+    \"\"\"
+    Solution for: {goal}
+    \"\"\"
+    # Implementation details would go here
+    return "Solution implemented successfully"
+```
+
+This function provides a framework for solving the requested task.
+                    """
                 }
             ],
             "execution_time": 1.8  # seconds
