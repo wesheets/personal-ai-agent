@@ -21,12 +21,15 @@ def extract_outputs_from_memory(agent_id: str) -> List[Dict[str, Any]]:
     Returns:
         List of memory entries containing outputs
     """
+    # Add debug logging
+    print(f"DEBUG: Extracting outputs for agent: {agent_id}")
+    
     # Simulate memory extraction - this would be replaced with actual implementation
     # that queries the memory store for the agent's outputs
     
     # For HAL agent, return outputs including task.output
     if agent_id.lower() == "hal":
-        return [
+        outputs = [
             {
                 "type": "output",
                 "content": "login.route implementation",
@@ -51,7 +54,7 @@ def extract_outputs_from_memory(agent_id: str) -> List[Dict[str, Any]]:
     
     # For ASH agent, return outputs including summary.task.output and reflection
     elif agent_id.lower() == "ash":
-        return [
+        outputs = [
             {
                 "type": "output",
                 "content": "This function capitalizes each word by splitting the string and applying capitalize() to each word.",
@@ -66,7 +69,7 @@ def extract_outputs_from_memory(agent_id: str) -> List[Dict[str, Any]]:
     
     # For NOVA agent, return outputs including ui.preview and reflection
     elif agent_id.lower() == "nova":
-        return [
+        outputs = [
             {
                 "type": "output",
                 "content": "<div class='result'>\n  <h3>Reversed Words</h3>\n  <ul>\n    <li>world (5)</li>\n    <li>hello (5)</li>\n  </ul>\n</div>",
@@ -80,7 +83,15 @@ def extract_outputs_from_memory(agent_id: str) -> List[Dict[str, Any]]:
         ]
     
     # For other agents, return empty list
-    return []
+    else:
+        outputs = []
+    
+    # Debug log the outputs
+    print(f"DEBUG: Extracted {len(outputs)} outputs for {agent_id}:")
+    for i, output in enumerate(outputs):
+        print(f"  Output {i+1}: type={output.get('type')}, tags={output.get('tags')}")
+    
+    return outputs
 
 def validate_instruction_outputs(
     agent_id: str,
@@ -101,6 +112,11 @@ def validate_instruction_outputs(
     if checkpoints is None:
         checkpoints = []
     
+    # Add debug logging
+    print(f"DEBUG: Validating outputs for agent: {agent_id}")
+    print(f"DEBUG: Expected outputs: {expected_outputs}")
+    print(f"DEBUG: Expected checkpoints: {checkpoints}")
+    
     # Extract outputs from agent memory
     memory_entries = extract_outputs_from_memory(agent_id)
     
@@ -114,24 +130,46 @@ def validate_instruction_outputs(
     for output in expected_outputs:
         output_found = False
         for entry in memory_entries:
-            if output in entry.get("tags", []) or output in entry.get("content", ""):
+            # Debug log the entry being checked
+            print(f"DEBUG: Checking if '{output}' is in entry: type={entry.get('type')}, tags={entry.get('tags')}")
+            
+            # Check if output is in tags or content
+            if output in entry.get("tags", []):
+                print(f"DEBUG: Found '{output}' in tags")
+                output_found = True
+                found_outputs.append(output)
+                break
+            elif output in entry.get("content", ""):
+                print(f"DEBUG: Found '{output}' in content")
                 output_found = True
                 found_outputs.append(output)
                 break
         
         if not output_found:
+            print(f"DEBUG: '{output}' not found in any entry")
             missing_outputs.append(output)
     
     # Check for checkpoints
     for checkpoint in checkpoints:
         checkpoint_found = False
         for entry in memory_entries:
-            if checkpoint in entry.get("tags", []) or checkpoint in entry.get("content", ""):
+            # Debug log the entry being checked
+            print(f"DEBUG: Checking if '{checkpoint}' is in entry: type={entry.get('type')}, tags={entry.get('tags')}")
+            
+            # Check if checkpoint is in tags or content
+            if checkpoint in entry.get("tags", []):
+                print(f"DEBUG: Found '{checkpoint}' in tags")
+                checkpoint_found = True
+                found_checkpoints.append(checkpoint)
+                break
+            elif checkpoint in entry.get("content", ""):
+                print(f"DEBUG: Found '{checkpoint}' in content")
                 checkpoint_found = True
                 found_checkpoints.append(checkpoint)
                 break
         
         if not checkpoint_found:
+            print(f"DEBUG: '{checkpoint}' not found in any entry")
             missing_checkpoints.append(checkpoint)
     
     # Determine overall status
@@ -157,6 +195,9 @@ def validate_instruction_outputs(
             f"Validation failed for agent {agent_id}", 
             details
         )
+    
+    # Debug log the validation result
+    print(f"DEBUG: Validation result for {agent_id}: status={status}, details={details}")
     
     # Return validation result
     return {
