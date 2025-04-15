@@ -64,6 +64,21 @@ def extract_outputs_from_memory(agent_id: str) -> List[Dict[str, Any]]:
             }
         ]
     
+    # For NOVA agent, return outputs including ui.preview and reflection
+    elif agent_id.lower() == "nova":
+        return [
+            {
+                "type": "output",
+                "content": "<div class='result'>\n  <h3>Reversed Words</h3>\n  <ul>\n    <li>world (5)</li>\n    <li>hello (5)</li>\n  </ul>\n</div>",
+                "tags": ["output", "ui.preview"]
+            },
+            {
+                "type": "reflection",
+                "content": "Generated a UI preview that matches HAL's result.",
+                "tags": ["reflection"]
+            }
+        ]
+    
     # For other agents, return empty list
     return []
 
