@@ -7,17 +7,20 @@ MODIFIED: Updated schema to make agent_id optional or provide a default value
 MODIFIED: Added enhanced logging for debugging memory summarize issues
 MODIFIED: Updated to use Pydantic model for request validation
 MODIFIED: Fixed thread key format to use double colons
+MODIFIED: Imported SummarizationRequest from schemas to ensure agent_id is truly optional
 """
 
 import json
 import logging
 import traceback
 from typing import Dict, List, Any, Optional, Union
-from fastapi import APIRouter, HTTPException, Request, Body, Depends
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException, Request
 
 # Import THREAD_DB from memory_thread module
 from app.modules.memory_thread import THREAD_DB
+
+# Import SummarizationRequest from schemas
+from app.schemas.memory import SummarizationRequest
 
 # Configure logging
 logger = logging.getLogger("modules.memory_summarize")
@@ -25,62 +28,35 @@ logger = logging.getLogger("modules.memory_summarize")
 # Create router for memory summarize endpoint
 router = APIRouter()
 
-# Define Pydantic model for request validation
-class SummarizationRequest(BaseModel):
-    project_id: str
-    chain_id: str
-    agent_id: Optional[str] = "orchestrator"  # Using Optional with default value
-
-    class Config:
-        # Make extra fields forbidden to ensure strict validation
-        extra = "forbid"
-
-# Define a function to extract request data
-def get_request_data(
-    project_id: str,
-    chain_id: str,
-    agent_id: Optional[str] = "orchestrator"
-) -> Dict[str, str]:
-    return {
-        "project_id": project_id,
-        "chain_id": chain_id,
-        "agent_id": agent_id
-    }
-
 @router.post("/summarize")
-async def summarize_memory_thread(
-    project_id: str = Body(..., description="Project identifier"),
-    chain_id: str = Body(..., description="Chain identifier"),
-    agent_id: Optional[str] = Body("orchestrator", description="Agent identifier, defaults to orchestrator")
-) -> Dict[str, str]:
+async def summarize_memory_thread(request: SummarizationRequest) -> Dict[str, str]:
     """
     Generate a summary of a memory thread.
     
     Args:
-        project_id: Project identifier
-        chain_id: Chain identifier
-        agent_id: Optional agent identifier, defaults to "orchestrator"
+        request: SummarizationRequest model containing project_id, chain_id, and optional agent_id
         
     Returns:
         Dict[str, str]: Summary of the memory thread
     """
     # Enhanced logging for debugging
-    print(f"🧠 /memory/summarize hit with project_id={project_id}, chain_id={chain_id}, agent_id={agent_id}")
-    logger.info(f"🧠 Memory Summarize: Received request for project_id={project_id}, chain_id={chain_id}")
-    logger.info(f"🧠 Memory Summarize: Using agent_id={agent_id}")
+    print(f"🧠 /memory/summarize hit with project_id={request.project_id}, chain_id={request.chain_id}, agent_id={request.agent_id}")
+    logger.info(f"🧠 Memory Summarize: Received request for project_id={request.project_id}, chain_id={request.chain_id}")
+    logger.info(f"🧠 Memory Summarize: Using agent_id={request.agent_id}")
+    logger.debug(f"🧠 Memory Summarize: Full request={request.dict()}")
     
     # Add specific logging for summarize route hit
-    logger.info(f"🧠 Summarize route hit: {project_id} / {chain_id}")
+    logger.info(f"🧠 Summarize route hit: {request.project_id} / {request.chain_id}")
     
     try:
         # Create the thread key with double colons
-        thread_key = f"{project_id}::{chain_id}"
+        thread_key = f"{request.project_id}::{request.chain_id}"
         print(f"🔍 DEBUG: Thread key: {thread_key}")
         logger.info(f"🧠 Memory Summarize: Using thread key: {thread_key}")
         
         # Check if the thread exists
         if thread_key not in THREAD_DB or not THREAD_DB[thread_key]:
-            error_msg = f"No memory thread found for project_id: {project_id}, chain_id: {chain_id}"
+            error_msg = f"No memory thread found for project_id: {request.project_id}, chain_id: {request.chain_id}"
             print(f"❌ ERROR: {error_msg}")
             print(f"🔍 DEBUG: Available thread keys: {list(THREAD_DB.keys())}")
             logger.error(f"🧠 Memory Summarize: Error - {error_msg}")
@@ -103,7 +79,7 @@ async def summarize_memory_thread(
         # Return the summary
         result = {
             "summary": summary,
-            "agent_id": agent_id  # Include agent_id in response for clarity
+            "agent_id": request.agent_id  # Include agent_id in response for clarity
         }
         print(f"✅ SUCCESS: Memory thread summary generated: {result}")
         logger.info(f"🧠 Memory Summarize: Successfully generated memory thread summary")
@@ -139,9 +115,9 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
     try:
         # Track agents and their activities
         agents_activities = {
-            "hal": {"tasks": [], "summaries": [], "reflections": [], "uis": []},
-            "ash": {"tasks": [], "summaries": [], "reflections": [], "uis": []},
-            "nova": {"tasks": [], "summaries": [], "reflections": [], "uis": []}
+            "hal": {"tasks": [], "summaries": [], "reflections": [], "uis": [], "plans": [], "docs": []},
+            "ash": {"tasks": [], "summaries": [], "reflections": [], "uis": [], "plans": [], "docs": []},
+            "nova": {"tasks": [], "summaries": [], "reflections": [], "uis": [], "plans": [], "docs": []}
         }
         
         # Process each entry in the thread
@@ -168,6 +144,10 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
                 key = "reflections"
             elif step_type == "ui":
                 key = "uis"
+            elif step_type == "plan":
+                key = "plans"
+            elif step_type == "docs":
+                key = "docs"
             else:
                 print(f"🔍 DEBUG: Skipping unrecognized step_type: {step_type}")
                 logger.debug(f"🧠 Memory Summarize: Skipping unrecognized step_type: {step_type}")
@@ -194,6 +174,10 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
             hal_parts.append("reflected on the process")
         if agents_activities["hal"]["uis"]:
             hal_parts.append("created UI elements")
+        if agents_activities["hal"]["plans"]:
+            hal_parts.append("created plans")
+        if agents_activities["hal"]["docs"]:
+            hal_parts.append("wrote documentation")
         
         if hal_parts:
             summary_parts.append(f"HAL {', '.join(hal_parts)}")
@@ -210,6 +194,10 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
             ash_parts.append("provided reflections")
         if agents_activities["ash"]["uis"]:
             ash_parts.append("designed UI components")
+        if agents_activities["ash"]["plans"]:
+            ash_parts.append("developed plans")
+        if agents_activities["ash"]["docs"]:
+            ash_parts.append("created documentation")
         
         if ash_parts:
             summary_parts.append(f"ASH {', '.join(ash_parts)}")
@@ -226,6 +214,10 @@ def generate_thread_summary(thread: List[Dict[str, Any]]) -> str:
             nova_parts.append("offered reflections")
         if agents_activities["nova"]["uis"]:
             nova_parts.append("rendered UI designs")
+        if agents_activities["nova"]["plans"]:
+            nova_parts.append("formulated plans")
+        if agents_activities["nova"]["docs"]:
+            nova_parts.append("prepared documentation")
         
         if nova_parts:
             summary_parts.append(f"NOVA {', '.join(nova_parts)}")
