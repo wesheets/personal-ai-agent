@@ -23,7 +23,7 @@ def generate_preview(function_output: Any) -> Dict[str, str]:
         # Process the function output
         if not function_output:
             return {
-                "ui.preview": "<div class=\"error\">No output to display</div>",
+                "ui.preview": "<div class='error'>No output to display</div>",
                 "reflection": "Failed to generate UI preview due to empty function output."
             }
         
@@ -32,7 +32,7 @@ def generate_preview(function_output: Any) -> Dict[str, str]:
                                                     isinstance(item[0], str) and isinstance(item[1], int) 
                                                     for item in function_output):
             # Generate HTML for the word-length pairs
-            html = "<div class=\"result\">\n"
+            html = "<div class='result'>\n"
             html += "  <h3>Reversed Words</h3>\n"
             html += "  <ul>\n"
             
@@ -48,14 +48,14 @@ def generate_preview(function_output: Any) -> Dict[str, str]:
             }
         elif isinstance(function_output, list) and len(function_output) > 0 and not all(isinstance(item, tuple) and len(item) == 2 for item in function_output):
             # Invalid format for reverse_and_measure output
-            error_html = "<div class=\"error\">Invalid format: Expected list of (word, length) tuples</div>"
+            error_html = "<div class='error'>Invalid format: Expected list of (word, length) tuples</div>"
             return {
                 "ui.preview": error_html,
                 "reflection": "Failed to generate UI preview: Invalid input format. Expected list of (word, length) tuples."
             }
         else:
             # Handle other types of function outputs
-            html = "<div class=\"result\">\n"
+            html = "<div class='result'>\n"
             html += "  <h3>Function Output</h3>\n"
             
             if isinstance(function_output, dict):
@@ -79,7 +79,7 @@ def generate_preview(function_output: Any) -> Dict[str, str]:
             }
     except Exception as e:
         # Handle errors
-        error_html = f"<div class=\"error\">Error generating preview: {str(e)}</div>"
+        error_html = f"<div class='error'>Error generating preview: {str(e)}</div>"
         return {
             "ui.preview": error_html,
             "reflection": f"Failed to generate UI preview: {str(e)}. The output must be recoverable by other agents."
@@ -97,7 +97,7 @@ def test_preview_generation():
     test_output = [("world", 5), ("hello", 5)]
     result = generate_preview(test_output)
     
-    expected_html = '<div class=\"result\">\n  <h3>Reversed Words</h3>\n  <ul>\n    <li>world (5)</li>\n    <li>hello (5)</li>\n  </ul>\n</div>'
+    expected_html = '<div class=\'result\'>\n  <h3>Reversed Words</h3>\n  <ul>\n    <li>world (5)</li>\n    <li>hello (5)</li>\n  </ul>\n</div>'
     
     if result["ui.preview"] == expected_html:
         return {
