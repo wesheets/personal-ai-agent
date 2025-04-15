@@ -4,6 +4,7 @@ Memory Thread Module
 This module provides functionality to store and retrieve memory threads.
 
 MODIFIED: Added enhanced logging for debugging memory thread issues
+MODIFIED: Fixed thread key format to use double colons
 """
 
 import json
@@ -91,8 +92,8 @@ async def add_memory_thread(memory_entry: Dict[str, Any], request: Request = Non
             print(f"🔍 DEBUG: Added timestamp: {memory_entry['timestamp']}")
             logger.debug(f"📝 Memory Thread: Added timestamp: {memory_entry['timestamp']}")
         
-        # Create the thread key
-        thread_key = f"{memory_entry['project_id']}:{memory_entry['chain_id']}"
+        # Create the thread key with double colons
+        thread_key = f"{memory_entry['project_id']}::{memory_entry['chain_id']}"
         print(f"🔍 DEBUG: Thread key: {thread_key}")
         logger.info(f"📝 Memory Thread: Using thread key: {thread_key}")
         
@@ -108,6 +109,9 @@ async def add_memory_thread(memory_entry: Dict[str, Any], request: Request = Non
         logger.info(f"📝 Memory Thread: Added entry to thread. New length: {len(THREAD_DB[thread_key])}")
         print(f"🔍 DEBUG: THREAD_DB now contains {len(THREAD_DB)} threads")
         logger.info(f"📝 Memory Thread: THREAD_DB now contains {len(THREAD_DB)} threads")
+        
+        # Add additional logging for thread updates
+        logger.info(f"📝 Thread updated: {thread_key} now has {len(THREAD_DB[thread_key])} entries")
         
         # Return status and updated thread length
         result = {
@@ -148,8 +152,8 @@ async def get_memory_thread(project_id: str, chain_id: str) -> List[Dict[str, An
     print(f"🔍 DEBUG: GET /memory/thread/{project_id}/{chain_id} endpoint called")
     
     try:
-        # Create the thread key
-        thread_key = f"{project_id}:{chain_id}"
+        # Create the thread key with double colons
+        thread_key = f"{project_id}::{chain_id}"
         print(f"🔍 DEBUG: Thread key: {thread_key}")
         logger.info(f"📝 Memory Thread: Using thread key: {thread_key}")
         
