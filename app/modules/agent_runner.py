@@ -6,6 +6,7 @@ independently from the central agent registry, UI, or delegate-stream system.
 
 MODIFIED: Added full runtime logging and error protection to prevent 502 errors
 MODIFIED: Added memory thread logging for agent steps
+MODIFIED: Added enhanced logging for debugging memory thread issues
 """
 
 import logging
@@ -137,20 +138,28 @@ async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: st
             "content": content
         }
         
+        # Enhanced logging for debugging
+        print(f"🔍 DEBUG: Memory thread entry created with project_id={project_id}, chain_id={chain_id}")
+        print(f"🔍 DEBUG: Memory entry details: {memory_entry}")
+        logger.info(f"DEBUG: Memory thread entry created with project_id={project_id}, chain_id={chain_id}")
+        
         # Log memory entry
         print(f"📝 Logging memory thread for {agent} agent, {step_type} step")
         logger.info(f"Logging memory thread for {agent} agent, {step_type} step")
         
         # Add memory entry to thread
+        print(f"🔍 DEBUG: Calling add_memory_thread with entry")
         result = await add_memory_thread(memory_entry)
         
         # Log result
         print(f"✅ Memory thread logged successfully: {result}")
+        print(f"🔍 DEBUG: add_memory_thread returned: {result}")
         logger.info(f"Memory thread logged successfully: {result}")
     except Exception as e:
         # Log error but don't fail the main process
         error_msg = f"Error logging memory thread: {str(e)}"
         print(f"❌ {error_msg}")
+        print(f"🔍 DEBUG: Exception traceback: {traceback.format_exc()}")
         logger.error(error_msg)
         logger.error(traceback.format_exc())
 
@@ -176,6 +185,10 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
         chain_id = f"chain_{uuid.uuid4().hex[:8]}"
         print(f"🔗 Generated chain_id: {chain_id}")
     
+    # Enhanced logging for debugging
+    print(f"🔍 DEBUG: run_agent_async called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}")
+    logger.info(f"DEBUG: run_agent_async called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}")
+    
     # Map agent_id to standard agent types and roles
     agent_mapping = {
         "hal": {"agent": "hal", "role": "thinker"},
@@ -188,6 +201,8 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
     agent_info = agent_mapping.get(agent_id.lower(), {"agent": "hal", "role": "thinker"})
     agent_type = agent_info["agent"]
     agent_role = agent_info["role"]
+    
+    print(f"🔍 DEBUG: Mapped agent_id={agent_id} to agent_type={agent_type}, agent_role={agent_role}")
     
     try:
         print("🧠 Attempting to run CoreForgeAgent fallback")
@@ -204,6 +219,7 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
             logger.error(error_msg)
             
             # Log error to memory thread
+            print(f"🔍 DEBUG: About to log error to memory thread")
             await log_memory_thread(
                 project_id=project_id,
                 chain_id=chain_id,
@@ -212,6 +228,7 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
                 step_type="task",
                 content=f"Error: {error_msg}"
             )
+            print(f"🔍 DEBUG: Finished logging error to memory thread")
             
             return JSONResponse(
                 status_code=500,
@@ -237,6 +254,7 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
             logger.error(error_msg)
             
             # Log error to memory thread
+            print(f"🔍 DEBUG: About to log error to memory thread")
             await log_memory_thread(
                 project_id=project_id,
                 chain_id=chain_id,
@@ -245,6 +263,7 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
                 step_type="task",
                 content=f"Error: {result.get('content', 'Unknown error')}"
             )
+            print(f"🔍 DEBUG: Finished logging error to memory thread")
             
             return JSONResponse(
                 status_code=500,
@@ -260,6 +279,7 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
         logger.info("AgentRunner success, returning response")
         
         # Log successful response to memory thread
+        print(f"🔍 DEBUG: About to log successful response to memory thread")
         await log_memory_thread(
             project_id=project_id,
             chain_id=chain_id,
@@ -268,6 +288,7 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
             step_type="task",
             content=result.get("content", "")
         )
+        print(f"🔍 DEBUG: Finished logging successful response to memory thread")
         
         # Return successful response
         return {
@@ -288,6 +309,7 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
         
         # Log error to memory thread
         try:
+            print(f"🔍 DEBUG: About to log exception to memory thread")
             await log_memory_thread(
                 project_id=project_id,
                 chain_id=chain_id,
@@ -296,8 +318,10 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
                 step_type="task",
                 content=f"Error: {str(e)}"
             )
+            print(f"🔍 DEBUG: Finished logging exception to memory thread")
         except Exception as log_error:
             print(f"❌ Failed to log error to memory thread: {str(log_error)}")
+            print(f"🔍 DEBUG: Exception when logging error: {traceback.format_exc()}")
         
         # Return structured error response
         return JSONResponse(
@@ -318,6 +342,7 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]], project_id: str = N
     
     MODIFIED: Added full runtime logging and error protection to prevent 502 errors
     MODIFIED: Added memory thread logging for agent steps
+    MODIFIED: Added enhanced logging for debugging memory thread issues
     
     Args:
         agent_id: The ID of the agent to run
@@ -330,15 +355,23 @@ def run_agent(agent_id: str, messages: List[Dict[str, Any]], project_id: str = N
     """
     # ADDED: Entry confirmation logging
     print("🔥 AgentRunner route invoked")
+    print(f"🔍 DEBUG: run_agent called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}")
     logger.info("🔥 AgentRunner route invoked")
     
     # Run the async version in a new event loop
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
+        print(f"🔍 DEBUG: Creating new event loop and running run_agent_async")
         result = loop.run_until_complete(run_agent_async(agent_id, messages, project_id, chain_id))
+        print(f"🔍 DEBUG: run_agent_async completed successfully")
         return result
+    except Exception as e:
+        print(f"🔍 DEBUG: Exception in run_agent event loop: {str(e)}")
+        print(f"🔍 DEBUG: {traceback.format_exc()}")
+        raise
     finally:
+        print(f"🔍 DEBUG: Closing event loop")
         loop.close()
 
 def test_core_forge_isolation():
