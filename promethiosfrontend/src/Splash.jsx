@@ -28,7 +28,7 @@ export default function Splash() {
         <img
           src={logo}
           alt="Promethios Logo"
-          className="w-24 md:w-28 lg:w-32 mx-auto drop-shadow-xl animate-logo-glow"
+          className="w-40 md:w-48 lg:w-56 mx-auto mb-6 drop-shadow-xl animate-logo-glow"
         />
 
         <form
