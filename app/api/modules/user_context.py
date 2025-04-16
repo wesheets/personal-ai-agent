@@ -312,3 +312,85 @@ async def get_user_context(user_id: str = Query(..., description="ID of the user
                 "message": f"Failed to retrieve user context: {str(e)}"
             }
         )
+
+@router.post("/update")
+async def update_user_context(request: Request):
+    """
+    Update user context with provided data
+    
+    This endpoint updates the user context with the provided information.
+    It's a simplified version of the register endpoint for quick updates.
+    
+    Request body:
+    - user_id: Unique identifier for the user (required)
+    - agent_id: ID of the agent associated with this user (optional)
+    - memory_scope: Memory scope for this user (optional)
+    - preferences: Dictionary of user preferences (optional)
+    
+    Returns:
+    - status: "ok" if successful
+    - message: Confirmation message
+    """
+    try:
+        # Parse request body
+        body = await request.json()
+        user_id = body.get("user_id")
+        
+        if not user_id:
+            return JSONResponse(
+                status_code=400, 
+                content={"status": "error", "message": "user_id is required"}
+            )
+        
+        # Check if user already exists
+        existing_user = read_user_context(user_id)
+        
+        # If user exists, update their context
+        if existing_user:
+            # Update fields that are provided
+            if "agent_id" in body:
+                existing_user["agent_id"] = body["agent_id"]
+            
+            if "memory_scope" in body:
+                existing_user["memory_scope"] = body["memory_scope"]
+            
+            if "preferences" in body:
+                existing_user["preferences"] = body["preferences"]
+            
+            # Write updated context
+            write_user_context(existing_user)
+            logger.info(f"✅ Updated existing user context: {user_id}")
+        else:
+            # For new users, create a minimal context
+            user_context_id = f"ctx_{user_id}"
+            memory_scope = body.get("memory_scope", f"user:{user_id}")
+            agent_id = body.get("agent_id", "hal")  # Default to HAL if not specified
+            
+            # Create user context
+            user_context = {
+                "user_context_id": user_context_id,
+                "user_id": user_id,
+                "name": f"User {user_id}",  # Default name
+                "agent_id": agent_id,
+                "preferences": body.get("preferences", {}),
+                "memory_scope": memory_scope,
+                "created_at": datetime.utcnow().isoformat()
+            }
+            
+            # Write to database and in-memory store
+            write_user_context(user_context)
+            logger.info(f"✅ Created new user context via update endpoint: {user_id}")
+        
+        # Store the full context in the in-memory store for quick access
+        user_context_store[user_id] = body
+        
+        return {"status": "ok", "message": f"Context stored for {user_id}"}
+    except Exception as e:
+        logger.error(f"❌ Error updating user context: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": f"Failed to update user context: {str(e)}"
+            }
+        )
