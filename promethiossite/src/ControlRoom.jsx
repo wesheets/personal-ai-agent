@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AgentSidebar from './components/AgentSidebar';
 import AgentInputBar from './components/AgentInputBar';
 import AgentLogThread from './components/AgentLogThread';
+import RightPanel from './components/RightPanel';
 import ThemeToggle from './components/ThemeToggle';
 
 export default function ControlRoom() {
@@ -18,7 +19,7 @@ export default function ControlRoom() {
     setMessages((prev) => [...prev, userMessage]);
     setThinking(true);
 
-    // Simulate agent delay
+    // Simulated agent response
     setTimeout(() => {
       const agentReply = {
         id: Date.now() + 1,
@@ -33,11 +34,11 @@ export default function ControlRoom() {
 
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden">
-      {/* Sidebar */}
+      {/* Left Sidebar */}
       <AgentSidebar />
 
-      {/* Main Panel */}
-      <main className="flex-1 flex flex-col overflow-y-auto">
+      {/* Main Control Panel */}
+      <main className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 flex flex-col p-6 space-y-6 overflow-y-auto">
           <header className="text-center">
             <h1 className="text-3xl font-bold tracking-wide mb-2">🧠 Promethios Control Room</h1>
@@ -46,7 +47,7 @@ export default function ControlRoom() {
             </p>
           </header>
 
-          {/* Agent Log Thread */}
+          {/* Log Thread */}
           <div className="flex-1 bg-gray-900 rounded-xl p-4 overflow-y-auto space-y-2">
             <AgentLogThread messages={messages} />
             {thinking && (
@@ -57,11 +58,14 @@ export default function ControlRoom() {
           </div>
         </div>
 
-        {/* Input */}
+        {/* Input Bar */}
         <AgentInputBar onSend={handleSend} />
       </main>
 
-      {/* Theme Button */}
+      {/* Right Panel (shown only when thinking) */}
+      <RightPanel visible={thinking} />
+
+      {/* Floating Theme Toggle */}
       <ThemeToggle />
     </div>
   );
