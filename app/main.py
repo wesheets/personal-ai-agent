@@ -616,6 +616,11 @@ try:
     print(f"🔍 DEBUG: Respond router object: {respond_router}")
     app.include_router(respond_router, prefix="/api/modules/respond")
     print("🧠 Route defined: /api/modules/respond/generate -> generate_response")
+
+    # ✅ Directly expose at /api/respond for frontend access
+    app.include_router(respond_router, prefix="/api/respond")
+    print("🧠 Route defined: /api/respond -> respond_to_operator")
+
     
     # Import and mount the plan router
     print(f"🔍 DEBUG: Plan router object: {plan_router}")
