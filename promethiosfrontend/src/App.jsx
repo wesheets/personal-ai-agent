@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AgentProvider } from './context/AgentContext';
+
+import Splash from './Splash';
+import ControlRoom from './components/ControlRoom';
 import Layout from './components/Layout';
 
 function App() {
@@ -8,10 +11,8 @@ function App() {
       <Router>
         <Layout>
           <Routes>
-            <Route
-              path="/"
-              element={<div className="text-center p-10">Welcome to Promethios</div>}
-            />
+            <Route path="/" element={<Splash />} />
+            <Route path="/control" element={<ControlRoom />} />
           </Routes>
         </Layout>
       </Router>
