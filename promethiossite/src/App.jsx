@@ -7,7 +7,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<SplashPage />} />
+        <Route path="/" element={<Splash />} />
         <Route
           path="/dashboard"
           element={
