@@ -1,53 +1,42 @@
 """
-Modified system_routes.py to fix the agent manifest endpoint.
-This ensures the endpoint returns a list of available agents from the agent registry
-rather than from a static JSON file.
+Modified system_routes.py to register /respond and expose agent manifest and CORS debug endpoints.
 """
 
 from fastapi import APIRouter, Request
 import logging
 import os
-import json
-from pathlib import Path
 from app.core.middleware.cors import normalize_origin, sanitize_origin_for_header
 from app.core.agent_loader import get_all_agents
+from app.api import respond  # ✅ NEW
 
 # Configure logging
 logger = logging.getLogger("api")
 
 # Create router
-router = APIRouter(prefix="/system", tags=["System"])
+router = APIRouter()
 
-@router.get("/cors-debug")
+# ✅ Register respond.py from app/api/respond.py
+router.include_router(respond.router, prefix="/api")
+
+@router.get("/system/cors-debug")
 async def cors_debug(request: Request):
-    """
-    CORS debugging endpoint that returns detailed diagnostic information
-    about the current request's origin and matching status.
-    
-    This endpoint uses the same logic as the CORS middleware to determine
-    if the request origin is allowed.
-    """
-    # Get the request origin
     request_origin = request.headers.get("origin", "")
     normalized_request_origin = normalize_origin(request_origin)
-    
-    # Get the allowed origins from environment
+
     raw_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "")
     allowed_origins = []
     normalized_allowed_origins = []
-    
-    # Parse and normalize allowed origins
+
     for origin in raw_origins.split(","):
         origin = origin.strip()
         if origin:
             allowed_origins.append(origin)
             normalized_allowed_origins.append(normalize_origin(origin))
-    
-    # Check for a match using strict string equality
+
     matched_origin = None
     match_successful = False
     comparison_results = []
-    
+
     for idx, norm_allowed in enumerate(normalized_allowed_origins):
         is_match = normalized_request_origin == norm_allowed
         comparison_results.append({
@@ -58,13 +47,12 @@ async def cors_debug(request: Request):
             "is_match": is_match,
             "comparison_type": "strict equality"
         })
-        
+
         if is_match:
             matched_origin = allowed_origins[idx]
             match_successful = True
             break
-    
-    # Return detailed diagnostic information
+
     return {
         "request_origin": request_origin,
         "normalized_origin": normalized_request_origin,
@@ -82,18 +70,11 @@ async def cors_debug(request: Request):
         }
     }
 
-@router.get("/agents/manifest")
+@router.get("/system/agents/manifest")
 async def get_agents_manifest():
-    """
-    Returns the agent manifest containing metadata about all available agents.
-    
-    Modified to use the agent registry instead of a static JSON file.
-    This ensures the manifest reflects the actual loaded agents.
-    """
     try:
-        # Get all loaded agents from the registry
         loaded_agents = get_all_agents()
-        
+
         if not loaded_agents:
             logger.warning("Agent registry is empty or failed to initialize")
             return {
@@ -103,8 +84,7 @@ async def get_agents_manifest():
                 "status": "degraded",
                 "error": "Agent registry is empty or failed to initialize"
             }
-        
-        # Create a list of agent data for the response
+
         agent_list = []
         for agent_id, agent_instance in loaded_agents.items():
             agent_info = {
@@ -115,15 +95,14 @@ async def get_agents_manifest():
                 "description": getattr(agent_instance, "description", "No description available")
             }
             agent_list.append(agent_info)
-        
-        # Return the agent manifest
+
         return {
             "agents": agent_list,
             "total_agents": len(agent_list),
             "active_agents": len(agent_list),
             "status": "success"
         }
-    
+
     except Exception as e:
         logger.error(f"Error generating agent manifest: {str(e)}")
         return {
