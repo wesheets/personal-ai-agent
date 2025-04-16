@@ -6,7 +6,7 @@ from typing import Optional, List, Dict, Any
 import uuid
 from datetime import datetime
 from src.utils.debug_logger import log_test_result
-from app.core.agent_loader import agent_registry  # ✅ Direct registry
+from app.core.agent_loader import get_all_agents
 
 router = APIRouter()
 
@@ -34,16 +34,22 @@ async def delegate_task(request: Request):
 
         # Validation
         if not delegation_request.agent_name or not delegation_request.objective:
-            raise HTTPException(status_code=400, detail="agent_name and objective are required.")
-
-        if delegation_request.agent_name not in agent_registry:
-            return JSONResponse(content={
-                "status": "error",
-                "log": f"Agent '{delegation_request.agent_name}' not found."
-            })
-
-        # Check capabilities
-        if delegation_request.required_capabilities:
+            raise HTTPException(status_code=400, detail="Missing required fields: agent_name and objective are required")
+        
+        # Check agent capabilities if required_capabilities is provided
+        if delegation_request.required_capabilities and len(delegation_request.required_capabilities) > 0:
+            # Get agent registry
+            agent_registry = get_all_agents()
+            
+            # Check if agent exists
+            if delegation_request.agent_name not in agent_registry:
+                log_test_result("Delegation", "/api/delegate", "FAIL", f"Agent '{delegation_request.agent_name}' not found", "Agent not in registry")
+                return JSONResponse(content={
+                    "status": "error",
+                    "log": f"Agent '{delegation_request.agent_name}' not found."
+                })
+                
+            # Check capabilities
             capabilities = agent_registry[delegation_request.agent_name].get("tools", [])
             missing = [cap for cap in delegation_request.required_capabilities if cap not in capabilities]
             if missing:

@@ -700,12 +700,15 @@ except Exception as e:
         version="1.0.0"
     )
     
+    # Store error message in a variable to avoid referencing 'e' directly in route decorators
+    error_message = str(e)
+    
     @app.get("/")
     async def error_root():
         """Root endpoint in error mode."""
         return {
             "status": "error",
-            "message": f"Application failed to start: {str(e)}",
+            "message": f"Application failed to start: {error_message}",
             "timestamp": datetime.datetime.now().isoformat()
         }
     
@@ -714,7 +717,7 @@ except Exception as e:
         """Health check endpoint in error mode."""
         return {
             "status": "error",
-            "message": f"Application failed to start: {str(e)}",
+            "message": f"Application failed to start: {error_message}",
             "timestamp": datetime.datetime.now().isoformat()
         }
     
