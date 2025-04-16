@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+
 import AgentSidebar from './AgentSidebar';
 import AgentOutputCard from './AgentOutputCard';
 import CriticOutputCard from './CriticOutputCard';
 import AgentChatPanel from './AgentChatPanel';
+import AgentInputBar from './AgentInputBar';
 import TerminalDrawer from './TerminalDrawer';
 import ThemeToggle from './ThemeToggle';
 
@@ -11,7 +13,7 @@ export default function ControlRoom() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mocked data (swap with fetch later)
+    // Simulate agent output for now
     setTimeout(() => {
       setData({
         project_id: 'founder-stack',
@@ -56,6 +58,9 @@ export default function ControlRoom() {
 
         <section className="flex-1 min-h-[200px] mt-6">
           <AgentChatPanel />
+          <div className="mt-4">
+            <AgentInputBar />
+          </div>
         </section>
       </main>
 
