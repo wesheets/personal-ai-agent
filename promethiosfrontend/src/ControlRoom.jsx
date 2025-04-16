@@ -39,5 +39,28 @@ export default function ControlRoom() {
       <main className="flex-1 flex flex-col overflow-y-auto p-6 space-y-6">
         <header className="text-center">
           <h1 className="text-3xl font-bold tracking-wide mb-2">🧠 Promethios Control Room</h1>
-          <p> className="text-sm text-gray-400">
-            Project:
+          <p className="text-sm text-gray-400">
+            Project: <strong>{data.project_id}</strong> / Chain: <strong>{data.chain_id}</strong>
+          </p>
+        </header>
+
+        <section className="space-y-4">
+          <AgentOutputCard title="HAL – Product Scope" content={data.outputs.hal} />
+          <AgentOutputCard title="ASH – Docs & Onboarding" content={data.outputs.ash} />
+          <AgentOutputCard title="NOVA – UI Layouts" content={data.outputs.nova} />
+          <CriticOutputCard
+            score={data.outputs.critic.score}
+            feedback={data.outputs.critic.feedback}
+          />
+        </section>
+
+        <section className="flex-1 min-h-[200px] mt-6">
+          <AgentChatPanel />
+        </section>
+      </main>
+
+      <ThemeToggle />
+      <TerminalDrawer />
+    </div>
+  );
+}
