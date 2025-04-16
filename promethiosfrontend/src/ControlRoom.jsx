@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
+import AgentSidebar from "./AgentSidebar";
 import AgentOutputCard from "./AgentOutputCard";
 import CriticOutputCard from "./CriticOutputCard";
+import AgentChatPanel from "./AgentChatPanel";
+import TerminalDrawer from "./TerminalDrawer";
+import ThemeToggle from "./ThemeToggle";
 
 export default function ControlRoom() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mocked response to simulate agent output
+    // Mocked data (swap with fetch later)
     setTimeout(() => {
       setData({
         project_id: "founder-stack",
@@ -29,19 +33,11 @@ export default function ControlRoom() {
   if (loading) return <div className="p-8 text-gray-400">Loading agent thread...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 text-white">
-      <h1 className="text-3xl font-bold mb-6 text-center tracking-wide">🧠 Promethios Control Room</h1>
-      <p className="text-sm text-gray-400 mb-4 text-center">
-        Project: <strong>{data.project_id}</strong> / Chain: <strong>{data.chain_id}</strong>
-      </p>
+    <div className="flex h-screen bg-black text-white overflow-hidden">
+      <AgentSidebar />
 
-      <AgentOutputCard title="HAL – Product Scope" content={data.outputs.hal} />
-      <AgentOutputCard title="ASH – Docs & Onboarding" content={data.outputs.ash} />
-      <AgentOutputCard title="NOVA – UI Layouts" content={data.outputs.nova} />
-      <CriticOutputCard
-        score={data.outputs.critic.score}
-        feedback={data.outputs.critic.feedback}
-      />
-    </div>
-  );
-}
+      <main className="flex-1 flex flex-col overflow-y-auto p-6 space-y-6">
+        <header className="text-center">
+          <h1 className="text-3xl font-bold tracking-wide mb-2">🧠 Promethios Control Room</h1>
+          <p className="text-sm text-gray-400">
+            Project:
