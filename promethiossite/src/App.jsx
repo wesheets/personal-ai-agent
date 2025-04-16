@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import SplashPage from './SplashPage';
+import SplashPage from './Splash';
 import ControlRoom from './ControlRoom';
 import PrivateRoute from './PrivateRoute';
 
