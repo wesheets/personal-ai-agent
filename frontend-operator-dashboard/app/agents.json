@@ -1,0 +1,18 @@
+{
+  "hal": {
+    "description": "HAL is a general purpose assistant",
+    "traits": ["helpful", "analytical", "logical"],
+    "name": "HAL",
+    "created_at": "2025-04-10T11:34:22Z",
+    "modules": ["memory", "reflection", "loop"],
+    "loop_count": 0
+  },
+  "ash": {
+    "description": "ASH is a specialized science assistant",
+    "traits": ["scientific", "precise", "methodical"],
+    "name": "ASH",
+    "created_at": "2025-04-09T17:12:01Z",
+    "modules": ["memory", "delegate"],
+    "loop_count": 0
+  }
+}

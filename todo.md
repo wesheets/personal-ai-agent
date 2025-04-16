@@ -1,59 +1,44 @@
-# Promethios Phase 2 — UI & Agent Loop Stabilization Todo List
+# Agent Debug & Cognition Tracker Suite Implementation
 
-## Sprint 1: manus-task-ui-recovery
+## Tasks
 
-### Fix AgentChat Logic
-- [x] Replace static agent_id references with dynamic useParams() in AgentChat.jsx
-- [x] Scope conversationHistory to: chat_history_${agentId}
-- [x] Ensure agent.name renders from loaded agent object (not hardcoded)
+- [x] Step 1: Confirm `debug_tracker.md` and `debug_logger.py` from the previous task are active.
 
-### Add UI Feedback States
-- [x] Add loading spinner on agent fetch
-- [x] Add error fallback: "⚠️ Agent response failed. Try again or switch agents."
-- [x] Use AbortController to prevent infinite hangs during fetch
+- [x] Step 2: Create `/api/orchestrator/consult` route
 
-### Handle 502+ API Failures
-- [x] Detect 502, 504, or undefined responses from /api/delegate-stream
-- [x] Display UI-friendly fallback: "⚠️ This agent is temporarily unavailable. Please try again or switch agents."
-- [x] Implement retry once before showing error
-- [x] Confirm payload includes valid agent_id (LifeTree, SiteGen, NEUREAL, etc.)
+  - [x] Add `consult.py` route file
+  - [x] Implement InstructionSchema handling
+  - [x] Trigger agent tool.run() logic
+  - [x] Write outputs to memory
+  - [x] Write reflection tagged to goal
+  - [x] Return appropriate status
 
-### Agent Mapping Fix (Critical)
-- [x] Add agent name → backend ID mapping logic
-- [x] Implement mapping using agentNameMap[displayName] || displayName to resolve all delegate calls
+- [x] Step 3: Create `/modules/instruction_validator.py`
 
-### Route Handling
-- [x] Confirm sidebar + /agent/:id loads dynamically
-- [x] Ensure unknown agent IDs fail gracefully
+  - [x] Implement validation of expected outputs
+  - [x] Return "complete" or "failed" status
+  - [x] Log validation results
 
-## Sprint 2: manus-task-agent-loop-test
+- [x] Step 4: Create stubs
 
-### Validate Agent Loop Functionality
-- [x] Test Core Promethios OS Agents
-- [x] Test Life Tree Agent
-- [x] Test Site Plan Agent
-- [x] Test NEUREAL Agent
-- [x] Verify loop validation criteria
+  - [x] Create `agent_tool_runner.py`
+  - [x] Create `agent_reflection.py`
+  - [x] Create `extract_outputs_from_memory` function
 
-## Sprint 3: manus-task-dashboard-stabilize
+- [x] Step 5: Enhance `/tests/run_debug_sequence.py`
 
-### Memory Browser
-- [x] Fix infinite spinner issues
-- [x] Add pagination
-- [x] Add fallback on empty/fail states
+  - [x] Add test for sample instruction to HAL
+  - [x] Log response and memory to debug_tracker.md
 
-### Dashboard View
-- [x] Add "Loading system metrics..." fallback
-- [x] Throttle or debounce heavy API calls
+- [x] Step 6: Wire `log_test_result()` into components
 
-### Agent Activity Map
-- [x] Validate /api/agent/status returns clean JSON
-- [x] Display health: uptime, response rate, error %
+  - [x] Agent tool execution step
+  - [x] Reflection writing step
+  - [x] Instruction validation result
+  - [x] Failure/exception traces
 
-### Diagnostic: Agent Manifest Route
-- [x] Call and expose results from GET /api/system/agents/manifest
-- [x] Use this for live verification of available agent IDs
-
-### Optional: GPT Usage Debug Route
-- [x] Implement /api/debug/gpt-usage route
-- [x] Display token use, agent ID, latency, failures
+- [ ] Step 7: Push to branch `feature/phase-11-tracker`
+  - [ ] Create branch
+  - [ ] Commit changes
+  - [ ] Push to GitHub
+  - [ ] Notify when ready

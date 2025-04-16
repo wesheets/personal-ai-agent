@@ -44,6 +44,32 @@ try:
     from app.api.modules.plan import router as plan_router  # Plan Generator module router
     from app.api.modules.project import router as project_router  # Project Management module router
     
+    # Import missing routers identified in Postman sweep
+    from app.api.orchestrator import consult  # Orchestrator consult router
+    from app.api.orchestrator import chain  # Orchestrator chain router
+    from app.api.modules import delegate  # Delegate router
+    from app.api.modules import system  # System status router
+    from app.api.modules import agent  # Agent list router
+    
+    # Import memory thread and summarize routers
+    from app.modules.memory_thread import router as memory_thread_router
+    from app.modules.memory_summarize import router as memory_summarize_router
+    
+    # Import project start router for Phase 12.0 - CRITICAL for Agent Playground
+    print("🔄 Importing project start router for Phase 12.0 (Agent Playground)")
+    try:
+        from app.api.project import start  # Project start router
+        print("✅ Successfully imported project start router")
+    except Exception as e:
+        print(f"❌ ERROR importing project start router: {str(e)}")
+        logging.error(f"Failed to import project start router: {str(e)}")
+        # Create a placeholder router to prevent app startup failure
+        start = APIRouter()
+        @start.get("/error")
+        async def project_start_import_error():
+            return {"status": "error", "message": f"Failed to import project start router: {str(e)}"}
+        print("⚠️ Created placeholder router for /api/project/error")
+    
     # MODIFIED: Commented out problematic routes
     """
     from app.api.agent import router as agent_router
@@ -186,6 +212,41 @@ try:
                 "future": "Planned for future implementation"
             },
             "last_updated": current_time
+        }
+
+    # Add debug endpoint for memory verification
+    @app.get("/api/debug/memory/log")
+    async def debug_memory_log():
+        """
+        Debug endpoint to verify memory thread database state.
+        Returns thread counts and recent entries.
+        """
+        from app.modules.memory_thread import THREAD_DB
+        import datetime
+
+        thread_counts = {}
+        for key, entries in THREAD_DB.items():
+            project_id, chain_id = key.split(":")
+            if project_id not in thread_counts:
+                thread_counts[project_id] = {}
+            thread_counts[project_id][chain_id] = len(entries)
+
+        recent_entries = []
+        for key, entries in THREAD_DB.items():
+            for entry in entries[-5:]:
+                entry_with_key = entry.copy()
+                entry_with_key["thread_key"] = key
+                recent_entries.append(entry_with_key)
+
+        recent_entries.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+        recent_entries = recent_entries[:10]
+
+        return {
+            "status": "ok",
+            "thread_count": len(THREAD_DB),
+            "thread_counts_by_project": thread_counts,
+            "recent_entries": recent_entries,
+            "timestamp": datetime.datetime.now().isoformat()
         }
 
     # Add startup delay to ensure FastAPI is fully initialized before healthcheck
@@ -336,6 +397,62 @@ try:
     print("📡 Including Agent Reflect module router from /app/modules/agent_reflect.py")
     print("📡 Including Agent Fallback module router from /app/modules/agent_fallback.py")
     print("📡 Including Task Supervisor module router from /app/modules/task_supervisor.py")
+    print("📡 Including MemoryThread module router from /app/modules/memory_thread.py")
+    print("📡 Including MemorySummarize module router from /app/modules/memory_summarize.py")
+    
+    # Register missing routers identified in Postman sweep
+    print("📡 Including Orchestrator Consult router from /app/api/orchestrator/consult.py")
+    app.include_router(consult.router, prefix="/api/orchestrator")
+    print("🧠 Route defined: /api/orchestrator/consult -> consult_agent")
+    
+    # Register chain router for Phase 11.4
+    print("📡 Including Orchestrator Chain router from /app/api/orchestrator/chain.py")
+    app.include_router(chain.router, prefix="/api/orchestrator")
+    print("🧠 Route defined: /api/orchestrator/chain -> chain_instructions")
+    
+    # Register project start router for Phase 12.0 - CRITICAL for Agent Playground
+    print("📡 Including Project Start router from /app/api/project/start.py")
+    try:
+        app.include_router(start.router, prefix="/api/project")
+        print("🧠 Route defined: /api/project/start -> start_project")
+        print("✅ Successfully registered /api/project/start route")
+        
+        # Add a debug endpoint to verify project start router registration
+        @app.get("/api/debug/project-start-registered")
+        async def verify_project_start_registration():
+            """Debug endpoint to verify project start router registration."""
+            routes = [{"path": route.path, "methods": list(route.methods) if hasattr(route, "methods") else []} 
+                     for route in app.routes if "/api/project/start" in route.path]
+            return {
+                "status": "ok", 
+                "project_start_routes": routes,
+                "registered": len(routes) > 0,
+                "timestamp": datetime.datetime.now().isoformat()
+            }
+    except Exception as e:
+        print(f"❌ ERROR registering project start router: {str(e)}")
+        logging.error(f"Failed to register project start router: {str(e)}")
+        # Add a debug endpoint to report the error
+        @app.get("/api/debug/project-start-error")
+        async def project_start_registration_error():
+            """Debug endpoint to report project start router registration error."""
+            return {
+                "status": "error", 
+                "message": f"Failed to register project start router: {str(e)}",
+                "timestamp": datetime.datetime.now().isoformat()
+            }
+    
+    print("📡 Including Delegate router from /app/api/modules/delegate.py")
+    app.include_router(delegate.router, prefix="/api")
+    print("🧠 Route defined: /api/delegate -> delegate_task")
+    
+    print("📡 Including System Status router from /app/api/modules/system.py")
+    app.include_router(system.router, prefix="/api/system")
+    print("🧠 Route defined: /api/system/status -> get_system_status")
+    
+    print("📡 Including Agent List router from /app/api/modules/agent.py")
+    app.include_router(agent.router, prefix="/api/agent")
+    print("🧠 Route defined: /api/agent/list -> list_agents")
     
     # Mount the AgentRunner module router
     print(f"🔍 DEBUG: AgentRunner module router object: {agent_module_router}")
@@ -352,6 +469,16 @@ try:
     print("🧠 Route defined: /api/memory/thread -> memory_thread")
     print("🧠 Route defined: /api/memory/reflect -> reflect_on_memories")
     print("🧠 Route defined: /api/memory/summarize -> summarize_memories_endpoint")
+    
+    # Mount the MemoryThread module router
+    print(f"🔍 DEBUG: MemoryThread module router object: {memory_thread_router}")
+    app.include_router(memory_thread_router, prefix="/api/memory")
+    print("🧠 Route defined: /api/memory/thread/{project_id}/{chain_id}")
+    
+    # Mount the MemorySummarize module router
+    print(f"🔍 DEBUG: MemorySummarize module router object: {memory_summarize_router}")
+    app.include_router(memory_summarize_router, prefix="/api/memory")
+    print("🧠 Route defined: /api/memory/summarize")
     
     # Import and use the enhanced route logger for detailed diagnostics
     try:
@@ -383,6 +510,14 @@ try:
         except Exception as e:
             print(f"⚠️ Error logging routes: {str(e)}")
             logger.error(f"⚠️ Error logging routes: {str(e)}")
+    
+    # Add dedicated route debug logger for troubleshooting 404 issues
+    @app.on_event("startup")
+    async def log_registered_routes():
+        print("\n🔍 [ROUTE DEBUG] Registered routes:")
+        for route in app.routes:
+            print(f"📍 {route.path} -> {route.name}")
+        print("✅ [ROUTE DEBUG] Route listing complete\n")
     
     # Import and mount the orchestrator scope router
     from app.modules.orchestrator_scope import router as scope_router
@@ -469,60 +604,125 @@ try:
     
     # Import and mount the feedback router
     print(f"🔍 DEBUG: Feedback router object: {feedback_router}")
-    app.include_router(feedback_router, prefix="/api/modules")
-    print("🧠 Route defined: /api/modules/feedback/write -> write_feedback")
+    app.include_router(feedback_router, prefix="/api/modules/feedback")
+    print("🧠 Route defined: /api/modules/feedback/submit -> submit_feedback")
     
-    # Import and mount the user_context router
+    # Import and mount the user context router
     print(f"🔍 DEBUG: User Context router object: {user_context_router}")
     app.include_router(user_context_router, prefix="/api/modules/user_context")
-    print("🧠 Route defined: /api/modules/user_context/register -> register_user")
     print("🧠 Route defined: /api/modules/user_context/get -> get_user_context")
+
+    # ✅ Register delegate route directly at /api/delegate
+    from app.api import delegate  # Add this near your other import statements if missing
+
+    print("📡 Including Delegate router from /app/api/delegate.py")
+    app.include_router(delegate.router, prefix="/api")
+    print("🧠 Route defined: /api/delegate -> delegate_task")
+
     
     # Import and mount the respond router
     print(f"🔍 DEBUG: Respond router object: {respond_router}")
     app.include_router(respond_router, prefix="/api/modules/respond")
+    print("🧠 Route defined: /api/modules/respond/generate -> generate_response")
+
+    # ✅ Directly expose at /api/respond for frontend access
+    app.include_router(respond_router, prefix="/api/respond")
+    print("🧠 Route defined: /api/respond -> respond_to_operator")
+
     
     # Import and mount the plan router
     print(f"🔍 DEBUG: Plan router object: {plan_router}")
     app.include_router(plan_router, prefix="/api/modules/plan")
-    print("🧠 Route defined: /api/modules/plan/generate -> generate_task_plan")
-    print("🧠 Route defined: /api/modules/plan/user-goal -> generate_user_goal_plan")
-    print("🧠 Route defined: /api/modules/respond -> respond_endpoint")
+    print("🧠 Route defined: /api/modules/plan/generate -> generate_plan")
     
     # Import and mount the project router
     print(f"🔍 DEBUG: Project router object: {project_router}")
     app.include_router(project_router, prefix="/api/modules/project")
-    print("🧠 Route defined: /api/modules/project/initiate -> project_initiate")
+    print("🧠 Route defined: /api/modules/project/create -> create_project")
     
-    # Mount health router
-    app.include_router(health_router)
+    # Mount the health router
+    app.include_router(health_router, prefix="/api/health")
+    print("🧠 Route defined: /api/health/check -> health_check")
     
-    # Commented out static files mount to prevent crash in container deployment
-    # app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    # Add Swagger UI with custom configuration
+    @app.get("/docs", include_in_schema=False)
+    async def custom_swagger_ui_html():
+        return get_swagger_ui_html(
+            openapi_url=app.openapi_url,
+            title=app.title + " - API Documentation",
+            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+            swagger_js_url="/static/swagger-ui-bundle.js",
+            swagger_css_url="/static/swagger-ui.css",
+        )
     
-    # Log successful startup
+    # Mount static files for Swagger UI
+    app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    
+    # Add a catch-all route for debugging 404 errors
+    @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"])
+    async def catch_all(request: Request, path: str):
+        """
+        Catch-all route for debugging 404 errors.
+        This helps identify missing routes during development.
+        """
+        logger.warning(f"404 Not Found: {request.method} {request.url}")
+        logger.warning(f"Path: {path}")
+        logger.warning(f"Headers: {request.headers}")
+        
+        # Return a more detailed 404 response for debugging
+        return JSONResponse(
+            status_code=404,
+            content={
+                "status": "error",
+                "message": f"Route not found: {request.method} {path}",
+                "timestamp": datetime.datetime.now().isoformat(),
+                "available_routes": [
+                    {"path": route.path, "methods": list(route.methods) if hasattr(route, "methods") else []} 
+                    for route in app.routes if isinstance(route, APIRoute)
+                ]
+            }
+        )
+    
+    # Final startup message
     print("✅ All routes registered successfully")
-    print("✅ API is ready to accept requests")
+    print("🚀 Enhanced AI Agent System is ready to serve requests")
     
 except Exception as e:
-    # Log the error
-    print(f"❌ ERROR DURING STARTUP: {str(e)}")
+    # Global error handler for startup failures
+    import traceback
+    print(f"❌ CRITICAL ERROR during startup: {str(e)}")
+    print(f"❌ Traceback: {traceback.format_exc()}")
     
-    # Create a minimal FastAPI app that can respond to health checks
+    # Create a minimal FastAPI app for error reporting
     app = FastAPI(
-        title="Enhanced AI Agent System [ERROR MODE]",
-        description="Error occurred during startup. Only health endpoints are available.",
+        title="Enhanced AI Agent System (ERROR MODE)",
+        description="Error recovery mode due to startup failure",
         version="1.0.0"
     )
     
-    # Add health endpoints that still return OK to prevent container restarts
-    @app.get("/health")
-    async def health_error_mode():
-        return {"status": "error", "message": "Error during startup"}
+    # Store error message in a variable to avoid referencing 'e' directly in route decorators
+    error_message = str(e)
     
     @app.get("/")
-    async def root_health_error_mode():
-        return {"status": "error", "message": "Error during startup"}
+    async def error_root():
+        """Root endpoint in error mode."""
+        return {
+            "status": "error",
+            "message": f"Application failed to start: {error_message}",
+            "timestamp": datetime.datetime.now().isoformat()
+        }
     
-    # Log the fallback mode
-    print("⚠️ Started in ERROR MODE with minimal health endpoints")
+    @app.get("/health")
+    async def error_health():
+        """Health check endpoint in error mode."""
+        return {
+            "status": "error",
+            "message": f"Application failed to start: {error_message}",
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+    
+    print("⚠️ Created minimal error reporting API")
+
+# If this file is run directly, start the server
+if __name__ == "__main__":
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

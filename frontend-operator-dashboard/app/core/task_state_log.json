@@ -1,0 +1,110 @@
+{
+  "goal_id": "g-20250330-parallel-workflow-test",
+  "goal_description": "Build a SaaS landing page with code, copy, and competitive research",
+  "status": "completed",
+  "created_at": "2025-03-30T01:10:20.123456",
+  "updated_at": "2025-03-30T01:10:45.789012",
+  "completed_at": "2025-03-30T01:10:45.789012",
+  "tasks": [
+    {
+      "task_id": "t-20250330-001",
+      "task_description": "Create HTML/CSS for SaaS landing page",
+      "status": "completed",
+      "priority": 5,
+      "assigned_agent": "builder",
+      "created_at": "2025-03-30T01:10:20.123456",
+      "updated_at": "2025-03-30T01:10:35.123456",
+      "started_at": "2025-03-30T01:10:25.123456",
+      "completed_at": "2025-03-30T01:10:35.123456",
+      "dependencies": [],
+      "result": {
+        "code_files": ["index.html", "styles.css"],
+        "completion_message": "Landing page code completed successfully"
+      },
+      "error": null,
+      "retry_count": 0,
+      "max_retries": 3
+    },
+    {
+      "task_id": "t-20250330-002",
+      "task_description": "Write compelling copy for SaaS landing page",
+      "status": "completed",
+      "priority": 4,
+      "assigned_agent": "researcher",
+      "created_at": "2025-03-30T01:10:20.123456",
+      "updated_at": "2025-03-30T01:10:40.123456",
+      "started_at": "2025-03-30T01:10:25.123456",
+      "completed_at": "2025-03-30T01:10:40.123456",
+      "dependencies": [],
+      "result": {
+        "copy_sections": ["hero", "features", "pricing", "testimonials", "cta"],
+        "completion_message": "Landing page copy completed successfully"
+      },
+      "error": null,
+      "retry_count": 0,
+      "max_retries": 3
+    },
+    {
+      "task_id": "t-20250330-003",
+      "task_description": "Conduct competitive research on similar SaaS products",
+      "status": "completed",
+      "priority": 3,
+      "assigned_agent": "researcher",
+      "created_at": "2025-03-30T01:10:20.123456",
+      "updated_at": "2025-03-30T01:10:38.123456",
+      "started_at": "2025-03-30T01:10:25.123456",
+      "completed_at": "2025-03-30T01:10:38.123456",
+      "dependencies": [],
+      "result": {
+        "competitors_analyzed": 5,
+        "key_findings": ["pricing strategies", "feature differentiation", "messaging approaches"],
+        "completion_message": "Competitive research completed successfully"
+      },
+      "error": null,
+      "retry_count": 0,
+      "max_retries": 3
+    },
+    {
+      "task_id": "t-20250330-004",
+      "task_description": "Integrate copy into landing page code",
+      "status": "completed",
+      "priority": 4,
+      "assigned_agent": "builder",
+      "created_at": "2025-03-30T01:10:20.123456",
+      "updated_at": "2025-03-30T01:10:45.123456",
+      "started_at": "2025-03-30T01:10:40.123456",
+      "completed_at": "2025-03-30T01:10:45.123456",
+      "dependencies": ["t-20250330-001", "t-20250330-002"],
+      "result": {
+        "integrated_files": ["index.html"],
+        "completion_message": "Copy successfully integrated into landing page"
+      },
+      "error": null,
+      "retry_count": 0,
+      "max_retries": 3
+    },
+    {
+      "task_id": "t-20250330-005",
+      "task_description": "Apply competitive insights to final landing page",
+      "status": "completed",
+      "priority": 3,
+      "assigned_agent": "memory",
+      "created_at": "2025-03-30T01:10:20.123456",
+      "updated_at": "2025-03-30T01:10:45.123456",
+      "started_at": "2025-03-30T01:10:38.123456",
+      "completed_at": "2025-03-30T01:10:45.123456",
+      "dependencies": ["t-20250330-003", "t-20250330-004"],
+      "result": {
+        "applied_insights": [
+          "unique value proposition",
+          "pricing strategy",
+          "feature highlighting"
+        ],
+        "completion_message": "Competitive insights successfully applied"
+      },
+      "error": null,
+      "retry_count": 0,
+      "max_retries": 3
+    }
+  ]
+}
