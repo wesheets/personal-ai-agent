@@ -40,6 +40,9 @@ def deploy() -> dict:
                 deployment_url = line.strip()
                 break
         
+        # Log to memory
+        _log_to_memory("deploy", f"Successfully deployed to Vercel: {deployment_url if deployment_url else 'URL not found'}", "success")
+        
         return {
             "status": "success",
             "message": "Successfully deployed to Vercel",
@@ -50,6 +53,10 @@ def deploy() -> dict:
     except subprocess.CalledProcessError as e:
         error_message = f"Vercel deployment failed: {e.stderr}"
         logger.error(error_message)
+        
+        # Log to memory
+        _log_to_memory("deploy", f"Vercel deployment failed: {e.stderr}", "error")
+        
         return {
             "status": "error",
             "message": error_message,
@@ -61,11 +68,40 @@ def deploy() -> dict:
     except Exception as e:
         error_message = f"Error in deploy: {str(e)}"
         logger.error(error_message)
+        
+        # Log to memory
+        _log_to_memory("deploy", f"Error in deployment: {str(e)}", "error")
+        
         return {
             "status": "error",
             "message": error_message,
             "error": str(e)
         }
+
+def _log_to_memory(operation: str, content: str, status: str):
+    """
+    Log deployment operations to memory.
+    
+    Args:
+        operation (str): The operation performed
+        content (str): Description of the operation
+        status (str): Status of the operation (success, error)
+    """
+    try:
+        from app.modules.memory_writer import write_memory
+        
+        write_memory(
+            agent_id="system",
+            type="deployment_operation",
+            content=content,
+            tags=["tools", "vercel_deploy", operation, status],
+            task_type="deployment_operation",
+            status="completed" if status == "success" else status
+        )
+        
+        logger.info(f"Logged {operation} operation to memory with status {status}")
+    except Exception as e:
+        logger.error(f"Failed to log operation to memory: {str(e)}")
 
 # Add memory logging function for tool installation
 def log_installation():
@@ -79,8 +115,8 @@ def log_installation():
         write_memory(
             agent_id="system",
             type="tool_installation",
-            content="Installed vercel_deploy.py tool for Phase 3 Agent Toolkit",
-            tags=["tools", "vercel_deploy", "installation"],
+            content="Installed vercel_deploy.py tool for Phase 3.2 Agent Toolkit",
+            tags=["tools", "vercel_deploy", "installation", "toolkit_ready"],
             task_type="installation",
             status="completed"
         )

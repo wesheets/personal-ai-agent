@@ -45,6 +45,10 @@ def git_commit_push(message: str) -> dict:
         # Check if there were changes to commit
         if commit_process.returncode != 0 and "nothing to commit" in commit_process.stdout + commit_process.stderr:
             logger.info("No changes to commit")
+            
+            # Log to memory
+            _log_to_memory("git_commit_push", "No changes to commit", "no_changes")
+            
             return {
                 "status": "success",
                 "message": "No changes to commit",
@@ -67,6 +71,9 @@ def git_commit_push(message: str) -> dict:
         )
         logger.info("Successfully pushed changes to GitHub")
         
+        # Log to memory
+        _log_to_memory("git_commit_push", f"Committed and pushed changes with message: {message}", "success")
+        
         return {
             "status": "success",
             "message": "Changes committed and pushed successfully",
@@ -81,6 +88,10 @@ def git_commit_push(message: str) -> dict:
     except subprocess.CalledProcessError as e:
         error_message = f"Git operation failed: {e.stderr}"
         logger.error(error_message)
+        
+        # Log to memory
+        _log_to_memory("git_commit_push", f"Git operation failed: {e.stderr}", "error")
+        
         return {
             "status": "error",
             "message": error_message,
@@ -92,11 +103,40 @@ def git_commit_push(message: str) -> dict:
     except Exception as e:
         error_message = f"Error in git_commit_push: {str(e)}"
         logger.error(error_message)
+        
+        # Log to memory
+        _log_to_memory("git_commit_push", f"Error in git operation: {str(e)}", "error")
+        
         return {
             "status": "error",
             "message": error_message,
             "error": str(e)
         }
+
+def _log_to_memory(operation: str, content: str, status: str):
+    """
+    Log git operations to memory.
+    
+    Args:
+        operation (str): The operation performed
+        content (str): Description of the operation
+        status (str): Status of the operation (success, error, no_changes)
+    """
+    try:
+        from app.modules.memory_writer import write_memory
+        
+        write_memory(
+            agent_id="system",
+            type="git_operation",
+            content=content,
+            tags=["tools", "git_utils", operation, status],
+            task_type="git_operation",
+            status="completed" if status == "success" else status
+        )
+        
+        logger.info(f"Logged {operation} operation to memory with status {status}")
+    except Exception as e:
+        logger.error(f"Failed to log operation to memory: {str(e)}")
 
 # Add memory logging function for tool installation
 def log_installation():
@@ -110,8 +150,8 @@ def log_installation():
         write_memory(
             agent_id="system",
             type="tool_installation",
-            content="Installed git_utils.py tool for Phase 3 Agent Toolkit",
-            tags=["tools", "git_utils", "installation"],
+            content="Installed git_utils.py tool for Phase 3.2 Agent Toolkit",
+            tags=["tools", "git_utils", "installation", "toolkit_ready"],
             task_type="installation",
             status="completed"
         )
