@@ -611,6 +611,14 @@ try:
     print(f"🔍 DEBUG: User Context router object: {user_context_router}")
     app.include_router(user_context_router, prefix="/api/modules/user_context")
     print("🧠 Route defined: /api/modules/user_context/get -> get_user_context")
+
+    # ✅ Register delegate route directly at /api/delegate
+    from app.api import delegate  # Add this near your other import statements if missing
+
+    print("📡 Including Delegate router from /app/api/delegate.py")
+    app.include_router(delegate.router, prefix="/api")
+    print("🧠 Route defined: /api/delegate -> delegate_task")
+
     
     # Import and mount the respond router
     print(f"🔍 DEBUG: Respond router object: {respond_router}")
