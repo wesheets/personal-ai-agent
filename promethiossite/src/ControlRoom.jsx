@@ -1,19 +1,34 @@
 import React, { useState } from 'react';
 import AgentSidebar from './components/AgentSidebar';
 import AgentInputBar from './components/AgentInputBar';
+import AgentLogThread from './components/AgentLogThread';
 import ThemeToggle from './components/ThemeToggle';
 
 export default function ControlRoom() {
   const [messages, setMessages] = useState([]);
+  const [thinking, setThinking] = useState(false);
 
-  const handleSend = (message) => {
-    // For now, append message locally; ORCHESTRATOR integration coming next
-    const newMessage = {
+  const handleSend = async (message) => {
+    const userMessage = {
       id: Date.now(),
       sender: 'operator',
       text: message,
     };
-    setMessages((prev) => [...prev, newMessage]);
+
+    setMessages((prev) => [...prev, userMessage]);
+    setThinking(true);
+
+    // Simulate agent delay
+    setTimeout(() => {
+      const agentReply = {
+        id: Date.now() + 1,
+        sender: 'orchestrator',
+        text: `🔁 Received: "${message}" — response coming soon...`,
+      };
+
+      setMessages((prev) => [...prev, agentReply]);
+      setThinking(false);
+    }, 1500);
   };
 
   return (
@@ -31,13 +46,14 @@ export default function ControlRoom() {
             </p>
           </header>
 
-          {/* Message Feed (placeholder for now) */}
-          <div className="flex-1 bg-gray-900 rounded-xl p-4 overflow-y-auto">
-            {messages.map((msg) => (
-              <div key={msg.id} className={`text-sm mb-3 ${msg.sender === 'operator' ? 'text-right' : 'text-left'}`}>
-                <span className="font-mono text-gray-300">{msg.text}</span>
+          {/* Agent Log Thread */}
+          <div className="flex-1 bg-gray-900 rounded-xl p-4 overflow-y-auto space-y-2">
+            <AgentLogThread messages={messages} />
+            {thinking && (
+              <div className="text-left animate-pulse text-gray-500 italic mt-2">
+                [ orchestrator is thinking... ]
               </div>
-            ))}
+            )}
           </div>
         </div>
 
