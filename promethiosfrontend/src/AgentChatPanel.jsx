@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import AgentOutputBubble from "./AgentOutputBubble";
 import AgentInputBar from "./AgentInputBar";
+import RespondEngine from "./RespondEngine";
 
 export default function AgentChatPanel() {
   const [messages, setMessages] = useState([
-    { role: "agent", content: "System initialized. Welcome, Operator." },
-    { role: "operator", content: "Show me the latest agent summary." }
+    { role: "agent", content: "🧠 Promethios OS booted. Welcome, Operator." }
   ]);
 
   const bottomRef = useRef(null);
@@ -14,20 +14,20 @@ export default function AgentChatPanel() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  function handleSend(content) {
+  async function handleSend(content) {
     if (!content.trim()) return;
+
+    // Add operator message
     setMessages((prev) => [...prev, { role: "operator", content }]);
 
-    // Simulate agent response
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "agent",
-          content: `Acknowledged. Processing request: "${content}".`
-        }
-      ]);
-    }, 500);
+    // Call RespondEngine to simulate/trigger agent
+    const agentReply = await RespondEngine({ message: content });
+
+    // Add agent reply
+    setMessages((prev) => [
+      ...prev,
+      { role: "agent", content: agentReply }
+    ]);
   }
 
   return (
