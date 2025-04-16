@@ -11,12 +11,15 @@ export default function Splash() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    const adminUser = import.meta.env.VITE_ADMIN_USERNAME;
-    const adminPass = import.meta.env.VITE_ADMIN_PASSWORD;
+    const envUsername = import.meta.env.VITE_ADMIN_USERNAME;
+    const envPassword = import.meta.env.VITE_ADMIN_PASSWORD;
+    
+    console.log("ENV USERNAME:", envUsername);
+    console.log("ENV PASSWORD:", envPassword);
 
-    if (username === adminUser && password === adminPass) {
+    if (username === envUsername && password === envPassword) {
       setError('');
-      navigate('/dashboard');
+      navigate('/control');
     } else {
       setError('Access denied. 🔒 Invalid credentials.');
     }
