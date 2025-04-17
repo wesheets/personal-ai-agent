@@ -7,7 +7,7 @@ to reflect, route tasks, and respond to operator input.
 """
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 from app.core.orchestrator import get_orchestrator
 
@@ -19,7 +19,7 @@ class OrchestratorConsultRequest(BaseModel):
     """Request model for the orchestrator/consult endpoint"""
     objective: str
     context: str
-    agent_preferences: List[str] = []
+    agent_preferences: List[str] = Field(default_factory=list)
 
 class OrchestratorConsultResponse(BaseModel):
     """Response model for the orchestrator/consult endpoint"""

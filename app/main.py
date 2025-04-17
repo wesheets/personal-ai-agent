@@ -1,5 +1,5 @@
 """
-Modified main.py to include the orchestrator/scope router.
+Main application entry point for the Promethios API.
 """
 
 from fastapi import FastAPI, APIRouter, Response, Request
@@ -31,63 +31,41 @@ try:
     agents = initialize_agents()
     print(f"✅ Agent registry initialized with {len(agents)} agents")
     
-    # MODIFIED: Import only the modules we need for isolated AgentRunner
-    # Comment out problematic routes to isolate AgentRunner
+    # Import router modules
+    # Import orchestrator routes
+    from routes.orchestrator_routes import router as orchestrator_router
+    
+    # Import agent routes
+    from routes.agent_routes import router as agent_router
+    
+    # Import memory routes
+    from routes.memory_routes import router as memory_router
+    
+    # Import system routes
+    from routes.system_routes import router as system_router
+    
+    # Import debug routes
+    from routes.debug_routes import router as debug_router
+    
+    # Import HAL routes
+    from routes.hal_routes import router as hal_router
+    
+    # Import snapshot routes
+    from routes.snapshot_routes import router as snapshot_router
     
     # Import modules for API routes
     from app.api.modules.agent import router as agent_module_router  # AgentRunner module router
-    from app.api.modules.memory import router as memory_router  # Memory module router
-    from app.api.modules.orchestrator import router as orchestrator_router  # Orchestrator module router
+    from app.api.modules.memory import router as memory_router_module  # Memory module router
+    from app.api.modules.orchestrator import router as orchestrator_router_module  # Orchestrator module router
     from app.api.modules.feedback import router as feedback_router  # Feedback module router
     from app.api.modules.user_context import router as user_context_router  # User Context module router
     from app.api.modules.respond import router as respond_router  # Respond module router
     from app.api.modules.plan import router as plan_router  # Plan Generator module router
     from app.api.modules.project import router as project_router  # Project Management module router
     
-    # Import missing routers identified in Postman sweep
-    from app.api.orchestrator import consult  # Orchestrator consult router
-    from app.api.orchestrator import chain  # Orchestrator chain router
-    from app.api.modules import delegate  # Delegate router
-    from app.api.modules import system  # System status router
-    from app.api.modules import agent  # Agent list router
-    
     # Import memory thread and summarize routers
     from app.modules.memory_thread import router as memory_thread_router
     from app.modules.memory_summarize import router as memory_summarize_router
-    
-    # Import orchestrator routes for the /api/orchestrator/consult endpoint
-    from routes.orchestrator_routes import router as orchestrator_routes_router
-    
-    # Import project start router for Phase 12.0 - CRITICAL for Agent Playground
-    print("🔄 Importing project start router for Phase 12.0 (Agent Playground)")
-    try:
-        from app.api.project import start  # Project start router
-        print("✅ Successfully imported project start router")
-    except Exception as e:
-        print(f"❌ ERROR importing project start router: {str(e)}")
-        logging.error(f"Failed to import project start router: {str(e)}")
-        # Create a placeholder router to prevent app startup failure
-        start = APIRouter()
-        @start.get("/error")
-        async def project_start_import_error():
-            return {"status": "error", "message": f"Failed to import project start router: {str(e)}"}
-        print("⚠️ Created placeholder router for /api/project/error")
-    
-    # MODIFIED: Commented out problematic routes
-    """
-    from app.api.agent import router as agent_router
-    from app.api.goals import goals_router
-    from app.api.memory_viewer import router as memory_viewer_router
-    from app.api.control import control_router
-    from app.api.logs import logs_router
-    from app.api.delegate_route import router as delegate_router, AGENT_PERSONALITIES
-    from app.diagnostics.hal_route_debug import router as hal_debug_router
-    from app.api.debug_routes import router as debug_router
-    from app.api.performance_monitoring import router as performance_router
-    from app.api.streaming_route import router as streaming_router, stream_response
-    from app.api.system_routes import router as system_routes
-    from app.api.agent_status import router as agent_status_router
-    """
     
     from app.middleware.size_limiter import limit_request_body_size  # Request body size limiter
     from app.health import health_router  # Health check endpoint for Railway deployment
@@ -123,52 +101,24 @@ try:
     print("✅ FastAPI app initialized")
     print("🔓 FastAPI app object was successfully created in main.py")
 
-    # MODIFIED: Commented out delegate-stream endpoint
-    """
-    # Direct route for delegate-stream
-    @app.post("/api/delegate-stream")
-    async def delegate_stream(request: Request):
-        print("✅ /api/delegate-stream hit")  # Explicit print for debugging
-        logger.info(f"🔄 Direct delegate-stream route executed from {inspect.currentframe().f_code.co_filename}")
-        
-        # Return streaming response with enhanced headers
-        return StreamingResponse(
-            stream_response(request),
-            media_type="application/x-ndjson",
-            headers={
-                "X-Streaming-Mode": "enabled",
-                "X-Agent-Version": "1.0.0",
-                "Cache-Control": "no-cache"
-            }
-        )
-    """
-
     # Direct healthcheck endpoints for Railway deployment
     @app.get("/health")
     async def health():
         """
         Simple health check endpoint that returns a JSON response with {"status": "ok"}.
         Used by Railway to verify the application is running properly.
-        
-        Modified to always return ok status regardless of agent registry state.
         """
         logger.info("Health check endpoint accessed at /health")
-        
-        # MODIFIED: Always return ok status to ensure health checks pass
-        return {"status": "ok", "mode": "isolated"}
+        return {"status": "ok", "mode": "production"}
 
     @app.get("/")
     async def root_health():
         """
         Root-level health check endpoint that returns a JSON response with {"status": "ok"}.
         Some platforms expect the healthcheck at the root level.
-        
-        Modified to always return ok status regardless of agent registry state.
         """
         logger.info("Health check endpoint accessed at root level")
-        
-        # MODIFIED: Always return ok status to ensure health checks pass
-        return {"status": "ok", "mode": "isolated"}
+        return {"status": "ok", "mode": "production"}
         
     @app.get("/control/registry")
     async def control_registry():
@@ -268,7 +218,7 @@ try:
     # Route logger for debugging
     @app.on_event("startup")
     async def log_all_routes():
-        print("🚀 Booting Enhanced AI Agent System in ISOLATED MODE...")
+        print("🚀 Booting Enhanced AI Agent System...")
         print("📡 ROUTES REGISTERED ON STARTUP:")
         for route in app.routes:
             if isinstance(route, APIRoute):
@@ -340,146 +290,84 @@ try:
             
             # Add timing header to response
             response.headers["X-Process-Time"] = str(process_time)
-            
-            # Log CORS headers for debugging
-            if origin:
-                allow_origin = response.headers.get("Access-Control-Allow-Origin", "")
-                logger.info(f"🔒 Response Access-Control-Allow-Origin: {allow_origin}")
-            
             return response
         except asyncio.TimeoutError:
-            # Handle request timeout
+            # Handle timeout
             process_time = time.time() - start_time
             logger.error(f"Request timed out after {process_time:.4f}s: {request.method} {request.url}")
-            
-            # Return timeout response
             return JSONResponse(
                 status_code=504,
                 content={
                     "status": "error",
                     "message": "Request timed out",
-                    "timeout": timeout_seconds,
-                    "process_time": process_time
+                    "process_time": f"{process_time:.4f}s"
                 }
             )
         except Exception as e:
             # Handle other exceptions
             process_time = time.time() - start_time
-            logger.error(f"Error processing request: {str(e)}")
-            logger.error(f"Process time before error: {process_time:.4f}s")
-            
-            # Return error response
+            logger.error(f"Request failed after {process_time:.4f}s: {request.method} {request.url}")
+            logger.error(f"Error: {str(e)}")
             return JSONResponse(
                 status_code=500,
                 content={
                     "status": "error",
-                    "message": f"Internal server error: {str(e)}",
-                    "process_time": process_time
+                    "message": "Internal server error",
+                    "error": str(e),
+                    "process_time": f"{process_time:.4f}s"
                 }
             )
-            print("=" * 50)
-        
-    # Add route registration logging at the end of startup
-    @app.on_event("startup")
-    async def log_routes_on_startup():
-        """Log all registered routes after startup for debugging."""
-        try:
-            print("🔍 Running route registration diagnostic...")
-            log_registered_routes(app)
-        except Exception as e:
-            print(f"⚠️ Error logging routes: {str(e)}")
-            logger.error(f"⚠️ Error logging routes: {str(e)}")
     
-    # Add dedicated route debug logger for troubleshooting 404 issues
-    @app.on_event("startup")
-    async def log_registered_routes():
-        print("\n🔍 [ROUTE DEBUG] Registered routes:")
-        for route in app.routes:
-            print(f"📍 {route.path} -> {route.name}")
-        print("✅ [ROUTE DEBUG] Route listing complete\n")
-    
-    # Import and mount the orchestrator scope router
-    from app.modules.orchestrator_scope import router as scope_router
-    print(f"🔍 DEBUG: Orchestrator Scope router object: {scope_router}")
-    app.include_router(scope_router, prefix="/api/modules/orchestrator")
-    print("🧠 Route defined: /api/modules/orchestrator/scope -> determine_suggested_agents")
-    
-    # Import and mount the orchestrator present router
-    from app.modules.orchestrator_present import router as present_router
-    print(f"🔍 DEBUG: Orchestrator Present router object: {present_router}")
-    app.include_router(present_router, prefix="/api/modules/orchestrator")
-    print("🧠 Route defined: /api/modules/orchestrator/present -> present_task_results")
-    
-    # Import and mount the orchestrator build router
-    from app.modules.orchestrator_build import router as build_router
-    print(f"🔍 DEBUG: Orchestrator Build router object: {build_router}")
-    app.include_router(build_router, prefix="/api/modules/orchestrator")
-    print("🧠 Route defined: /api/modules/orchestrator/build -> execute_task_plan")
-    
-    # Import and mount the agent present router
-    from app.modules.agent_present import router as agent_present_router
-    print(f"🔍 DEBUG: Agent Present router object: {agent_present_router}")
-    app.include_router(agent_present_router, prefix="/api/modules/agent")
-    print("🧠 Route defined: /api/modules/agent/present -> present_agent_results")
-    
-    # Import and mount the agent create router
-    from app.modules.agent_create import router as agent_create_router
-    print(f"🔍 DEBUG: Agent Create router object: {agent_create_router}")
-    app.include_router(agent_create_router, prefix="/api/modules/agent")
-    print("🧠 Route defined: /api/modules/agent/create -> create_agent")
-    
-    # Import and mount the agent verify router
-    from app.modules.agent_verify import router as agent_verify_router
-    print(f"🔍 DEBUG: Agent Verify router object: {agent_verify_router}")
-    app.include_router(agent_verify_router, prefix="/api/modules/agent")
-    print("🧠 Route defined: /api/modules/agent/verify_task -> verify_task")
-    
-    # Import and mount the agent reflect router
-    from app.modules.agent_reflect import router as agent_reflect_router
-    print(f"🔍 DEBUG: Agent Reflect router object: {agent_reflect_router}")
-    app.include_router(agent_reflect_router, prefix="/api/modules/agent")
-    print("🧠 Route defined: /api/modules/agent/reflect -> reflect")
-    
-    # Import and mount the agent fallback router
-    from app.modules.agent_fallback import router as agent_fallback_router
-    print(f"🔍 DEBUG: Agent Fallback router object: {agent_fallback_router}")
-    app.include_router(agent_fallback_router, prefix="/api/modules/agent")
-    print("🧠 Route defined: /api/modules/agent/fallback -> fallback_task")
-    
-    # Import and mount the task supervisor router
-    from app.modules.task_supervisor import router as task_supervisor_router
-    print(f"🔍 DEBUG: Task Supervisor router object: {task_supervisor_router}")
-    app.include_router(task_supervisor_router, prefix="/api/modules/task")
-    print("🧠 Route defined: /api/modules/task/status -> get_task_status")
-    
-    # Import and mount the task result router
-    from app.modules.task_result import router as task_result_router
-    print(f"🔍 DEBUG: Task Result router object: {task_result_router}")
-    app.include_router(task_result_router, prefix="/api/modules/task")
-    print("🧠 Route defined: /api/modules/task/result -> log_task_result")
-    
-    # Import and mount the loop router
-    from app.modules.loop import router as loop_router
-    print(f"🔍 DEBUG: Loop router object: {loop_router}")
-    app.include_router(loop_router, prefix="/api/modules")
-    print("🧠 Route defined: /api/modules/loop -> loop_task")
-    
-    # Import and mount the delegate router
-    from app.modules.delegate import router as delegate_router
-    print(f"🔍 DEBUG: Delegate router object: {delegate_router}")
-    app.include_router(delegate_router, prefix="/api/modules")
-    print("🧠 Route defined: /api/modules/delegate -> delegate_task")
-    
-    # Import and mount the reflect router
-    from app.modules.reflect import router as reflect_router
-    print(f"🔍 DEBUG: Reflect router object: {reflect_router}")
-    app.include_router(reflect_router, prefix="/api/modules")
-    print("🧠 Route defined: /api/modules/reflect -> reflect_on_task")
-    
-    # Import and mount the orchestrator router
+    # Register all routers with the /api prefix
+    # Register the orchestrator_router
     print(f"🔍 DEBUG: Orchestrator router object: {orchestrator_router}")
-    app.include_router(orchestrator_router, prefix="/api/modules/orchestrator")
-    print("🧠 Route defined: /api/modules/orchestrator/audit -> audit_agent_performance")
+    app.include_router(orchestrator_router, prefix="/api")
+    print("🧠 Route defined: /api/orchestrator/consult -> orchestrator_consult")
+    
+    # Register the agent_router
+    print(f"🔍 DEBUG: Agent router object: {agent_router}")
+    app.include_router(agent_router, prefix="/api")
+    print("🧠 Route defined: /api/agent/* -> agent_routes")
+    
+    # Register the memory_router
+    print(f"🔍 DEBUG: Memory router object: {memory_router}")
+    app.include_router(memory_router, prefix="/api")
+    print("🧠 Route defined: /api/memory/* -> memory_routes")
+    
+    # Register the system_router
+    print(f"🔍 DEBUG: System router object: {system_router}")
+    app.include_router(system_router, prefix="/api")
+    print("🧠 Route defined: /api/system/* -> system_routes")
+    
+    # Register the debug_router
+    print(f"🔍 DEBUG: Debug router object: {debug_router}")
+    app.include_router(debug_router, prefix="/api")
+    print("🧠 Route defined: /api/debug/* -> debug_routes")
+    
+    # Register the hal_router
+    print(f"🔍 DEBUG: HAL router object: {hal_router}")
+    app.include_router(hal_router, prefix="/api")
+    print("🧠 Route defined: /api/hal/* -> hal_routes")
+    
+    # Register the snapshot_router
+    print(f"🔍 DEBUG: Snapshot router object: {snapshot_router}")
+    app.include_router(snapshot_router, prefix="/api")
+    print("🧠 Route defined: /api/snapshot/* -> snapshot_routes")
+    
+    # Import and mount the agent module router
+    print(f"🔍 DEBUG: Agent Module router object: {agent_module_router}")
+    app.include_router(agent_module_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/run -> run_agent")
+    
+    # Import and mount the memory module router
+    print(f"🔍 DEBUG: Memory Module router object: {memory_router_module}")
+    app.include_router(memory_router_module, prefix="/api/modules/memory")
+    print("🧠 Route defined: /api/modules/memory/write -> write_memory")
+    
+    # Import and mount the orchestrator module router
+    print(f"🔍 DEBUG: Orchestrator Module router object: {orchestrator_router_module}")
+    app.include_router(orchestrator_router_module, prefix="/api/modules/orchestrator")
+    print("🧠 Route defined: /api/modules/orchestrator/scope -> scope_task")
     
     # Import and mount the feedback router
     print(f"🔍 DEBUG: Feedback router object: {feedback_router}")
@@ -490,14 +378,6 @@ try:
     print(f"🔍 DEBUG: User Context router object: {user_context_router}")
     app.include_router(user_context_router, prefix="/api/modules/user_context")
     print("🧠 Route defined: /api/modules/user_context/get -> get_user_context")
-
-    # ✅ Register delegate route directly at /api/delegate
-    from app.api import delegate  # Add this near your other import statements if missing
-
-    print("📡 Including Delegate router from /app/api/delegate.py")
-    app.include_router(delegate.router, prefix="/api")
-    print("🧠 Route defined: /api/delegate -> delegate_task")
-
     
     # Import and mount the respond router
     print(f"🔍 DEBUG: Respond router object: {respond_router}")
@@ -507,7 +387,6 @@ try:
     # ✅ Directly expose at /api/respond for frontend access
     app.include_router(respond_router, prefix="/api/respond")
     print("🧠 Route defined: /api/respond -> respond_to_operator")
-
     
     # Import and mount the plan router
     print(f"🔍 DEBUG: Plan router object: {plan_router}")
@@ -522,11 +401,6 @@ try:
     # Mount the health router
     app.include_router(health_router, prefix="/api/health")
     print("🧠 Route defined: /api/health/check -> health_check")
-    
-    # Register the orchestrator_routes router for the /api/orchestrator/consult endpoint
-    print(f"🔍 DEBUG: Orchestrator Routes router object: {orchestrator_routes_router}")
-    app.include_router(orchestrator_routes_router, prefix="/api")
-    print("🧠 Route defined: /api/orchestrator/consult -> orchestrator_consult")
     
     # Add Swagger UI with custom configuration
     @app.get("/docs", include_in_schema=False)
