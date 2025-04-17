@@ -14,6 +14,7 @@ import json
 import asyncio
 import time
 import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.middleware.cors import CustomCORSMiddleware, normalize_origin, sanitize_origin_for_header
 
 # Wrap the entire startup in a try-except block for error trapping
@@ -571,7 +572,6 @@ try:
         
         # Log CORS configuration on startup
         logger.info(f"🔒 CORS Configuration Loaded:")
-        import os
         
         raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
         logger.info(f"🔒 CORS_ALLOWED_ORIGINS raw: {raw_origins}")
@@ -581,9 +581,9 @@ try:
         # Removed legacy allowed_origins references to fix startup issues
         logger.info(f"✅ Using CORSMiddleware with allow_origin_regex")
 
-    # Add custom CORS middleware from the extracted module
-    from fastapi.middleware.cors import CORSMiddleware
-    from fastapi import Request
+    except Exception as e:
+        print(f"❌ Error during router registration: {str(e)}")
+        print(traceback.format_exc())
 
     # Production CORS middleware with regex pattern to allow Vercel deploys, Railway apps, and local development
     app.add_middleware(
@@ -710,7 +710,6 @@ except Exception as e:
         }
     
     # Add CORS middleware even in error mode
-    from fastapi.middleware.cors import CORSMiddleware
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
