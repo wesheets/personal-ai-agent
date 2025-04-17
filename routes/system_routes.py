@@ -417,11 +417,11 @@ async def system_summary(
                 logger.info(f"Generated new summary for project {effective_project_id}")
                 return {
                     "status": "success",
+                    "message": "Memory summarize request received",
                     "project_id": effective_project_id,
+                    "chain_id": "default",
                     "summary": result["summary"],
-                    "timestamp": datetime.datetime.now().isoformat(),
-                    "actions_taken": result.get("actions_taken", []),
-                    "source": "sage_agent"
+                    "timestamp": datetime.datetime.now().isoformat()
                 }
             else:
                 logger.error(f"SAGE agent failed to generate summary: {result.get('message', 'Unknown error')}")
