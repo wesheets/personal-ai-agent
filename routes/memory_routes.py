@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Query
+from typing import Optional, Dict, Any
 from app.memory.memory_reader import get_memory_for_project, get_memory_thread_for_project
 
 router = APIRouter()
@@ -13,6 +14,17 @@ def memory_ping():
 async def memory_write(request_data: dict):
     """
     Write content to memory.
+    
+    Args:
+        request_data: Dictionary containing memory entry data
+            - project_id: The project identifier
+            - agent: The agent identifier
+            - type: The memory entry type
+            - content: The memory entry content
+            - tags: Optional list of tags
+            
+    Returns:
+        Dict containing status and memory entry details
     """
     return {
         "status": "success",
@@ -57,6 +69,15 @@ async def memory_read(project_id: str = Query(..., description="Project identifi
 async def memory_summarize(request_data: dict):
     """
     Summarize a memory thread.
+    
+    Args:
+        request_data: Dictionary containing summarization parameters
+            - project_id: The project identifier
+            - summary_type: The type of summary to generate
+            - limit: Optional maximum number of entries to summarize
+            
+    Returns:
+        Dict containing the generated summary
     """
     return {
         "status": "success",

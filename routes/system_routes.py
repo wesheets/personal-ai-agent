@@ -364,7 +364,10 @@ def get_system_summary(project_id: str = Query(..., description="Project identif
         }
 
 @router.post("/summary")
-def generate_system_summary(project_id: str = Query(..., description="Project identifier")):
+async def system_summary(
+    project_id: Optional[str] = Query(None, description="Project identifier"),
+    request_body: Optional[Dict[str, Any]] = Body(None)
+):
     """
     Generates a new narrative summary of system activities for a specific project.
     
@@ -372,13 +375,21 @@ def generate_system_summary(project_id: str = Query(..., description="Project id
     current state and activities, regardless of whether a recent summary exists.
     
     Args:
-        project_id: The project identifier
+        project_id: The project identifier (can be provided as query parameter)
+        request_body: Optional JSON body that may contain project_id
         
     Returns:
         Dict containing the newly generated narrative summary and metadata
     """
+    # Extract project_id from either query parameter or request body
+    effective_project_id = project_id or (request_body or {}).get("project_id")
+    
+    # Validate that project_id is provided
+    if not effective_project_id:
+        raise HTTPException(status_code=400, detail="project_id is required")
+    
     try:
-        logger.info(f"Generating new system summary for project: {project_id}")
+        logger.info(f"Generating new system summary for project: {effective_project_id}")
         
         # Try to import SAGE agent
         try:
@@ -389,19 +400,19 @@ def generate_system_summary(project_id: str = Query(..., description="Project id
             return {
                 "status": "error",
                 "message": "SAGE agent is unavailable",
-                "project_id": project_id,
+                "project_id": effective_project_id,
                 "summary": "Unable to generate summary due to missing dependencies"
             }
         
         # Run SAGE agent to generate a new summary
         try:
-            result = run_sage_agent(project_id, tools=["memory_writer"])
+            result = run_sage_agent(effective_project_id, tools=["memory_writer"])
             
             if result["status"] == "success":
-                logger.info(f"Generated new summary for project {project_id}")
+                logger.info(f"Generated new summary for project {effective_project_id}")
                 return {
                     "status": "success",
-                    "project_id": project_id,
+                    "project_id": effective_project_id,
                     "summary": result["summary"],
                     "timestamp": datetime.datetime.now().isoformat(),
                     "actions_taken": result.get("actions_taken", []),
@@ -412,7 +423,7 @@ def generate_system_summary(project_id: str = Query(..., description="Project id
                 return {
                     "status": "error",
                     "message": result.get("message", "SAGE agent failed to generate summary"),
-                    "project_id": project_id,
+                    "project_id": effective_project_id,
                     "summary": result.get("summary", "Error generating summary")
                 }
         except Exception as e:
@@ -420,7 +431,7 @@ def generate_system_summary(project_id: str = Query(..., description="Project id
             return {
                 "status": "error",
                 "message": f"Error running SAGE agent: {str(e)}",
-                "project_id": project_id,
+                "project_id": effective_project_id,
                 "summary": f"Error generating summary: {str(e)}"
             }
     
@@ -429,175 +440,6 @@ def generate_system_summary(project_id: str = Query(..., description="Project id
         return {
             "status": "error",
             "message": f"Unexpected error: {str(e)}",
-            "project_id": project_id,
+            "project_id": effective_project_id,
             "summary": f"Error: {str(e)}"
-        }
-
-@router.get("/pulse")
-def get_system_pulse():
-    """
-    Returns a simple system pulse check with basic metrics.
-    
-    This endpoint provides a lightweight way to verify system health
-    and get basic operational metrics without requiring a project ID.
-    
-    Returns:
-        Dict containing system pulse information
-    """
-    try:
-        # Get basic system metrics
-        uptime = time.time() - os.path.getmtime("/proc/1/cmdline")
-        memory_usage = os.popen("free -m | grep Mem").read().split()[2]
-        
-        # Get agent registry status
-        try:
-            from app.core.agent_loader import get_all_agents
-            agents = get_all_agents()
-            agent_count = len(agents)
-            agent_status = "active" if agent_count > 0 else "degraded"
-        except Exception as e:
-            logger.error(f"Error getting agent registry status: {str(e)}")
-            agent_count = 0
-            agent_status = "unknown"
-        
-        # Return pulse information
-        return {
-            "status": "active",
-            "timestamp": datetime.datetime.now().isoformat(),
-            "uptime_seconds": uptime,
-            "memory_usage_mb": memory_usage,
-            "agent_count": agent_count,
-            "agent_status": agent_status,
-            "api_version": "1.0.0"
-        }
-    
-    except Exception as e:
-        logger.error(f"Error in system pulse check: {str(e)}")
-        return {
-            "status": "error",
-            "message": f"Error in system pulse check: {str(e)}",
-            "timestamp": datetime.datetime.now().isoformat()
-        }
-
-@router.get("/log")
-def get_system_log(limit: int = Query(10, description="Maximum number of log entries to return")):
-    """
-    Returns recent system log entries.
-    
-    This endpoint provides access to system-level logs for monitoring
-    and debugging purposes.
-    
-    Args:
-        limit: Maximum number of log entries to return
-        
-    Returns:
-        Dict containing system log entries
-    """
-    try:
-        logger.info(f"Getting system log with limit: {limit}")
-        
-        # Try to import system_log module
-        try:
-            from memory.system_log import get_system_log as get_log
-            logger.info("Successfully imported system_log module")
-        except ImportError:
-            logger.error("Failed to import system_log module")
-            return {
-                "status": "error",
-                "message": "System log module is unavailable",
-                "logs": []
-            }
-        
-        # Get system logs
-        try:
-            logs = get_log(limit)
-            logger.info(f"Retrieved {len(logs)} system log entries")
-            
-            return {
-                "status": "success",
-                "logs": logs,
-                "count": len(logs),
-                "timestamp": datetime.datetime.now().isoformat()
-            }
-        except Exception as e:
-            logger.error(f"Error retrieving system logs: {str(e)}")
-            return {
-                "status": "error",
-                "message": f"Error retrieving system logs: {str(e)}",
-                "logs": []
-            }
-    
-    except Exception as e:
-        logger.error(f"Unexpected error in get_system_log: {str(e)}")
-        return {
-            "status": "error",
-            "message": f"Unexpected error: {str(e)}",
-            "logs": []
-        }
-
-@router.get("/integrity")
-def check_system_integrity():
-    """
-    Performs a system integrity check.
-    
-    This endpoint verifies the integrity of critical system components
-    and returns a detailed report of any issues found.
-    
-    Returns:
-        Dict containing system integrity check results
-    """
-    try:
-        logger.info("Performing system integrity check")
-        
-        # Check agent registry
-        try:
-            from app.core.agent_loader import get_all_agents
-            agents = get_all_agents()
-            agent_count = len(agents)
-            agent_status = "ok" if agent_count > 0 else "degraded"
-        except Exception as e:
-            logger.error(f"Error checking agent registry: {str(e)}")
-            agent_count = 0
-            agent_status = "error"
-        
-        # Check memory system
-        try:
-            from memory.memory_writer import write_memory
-            memory_status = "ok"
-        except Exception as e:
-            logger.error(f"Error checking memory system: {str(e)}")
-            memory_status = "error"
-        
-        # Check project state system
-        try:
-            from app.modules.project_state import read_project_state
-            project_state_status = "ok"
-        except Exception as e:
-            logger.error(f"Error checking project state system: {str(e)}")
-            project_state_status = "error"
-        
-        # Return integrity check results
-        return {
-            "status": "ok" if all(s == "ok" for s in [agent_status, memory_status, project_state_status]) else "degraded",
-            "timestamp": datetime.datetime.now().isoformat(),
-            "components": {
-                "agent_registry": {
-                    "status": agent_status,
-                    "agent_count": agent_count
-                },
-                "memory_system": {
-                    "status": memory_status
-                },
-                "project_state": {
-                    "status": project_state_status
-                }
-            }
-        }
-    
-    except Exception as e:
-        logger.error(f"Error in system integrity check: {str(e)}")
-        return {
-            "status": "error",
-            "message": f"Error in system integrity check: {str(e)}",
-            "timestamp": datetime.datetime.now().isoformat()
         }
