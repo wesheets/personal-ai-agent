@@ -7,16 +7,19 @@ import AgentChatPanel from './AgentChatPanel';
 import AgentInputBar from './AgentInputBar';
 import TerminalDrawer from './TerminalDrawer';
 import ThemeToggle from './ThemeToggle';
+import SystemStatusPanel from './SystemStatusPanel';
+import SystemSummaryPanel from './SystemSummaryPanel';
 
 export default function ControlRoom() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const projectId = 'founder-stack'; // Default project ID
 
   useEffect(() => {
     // Simulate agent output for now
     setTimeout(() => {
       setData({
-        project_id: 'founder-stack',
+        project_id: projectId,
         chain_id: 'latest',
         outputs: {
           hal: 'Scoped MVP: login, dashboard, Stripe billing integration.',
@@ -45,6 +48,12 @@ export default function ControlRoom() {
             Project: <strong>{data.project_id}</strong> / Chain: <strong>{data.chain_id}</strong>
           </p>
         </header>
+
+        {/* Ground Control Integration - System Status and Summary Panels */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <SystemStatusPanel projectId={data.project_id} />
+          <SystemSummaryPanel projectId={data.project_id} />
+        </div>
 
         <section className="space-y-4">
           <AgentOutputCard title="HAL – Product Scope" content={data.outputs.hal} />
