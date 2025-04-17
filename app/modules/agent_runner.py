@@ -17,6 +17,7 @@ MODIFIED: Added project_state integration for tracking project status
 MODIFIED: Updated run_nova_agent with file creation and memory logging functionality
 MODIFIED: Standardized output format across all agents
 MODIFIED: Added memory logging for CRITIC and ASH agents
+MODIFIED: Added agent retry and recovery flow for blocked agents
 """
 
 import logging
@@ -68,13 +69,29 @@ except ImportError:
     PROJECT_STATE_AVAILABLE = False
     print("❌ project_state import failed")
 
-# Import agent-specific implementations
+# Import agent_retry for retry and recovery flow
 try:
-    from app.modules.critic_agent import run_critic_agent as critic_agent_impl
-    CRITIC_AGENT_AVAILABLE = True
+    from app.modules.agent_retry import register_blocked_agent, check_for_unblocked_agents, mark_agent_retry_attempted
+    AGENT_RETRY_AVAILABLE = True
 except ImportError:
-    CRITIC_AGENT_AVAILABLE = False
-    print("❌ critic_agent import failed")
+    AGENT_RETRY_AVAILABLE = False
+    print("❌ agent_retry import failed")
+
+# Import memory_block_writer for logging block information
+try:
+    from app.modules.memory_block_writer import write_block_memory, write_unblock_memory
+    MEMORY_BLOCK_WRITER_AVAILABLE = True
+except ImportError:
+    MEMORY_BLOCK_WRITER_AVAILABLE = False
+    print("❌ memory_block_writer import failed")
+
+# Import passive_reflection for re-evaluating tasks
+try:
+    from app.modules.passive_reflection import re_evaluate_task, start_reflection
+    PASSIVE_REFLECTION_AVAILABLE = True
+except ImportError:
+    PASSIVE_REFLECTION_AVAILABLE = False
+    print("❌ passive_reflection import failed")
 
 try:
     from app.modules.ash_agent import run_ash_agent as ash_agent_impl
@@ -443,12 +460,28 @@ def run_hal_agent(task, project_id, tools):
     logger.info(f"HAL agent execution started with task: {task}, project_id: {project_id}")
     
     try:
+        # Start reflection for project if available
+        if PASSIVE_REFLECTION_AVAILABLE:
+            start_reflection(project_id)
+            print(f"🧠 Started passive reflection for project {project_id}")
+        
         # Read project state if available
         project_state = {}
         if PROJECT_STATE_AVAILABLE:
             project_state = read_project_state(project_id)
             print(f"📊 Project state read for {project_id}")
             logger.info(f"HAL read project state for {project_id}")
+            
+            # Check if task has been re-evaluated after being unblocked
+            if PASSIVE_REFLECTION_AVAILABLE and AGENT_RETRY_AVAILABLE:
+                retry_status = get_retry_status(project_id, "hal")
+                if retry_status and retry_status.get("status") == "unblocked":
+                    # Re-evaluate task with current project state
+                    re_eval_result = re_evaluate_task(project_id, "hal", task)
+                    if re_eval_result.get("status") == "success":
+                        task = re_eval_result.get("task", task)
+                        print(f"🔄 Re-evaluated task for HAL agent after being unblocked")
+                        logger.info(f"HAL task re-evaluated after being unblocked")
             
             # Check if README.md already exists
             if "README.md" in project_state.get("files_created", []):
@@ -587,14 +620,69 @@ def run_nova_agent(task, project_id, tools):
             print(f"📊 Project state read for {project_id}")
             logger.info(f"NOVA read project state for {project_id}")
             
+            # Check if task has been re-evaluated after being unblocked
+            if PASSIVE_REFLECTION_AVAILABLE and AGENT_RETRY_AVAILABLE:
+                retry_status = get_retry_status(project_id, "nova")
+                if retry_status and retry_status.get("status") == "unblocked":
+                    # Re-evaluate task with current project state
+                    re_eval_result = re_evaluate_task(project_id, "nova", task)
+                    if re_eval_result.get("status") == "success":
+                        task = re_eval_result.get("task", task)
+                        print(f"🔄 Re-evaluated task for NOVA agent after being unblocked")
+                        logger.info(f"NOVA task re-evaluated after being unblocked")
+            
             # Check if HAL has created initial files
             if "hal" not in project_state.get("agents_involved", []):
                 print(f"⏩ HAL has not created initial files yet, cannot proceed")
                 logger.info(f"NOVA execution blocked - HAL has not run yet")
+                
+                # Register blocked agent for future retry
+                if AGENT_RETRY_AVAILABLE:
+                    register_blocked_agent(
+                        project_id=project_id,
+                        agent_id="nova",
+                        blocked_due_to="hal",
+                        unblock_condition="initial files created"
+                    )
+                    print(f"🔄 NOVA agent registered for retry when HAL completes initial file creation")
+                
+                # Log block memory
+                if MEMORY_BLOCK_WRITER_AVAILABLE:
+                    write_block_memory({
+                        "project_id": project_id,
+                        "agent": "nova",
+                        "action": "blocked",
+                        "content": f"NOVA agent blocked - HAL has not created initial files yet",
+                        "blocked_due_to": "hal",
+                        "unblock_condition": "initial files created"
+                    })
+                    print(f"📝 Block memory logged for NOVA agent")
+                
+                # Update project state to include nova in agents_involved even when blocked
+                if PROJECT_STATE_AVAILABLE:
+                    project_state_data = {
+                        "agents_involved": ["nova"],
+                        "latest_agent_action": {
+                            "agent": "nova",
+                            "action": f"Checked project {project_id} but was blocked - HAL has not run yet"
+                        },
+                        "blocked_due_to": "hal",
+                        "unblock_condition": "initial files created"
+                    }
+                    
+                    project_state_result = update_project_state(project_id, project_state_data)
+                    print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+                    logger.info(f"NOVA updated project state for {project_id} even though blocked")
+                    
+                    # Read updated project state
+                    project_state = read_project_state(project_id)
+                
                 return {
                     "status": "blocked",
                     "notes": "Cannot create UI - HAL has not yet created initial project files.",
-                    "project_state": project_state
+                    "project_state": project_state,
+                    "blocked_due_to": "hal",
+                    "unblock_condition": "initial files created"
                 }
         
         # Initialize list of created files
@@ -968,14 +1056,69 @@ def run_ash_agent(task, project_id, tools):
             print(f"📊 Project state read for {project_id}")
             logger.info(f"ASH read project state for {project_id}")
             
+            # Check if task has been re-evaluated after being unblocked
+            if PASSIVE_REFLECTION_AVAILABLE and AGENT_RETRY_AVAILABLE:
+                retry_status = get_retry_status(project_id, "ash")
+                if retry_status and retry_status.get("status") == "unblocked":
+                    # Re-evaluate task with current project state
+                    re_eval_result = re_evaluate_task(project_id, "ash", task)
+                    if re_eval_result.get("status") == "success":
+                        task = re_eval_result.get("task", task)
+                        print(f"🔄 Re-evaluated task for ASH agent after being unblocked")
+                        logger.info(f"ASH task re-evaluated after being unblocked")
+            
             # Check if project is ready for deployment
             if project_state.get("status") != "ready_for_deploy":
                 print(f"⏩ Project not ready for deployment yet")
                 logger.info(f"ASH execution on hold - project not ready for deployment")
+                
+                # Register blocked agent for future retry
+                if AGENT_RETRY_AVAILABLE:
+                    register_blocked_agent(
+                        project_id=project_id,
+                        agent_id="ash",
+                        blocked_due_to="project_status",
+                        unblock_condition="ready_for_deploy"
+                    )
+                    print(f"🔄 ASH agent registered for retry when project is ready for deployment")
+                
+                # Log block memory
+                if MEMORY_BLOCK_WRITER_AVAILABLE:
+                    write_block_memory({
+                        "project_id": project_id,
+                        "agent": "ash",
+                        "action": "blocked",
+                        "content": f"ASH agent on hold - project not ready for deployment yet",
+                        "blocked_due_to": "project_status",
+                        "unblock_condition": "ready_for_deploy"
+                    })
+                    print(f"📝 Block memory logged for ASH agent")
+                
+                # Update project state to include ash in agents_involved even when on hold
+                if PROJECT_STATE_AVAILABLE:
+                    project_state_data = {
+                        "agents_involved": ["ash"],
+                        "latest_agent_action": {
+                            "agent": "ash",
+                            "action": f"Checked project {project_id} but is on hold - project not ready for deployment"
+                        },
+                        "blocked_due_to": "project_status",
+                        "unblock_condition": "ready_for_deploy"
+                    }
+                    
+                    project_state_result = update_project_state(project_id, project_state_data)
+                    print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+                    logger.info(f"ASH updated project state for {project_id} even though on hold")
+                    
+                    # Read updated project state
+                    project_state = read_project_state(project_id)
+                
                 return {
                     "status": "on_hold",
                     "notes": "Project not ready for deployment yet.",
-                    "project_state": project_state
+                    "project_state": project_state,
+                    "blocked_due_to": "project_status",
+                    "unblock_condition": "ready_for_deploy"
                 }
         
         # Use ASH agent implementation if available
@@ -1088,6 +1231,24 @@ def run_critic_agent(task, project_id, tools):
             except NameError:
                 print(f"[CRITIC] Read project state for {project_id}")
             
+            # Check if task has been re-evaluated after being unblocked
+            if PASSIVE_REFLECTION_AVAILABLE and AGENT_RETRY_AVAILABLE:
+                try:
+                    retry_status = get_retry_status(project_id, "critic")
+                    if retry_status and retry_status.get("status") == "unblocked":
+                        # Re-evaluate task with current project state
+                        re_eval_result = re_evaluate_task(project_id, "critic", task)
+                        if re_eval_result.get("status") == "success":
+                            task = re_eval_result.get("task", task)
+                            print(f"🔄 Re-evaluated task for CRITIC agent after being unblocked")
+                            logger.info(f"CRITIC task re-evaluated after being unblocked")
+                except Exception as e:
+                    print(f"⚠️ Error re-evaluating CRITIC task: {str(e)}")
+                    try:
+                        logger.error(f"Error re-evaluating CRITIC task: {str(e)}")
+                    except:
+                        pass
+            
             # Check if NOVA has created UI files
             if "nova" not in project_state.get("agents_involved", []):
                 print(f"⏩ NOVA has not created UI files yet, cannot review")
@@ -1095,6 +1256,29 @@ def run_critic_agent(task, project_id, tools):
                     logger.info(f"CRITIC execution blocked - NOVA has not run yet")
                 except NameError:
                     print(f"[CRITIC] Execution blocked - NOVA has not run yet")
+                
+                # Register blocked agent for future retry
+                if AGENT_RETRY_AVAILABLE:
+                    register_blocked_agent(
+                        project_id=project_id,
+                        agent_id="critic",
+                        blocked_due_to="nova",
+                        unblock_condition="frontend created"
+                    )
+                    print(f"🔄 CRITIC agent registered for retry when NOVA completes frontend creation")
+                
+                # Log block memory
+                if MEMORY_BLOCK_WRITER_AVAILABLE:
+                    write_block_memory({
+                        "project_id": project_id,
+                        "agent": "critic",
+                        "action": "blocked",
+                        "content": f"CRITIC agent blocked - NOVA has not created UI files yet",
+                        "blocked_due_to": "nova",
+                        "unblock_condition": "frontend created"
+                    })
+                    print(f"📝 Block memory logged for CRITIC agent")
+                
                 # Update project state to include critic in agents_involved even when blocked
                 if PROJECT_STATE_AVAILABLE:
                     project_state_data = {
@@ -1102,7 +1286,9 @@ def run_critic_agent(task, project_id, tools):
                         "latest_agent_action": {
                             "agent": "critic",
                             "action": f"Checked project {project_id} but was blocked - NOVA has not run yet"
-                        }
+                        },
+                        "blocked_due_to": "nova",
+                        "unblock_condition": "frontend created"
                     }
                     
                     project_state_result = update_project_state(project_id, project_state_data)
@@ -1121,7 +1307,9 @@ def run_critic_agent(task, project_id, tools):
                     "project_state": project_state,
                     "files_created": [],
                     "actions_taken": ["Checked project state"],
-                    "message": "CRITIC execution blocked - NOVA has not run yet"
+                    "message": "CRITIC execution blocked - NOVA has not run yet",
+                    "blocked_due_to": "nova",
+                    "unblock_condition": "frontend created"
                 }
         
         # Use CRITIC agent implementation if available
