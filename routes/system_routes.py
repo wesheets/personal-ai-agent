@@ -384,8 +384,13 @@ async def system_summary(
     # Extract project_id from either query parameter or request body
     effective_project_id = project_id or (request_body or {}).get("project_id")
     
+    # Add debug logging
+    print(f"[SYSTEM SUMMARY] project_id resolved to: {effective_project_id}")
+    logger.info(f"[SYSTEM SUMMARY] project_id resolved to: {effective_project_id}")
+    
     # Validate that project_id is provided
     if not effective_project_id:
+        logger.error("[SYSTEM SUMMARY] Missing project_id in both query and body")
         raise HTTPException(status_code=400, detail="project_id is required")
     
     try:
