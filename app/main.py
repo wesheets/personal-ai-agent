@@ -112,12 +112,12 @@ try:
             
     # Import project routes
     try:
-        from routes.project_routes import router as project_routes_router
+        from routes.project_routes import router as project_router
         print("✅ Successfully imported project_routes_router")
     except ModuleNotFoundError as e:
         print(f"⚠️ Router Load Failed: project_routes — {e}")
-        project_routes_router = APIRouter()
-        @project_routes_router.get("/project/ping")
+        project_router = APIRouter()
+        @project_router.get("/project/ping")
         def project_ping():
             return {"status": "Project router placeholder"}
     
@@ -132,6 +132,18 @@ try:
         async def integrity_import_error():
             return {"status": "error", "message": f"Failed to import system integrity router: {str(e)}"}
         print("⚠️ Created placeholder router for /api/system/integrity")
+        
+    # Import system log router
+    try:
+        from routes.system_log_routes import router as system_log_router
+        print("✅ Successfully imported system log router")
+    except Exception as e:
+        print(f"⚠️ Router Load Failed: system_log_routes — {e}")
+        system_log_router = APIRouter()
+        @system_log_router.get("/log")
+        async def system_log_import_error():
+            return {"status": "error", "message": f"Failed to import system log router: {str(e)}"}
+        print("⚠️ Created placeholder router for /api/system/log")
     
     # Import project start router for Phase 12.0 - CRITICAL for Agent Playground
     print("🔄 Importing project start router for Phase 12.0 (Agent Playground)")
@@ -197,11 +209,11 @@ try:
         plan_router = APIRouter()
     
     try:
-        from app.api.modules.project import router as project_router  # Project Management module router
+        from app.api.modules.project import router as project_router_module  # Project Management module router
         print("✅ Successfully imported project_router")
     except Exception as e:
         print(f"⚠️ Module Router Load Failed: project — {e}")
-        project_router = APIRouter()
+        project_router_module = APIRouter()
     
     # Import memory thread and summarize routers
     try:
@@ -348,35 +360,40 @@ try:
                 if project_id not in thread_counts:
                     thread_counts[project_id] = {}
                 thread_counts[project_id][chain_id] = len(entries)
-
+            
+            # Get a sample of recent entries
             recent_entries = []
             for key, entries in THREAD_DB.items():
-                for entry in entries[-5:]:
-                    entry_with_key = entry.copy()
-                    entry_with_key["thread_key"] = key
-                    recent_entries.append(entry_with_key)
-
-            recent_entries.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
-            recent_entries = recent_entries[:10]
-
+                if entries:
+                    project_id, chain_id = key.split(":")
+                    for entry in entries[-3:]:  # Last 3 entries
+                        recent_entries.append({
+                            "project_id": project_id,
+                            "chain_id": chain_id,
+                            "timestamp": entry.get("timestamp", "unknown"),
+                            "content_preview": entry.get("content", "")[:100] + "..." if len(entry.get("content", "")) > 100 else entry.get("content", "")
+                        })
+            
             return {
-                "status": "ok",
-                "thread_count": len(THREAD_DB),
-                "thread_counts_by_project": thread_counts,
-                "recent_entries": recent_entries,
+                "status": "success",
+                "thread_counts": thread_counts,
+                "total_threads": sum(len(chains) for chains in thread_counts.values()),
+                "recent_entries": recent_entries[:10],  # Limit to 10 entries
                 "timestamp": datetime.datetime.now().isoformat()
             }
         except Exception as e:
-            logger.error(f"Error in debug_memory_log: {str(e)}")
             return {
                 "status": "error",
-                "message": f"Failed to get memory log: {str(e)}"
+                "message": f"Error accessing memory thread database: {str(e)}",
+                "timestamp": datetime.datetime.now().isoformat()
             }
-        
+
+    # Register routers with safeguards
+    try:
         # Register the orchestrator_router
         try:
             print(f"🔍 DEBUG: Orchestrator router object: {orchestrator_router}")
-            app.include_router(orchestrator_router, prefix="/api")
+            app.include_router(orchestrator_router, prefix="/api/orchestrator")
             print("🧠 Route defined: /api/orchestrator/* -> orchestrator_routes")
         except Exception as e:
             print(f"⚠️ Failed to register orchestrator_router: {e}")
@@ -384,7 +401,7 @@ try:
         # Register the agent_router
         try:
             print(f"🔍 DEBUG: Agent router object: {agent_router}")
-            app.include_router(agent_router, prefix="/api")
+            app.include_router(agent_router, prefix="/api/agent")
             print("🧠 Route defined: /api/agent/* -> agent_routes")
         except Exception as e:
             print(f"⚠️ Failed to register agent_router: {e}")
@@ -392,7 +409,7 @@ try:
         # Register the memory_router
         try:
             print(f"🔍 DEBUG: Memory router object: {memory_router}")
-            app.include_router(memory_router, prefix="/api")
+            app.include_router(memory_router, prefix="/api/memory")
             print("🧠 Route defined: /api/memory/* -> memory_routes")
         except Exception as e:
             print(f"⚠️ Failed to register memory_router: {e}")
@@ -400,7 +417,7 @@ try:
         # Register the system_router
         try:
             print(f"🔍 DEBUG: System router object: {system_router}")
-            app.include_router(system_router, prefix="/api")
+            app.include_router(system_router, prefix="/api/system")
             print("🧠 Route defined: /api/system/* -> system_routes")
         except Exception as e:
             print(f"⚠️ Failed to register system_router: {e}")
@@ -408,7 +425,7 @@ try:
         # Register the debug_router
         try:
             print(f"🔍 DEBUG: Debug router object: {debug_router}")
-            app.include_router(debug_router, prefix="/api")
+            app.include_router(debug_router, prefix="/api/debug")
             print("🧠 Route defined: /api/debug/* -> debug_routes")
         except Exception as e:
             print(f"⚠️ Failed to register debug_router: {e}")
@@ -416,7 +433,7 @@ try:
         # Register the hal_router
         try:
             print(f"🔍 DEBUG: HAL router object: {hal_router}")
-            app.include_router(hal_router, prefix="/api")
+            app.include_router(hal_router, prefix="/api/hal")
             print("🧠 Route defined: /api/hal/* -> hal_routes")
         except Exception as e:
             print(f"⚠️ Failed to register hal_router: {e}")
@@ -424,18 +441,18 @@ try:
         # Register the snapshot_router
         try:
             print(f"🔍 DEBUG: Snapshot router object: {snapshot_router}")
-            app.include_router(snapshot_router, prefix="/api")
+            app.include_router(snapshot_router, prefix="/api/snapshot")
             print("🧠 Route defined: /api/snapshot/* -> snapshot_routes")
         except Exception as e:
             print(f"⚠️ Failed to register snapshot_router: {e}")
             
-        # Register the project_routes_router
+        # Register the project_router
         try:
-            print(f"🔍 DEBUG: Project routes router object: {project_routes_router}")
-            app.include_router(project_routes_router, prefix="/api")
+            print(f"🔍 DEBUG: Project routes router object: {project_router}")
+            app.include_router(project_router, prefix="/api/project")
             print("🧠 Route defined: /api/project/* -> project_routes")
         except Exception as e:
-            print(f"⚠️ Failed to register project_routes_router: {e}")
+            print(f"⚠️ Failed to register project_router: {e}")
         
         # Register the integrity_router
         try:
@@ -444,6 +461,14 @@ try:
             print("🧠 Route defined: /api/system/integrity -> check_system_integrity")
         except Exception as e:
             print(f"⚠️ Failed to register integrity_router: {e}")
+            
+        # Register the system_log_router
+        try:
+            print(f"🔍 DEBUG: System log router object: {system_log_router}")
+            app.include_router(system_log_router, prefix="/api/system")
+            print("🧠 Route defined: /api/system/log -> get_system_log")
+        except Exception as e:
+            print(f"⚠️ Failed to register system_log_router: {e}")
         
         # Register other routers with safeguards
         try:
@@ -498,11 +523,11 @@ try:
             print(f"⚠️ Failed to register plan_router: {e}")
         
         try:
-            print(f"🔍 DEBUG: Project router object: {project_router}")
-            app.include_router(project_router, prefix="/api/modules/project")
-            print("🧠 Route defined: /api/modules/project/* -> project_router")
+            print(f"🔍 DEBUG: Project router object: {project_router_module}")
+            app.include_router(project_router_module, prefix="/api/modules/project")
+            print("🧠 Route defined: /api/modules/project/* -> project_router_module")
         except Exception as e:
-            print(f"⚠️ Failed to register project_router: {e}")
+            print(f"⚠️ Failed to register project_router_module: {e}")
         
         try:
             print(f"🔍 DEBUG: Health router object: {health_router}")
@@ -534,9 +559,10 @@ try:
         except Exception as e:
             print(f"⚠️ Failed to register project start router: {e}")
         
-        # Log all routes for debugging
+        # Debug Router Exposure - Print all registered routes
         print("📡 ROUTES REGISTERED ON STARTUP:")
         for route in app.routes:
+            print(f"🧠 ROUTE: {route.path} {route.methods}")
             if isinstance(route, APIRoute):
                 print(f"➡️ {route.path} [{', '.join(route.methods)}] from {inspect.getsourcefile(route.endpoint)}")
                 print(f"🔍 DEBUG ROUTE: {route.path} [{', '.join(route.methods)}]")
@@ -578,106 +604,51 @@ try:
         import time
         import asyncio
         import json
-        from fastapi.responses import JSONResponse
         
-        logger.info(f"Request: {request.method} {request.url}")
+        start_time = time.time()
         
-        # Log origin for CORS debugging with normalization
-        origin = request.headers.get("origin")
-        if origin:
-            normalized_origin = normalize_origin(origin)
-            sanitized_origin = sanitize_origin_for_header(normalized_origin)
-            logger.info(f"Request origin: {sanitized_origin}")
-            
-            # Debug CORS if enabled
-            if os.getenv("CORS_DEBUG", "false").lower() == "true":
-                logger.info(f"CORS DEBUG: Raw origin header: {origin}")
-                logger.info(f"CORS DEBUG: Normalized origin: {normalized_origin}")
-                logger.info(f"CORS DEBUG: Sanitized for header: {sanitized_origin}")
+        # Extract request details
+        method = request.method
+        url = str(request.url)
+        client_host = request.client.host if request.client else "unknown"
         
-        # Get client IP with safeguards
-        client_ip = request.client.host if request.client else "unknown"
-        forwarded_for = request.headers.get("x-forwarded-for")
-        if forwarded_for:
-            # Only use the first IP in the chain to avoid spoofing
-            client_ip = forwarded_for.split(",")[0].strip()
-        
-        # Log client IP with privacy protection (last octet masked)
-        if "." in client_ip:  # IPv4
-            masked_ip = ".".join(client_ip.split(".")[:3]) + ".xxx"
-        elif ":" in client_ip:  # IPv6
-            masked_ip = ":".join(client_ip.split(":")[:4]) + ":xxxx:xxxx"
-        else:
-            masked_ip = "unknown"
-        
-        logger.info(f"Client: {masked_ip}")
-        
-        # Set up timeout handling
-        request_timeout = 60  # seconds
-        
+        # Set a timeout for the request processing
         try:
-            # Use asyncio.wait_for to implement timeout
-            start_time = time.time()
-            response = await asyncio.wait_for(call_next(request), timeout=request_timeout)
+            response = await asyncio.wait_for(call_next(request), timeout=60.0)  # 60 second timeout
             process_time = time.time() - start_time
             
-            # Log response details
-            logger.info(f"Response: {response.status_code} in {process_time:.2f}s")
-            
-            # Add custom headers for debugging and monitoring
-            response.headers["X-Process-Time"] = str(process_time)
+            # Log the request details
+            logger.info(f"{method} {url} - {response.status_code} - {process_time:.4f}s - {client_host}")
             
             return response
         except asyncio.TimeoutError:
-            # Handle timeout gracefully
-            logger.error(f"Request timeout after {request_timeout}s: {request.url}")
-            
-            error_response = {
-                "status": "error",
-                "message": f"Request timed out after {request_timeout} seconds",
-                "path": str(request.url)
-            }
+            # Handle timeout
+            process_time = time.time() - start_time
+            logger.error(f"{method} {url} - TIMEOUT after {process_time:.4f}s - {client_host}")
             
             return JSONResponse(
                 status_code=504,
-                content=error_response
+                content={"detail": "Request processing timed out"}
             )
         except Exception as e:
             # Handle other exceptions
-            logger.error(f"Request failed: {str(e)}")
-            logger.error(traceback.format_exc())
-            
-            error_response = {
-                "status": "error",
-                "message": "Internal server error",
-                "detail": str(e),
-                "path": str(request.url)
-            }
+            process_time = time.time() - start_time
+            logger.error(f"{method} {url} - ERROR: {str(e)} after {process_time:.4f}s - {client_host}")
             
             return JSONResponse(
                 status_code=500,
-                content=error_response
+                content={"detail": f"Internal server error: {str(e)}"}
             )
 
-    # Mount static files for UI
-    app.mount("/static", StaticFiles(directory="public"), name="static")
-    print("✅ Static files mounted")
-
-    # Serve Swagger UI at /docs
-    @app.get("/docs", include_in_schema=False)
-    async def custom_swagger_ui_html():
-        return get_swagger_ui_html(
-            openapi_url=app.openapi_url,
-            title=app.title + " - API Documentation",
-            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
-            swagger_js_url="/static/swagger-ui-bundle.js",
-            swagger_css_url="/static/swagger-ui.css",
-        )
-    print("✅ Swagger UI configured")
-
-    # Serve the React app for all other routes
-    @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_react_app(full_path: str, request: Request):
+    # Catch-all handler for SPA routing
+    @app.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+    async def catch_all(request: Request, full_path: str):
+        """
+        Catch-all handler for SPA routing.
+        
+        This handler serves the index.html file for all routes that don't match an API endpoint,
+        allowing the frontend SPA to handle client-side routing.
+        """
         # Log the request path for debugging
         logger.info(f"Catch-all handler received request for path: {full_path}")
         
