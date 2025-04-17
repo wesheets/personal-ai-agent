@@ -16,7 +16,7 @@ import glob
 logger = logging.getLogger("api.system.integrity")
 
 # Create router
-router = APIRouter(prefix="/system", tags=["System"])
+router = APIRouter(tags=["System"])
 
 @router.get("/integrity")
 async def system_integrity_check(full_report: bool = False):

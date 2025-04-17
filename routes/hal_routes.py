@@ -19,7 +19,7 @@ from app.agents.hal_agent import SAFETY_CONSTRAINTS, log_constraint
 logger = logging.getLogger("api")
 
 # Create router
-router = APIRouter(prefix="/hal", tags=["HAL"])
+router = APIRouter(tags=["HAL"])
 
 @router.get("/simulate-block")
 async def simulate_hal_constraint(

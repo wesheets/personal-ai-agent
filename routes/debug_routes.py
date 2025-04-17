@@ -17,7 +17,7 @@ from app.core.agent_router import get_agent_router
 logger = logging.getLogger("api.debug")
 
 # Create router
-router = APIRouter(prefix="/api/debug", tags=["Debug"])
+router = APIRouter(tags=["Debug"])
 
 @router.get("/agents")
 async def debug_agents():
