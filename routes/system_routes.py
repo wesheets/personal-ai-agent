@@ -29,7 +29,7 @@ from app.core.agent_loader import get_all_agents
 logger = logging.getLogger("api")
 
 # Create router
-router = APIRouter(prefix="/system", tags=["System"])
+router = APIRouter(tags=["System"])
 
 @router.get("/cors-debug")
 async def cors_debug(request: Request):
@@ -434,86 +434,58 @@ def generate_system_summary(project_id: str = Query(..., description="Project id
         }
 
 @router.get("/pulse")
-def get_system_pulse(agent_id: Optional[str] = None):
+def get_system_pulse():
     """
-    Returns a heartbeat status for the system or a specific agent.
+    Returns a simple system pulse check with basic metrics.
     
-    This endpoint provides a quick way to check if the system or a specific agent
-    is responsive and functioning properly.
+    This endpoint provides a lightweight way to verify system health
+    and get basic operational metrics without requiring a project ID.
     
-    Args:
-        agent_id: Optional agent identifier to check specific agent status
-        
     Returns:
-        Dict containing pulse status information
+        Dict containing system pulse information
     """
     try:
-        # Get current timestamp
-        timestamp = datetime.datetime.now().isoformat()
+        # Get basic system metrics
+        uptime = time.time() - os.path.getmtime("/proc/1/cmdline")
+        memory_usage = os.popen("free -m | grep Mem").read().split()[2]
         
-        # Get system uptime
-        uptime_seconds = time.time() - os.path.getmtime('/proc/1/cmdline')
+        # Get agent registry status
+        try:
+            from app.core.agent_loader import get_all_agents
+            agents = get_all_agents()
+            agent_count = len(agents)
+            agent_status = "active" if agent_count > 0 else "degraded"
+        except Exception as e:
+            logger.error(f"Error getting agent registry status: {str(e)}")
+            agent_count = 0
+            agent_status = "unknown"
         
-        # Format uptime
-        days, remainder = divmod(uptime_seconds, 86400)
-        hours, remainder = divmod(remainder, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        uptime_formatted = f"{int(days)}d {int(hours)}h {int(minutes)}m {int(seconds)}s"
-        
-        # Base response
-        response = {
+        # Return pulse information
+        return {
             "status": "active",
-            "timestamp": timestamp,
-            "uptime": uptime_formatted,
-            "uptime_seconds": uptime_seconds
+            "timestamp": datetime.datetime.now().isoformat(),
+            "uptime_seconds": uptime,
+            "memory_usage_mb": memory_usage,
+            "agent_count": agent_count,
+            "agent_status": agent_status,
+            "api_version": "1.0.0"
         }
-        
-        # If agent_id is provided, check specific agent
-        if agent_id:
-            try:
-                # Get all loaded agents
-                loaded_agents = get_all_agents()
-                
-                # Check if agent exists
-                if agent_id in loaded_agents:
-                    agent_instance = loaded_agents[agent_id]
-                    response["agent"] = {
-                        "id": agent_id,
-                        "name": getattr(agent_instance, "name", agent_id),
-                        "status": "active",
-                        "version": getattr(agent_instance, "version", "1.0.0")
-                    }
-                else:
-                    response["agent"] = {
-                        "id": agent_id,
-                        "status": "not_found",
-                        "message": f"Agent {agent_id} not found in registry"
-                    }
-            except Exception as e:
-                logger.error(f"Error checking agent status: {str(e)}")
-                response["agent"] = {
-                    "id": agent_id,
-                    "status": "error",
-                    "message": f"Error checking agent status: {str(e)}"
-                }
-        
-        return response
     
     except Exception as e:
-        logger.error(f"Unexpected error in get_system_pulse: {str(e)}")
+        logger.error(f"Error in system pulse check: {str(e)}")
         return {
             "status": "error",
-            "message": f"Unexpected error: {str(e)}",
+            "message": f"Error in system pulse check: {str(e)}",
             "timestamp": datetime.datetime.now().isoformat()
         }
 
 @router.get("/log")
-def get_system_log(limit: int = Query(20, description="Maximum number of log entries to return")):
+def get_system_log(limit: int = Query(10, description="Maximum number of log entries to return")):
     """
-    Returns system log entries tracking orchestration decisions, retries, and blocks.
+    Returns recent system log entries.
     
-    This endpoint provides visibility into system-level events and decisions,
-    particularly useful for debugging and monitoring.
+    This endpoint provides access to system-level logs for monitoring
+    and debugging purposes.
     
     Args:
         limit: Maximum number of log entries to return
@@ -522,33 +494,110 @@ def get_system_log(limit: int = Query(20, description="Maximum number of log ent
         Dict containing system log entries
     """
     try:
-        # Define sample log entries (in a real implementation, these would come from a database)
-        sample_logs = [
-            {
-                "timestamp": (datetime.datetime.now() - datetime.timedelta(minutes=i)).isoformat(),
-                "level": "INFO" if i % 3 != 0 else "WARNING",
-                "component": "orchestrator" if i % 2 == 0 else "retry_hook",
-                "message": f"Sample log entry {i}",
-                "details": {
-                    "project_id": f"project_{i % 3}",
-                    "agent_id": f"agent_{i % 4}"
-                }
-            }
-            for i in range(1, limit + 1)
-        ]
+        logger.info(f"Getting system log with limit: {limit}")
         
-        return {
-            "status": "success",
-            "timestamp": datetime.datetime.now().isoformat(),
-            "log_entries": sample_logs,
-            "total_entries": len(sample_logs)
-        }
+        # Try to import system_log module
+        try:
+            from memory.system_log import get_system_log as get_log
+            logger.info("Successfully imported system_log module")
+        except ImportError:
+            logger.error("Failed to import system_log module")
+            return {
+                "status": "error",
+                "message": "System log module is unavailable",
+                "logs": []
+            }
+        
+        # Get system logs
+        try:
+            logs = get_log(limit)
+            logger.info(f"Retrieved {len(logs)} system log entries")
+            
+            return {
+                "status": "success",
+                "logs": logs,
+                "count": len(logs),
+                "timestamp": datetime.datetime.now().isoformat()
+            }
+        except Exception as e:
+            logger.error(f"Error retrieving system logs: {str(e)}")
+            return {
+                "status": "error",
+                "message": f"Error retrieving system logs: {str(e)}",
+                "logs": []
+            }
     
     except Exception as e:
         logger.error(f"Unexpected error in get_system_log: {str(e)}")
         return {
             "status": "error",
             "message": f"Unexpected error: {str(e)}",
+            "logs": []
+        }
+
+@router.get("/integrity")
+def check_system_integrity():
+    """
+    Performs a system integrity check.
+    
+    This endpoint verifies the integrity of critical system components
+    and returns a detailed report of any issues found.
+    
+    Returns:
+        Dict containing system integrity check results
+    """
+    try:
+        logger.info("Performing system integrity check")
+        
+        # Check agent registry
+        try:
+            from app.core.agent_loader import get_all_agents
+            agents = get_all_agents()
+            agent_count = len(agents)
+            agent_status = "ok" if agent_count > 0 else "degraded"
+        except Exception as e:
+            logger.error(f"Error checking agent registry: {str(e)}")
+            agent_count = 0
+            agent_status = "error"
+        
+        # Check memory system
+        try:
+            from memory.memory_writer import write_memory
+            memory_status = "ok"
+        except Exception as e:
+            logger.error(f"Error checking memory system: {str(e)}")
+            memory_status = "error"
+        
+        # Check project state system
+        try:
+            from app.modules.project_state import read_project_state
+            project_state_status = "ok"
+        except Exception as e:
+            logger.error(f"Error checking project state system: {str(e)}")
+            project_state_status = "error"
+        
+        # Return integrity check results
+        return {
+            "status": "ok" if all(s == "ok" for s in [agent_status, memory_status, project_state_status]) else "degraded",
             "timestamp": datetime.datetime.now().isoformat(),
-            "log_entries": []
+            "components": {
+                "agent_registry": {
+                    "status": agent_status,
+                    "agent_count": agent_count
+                },
+                "memory_system": {
+                    "status": memory_status
+                },
+                "project_state": {
+                    "status": project_state_status
+                }
+            }
+        }
+    
+    except Exception as e:
+        logger.error(f"Error in system integrity check: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Error in system integrity check: {str(e)}",
+            "timestamp": datetime.datetime.now().isoformat()
         }
