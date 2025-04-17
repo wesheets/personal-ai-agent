@@ -617,12 +617,10 @@ except Exception as startup_error:
     
     @app.get("/health")
     async def error_health():
-        return {
-            "status": "error",
-            "message": "Application is in error recovery mode due to startup failure",
-            "error": str(startup_error),
-            "timestamp": datetime.datetime.now().isoformat()
-        }
+        try:
+            return JSONResponse(status_code=200, content={"status": "ok"})
+        except Exception as e:
+            return JSONResponse(status_code=500, content={"error": str(e)})
     
     # Add CORS middleware even in error mode
     from fastapi.middleware.cors import CORSMiddleware
