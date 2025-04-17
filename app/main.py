@@ -1,5 +1,5 @@
 """
-Modified main.py to include the orchestrator/scope router.
+Modified main.py to include all recovered route modules.
 """
 
 from fastapi import FastAPI, APIRouter, Response, Request
@@ -72,6 +72,38 @@ try:
         async def project_start_import_error():
             return {"status": "error", "message": f"Failed to import project start router: {str(e)}"}
         print("⚠️ Created placeholder router for /api/project/error")
+    
+    # RECOVERED ROUTES: Import recovered route modules
+    print("🔄 Importing recovered route modules...")
+    try:
+        from routes.hal_routes import router as hal_router
+        from routes.system_routes import router as system_router
+        from routes.debug_routes import router as debug_router
+        from routes.system_integrity import router as integrity_router
+        print("✅ Successfully imported recovered route modules")
+    except Exception as e:
+        print(f"❌ ERROR importing recovered route modules: {str(e)}")
+        logging.error(f"Failed to import recovered route modules: {str(e)}")
+        # Create placeholder routers to prevent app startup failure
+        hal_router = APIRouter()
+        system_router = APIRouter()
+        debug_router = APIRouter()
+        integrity_router = APIRouter()
+        @hal_router.get("/error")
+        async def hal_router_import_error():
+            return {"status": "error", "message": f"Failed to import hal_routes: {str(e)}"}
+        print("⚠️ Created placeholder routers for recovered routes")
+    
+    # SNAPSHOT ROUTES: Create placeholder for missing snapshot_routes
+    print("🔄 Creating placeholder for snapshot_routes...")
+    snapshot_router = APIRouter()
+    @snapshot_router.get("/snapshot")
+    async def snapshot_not_implemented():
+        return Response(status_code=501, content="Snapshot functionality not implemented yet")
+    @snapshot_router.post("/snapshot")
+    async def snapshot_post_not_implemented():
+        return Response(status_code=501, content="Snapshot functionality not implemented yet")
+    print("✅ Created placeholder for snapshot_routes")
     
     # MODIFIED: Commented out problematic routes
     """
@@ -306,6 +338,7 @@ try:
     # Request body size limiter middleware
     app.middleware("http")(limit_request_body_size)
 
+feature/phase-4.1-orchestrator-consult
     # Middleware for logging with timeout handling
     @app.middleware("http")
     async def log_requests(request: Request, call_next):
@@ -478,51 +511,26 @@ try:
     
     # Import and mount the orchestrator router
     print(f"🔍 DEBUG: Orchestrator router object: {orchestrator_router}")
+
+    # Register all API routes
+    print("🔄 Registering API routes...")
+    
+    # Register existing module routers
+    app.include_router(agent_module_router, prefix="/api/modules/agent")
+    app.include_router(memory_router, prefix="/api/modules/memory")
+main
     app.include_router(orchestrator_router, prefix="/api/modules/orchestrator")
-    print("🧠 Route defined: /api/modules/orchestrator/audit -> audit_agent_performance")
-    
-    # Import and mount the feedback router
-    print(f"🔍 DEBUG: Feedback router object: {feedback_router}")
     app.include_router(feedback_router, prefix="/api/modules/feedback")
-    print("🧠 Route defined: /api/modules/feedback/submit -> submit_feedback")
-    
-    # Import and mount the user context router
-    print(f"🔍 DEBUG: User Context router object: {user_context_router}")
     app.include_router(user_context_router, prefix="/api/modules/user_context")
-    print("🧠 Route defined: /api/modules/user_context/get -> get_user_context")
-
-    # ✅ Register delegate route directly at /api/delegate
-    from app.api import delegate  # Add this near your other import statements if missing
-
-    print("📡 Including Delegate router from /app/api/delegate.py")
-    app.include_router(delegate.router, prefix="/api")
-    print("🧠 Route defined: /api/delegate -> delegate_task")
-
-    
-    # Import and mount the respond router
-    print(f"🔍 DEBUG: Respond router object: {respond_router}")
     app.include_router(respond_router, prefix="/api/modules/respond")
-    print("🧠 Route defined: /api/modules/respond/generate -> generate_response")
-
-    # ✅ Directly expose at /api/respond for frontend access
-    app.include_router(respond_router, prefix="/api/respond")
-    print("🧠 Route defined: /api/respond -> respond_to_operator")
-
-    
-    # Import and mount the plan router
-    print(f"🔍 DEBUG: Plan router object: {plan_router}")
     app.include_router(plan_router, prefix="/api/modules/plan")
-    print("🧠 Route defined: /api/modules/plan/generate -> generate_plan")
-    
-    # Import and mount the project router
-    print(f"🔍 DEBUG: Project router object: {project_router}")
     app.include_router(project_router, prefix="/api/modules/project")
-    print("🧠 Route defined: /api/modules/project/create -> create_project")
     
-    # Mount the health router
-    app.include_router(health_router, prefix="/api/health")
-    print("🧠 Route defined: /api/health/check -> health_check")
+    # Register memory-related routers
+    app.include_router(memory_thread_router, prefix="/api/memory/thread")
+    app.include_router(memory_summarize_router, prefix="/api/memory/summarize")
     
+feature/phase-4.1-orchestrator-consult
     # Register the orchestrator_routes router for the /api/orchestrator/consult endpoint
     print(f"🔍 DEBUG: Orchestrator Routes router object: {orchestrator_routes_router}")
     app.include_router(orchestrator_routes_router, prefix="/api")
@@ -538,48 +546,59 @@ try:
             swagger_js_url="/static/swagger-ui-bundle.js",
             swagger_css_url="/static/swagger-ui.css",
         )
+
+    # Register orchestrator routers
+    app.include_router(consult.router, prefix="/api/orchestrator")
+    app.include_router(chain.router, prefix="/api/orchestrator")
+main
     
-    # Mount static files for Swagger UI
-    app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    # Register delegate router
+    app.include_router(delegate.router, prefix="/api/modules")
     
-    # Add a catch-all route for debugging 404 errors
-    @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"])
-    async def catch_all(request: Request, path: str):
-        """
-        Catch-all route for debugging 404 errors.
-        This helps identify missing routes during development.
-        """
-        logger.warning(f"404 Not Found: {request.method} {request.url}")
-        logger.warning(f"Path: {path}")
-        logger.warning(f"Headers: {request.headers}")
-        
-        # Return a more detailed 404 response for debugging
-        return JSONResponse(
-            status_code=404,
-            content={
-                "status": "error",
-                "message": f"Route not found: {request.method} {path}",
-                "timestamp": datetime.datetime.now().isoformat(),
-                "available_routes": [
-                    {"path": route.path, "methods": list(route.methods) if hasattr(route, "methods") else []} 
-                    for route in app.routes if isinstance(route, APIRoute)
-                ]
-            }
-        )
+    # Register system router
+    app.include_router(system.router, prefix="/api/modules")
     
-    # Final startup message
-    print("✅ All routes registered successfully")
-    print("🚀 Enhanced AI Agent System is ready to serve requests")
+    # Register agent router
+    app.include_router(agent.router, prefix="/api/modules")
     
+    # Register project start router
+    app.include_router(start.router, prefix="/api/project")
+    
+    # Register health router
+    app.include_router(health_router, prefix="/api/health")
+    
+    # RECOVERED ROUTES: Register recovered route modules
+    print("🔄 Registering recovered route modules...")
+    app.include_router(hal_router, prefix="/api")
+    app.include_router(system_router, prefix="/api")
+    app.include_router(debug_router, prefix="/api")
+    app.include_router(integrity_router, prefix="/api")
+    app.include_router(snapshot_router, prefix="/api")
+    print("✅ Recovered route modules registered")
+    
+    print("✅ All API routes registered")
+
 except Exception as e:
-    # Global error handler for startup failures
-    import traceback
-    print(f"❌ CRITICAL ERROR during startup: {str(e)}")
-    print(f"❌ Traceback: {traceback.format_exc()}")
+    print(f"❌ ERROR during application startup: {str(e)}")
+    logging.error(f"Application startup failed: {str(e)}")
     
     # Create a minimal FastAPI app for error reporting
     app = FastAPI(
-        title="Enhanced AI Agent System (ERROR MODE)",
+        title="Promethios OS (Error Recovery Mode)",
         description="Error recovery mode due to startup failure",
         version="1.0.0"
     )
+feature/phase-4.1-orchestrator-consult
+    
+    @app.get("/")
+    async def error_root():
+        return {"status": "error", "message": f"Application startup failed: {str(e)}"}
+    
+    @app.get("/health")
+    async def error_health():
+        return {"status": "error", "message": f"Application startup failed: {str(e)}"}
+
+# If this file is run directly, start the server
+if __name__ == "__main__":
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+main
