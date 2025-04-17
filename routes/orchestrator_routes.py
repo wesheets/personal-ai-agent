@@ -17,17 +17,11 @@ router = APIRouter()
 # Define request and response models
 class OrchestratorConsultRequest(BaseModel):
     """Request model for the orchestrator/consult endpoint"""
-<<<<<<< HEAD
+    agent_id: str = Field(..., description="Agent identifier")
     project_id: str = Field(..., description="Project context")
     task: str = Field(..., description="Primary task to evaluate")
+    objective: Optional[str] = Field(None, description="Optional objective")
     context: Optional[str] = Field(None, description="Optional context")
-=======
-    agent_id: str
-    project_id: str
-    task: str
-    objective: Optional[str] = None
-    context: Optional[str] = None
->>>>>>> origin/main
 
 @router.post("/orchestrator/consult")
 async def orchestrator_consult(request: OrchestratorConsultRequest, background_tasks: BackgroundTasks = None):
@@ -39,11 +33,7 @@ async def orchestrator_consult(request: OrchestratorConsultRequest, background_t
     with reasoning.
     
     Args:
-<<<<<<< HEAD
-        request: The consultation request containing project_id, task, and optional context
-=======
         request: The consultation request containing project_id, task, agent_id, and optional objective and context
->>>>>>> origin/main
         background_tasks: Optional background tasks for async operations
         
     Returns:
@@ -55,37 +45,12 @@ async def orchestrator_consult(request: OrchestratorConsultRequest, background_t
         
         # Log the consultation request to memory
         # This would typically use a memory manager, but we'll keep it simple for now
-<<<<<<< HEAD
         print(f"Orchestrator consultation request: {request.task} for project {request.project_id}")
-=======
-        print(f"Orchestrator consultation request: {request.task}")
->>>>>>> origin/main
         
         # Process the request
         # In a full implementation, this would use more sophisticated logic
         # based on the orchestrator's capabilities
         
-<<<<<<< HEAD
-        # Determine the best agent for the task
-        # For now, we'll use a simple rule-based approach
-        task_lower = request.task.lower()
-        
-        if "bootstrap" in task_lower or "initialize" in task_lower or "create file" in task_lower:
-            agent_id = "hal"
-            reasoning = "HAL is specialized in file creation and project bootstrapping."
-        elif "ui" in task_lower or "interface" in task_lower or "component" in task_lower:
-            agent_id = "nova"
-            reasoning = "NOVA is specialized in UI component creation and design."
-        elif "review" in task_lower or "evaluate" in task_lower or "critique" in task_lower:
-            agent_id = "critic"
-            reasoning = "CRITIC is specialized in code review and evaluation."
-        elif "deploy" in task_lower or "publish" in task_lower:
-            agent_id = "ash"
-            reasoning = "ASH is specialized in deployment and publishing."
-        else:
-            agent_id = "hal"  # Default to HAL
-            reasoning = "Default agent selection based on general-purpose capabilities."
-=======
         # Use the specified agent_id or determine which agents to delegate to
         delegated_agents = [request.agent_id] if request.agent_id else ["hal", "nova"]
         
@@ -102,14 +67,13 @@ async def orchestrator_consult(request: OrchestratorConsultRequest, background_t
             f"{' and '.join(delegated_agents).upper()} are best suited for this task. "
             f"Initiating collaborative workflow with these agents as primary handlers for project {request.project_id}."
         )
->>>>>>> origin/main
         
         # Create and return the response
         return {
             "status": "success",
             "message": "Consultation complete",
-            "agent_id": agent_id,
-            "reasoning": reasoning
+            "agent_id": request.agent_id,
+            "reasoning": reflection
         }
         
     except Exception as e:
