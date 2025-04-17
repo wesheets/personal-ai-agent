@@ -13,6 +13,7 @@ MODIFIED: Added structured output for ASH documentation and onboarding
 MODIFIED: Added AGENT_RUNNERS mapping for direct agent execution
 MODIFIED: Added run_hal_agent function with file_writer integration
 MODIFIED: Updated run_hal_agent with real execution logic and memory logging
+MODIFIED: Added project_state integration for tracking project status
 """
 
 import logging
@@ -55,6 +56,14 @@ try:
 except ImportError:
     MEMORY_WRITER_AVAILABLE = False
     print("❌ memory_writer import failed")
+
+# Import project_state for tracking project status
+try:
+    from app.modules.project_state import update_project_state, read_project_state
+    PROJECT_STATE_AVAILABLE = True
+except ImportError:
+    PROJECT_STATE_AVAILABLE = False
+    print("❌ project_state import failed")
 
 # Configure logging
 logger = logging.getLogger("modules.agent_runner")
@@ -383,14 +392,29 @@ def run_hal_agent(task, project_id, tools):
     Returns:
         Dict containing the response and metadata
     """
-    print(f"🤖 HAL agent execution started")
-    print(f"📋 Task: {task}")
-    print(f"🆔 Project ID: {project_id}")
-    print(f"🧰 Tools: {tools}")
-    logger.info(f"HAL agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
-    
     try:
-        # Initialize files_created list to track created files
+        print(f"🤖 HAL agent execution started")
+        logger.info(f"HAL agent execution started with task: {task}, project_id: {project_id}")
+        
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"HAL read project state for {project_id}")
+            
+            # Check if README.md already exists
+            if "README.md" in project_state.get("files_created", []):
+                print(f"⏩ README.md already exists, skipping duplicate write")
+                logger.info(f"HAL skipped README.md creation - file already exists")
+                return {
+                    "status": "skipped",
+                    "notes": "README.md already exists, skipping duplicate write.",
+                    "output": project_state,
+                    "project_state": project_state
+                }
+        
+        # Initialize list of created files
         files_created = []
         
         # Create files using file_writer
@@ -430,13 +454,34 @@ def run_hal_agent(task, project_id, tools):
                 print(f"✅ Memory entry created: {memory_result.get('memory_id', 'unknown')}")
                 logger.info(f"HAL logged memory entry for file creation")
         
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "status": "in_progress",
+                "files_created": files_created,
+                "agents_involved": ["hal"],
+                "latest_agent_action": {
+                    "agent": "hal",
+                    "action": f"Created initial files for project {project_id}"
+                },
+                "next_recommended_step": "Run NOVA to design the project",
+                "tool_usage": {
+                    "file_writer": 1
+                }
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"HAL updated project state for {project_id}")
+        
         # Return result with files_created list
         return {
             "status": "success",
             "message": f"HAL successfully created files for project {project_id}",
             "files_created": files_created,
             "task": task,
-            "tools": tools
+            "tools": tools,
+            "project_state": project_state
         }
     except Exception as e:
         error_msg = f"Error in run_hal_agent: {str(e)}"
@@ -450,7 +495,8 @@ def run_hal_agent(task, project_id, tools):
             "files_created": [],
             "task": task,
             "tools": tools,
-            "error": str(e)
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
         }
 
 def run_nova_agent(task, project_id, tools):
@@ -468,12 +514,63 @@ def run_nova_agent(task, project_id, tools):
     print(f"🤖 NOVA agent execution started")
     logger.info(f"NOVA agent execution started with task: {task}, project_id: {project_id}")
     
-    # TODO: Implement NOVA agent execution
-    return {
-        "message": f"NOVA received task for project {project_id}",
-        "task": task,
-        "tools": tools
-    }
+    try:
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"NOVA read project state for {project_id}")
+            
+            # Check if HAL has created initial files
+            if "hal" not in project_state.get("agents_involved", []):
+                print(f"⏩ HAL has not created initial files yet, cannot proceed")
+                logger.info(f"NOVA execution blocked - HAL has not run yet")
+                return {
+                    "status": "blocked",
+                    "notes": "Cannot create UI - HAL has not yet created initial project files.",
+                    "project_state": project_state
+                }
+        
+        # TODO: Implement NOVA agent execution
+        result = {
+            "message": f"NOVA received task for project {project_id}",
+            "task": task,
+            "tools": tools,
+            "project_state": project_state
+        }
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "agents_involved": ["nova"],
+                "latest_agent_action": {
+                    "agent": "nova",
+                    "action": f"Designed project {project_id}"
+                },
+                "next_recommended_step": "Run ASH to create documentation",
+                "tool_usage": {}
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"NOVA updated project state for {project_id}")
+        
+        return result
+    except Exception as e:
+        error_msg = f"Error in run_nova_agent: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        
+        return {
+            "status": "error",
+            "message": f"Error executing NOVA agent: {str(e)}",
+            "task": task,
+            "tools": tools,
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
+        }
 
 def run_ash_agent(task, project_id, tools):
     """
@@ -490,12 +587,63 @@ def run_ash_agent(task, project_id, tools):
     print(f"🤖 ASH agent execution started")
     logger.info(f"ASH agent execution started with task: {task}, project_id: {project_id}")
     
-    # TODO: Implement ASH agent execution
-    return {
-        "message": f"ASH received task for project {project_id}",
-        "task": task,
-        "tools": tools
-    }
+    try:
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"ASH read project state for {project_id}")
+            
+            # Check if project is ready for deployment
+            if project_state.get("status") != "ready_for_deploy":
+                print(f"⏩ Project not ready for deployment yet")
+                logger.info(f"ASH execution on hold - project not ready for deployment")
+                return {
+                    "status": "on_hold",
+                    "notes": "Project not ready for deployment yet.",
+                    "project_state": project_state
+                }
+        
+        # TODO: Implement ASH agent execution
+        result = {
+            "message": f"ASH received task for project {project_id}",
+            "task": task,
+            "tools": tools,
+            "project_state": project_state
+        }
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "agents_involved": ["ash"],
+                "latest_agent_action": {
+                    "agent": "ash",
+                    "action": f"Created documentation for project {project_id}"
+                },
+                "next_recommended_step": "Run CRITIC to review the project",
+                "tool_usage": {}
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"ASH updated project state for {project_id}")
+        
+        return result
+    except Exception as e:
+        error_msg = f"Error in run_ash_agent: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        
+        return {
+            "status": "error",
+            "message": f"Error executing ASH agent: {str(e)}",
+            "task": task,
+            "tools": tools,
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
+        }
 
 def run_critic_agent(task, project_id, tools):
     """
@@ -512,12 +660,64 @@ def run_critic_agent(task, project_id, tools):
     print(f"🤖 CRITIC agent execution started")
     logger.info(f"CRITIC agent execution started with task: {task}, project_id: {project_id}")
     
-    # TODO: Implement CRITIC agent execution
-    return {
-        "message": f"CRITIC received task for project {project_id}",
-        "task": task,
-        "tools": tools
-    }
+    try:
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"CRITIC read project state for {project_id}")
+            
+            # Check if NOVA has created UI files
+            if "nova" not in project_state.get("agents_involved", []):
+                print(f"⏩ NOVA has not created UI files yet, cannot review")
+                logger.info(f"CRITIC execution blocked - NOVA has not run yet")
+                return {
+                    "status": "blocked",
+                    "notes": "Cannot review UI – NOVA has not yet created any frontend files.",
+                    "project_state": project_state
+                }
+        
+        # TODO: Implement CRITIC agent execution
+        result = {
+            "message": f"CRITIC received task for project {project_id}",
+            "task": task,
+            "tools": tools,
+            "project_state": project_state
+        }
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "status": "ready_for_deploy",
+                "agents_involved": ["critic"],
+                "latest_agent_action": {
+                    "agent": "critic",
+                    "action": f"Reviewed project {project_id}"
+                },
+                "next_recommended_step": "Run ASH to deploy",
+                "tool_usage": {}
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"CRITIC updated project state for {project_id}")
+        
+        return result
+    except Exception as e:
+        error_msg = f"Error in run_critic_agent: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        
+        return {
+            "status": "error",
+            "message": f"Error executing CRITIC agent: {str(e)}",
+            "task": task,
+            "tools": tools,
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
+        }
 
 def run_orchestrator_agent(task, project_id, tools):
     """
@@ -534,12 +734,52 @@ def run_orchestrator_agent(task, project_id, tools):
     print(f"🤖 ORCHESTRATOR agent execution started")
     logger.info(f"ORCHESTRATOR agent execution started with task: {task}, project_id: {project_id}")
     
-    # TODO: Implement ORCHESTRATOR agent execution
-    return {
-        "message": f"ORCHESTRATOR received task for project {project_id}",
-        "task": task,
-        "tools": tools
-    }
+    try:
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"ORCHESTRATOR read project state for {project_id}")
+        
+        # TODO: Implement ORCHESTRATOR agent execution
+        result = {
+            "message": f"ORCHESTRATOR received task for project {project_id}",
+            "task": task,
+            "tools": tools,
+            "project_state": project_state
+        }
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "agents_involved": ["orchestrator"],
+                "latest_agent_action": {
+                    "agent": "orchestrator",
+                    "action": f"Orchestrated project {project_id}"
+                },
+                "tool_usage": {}
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"ORCHESTRATOR updated project state for {project_id}")
+        
+        return result
+    except Exception as e:
+        error_msg = f"Error in run_orchestrator_agent: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        
+        return {
+            "status": "error",
+            "message": f"Error executing ORCHESTRATOR agent: {str(e)}",
+            "task": task,
+            "tools": tools,
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
+        }
 
 # Map agent_id to runner function
 AGENT_RUNNERS = {

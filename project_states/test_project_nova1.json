@@ -1,0 +1,14 @@
+{
+  "project_id": "test_project_nova1",
+  "status": "in_progress",
+  "files_created": [
+    "/verticals/test_project_nova1/README.md"
+  ],
+  "agents_involved": [],
+  "latest_agent_action": {
+    "agent": "system",
+    "action": "Project initialized"
+  },
+  "next_recommended_step": "Run HAL",
+  "tool_usage": {}
+}
