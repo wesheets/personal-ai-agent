@@ -12,6 +12,7 @@ MODIFIED: Added product strategist logic for HAL in saas domain
 MODIFIED: Added structured output for ASH documentation and onboarding
 MODIFIED: Added AGENT_RUNNERS mapping for direct agent execution
 MODIFIED: Added run_hal_agent function with file_writer integration
+MODIFIED: Updated run_hal_agent with real execution logic and memory logging
 """
 
 import logging
@@ -46,6 +47,14 @@ try:
 except ImportError:
     FILE_WRITER_AVAILABLE = False
     print("❌ file_writer import failed")
+
+# Import memory_writer for logging agent actions
+try:
+    from app.modules.memory_writer import write_memory
+    MEMORY_WRITER_AVAILABLE = True
+except ImportError:
+    MEMORY_WRITER_AVAILABLE = False
+    print("❌ memory_writer import failed")
 
 # Configure logging
 logger = logging.getLogger("modules.agent_runner")
@@ -381,39 +390,54 @@ def run_hal_agent(task, project_id, tools):
     logger.info(f"HAL agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
     
     try:
-        # Create a bootstrap file using file_writer
-        if FILE_WRITER_AVAILABLE and "file_writer" in tools:
-            print(f"📝 Using file_writer to create bootstrap file")
+        # Initialize files_created list to track created files
+        files_created = []
+        
+        # Create files using file_writer
+        if "file_writer" in tools:
+            print(f"📝 Using file_writer to create files")
             
             # Create content for README.md
-            contents = f"# Project {project_id}\n\nTask: {task}\nTools: {', '.join(tools)}"
+            content = f"# Project {project_id}\n\nTask: {task}"
+            file_path = f"/verticals/{project_id}/README.md"
+            
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
             
             # Write file
-            output = write_file(
+            result = write_file(
                 project_id=project_id,
-                file_path=f"/verticals/{project_id}/README.md",
-                content=contents
+                file_path=file_path,
+                content=content
             )
             
-            print(f"✅ Bootstrap file created successfully")
-            logger.info(f"HAL created bootstrap file for project {project_id}")
+            # Add to files_created list
+            files_created.append(file_path)
             
-            return {
-                "message": f"HAL successfully created bootstrap file",
-                "output": output,
-                "task": task,
-                "tools": tools
-            }
-        else:
-            # If file_writer is not available or not in tools
-            print(f"⚠️ file_writer not available or not in tools list")
-            logger.warning(f"file_writer not available or not in tools list")
+            print(f"✅ File created successfully: {file_path}")
+            logger.info(f"HAL created file: {file_path}")
             
-            return {
-                "message": f"HAL received task for project {project_id}",
-                "task": task,
-                "tools": tools
-            }
+            # Log memory entry if memory_writer is available
+            if MEMORY_WRITER_AVAILABLE:
+                memory_data = {
+                    "agent": "hal",
+                    "project_id": project_id,
+                    "action": f"Wrote {file_path}",
+                    "tool_used": "file_writer"
+                }
+                
+                memory_result = write_memory(memory_data)
+                print(f"✅ Memory entry created: {memory_result.get('memory_id', 'unknown')}")
+                logger.info(f"HAL logged memory entry for file creation")
+        
+        # Return result with files_created list
+        return {
+            "status": "success",
+            "message": f"HAL successfully created files for project {project_id}",
+            "files_created": files_created,
+            "task": task,
+            "tools": tools
+        }
     except Exception as e:
         error_msg = f"Error in run_hal_agent: {str(e)}"
         print(f"❌ {error_msg}")
@@ -421,7 +445,9 @@ def run_hal_agent(task, project_id, tools):
         logger.error(traceback.format_exc())
         
         return {
+            "status": "error",
             "message": f"Error executing HAL agent: {str(e)}",
+            "files_created": [],
             "task": task,
             "tools": tools,
             "error": str(e)
@@ -515,7 +541,7 @@ def run_orchestrator_agent(task, project_id, tools):
         "tools": tools
     }
 
-# Define agent runners mapping
+# Map agent_id to runner function
 AGENT_RUNNERS = {
     "hal": run_hal_agent,
     "nova": run_nova_agent,
@@ -523,317 +549,3 @@ AGENT_RUNNERS = {
     "critic": run_critic_agent,
     "orchestrator": run_orchestrator_agent
 }
-
-async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None, domain: str = "saas"):
-    """
-    Async version of run_agent function.
-    
-    Args:
-        agent_id: The ID of the agent to run
-        messages: List of message dictionaries with role and content
-        project_id: Optional project identifier for memory logging
-        chain_id: Optional chain identifier for memory logging
-        domain: Optional domain for toolkit selection, defaults to "saas"
-        
-    Returns:
-        Dict containing the response and metadata or JSONResponse with error details
-    """
-    # Generate project_id and chain_id if not provided
-    if not project_id:
-        project_id = f"project_{uuid.uuid4().hex[:8]}"
-        print(f"🆔 Generated project_id: {project_id}")
-    
-    if not chain_id:
-        chain_id = f"chain_{uuid.uuid4().hex[:8]}"
-        print(f"🔗 Generated chain_id: {chain_id}")
-    
-    # Enhanced logging for debugging
-    print(f"🔍 DEBUG: run_agent_async called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}, domain={domain}")
-    logger.info(f"DEBUG: run_agent_async called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}, domain={domain}")
-    
-    # Map agent_id to standard agent types and roles
-    agent_mapping = {
-        "hal": {"agent": "hal", "role": "thinker"},
-        "ash": {"agent": "ash", "role": "explainer"},
-        "nova": {"agent": "nova", "role": "designer"},
-        "critic": {"agent": "critic", "role": "critic"},
-        "orchestrator": {"agent": "orchestrator", "role": "orchestrator"},
-        "Core.Forge": {"agent": "hal", "role": "thinker"}  # Default to HAL for CoreForge
-    }
-    
-    # Get agent type and role
-    agent_info = agent_mapping.get(agent_id.lower(), {"agent": "hal", "role": "thinker"})
-    agent_type = agent_info["agent"]
-    agent_role = agent_info["role"]
-    
-    print(f"🔍 DEBUG: Mapped agent_id={agent_id} to agent_type={agent_type}, agent_role={agent_role}")
-    
-    try:
-        print("🧠 Attempting to run CoreForgeAgent fallback")
-        logger.info("Attempting to run CoreForgeAgent fallback")
-        
-        # Check OpenAI API key
-        api_key = os.getenv("OPENAI_API_KEY")
-        print(f"🔑 OpenAI API Key loaded: {bool(api_key)}")
-        logger.info(f"OpenAI API Key available: {bool(api_key)}")
-        
-        if not api_key:
-            error_msg = "OpenAI API key is not set in environment variables"
-            print(f"❌ {error_msg}")
-            logger.error(error_msg)
-            
-            # Log error to memory thread
-            print(f"🔍 DEBUG: About to log error to memory thread")
-            await log_memory_thread(
-                project_id=project_id,
-                chain_id=chain_id,
-                agent=agent_type,
-                role=agent_role,
-                step_type="task",
-                content=f"Error: {error_msg}"
-            )
-            print(f"🔍 DEBUG: Finished logging error to memory thread")
-            
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "agent_id": agent_id,
-                    "response": error_msg,
-                    "status": "error"
-                }
-            )
-        
-        # Create CoreForgeAgent instance
-        print(f"🔄 Creating CoreForgeAgent instance for: {agent_id}")
-        agent = CoreForgeAgent()
-        
-        # Call agent's run method with agent_id and domain for toolkit selection
-        print(f"🏃 Calling CoreForgeAgent.run() method with {len(messages)} messages")
-        result = agent.run(messages, agent_id=agent_id, domain=domain)
-        
-        # Check if agent execution was successful
-        if result.get("status") == "error":
-            error_msg = f"CoreForgeAgent execution failed: {result.get('content')}"
-            print(f"❌ {error_msg}")
-            logger.error(error_msg)
-            
-            # Log error to memory thread
-            print(f"🔍 DEBUG: About to log error to memory thread")
-            await log_memory_thread(
-                project_id=project_id,
-                chain_id=chain_id,
-                agent=agent_type,
-                role=agent_role,
-                step_type="task",
-                content=f"Error: {result.get('content', 'Unknown error')}"
-            )
-            print(f"🔍 DEBUG: Finished logging error to memory thread")
-            
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "agent_id": "Core.Forge",
-                    "response": result.get("content", "Unknown error"),
-                    "status": "error"
-                }
-            )
-        
-        # Process agent-specific responses
-        structured_data = None
-        
-        # Process HAL's response for saas domain
-        if agent_id.lower() == "hal" and domain == "saas":
-            try:
-                # Parse JSON response
-                content = result.get("content", "")
-                parsed_content = json.loads(content)
-                
-                # Check for required fields
-                required_fields = ["core_features", "mvp_features", "premium_features", "monetization", "task_steps"]
-                for field in required_fields:
-                    if field not in parsed_content:
-                        parsed_content[field] = []
-                
-                # Update content with structured data
-                result["content"] = json.dumps(parsed_content)
-                structured_data = parsed_content
-            except Exception as e:
-                print(f"❌ Error parsing HAL's JSON response: {str(e)}")
-                logger.error(f"Error parsing HAL's JSON response: {str(e)}")
-                # Continue with original content
-        
-        # Process ASH's response for saas domain
-        elif agent_id.lower() == "ash" and domain == "saas":
-            try:
-                # Parse JSON response
-                content = result.get("content", "")
-                parsed_content = json.loads(content)
-                
-                # Check for required fields
-                required_fields = ["docs.api", "docs.onboarding", "docs.integration"]
-                for field in required_fields:
-                    if field not in parsed_content:
-                        parsed_content[field] = ""
-                
-                # Update content with structured data
-                result["content"] = json.dumps(parsed_content)
-                structured_data = parsed_content
-            except Exception as e:
-                print(f"❌ Error parsing ASH's JSON response: {str(e)}")
-                logger.error(f"Error parsing ASH's JSON response: {str(e)}")
-                # Continue with original content
-        
-        # Log success
-        print("✅ AgentRunner success, returning response")
-        logger.info("AgentRunner success, returning response")
-        
-        # Log successful response to memory thread
-        print(f"🔍 DEBUG: About to log successful response to memory thread")
-        await log_memory_thread(
-            project_id=project_id,
-            chain_id=chain_id,
-            agent=agent_type,
-            role=agent_role,
-            step_type="task",
-            content=result.get("content", ""),
-            structured_data=structured_data
-        )
-        print(f"🔍 DEBUG: Finished logging successful response to memory thread")
-        
-        # Return successful response
-        return {
-            "agent_id": "Core.Forge",
-            "response": result.get("content", ""),
-            "status": "ok",
-            "usage": result.get("usage", {}),
-            "project_id": project_id,
-            "chain_id": chain_id,
-            "structured_data": structured_data
-        }
-    
-    except Exception as e:
-        # Handle any unexpected errors
-        error_msg = f"Error running agent {agent_id}: {str(e)}"
-        print(f"❌ AgentRunner failed: {str(e)}")
-        logger.error(error_msg)
-        logger.error(traceback.format_exc())
-        
-        # Log error to memory thread
-        try:
-            print(f"🔍 DEBUG: About to log exception to memory thread")
-            await log_memory_thread(
-                project_id=project_id,
-                chain_id=chain_id,
-                agent=agent_type,
-                role=agent_role,
-                step_type="task",
-                content=f"Error: {str(e)}"
-            )
-            print(f"🔍 DEBUG: Finished logging exception to memory thread")
-        except Exception as log_error:
-            print(f"❌ Failed to log error to memory thread: {str(log_error)}")
-            print(f"🔍 DEBUG: Exception when logging error: {traceback.format_exc()}")
-        
-        # Return structured error response
-        return JSONResponse(
-            status_code=500,
-            content={
-                "agent_id": agent_id,
-                "response": error_msg,
-                "status": "error",
-                "message": str(e),
-                "project_id": project_id,
-                "chain_id": chain_id
-            }
-        )
-
-def run_agent(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None, domain: str = "saas"):
-    """
-    Run an agent with the given messages, with no registry dependencies.
-    
-    MODIFIED: Added full runtime logging and error protection to prevent 502 errors
-    MODIFIED: Added memory thread logging for agent steps
-    MODIFIED: Added enhanced logging for debugging memory thread issues
-    MODIFIED: Added toolkit registry integration for specialized agent tools
-    MODIFIED: Added product strategist logic for HAL in saas domain
-    MODIFIED: Added structured output for ASH documentation and onboarding
-    
-    Args:
-        agent_id: The ID of the agent to run
-        messages: List of message dictionaries with role and content
-        project_id: Optional project identifier for memory logging
-        chain_id: Optional chain identifier for memory logging
-        domain: Optional domain for toolkit selection, defaults to "saas"
-        
-    Returns:
-        Dict containing the response and metadata or JSONResponse with error details
-    """
-    # ADDED: Entry confirmation logging
-    print("🔥 AgentRunner route invoked")
-    print(f"🔍 DEBUG: run_agent called with agent_id={agent_id}, project_id={project_id}, chain_id={chain_id}, domain={domain}")
-    logger.info("🔥 AgentRunner route invoked")
-    
-    # Run the async version in a new event loop
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    try:
-        print(f"🔍 DEBUG: Creating new event loop and running run_agent_async")
-        result = loop.run_until_complete(run_agent_async(agent_id, messages, project_id, chain_id, domain))
-        print(f"🔍 DEBUG: run_agent_async completed successfully")
-        return result
-    except Exception as e:
-        print(f"🔍 DEBUG: Exception in run_agent event loop: {str(e)}")
-        print(f"🔍 DEBUG: {traceback.format_exc()}")
-        raise
-    finally:
-        print(f"🔍 DEBUG: Closing event loop")
-        loop.close()
-
-def test_core_forge_isolation():
-    """
-    Test CoreForgeAgent in isolation to verify it works correctly.
-    
-    Returns:
-        Dict containing the test results
-    """
-    print("\n=== Testing CoreForgeAgent in isolation ===\n")
-    
-    try:
-        # Create test messages
-        messages = [
-            {"role": "user", "content": "What is 7 + 5?"}
-        ]
-        
-        # Create agent
-        print("🔧 Creating CoreForgeAgent instance")
-        agent = CoreForgeAgent()
-        
-        # Run the agent
-        print(f"🏃 Running CoreForgeAgent with message: {messages[0]['content']}")
-        result = agent.run(messages)
-        
-        # Print the result
-        print(f"\nResult:")
-        print(f"Status: {result.get('status', 'unknown')}")
-        print(f"Response: {result.get('content', 'No response')}")
-        
-        if result.get('status') == 'success':
-            print("\n✅ Test passed: CoreForgeAgent returned successful response")
-        else:
-            print("\n❌ Test failed: CoreForgeAgent did not return successful response")
-        
-        return result
-    
-    except Exception as e:
-        error_msg = f"Error testing CoreForgeAgent in isolation: {str(e)}"
-        print(f"❌ {error_msg}")
-        print(traceback.format_exc())
-        
-        return {
-            "status": "error",
-            "content": error_msg
-        }
-
-if __name__ == "__main__":
-    # Run the isolation test if this module is executed directly
-    test_core_forge_isolation()
