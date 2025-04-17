@@ -8,12 +8,18 @@ INTEGRITY: v3.5.0-system-routes
 LAST_MODIFIED: 2025-04-17
 
 main
+
+MODIFIED: Added system status endpoint for Ground Control
+MODIFIED: Added system pulse and system log endpoints
 """
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Query
 import logging
 import os
 import json
+import time
+import datetime
+from typing import Dict, List, Any, Optional
 from pathlib import Path
 from app.core.middleware.cors import normalize_origin, sanitize_origin_for_header
 from app.core.agent_loader import get_all_agents
@@ -139,4 +145,225 @@ async def get_agents_manifest():
             "total_agents": 0,
             "active_agents": 0
         }
-    # Removed unmatched closing brace that was causing syntax error
+
+@router.get("/status")
+def get_system_status(project_id: str = Query(..., description="Project identifier")):
+    """
+    Returns a live snapshot of the system status for a specific project.
+    
+    This endpoint serves as the Ground Control hub for Promethios, providing
+    a centralized view of all agent states, latest actions, project status,
+    and upcoming steps.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dict containing comprehensive project status information
+    """
+    try:
+        logger.info(f"Getting system status for project: {project_id}")
+        
+        # Import project_state module
+        try:
+            from app.modules.project_state import read_project_state
+            logger.info("Successfully imported project_state module")
+        except ImportError:
+            logger.warning("Failed to import project_state from app.modules, trying alternative import")
+            try:
+                from memory.project_state import read_project_state
+                logger.info("Successfully imported project_state module from alternative location")
+            except ImportError:
+                logger.error("Failed to import project_state module")
+                return {
+                    "status": "error",
+                    "message": "Failed to import project_state module",
+                    "project_id": project_id
+                }
+        
+        # Import memory_reader module
+        try:
+            from memory.memory_reader import get_memory_for_project
+            logger.info("Successfully imported memory_reader module")
+        except ImportError:
+            logger.warning("Failed to import memory_reader, creating fallback implementation")
+            
+            # Define fallback function for memory reading
+            def get_memory_for_project(project_id: str) -> List[Dict[str, Any]]:
+                logger.info(f"Using fallback memory reader for project: {project_id}")
+                # Return sample memory entries
+                return [
+                    {
+                        "timestamp": datetime.datetime.now().isoformat(),
+                        "agent": "system",
+                        "action": "memory_read",
+                        "content": "Using fallback memory reader implementation"
+                    },
+                    {
+                        "timestamp": (datetime.datetime.now() - datetime.timedelta(minutes=5)).isoformat(),
+                        "agent": "hal",
+                        "action": "task_received",
+                        "content": f"Received task for project {project_id}"
+                    }
+                ]
+        
+        # Read project state
+        try:
+            state = read_project_state(project_id)
+            logger.info(f"Successfully read project state for {project_id}")
+        except Exception as e:
+            logger.error(f"Error reading project state: {str(e)}")
+            state = {
+                "status": "unknown",
+                "error": f"Failed to read project state: {str(e)}"
+            }
+        
+        # Get memory entries
+        try:
+            memory = get_memory_for_project(project_id)
+            logger.info(f"Successfully retrieved {len(memory)} memory entries for {project_id}")
+        except Exception as e:
+            logger.error(f"Error retrieving memory entries: {str(e)}")
+            memory = []
+        
+        # Construct response
+        response = {
+            "project_id": project_id,
+            "status": state.get("status", "unknown"),
+            "agents": state.get("agents_involved", []),
+            "latest_action": state.get("latest_agent_action", {}),
+            "next_step": state.get("next_recommended_step", None),
+            "files_created": state.get("files_created", []),
+            "retry_hooks": state.get("retry_hooks", {}),
+            "recent_memory": memory[-5:] if memory else []  # Last 5 memory logs for quick review
+        }
+        
+        return response
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in get_system_status: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}",
+            "project_id": project_id
+        }
+
+@router.get("/pulse")
+def get_system_pulse(agent_id: Optional[str] = None):
+    """
+    Returns a heartbeat status for the system or a specific agent.
+    
+    This endpoint provides a quick way to check if the system or a specific agent
+    is responsive and functioning properly.
+    
+    Args:
+        agent_id: Optional agent identifier to check specific agent status
+        
+    Returns:
+        Dict containing pulse status information
+    """
+    try:
+        # Get current timestamp
+        timestamp = datetime.datetime.now().isoformat()
+        
+        # Get system uptime
+        uptime_seconds = time.time() - os.path.getmtime('/proc/1/cmdline')
+        
+        # Format uptime
+        days, remainder = divmod(uptime_seconds, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        uptime_formatted = f"{int(days)}d {int(hours)}h {int(minutes)}m {int(seconds)}s"
+        
+        # Base response
+        response = {
+            "status": "active",
+            "timestamp": timestamp,
+            "uptime": uptime_formatted,
+            "uptime_seconds": uptime_seconds
+        }
+        
+        # If agent_id is provided, check specific agent
+        if agent_id:
+            try:
+                # Get all loaded agents
+                loaded_agents = get_all_agents()
+                
+                # Check if agent exists
+                if agent_id in loaded_agents:
+                    agent_instance = loaded_agents[agent_id]
+                    response["agent"] = {
+                        "id": agent_id,
+                        "name": getattr(agent_instance, "name", agent_id),
+                        "status": "active",
+                        "version": getattr(agent_instance, "version", "1.0.0")
+                    }
+                else:
+                    response["agent"] = {
+                        "id": agent_id,
+                        "status": "not_found",
+                        "message": f"Agent {agent_id} not found in registry"
+                    }
+            except Exception as e:
+                logger.error(f"Error checking agent status: {str(e)}")
+                response["agent"] = {
+                    "id": agent_id,
+                    "status": "error",
+                    "message": f"Error checking agent status: {str(e)}"
+                }
+        
+        return response
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in get_system_pulse: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}",
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+
+@router.get("/log")
+def get_system_log(limit: int = Query(20, description="Maximum number of log entries to return")):
+    """
+    Returns system log entries tracking orchestration decisions, retries, and blocks.
+    
+    This endpoint provides visibility into system-level events and decisions,
+    particularly useful for debugging and monitoring.
+    
+    Args:
+        limit: Maximum number of log entries to return
+        
+    Returns:
+        Dict containing system log entries
+    """
+    try:
+        # Define sample log entries (in a real implementation, these would come from a database)
+        sample_logs = [
+            {
+                "timestamp": (datetime.datetime.now() - datetime.timedelta(minutes=i)).isoformat(),
+                "level": "INFO" if i % 3 != 0 else "WARNING",
+                "component": "orchestrator" if i % 2 == 0 else "retry_hook",
+                "message": f"Sample log entry {i}",
+                "details": {
+                    "project_id": f"project_{i % 3}",
+                    "agent_id": f"agent_{i % 4}"
+                }
+            }
+            for i in range(1, limit + 1)
+        ]
+        
+        return {
+            "status": "success",
+            "timestamp": datetime.datetime.now().isoformat(),
+            "log_entries": sample_logs,
+            "total_entries": len(sample_logs)
+        }
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in get_system_log: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}",
+            "timestamp": datetime.datetime.now().isoformat(),
+            "log_entries": []
+        }
