@@ -611,7 +611,7 @@ except Exception as startup_error:
         return {
             "status": "error",
             "message": "Application is in error recovery mode due to startup failure",
-            "error": str(startup_error),
+            "error": str(e),  # Changed from startup_error to e
             "timestamp": datetime.datetime.now().isoformat()
         }
     
@@ -620,7 +620,7 @@ except Exception as startup_error:
         return {
             "status": "error",
             "message": "Application is in error recovery mode due to startup failure",
-            "error": str(startup_error),
+            "error": str(e),  # Changed from startup_error to e
             "timestamp": datetime.datetime.now().isoformat()
         }
     
