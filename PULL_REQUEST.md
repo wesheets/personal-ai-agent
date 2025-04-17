@@ -1,35 +1,42 @@
-# Pull Request: Enable Agents to Read from project_state
+# Pull Request: Fix CRITIC Logger Crash
 
 ## Description
-This pull request implements project state awareness for agents in the personal-ai-agent system. This feature enables agents to access the project state when executing tasks, allowing them to know what's already been built, skip duplicate work, improve task planning, and reflect on team progress.
+This PR fixes an issue where the CRITIC agent was crashing due to undefined logger references. When attempting to log feedback or errors, it was calling `logger` without a proper import or definition.
 
 ## Changes Made
-1. Updated import statement in agent_runner.py to include the `read_project_state` function
-2. Added code to read the project state at the beginning of each agent runner function
-3. Implemented conditional execution logic for each agent type:
-   - HAL: Skips work when README.md already exists
-   - NOVA: Blocks when HAL hasn't run
-   - CRITIC: Blocks when NOVA hasn't run
-   - ASH: Goes on hold when project is not ready for deployment
-4. Included project state in all agent responses, including error handling cases
+- Added dedicated logger definition for the CRITIC agent
+- Implemented safety wrappers around all logger calls
+- Enhanced response structure to include all required fields
+- Modified the CRITIC agent to update project state even when blocked
 
 ## Testing
-The implementation was tested with various scenarios to verify that:
-- Agents skip already-built components
-- Agents reference teammates' work
-- Project state context is included in output
+Created two test scripts to verify the fix:
+1. `test_critic_logger.py`: Tests basic logger functionality and response structure
+2. `test_critic_payload.py`: Tests with the specific payload from the requirements
 
-All tests pass successfully, confirming that the implementation meets the requirements.
+Both tests confirm that:
+- No logger errors occur
+- All required fields are present in the response
+- Project state is properly updated
+- The agent correctly handles blocked scenarios
+
+## Validation
+The implementation meets all requirements specified in the task:
+- ✅ Logger definition added
+- ✅ Safety wrappers implemented
+- ✅ Memory logging functionality verified
+- ✅ Project state inclusion confirmed
+- ✅ Structured response with required fields
+- ✅ No logger errors
 
 ## Documentation
-- Created DOCUMENTATION.md with detailed implementation information
-- Created VALIDATION.md to verify requirements are met
+See `CRITIC_LOGGER_FIX.md` for detailed documentation of the changes.
 
-## Related Task
-Phase 5.2.1 — Enable Agents to Read from project_state
+## Related Issues
+Fixes the "name 'logger' is not defined" error in the CRITIC agent.
 
 ## Checklist
-- [x] Code follows the project's coding style
-- [x] Tests have been added/updated and all tests pass
+- [x] Code follows the project's coding standards
+- [x] Tests have been added/updated and pass successfully
 - [x] Documentation has been updated
-- [x] Branch is up to date with the base branch
+- [x] Changes have been tested with the specified payload
