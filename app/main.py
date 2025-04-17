@@ -7,7 +7,14 @@ import logging
 import inspect
 import re
 import datetime
-from dotenv import load_dotenv
+# Import dotenv with fallback
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    print("⚠️ python-dotenv not installed, creating fallback")
+    def load_dotenv():
+        print("⚠️ Using fallback load_dotenv function")
+        return None
 from fastapi.responses import StreamingResponse, JSONResponse
 import json
 import asyncio
@@ -86,6 +93,17 @@ try:
         @system_router.get("/system/ping")
         def system_ping():
             return {"status": "System router placeholder"}
+            
+    # Import system summary routes
+    try:
+        from routes.system_summary_routes import router as system_summary_router
+        print("✅ Successfully imported system_summary_router")
+    except ModuleNotFoundError as e:
+        print(f"⚠️ Router Load Failed: system_summary_routes — {e}")
+        system_summary_router = APIRouter()
+        @system_summary_router.get("/system/summary/ping")
+        def system_summary_ping():
+            return {"status": "System summary router placeholder"}
     
     # Import debug routes
     try:
@@ -397,6 +415,10 @@ try:
     app.include_router(system_router, prefix="/api")
     print("✅ Registered system_router at /api")
     
+    # Register system summary router
+    app.include_router(system_summary_router, prefix="/api/system")
+    print("✅ Registered system_summary_router at /api/system")
+    
     # Register debug router
     app.include_router(debug_router, prefix="/api")
     print("✅ Registered debug_router at /api")
@@ -464,6 +486,14 @@ try:
     
     # Final startup message
     print("✅ All routes registered successfully")
+    
+    # Debug aid for route validation - Phase 6.3.3
+    print("\n🔍 DEBUG: Validating route registration for summary endpoints...")
+    for route in app.routes:
+        if "summary" in str(route.path):
+            print(f"✅ ROUTE LOADED: {route.path} {route.methods}")
+    print("🔍 DEBUG: Route validation complete\n")
+    
     print("🚀 Enhanced AI Agent System is ready to serve requests")
     
 except Exception as startup_error:

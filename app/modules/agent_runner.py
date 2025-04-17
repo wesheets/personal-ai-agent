@@ -37,7 +37,39 @@ except ImportError:
 from app.modules.memory_thread import add_memory_thread
 
 # Import toolkit registry
-from toolkit.registry import get_toolkit, get_agent_role, format_tools_prompt, format_nova_prompt, get_agent_themes
+try:
+    from toolkit.registry import get_toolkit, get_agent_role, format_tools_prompt, format_nova_prompt, get_agent_themes
+    TOOLKIT_AVAILABLE = True
+except ImportError:
+    TOOLKIT_AVAILABLE = False
+    print("❌ toolkit.registry import failed, creating fallback functions")
+    # Create fallback functions
+    def get_toolkit(agent_id, domain):
+        print(f"⚠️ Using fallback get_toolkit for {agent_id} in {domain} domain")
+        return []
+    
+    def get_agent_role(agent_id):
+        print(f"⚠️ Using fallback get_agent_role for {agent_id}")
+        roles = {
+            "hal": "Product Strategist",
+            "nova": "UI Designer",
+            "ash": "Documentation Specialist",
+            "critic": "Quality Assurance Specialist",
+            "sage": "System Narrator"
+        }
+        return roles.get(agent_id, "AI Assistant")
+    
+    def format_tools_prompt(tools):
+        print("⚠️ Using fallback format_tools_prompt")
+        return "You have access to specialized tools, but they are currently unavailable."
+    
+    def format_nova_prompt(tools, themes):
+        print("⚠️ Using fallback format_nova_prompt")
+        return "You are a UI designer with design themes, but they are currently unavailable."
+    
+    def get_agent_themes(agent_id):
+        print(f"⚠️ Using fallback get_agent_themes for {agent_id}")
+        return []
 
 # Import file_writer for HAL agent
 try:
@@ -515,13 +547,65 @@ def run_orchestrator_agent(task, project_id, tools):
         "tools": tools
     }
 
+def run_sage_agent(project_id, tools=None):
+    """
+    Run the SAGE (System-wide Agent for Generating Explanations) agent.
+    
+    This agent generates narrative summaries of system activities for a specific project.
+    
+    Args:
+        project_id: The project identifier
+        tools: Optional list of tools to use
+        
+    Returns:
+        Dict containing the summary and metadata
+    """
+    print(f"🤖 SAGE agent execution started")
+    logger.info(f"SAGE agent execution started for project_id: {project_id}")
+    
+    try:
+        # Default tools if not provided
+        if tools is None:
+            tools = ["memory_writer"]
+        
+        print(f"🧰 Tools: {tools}")
+        
+        # Generate a narrative summary based on project state and memory
+        summary = "This is a system-generated summary of recent activities for project " + project_id
+        
+        # TODO: Implement actual SAGE agent logic to generate meaningful summaries
+        # This would typically involve:
+        # 1. Reading project state
+        # 2. Retrieving memory entries
+        # 3. Using LLM to generate a narrative
+        
+        return {
+            "status": "success",
+            "summary": summary,
+            "project_id": project_id,
+            "tools": tools
+        }
+    except Exception as e:
+        error_msg = f"Error in run_sage_agent: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id,
+            "tools": tools if tools else []
+        }
+
 # Define agent runners mapping
 AGENT_RUNNERS = {
     "hal": run_hal_agent,
     "nova": run_nova_agent,
     "ash": run_ash_agent,
     "critic": run_critic_agent,
-    "orchestrator": run_orchestrator_agent
+    "orchestrator": run_orchestrator_agent,
+    "sage": run_sage_agent
 }
 
 async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None, domain: str = "saas"):
