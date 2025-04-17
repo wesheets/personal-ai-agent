@@ -1059,11 +1059,21 @@ def run_critic_agent(task, project_id, tools):
     """
     # Ensure logger is defined for CRITIC agent
     import logging
-    critic_logger = logging.getLogger("modules.agent_runner.critic")
+    logger = logging.getLogger("critic")
+    
+    # Add local fallback in case the system loads without logging
+    if 'logger' not in globals():
+        def logger_stub(*args, **kwargs): pass
+        logger = type('logger', (), {
+            "info": logger_stub,
+            "error": logger_stub,
+            "debug": logger_stub,
+            "warning": logger_stub
+        })()
     
     print(f"🤖 CRITIC agent execution started")
     try:
-        critic_logger.info(f"CRITIC agent execution started with task: {task}, project_id: {project_id}")
+        logger.info(f"CRITIC agent execution started with task: {task}, project_id: {project_id}")
     except NameError:
         print(f"[CRITIC] Agent execution started with task: {task}, project_id: {project_id}")
     
@@ -1074,7 +1084,7 @@ def run_critic_agent(task, project_id, tools):
             project_state = read_project_state(project_id)
             print(f"📊 Project state read for {project_id}")
             try:
-                critic_logger.info(f"CRITIC read project state for {project_id}")
+                logger.info(f"CRITIC read project state for {project_id}")
             except NameError:
                 print(f"[CRITIC] Read project state for {project_id}")
             
@@ -1082,7 +1092,7 @@ def run_critic_agent(task, project_id, tools):
             if "nova" not in project_state.get("agents_involved", []):
                 print(f"⏩ NOVA has not created UI files yet, cannot review")
                 try:
-                    critic_logger.info(f"CRITIC execution blocked - NOVA has not run yet")
+                    logger.info(f"CRITIC execution blocked - NOVA has not run yet")
                 except NameError:
                     print(f"[CRITIC] Execution blocked - NOVA has not run yet")
                 # Update project state to include critic in agents_involved even when blocked
@@ -1098,7 +1108,7 @@ def run_critic_agent(task, project_id, tools):
                     project_state_result = update_project_state(project_id, project_state_data)
                     print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
                     try:
-                        critic_logger.info(f"CRITIC updated project state for {project_id} even though blocked")
+                        logger.info(f"CRITIC updated project state for {project_id} even though blocked")
                     except NameError:
                         print(f"[CRITIC] Updated project state for {project_id} even though blocked")
                     
@@ -1135,7 +1145,7 @@ def run_critic_agent(task, project_id, tools):
                 project_state_result = update_project_state(project_id, project_state_data)
                 print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
                 try:
-                    critic_logger.info(f"CRITIC updated project state for {project_id}")
+                    logger.info(f"CRITIC updated project state for {project_id}")
                 except NameError:
                     print(f"[CRITIC] Updated project state for {project_id}")
             
@@ -1172,7 +1182,7 @@ def run_critic_agent(task, project_id, tools):
             project_state_result = update_project_state(project_id, project_state_data)
             print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
             try:
-                critic_logger.info(f"CRITIC updated project state for {project_id}")
+                logger.info(f"CRITIC updated project state for {project_id}")
             except NameError:
                 print(f"[CRITIC] Updated project state for {project_id}")
         
@@ -1181,8 +1191,8 @@ def run_critic_agent(task, project_id, tools):
         error_msg = f"Error in run_critic_agent: {str(e)}"
         print(f"❌ {error_msg}")
         try:
-            critic_logger.error(error_msg)
-            critic_logger.error(traceback.format_exc())
+            logger.error(error_msg)
+            logger.error(traceback.format_exc())
         except NameError:
             print(f"[CRITIC ERROR] {error_msg}")
             print(f"[CRITIC ERROR] {traceback.format_exc()}")
