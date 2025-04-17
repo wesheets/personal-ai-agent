@@ -65,6 +65,17 @@ try:
         def memory_ping():
             return {"status": "Memory router placeholder"}
     
+    # Import project routes
+    try:
+        from routes.project_routes import router as project_routes_router
+        print("✅ Successfully imported project_routes_router")
+    except ModuleNotFoundError as e:
+        print(f"⚠️ Router Load Failed: project_routes — {e}")
+        project_routes_router = APIRouter()
+        @project_routes_router.get("/project/ping")
+        def project_ping():
+            return {"status": "Project router placeholder"}
+    
     # Import system routes
     try:
         from routes.system_routes import router as system_router
@@ -108,17 +119,6 @@ try:
         @snapshot_router.get("/snapshot/ping")
         def snapshot_ping():
             return {"status": "Snapshot router placeholder"}
-            
-    # Import project routes
-    try:
-        from routes.project_routes import router as project_routes_router
-        print("✅ Successfully imported project_routes_router")
-    except ModuleNotFoundError as e:
-        print(f"⚠️ Router Load Failed: project_routes — {e}")
-        project_routes_router = APIRouter()
-        @project_routes_router.get("/project/ping")
-        def project_ping():
-            return {"status": "Project router placeholder"}
     
     # Import system integrity router
     try:
@@ -394,9 +394,9 @@ try:
         print("✅ FastAPI application started")
         logger.info("✅ FastAPI application started successfully")
 
-    # Route logger for debugging
+    # Register all routers with the API prefix
     @app.on_event("startup")
-    async def log_all_routes():
+    async def register_routers():
         print("🚀 Booting Enhanced AI Agent System...")
         
         # Register the orchestrator_router
@@ -718,6 +718,17 @@ try:
         )
     print("✅ React app route configured")
 
+    # Add catch-all route for debugging 404 errors
+    @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"])
+    async def catch_all(request: Request, path: str):
+        """
+        Catch-all route for debugging 404 errors.
+        This helps identify missing routes during development.
+        """
+        logger.warning(f"404 Not Found: {request.method} {request.url}")
+        logger.warning(f"Path: {path}")
+        logger.warning(f"Headers: {request.headers}")
+
     print("✅ All routes and middleware configured successfully")
     print("🚀 Application startup complete")
 
@@ -738,7 +749,8 @@ except Exception as e:
         return {
             "status": "error",
             "message": "Application failed to start properly",
-            "error": str(e)
+            "error": str(e),
+            "timestamp": datetime.datetime.now().isoformat()
         }
     
     @app.get("/health")
@@ -746,7 +758,8 @@ except Exception as e:
         return {
             "status": "error",
             "message": "Application failed to start properly",
-            "error": str(e)
+            "error": str(e),
+            "timestamp": datetime.datetime.now().isoformat()
         }
     
     # Add CORS middleware even in error mode
