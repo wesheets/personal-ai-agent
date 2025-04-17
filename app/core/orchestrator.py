@@ -259,6 +259,87 @@ class Orchestrator:
         # If no match, return None
         return None
     
+    # Add method for consult
+    async def consult(self, project_id: str) -> Dict[str, Any]:
+        """
+        Consult the orchestrator to determine the next steps for a project.
+        
+        This method is called by the agent loop autonomy system to determine
+        which agent should run next based on the current project state.
+        
+        Args:
+            project_id: The project identifier
+            
+        Returns:
+            Dict containing the consultation result
+        """
+        try:
+            # Import project_state module
+            from app.modules.project_state import read_project_state, update_project_state, should_continue_loop
+            
+            # Check if loop should continue
+            if not should_continue_loop(project_id):
+                # Update project state to complete
+                update_project_state(project_id, {"status": "complete"})
+                
+                # Return result indicating delegation should stop
+                return {
+                    "status": "complete",
+                    "message": "Project complete or max loops reached",
+                    "project_id": project_id,
+                    "should_delegate": False
+                }
+            
+            # Read project state
+            project_state = read_project_state(project_id)
+            
+            # Get last completed agent
+            last_agent = project_state.get("last_completed_agent")
+            
+            # Determine next agent based on last completed agent
+            next_agent = None
+            
+            # Simple agent sequence: HAL -> NOVA -> CRITIC -> HAL
+            agent_sequence = ["hal", "nova", "critic"]
+            
+            if last_agent:
+                try:
+                    current_index = agent_sequence.index(last_agent.lower())
+                    next_index = (current_index + 1) % len(agent_sequence)
+                    next_agent = agent_sequence[next_index]
+                except ValueError:
+                    # If last_agent not in sequence, default to HAL
+                    next_agent = "hal"
+            else:
+                # If no last_agent, start with HAL
+                next_agent = "hal"
+            
+            # Call the next agent
+            from app.modules.agent_loop_trigger import call_agent
+            agent_result = call_agent(next_agent, project_id)
+            
+            # Return result
+            return {
+                "status": "success",
+                "message": f"Consulted orchestrator for project {project_id}",
+                "project_id": project_id,
+                "next_agent": next_agent,
+                "agent_result": agent_result,
+                "should_delegate": True
+            }
+        except Exception as e:
+            error_msg = f"Error in orchestrator.consult: {str(e)}"
+            print(f"❌ {error_msg}")
+            import traceback
+            print(traceback.format_exc())
+            
+            return {
+                "status": "error",
+                "message": error_msg,
+                "project_id": project_id,
+                "should_delegate": False
+            }
+    
     # Add mock method for get_current_control_mode
     def get_current_control_mode(self) -> Dict[str, str]:
         """

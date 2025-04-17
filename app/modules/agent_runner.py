@@ -391,14 +391,33 @@ This project was created by the HAL agent.
             print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
             logger.info(f"HAL updated project state for {project_id}")
         
-        # Return result with files_created list
+        # Agent Loop Autonomy Core - Trigger agent loop
+        try:
+            from app.modules.agent_loop_trigger import trigger_agent_loop
+            
+            # Specify handoff hint to NOVA
+            handoff_to = "nova"
+            
+            # Trigger agent loop with handoff hint
+            trigger_result = trigger_agent_loop(project_id, "hal", handoff_to)
+            print(f"🔄 Agent loop triggered: {trigger_result}")
+            logger.info(f"Agent loop triggered: {trigger_result}")
+        except ImportError:
+            print("⚠️ agent_loop_trigger module not available, skipping loop trigger")
+            logger.warning("agent_loop_trigger module not available, skipping loop trigger")
+        except Exception as e:
+            print(f"❌ Error triggering agent loop: {str(e)}")
+            logger.error(f"Error triggering agent loop: {str(e)}")
+        
+        # Return result with files_created list and handoff hint
         return {
             "status": "success",
             "message": f"HAL successfully created files for project {project_id}",
             "files_created": files_created,
             "task": task,
             "tools": tools,
-            "project_state": project_state
+            "project_state": project_state,
+            "handoff_to": "nova"  # Agent Loop Autonomy Core - Handoff hint
         }
     except Exception as e:
         error_msg = f"Error in run_hal_agent: {str(e)}"
