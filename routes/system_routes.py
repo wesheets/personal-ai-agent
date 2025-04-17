@@ -2,9 +2,12 @@
 Modified system_routes.py to fix the agent manifest endpoint.
 This ensures the endpoint returns a list of available agents from the agent registry
 rather than from a static JSON file.
+feature/phase-3.5-hardening
 SHA256: 8f2d6b3c5a4e7d9f1b0c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a
 INTEGRITY: v3.5.0-system-routes
 LAST_MODIFIED: 2025-04-17
+
+main
 """
 
 from fastapi import APIRouter, Request
@@ -136,4 +139,6 @@ async def get_agents_manifest():
             "total_agents": 0,
             "active_agents": 0
         }
+feature/phase-3.5-hardening
 }
+main

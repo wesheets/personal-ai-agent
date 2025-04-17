@@ -1,7 +1,9 @@
+feature/phase-3.5-hardening
 __version__ = "3.5.0"
 __agent__ = "HAL"
 __role__ = "builder"
 
+main
 from app.agents.memory_agent import handle_memory_task
 import logging
 import json
