@@ -13,6 +13,7 @@ MODIFIED: Added structured output for ASH documentation and onboarding
 MODIFIED: Added AGENT_RUNNERS mapping for direct agent execution
 MODIFIED: Added run_hal_agent function with file_writer integration
 MODIFIED: Updated run_hal_agent with real execution logic and memory logging
+MODIFIED: Added project_state integration for tracking project status
 MODIFIED: Updated run_nova_agent with file creation and memory logging functionality
 MODIFIED: Standardized output format across all agents
 MODIFIED: Added memory logging for CRITIC and ASH agents
@@ -58,6 +59,14 @@ try:
 except ImportError:
     MEMORY_WRITER_AVAILABLE = False
     print("❌ memory_writer import failed")
+
+# Import project_state for tracking project status
+try:
+    from app.modules.project_state import update_project_state, read_project_state
+    PROJECT_STATE_AVAILABLE = True
+except ImportError:
+    PROJECT_STATE_AVAILABLE = False
+    print("❌ project_state import failed")
 
 # Import agent-specific implementations
 try:
@@ -370,25 +379,54 @@ async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: st
         
         # Log memory entry
         print(f"📝 Logging memory thread for {agent} agent, {step_type} step")
-        logger.info(f"Logging memory thread for {agent} agent, {step_type} step")
-        
-        # Add memory entry to thread
-        print(f"🔍 DEBUG: Calling add_memory_thread with entry")
         result = await add_memory_thread(memory_entry)
-        
-        # Log result
-        print(f"✅ Memory thread logged successfully: {result}")
-        print(f"🔍 DEBUG: add_memory_thread returned: {result}")
-        logger.info(f"Memory thread logged successfully: {result}")
+        print(f"✅ Memory thread logged with ID: {result.get('memory_id', 'unknown')}")
+        logger.info(f"Memory thread logged with ID: {result.get('memory_id', 'unknown')}")
     except Exception as e:
-        # Log error but don't fail the main process
         error_msg = f"Error logging memory thread: {str(e)}"
         print(f"❌ {error_msg}")
-        print(f"🔍 DEBUG: Exception traceback: {traceback.format_exc()}")
         logger.error(error_msg)
         logger.error(traceback.format_exc())
 
-# Define agent runner functions
+def log_memory(project_id: str, agent: str, action: str, content: str, structured_data: Dict = None) -> None:
+    """
+    Log a memory entry for an agent action.
+    
+    Args:
+        project_id: The project identifier
+        agent: The agent type (hal, ash, nova)
+        action: The action performed (created, updated, deleted)
+        content: The content of the action
+        structured_data: Optional structured data for specialized agents
+    """
+    try:
+        if not MEMORY_WRITER_AVAILABLE:
+            print(f"⚠️ Memory writer not available, skipping memory logging")
+            return
+        
+        # Create memory entry
+        memory_data = {
+            "project_id": project_id,
+            "agent": agent,
+            "action": action,
+            "content": content
+        }
+        
+        # Add structured data if available
+        if structured_data:
+            memory_data["structured_data"] = structured_data
+        
+        # Log memory entry
+        print(f"📝 Logging memory for {agent} agent, {action} action")
+        result = write_memory(memory_data)
+        print(f"✅ Memory logged with ID: {result.get('memory_id', 'unknown')}")
+        logger.info(f"Memory logged with ID: {result.get('memory_id', 'unknown')}")
+    except Exception as e:
+        error_msg = f"Error logging memory: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+
 def run_hal_agent(task, project_id, tools):
     """
     Run the HAL agent with the given task.
@@ -402,64 +440,113 @@ def run_hal_agent(task, project_id, tools):
         Dict containing the response and metadata
     """
     print(f"🤖 HAL agent execution started")
-    print(f"📋 Task: {task}")
-    print(f"🆔 Project ID: {project_id}")
-    print(f"🧰 Tools: {tools}")
-    logger.info(f"HAL agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
+    logger.info(f"HAL agent execution started with task: {task}, project_id: {project_id}")
     
     try:
-        # Initialize tracking lists
-        files_created = []
-        actions_taken = []
-        notes = ""
-        
-        # Create files using file_writer
-        if "file_writer" in tools:
-            print(f"📝 Using file_writer to create files")
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"HAL read project state for {project_id}")
             
-            # Create content for README.md
-            content = f"# Project {project_id}\n\nTask: {task}"
-            file_path = f"/verticals/{project_id}/README.md"
-            
-            # Ensure directory exists
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            
-            # Write file
-            result = write_file(
-                project_id=project_id,
-                file_path=file_path,
-                content=content
-            )
-            
-            # Add to tracking lists
-            files_created.append(file_path)
-            actions_taken.append(f"Created README.md for project {project_id}")
-            
-            print(f"✅ File created successfully: {file_path}")
-            logger.info(f"HAL created file: {file_path}")
-            
-            # Log memory entry if memory_writer is available
-            if MEMORY_WRITER_AVAILABLE:
-                memory_data = {
-                    "agent": "hal",
-                    "project_id": project_id,
-                    "action": f"Wrote {file_path}",
-                    "tool_used": "file_writer"
+            # Check if README.md already exists
+            if "README.md" in project_state.get("files_created", []):
+                print(f"⏩ README.md already exists, skipping duplicate write")
+                logger.info(f"HAL skipped README.md creation - file already exists")
+                return {
+                    "status": "skipped",
+                    "notes": "README.md already exists, skipping duplicate write.",
+                    "output": project_state,
+                    "project_state": project_state
                 }
-                
-                memory_result = write_memory(memory_data)
-                print(f"✅ Memory entry created: {memory_result.get('memory_id', 'unknown')}")
-                logger.info(f"HAL logged memory entry for file creation")
         
-        # Return standardized result
+        # Initialize list of created files
+        files_created = []
+        
+        # Check if file_writer is available
+        if not FILE_WRITER_AVAILABLE:
+            print(f"⚠️ file_writer not available, skipping file creation")
+            logger.warning(f"file_writer not available, skipping file creation")
+            return {
+                "status": "error",
+                "message": "file_writer not available, cannot create files",
+                "files_created": [],
+                "task": task,
+                "tools": tools,
+                "project_state": project_state
+            }
+        
+        # Create README.md
+        readme_content = f"""# {project_id.replace('_', ' ').title()}
+
+This project was created by the HAL agent.
+
+## Task
+{task}
+
+## Tools
+{', '.join(tools)}
+
+## Created
+{time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())}
+"""
+        
+        # Write README.md
+        readme_path = f"/verticals/{project_id}/README.md"
+        print(f"📝 Creating README.md at {readme_path}")
+        logger.info(f"Creating README.md at {readme_path}")
+        
+        readme_result = write_file(project_id, "README.md", readme_content)
+        if readme_result.get("status") == "success":
+            print(f"✅ README.md created successfully")
+            logger.info(f"README.md created successfully")
+            files_created.append(readme_path)
+            
+            # Log memory
+            log_memory(
+                project_id=project_id,
+                agent="hal",
+                action="created",
+                content=f"Created README.md for project {project_id}",
+                structured_data={
+                    "file_path": readme_path,
+                    "file_type": "markdown",
+                    "file_size": len(readme_content)
+                }
+            )
+        else:
+            print(f"❌ Failed to create README.md: {readme_result.get('error', 'unknown error')}")
+            logger.error(f"Failed to create README.md: {readme_result.get('error', 'unknown error')}")
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "status": "in_progress",
+                "files_created": files_created,
+                "agents_involved": ["hal"],
+                "latest_agent_action": {
+                    "agent": "hal",
+                    "action": f"Created initial files for project {project_id}"
+                },
+                "next_recommended_step": "Run NOVA to design the project",
+                "tool_usage": {
+                    "file_writer": 1
+                }
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"HAL updated project state for {project_id}")
+        
+        # Return result with files_created list
         return {
             "status": "success",
             "message": f"HAL successfully created files for project {project_id}",
             "files_created": files_created,
-            "actions_taken": actions_taken,
-            "notes": notes,
             "task": task,
-            "tools": tools
+            "tools": tools,
+            "project_state": project_state
         }
     except Exception as e:
         error_msg = f"Error in run_hal_agent: {str(e)}"
@@ -471,11 +558,10 @@ def run_hal_agent(task, project_id, tools):
             "status": "error",
             "message": f"Error executing HAL agent: {str(e)}",
             "files_created": [],
-            "actions_taken": [],
-            "notes": "",
             "task": task,
             "tools": tools,
-            "error": str(e)
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
         }
 
 def run_nova_agent(task, project_id, tools):
@@ -491,75 +577,358 @@ def run_nova_agent(task, project_id, tools):
         Dict containing the response and metadata
     """
     print(f"🤖 NOVA agent execution started")
-    print(f"📋 Task: {task}")
-    print(f"🆔 Project ID: {project_id}")
-    print(f"🧰 Tools: {tools}")
-    logger.info(f"NOVA agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
+    logger.info(f"NOVA agent execution started with task: {task}, project_id: {project_id}")
     
     try:
-        # Initialize tracking lists
-        files_created = []
-        actions_taken = []
-        notes = ""
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"NOVA read project state for {project_id}")
+            
+            # Check if HAL has created initial files
+            if "hal" not in project_state.get("agents_involved", []):
+                print(f"⏩ HAL has not created initial files yet, cannot proceed")
+                logger.info(f"NOVA execution blocked - HAL has not run yet")
+                return {
+                    "status": "blocked",
+                    "notes": "Cannot create UI - HAL has not yet created initial project files.",
+                    "project_state": project_state
+                }
         
-        # Create files using file_writer
-        if "file_writer" in tools:
-            print(f"📝 Using file_writer to create files")
-            
-            # Create frontend directory
-            frontend_dir = f"/verticals/{project_id}/frontend"
-            os.makedirs(frontend_dir, exist_ok=True)
-            
-            # Create content for LandingPage.jsx
-            file_path = f"/verticals/{project_id}/frontend/LandingPage.jsx"
-            content = """import React from 'react';
+        # Initialize list of created files
+        files_created = []
+        
+        # Check if file_writer is available
+        if not FILE_WRITER_AVAILABLE:
+            print(f"⚠️ file_writer not available, skipping file creation")
+            logger.warning(f"file_writer not available, skipping file creation")
+            return {
+                "status": "error",
+                "message": "file_writer not available, cannot create files",
+                "files_created": [],
+                "task": task,
+                "tools": tools,
+                "project_state": project_state
+            }
+        
+        # Create LandingPage.jsx
+        landing_page_content = """import React from 'react';
+import { Container, Row, Col, Button } from 'react-bootstrap';
+import './LandingPage.css';
 
-export default function LandingPage() {
+function LandingPage() {
   return (
-    <div>
-      <header><h1>Welcome</h1></header>
-      <section><p>This is the hero section.</p></section>
-      <footer><small>&copy; 2025</small></footer>
+    <div className="landing-page">
+      <header className="header">
+        <Container>
+          <Row className="align-items-center">
+            <Col md={6}>
+              <h1>Welcome to Our Platform</h1>
+              <p className="lead">
+                The most comprehensive solution for your needs.
+              </p>
+              <Button variant="primary" size="lg">Get Started</Button>
+              <Button variant="outline-secondary" size="lg" className="ml-3">Learn More</Button>
+            </Col>
+            <Col md={6}>
+              <img src="/images/hero-image.svg" alt="Hero" className="img-fluid" />
+            </Col>
+          </Row>
+        </Container>
+      </header>
+      
+      <section className="features">
+        <Container>
+          <h2 className="text-center mb-5">Key Features</h2>
+          <Row>
+            <Col md={4}>
+              <div className="feature-item">
+                <div className="feature-icon">
+                  <i className="fas fa-bolt"></i>
+                </div>
+                <h3>Lightning Fast</h3>
+                <p>Our platform is optimized for speed and performance.</p>
+              </div>
+            </Col>
+            <Col md={4}>
+              <div className="feature-item">
+                <div className="feature-icon">
+                  <i className="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure</h3>
+                <p>Your data is protected with enterprise-grade security.</p>
+              </div>
+            </Col>
+            <Col md={4}>
+              <div className="feature-item">
+                <div className="feature-icon">
+                  <i className="fas fa-cogs"></i>
+                </div>
+                <h3>Customizable</h3>
+                <p>Tailor the platform to meet your specific needs.</p>
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+      
+      <section className="cta">
+        <Container>
+          <Row className="justify-content-center">
+            <Col md={8} className="text-center">
+              <h2>Ready to get started?</h2>
+              <p className="lead">Join thousands of satisfied customers today.</p>
+              <Button variant="primary" size="lg">Sign Up Now</Button>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+      
+      <footer className="footer">
+        <Container>
+          <Row>
+            <Col md={4}>
+              <h4>Company</h4>
+              <ul className="list-unstyled">
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </Col>
+            <Col md={4}>
+              <h4>Resources</h4>
+              <ul className="list-unstyled">
+                <li><a href="#">Documentation</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Support</a></li>
+              </ul>
+            </Col>
+            <Col md={4}>
+              <h4>Legal</h4>
+              <ul className="list-unstyled">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Cookie Policy</a></li>
+              </ul>
+            </Col>
+          </Row>
+          <hr />
+          <p className="text-center">© 2023 Company Name. All rights reserved.</p>
+        </Container>
+      </footer>
     </div>
   );
-}"""
-            
-            # Write file
-            result = write_file(
-                project_id=project_id,
-                file_path=file_path,
-                content=content
-            )
-            
-            # Add to tracking lists
-            files_created.append(file_path)
-            actions_taken.append(f"Created LandingPage.jsx for project {project_id}")
-            
-            print(f"✅ File created successfully: {file_path}")
-            logger.info(f"NOVA created file: {file_path}")
-            
-            # Log memory entry if memory_writer is available
-            if MEMORY_WRITER_AVAILABLE:
-                memory_data = {
-                    "agent": "nova",
-                    "project_id": project_id,
-                    "action": f"Wrote {file_path}",
-                    "tool_used": "file_writer"
-                }
-                
-                memory_result = write_memory(memory_data)
-                print(f"✅ Memory entry created: {memory_result.get('memory_id', 'unknown')}")
-                logger.info(f"NOVA logged memory entry for file creation")
+}
+
+export default LandingPage;
+"""
         
-        # Return standardized result
+        # Write LandingPage.jsx
+        landing_page_path = f"frontend/LandingPage.jsx"
+        print(f"📝 Creating LandingPage.jsx at {landing_page_path}")
+        logger.info(f"Creating LandingPage.jsx at {landing_page_path}")
+        
+        landing_page_result = write_file(project_id, landing_page_path, landing_page_content)
+        if landing_page_result.get("status") == "success":
+            print(f"✅ LandingPage.jsx created successfully")
+            logger.info(f"LandingPage.jsx created successfully")
+            files_created.append(f"/verticals/{project_id}/{landing_page_path}")
+            
+            # Log memory
+            log_memory(
+                project_id=project_id,
+                agent="nova",
+                action="created",
+                content=f"Created LandingPage.jsx for project {project_id}",
+                structured_data={
+                    "file_path": landing_page_path,
+                    "file_type": "jsx",
+                    "file_size": len(landing_page_content)
+                }
+            )
+        else:
+            print(f"❌ Failed to create LandingPage.jsx: {landing_page_result.get('error', 'unknown error')}")
+            logger.error(f"Failed to create LandingPage.jsx: {landing_page_result.get('error', 'unknown error')}")
+        
+        # Create LandingPage.css
+        landing_page_css_content = """/* LandingPage.css */
+.landing-page {
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+.header {
+  padding: 100px 0;
+  background-color: #f8f9fa;
+}
+
+.header h1 {
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.header .lead {
+  font-size: 1.25rem;
+  margin-bottom: 30px;
+}
+
+.header .btn {
+  padding: 10px 20px;
+  margin-right: 10px;
+}
+
+.features {
+  padding: 100px 0;
+  background-color: #fff;
+}
+
+.feature-item {
+  text-align: center;
+  padding: 30px;
+  margin-bottom: 30px;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #007bff;
+}
+
+.feature-item h3 {
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.cta {
+  padding: 80px 0;
+  background-color: #007bff;
+  color: white;
+}
+
+.cta h2 {
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.cta .btn {
+  margin-top: 20px;
+  background-color: white;
+  color: #007bff;
+  border: none;
+  padding: 12px 30px;
+}
+
+.cta .btn:hover {
+  background-color: #f8f9fa;
+}
+
+.footer {
+  padding: 60px 0;
+  background-color: #343a40;
+  color: #fff;
+}
+
+.footer h4 {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.footer ul li {
+  margin-bottom: 10px;
+}
+
+.footer a {
+  color: #adb5bd;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: #fff;
+}
+
+.footer hr {
+  margin: 30px 0;
+  border-color: #495057;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 60px 0;
+    text-align: center;
+  }
+  
+  .header img {
+    margin-top: 30px;
+  }
+  
+  .feature-item {
+    margin-bottom: 40px;
+  }
+}
+"""
+        
+        # Write LandingPage.css
+        landing_page_css_path = f"frontend/LandingPage.css"
+        print(f"📝 Creating LandingPage.css at {landing_page_css_path}")
+        logger.info(f"Creating LandingPage.css at {landing_page_css_path}")
+        
+        landing_page_css_result = write_file(project_id, landing_page_css_path, landing_page_css_content)
+        if landing_page_css_result.get("status") == "success":
+            print(f"✅ LandingPage.css created successfully")
+            logger.info(f"LandingPage.css created successfully")
+            files_created.append(f"/verticals/{project_id}/{landing_page_css_path}")
+            
+            # Log memory
+            log_memory(
+                project_id=project_id,
+                agent="nova",
+                action="created",
+                content=f"Created LandingPage.css for project {project_id}",
+                structured_data={
+                    "file_path": landing_page_css_path,
+                    "file_type": "css",
+                    "file_size": len(landing_page_css_content)
+                }
+            )
+        else:
+            print(f"❌ Failed to create LandingPage.css: {landing_page_css_result.get('error', 'unknown error')}")
+            logger.error(f"Failed to create LandingPage.css: {landing_page_css_result.get('error', 'unknown error')}")
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "files_created": files_created,
+                "agents_involved": ["nova"],
+                "latest_agent_action": {
+                    "agent": "nova",
+                    "action": f"Created UI files for project {project_id}"
+                },
+                "next_recommended_step": "Run CRITIC to review the UI",
+                "tool_usage": {
+                    "file_writer": len(files_created)
+                }
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"NOVA updated project state for {project_id}")
+        
+        # Return result with files_created list
         return {
             "status": "success",
-            "message": f"NOVA successfully created files for project {project_id}",
+            "message": f"NOVA successfully created UI files for project {project_id}",
             "files_created": files_created,
-            "actions_taken": actions_taken,
-            "notes": notes,
             "task": task,
-            "tools": tools
+            "tools": tools,
+            "project_state": project_state
         }
     except Exception as e:
         error_msg = f"Error in run_nova_agent: {str(e)}"
@@ -570,91 +939,10 @@ export default function LandingPage() {
         return {
             "status": "error",
             "message": f"Error executing NOVA agent: {str(e)}",
-            "files_created": [],
-            "actions_taken": [],
-            "notes": "",
             "task": task,
             "tools": tools,
-            "error": str(e)
-        }
-
-def run_critic_agent(task, project_id, tools):
-    """
-    Run the CRITIC agent with the given task.
-    
-    Args:
-        task: The task to run
-        project_id: The project identifier
-        tools: List of tools to use
-        
-    Returns:
-        Dict containing the response and metadata
-    """
-    print(f"🤖 CRITIC agent execution started")
-    print(f"📋 Task: {task}")
-    print(f"🆔 Project ID: {project_id}")
-    print(f"🧰 Tools: {tools}")
-    logger.info(f"CRITIC agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
-    
-    try:
-        # Initialize tracking lists
-        files_created = []
-        actions_taken = []
-        notes = ""
-        
-        # Perform review if memory_writer is available
-        if "memory_writer" in tools:
-            print(f"📝 Using memory_writer to log feedback")
-            
-            # Simulate reviewing README
-            review_action = f"Reviewed README.md for project {project_id}"
-            actions_taken.append(review_action)
-            
-            # Generate feedback
-            notes = f"CRITIC feedback for {project_id}: Documentation is clear and concise."
-            
-            print(f"✅ Review completed: {review_action}")
-            logger.info(f"CRITIC completed review: {review_action}")
-            
-            # Log memory entry if memory_writer is available
-            if MEMORY_WRITER_AVAILABLE:
-                memory_data = {
-                    "agent": "critic",
-                    "project_id": project_id,
-                    "action": review_action,
-                    "tool_used": "memory_writer",
-                    "feedback": notes
-                }
-                
-                memory_result = write_memory(memory_data)
-                print(f"✅ Memory entry created: {memory_result.get('memory_id', 'unknown')}")
-                logger.info(f"CRITIC logged memory entry for review")
-        
-        # Return standardized result
-        return {
-            "status": "success",
-            "message": f"CRITIC successfully reviewed content for project {project_id}",
-            "files_created": files_created,
-            "actions_taken": actions_taken,
-            "notes": notes,
-            "task": task,
-            "tools": tools
-        }
-    except Exception as e:
-        error_msg = f"Error in run_critic_agent: {str(e)}"
-        print(f"❌ {error_msg}")
-        logger.error(error_msg)
-        logger.error(traceback.format_exc())
-        
-        return {
-            "status": "error",
-            "message": f"Error executing CRITIC agent: {str(e)}",
-            "files_created": [],
-            "actions_taken": [],
-            "notes": "",
-            "task": task,
-            "tools": tools,
-            "error": str(e)
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
         }
 
 def run_ash_agent(task, project_id, tools):
@@ -670,55 +958,78 @@ def run_ash_agent(task, project_id, tools):
         Dict containing the response and metadata
     """
     print(f"🤖 ASH agent execution started")
-    print(f"📋 Task: {task}")
-    print(f"🆔 Project ID: {project_id}")
-    print(f"🧰 Tools: {tools}")
-    logger.info(f"ASH agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
+    logger.info(f"ASH agent execution started with task: {task}, project_id: {project_id}")
     
     try:
-        # Initialize tracking lists
-        files_created = []
-        actions_taken = []
-        notes = ""
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"ASH read project state for {project_id}")
+            
+            # Check if project is ready for deployment
+            if project_state.get("status") != "ready_for_deploy":
+                print(f"⏩ Project not ready for deployment yet")
+                logger.info(f"ASH execution on hold - project not ready for deployment")
+                return {
+                    "status": "on_hold",
+                    "notes": "Project not ready for deployment yet.",
+                    "project_state": project_state
+                }
         
-        # Perform deployment simulation if memory_writer is available
-        if "memory_writer" in tools:
-            print(f"📝 Using memory_writer to log deployment simulation")
+        # Use ASH agent implementation if available
+        if ASH_AGENT_AVAILABLE:
+            print(f"🔄 Using ASH agent implementation")
+            result = ash_agent_impl(task, project_id, tools)
             
-            # Simulate deployment
-            deployment_action = f"Simulated deployment for project {project_id}"
-            actions_taken.append(deployment_action)
-            
-            # Generate deployment notes
-            notes = f"ASH deployment simulation for {project_id}: Successfully deployed to staging environment."
-            
-            print(f"✅ Deployment simulation completed: {deployment_action}")
-            logger.info(f"ASH completed deployment simulation: {deployment_action}")
-            
-            # Log memory entry if memory_writer is available
-            if MEMORY_WRITER_AVAILABLE:
-                memory_data = {
-                    "agent": "ash",
-                    "project_id": project_id,
-                    "action": deployment_action,
-                    "tool_used": "memory_writer",
-                    "deployment_notes": notes
+            # Update project state if project_state is available
+            if PROJECT_STATE_AVAILABLE:
+                project_state_data = {
+                    "agents_involved": ["ash"],
+                    "latest_agent_action": {
+                        "agent": "ash",
+                        "action": f"Created documentation for project {project_id}"
+                    },
+                    "next_recommended_step": "Project documentation complete",
+                    "tool_usage": {}
                 }
                 
-                memory_result = write_memory(memory_data)
-                print(f"✅ Memory entry created: {memory_result.get('memory_id', 'unknown')}")
-                logger.info(f"ASH logged memory entry for deployment simulation")
+                project_state_result = update_project_state(project_id, project_state_data)
+                print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+                logger.info(f"ASH updated project state for {project_id}")
+            
+            # Add project_state to result
+            if PROJECT_STATE_AVAILABLE:
+                result["project_state"] = project_state
+            
+            return result
         
-        # Return standardized result
-        return {
-            "status": "success",
-            "message": f"ASH successfully simulated deployment for project {project_id}",
-            "files_created": files_created,
-            "actions_taken": actions_taken,
-            "notes": notes,
+        # TODO: Implement ASH agent execution
+        result = {
+            "message": f"ASH received task for project {project_id}",
             "task": task,
-            "tools": tools
+            "tools": tools,
+            "project_state": project_state
         }
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "agents_involved": ["ash"],
+                "latest_agent_action": {
+                    "agent": "ash",
+                    "action": f"Created documentation for project {project_id}"
+                },
+                "next_recommended_step": "Project documentation complete",
+                "tool_usage": {}
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"ASH updated project state for {project_id}")
+        
+        return result
     except Exception as e:
         error_msg = f"Error in run_ash_agent: {str(e)}"
         print(f"❌ {error_msg}")
@@ -728,12 +1039,112 @@ def run_ash_agent(task, project_id, tools):
         return {
             "status": "error",
             "message": f"Error executing ASH agent: {str(e)}",
-            "files_created": [],
-            "actions_taken": [],
-            "notes": "",
             "task": task,
             "tools": tools,
-            "error": str(e)
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
+        }
+
+def run_critic_agent(task, project_id, tools):
+    """
+    Run the CRITIC agent with the given task.
+    
+    Args:
+        task: The task to run
+        project_id: The project identifier
+        tools: List of tools to use
+        
+    Returns:
+        Dict containing the response and metadata
+    """
+    print(f"🤖 CRITIC agent execution started")
+    logger.info(f"CRITIC agent execution started with task: {task}, project_id: {project_id}")
+    
+    try:
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"CRITIC read project state for {project_id}")
+            
+            # Check if NOVA has created UI files
+            if "nova" not in project_state.get("agents_involved", []):
+                print(f"⏩ NOVA has not created UI files yet, cannot review")
+                logger.info(f"CRITIC execution blocked - NOVA has not run yet")
+                return {
+                    "status": "blocked",
+                    "notes": "Cannot review UI – NOVA has not yet created any frontend files.",
+                    "project_state": project_state
+                }
+        
+        # Use CRITIC agent implementation if available
+        if CRITIC_AGENT_AVAILABLE:
+            print(f"🔄 Using CRITIC agent implementation")
+            result = critic_agent_impl(task, project_id, tools)
+            
+            # Update project state if project_state is available
+            if PROJECT_STATE_AVAILABLE:
+                project_state_data = {
+                    "status": "ready_for_deploy",
+                    "agents_involved": ["critic"],
+                    "latest_agent_action": {
+                        "agent": "critic",
+                        "action": f"Reviewed project {project_id}"
+                    },
+                    "next_recommended_step": "Run ASH to create documentation",
+                    "tool_usage": {}
+                }
+                
+                project_state_result = update_project_state(project_id, project_state_data)
+                print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+                logger.info(f"CRITIC updated project state for {project_id}")
+            
+            # Add project_state to result
+            if PROJECT_STATE_AVAILABLE:
+                result["project_state"] = project_state
+            
+            return result
+        
+        # TODO: Implement CRITIC agent execution
+        result = {
+            "message": f"CRITIC received task for project {project_id}",
+            "task": task,
+            "tools": tools,
+            "project_state": project_state
+        }
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "status": "ready_for_deploy",
+                "agents_involved": ["critic"],
+                "latest_agent_action": {
+                    "agent": "critic",
+                    "action": f"Reviewed project {project_id}"
+                },
+                "next_recommended_step": "Run ASH to create documentation",
+                "tool_usage": {}
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"CRITIC updated project state for {project_id}")
+        
+        return result
+    except Exception as e:
+        error_msg = f"Error in run_critic_agent: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        
+        return {
+            "status": "error",
+            "message": f"Error executing CRITIC agent: {str(e)}",
+            "task": task,
+            "tools": tools,
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
         }
 
 def run_orchestrator_agent(task, project_id, tools):
@@ -749,31 +1160,40 @@ def run_orchestrator_agent(task, project_id, tools):
         Dict containing the response and metadata
     """
     print(f"🤖 ORCHESTRATOR agent execution started")
-    print(f"📋 Task: {task}")
-    print(f"🆔 Project ID: {project_id}")
-    print(f"🧰 Tools: {tools}")
-    logger.info(f"ORCHESTRATOR agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
+    logger.info(f"ORCHESTRATOR agent execution started with task: {task}, project_id: {project_id}")
     
     try:
-        # Initialize tracking lists
-        files_created = []
-        actions_taken = []
-        notes = ""
+        # Read project state if available
+        project_state = {}
+        if PROJECT_STATE_AVAILABLE:
+            project_state = read_project_state(project_id)
+            print(f"📊 Project state read for {project_id}")
+            logger.info(f"ORCHESTRATOR read project state for {project_id}")
         
         # TODO: Implement ORCHESTRATOR agent execution
-        actions_taken.append(f"Orchestrated task for project {project_id}")
-        notes = f"ORCHESTRATOR notes for {project_id}: Task orchestration simulated."
-        
-        # Return standardized result
-        return {
-            "status": "success",
-            "message": f"ORCHESTRATOR successfully processed task for project {project_id}",
-            "files_created": files_created,
-            "actions_taken": actions_taken,
-            "notes": notes,
+        result = {
+            "message": f"ORCHESTRATOR received task for project {project_id}",
             "task": task,
-            "tools": tools
+            "tools": tools,
+            "project_state": project_state
         }
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "agents_involved": ["orchestrator"],
+                "latest_agent_action": {
+                    "agent": "orchestrator",
+                    "action": f"Orchestrated project {project_id}"
+                },
+                "tool_usage": {}
+            }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"ORCHESTRATOR updated project state for {project_id}")
+        
+        return result
     except Exception as e:
         error_msg = f"Error in run_orchestrator_agent: {str(e)}"
         print(f"❌ {error_msg}")
@@ -783,12 +1203,10 @@ def run_orchestrator_agent(task, project_id, tools):
         return {
             "status": "error",
             "message": f"Error executing ORCHESTRATOR agent: {str(e)}",
-            "files_created": [],
-            "actions_taken": [],
-            "notes": "",
             "task": task,
             "tools": tools,
-            "error": str(e)
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
         }
 
 # Map agent_id to runner function
