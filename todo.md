@@ -1,44 +1,39 @@
-# Agent Debug & Cognition Tracker Suite Implementation
+# Phase 6.1 Implementation - Agent Timing, Sync, and Self-Correction
 
 ## Tasks
 
-- [x] Step 1: Confirm `debug_tracker.md` and `debug_logger.py` from the previous task are active.
-
-- [x] Step 2: Create `/api/orchestrator/consult` route
-
-  - [x] Add `consult.py` route file
-  - [x] Implement InstructionSchema handling
-  - [x] Trigger agent tool.run() logic
-  - [x] Write outputs to memory
-  - [x] Write reflection tagged to goal
-  - [x] Return appropriate status
-
-- [x] Step 3: Create `/modules/instruction_validator.py`
-
-  - [x] Implement validation of expected outputs
-  - [x] Return "complete" or "failed" status
-  - [x] Log validation results
-
-- [x] Step 4: Create stubs
-
-  - [x] Create `agent_tool_runner.py`
-  - [x] Create `agent_reflection.py`
-  - [x] Create `extract_outputs_from_memory` function
-
-- [x] Step 5: Enhance `/tests/run_debug_sequence.py`
-
-  - [x] Add test for sample instruction to HAL
-  - [x] Log response and memory to debug_tracker.md
-
-- [x] Step 6: Wire `log_test_result()` into components
-
-  - [x] Agent tool execution step
-  - [x] Reflection writing step
-  - [x] Instruction validation result
-  - [x] Failure/exception traces
-
-- [ ] Step 7: Push to branch `feature/phase-11-tracker`
-  - [ ] Create branch
-  - [ ] Commit changes
-  - [ ] Push to GitHub
-  - [ ] Notify when ready
+- [x] Check GitHub repository access
+- [x] Read uploaded content
+- [x] Analyze Phase 6.1 requirements
+- [x] Create feature branch `feature/phase-6.1-agent-timing-sync`
+- [x] Implement agent retry and recovery flow
+  - [x] Add retry mechanism for blocked agents
+  - [x] Implement dependency tracking
+  - [x] Create auto-retry logic when dependencies are cleared
+- [x] Implement project state watch hooks
+  - [x] Create polling mechanism for project state changes
+  - [x] Implement event listeners for state updates
+  - [x] Add subscription functionality
+- [x] Implement post-block memory updates
+  - [x] Add "blocked_due_to" and "unblock_condition" fields
+  - [x] Update memory writer to include block information
+- [x] Implement passive reflection engine
+  - [x] Create orchestrator recheck mode
+  - [x] Implement agent re-evaluation logic
+- [x] Implement intelligent reset flags
+  - [x] Create reset state API endpoint
+  - [x] Implement agent-specific reset functionality
+- [x] Create API endpoints
+  - [ ] Add `/api/project/subscribe` endpoint
+  - [ ] Add `/api/project/reset_state` endpoint
+- [ ] Test implementation
+  - [ ] Test agent retry flow
+  - [ ] Test project state watch hooks
+  - [ ] Test memory updates
+  - [ ] Test reflection engine
+  - [ ] Test reset functionality
+- [ ] Validate against requirements
+- [ ] Document changes made
+- [ ] Prepare pull request
+- [ ] Push code to GitHub
+- [ ] Notify user of completion

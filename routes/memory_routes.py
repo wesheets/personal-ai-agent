@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 router = APIRouter()
 
 @router.get("/memory/ping")
@@ -50,7 +50,11 @@ async def memory_summarize(request_data: dict):
 @router.post("/memory/thread")
 async def memory_thread_post(request_data: dict):
     """
+<<<<<<< HEAD
     Get a memory thread via POST.
+=======
+    Get a memory thread via POST method.
+>>>>>>> origin/main
     """
     return {
         "status": "success",
@@ -65,6 +69,7 @@ async def memory_thread_post(request_data: dict):
     }
 
 @router.get("/memory/thread")
+<<<<<<< HEAD
 async def get_memory_thread(project_id: str):
     """
     Retrieve memory thread for a specific project.
@@ -84,10 +89,43 @@ async def get_memory_thread(project_id: str):
         return {
             "status": "success",
             "message": f"Retrieved memory thread for {project_id}",
+=======
+async def memory_thread_get(project_id: str = Query(..., description="Project identifier")):
+    """
+    Get a memory thread via GET method.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dict containing thread entries for the specified project
+    """
+    try:
+        from memory.memory_reader import get_memory_thread_for_project
+        
+        # Try to use the actual implementation if available
+        try:
+            thread = get_memory_thread_for_project(project_id)
+        except (ImportError, NameError):
+            # Fallback to sample data if the function is not available
+            thread = [
+                {"timestamp": "2025-04-17T01:56:00", "content": "Example memory entry 1"},
+                {"timestamp": "2025-04-17T01:56:30", "content": "Example memory entry 2"},
+                {"timestamp": "2025-04-17T01:57:00", "content": "Example memory entry 3"}
+            ]
+        
+        return {
+            "status": "success",
+            "project_id": project_id,
+>>>>>>> origin/main
             "thread": thread
         }
     except Exception as e:
         return {
             "status": "error",
+<<<<<<< HEAD
             "message": f"Failed to retrieve memory thread: {str(e)}"
+=======
+            "message": f"Failed to get memory thread: {str(e)}"
+>>>>>>> origin/main
         }

@@ -12,6 +12,13 @@ MODIFIED: Added product strategist logic for HAL in saas domain
 MODIFIED: Added structured output for ASH documentation and onboarding
 MODIFIED: Added AGENT_RUNNERS mapping for direct agent execution
 MODIFIED: Added run_hal_agent function with file_writer integration
+MODIFIED: Updated run_hal_agent with real execution logic and memory logging
+MODIFIED: Added project_state integration for tracking project status
+MODIFIED: Updated run_nova_agent with file creation and memory logging functionality
+MODIFIED: Standardized output format across all agents
+MODIFIED: Added memory logging for CRITIC and ASH agents
+MODIFIED: Added agent retry and recovery flow for blocked agents
+MODIFIED: Added retry_hooks integration with proper error handling
 """
 
 import logging
@@ -71,6 +78,15 @@ except ImportError:
         print(f"⚠️ Using fallback get_agent_themes for {agent_id}")
         return []
 
+# Import retry hooks for agent retry status checking
+try:
+    from utils.retry_hooks import get_retry_status, log_retry_action
+    RETRY_HOOKS_AVAILABLE = True
+    print("✅ retry_hooks import successful")
+except ImportError:
+    RETRY_HOOKS_AVAILABLE = False
+    print("❌ retry_hooks import failed")
+
 # Import file_writer for HAL agent
 try:
     from toolkit.file_writer import write_file
@@ -79,373 +95,311 @@ except ImportError:
     FILE_WRITER_AVAILABLE = False
     print("❌ file_writer import failed")
 
+# Import memory_writer for logging agent actions
+try:
+    from app.modules.memory_writer import write_memory
+    MEMORY_WRITER_AVAILABLE = True
+except ImportError:
+    MEMORY_WRITER_AVAILABLE = False
+    print("❌ memory_writer import failed")
+
+# Import project_state for tracking project status
+try:
+    from app.modules.project_state import update_project_state, read_project_state
+    PROJECT_STATE_AVAILABLE = True
+except ImportError:
+    PROJECT_STATE_AVAILABLE = False
+    print("❌ project_state import failed")
+
+# Import agent_retry for retry and recovery flow
+try:
+    from app.modules.agent_retry import register_blocked_agent, check_for_unblocked_agents, mark_agent_retry_attempted
+    AGENT_RETRY_AVAILABLE = True
+except ImportError:
+    AGENT_RETRY_AVAILABLE = False
+    print("❌ agent_retry import failed")
+
+# Import memory_block_writer for logging block information
+try:
+    from app.modules.memory_block_writer import write_block_memory, write_unblock_memory
+    MEMORY_BLOCK_WRITER_AVAILABLE = True
+except ImportError:
+    MEMORY_BLOCK_WRITER_AVAILABLE = False
+    print("❌ memory_block_writer import failed")
+
+# Import passive_reflection for re-evaluating tasks
+try:
+    from app.modules.passive_reflection import re_evaluate_task, start_reflection
+    PASSIVE_REFLECTION_AVAILABLE = True
+except ImportError:
+    PASSIVE_REFLECTION_AVAILABLE = False
+    print("❌ passive_reflection import failed")
+
+try:
+    from app.modules.ash_agent import run_ash_agent as ash_agent_impl
+    ASH_AGENT_AVAILABLE = True
+except ImportError:
+    ASH_AGENT_AVAILABLE = False
+    print("❌ ash_agent import failed")
+
+try:
+    from app.modules.critic_agent import run_critic_agent as critic_agent_impl
+    CRITIC_AGENT_AVAILABLE = True
+except ImportError:
+    CRITIC_AGENT_AVAILABLE = False
+    print("❌ critic_agent import failed")
+
 # Configure logging
-logger = logging.getLogger("modules.agent_runner")
+logger = logging.getLogger("agent_runner")
 
-class CoreForgeAgent:
+# Define memory store fallback if needed
+memory_store = {}
+
+# Helper function to safely get retry status with fallback
+def safe_get_retry_status(project_id: str, agent_id: str) -> Dict[str, Any]:
     """
-    Standalone implementation of CoreForgeAgent with no registry dependencies.
-    """
-    def __init__(self):
-        self.agent_id = "Core.Forge"
-        self.name = "Core.Forge"
-        self.description = "System orchestrator that routes tasks to appropriate agents"
-        self.tone = "professional"
-        
-        # Check if OpenAI API key is available
-        api_key = os.getenv("OPENAI_API_KEY")
-        print(f"🔑 OpenAI API Key loaded: {bool(api_key)}")
-        
-        # Initialize OpenAI client
-        try:
-            if not api_key:
-                raise ValueError("OpenAI API key is not set in environment variables")
-            
-            self.client = OpenAI(api_key=api_key)
-            print("✅ OpenAI client initialized successfully")
-        except Exception as e:
-            error_msg = f"Failed to initialize OpenAI client: {str(e)}"
-            print(f"❌ {error_msg}")
-            logger.error(error_msg)
-            self.client = None
-    
-    def run(self, messages: List[Dict[str, Any]], agent_id: str = None, domain: str = "saas") -> Dict[str, Any]:
-        """
-        Run the agent with the given messages.
-        
-        Args:
-            messages: List of message dictionaries with role and content
-            agent_id: Optional agent identifier for toolkit selection
-            domain: Optional domain for toolkit selection, defaults to "saas"
-            
-        Returns:
-            Dict containing the response and metadata
-        """
-        try:
-            print(f"🤖 CoreForgeAgent.run called with {len(messages)} messages")
-            
-            if not self.client:
-                error_msg = "OpenAI client initialization failed. Unable to process request."
-                print(f"❌ {error_msg}")
-                return {
-                    "content": error_msg,
-                    "status": "error"
-                }
-            
-            # Set response format based on agent
-            response_format = None
-            if agent_id:
-                if agent_id.lower() == "hal" and domain == "saas":
-                    response_format = {"type": "json_object"}
-                elif agent_id.lower() == "ash" and domain == "saas":
-                    response_format = {"type": "json_object"}
-            
-            # Prepare system message with agent role and tools if agent_id is provided
-            if agent_id and agent_id.lower() in ["hal", "ash", "nova"]:
-                # Get agent role
-                role = get_agent_role(agent_id.lower())
-                
-                # Get toolkit for agent and domain
-                tools = get_toolkit(agent_id.lower(), domain)
-                
-                # Format tools prompt based on agent
-                tools_prompt = ""
-                if agent_id.lower() == "nova":
-                    themes = get_agent_themes(agent_id.lower())
-                    tools_prompt = format_nova_prompt(tools, themes)
-                else:
-                    tools_prompt = format_tools_prompt(tools)
-                
-                # Check if first message is system message
-                if messages and messages[0].get("role") == "system":
-                    # Update existing system message
-                    system_content = messages[0].get("content", "")
-                    
-                    # Add role and tools information
-                    if role:
-                        system_content = f"You are a {role}.\n\n{system_content}"
-                    
-                    if tools_prompt:
-                        system_content = f"{system_content}\n\n{tools_prompt}"
-                    
-                    # Add specialized logic based on agent and domain
-                    if agent_id.lower() == "hal" and domain == "saas":
-                        # Add product strategist logic for HAL in saas domain
-                        product_strategist_prompt = """
-As a Product Strategist, your task is to create structured SaaS product plans.
-
-Your responses for SaaS planning should include:
-1. Core features (essential functionality)
-2. MVP features (minimum viable product)
-3. Premium features (for monetization)
-4. Monetization strategy (pricing model)
-5. Implementation task steps
-
-Format your response as a structured JSON object with these exact keys:
-- core_features: array of strings
-- mvp_features: array of strings
-- premium_features: array of strings
-- monetization: string
-- task_steps: array of strings
-
-Be specific, realistic, and focused on creating a monetizable SaaS product.
-"""
-                        system_content = f"{system_content}\n\n{product_strategist_prompt}"
-                    
-                    elif agent_id.lower() == "ash" and domain == "saas":
-                        # Add UX Docifier logic for ASH in saas domain
-                        ux_docifier_prompt = """
-As a UX Docifier, your task is to create comprehensive documentation for SaaS products.
-
-Your responses should include:
-1. API documentation with endpoints, methods, and payloads
-2. User onboarding instructions with clear steps
-3. Third-party service integration suggestions
-
-Format your response as a structured JSON object with these exact keys:
-- docs.api: string containing API endpoints with methods and payloads
-- docs.onboarding: string containing user onboarding copy with steps
-- docs.integration: string containing third-party service suggestions
-
-Be clear, comprehensive, and focused on creating documentation that enhances user experience.
-"""
-                        system_content = f"{system_content}\n\n{ux_docifier_prompt}"
-                    
-                    # Update system message
-                    messages[0]["content"] = system_content
-                else:
-                    # Create new system message
-                    system_content = ""
-                    
-                    if role:
-                        system_content = f"You are a {role}."
-                    
-                    if tools_prompt:
-                        if system_content:
-                            system_content = f"{system_content}\n\n{tools_prompt}"
-                        else:
-                            system_content = tools_prompt
-                    
-                    # Add specialized logic based on agent and domain
-                    if agent_id.lower() == "hal" and domain == "saas":
-                        # Add product strategist logic for HAL in saas domain
-                        product_strategist_prompt = """
-As a Product Strategist, your task is to create structured SaaS product plans.
-
-Your responses for SaaS planning should include:
-1. Core features (essential functionality)
-2. MVP features (minimum viable product)
-3. Premium features (for monetization)
-4. Monetization strategy (pricing model)
-5. Implementation task steps
-
-Format your response as a structured JSON object with these exact keys:
-- core_features: array of strings
-- mvp_features: array of strings
-- premium_features: array of strings
-- monetization: string
-- task_steps: array of strings
-
-Be specific, realistic, and focused on creating a monetizable SaaS product.
-"""
-                        if system_content:
-                            system_content = f"{system_content}\n\n{product_strategist_prompt}"
-                        else:
-                            system_content = product_strategist_prompt
-                    
-                    elif agent_id.lower() == "ash" and domain == "saas":
-                        # Add UX Docifier logic for ASH in saas domain
-                        ux_docifier_prompt = """
-As a UX Docifier, your task is to create comprehensive documentation for SaaS products.
-
-Your responses should include:
-1. API documentation with endpoints, methods, and payloads
-2. User onboarding instructions with clear steps
-3. Third-party service integration suggestions
-
-Format your response as a structured JSON object with these exact keys:
-- docs.api: string containing API endpoints with methods and payloads
-- docs.onboarding: string containing user onboarding copy with steps
-- docs.integration: string containing third-party service suggestions
-
-Be clear, comprehensive, and focused on creating documentation that enhances user experience.
-"""
-                        if system_content:
-                            system_content = f"{system_content}\n\n{ux_docifier_prompt}"
-                        else:
-                            system_content = ux_docifier_prompt
-                    
-                    # Add system message at the beginning
-                    if system_content:
-                        messages.insert(0, {"role": "system", "content": system_content})
-            
-            # Call OpenAI API
-            print("📡 Calling OpenAI API...")
-            response = self.client.chat.completions.create(
-                model="gpt-4",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=1000,
-                response_format=response_format
-            )
-            
-            # Extract content from response
-            content = response.choices[0].message.content
-            print(f"✅ OpenAI API call successful, received {len(content)} characters")
-            
-            # Return result with metadata
-            return {
-                "content": content,
-                "status": "success",
-                "usage": {
-                    "prompt_tokens": response.usage.prompt_tokens,
-                    "completion_tokens": response.usage.completion_tokens,
-                    "total_tokens": response.usage.total_tokens
-                },
-                "timestamp": time.time()
-            }
-        except Exception as e:
-            error_msg = f"Error in CoreForgeAgent.run: {str(e)}"
-            print(f"❌ {error_msg}")
-            logger.error(error_msg)
-            logger.error(traceback.format_exc())
-            return {
-                "content": f"Error processing request: {str(e)}",
-                "status": "error"
-            }
-
-async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: str, step_type: str, content: str, structured_data: Dict = None) -> None:
-    """
-    Log a memory thread entry for an agent step.
+    Safely get retry status with fallback if the retry_hooks module is not available
+    or if an error occurs during the call.
     
     Args:
         project_id: The project identifier
-        chain_id: The chain identifier
-        agent: The agent type (hal, ash, nova)
-        role: The agent role (thinker, explainer, designer)
-        step_type: The step type (task, summary, ui, reflection)
-        content: The content of the step
-        structured_data: Optional structured data for specialized agents
+        agent_id: The agent identifier
+        
+    Returns:
+        Dict containing retry status information with safe defaults
     """
     try:
-        # Create memory entry
-        memory_entry = {
-            "project_id": project_id,
-            "chain_id": chain_id,
-            "agent": agent,
-            "role": role,
-            "step_type": step_type,
-            "content": content
-        }
-        
-        # Add structured data if available
-        if structured_data:
-            memory_entry["structured_data"] = structured_data
-            
-            # For ASH, break down documentation into separate memory entries
-            if agent == "ash" and structured_data:
-                # Process API docs
-                if "docs.api" in structured_data:
-                    api_memory = memory_entry.copy()
-                    api_memory["step_type"] = "docs.api"
-                    api_memory["content"] = structured_data["docs.api"]
-                    await add_memory_thread(api_memory)
-                    print(f"✅ Memory thread logged for API docs")
-                
-                # Process onboarding docs
-                if "docs.onboarding" in structured_data:
-                    onboarding_memory = memory_entry.copy()
-                    onboarding_memory["step_type"] = "docs.onboarding"
-                    onboarding_memory["content"] = structured_data["docs.onboarding"]
-                    await add_memory_thread(onboarding_memory)
-                    print(f"✅ Memory thread logged for onboarding docs")
-                
-                # Process integration docs
-                if "docs.integration" in structured_data:
-                    integration_memory = memory_entry.copy()
-                    integration_memory["step_type"] = "docs.integration"
-                    integration_memory["content"] = structured_data["docs.integration"]
-                    await add_memory_thread(integration_memory)
-                    print(f"✅ Memory thread logged for integration docs")
-        
-        # Enhanced logging for debugging
-        print(f"🔍 DEBUG: Memory thread entry created with project_id={project_id}, chain_id={chain_id}")
-        print(f"🔍 DEBUG: Memory entry details: {memory_entry}")
-        logger.info(f"DEBUG: Memory thread entry created with project_id={project_id}, chain_id={chain_id}")
-        
-        # Log memory entry
-        print(f"📝 Logging memory thread for {agent} agent, {step_type} step")
-        logger.info(f"Logging memory thread for {agent} agent, {step_type} step")
-        
-        # Add memory entry to thread
-        print(f"🔍 DEBUG: Calling add_memory_thread with entry")
-        result = await add_memory_thread(memory_entry)
-        
-        # Log result
-        print(f"✅ Memory thread logged successfully: {result}")
-        print(f"🔍 DEBUG: add_memory_thread returned: {result}")
-        logger.info(f"Memory thread logged successfully: {result}")
+        if RETRY_HOOKS_AVAILABLE:
+            return get_retry_status(project_id, agent_id)
+        else:
+            logger.warning(f"Retry hooks not available for {agent_id} in project {project_id}")
+            return {
+                "should_retry": False,
+                "unblock_condition": None,
+                "last_block_reason": None
+            }
     except Exception as e:
-        # Log error but don't fail the main process
-        error_msg = f"Error logging memory thread: {str(e)}"
-        print(f"❌ {error_msg}")
-        print(f"🔍 DEBUG: Exception traceback: {traceback.format_exc()}")
-        logger.error(error_msg)
-        logger.error(traceback.format_exc())
+        logger.error(f"Error getting retry status: {str(e)}")
+        return {
+            "should_retry": False,
+            "unblock_condition": None,
+            "last_block_reason": None
+        }
 
-# Define agent runner functions
-def run_hal_agent(task, project_id, tools):
+# Helper function to safely log retry actions with fallback
+def safe_log_retry_action(agent_id: str, project_id: str, action: str) -> None:
     """
-    Run the HAL agent with the given task.
+    Safely log retry actions with fallback if the retry_hooks module is not available
+    or if an error occurs during the call.
     
     Args:
-        task: The task to run
+        agent_id: The agent identifier
+        project_id: The project identifier
+        action: Description of the retry action
+    """
+    try:
+        if RETRY_HOOKS_AVAILABLE:
+            log_retry_action(agent_id, project_id, action)
+        else:
+            logger.warning(f"Retry hooks not available for logging action: {action}")
+            # Fallback to standard memory logging if available
+            if MEMORY_WRITER_AVAILABLE:
+                write_memory({
+                    "agent": agent_id,
+                    "project_id": project_id,
+                    "tool_used": "retry_hook_fallback",
+                    "action": action
+                })
+    except Exception as e:
+        logger.error(f"Error logging retry action: {str(e)}")
+        # No further fallback needed as this is already a fallback function
+def run_hal_agent(task, project_id, tools):
+    """
+    Run the HAL agent with the given task, project_id, and tools.
+    
+    This function creates a new project with the given task and tools,
+    and returns the result with a list of created files.
+    
+    Args:
+        task: The task to execute
         project_id: The project identifier
         tools: List of tools to use
         
     Returns:
-        Dict containing the response and metadata
+        Dict containing the result of the execution
     """
-    print(f"🤖 HAL agent execution started")
-    print(f"📋 Task: {task}")
-    print(f"🆔 Project ID: {project_id}")
-    print(f"🧰 Tools: {tools}")
-    logger.info(f"HAL agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
-    
     try:
-        # Create a bootstrap file using file_writer
-        if FILE_WRITER_AVAILABLE and "file_writer" in tools:
-            print(f"📝 Using file_writer to create bootstrap file")
+        print(f"🤖 Running HAL agent with task: {task}")
+        logger.info(f"Running HAL agent with task: {task}")
+        
+        # Check retry status with robust error handling
+        retry_status = safe_get_retry_status(project_id, "hal")
+        
+        # Log retry status for debugging
+        print(f"🔄 HAL retry status: {retry_status}")
+        logger.info(f"HAL retry status: {retry_status}")
+        
+        # Check if agent should retry
+        if retry_status.get("should_retry", False):
+            # Log retry action
+            retry_message = f"HAL agent is retrying for project {project_id} due to: {retry_status.get('last_block_reason', 'unknown reason')}"
+            print(f"🔄 {retry_message}")
+            logger.info(retry_message)
             
-            # Create content for README.md
-            contents = f"# Project {project_id}\n\nTask: {task}\nTools: {', '.join(tools)}"
+            # Log retry action with robust error handling
+            safe_log_retry_action("hal", project_id, retry_message)
             
-            # Write file
-            output = write_file(
+            # Return retry status in response
+            return {
+                "status": "retry",
+                "message": retry_message,
+                "retry_status": retry_status,
+                "task": task,
+                "tools": tools
+            }
+        
+        # Initialize variables
+        files_created = []
+        project_state = {}
+        
+        # Log memory
+        def log_memory(project_id, agent, action, content, structured_data=None):
+            if not MEMORY_WRITER_AVAILABLE:
+                print(f"⚠️ memory_writer not available, skipping memory logging")
+                logger.warning(f"memory_writer not available, skipping memory logging")
+                return
+            
+            memory_data = {
+                "project_id": project_id,
+                "agent": agent,
+                "action": action,
+                "content": content
+            }
+            
+            if structured_data:
+                memory_data["structured_data"] = structured_data
+            
+            write_memory(memory_data)
+            
+            # Add to memory thread
+            thread_data = {
+                "agent": agent,
+                "content": content,
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+            }
+            
+            if structured_data:
+                thread_data["structured_data"] = structured_data
+            
+            add_memory_thread(project_id, "main", thread_data)
+        
+        # Log task received
+        log_memory(
+            project_id=project_id,
+            agent="hal",
+            action="received_task",
+            content=f"Received task: {task}",
+            structured_data={
+                "task": task,
+                "tools": tools
+            }
+        )
+        
+        # Read project state if available
+        if PROJECT_STATE_AVAILABLE:
+            try:
+                project_state = read_project_state(project_id)
+                print(f"📊 Project state read: {project_state}")
+                logger.info(f"HAL read project state for {project_id}")
+            except Exception as e:
+                print(f"⚠️ Failed to read project state: {str(e)}")
+                logger.warning(f"Failed to read project state: {str(e)}")
+                project_state = {}
+        
+        # Check if file_writer is available
+        if not FILE_WRITER_AVAILABLE:
+            print(f"⚠️ file_writer not available, skipping file creation")
+            logger.warning(f"file_writer not available, skipping file creation")
+            return {
+                "status": "error",
+                "message": "file_writer not available, cannot create files",
+                "files_created": [],
+                "task": task,
+                "tools": tools,
+                "project_state": project_state
+            }
+        
+        # Create README.md
+        readme_content = f"""# {project_id.replace('_', ' ').title()}
+
+This project was created by the HAL agent.
+
+## Task
+{task}
+
+## Tools
+{', '.join(tools)}
+
+## Created
+{time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())}
+"""
+        
+        # Write README.md
+        readme_path = f"/verticals/{project_id}/README.md"
+        print(f"📝 Creating README.md at {readme_path}")
+        logger.info(f"Creating README.md at {readme_path}")
+        
+        readme_result = write_file(project_id, "README.md", readme_content)
+        if readme_result.get("status") == "success":
+            print(f"✅ README.md created successfully")
+            logger.info(f"README.md created successfully")
+            files_created.append(readme_path)
+            
+            # Log memory
+            log_memory(
                 project_id=project_id,
-                file_path=f"/verticals/{project_id}/README.md",
-                content=contents
+                agent="hal",
+                action="created",
+                content=f"Created README.md for project {project_id}",
+                structured_data={
+                    "file_path": readme_path,
+                    "file_type": "markdown",
+                    "file_size": len(readme_content)
+                }
             )
-            
-            print(f"✅ Bootstrap file created successfully")
-            logger.info(f"HAL created bootstrap file for project {project_id}")
-            
-            return {
-                "message": f"HAL successfully created bootstrap file",
-                "output": output,
-                "task": task,
-                "tools": tools
-            }
         else:
-            # If file_writer is not available or not in tools
-            print(f"⚠️ file_writer not available or not in tools list")
-            logger.warning(f"file_writer not available or not in tools list")
-            
-            return {
-                "message": f"HAL received task for project {project_id}",
-                "task": task,
-                "tools": tools
+            print(f"❌ Failed to create README.md: {readme_result.get('error', 'unknown error')}")
+            logger.error(f"Failed to create README.md: {readme_result.get('error', 'unknown error')}")
+        
+        # Update project state if project_state is available
+        if PROJECT_STATE_AVAILABLE:
+            project_state_data = {
+                "status": "in_progress",
+                "files_created": files_created,
+                "agents_involved": ["hal"],
+                "latest_agent_action": {
+                    "agent": "hal",
+                    "action": f"Created initial files for project {project_id}"
+                },
+                "next_recommended_step": "Run NOVA to design the project",
+                "tool_usage": {
+                    "file_writer": 1
+                }
             }
+            
+            project_state_result = update_project_state(project_id, project_state_data)
+            print(f"✅ Project state updated: {project_state_result.get('status', 'unknown')}")
+            logger.info(f"HAL updated project state for {project_id}")
+        
+        # Return result with files_created list
+        return {
+            "status": "success",
+            "message": f"HAL successfully created files for project {project_id}",
+            "files_created": files_created,
+            "task": task,
+            "tools": tools,
+            "project_state": project_state
+        }
     except Exception as e:
         error_msg = f"Error in run_hal_agent: {str(e)}"
         print(f"❌ {error_msg}")
@@ -453,10 +407,13 @@ def run_hal_agent(task, project_id, tools):
         logger.error(traceback.format_exc())
         
         return {
+            "status": "error",
             "message": f"Error executing HAL agent: {str(e)}",
+            "files_created": [],
             "task": task,
             "tools": tools,
-            "error": str(e)
+            "error": str(e),
+            "project_state": project_state if 'project_state' in locals() else {}
         }
 
 def run_nova_agent(task, project_id, tools):

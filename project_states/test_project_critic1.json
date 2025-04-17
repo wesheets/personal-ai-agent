@@ -1,0 +1,18 @@
+{
+  "project_id": "test_project_critic1",
+  "status": "in_progress",
+  "files_created": [
+    "/verticals/test_project_critic1/README.md"
+  ],
+  "agents_involved": [
+    "hal"
+  ],
+  "latest_agent_action": {
+    "agent": "hal",
+    "action": "Created initial files"
+  },
+  "next_recommended_step": "Run NOVA",
+  "tool_usage": {
+    "file_writer": 1
+  }
+}

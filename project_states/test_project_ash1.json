@@ -1,0 +1,21 @@
+{
+  "project_id": "test_project_ash1",
+  "status": "in_progress",
+  "files_created": [
+    "/verticals/test_project_ash1/README.md",
+    "/verticals/test_project_ash1/frontend/LandingPage.jsx"
+  ],
+  "agents_involved": [
+    "hal",
+    "nova",
+    "critic"
+  ],
+  "latest_agent_action": {
+    "agent": "critic",
+    "action": "Reviewed UI"
+  },
+  "next_recommended_step": "Run ASH",
+  "tool_usage": {
+    "file_writer": 2
+  }
+}
