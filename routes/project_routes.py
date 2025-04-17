@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Query, HTTPException
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from app.modules.project_state import read_project_state
+import logging
+from datetime import datetime
+
+# Configure logging
+logger = logging.getLogger("api")
 
 router = APIRouter()
 
@@ -23,6 +28,102 @@ async def get_project_state(
 
     # Return the state
     return state
+
+
+@router.get("/output")
+async def get_project_output(
+    project_id: str = Query(..., description="The project identifier")
+):
+    """
+    Get the output of a project, including files created, last agent, task, and summary.
+
+    Args:
+        project_id: The project identifier (e.g., "demo_001")
+
+    Returns:
+        Dict containing the project output information
+    """
+    try:
+        logger.info(f"Getting project output for project: {project_id}")
+        
+        # Read the project state to get files_created
+        try:
+            state = read_project_state(project_id)
+            logger.info(f"Successfully read project state for {project_id}")
+        except Exception as e:
+            logger.error(f"Error reading project state: {str(e)}")
+            state = {
+                "status": "unknown",
+                "error": f"Failed to read project state: {str(e)}"
+            }
+        
+        # Get files created from project state
+        files_created = state.get("files_created", [])
+        
+        # Try to get the last agent task from memory
+        try:
+            from memory.memory_reader import get_memory_for_project
+            memory_entries = get_memory_for_project(project_id)
+            
+            # Find the last agent task entry
+            last_agent = None
+            task = None
+            
+            if memory_entries:
+                # Sort entries by timestamp in descending order
+                sorted_entries = sorted(
+                    memory_entries, 
+                    key=lambda x: x.get("timestamp", ""), 
+                    reverse=True
+                )
+                
+                # Find the first entry with an agent and action
+                for entry in sorted_entries:
+                    if entry.get("agent") and entry.get("action"):
+                        last_agent = entry.get("agent")
+                        task = entry.get("action")
+                        break
+        except Exception as e:
+            logger.error(f"Error retrieving memory entries: {str(e)}")
+            last_agent = None
+            task = None
+        
+        # Try to get summary from system summary endpoint
+        try:
+            from agents.sage_agent import run_sage_agent
+            summary_result = run_sage_agent(project_id, tools=["memory_reader"])
+            summary = summary_result.get("summary", "No summary available")
+        except Exception as e:
+            logger.error(f"Error getting summary: {str(e)}")
+            summary = "No summary available"
+        
+        # Determine status based on project state
+        status = state.get("status", "unknown")
+        
+        # Construct response
+        response = {
+            "project_id": project_id,
+            "files_created": files_created,
+            "last_agent": last_agent or "None",
+            "task": task or "No task information",
+            "status": status,
+            "summary": summary,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        return response
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in get_project_output: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}",
+            "project_id": project_id,
+            "files_created": [],
+            "last_agent": "None",
+            "task": "Error retrieving task information",
+            "summary": f"Error: {str(e)}"
+        }
 
 
 @router.post("/start")
