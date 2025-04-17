@@ -17,32 +17,25 @@ router = APIRouter()
 # Define request and response models
 class OrchestratorConsultRequest(BaseModel):
     """Request model for the orchestrator/consult endpoint"""
-    objective: str
-    context: str
-    agent_preferences: List[str] = Field(default_factory=list)
+    project_id: str = Field(..., description="Project context")
+    task: str = Field(..., description="Primary task to evaluate")
+    context: Optional[str] = Field(None, description="Optional context")
 
-class OrchestratorConsultResponse(BaseModel):
-    """Response model for the orchestrator/consult endpoint"""
-    decision: str
-    delegated_to: List[str]
-    reflection: str
-    status: str = "orchestrator_approved"
-
-@router.post("/orchestrator/consult", response_model=OrchestratorConsultResponse)
+@router.post("/orchestrator/consult")
 async def orchestrator_consult(request: OrchestratorConsultRequest, background_tasks: BackgroundTasks = None):
     """
     Consult the Orchestrator for task routing and decision making.
     
-    This endpoint allows the Orchestrator to reflect on an objective,
+    This endpoint allows the Orchestrator to reflect on a task,
     determine which agents should handle it, and provide a decision
-    with reflection.
+    with reasoning.
     
     Args:
-        request: The consultation request containing objective, context, and agent preferences
+        request: The consultation request containing project_id, task, and optional context
         background_tasks: Optional background tasks for async operations
         
     Returns:
-        OrchestratorConsultResponse: The orchestrator's decision and reflection
+        JSON response with agent recommendation and reasoning
     """
     try:
         # Get the orchestrator instance
@@ -50,41 +43,42 @@ async def orchestrator_consult(request: OrchestratorConsultRequest, background_t
         
         # Log the consultation request to memory
         # This would typically use a memory manager, but we'll keep it simple for now
-        print(f"Orchestrator consultation request: {request.objective}")
+        print(f"Orchestrator consultation request: {request.task} for project {request.project_id}")
         
         # Process the request
         # In a full implementation, this would use more sophisticated logic
         # based on the orchestrator's capabilities
         
-        # Determine which agents to delegate to based on preferences or defaults
-        delegated_agents = request.agent_preferences
-        if not delegated_agents:
-            # Default to HAL and NOVA if no preferences specified
-            delegated_agents = ["hal", "nova"]
+        # Determine the best agent for the task
+        # For now, we'll use a simple rule-based approach
+        task_lower = request.task.lower()
         
-        # Generate a decision based on the objective and context
-        decision = f"Initiate project boot sequence with {' and '.join(delegated_agents).upper()}"
-        
-        # Generate a reflection on the decision
-        reflection = (
-            f"Analyzed objective: '{request.objective}' in context: '{request.context}'. "
-            f"Based on task requirements and agent capabilities, determined that "
-            f"{' and '.join(delegated_agents).upper()} are best suited for this task. "
-            f"Initiating collaborative workflow with these agents as primary handlers."
-        )
+        if "bootstrap" in task_lower or "initialize" in task_lower or "create file" in task_lower:
+            agent_id = "hal"
+            reasoning = "HAL is specialized in file creation and project bootstrapping."
+        elif "ui" in task_lower or "interface" in task_lower or "component" in task_lower:
+            agent_id = "nova"
+            reasoning = "NOVA is specialized in UI component creation and design."
+        elif "review" in task_lower or "evaluate" in task_lower or "critique" in task_lower:
+            agent_id = "critic"
+            reasoning = "CRITIC is specialized in code review and evaluation."
+        elif "deploy" in task_lower or "publish" in task_lower:
+            agent_id = "ash"
+            reasoning = "ASH is specialized in deployment and publishing."
+        else:
+            agent_id = "hal"  # Default to HAL
+            reasoning = "Default agent selection based on general-purpose capabilities."
         
         # Create and return the response
-        response = OrchestratorConsultResponse(
-            decision=decision,
-            delegated_to=delegated_agents,
-            reflection=reflection,
-            status="orchestrator_approved"
-        )
-        
-        return response
+        return {
+            "status": "success",
+            "message": "Consultation complete",
+            "agent_id": agent_id,
+            "reasoning": reasoning
+        }
         
     except Exception as e:
         # Log the error
         print(f"Error in orchestrator_consult: {str(e)}")
         # Raise HTTP exception
-        raise HTTPException(status_code=500, detail=f"Orchestrator consultation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Consultation failed: {str(e)}")

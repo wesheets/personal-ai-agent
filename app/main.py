@@ -65,6 +65,17 @@ try:
         def memory_ping():
             return {"status": "Memory router placeholder"}
     
+    # Import project routes
+    try:
+        from routes.project_routes import router as project_routes_router
+        print("✅ Successfully imported project_routes_router")
+    except ModuleNotFoundError as e:
+        print(f"⚠️ Router Load Failed: project_routes — {e}")
+        project_routes_router = APIRouter()
+        @project_routes_router.get("/project/ping")
+        def project_ping():
+            return {"status": "Project router placeholder"}
+    
     # Import system routes
     try:
         from routes.system_routes import router as system_router
@@ -361,291 +372,72 @@ try:
                 "timestamp": datetime.datetime.now().isoformat()
             }
 
-    # Add startup delay to ensure FastAPI is fully initialized before healthcheck
-    import asyncio
-
-    @app.on_event("startup")
-    async def startup_delay():
-        """
-        Add a small delay during startup to ensure FastAPI is fully initialized
-        before Railway attempts the healthcheck.
-        """
-        logger.info("Adding startup delay to ensure application is fully initialized...")
-        await asyncio.sleep(1)  # give it breathing room before healthcheck
-        logger.info("Startup delay completed, application ready for healthcheck")
-
-    # Add new startup logging as required
-    @app.on_event("startup")
-    async def startup_log():
-        """
-        Log that the FastAPI application has started successfully.
-        """
-        print("✅ FastAPI application started")
-        logger.info("✅ FastAPI application started successfully")
-
-    # Route logger for debugging
-    @app.on_event("startup")
-    async def log_all_routes():
-        print("🚀 Booting Enhanced AI Agent System...")
-        print("📡 ROUTES REGISTERED ON STARTUP:")
-        for route in app.routes:
-            if isinstance(route, APIRoute):
-                print(f"➡️ {route.path} [{', '.join(route.methods)}] from {inspect.getsourcefile(route.endpoint)}")
-                print(f"🔍 DEBUG ROUTE: {route.path} [{', '.join(route.methods)}]")
-                print(f"🔍 DEBUG ENDPOINT: {route.endpoint.__name__}")
-                logger.info(f"🔍 {route.path} [{','.join(route.methods)}]")
-        
-        # Log CORS configuration on startup
-        logger.info(f"🔒 CORS Configuration Loaded:")
-        import os
-        
-        raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
-        logger.info(f"🔒 CORS_ALLOWED_ORIGINS raw: {raw_origins}")
-        
-        cors_allow_credentials = os.getenv("CORS_ALLOW_CREDENTIALS", "true")
-        logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
-        # Removed legacy allowed_origins references to fix startup issues
-        logger.info(f"✅ Using CORSMiddleware with allow_origin_regex")
-
-    # Add custom CORS middleware from the extracted module
-    from fastapi.middleware.cors import CORSMiddleware
-    from fastapi import Request
-
-    # Production CORS middleware with regex pattern to allow Vercel deploys, Railway apps, and local development
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origin_regex=r"https://(.*\.vercel\.app|.*\.railway\.app|promethios\.ai)|http://localhost:[0-9]+",
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    print("✅ CORS middleware added")
-
-    # Request body size limiter middleware
-    app.middleware("http")(limit_request_body_size)
-
-    # Middleware for logging with timeout handling
-    @app.middleware("http")
-    async def log_requests(request: Request, call_next):
-        import time
-        import asyncio
-        import json
-        from fastapi.responses import JSONResponse
-        
-        logger.info(f"Request: {request.method} {request.url}")
-        
-        # Log origin for CORS debugging with normalization
-        origin = request.headers.get("origin")
-        if origin:
-            normalized_request_origin = normalize_origin(origin)
-            logger.info(f"🔒 Request Origin: {origin}")
-            logger.info(f"🔒 Normalized Request Origin: {normalized_request_origin}")
-        
-        # Only log headers for non-production environments or if explicitly enabled
-        if os.environ.get("LOG_HEADERS", "false").lower() == "true":
-            logger.info(f"Request headers: {request.headers}")
-        
-        # Set overall request timeout (15 seconds max for Railway environment)
-        start_time = time.time()
-        try:
-            # Use asyncio.wait_for to implement timeout for the entire request
-            # Increased timeout for Railway environment
-            timeout_seconds = 15.0 if os.environ.get("RAILWAY_ENVIRONMENT") else 10.0
-            response = await asyncio.wait_for(call_next(request), timeout=timeout_seconds)
-            process_time = time.time() - start_time
-            logger.info(f"Response status: {response.status_code}")
-            logger.info(f"Process time: {process_time:.4f}s")
-            
-            # Add timing header to response
-            response.headers["X-Process-Time"] = str(process_time)
-            return response
-        except asyncio.TimeoutError:
-            # Handle timeout
-            process_time = time.time() - start_time
-            logger.error(f"Request timed out after {process_time:.4f}s: {request.method} {request.url}")
-            return JSONResponse(
-                status_code=504,
-                content={
-                    "status": "error",
-                    "message": "Request timed out",
-                    "process_time": f"{process_time:.4f}s"
-                }
-            )
-        except Exception as e:
-            # Handle other exceptions
-            process_time = time.time() - start_time
-            logger.error(f"Request failed after {process_time:.4f}s: {request.method} {request.url}")
-            logger.error(f"Error: {str(e)}")
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "status": "error",
-                    "message": "Internal server error",
-                    "error": str(e),
-                    "process_time": f"{process_time:.4f}s"
-                }
-            )
+    # Add startup delay to ensure FastAPI is fully initialized before healthch
     
-    # Register all routers with the /api prefix with safeguards
-    # Register the orchestrator_router
-    try:
-        print(f"🔍 DEBUG: Orchestrator router object: {orchestrator_router}")
-        app.include_router(orchestrator_router, prefix="/api")
-        print("🧠 Route defined: /api/orchestrator/consult -> orchestrator_consult")
-    except Exception as e:
-        print(f"⚠️ Failed to register orchestrator_router: {e}")
+    # Register all routers with the API prefix
+    print("🔄 Registering all routers with API prefix...")
     
-    # Register the agent_router
-    try:
-        print(f"🔍 DEBUG: Agent router object: {agent_router}")
-        app.include_router(agent_router, prefix="/api")
-        print("🧠 Route defined: /api/agent/* -> agent_routes")
-    except Exception as e:
-        print(f"⚠️ Failed to register agent_router: {e}")
+    # Register orchestrator router
+    app.include_router(orchestrator_router, prefix="/api")
+    print("✅ Registered orchestrator_router at /api")
     
-    # Register the memory_router
-    try:
-        print(f"🔍 DEBUG: Memory router object: {memory_router}")
-        app.include_router(memory_router, prefix="/api")
-        print("🧠 Route defined: /api/memory/* -> memory_routes")
-    except Exception as e:
-        print(f"⚠️ Failed to register memory_router: {e}")
+    # Register agent router
+    app.include_router(agent_router, prefix="/api")
+    print("✅ Registered agent_router at /api")
     
-    # Register the system_router
-    try:
-        print(f"🔍 DEBUG: System router object: {system_router}")
-        app.include_router(system_router, prefix="/api")
-        print("🧠 Route defined: /api/system/* -> system_routes")
-    except Exception as e:
-        print(f"⚠️ Failed to register system_router: {e}")
+    # Register memory router
+    app.include_router(memory_router, prefix="/api")
+    print("✅ Registered memory_router at /api")
     
-    # Register the debug_router
-    try:
-        print(f"🔍 DEBUG: Debug router object: {debug_router}")
-        app.include_router(debug_router, prefix="/api")
-        print("🧠 Route defined: /api/debug/* -> debug_routes")
-    except Exception as e:
-        print(f"⚠️ Failed to register debug_router: {e}")
+    # Register project routes router
+    app.include_router(project_routes_router, prefix="/api")
+    print("✅ Registered project_routes_router at /api")
     
-    # Register the hal_router
-    try:
-        print(f"🔍 DEBUG: HAL router object: {hal_router}")
-        app.include_router(hal_router, prefix="/api")
-        print("🧠 Route defined: /api/hal/* -> hal_routes")
-    except Exception as e:
-        print(f"⚠️ Failed to register hal_router: {e}")
+    # Register system router
+    app.include_router(system_router, prefix="/api")
+    print("✅ Registered system_router at /api")
     
-    # Register the snapshot_router
-    try:
-        print(f"🔍 DEBUG: Snapshot router object: {snapshot_router}")
-        app.include_router(snapshot_router, prefix="/api")
-        print("🧠 Route defined: /api/snapshot/* -> snapshot_routes")
-    except Exception as e:
-        print(f"⚠️ Failed to register snapshot_router: {e}")
+    # Register debug router
+    app.include_router(debug_router, prefix="/api")
+    print("✅ Registered debug_router at /api")
     
-    # Register the integrity_router
-    try:
-        print(f"🔍 DEBUG: Integrity router object: {integrity_router}")
-        app.include_router(integrity_router, prefix="/api/system")
-        print("🧠 Route defined: /api/system/integrity -> check_system_integrity")
-    except Exception as e:
-        print(f"⚠️ Failed to register integrity_router: {e}")
+    # Register HAL router
+    app.include_router(hal_router, prefix="/api")
+    print("✅ Registered hal_router at /api")
     
-    # Register other routers with safeguards
-    try:
-        # Import and mount the agent module router
-        print(f"🔍 DEBUG: Agent Module router object: {agent_module_router}")
-        app.include_router(agent_module_router, prefix="/api/modules/agent")
-        print("🧠 Route defined: /api/modules/agent/run -> run_agent")
-    except Exception as e:
-        print(f"⚠️ Failed to register agent_module_router: {e}")
+    # Register snapshot router
+    app.include_router(snapshot_router, prefix="/api")
+    print("✅ Registered snapshot_router at /api")
     
-    try:
-        # Import and mount the memory module router
-        print(f"🔍 DEBUG: Memory Module router object: {memory_router_module}")
-        app.include_router(memory_router_module, prefix="/api/modules/memory")
-        print("🧠 Route defined: /api/modules/memory/write -> write_memory")
-    except Exception as e:
-        print(f"⚠️ Failed to register memory_router_module: {e}")
+    # Register system integrity router
+    app.include_router(integrity_router, prefix="/api/system")
+    print("✅ Registered integrity_router at /api/system")
     
-    try:
-        # Import and mount the orchestrator module router
-        print(f"🔍 DEBUG: Orchestrator Module router object: {orchestrator_router_module}")
-        app.include_router(orchestrator_router_module, prefix="/api/modules/orchestrator")
-        print("🧠 Route defined: /api/modules/orchestrator/scope -> scope_task")
-    except Exception as e:
-        print(f"⚠️ Failed to register orchestrator_router_module: {e}")
+    # Register project start router
+    app.include_router(start, prefix="/api/project")
+    print("✅ Registered project start router at /api/project")
     
-    try:
-        # Import and mount the feedback router
-        print(f"🔍 DEBUG: Feedback router object: {feedback_router}")
-        app.include_router(feedback_router, prefix="/api/modules/feedback")
-        print("🧠 Route defined: /api/modules/feedback/submit -> submit_feedback")
-    except Exception as e:
-        print(f"⚠️ Failed to register feedback_router: {e}")
+    # Register module routers
+    app.include_router(agent_module_router, prefix="/api/modules")
+    app.include_router(memory_router_module, prefix="/api/modules")
+    app.include_router(orchestrator_router_module, prefix="/api/modules")
+    app.include_router(feedback_router, prefix="/api/modules")
+    app.include_router(user_context_router, prefix="/api/modules")
+    app.include_router(respond_router, prefix="/api/modules")
+    app.include_router(plan_router, prefix="/api/modules")
+    app.include_router(project_router, prefix="/api/modules")
+    print("✅ Registered all module routers at /api/modules")
     
-    try:
-        # Import and mount the user context router
-        print(f"🔍 DEBUG: User Context router object: {user_context_router}")
-        app.include_router(user_context_router, prefix="/api/modules/user_context")
-        print("🧠 Route defined: /api/modules/user_context/get -> get_user_context")
-    except Exception as e:
-        print(f"⚠️ Failed to register user_context_router: {e}")
+    # Register memory thread and summarize routers
+    app.include_router(memory_thread_router, prefix="/api")
+    app.include_router(memory_summarize_router, prefix="/api")
+    print("✅ Registered memory thread and summarize routers at /api")
     
-    try:
-        # Import and mount the respond router
-        print(f"🔍 DEBUG: Respond router object: {respond_router}")
-        app.include_router(respond_router, prefix="/api/modules/respond")
-        print("🧠 Route defined: /api/modules/respond/generate -> generate_response")
-
-        # ✅ Directly expose at /api/respond for frontend access
-        app.include_router(respond_router, prefix="/api/respond")
-        print("🧠 Route defined: /api/respond -> respond_to_operator")
-    except Exception as e:
-        print(f"⚠️ Failed to register respond_router: {e}")
+    # Register health router
+    app.include_router(health_router)
+    print("✅ Registered health router")
     
-    try:
-        # Import and mount the plan router
-        print(f"🔍 DEBUG: Plan router object: {plan_router}")
-        app.include_router(plan_router, prefix="/api/modules/plan")
-        print("🧠 Route defined: /api/modules/plan/generate -> generate_plan")
-    except Exception as e:
-        print(f"⚠️ Failed to register plan_router: {e}")
-    
-    try:
-        # Import and mount the project router
-        print(f"🔍 DEBUG: Project router object: {project_router}")
-        app.include_router(project_router, prefix="/api/modules/project")
-        print("🧠 Route defined: /api/modules/project/create -> create_project")
-    except Exception as e:
-        print(f"⚠️ Failed to register project_router: {e}")
-    
-    try:
-        # Mount the health router
-        app.include_router(health_router, prefix="/api/health")
-        print("🧠 Route defined: /api/health/check -> health_check")
-    except Exception as e:
-        print(f"⚠️ Failed to register health_router: {e}")
-    
-    # Add Swagger UI with custom configuration
-    @app.get("/docs", include_in_schema=False)
-    async def custom_swagger_ui_html():
-        return get_swagger_ui_html(
-            openapi_url=app.openapi_url,
-            title=app.title + " - API Documentation",
-            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
-            swagger_js_url="/static/swagger-ui-bundle.js",
-            swagger_css_url="/static/swagger-ui.css",
-        )
-    
-    # Mount static files for Swagger UI
-    try:
-        app.mount("/static", StaticFiles(directory="app/static"), name="static")
-        print("✅ Static files mounted for Swagger UI")
-    except Exception as e:
-        print(f"⚠️ Failed to mount static files: {e}")
-    
-    # Add a catch-all route for debugging 404 errors
+    # Add catch-all route for debugging 404 errors
     @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH", "TRACE"])
     async def catch_all(request: Request, path: str):
         """
@@ -692,7 +484,7 @@ except Exception as startup_error:
         return {
             "status": "error",
             "message": "Application is in error recovery mode due to startup failure",
-            "error": str(startup_error),
+            "error": str(startup_error) if 'startup_error' in locals() else "unknown",
             "timestamp": datetime.datetime.now().isoformat()
         }
     
@@ -701,6 +493,6 @@ except Exception as startup_error:
         return {
             "status": "error",
             "message": "Application is in error recovery mode due to startup failure",
-            "error": str(startup_error),
+            "error": str(startup_error) if 'startup_error' in locals() else "unknown",
             "timestamp": datetime.datetime.now().isoformat()
         }
