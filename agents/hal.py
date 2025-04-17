@@ -1,3 +1,7 @@
+__version__ = "3.5.0"
+__agent__ = "HAL"
+__role__ = "builder"
+
 from app.agents.memory_agent import handle_memory_task
 import logging
 import json

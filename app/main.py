@@ -76,6 +76,7 @@ try:
         from routes.hal_routes import router as hal_router
         from routes.system_routes import router as system_router
         from routes.debug_routes import router as debug_router
+        from routes.system_integrity import router as integrity_router
         print("✅ Successfully imported recovered route modules")
     except Exception as e:
         print(f"❌ ERROR importing recovered route modules: {str(e)}")
@@ -84,6 +85,7 @@ try:
         hal_router = APIRouter()
         system_router = APIRouter()
         debug_router = APIRouter()
+        integrity_router = APIRouter()
         @hal_router.get("/error")
         async def hal_router_import_error():
             return {"status": "error", "message": f"Failed to import hal_routes: {str(e)}"}
@@ -374,6 +376,7 @@ try:
     app.include_router(hal_router, prefix="/api")
     app.include_router(system_router, prefix="/api")
     app.include_router(debug_router, prefix="/api")
+    app.include_router(integrity_router, prefix="/api")
     app.include_router(snapshot_router, prefix="/api")
     print("✅ Recovered route modules registered")
     

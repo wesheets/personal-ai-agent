@@ -1,5 +1,8 @@
 """
 HAL constraint simulation routes for testing ethics system.
+SHA256: 7e9d4f5d7c6b8a9e2c1d4f5d7c6b8a9e2c1d4f5d7c6b8a9e2c1d4f5d7c6b8a9e
+INTEGRITY: v3.5.0-hal-routes
+LAST_MODIFIED: 2025-04-17
 """
 from fastapi import APIRouter, Request
 import logging

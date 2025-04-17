@@ -44,6 +44,21 @@ AGENT_REGISTRY = {
         "availability": "active",
         "contract_version": "v1.0.0"
     },
+    "nova": {
+        "name": "NOVA",
+        "model": "gpt-4",
+        "description": "Strategic UI and design agent focused on user experience and visual presentation.",
+        "tone": "creative",
+        "system_prompt": "You are NOVA, a strategic agent responsible for UI design, visual presentation, and user experience.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["design", "visualize", "strategize"],
+        "input_schema": ["objective", "design_requirements"],
+        "output_schema": ["strategy", "design_output"],
+        "persona": "creative strategist",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
     "critic": {
         "name": "Critic",
         "model": "gpt-4",
@@ -122,7 +137,7 @@ AGENT_PERSONALITIES = {
     "availability": "active",
     "contract_version": "v1.0.0"
   },
-  "ash-xenomorph": {
+  "ash": {
     "name": "Ash",
     "type": "persona",
     "tone": "clinical",
@@ -134,6 +149,21 @@ AGENT_PERSONALITIES = {
     "input_schema": ["objective", "memory_trace"],
     "output_schema": ["reflection", "risk_assessment"],
     "persona": "clinical analyst",
+    "availability": "active",
+    "contract_version": "v1.0.0"
+  },
+  "nova": {
+    "name": "NOVA",
+    "type": "persona",
+    "tone": "creative",
+    "description": "Strategic UI and design agent focused on user experience.",
+    "system_prompt": "You are NOVA. Create intuitive, visually appealing designs and strategic user experiences.",
+    "agent_state": "idle",
+    "last_active": "",
+    "tools": ["design", "visualize", "strategize"],
+    "input_schema": ["objective", "design_requirements"],
+    "output_schema": ["strategy", "design_output"],
+    "persona": "creative strategist",
     "availability": "active",
     "contract_version": "v1.0.0"
   },

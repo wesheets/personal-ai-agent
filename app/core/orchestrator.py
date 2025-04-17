@@ -1,3 +1,7 @@
+__version__ = "3.5.0"
+__agent__ = "ORCHESTRATOR"
+__role__ = "operator"
+
 import os
 import json
 import uuid

@@ -1,3 +1,7 @@
+__version__ = "3.5.0"
+__agent__ = "CRITIC"
+__role__ = "reviewer"
+
 """
 CriticAgent Module
 
