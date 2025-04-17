@@ -674,10 +674,10 @@ try:
     print("✅ All routes registered successfully")
     print("🚀 Enhanced AI Agent System is ready to serve requests")
     
-except Exception as e:
+except Exception as startup_error:
     # Global error handler for startup failures
     import traceback
-    print(f"❌ CRITICAL ERROR during startup: {str(e)}")
+    print(f"❌ CRITICAL ERROR during startup: {str(startup_error)}")
     print(f"❌ Traceback: {traceback.format_exc()}")
     
     # Create a minimal FastAPI app for error reporting
@@ -692,7 +692,7 @@ except Exception as e:
         return {
             "status": "error",
             "message": "Application is in error recovery mode due to startup failure",
-            "error": str(e),
+            "error": str(startup_error),
             "timestamp": datetime.datetime.now().isoformat()
         }
     
@@ -701,6 +701,6 @@ except Exception as e:
         return {
             "status": "error",
             "message": "Application is in error recovery mode due to startup failure",
-            "error": str(e),
+            "error": str(startup_error),
             "timestamp": datetime.datetime.now().isoformat()
         }

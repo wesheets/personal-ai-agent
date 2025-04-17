@@ -139,6 +139,4 @@ async def get_agents_manifest():
             "total_agents": 0,
             "active_agents": 0
         }
-feature/phase-3.5-hardening
-}
-main
+    # Removed unmatched closing brace that was causing syntax error
