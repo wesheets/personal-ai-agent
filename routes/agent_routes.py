@@ -72,7 +72,7 @@ async def agent_run(request_data: dict):
         logger.info(f"Agent {agent_id} executed successfully")
         print(f"✅ Agent {agent_id} executed successfully")
         
-        # Return result
+        # Return result with entire result object as output
         return {
             "status": "success",
             "message": result.get("message", f"Agent {agent_id} executed successfully"),
@@ -80,7 +80,7 @@ async def agent_run(request_data: dict):
             "project_id": project_id,
             "task": task,
             "tools": tools,
-            "output": result.get("output", {})
+            "output": result  # Use entire result object instead of just files_created
         }
     
     except Exception as e:
