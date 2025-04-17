@@ -1,160 +1,186 @@
-# Project State Awareness Implementation Documentation
+# Phase 6.1 Agent Timing & Synchronization Documentation
 
 ## Overview
-This document describes the implementation of project state awareness for agents in the personal-ai-agent system. This feature enables agents to access the project state when executing tasks, allowing them to know what's already been built, skip duplicate work, improve task planning, and reflect on team progress.
+This document provides comprehensive documentation for the Phase 6.1 Agent Timing & Synchronization features implemented in the personal AI agent system. These features enable better coordination between agents, intelligent recovery from blocked states, and improved state management.
 
-## Changes Made
+## Features
 
-### 1. Updated Import Statement in agent_runner.py
-Modified the import statement to include the `read_project_state` function:
+### 1. Agent Retry and Recovery Flow
+The agent retry and recovery flow allows agents to be blocked when dependencies are not met and automatically unblocked when conditions are satisfied.
 
+#### Key Components:
+- **Module**: `app/modules/agent_retry.py`
+- **Main Functions**:
+  - `register_blocked_agent(project_id, agent_id, blocked_due_to, unblock_condition)`: Registers an agent as blocked due to a dependency
+  - `check_for_unblocked_agents(project_id)`: Checks for agents that can be unblocked based on current project state
+  - `get_retry_status(project_id, agent_id)`: Gets the current retry status of an agent
+  - `mark_agent_retry_attempted(project_id, agent_id)`: Marks an agent as having attempted a retry
+
+#### Usage Example:
 ```python
-# Before
-from app.modules.project_state import update_project_state
-PROJECT_STATE_AVAILABLE = True
+from app.modules.agent_retry import register_blocked_agent
 
-# After
-from app.modules.project_state import update_project_state, read_project_state
-PROJECT_STATE_AVAILABLE = True
+# Register NOVA agent as blocked due to HAL not completing initial files
+register_blocked_agent(
+    project_id="demo_project_001",
+    agent_id="nova",
+    blocked_due_to="hal",
+    unblock_condition="initial_files_created"
+)
 ```
 
-### 2. Added Project State Reading to Agent Functions
-Added code to read the project state at the beginning of each agent runner function:
+### 2. Project State Watch Hooks
+The project state watch hooks provide a mechanism for monitoring changes to project state and triggering actions when specific conditions are met.
 
+#### Key Components:
+- **Module**: `app/modules/project_state_watch.py`
+- **Main Functions**:
+  - `subscribe_to_state_changes(project_id)`: Creates a subscription to monitor state changes for a project
+  - `get_state_changes(subscription_id)`: Gets the changes that have occurred since the last check
+  - `unsubscribe(subscription_id)`: Removes a subscription
+
+#### Usage Example:
 ```python
-# Read project state if available
-project_state = {}
-if PROJECT_STATE_AVAILABLE:
-    project_state = read_project_state(project_id)
-    print(f"📊 Project state read for {project_id}")
-    logger.info(f"[AGENT] read project state for {project_id}")
+from app.modules.project_state_watch import subscribe_to_state_changes, get_state_changes
+
+# Subscribe to state changes
+subscription_id = subscribe_to_state_changes("demo_project_001")
+
+# Later, check for changes
+changes = get_state_changes(subscription_id)
+for change in changes:
+    print(f"Field {change['field']} changed from {change['old_value']} to {change['new_value']}")
 ```
 
-### 3. Implemented Conditional Execution Logic
-Added conditional logic to each agent function to make decisions based on the project state:
+### 3. Post-Block Memory Updates
+The post-block memory updates feature allows agents to log information about blocked and unblocked states, providing a history of agent interactions and dependencies.
 
-#### HAL Agent
+#### Key Components:
+- **Module**: `app/modules/memory_block_writer.py`
+- **Main Functions**:
+  - `write_block_memory(block_data)`: Logs information when an agent is blocked
+  - `write_unblock_memory(unblock_data)`: Logs information when an agent is unblocked
+
+#### Usage Example:
 ```python
-# Check if README.md already exists
-if "README.md" in project_state.get("files_created", []):
-    print(f"⏩ README.md already exists, skipping duplicate write")
-    logger.info(f"HAL skipped README.md creation - file already exists")
-    return {
-        "status": "skipped",
-        "notes": "README.md already exists, skipping duplicate write.",
-        "output": project_state,
-        "project_state": project_state
-    }
+from app.modules.memory_block_writer import write_block_memory
+
+# Log block memory when NOVA is blocked by HAL
+write_block_memory({
+    "project_id": "demo_project_001",
+    "agent": "nova",
+    "action": "blocked",
+    "content": "NOVA agent blocked - HAL has not created initial files yet",
+    "blocked_due_to": "hal",
+    "unblock_condition": "initial_files_created"
+})
 ```
 
-#### NOVA Agent
+### 4. Passive Reflection Engine
+The passive reflection engine allows agents to re-evaluate tasks after being blocked, taking into account the updated project state.
+
+#### Key Components:
+- **Module**: `app/modules/passive_reflection.py`
+- **Main Functions**:
+  - `start_reflection(project_id, interval)`: Starts passive reflection for a project
+  - `stop_reflection(project_id)`: Stops passive reflection for a project
+  - `re_evaluate_task(project_id, agent_id, task)`: Re-evaluates a task for an agent after being unblocked
+
+#### Usage Example:
 ```python
-# Check if HAL has created initial files
-if "hal" not in project_state.get("agents_involved", []):
-    print(f"⏩ HAL has not created initial files yet, cannot proceed")
-    logger.info(f"NOVA execution blocked - HAL has not run yet")
-    return {
-        "status": "blocked",
-        "notes": "Cannot create UI - HAL has not yet created initial project files.",
-        "project_state": project_state
-    }
+from app.modules.passive_reflection import start_reflection, re_evaluate_task
+
+# Start reflection for a project
+start_reflection("demo_project_001", interval=60)
+
+# Re-evaluate a task after an agent is unblocked
+task = {"original_task": "Create UI", "project_id": "demo_project_001"}
+updated_task = re_evaluate_task("demo_project_001", "nova", task)
 ```
 
-#### CRITIC Agent
+### 5. Intelligent Reset Flags
+The intelligent reset flags feature allows for resetting agent state when needed, enabling recovery from errors or inconsistent states.
+
+#### Key Components:
+- **Module**: `app/modules/reset_flags.py`
+- **Main Functions**:
+  - `reset_agent_state(project_id, agent_id)`: Resets the state of a specific agent
+  - `reset_project_state(project_id, full_reset)`: Resets the state of an entire project
+  - `get_reset_status(project_id)`: Gets the reset status of a project
+
+#### Usage Example:
 ```python
-# Check if NOVA has created UI files
-if "nova" not in project_state.get("agents_involved", []):
-    print(f"⏩ NOVA has not created UI files yet, cannot review")
-    logger.info(f"CRITIC execution blocked - NOVA has not run yet")
-    return {
-        "status": "blocked",
-        "notes": "Cannot review UI – NOVA has not yet created any frontend files.",
-        "project_state": project_state
-    }
+from app.modules.reset_flags import reset_agent_state, reset_project_state
+
+# Reset state for a specific agent
+reset_agent_state("demo_project_001", "hal")
+
+# Reset state for an entire project (partial reset)
+reset_project_state("demo_project_001", full_reset=False)
 ```
 
-#### ASH Agent
-```python
-# Check if project is ready for deployment
-if project_state.get("status") != "ready_for_deploy":
-    print(f"⏩ Project not ready for deployment yet")
-    logger.info(f"ASH execution on hold - project not ready for deployment")
-    return {
-        "status": "on_hold",
-        "notes": "Project not ready for deployment yet.",
-        "project_state": project_state
-    }
+### 6. API Endpoints
+The API endpoints provide a way to interact with the agent timing and synchronization features through HTTP requests.
+
+#### Key Components:
+- **Module**: `routes/reset_routes.py`
+- **Endpoints**:
+  - `POST /api/reset/agent`: Resets the state of a specific agent
+  - `POST /api/reset/project`: Resets the state of an entire project
+  - `GET /api/reset/status`: Gets the reset status of a project
+
+#### Usage Example:
+```bash
+# Reset agent state
+curl -X POST http://localhost:8000/api/reset/agent \
+  -H "Content-Type: application/json" \
+  -d '{"project_id": "demo_project_001", "agent_id": "hal"}'
+
+# Reset project state
+curl -X POST http://localhost:8000/api/reset/project \
+  -H "Content-Type: application/json" \
+  -d '{"project_id": "demo_project_001", "full_reset": false}'
+
+# Get reset status
+curl -X GET http://localhost:8000/api/reset/status?project_id=demo_project_001
 ```
 
-### 4. Included Project State in Agent Responses
-Modified all agent functions to include the project state in their return values:
+## Integration with Agent Runner
 
-```python
-# Before
-return {
-    "status": "success",
-    "message": f"Agent successfully executed task for project {project_id}",
-    "task": task,
-    "tools": tools
-}
+All agent implementations in `app/modules/agent_runner.py` have been updated to integrate with the new features:
 
-# After
-return {
-    "status": "success",
-    "message": f"Agent successfully executed task for project {project_id}",
-    "task": task,
-    "tools": tools,
-    "project_state": project_state
-}
-```
+1. **HAL Agent**:
+   - Checks project state before execution
+   - Starts passive reflection for the project
+   - Re-evaluates tasks after being unblocked
 
-Also added project_state to error responses with a fallback if project_state isn't defined:
+2. **NOVA Agent**:
+   - Checks if HAL has created initial files
+   - Registers as blocked if dependencies are not met
+   - Re-evaluates tasks after being unblocked
 
-```python
-return {
-    "status": "error",
-    "message": f"Error executing agent: {str(e)}",
-    "task": task,
-    "tools": tools,
-    "error": str(e),
-    "project_state": project_state if 'project_state' in locals() else {}
-}
-```
+3. **CRITIC Agent**:
+   - Checks if NOVA has created UI files
+   - Registers as blocked if dependencies are not met
+   - Logs block memory with detailed information
+   - Re-evaluates tasks after being unblocked
+
+4. **ASH Agent**:
+   - Checks if project is ready for deployment
+   - Registers as blocked if project status is not ready
+   - Logs block memory with detailed information
+   - Re-evaluates tasks after being unblocked
 
 ## Testing
-The implementation was tested with various scenarios to verify that:
 
-1. Agents skip already-built components
-   - HAL skips work when README.md already exists
-   - NOVA blocks when HAL hasn't run
-   - CRITIC blocks when NOVA hasn't run
-   - ASH goes on hold when project is not ready for deployment
+A comprehensive test script (`test_phase_6_1.py`) has been created to test all the implemented features. The script tests:
 
-2. Agents reference teammates' work
-   - NOVA checks if HAL has been involved
-   - CRITIC checks if NOVA has been involved
-   - ASH checks the project status which is set by CRITIC
+1. Agent retry flow
+2. Project state watch
+3. Memory block writer
+4. Passive reflection engine
+5. Intelligent reset flags
 
-3. Project state context is included in output
-   - All agent responses include the project_state field
+## Conclusion
 
-## Benefits
-This implementation provides several benefits:
-
-1. **Reduced Redundancy**: Agents can now skip work that has already been done, preventing duplicate efforts.
-
-2. **Improved Coordination**: Agents can now understand what other agents have done and make decisions accordingly.
-
-3. **Better Context**: The project state provides valuable context for agents to make more informed decisions.
-
-4. **Enhanced Debugging**: Including the project state in responses makes it easier to understand agent behavior.
-
-5. **Streamlined Workflow**: The conditional execution logic ensures that agents run in the correct order and only when appropriate.
-
-## Future Enhancements
-Potential future enhancements for the project state awareness feature:
-
-1. Add more detailed tracking of agent actions in the project state
-2. Implement a UI to visualize the project state and agent interactions
-3. Add the ability for agents to modify their behavior based on more complex project state conditions
-4. Implement automatic recovery strategies when dependencies are not met
+The Phase 6.1 Agent Timing & Synchronization features provide a robust framework for agent coordination and synchronization in the personal AI agent system. These features enable agents to work together more effectively, recover from blocked states intelligently, and maintain consistent project state throughout the development process.

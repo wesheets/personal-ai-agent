@@ -1,24 +1,39 @@
-# Project State Awareness Implementation
+# Phase 6.1 Implementation - Agent Timing, Sync, and Self-Correction
 
 ## Tasks
+
 - [x] Check GitHub repository access
 - [x] Read uploaded content
-- [x] Analyze task requirements
-- [x] Create feature branch `feature/phase-5.2.1-project-state-awareness`
-- [x] Identify agent runner functions to modify
-- [x] Implement project state reading
-  - [x] Import read_project_state function in each agent runner
-  - [x] Add code to read project state at the beginning of each function
-- [x] Implement conditional execution
-  - [x] Add conditional logic for HAL to skip duplicate work
-  - [x] Add conditional logic for CRITIC to check for NOVA's work
-  - [x] Add conditional logic for ASH to check deployment readiness
-- [x] Include project state in responses
-  - [x] Add project_state to the return value of each agent runner
-- [x] Test implementation
-  - [x] Verify agents skip already-built components
-  - [x] Verify agents reference teammates' work
-  - [x] Verify project_state context is included in output
-- [x] Validate against requirements
-- [x] Document changes made
-- [x] Prepare pull request
+- [x] Analyze Phase 6.1 requirements
+- [x] Create feature branch `feature/phase-6.1-agent-timing-sync`
+- [x] Implement agent retry and recovery flow
+  - [x] Add retry mechanism for blocked agents
+  - [x] Implement dependency tracking
+  - [x] Create auto-retry logic when dependencies are cleared
+- [x] Implement project state watch hooks
+  - [x] Create polling mechanism for project state changes
+  - [x] Implement event listeners for state updates
+  - [x] Add subscription functionality
+- [x] Implement post-block memory updates
+  - [x] Add "blocked_due_to" and "unblock_condition" fields
+  - [x] Update memory writer to include block information
+- [x] Implement passive reflection engine
+  - [x] Create orchestrator recheck mode
+  - [x] Implement agent re-evaluation logic
+- [x] Implement intelligent reset flags
+  - [x] Create reset state API endpoint
+  - [x] Implement agent-specific reset functionality
+- [x] Create API endpoints
+  - [ ] Add `/api/project/subscribe` endpoint
+  - [ ] Add `/api/project/reset_state` endpoint
+- [ ] Test implementation
+  - [ ] Test agent retry flow
+  - [ ] Test project state watch hooks
+  - [ ] Test memory updates
+  - [ ] Test reflection engine
+  - [ ] Test reset functionality
+- [ ] Validate against requirements
+- [ ] Document changes made
+- [ ] Prepare pull request
+- [ ] Push code to GitHub
+- [ ] Notify user of completion

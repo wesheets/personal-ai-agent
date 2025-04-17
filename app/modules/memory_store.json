@@ -4,7 +4,9 @@
     "agent_id": "hal-agent",
     "type": "test",
     "content": "Testing agent tone",
-    "tags": ["test"],
+    "tags": [
+      "test"
+    ],
     "timestamp": "2025-04-11T06:20:09.937063",
     "project_id": null,
     "status": null,
@@ -23,7 +25,9 @@
     "agent_id": "shiva",
     "type": "test",
     "content": "Testing manual memory entry.",
-    "tags": ["debug"],
+    "tags": [
+      "debug"
+    ],
     "timestamp": "2025-04-10T00:53:21.029202"
   },
   {
@@ -31,7 +35,9 @@
     "agent_id": "shiva",
     "type": "test",
     "content": "Testing manual memory entry.",
-    "tags": ["debug"],
+    "tags": [
+      "debug"
+    ],
     "timestamp": "2025-04-10T01:06:19.080844"
   },
   {
@@ -39,7 +45,9 @@
     "agent_id": "shiva",
     "type": "test",
     "content": "Testing manual memory entry.",
-    "tags": ["debug"],
+    "tags": [
+      "debug"
+    ],
     "timestamp": "2025-04-10T01:08:21.766757"
   },
   {
@@ -47,7 +55,10 @@
     "agent_id": "shiva",
     "type": "reflection",
     "content": "No relevant memories to reflect on.",
-    "tags": ["reflection", "based_on_training"],
+    "tags": [
+      "reflection",
+      "based_on_training"
+    ],
     "timestamp": "2025-04-10T01:09:36.516667"
   },
   {
@@ -55,7 +66,11 @@
     "agent_id": "hal",
     "type": "reflection",
     "content": "Based on the output, I successfully completed the goal: Test reflection goal. Summary: This is a test summary",
-    "tags": ["instruction.goal:Test reflection goal", "reflection", "phase:11.2"],
+    "tags": [
+      "instruction.goal:Test reflection goal",
+      "reflection",
+      "phase:11.2"
+    ],
     "timestamp": "2025-04-14T18:28:38.570640",
     "project_id": null,
     "status": null,
@@ -64,5 +79,56 @@
     "memory_trace_id": null,
     "goal_id": "test-goal-123",
     "metadata": null
+  },
+  {
+    "memory_id": "c645b47b-f03d-4e23-a296-7003dcb8459b",
+    "timestamp": "2025-04-17T05:45:40.074931",
+    "project_id": "test_phase_6_1_project",
+    "agent": "nova",
+    "action": "blocked",
+    "content": "NOVA agent blocked - HAL has not created initial files yet",
+    "blocked_due_to": "hal",
+    "unblock_condition": "initial_files_created",
+    "structured_data": {
+      "block_info": {
+        "blocked_due_to": "hal",
+        "unblock_condition": "initial_files_created",
+        "blocked_at": 1744868740.074904
+      }
+    }
+  },
+  {
+    "memory_id": "3b9a3ad3-2ca3-4d02-b985-762fccb14f2a",
+    "timestamp": "2025-04-17T05:45:40.075409",
+    "project_id": "test_phase_6_1_project",
+    "agent": "nova",
+    "action": "unblocked",
+    "content": "NOVA agent unblocked - HAL has created initial files",
+    "previously_blocked_due_to": "hal",
+    "unblock_reason": "initial_files_created condition met",
+    "structured_data": {
+      "unblock_info": {
+        "previously_blocked_due_to": "hal",
+        "unblock_reason": "initial_files_created condition met",
+        "unblocked_at": 1744868740.0753894
+      }
+    }
+  },
+  {
+    "memory_id": "9e549588-3c8a-4c56-a9b4-a604e8b0a658",
+    "timestamp": "2025-04-17T05:45:40.078299",
+    "project_id": "test_phase_6_1_project",
+    "agent": "nova",
+    "action": "unblocked",
+    "content": "NOVA agent unblocked - initial_files_created condition met",
+    "previously_blocked_due_to": "hal",
+    "unblock_reason": "initial_files_created condition met",
+    "structured_data": {
+      "unblock_info": {
+        "previously_blocked_due_to": "hal",
+        "unblock_reason": "initial_files_created condition met",
+        "unblocked_at": 1744868740.078278
+      }
+    }
   }
 ]

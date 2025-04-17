@@ -1,49 +1,80 @@
-# Pull Request: Final CRITIC Logger Fix
+# Pull Request: Phase 6.1 Agent Timing & Synchronization
 
-## Description
-This PR implements the final fix for the CRITIC agent logger crash issue. Despite previous patching, the CRITIC agent was still experiencing crashes due to undefined logger references. This PR ensures the logger is fully declared and safely used inside CRITIC agent execution.
+## Overview
+This PR implements the Phase 6.1 Agent Timing & Synchronization features, which enable better coordination between agents, intelligent recovery from blocked states, and improved state management.
 
-## Changes Made
-- Updated logger definition to use `logger = logging.getLogger("critic")` as specified
-- Added local fallback mechanism to handle cases where the logging system fails to initialize
-- Implemented comprehensive safety wrappers around ALL logger calls (including debug, warning, and error logs)
-- Maintained consistent response structure with all required fields
+## Features Implemented
+
+### 1. Agent Retry and Recovery Flow
+- Created `agent_retry.py` module with functions for registering blocked agents and checking for unblocked agents
+- Integrated retry functionality with all agent implementations in `agent_runner.py`
+- Added support for `blocked_due_to` and `unblock_condition` fields
+
+### 2. Project State Watch Hooks
+- Created `project_state_watch.py` module with subscription functionality
+- Implemented polling mechanism for project state changes
+- Added event listeners for state updates
+- Implemented subscription functionality for monitoring changes
+
+### 3. Post-Block Memory Updates
+- Created `memory_block_writer.py` module for logging block information
+- Added required `blocked_due_to` and `unblock_condition` fields
+- Integrated with all agent implementations in `agent_runner.py`
+- Implemented memory storage for block and unblock events
+
+### 4. Passive Reflection Engine
+- Created `passive_reflection.py` module with reflection functionality
+- Implemented orchestrator recheck mode
+- Added agent re-evaluation logic
+- Integrated with all agent implementations in `agent_runner.py`
+
+### 5. Intelligent Reset Flags
+- Created `reset_flags.py` module with reset functionality
+- Created reset state API endpoints in `reset_routes.py`
+- Implemented agent-specific reset functionality
+- Added support for both full and partial resets
+
+### 6. API Endpoints
+- Created API endpoints for all required functionality
+- Added `/api/reset/agent`, `/api/reset/project`, and `/api/reset/status` endpoints
+- Implemented proper error handling for all endpoints
 
 ## Testing
-Created a test script (`test_final_critic_payload.py`) to verify the fix with the specified payload:
+- Created comprehensive test script (`test_phase_6_1.py`) to test all implemented features
+- Validated implementation against requirements
+- Documented all changes in `DOCUMENTATION.md` and `VALIDATION_REPORT.md`
 
-```json
-{
-  "agent_id": "critic",
-  "project_id": "smart_sync_test_001",
-  "task": "Review the full build from HAL and NOVA and provide feedback.",
-  "tools": ["memory_writer"]
-}
-```
+## Changes Made
+- New modules:
+  - `app/modules/agent_retry.py`
+  - `app/modules/project_state_watch.py`
+  - `app/modules/memory_block_writer.py`
+  - `app/modules/passive_reflection.py`
+  - `app/modules/reset_flags.py`
+  - `routes/reset_routes.py`
+- Modified modules:
+  - `app/modules/agent_runner.py` (updated all agent implementations)
+- Documentation:
+  - `DOCUMENTATION.md`
+  - `VALIDATION_REPORT.md`
+  - `test_phase_6_1.py`
 
-The test confirms that:
-- No "logger not defined" errors occur
-- All required fields are present in the response
-- `project_state.agents_involved` includes "critic"
-- The agent correctly handles blocked scenarios
-
-## Validation
-The implementation meets all requirements specified in the task:
-- ✅ Logger is properly defined at the top of the function
-- ✅ ALL logger calls are wrapped in try-except blocks
-- ✅ Local fallback mechanism is implemented
-- ✅ Response includes all required fields
-- ✅ `project_state.agents_involved` includes "critic"
-- ✅ No "logger not defined" errors
-
-## Documentation
-See `FINAL_CRITIC_LOGGER_FIX.md` for detailed documentation of the changes.
+## How to Test
+1. Run the test script: `python test_phase_6_1.py`
+2. Test API endpoints:
+   - Reset agent state: `POST /api/reset/agent`
+   - Reset project state: `POST /api/reset/project`
+   - Get reset status: `GET /api/reset/status?project_id=demo_project_001`
+3. Test agent coordination by running agents in sequence and observing blocking/unblocking behavior
 
 ## Related Issues
-Fixes the remaining "name 'logger' is not defined" errors in the CRITIC agent.
+- Implements Phase 6.1 Agent Timing & Synchronization requirements
 
-## Checklist
-- [x] Code follows the project's coding standards
-- [x] Tests have been added/updated and pass successfully
-- [x] Documentation has been updated
-- [x] Changes have been tested with the specified payload
+## Screenshots
+N/A - Backend implementation
+
+## Additional Notes
+The implementation provides a solid foundation for agent coordination and synchronization in the personal AI agent system. Future improvements could include:
+- Enhanced error handling for edge cases
+- More sophisticated dependency tracking
+- UI components for visualizing agent state and dependencies
