@@ -11,9 +11,10 @@ main
 
 MODIFIED: Added system status endpoint for Ground Control
 MODIFIED: Added system pulse and system log endpoints
+MODIFIED: Added system summary endpoint for Meta-Summary Agent (SAGE)
 """
 
-from fastapi import APIRouter, Request, Query
+from fastapi import APIRouter, Request, Query, Body, HTTPException
 import logging
 import os
 import json
@@ -246,6 +247,190 @@ def get_system_status(project_id: str = Query(..., description="Project identifi
             "status": "error",
             "message": f"Unexpected error: {str(e)}",
             "project_id": project_id
+        }
+
+@router.get("/summary")
+def get_system_summary(project_id: str = Query(..., description="Project identifier")):
+    """
+    Returns a narrative summary of system activities for a specific project.
+    
+    This endpoint leverages the SAGE (System-wide Agent for Generating Explanations)
+    to provide human-readable summaries of project activities, agent actions,
+    and system state.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dict containing the narrative summary and metadata
+    """
+    try:
+        logger.info(f"Getting system summary for project: {project_id}")
+        
+        # Try to import system_summary module
+        try:
+            from memory.system_summary import get_latest_summary, get_all_summaries
+            logger.info("Successfully imported system_summary module")
+            summary_module_available = True
+        except ImportError:
+            logger.warning("Failed to import system_summary module, will use SAGE agent directly")
+            summary_module_available = False
+        
+        # Try to import SAGE agent
+        try:
+            from agents.sage_agent import run_sage_agent, get_latest_summary as sage_get_latest_summary
+            logger.info("Successfully imported SAGE agent")
+            sage_agent_available = True
+        except ImportError:
+            logger.error("Failed to import SAGE agent")
+            sage_agent_available = False
+            
+            if not summary_module_available:
+                return {
+                    "status": "error",
+                    "message": "Both system_summary module and SAGE agent are unavailable",
+                    "project_id": project_id,
+                    "summary": "Unable to generate summary due to missing dependencies"
+                }
+        
+        # First, try to get existing summary from memory
+        if summary_module_available:
+            try:
+                latest_summary = get_latest_summary(project_id)
+                all_summaries = get_all_summaries(project_id)
+                
+                # If we have a valid summary, return it
+                if latest_summary and not latest_summary.startswith("No system summary found"):
+                    logger.info(f"Retrieved existing summary for project {project_id}")
+                    return {
+                        "status": "success",
+                        "project_id": project_id,
+                        "summary": latest_summary,
+                        "timestamp": datetime.datetime.now().isoformat(),
+                        "summary_count": len(all_summaries),
+                        "source": "memory"
+                    }
+            except Exception as e:
+                logger.error(f"Error retrieving summary from memory: {str(e)}")
+        
+        # If no summary in memory or retrieval failed, generate a new one using SAGE agent
+        if sage_agent_available:
+            try:
+                # Run SAGE agent to generate a new summary
+                result = run_sage_agent(project_id, tools=["memory_writer"])
+                
+                if result["status"] == "success":
+                    logger.info(f"Generated new summary for project {project_id}")
+                    return {
+                        "status": "success",
+                        "project_id": project_id,
+                        "summary": result["summary"],
+                        "timestamp": datetime.datetime.now().isoformat(),
+                        "actions_taken": result.get("actions_taken", []),
+                        "source": "sage_agent"
+                    }
+                else:
+                    logger.error(f"SAGE agent failed to generate summary: {result.get('message', 'Unknown error')}")
+                    return {
+                        "status": "error",
+                        "message": result.get("message", "SAGE agent failed to generate summary"),
+                        "project_id": project_id,
+                        "summary": result.get("summary", "Error generating summary")
+                    }
+            except Exception as e:
+                logger.error(f"Error running SAGE agent: {str(e)}")
+                return {
+                    "status": "error",
+                    "message": f"Error running SAGE agent: {str(e)}",
+                    "project_id": project_id,
+                    "summary": f"Error generating summary: {str(e)}"
+                }
+        
+        # If we get here, both methods failed
+        return {
+            "status": "error",
+            "message": "Failed to generate or retrieve summary",
+            "project_id": project_id,
+            "summary": "Unable to generate or retrieve summary"
+        }
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in get_system_summary: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}",
+            "project_id": project_id,
+            "summary": f"Error: {str(e)}"
+        }
+
+@router.post("/summary")
+def generate_system_summary(project_id: str = Query(..., description="Project identifier")):
+    """
+    Generates a new narrative summary of system activities for a specific project.
+    
+    This endpoint triggers the SAGE agent to create a fresh summary of the project's
+    current state and activities, regardless of whether a recent summary exists.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dict containing the newly generated narrative summary and metadata
+    """
+    try:
+        logger.info(f"Generating new system summary for project: {project_id}")
+        
+        # Try to import SAGE agent
+        try:
+            from agents.sage_agent import run_sage_agent
+            logger.info("Successfully imported SAGE agent")
+        except ImportError:
+            logger.error("Failed to import SAGE agent")
+            return {
+                "status": "error",
+                "message": "SAGE agent is unavailable",
+                "project_id": project_id,
+                "summary": "Unable to generate summary due to missing dependencies"
+            }
+        
+        # Run SAGE agent to generate a new summary
+        try:
+            result = run_sage_agent(project_id, tools=["memory_writer"])
+            
+            if result["status"] == "success":
+                logger.info(f"Generated new summary for project {project_id}")
+                return {
+                    "status": "success",
+                    "project_id": project_id,
+                    "summary": result["summary"],
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "actions_taken": result.get("actions_taken", []),
+                    "source": "sage_agent"
+                }
+            else:
+                logger.error(f"SAGE agent failed to generate summary: {result.get('message', 'Unknown error')}")
+                return {
+                    "status": "error",
+                    "message": result.get("message", "SAGE agent failed to generate summary"),
+                    "project_id": project_id,
+                    "summary": result.get("summary", "Error generating summary")
+                }
+        except Exception as e:
+            logger.error(f"Error running SAGE agent: {str(e)}")
+            return {
+                "status": "error",
+                "message": f"Error running SAGE agent: {str(e)}",
+                "project_id": project_id,
+                "summary": f"Error generating summary: {str(e)}"
+            }
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in generate_system_summary: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Unexpected error: {str(e)}",
+            "project_id": project_id,
+            "summary": f"Error: {str(e)}"
         }
 
 @router.get("/pulse")
