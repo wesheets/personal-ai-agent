@@ -1,39 +1,46 @@
-# Pull Request: Fix CRITIC Logger Crash
+# Pull Request: Final CRITIC Logger Fix
 
 ## Description
-This PR fixes an issue where the CRITIC agent was crashing due to undefined logger references. When attempting to log feedback or errors, it was calling `logger` without a proper import or definition.
+This PR implements the final fix for the CRITIC agent logger crash issue. Despite previous patching, the CRITIC agent was still experiencing crashes due to undefined logger references. This PR ensures the logger is fully declared and safely used inside CRITIC agent execution.
 
 ## Changes Made
-- Added dedicated logger definition for the CRITIC agent
-- Implemented safety wrappers around all logger calls
-- Enhanced response structure to include all required fields
-- Modified the CRITIC agent to update project state even when blocked
+- Updated logger definition to use `logger = logging.getLogger("critic")` as specified
+- Added local fallback mechanism to handle cases where the logging system fails to initialize
+- Implemented comprehensive safety wrappers around ALL logger calls (including debug, warning, and error logs)
+- Maintained consistent response structure with all required fields
 
 ## Testing
-Created two test scripts to verify the fix:
-1. `test_critic_logger.py`: Tests basic logger functionality and response structure
-2. `test_critic_payload.py`: Tests with the specific payload from the requirements
+Created a test script (`test_final_critic_payload.py`) to verify the fix with the specified payload:
 
-Both tests confirm that:
-- No logger errors occur
+```json
+{
+  "agent_id": "critic",
+  "project_id": "smart_sync_test_001",
+  "task": "Review the full build from HAL and NOVA and provide feedback.",
+  "tools": ["memory_writer"]
+}
+```
+
+The test confirms that:
+- No "logger not defined" errors occur
 - All required fields are present in the response
-- Project state is properly updated
+- `project_state.agents_involved` includes "critic"
 - The agent correctly handles blocked scenarios
 
 ## Validation
 The implementation meets all requirements specified in the task:
-- ✅ Logger definition added
-- ✅ Safety wrappers implemented
-- ✅ Memory logging functionality verified
-- ✅ Project state inclusion confirmed
-- ✅ Structured response with required fields
-- ✅ No logger errors
+- ✅ Logger is properly defined at the top of the function
+- ✅ ALL logger calls are wrapped in try-except blocks
+- ✅ Local fallback mechanism is implemented
+- ✅ Response includes all required fields
+- ✅ `project_state.agents_involved` includes "critic"
+- ✅ No "logger not defined" errors
 
 ## Documentation
-See `CRITIC_LOGGER_FIX.md` for detailed documentation of the changes.
+See `FINAL_CRITIC_LOGGER_FIX.md` for detailed documentation of the changes.
 
 ## Related Issues
-Fixes the "name 'logger' is not defined" error in the CRITIC agent.
+Fixes the remaining "name 'logger' is not defined" errors in the CRITIC agent.
 
 ## Checklist
 - [x] Code follows the project's coding standards
