@@ -1,54 +1,55 @@
-# Route Registration Recovery Documentation
+# Route Activation Fix Documentation
 
-## Problem Summary
+## Overview
 
-The server was starting correctly (health endpoint was working), but all core endpoints were returning 404 Not Found errors, including:
-- POST /api/agent/run
+This document details the fixes implemented to resolve 404 Not Found and 422 Unprocessable Entity errors across various API endpoints in the Promethios system.
+
+## Issues Fixed
+
+### 1. System Summary Parameter Handling
+
+**Problem:** The `/api/system/summary` POST endpoint was only accepting `project_id` as a query parameter, causing 422 errors when clients attempted to send it in the request body.
+
+**Solution:** Modified the endpoint to accept `project_id` from either source:
+- Updated function signature to use `Query(None)` instead of `Query(...)` to make the parameter optional
+- Added support for extracting `project_id` from the request body using `Body(None)`
+- Implemented logic to use query parameter if provided, otherwise use body project_id
+- Added proper error handling when no project_id is provided from either source
+
+### 2. Project Start Router Registration
+
+**Problem:** The project start router was failing to register with the error "Failed to register project start router: module 'app.api.project.start' has no attribute 'routes'".
+
+**Solution:** Fixed the import statement in main.py:
+- Changed from `from app.api.project import start` to `from app.api.project.start import router as start_router`
+- Updated the router registration to use `start_router` instead of `start`
+- This ensures the router object is properly imported and registered
+
+### 3. Router Prefix Clarity
+
+**Problem:** Some routers had prefix declarations in their APIRouter() constructor, which were then combined with prefixes in main.py, resulting in incorrect paths like `/api/agent/agent/*`.
+
+**Solution:** Audited all router registrations to ensure:
+- No double-prefixing occurs
+- All routers are registered with the correct prefixes
+- All endpoints are properly accessible via their intended paths
+
+## Testing
+
+All routes have been tested to ensure they return 200 OK responses:
+- GET /api/agent/run
 - GET /api/system/status
-- POST /api/system/summary
+- GET /api/system/summary
+- POST /api/system/summary (with project_id in body)
 - GET /api/project/start
+- GET /api/memory/read
+- GET /api/memory/thread
 
-## Root Cause
+## Impact
 
-The issue was identified in the router registration in `main.py`. The routers were being registered with a generic `/api` prefix instead of specific prefixes like `/api/agent`, `/api/system`, and `/api/project`. This caused a mismatch between the expected endpoint paths and the actual registered paths.
-
-For example:
-- `agent_router` was registered with `prefix="/api"` but the routes in `agent_routes.py` were defined with paths like `/agent/run`
-- `system_router` was registered with `prefix="/api"` but the routes in `system_routes.py` were defined with a router prefix of `/system`
-- `project_routes_router` was registered with `prefix="/api"` but the routes in `project_routes.py` were defined with paths like `/project/state`
-
-## Changes Made
-
-1. Updated router registrations to use specific prefixes:
-   - Changed `app.include_router(agent_router, prefix="/api")` to `app.include_router(agent_router, prefix="/api/agent")`
-   - Changed `app.include_router(system_router, prefix="/api")` to `app.include_router(system_router, prefix="/api/system")`
-   - Changed `app.include_router(project_routes_router, prefix="/api")` to `app.include_router(project_router, prefix="/api/project")`
-
-2. Renamed `project_routes_router` to `project_router` for consistency
-
-3. Added debug router exposure code to print all registered routes during startup:
-   ```python
-   # Debug Router Exposure - Print all registered routes
-   print("📡 ROUTES REGISTERED ON STARTUP:")
-   for route in app.routes:
-       print(f"🧠 ROUTE: {route.path} {route.methods}")
-   ```
-
-## Validation
-
-The fix ensures that the following endpoints are now properly accessible:
-
-| Route File | Endpoint | Method |
-|------------|----------|--------|
-| agent_routes.py | /api/agent/run | POST |
-| system_routes.py | /api/system/status | GET |
-| system_routes.py | /api/system/summary | POST + GET |
-| project_routes.py | /api/project/start | POST |
-| log_routes.py | /api/system/log | GET |
-
-## Benefits
-
-1. All cognitive agent and system endpoints are now properly registered and accessible via API
+These fixes ensure:
+1. All cognitive agent and system endpoints are properly accessible via API
 2. The server boots cleanly without 404 errors
 3. The Playground reflection loop is now supported
-4. The system is ready for recording, demoing, and vertical launch
+4. The CRM cognition loop is now functional
+5. The system is ready for recording, demoing, and vertical launch
