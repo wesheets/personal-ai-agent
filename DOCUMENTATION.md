@@ -1,186 +1,143 @@
-# Phase 6.1 Agent Timing & Synchronization Documentation
+# Ground Control Integration Documentation
 
 ## Overview
-This document provides comprehensive documentation for the Phase 6.1 Agent Timing & Synchronization features implemented in the personal AI agent system. These features enable better coordination between agents, intelligent recovery from blocked states, and improved state management.
 
-## Features
+The Ground Control integration adds real-time system status monitoring and summary capabilities to the Promethios Playground UI. This enhancement provides users with immediate visibility into the current state of their projects, including agent activities, progress status, and a narrative summary of the project state.
 
-### 1. Agent Retry and Recovery Flow
-The agent retry and recovery flow allows agents to be blocked when dependencies are not met and automatically unblocked when conditions are satisfied.
+## Components
 
-#### Key Components:
-- **Module**: `app/modules/agent_retry.py`
-- **Main Functions**:
-  - `register_blocked_agent(project_id, agent_id, blocked_due_to, unblock_condition)`: Registers an agent as blocked due to a dependency
-  - `check_for_unblocked_agents(project_id)`: Checks for agents that can be unblocked based on current project state
-  - `get_retry_status(project_id, agent_id)`: Gets the current retry status of an agent
-  - `mark_agent_retry_attempted(project_id, agent_id)`: Marks an agent as having attempted a retry
+### 1. SystemStatusPanel
 
-#### Usage Example:
-```python
-from app.modules.agent_retry import register_blocked_agent
+The SystemStatusPanel component displays the current status of the system, including:
 
-# Register NOVA agent as blocked due to HAL not completing initial files
-register_blocked_agent(
-    project_id="demo_project_001",
-    agent_id="nova",
-    blocked_due_to="hal",
-    unblock_condition="initial_files_created"
-)
+- Current project status (in progress, completed, error, blocked)
+- List of agents involved in the project
+- Latest agent action
+- Next planned step
+- Count of files created
+- Blocking information (when applicable)
+
+The panel automatically refreshes every 10 seconds to ensure the displayed information is current.
+
+### 2. SystemSummaryPanel
+
+The SystemSummaryPanel component displays a narrative summary of the project state, including:
+
+- SAGE-generated summary of the current project state
+- Timestamp of when the summary was last generated
+- A manual refresh button to trigger summary regeneration
+
+The panel automatically refreshes every 15 seconds to ensure the summary remains current.
+
+## Implementation Details
+
+### API Integration
+
+Both panels communicate with backend API endpoints:
+
+- `/api/system/status?project_id={projectId}` - Retrieves system status information
+- `/api/system/summary?project_id={projectId}` - Retrieves the narrative summary
+- `/api/system/summary` (POST) - Triggers generation of a new summary
+
+### Styling
+
+The components use a custom CSS file (`SystemPanels.css`) that defines styles for:
+
+- Panel containers and headers
+- Status indicators with appropriate colors
+- Content layout and spacing
+- Interactive elements like buttons
+- Loading and error states
+
+The styling follows the existing Promethios UI design language while providing clear visual hierarchy for the information displayed.
+
+### Auto-Refresh Mechanism
+
+Both panels implement auto-refresh using React's `useEffect` hook with `setInterval`:
+
+```jsx
+useEffect(() => {
+  const fetchData = async () => {
+    // Fetch data from API
+  };
+
+  fetchData();
+  
+  // Set up polling interval
+  const intervalId = setInterval(fetchData, 10000); // Poll every 10 seconds
+  
+  // Clean up interval on component unmount
+  return () => clearInterval(intervalId);
+}, [projectId]);
 ```
 
-### 2. Project State Watch Hooks
-The project state watch hooks provide a mechanism for monitoring changes to project state and triggering actions when specific conditions are met.
+This ensures that the displayed information stays current without requiring manual refreshes.
 
-#### Key Components:
-- **Module**: `app/modules/project_state_watch.py`
-- **Main Functions**:
-  - `subscribe_to_state_changes(project_id)`: Creates a subscription to monitor state changes for a project
-  - `get_state_changes(subscription_id)`: Gets the changes that have occurred since the last check
-  - `unsubscribe(subscription_id)`: Removes a subscription
+## Integration with Playground UI
 
-#### Usage Example:
-```python
-from app.modules.project_state_watch import subscribe_to_state_changes, get_state_changes
+The panels are integrated into the `ControlRoom` component, positioned between the header and the agent output cards:
 
-# Subscribe to state changes
-subscription_id = subscribe_to_state_changes("demo_project_001")
-
-# Later, check for changes
-changes = get_state_changes(subscription_id)
-for change in changes:
-    print(f"Field {change['field']} changed from {change['old_value']} to {change['new_value']}")
+```jsx
+<main className="flex-1 flex flex-col overflow-y-auto p-6 space-y-6">
+  <header>...</header>
+  
+  {/* Ground Control Integration - System Status and Summary Panels */}
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <SystemStatusPanel projectId={data.project_id} />
+    <SystemSummaryPanel projectId={data.project_id} />
+  </div>
+  
+  <section>
+    {/* Agent output cards */}
+  </section>
+  
+  <section>
+    {/* Chat panel */}
+  </section>
+</main>
 ```
 
-### 3. Post-Block Memory Updates
-The post-block memory updates feature allows agents to log information about blocked and unblocked states, providing a history of agent interactions and dependencies.
+The responsive grid layout ensures that the panels display properly on different screen sizes.
 
-#### Key Components:
-- **Module**: `app/modules/memory_block_writer.py`
-- **Main Functions**:
-  - `write_block_memory(block_data)`: Logs information when an agent is blocked
-  - `write_unblock_memory(unblock_data)`: Logs information when an agent is unblocked
+## Error Handling
 
-#### Usage Example:
-```python
-from app.modules.memory_block_writer import write_block_memory
+Both components implement comprehensive error handling:
 
-# Log block memory when NOVA is blocked by HAL
-write_block_memory({
-    "project_id": "demo_project_001",
-    "agent": "nova",
-    "action": "blocked",
-    "content": "NOVA agent blocked - HAL has not created initial files yet",
-    "blocked_due_to": "hal",
-    "unblock_condition": "initial_files_created"
-})
-```
-
-### 4. Passive Reflection Engine
-The passive reflection engine allows agents to re-evaluate tasks after being blocked, taking into account the updated project state.
-
-#### Key Components:
-- **Module**: `app/modules/passive_reflection.py`
-- **Main Functions**:
-  - `start_reflection(project_id, interval)`: Starts passive reflection for a project
-  - `stop_reflection(project_id)`: Stops passive reflection for a project
-  - `re_evaluate_task(project_id, agent_id, task)`: Re-evaluates a task for an agent after being unblocked
-
-#### Usage Example:
-```python
-from app.modules.passive_reflection import start_reflection, re_evaluate_task
-
-# Start reflection for a project
-start_reflection("demo_project_001", interval=60)
-
-# Re-evaluate a task after an agent is unblocked
-task = {"original_task": "Create UI", "project_id": "demo_project_001"}
-updated_task = re_evaluate_task("demo_project_001", "nova", task)
-```
-
-### 5. Intelligent Reset Flags
-The intelligent reset flags feature allows for resetting agent state when needed, enabling recovery from errors or inconsistent states.
-
-#### Key Components:
-- **Module**: `app/modules/reset_flags.py`
-- **Main Functions**:
-  - `reset_agent_state(project_id, agent_id)`: Resets the state of a specific agent
-  - `reset_project_state(project_id, full_reset)`: Resets the state of an entire project
-  - `get_reset_status(project_id)`: Gets the reset status of a project
-
-#### Usage Example:
-```python
-from app.modules.reset_flags import reset_agent_state, reset_project_state
-
-# Reset state for a specific agent
-reset_agent_state("demo_project_001", "hal")
-
-# Reset state for an entire project (partial reset)
-reset_project_state("demo_project_001", full_reset=False)
-```
-
-### 6. API Endpoints
-The API endpoints provide a way to interact with the agent timing and synchronization features through HTTP requests.
-
-#### Key Components:
-- **Module**: `routes/reset_routes.py`
-- **Endpoints**:
-  - `POST /api/reset/agent`: Resets the state of a specific agent
-  - `POST /api/reset/project`: Resets the state of an entire project
-  - `GET /api/reset/status`: Gets the reset status of a project
-
-#### Usage Example:
-```bash
-# Reset agent state
-curl -X POST http://localhost:8000/api/reset/agent \
-  -H "Content-Type: application/json" \
-  -d '{"project_id": "demo_project_001", "agent_id": "hal"}'
-
-# Reset project state
-curl -X POST http://localhost:8000/api/reset/project \
-  -H "Content-Type: application/json" \
-  -d '{"project_id": "demo_project_001", "full_reset": false}'
-
-# Get reset status
-curl -X GET http://localhost:8000/api/reset/status?project_id=demo_project_001
-```
-
-## Integration with Agent Runner
-
-All agent implementations in `app/modules/agent_runner.py` have been updated to integrate with the new features:
-
-1. **HAL Agent**:
-   - Checks project state before execution
-   - Starts passive reflection for the project
-   - Re-evaluates tasks after being unblocked
-
-2. **NOVA Agent**:
-   - Checks if HAL has created initial files
-   - Registers as blocked if dependencies are not met
-   - Re-evaluates tasks after being unblocked
-
-3. **CRITIC Agent**:
-   - Checks if NOVA has created UI files
-   - Registers as blocked if dependencies are not met
-   - Logs block memory with detailed information
-   - Re-evaluates tasks after being unblocked
-
-4. **ASH Agent**:
-   - Checks if project is ready for deployment
-   - Registers as blocked if project status is not ready
-   - Logs block memory with detailed information
-   - Re-evaluates tasks after being unblocked
+1. API request failures are caught and displayed to the user
+2. Loading states are shown during initial data fetching
+3. Existing data is preserved during refresh operations
+4. Components gracefully handle missing or incomplete data
 
 ## Testing
 
-A comprehensive test script (`test_phase_6_1.py`) has been created to test all the implemented features. The script tests:
+The implementation includes comprehensive tests:
 
-1. Agent retry flow
-2. Project state watch
-3. Memory block writer
-4. Passive reflection engine
-5. Intelligent reset flags
+1. Unit tests for individual panel components (`test_system_panels.js`)
+2. Integration tests for the ControlRoom component (`test_control_room_integration.js`)
 
-## Conclusion
+Tests cover loading states, successful data fetching, error handling, and refresh functionality.
 
-The Phase 6.1 Agent Timing & Synchronization features provide a robust framework for agent coordination and synchronization in the personal AI agent system. These features enable agents to work together more effectively, recover from blocked states intelligently, and maintain consistent project state throughout the development process.
+## Usage
+
+The Ground Control panels are automatically included in the Playground UI and require no additional configuration. They will display information for the current project as specified by the `projectId` prop.
+
+To manually refresh the summary, users can click the "Refresh Summary" button in the System Summary panel.
+
+## Future Enhancements
+
+Potential future enhancements could include:
+
+1. Detailed view of files created with links to view/edit
+2. Historical view of agent actions with timeline
+3. Filtering options for specific agent activities
+4. Customizable refresh intervals
+5. Export functionality for status reports
+
+## Maintenance Considerations
+
+When maintaining this code, consider:
+
+1. API endpoint changes may require updates to the fetch calls
+2. CSS changes should maintain consistency with the overall UI design
+3. Performance optimizations may be needed if the amount of status data grows significantly
+4. Additional error handling may be needed for specific edge cases
