@@ -53,6 +53,35 @@ try:
     # Import snapshot routes
     from routes.snapshot_routes import router as snapshot_router
     
+    # Import system integrity router
+    try:
+        from routes.system_integrity import router as integrity_router
+        print("✅ Successfully imported system integrity router")
+    except Exception as e:
+        print(f"❌ ERROR importing system integrity router: {str(e)}")
+        logging.error(f"Failed to import system integrity router: {str(e)}")
+        # Create a placeholder router to prevent app startup failure
+        integrity_router = APIRouter()
+        @integrity_router.get("/integrity")
+        async def integrity_import_error():
+            return {"status": "error", "message": f"Failed to import system integrity router: {str(e)}"}
+        print("⚠️ Created placeholder router for /api/system/integrity")
+    
+    # Import project start router for Phase 12.0 - CRITICAL for Agent Playground
+    print("🔄 Importing project start router for Phase 12.0 (Agent Playground)")
+    try:
+        from app.api.project import start  # Project start router
+        print("✅ Successfully imported project start router")
+    except Exception as e:
+        print(f"❌ ERROR importing project start router: {str(e)}")
+        logging.error(f"Failed to import project start router: {str(e)}")
+        # Create a placeholder router to prevent app startup failure
+        start = APIRouter()
+        @start.get("/error")
+        async def project_start_import_error():
+            return {"status": "error", "message": f"Failed to import project start router: {str(e)}"}
+        print("⚠️ Created placeholder router for /api/project/error")
+    
     # Import modules for API routes
     from app.api.modules.agent import router as agent_module_router  # AgentRunner module router
     from app.api.modules.memory import router as memory_router_module  # Memory module router
@@ -353,6 +382,11 @@ try:
     print(f"🔍 DEBUG: Snapshot router object: {snapshot_router}")
     app.include_router(snapshot_router, prefix="/api")
     print("🧠 Route defined: /api/snapshot/* -> snapshot_routes")
+    
+    # Register the integrity_router
+    print(f"🔍 DEBUG: Integrity router object: {integrity_router}")
+    app.include_router(integrity_router, prefix="/api/system")
+    print("🧠 Route defined: /api/system/integrity -> check_system_integrity")
     
     # Import and mount the agent module router
     print(f"🔍 DEBUG: Agent Module router object: {agent_module_router}")
