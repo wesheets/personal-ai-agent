@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 router = APIRouter()
 
 @router.get("/memory/ping")
@@ -48,9 +48,9 @@ async def memory_summarize(request_data: dict):
     }
 
 @router.post("/memory/thread")
-async def memory_thread(request_data: dict):
+async def memory_thread_post(request_data: dict):
     """
-    Get a memory thread.
+    Get a memory thread via POST method.
     """
     return {
         "status": "success",
@@ -63,3 +63,39 @@ async def memory_thread(request_data: dict):
             {"timestamp": "2025-04-17T01:57:00", "content": "Example memory entry 3"}
         ]
     }
+
+@router.get("/memory/thread")
+async def memory_thread_get(project_id: str = Query(..., description="Project identifier")):
+    """
+    Get a memory thread via GET method.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dict containing thread entries for the specified project
+    """
+    try:
+        from memory.memory_reader import get_memory_thread_for_project
+        
+        # Try to use the actual implementation if available
+        try:
+            thread = get_memory_thread_for_project(project_id)
+        except (ImportError, NameError):
+            # Fallback to sample data if the function is not available
+            thread = [
+                {"timestamp": "2025-04-17T01:56:00", "content": "Example memory entry 1"},
+                {"timestamp": "2025-04-17T01:56:30", "content": "Example memory entry 2"},
+                {"timestamp": "2025-04-17T01:57:00", "content": "Example memory entry 3"}
+            ]
+        
+        return {
+            "status": "success",
+            "project_id": project_id,
+            "thread": thread
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Failed to get memory thread: {str(e)}"
+        }

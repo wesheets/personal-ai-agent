@@ -17,9 +17,11 @@ router = APIRouter()
 # Define request and response models
 class OrchestratorConsultRequest(BaseModel):
     """Request model for the orchestrator/consult endpoint"""
-    objective: str
-    context: str
-    agent_preferences: List[str] = Field(default_factory=list)
+    agent_id: str
+    project_id: str
+    task: str
+    objective: Optional[str] = None
+    context: Optional[str] = None
 
 class OrchestratorConsultResponse(BaseModel):
     """Response model for the orchestrator/consult endpoint"""
@@ -38,7 +40,7 @@ async def orchestrator_consult(request: OrchestratorConsultRequest, background_t
     with reflection.
     
     Args:
-        request: The consultation request containing objective, context, and agent preferences
+        request: The consultation request containing project_id, task, agent_id, and optional objective and context
         background_tasks: Optional background tasks for async operations
         
     Returns:
@@ -50,27 +52,27 @@ async def orchestrator_consult(request: OrchestratorConsultRequest, background_t
         
         # Log the consultation request to memory
         # This would typically use a memory manager, but we'll keep it simple for now
-        print(f"Orchestrator consultation request: {request.objective}")
+        print(f"Orchestrator consultation request: {request.task}")
         
         # Process the request
         # In a full implementation, this would use more sophisticated logic
         # based on the orchestrator's capabilities
         
-        # Determine which agents to delegate to based on preferences or defaults
-        delegated_agents = request.agent_preferences
-        if not delegated_agents:
-            # Default to HAL and NOVA if no preferences specified
-            delegated_agents = ["hal", "nova"]
+        # Use the specified agent_id or determine which agents to delegate to
+        delegated_agents = [request.agent_id] if request.agent_id else ["hal", "nova"]
         
-        # Generate a decision based on the objective and context
-        decision = f"Initiate project boot sequence with {' and '.join(delegated_agents).upper()}"
+        # Generate a decision based on the task and context
+        objective_text = request.objective if request.objective else request.task
+        context_text = request.context if request.context else "No additional context provided"
+        
+        decision = f"Initiate project {request.project_id} with {' and '.join(delegated_agents).upper()}"
         
         # Generate a reflection on the decision
         reflection = (
-            f"Analyzed objective: '{request.objective}' in context: '{request.context}'. "
+            f"Analyzed task: '{request.task}' with objective: '{objective_text}' in context: '{context_text}'. "
             f"Based on task requirements and agent capabilities, determined that "
             f"{' and '.join(delegated_agents).upper()} are best suited for this task. "
-            f"Initiating collaborative workflow with these agents as primary handlers."
+            f"Initiating collaborative workflow with these agents as primary handlers for project {request.project_id}."
         )
         
         # Create and return the response
