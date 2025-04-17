@@ -10,6 +10,8 @@ MODIFIED: Added enhanced logging for debugging memory thread issues
 MODIFIED: Added toolkit registry integration for specialized agent tools
 MODIFIED: Added product strategist logic for HAL in saas domain
 MODIFIED: Added structured output for ASH documentation and onboarding
+MODIFIED: Added AGENT_RUNNERS mapping for direct agent execution
+MODIFIED: Added run_hal_agent function with file_writer integration
 """
 
 import logging
@@ -36,6 +38,14 @@ from app.modules.memory_thread import add_memory_thread
 
 # Import toolkit registry
 from toolkit.registry import get_toolkit, get_agent_role, format_tools_prompt, format_nova_prompt, get_agent_themes
+
+# Import file_writer for HAL agent
+try:
+    from toolkit.file_writer import write_file
+    FILE_WRITER_AVAILABLE = True
+except ImportError:
+    FILE_WRITER_AVAILABLE = False
+    print("❌ file_writer import failed")
 
 # Configure logging
 logger = logging.getLogger("modules.agent_runner")
@@ -351,6 +361,169 @@ async def log_memory_thread(project_id: str, chain_id: str, agent: str, role: st
         logger.error(error_msg)
         logger.error(traceback.format_exc())
 
+# Define agent runner functions
+def run_hal_agent(task, project_id, tools):
+    """
+    Run the HAL agent with the given task.
+    
+    Args:
+        task: The task to run
+        project_id: The project identifier
+        tools: List of tools to use
+        
+    Returns:
+        Dict containing the response and metadata
+    """
+    print(f"🤖 HAL agent execution started")
+    print(f"📋 Task: {task}")
+    print(f"🆔 Project ID: {project_id}")
+    print(f"🧰 Tools: {tools}")
+    logger.info(f"HAL agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
+    
+    try:
+        # Create a bootstrap file using file_writer
+        if FILE_WRITER_AVAILABLE and "file_writer" in tools:
+            print(f"📝 Using file_writer to create bootstrap file")
+            
+            # Create content for README.md
+            contents = f"# Project {project_id}\n\nTask: {task}\nTools: {', '.join(tools)}"
+            
+            # Write file
+            output = write_file(
+                project_id=project_id,
+                file_path=f"/verticals/{project_id}/README.md",
+                content=contents
+            )
+            
+            print(f"✅ Bootstrap file created successfully")
+            logger.info(f"HAL created bootstrap file for project {project_id}")
+            
+            return {
+                "message": f"HAL successfully created bootstrap file",
+                "output": output,
+                "task": task,
+                "tools": tools
+            }
+        else:
+            # If file_writer is not available or not in tools
+            print(f"⚠️ file_writer not available or not in tools list")
+            logger.warning(f"file_writer not available or not in tools list")
+            
+            return {
+                "message": f"HAL received task for project {project_id}",
+                "task": task,
+                "tools": tools
+            }
+    except Exception as e:
+        error_msg = f"Error in run_hal_agent: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        
+        return {
+            "message": f"Error executing HAL agent: {str(e)}",
+            "task": task,
+            "tools": tools,
+            "error": str(e)
+        }
+
+def run_nova_agent(task, project_id, tools):
+    """
+    Run the NOVA agent with the given task.
+    
+    Args:
+        task: The task to run
+        project_id: The project identifier
+        tools: List of tools to use
+        
+    Returns:
+        Dict containing the response and metadata
+    """
+    print(f"🤖 NOVA agent execution started")
+    logger.info(f"NOVA agent execution started with task: {task}, project_id: {project_id}")
+    
+    # TODO: Implement NOVA agent execution
+    return {
+        "message": f"NOVA received task for project {project_id}",
+        "task": task,
+        "tools": tools
+    }
+
+def run_ash_agent(task, project_id, tools):
+    """
+    Run the ASH agent with the given task.
+    
+    Args:
+        task: The task to run
+        project_id: The project identifier
+        tools: List of tools to use
+        
+    Returns:
+        Dict containing the response and metadata
+    """
+    print(f"🤖 ASH agent execution started")
+    logger.info(f"ASH agent execution started with task: {task}, project_id: {project_id}")
+    
+    # TODO: Implement ASH agent execution
+    return {
+        "message": f"ASH received task for project {project_id}",
+        "task": task,
+        "tools": tools
+    }
+
+def run_critic_agent(task, project_id, tools):
+    """
+    Run the CRITIC agent with the given task.
+    
+    Args:
+        task: The task to run
+        project_id: The project identifier
+        tools: List of tools to use
+        
+    Returns:
+        Dict containing the response and metadata
+    """
+    print(f"🤖 CRITIC agent execution started")
+    logger.info(f"CRITIC agent execution started with task: {task}, project_id: {project_id}")
+    
+    # TODO: Implement CRITIC agent execution
+    return {
+        "message": f"CRITIC received task for project {project_id}",
+        "task": task,
+        "tools": tools
+    }
+
+def run_orchestrator_agent(task, project_id, tools):
+    """
+    Run the ORCHESTRATOR agent with the given task.
+    
+    Args:
+        task: The task to run
+        project_id: The project identifier
+        tools: List of tools to use
+        
+    Returns:
+        Dict containing the response and metadata
+    """
+    print(f"🤖 ORCHESTRATOR agent execution started")
+    logger.info(f"ORCHESTRATOR agent execution started with task: {task}, project_id: {project_id}")
+    
+    # TODO: Implement ORCHESTRATOR agent execution
+    return {
+        "message": f"ORCHESTRATOR received task for project {project_id}",
+        "task": task,
+        "tools": tools
+    }
+
+# Define agent runners mapping
+AGENT_RUNNERS = {
+    "hal": run_hal_agent,
+    "nova": run_nova_agent,
+    "ash": run_ash_agent,
+    "critic": run_critic_agent,
+    "orchestrator": run_orchestrator_agent
+}
+
 async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project_id: str = None, chain_id: str = None, domain: str = "saas"):
     """
     Async version of run_agent function.
@@ -383,6 +556,8 @@ async def run_agent_async(agent_id: str, messages: List[Dict[str, Any]], project
         "hal": {"agent": "hal", "role": "thinker"},
         "ash": {"agent": "ash", "role": "explainer"},
         "nova": {"agent": "nova", "role": "designer"},
+        "critic": {"agent": "critic", "role": "critic"},
+        "orchestrator": {"agent": "orchestrator", "role": "orchestrator"},
         "Core.Forge": {"agent": "hal", "role": "thinker"}  # Default to HAL for CoreForge
     }
     
