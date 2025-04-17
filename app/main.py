@@ -323,6 +323,12 @@ def create_app():
             print(f"🔍 DEBUG: System router object: {system_router}")
             app.include_router(system_router, prefix="/api/system")
             print("🧠 Route defined: /api/system/* -> system_router")
+            
+            # Debug line to print all system routes
+            print("📋 DEBUG: Listing all system routes after mounting:")
+            for route in app.routes:
+                if "/api/system" in route.path:
+                    print(f"🔍 SYSTEM ROUTE: {route.path} {route.methods}")
         except Exception as e:
             print(f"⚠️ Failed to register system_router: {e}")
         

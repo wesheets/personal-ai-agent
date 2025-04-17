@@ -259,6 +259,137 @@ class Orchestrator:
         # If no match, return None
         return None
     
+    # Add method for consult
+    async def consult(self, project_id: str) -> Dict[str, Any]:
+        """
+        Consult the orchestrator to determine the next steps for a project.
+        
+        This method is called by the agent loop autonomy system to determine
+        which agent should run next based on the current project state.
+        
+        Args:
+            project_id: The project identifier
+            
+        Returns:
+            Dict containing the consultation result
+        """
+        try:
+            # Log entry to consult method
+            print(f"🧠 ORCHESTRATOR CONSULT: Starting consult for project {project_id}")
+            import logging
+            logger = logging.getLogger("app.core.orchestrator")
+            logger.info(f"🧠 ORCHESTRATOR CONSULT: Starting consult for project {project_id}")
+            
+            # Import project_state module
+            from app.modules.project_state import read_project_state, update_project_state, should_continue_loop
+            
+            # Check if loop should continue
+            logger.info(f"Checking if loop should continue for project {project_id}")
+            should_continue = should_continue_loop(project_id)
+            logger.info(f"Loop continuation result: {should_continue}")
+            print(f"Loop continuation result: {should_continue}")
+            
+            if not should_continue:
+                # Update project state to complete
+                logger.info(f"🛑 Loop should not continue. Updating project state to complete.")
+                print(f"🛑 Loop should not continue. Updating project state to complete.")
+                update_project_state(project_id, {"status": "complete"})
+                
+                # Return result indicating delegation should stop
+                result = {
+                    "status": "complete",
+                    "message": "Project complete or max loops reached",
+                    "project_id": project_id,
+                    "should_delegate": False
+                }
+                logger.info(f"Returning result: {result}")
+                return result
+            
+            # Read project state
+            logger.info(f"Reading project state for {project_id}")
+            project_state = read_project_state(project_id)
+            logger.info(f"Project state: {project_state}")
+            print(f"Project state retrieved for {project_id}")
+            
+            # Get last completed agent
+            last_agent = project_state.get("last_completed_agent")
+            logger.info(f"Last completed agent: {last_agent}")
+            print(f"Last completed agent: {last_agent}")
+            
+            # Determine next agent based on last completed agent
+            next_agent = None
+            
+            # Simple agent sequence: HAL -> NOVA -> CRITIC -> HAL
+            agent_sequence = ["hal", "nova", "critic"]
+            
+            if last_agent:
+                try:
+                    current_index = agent_sequence.index(last_agent.lower())
+                    next_index = (current_index + 1) % len(agent_sequence)
+                    next_agent = agent_sequence[next_index]
+                    logger.info(f"Determined next agent: {next_agent} (based on last agent: {last_agent})")
+                    print(f"Determined next agent: {next_agent} (based on last agent: {last_agent})")
+                except ValueError:
+                    # If last_agent not in sequence, default to HAL
+                    next_agent = "hal"
+                    logger.info(f"Last agent {last_agent} not in sequence, defaulting to HAL")
+                    print(f"Last agent {last_agent} not in sequence, defaulting to HAL")
+            else:
+                # If no last_agent, start with HAL
+                next_agent = "hal"
+                logger.info(f"No last agent found, starting with HAL")
+                print(f"No last agent found, starting with HAL")
+            
+            # Call the next agent
+            logger.info(f"🤖 Calling agent: {next_agent} for project {project_id}")
+            print(f"🤖 Calling agent: {next_agent} for project {project_id}")
+            from app.modules.agent_loop_trigger import call_agent
+            agent_result = call_agent(next_agent, project_id)
+            
+            # Validate agent result
+            if not agent_result:
+                logger.error(f"❌ Agent {next_agent} returned no result")
+                print(f"❌ Agent {next_agent} returned no result")
+                return {
+                    "status": "error",
+                    "message": f"Agent {next_agent} returned no result",
+                    "project_id": project_id,
+                    "next_agent": next_agent,
+                    "should_delegate": False
+                }
+            
+            logger.info(f"Agent result: {agent_result}")
+            print(f"Agent result status: {agent_result.get('status', 'unknown')}")
+            
+            # Return result
+            result = {
+                "status": "success",
+                "message": f"Consulted orchestrator for project {project_id}",
+                "project_id": project_id,
+                "next_agent": next_agent,
+                "agent_result": agent_result,
+                "should_delegate": True
+            }
+            logger.info(f"Returning orchestrator consult result: {result}")
+            print(f"Returning orchestrator consult result with status: {result['status']}")
+            return result
+        except Exception as e:
+            error_msg = f"Error in orchestrator.consult: {str(e)}"
+            print(f"❌ {error_msg}")
+            import traceback, logging
+            logger = logging.getLogger("app.core.orchestrator")
+            logger.error(f"❌ {error_msg}")
+            logger.error(traceback.format_exc())
+            print(traceback.format_exc())
+            
+            return {
+                "status": "error",
+                "message": error_msg,
+                "project_id": project_id,
+                "should_delegate": False,
+                "error_details": traceback.format_exc()
+            }
+    
     # Add mock method for get_current_control_mode
     def get_current_control_mode(self) -> Dict[str, str]:
         """
