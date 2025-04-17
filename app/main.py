@@ -55,6 +55,9 @@ try:
     from app.modules.memory_thread import router as memory_thread_router
     from app.modules.memory_summarize import router as memory_summarize_router
     
+    # Import orchestrator routes for the /api/orchestrator/consult endpoint
+    from routes.orchestrator_routes import router as orchestrator_routes_router
+    
     # Import project start router for Phase 12.0 - CRITICAL for Agent Playground
     print("🔄 Importing project start router for Phase 12.0 (Agent Playground)")
     try:
@@ -335,12 +338,187 @@ try:
     # Request body size limiter middleware
     app.middleware("http")(limit_request_body_size)
 
+feature/phase-4.1-orchestrator-consult
+    # Middleware for logging with timeout handling
+    @app.middleware("http")
+    async def log_requests(request: Request, call_next):
+        import time
+        import asyncio
+        import json
+        from fastapi.responses import JSONResponse
+        
+        logger.info(f"Request: {request.method} {request.url}")
+        
+        # Log origin for CORS debugging with normalization
+        origin = request.headers.get("origin")
+        if origin:
+            normalized_request_origin = normalize_origin(origin)
+            logger.info(f"🔒 Request Origin: {origin}")
+            logger.info(f"🔒 Normalized Request Origin: {normalized_request_origin}")
+        
+        # Only log headers for non-production environments or if explicitly enabled
+        if os.environ.get("LOG_HEADERS", "false").lower() == "true":
+            logger.info(f"Request headers: {request.headers}")
+        
+        # Set overall request timeout (15 seconds max for Railway environment)
+        start_time = time.time()
+        try:
+            # Use asyncio.wait_for to implement timeout for the entire request
+            # Increased timeout for Railway environment
+            timeout_seconds = 15.0 if os.environ.get("RAILWAY_ENVIRONMENT") else 10.0
+            response = await asyncio.wait_for(call_next(request), timeout=timeout_seconds)
+            process_time = time.time() - start_time
+            logger.info(f"Response status: {response.status_code}")
+            logger.info(f"Process time: {process_time:.4f}s")
+            
+            # Add timing header to response
+            response.headers["X-Process-Time"] = str(process_time)
+            
+            # Log CORS headers for debugging
+            if origin:
+                allow_origin = response.headers.get("Access-Control-Allow-Origin", "")
+                logger.info(f"🔒 Response Access-Control-Allow-Origin: {allow_origin}")
+            
+            return response
+        except asyncio.TimeoutError:
+            # Handle request timeout
+            process_time = time.time() - start_time
+            logger.error(f"Request timed out after {process_time:.4f}s: {request.method} {request.url}")
+            
+            # Return timeout response
+            return JSONResponse(
+                status_code=504,
+                content={
+                    "status": "error",
+                    "message": "Request timed out",
+                    "timeout": timeout_seconds,
+                    "process_time": process_time
+                }
+            )
+        except Exception as e:
+            # Handle other exceptions
+            process_time = time.time() - start_time
+            logger.error(f"Error processing request: {str(e)}")
+            logger.error(f"Process time before error: {process_time:.4f}s")
+            
+            # Return error response
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "status": "error",
+                    "message": f"Internal server error: {str(e)}",
+                    "process_time": process_time
+                }
+            )
+            print("=" * 50)
+        
+    # Add route registration logging at the end of startup
+    @app.on_event("startup")
+    async def log_routes_on_startup():
+        """Log all registered routes after startup for debugging."""
+        try:
+            print("🔍 Running route registration diagnostic...")
+            log_registered_routes(app)
+        except Exception as e:
+            print(f"⚠️ Error logging routes: {str(e)}")
+            logger.error(f"⚠️ Error logging routes: {str(e)}")
+    
+    # Add dedicated route debug logger for troubleshooting 404 issues
+    @app.on_event("startup")
+    async def log_registered_routes():
+        print("\n🔍 [ROUTE DEBUG] Registered routes:")
+        for route in app.routes:
+            print(f"📍 {route.path} -> {route.name}")
+        print("✅ [ROUTE DEBUG] Route listing complete\n")
+    
+    # Import and mount the orchestrator scope router
+    from app.modules.orchestrator_scope import router as scope_router
+    print(f"🔍 DEBUG: Orchestrator Scope router object: {scope_router}")
+    app.include_router(scope_router, prefix="/api/modules/orchestrator")
+    print("🧠 Route defined: /api/modules/orchestrator/scope -> determine_suggested_agents")
+    
+    # Import and mount the orchestrator present router
+    from app.modules.orchestrator_present import router as present_router
+    print(f"🔍 DEBUG: Orchestrator Present router object: {present_router}")
+    app.include_router(present_router, prefix="/api/modules/orchestrator")
+    print("🧠 Route defined: /api/modules/orchestrator/present -> present_task_results")
+    
+    # Import and mount the orchestrator build router
+    from app.modules.orchestrator_build import router as build_router
+    print(f"🔍 DEBUG: Orchestrator Build router object: {build_router}")
+    app.include_router(build_router, prefix="/api/modules/orchestrator")
+    print("🧠 Route defined: /api/modules/orchestrator/build -> execute_task_plan")
+    
+    # Import and mount the agent present router
+    from app.modules.agent_present import router as agent_present_router
+    print(f"🔍 DEBUG: Agent Present router object: {agent_present_router}")
+    app.include_router(agent_present_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/present -> present_agent_results")
+    
+    # Import and mount the agent create router
+    from app.modules.agent_create import router as agent_create_router
+    print(f"🔍 DEBUG: Agent Create router object: {agent_create_router}")
+    app.include_router(agent_create_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/create -> create_agent")
+    
+    # Import and mount the agent verify router
+    from app.modules.agent_verify import router as agent_verify_router
+    print(f"🔍 DEBUG: Agent Verify router object: {agent_verify_router}")
+    app.include_router(agent_verify_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/verify_task -> verify_task")
+    
+    # Import and mount the agent reflect router
+    from app.modules.agent_reflect import router as agent_reflect_router
+    print(f"🔍 DEBUG: Agent Reflect router object: {agent_reflect_router}")
+    app.include_router(agent_reflect_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/reflect -> reflect")
+    
+    # Import and mount the agent fallback router
+    from app.modules.agent_fallback import router as agent_fallback_router
+    print(f"🔍 DEBUG: Agent Fallback router object: {agent_fallback_router}")
+    app.include_router(agent_fallback_router, prefix="/api/modules/agent")
+    print("🧠 Route defined: /api/modules/agent/fallback -> fallback_task")
+    
+    # Import and mount the task supervisor router
+    from app.modules.task_supervisor import router as task_supervisor_router
+    print(f"🔍 DEBUG: Task Supervisor router object: {task_supervisor_router}")
+    app.include_router(task_supervisor_router, prefix="/api/modules/task")
+    print("🧠 Route defined: /api/modules/task/status -> get_task_status")
+    
+    # Import and mount the task result router
+    from app.modules.task_result import router as task_result_router
+    print(f"🔍 DEBUG: Task Result router object: {task_result_router}")
+    app.include_router(task_result_router, prefix="/api/modules/task")
+    print("🧠 Route defined: /api/modules/task/result -> log_task_result")
+    
+    # Import and mount the loop router
+    from app.modules.loop import router as loop_router
+    print(f"🔍 DEBUG: Loop router object: {loop_router}")
+    app.include_router(loop_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/loop -> loop_task")
+    
+    # Import and mount the delegate router
+    from app.modules.delegate import router as delegate_router
+    print(f"🔍 DEBUG: Delegate router object: {delegate_router}")
+    app.include_router(delegate_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/delegate -> delegate_task")
+    
+    # Import and mount the reflect router
+    from app.modules.reflect import router as reflect_router
+    print(f"🔍 DEBUG: Reflect router object: {reflect_router}")
+    app.include_router(reflect_router, prefix="/api/modules")
+    print("🧠 Route defined: /api/modules/reflect -> reflect_on_task")
+    
+    # Import and mount the orchestrator router
+    print(f"🔍 DEBUG: Orchestrator router object: {orchestrator_router}")
+
     # Register all API routes
     print("🔄 Registering API routes...")
     
     # Register existing module routers
     app.include_router(agent_module_router, prefix="/api/modules/agent")
     app.include_router(memory_router, prefix="/api/modules/memory")
+main
     app.include_router(orchestrator_router, prefix="/api/modules/orchestrator")
     app.include_router(feedback_router, prefix="/api/modules/feedback")
     app.include_router(user_context_router, prefix="/api/modules/user_context")
@@ -352,9 +530,27 @@ try:
     app.include_router(memory_thread_router, prefix="/api/memory/thread")
     app.include_router(memory_summarize_router, prefix="/api/memory/summarize")
     
+feature/phase-4.1-orchestrator-consult
+    # Register the orchestrator_routes router for the /api/orchestrator/consult endpoint
+    print(f"🔍 DEBUG: Orchestrator Routes router object: {orchestrator_routes_router}")
+    app.include_router(orchestrator_routes_router, prefix="/api")
+    print("🧠 Route defined: /api/orchestrator/consult -> orchestrator_consult")
+    
+    # Add Swagger UI with custom configuration
+    @app.get("/docs", include_in_schema=False)
+    async def custom_swagger_ui_html():
+        return get_swagger_ui_html(
+            openapi_url=app.openapi_url,
+            title=app.title + " - API Documentation",
+            oauth2_redirect_url=app.swagger_ui_oauth2_redirect_url,
+            swagger_js_url="/static/swagger-ui-bundle.js",
+            swagger_css_url="/static/swagger-ui.css",
+        )
+
     # Register orchestrator routers
     app.include_router(consult.router, prefix="/api/orchestrator")
     app.include_router(chain.router, prefix="/api/orchestrator")
+main
     
     # Register delegate router
     app.include_router(delegate.router, prefix="/api/modules")
@@ -392,6 +588,7 @@ except Exception as e:
         description="Error recovery mode due to startup failure",
         version="1.0.0"
     )
+feature/phase-4.1-orchestrator-consult
     
     @app.get("/")
     async def error_root():
@@ -404,3 +601,4 @@ except Exception as e:
 # If this file is run directly, start the server
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+main
