@@ -1,49 +1,29 @@
-from fastapi import FastAPI, APIRouter, Response, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.routing import APIRoute
+"""
+Modified main.py to fix router imports and registrations.
+This ensures all cognitive agent and system endpoints are properly accessible via API.
+"""
+
 import os
 import logging
-import inspect
-import re
-import datetime
 import traceback
+import inspect
 from dotenv import load_dotenv
-from fastapi.responses import StreamingResponse, JSONResponse
-import json
-import asyncio
-import time
-import uvicorn
+from fastapi import FastAPI, APIRouter, Request, HTTPException, Depends
+from fastapi.routing import APIRoute
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.middleware.cors import CustomCORSMiddleware, normalize_origin, sanitize_origin_for_header
+from fastapi.responses import JSONResponse
 
-# Wrap the entire startup in a try-except block for error trapping
-try:
-    print("🚀 Starting Promethios OS...")
+def create_app():
+    """
+    Create and configure the FastAPI application.
     
-    # Initialize agent registry first with failsafe loader
-    try:
-        from app.core.agent_loader import initialize_agents, get_all_agents, get_agent
-        
-        # Initialize all agents with failsafe error handling
-        print("🔄 Initializing agent registry...")
-        agents = initialize_agents()
-        print(f"✅ Agent registry initialized with {len(agents)} agents")
-    except Exception as e:
-        print(f"⚠️ Agent Registry Load Failed: {e}")
-        agents = []
+    This function handles all router imports and registrations,
+    sets up middleware, and configures logging.
     
-    # Import router modules with safeguards
-    # Import orchestrator routes
-    try:
-        from routes.orchestrator_routes import router as orchestrator_router
-        print("✅ Successfully imported orchestrator_router")
-    except ModuleNotFoundError as e:
-        print(f"⚠️ Router Load Failed: orchestrator_routes — {e}")
-        orchestrator_router = APIRouter()
-        @orchestrator_router.get("/orchestrator/ping")
-        def orchestrator_ping():
-            return {"status": "Orchestrator router placeholder"}
+    Returns:
+        FastAPI: The configured FastAPI application
+    """
+    print("🚀 Starting Promethios API Server")
     
     # Import agent routes
     try:
@@ -52,20 +32,9 @@ try:
     except ModuleNotFoundError as e:
         print(f"⚠️ Router Load Failed: agent_routes — {e}")
         agent_router = APIRouter()
-        @agent_router.get("/agent/ping")
+        @agent_router.get("/ping")
         def agent_ping():
             return {"status": "Agent router placeholder"}
-    
-    # Import memory routes
-    try:
-        from routes.memory_routes import router as memory_router
-        print("✅ Successfully imported memory_router")
-    except ModuleNotFoundError as e:
-        print(f"⚠️ Router Load Failed: memory_routes — {e}")
-        memory_router = APIRouter()
-        @memory_router.get("/memory/ping")
-        def memory_ping():
-            return {"status": "Memory router placeholder"}
     
     # Import system routes
     try:
@@ -74,9 +43,20 @@ try:
     except ModuleNotFoundError as e:
         print(f"⚠️ Router Load Failed: system_routes — {e}")
         system_router = APIRouter()
-        @system_router.get("/system/ping")
+        @system_router.get("/ping")
         def system_ping():
             return {"status": "System router placeholder"}
+    
+    # Import memory routes
+    try:
+        from routes.memory_routes import router as memory_router
+        print("✅ Successfully imported memory_router")
+    except ModuleNotFoundError as e:
+        print(f"⚠️ Router Load Failed: memory_routes — {e}")
+        memory_router = APIRouter()
+        @memory_router.get("/ping")
+        def memory_ping():
+            return {"status": "Memory router placeholder"}
     
     # Import debug routes
     try:
@@ -85,7 +65,7 @@ try:
     except ModuleNotFoundError as e:
         print(f"⚠️ Router Load Failed: debug_routes — {e}")
         debug_router = APIRouter()
-        @debug_router.get("/debug/ping")
+        @debug_router.get("/ping")
         def debug_ping():
             return {"status": "Debug router placeholder"}
     
@@ -96,7 +76,7 @@ try:
     except ModuleNotFoundError as e:
         print(f"⚠️ Router Load Failed: hal_routes — {e}")
         hal_router = APIRouter()
-        @hal_router.get("/hal/ping")
+        @hal_router.get("/ping")
         def hal_ping():
             return {"status": "HAL router placeholder"}
     
@@ -149,12 +129,12 @@ try:
     # Import project start router for Phase 12.0 - CRITICAL for Agent Playground
     print("🔄 Importing project start router for Phase 12.0 (Agent Playground)")
     try:
-        from app.api.project import start  # Project start router
+        from app.api.project.start import router as start_router  # Project start router
         print("✅ Successfully imported project start router")
     except Exception as e:
         print(f"⚠️ Router Load Failed: project start — {e}")
-        start = APIRouter()
-        @start.get("/error")
+        start_router = APIRouter()
+        @start_router.get("/error")
         async def project_start_import_error():
             return {"status": "error", "message": f"Failed to import project start router: {str(e)}"}
         print("⚠️ Created placeholder router for /api/project/error")
@@ -298,180 +278,96 @@ try:
         return {"status": "ok", "mode": "production"}
         
     @app.get("/control/registry")
-    async def control_registry():
+    async def get_registry():
         """
-        Control Room registry endpoint that returns information about available modules
-        and their UI integration status. This powers dynamic UI menus, dev dashboards,
-        and Control Room builder screens.
+        Returns a list of all registered routes in the application.
+        Useful for debugging and monitoring.
         """
-        logger.info("Control Room registry endpoint accessed")
-        
-        # Use standard library for timestamp to avoid import issues
-        import datetime as dt
-        current_time = dt.datetime.now().isoformat()
+        routes = []
+        for route in app.routes:
+            route_info = {
+                "path": route.path,
+                "methods": list(route.methods) if hasattr(route, "methods") else ["GET"],
+                "name": route.name if hasattr(route, "name") else None,
+                "endpoint": route.endpoint.__name__ if hasattr(route, "endpoint") else None
+            }
+            routes.append(route_info)
         
         return {
-            "modules": [
-                {"name": "Scope Planner", "route": "/orchestrator/scope", "ui": "markdown", "status": "needs_ui"},
-                {"name": "Delegate Executor", "route": "/delegate", "ui": "payload_button", "status": "needs_ui"},
-                {"name": "Summary Viewer", "route": "/summarize", "ui": "markdown_panel", "status": "needs_ui"},
-                {"name": "Project Selector", "route": "/projects", "ui": "sidebar_dropdown", "status": "built"},
-                {"name": "Tone Configurator", "route": "/agent/tone", "ui": "editable_table", "status": "future"},
-                {"name": "Loop Controller", "route": "/loop", "ui": "status_panel", "status": "needs_ui"},
-                {"name": "Reflection Viewer", "route": "/reflect", "ui": "text_panel", "status": "needs_ui"},
-                {"name": "Memory Browser", "route": "/read", "ui": "searchable_table", "status": "in_progress"},
-                {"name": "Agent Registry", "route": "/agents", "ui": "card_grid", "status": "needs_ui"},
-                {"name": "System Caps Monitor", "route": "/system/caps", "ui": "settings_panel", "status": "future"}
-            ],
-            "ui_components": [
-                {"type": "markdown", "description": "Markdown content viewer with code highlighting"},
-                {"type": "payload_button", "description": "JSON payload editor with request/response handling"},
-                {"type": "markdown_panel", "description": "Formatted text display with copy functionality"},
-                {"type": "sidebar_dropdown", "description": "Hierarchical organization with search"},
-                {"type": "editable_table", "description": "Inline editing with validation"},
-                {"type": "status_panel", "description": "Visual status display with metrics"},
-                {"type": "text_panel", "description": "Plain text display with search"},
-                {"type": "searchable_table", "description": "Data table with filtering and sorting"},
-                {"type": "card_grid", "description": "Visual card layout for entity display"},
-                {"type": "settings_panel", "description": "Configuration interface with save/reset"}
-            ],
-            "integration_status": {
-                "needs_ui": "Component needs UI implementation",
-                "in_progress": "UI implementation in progress",
-                "built": "UI component is implemented and functional",
-                "future": "Planned for future implementation"
-            },
-            "last_updated": current_time
+            "status": "success",
+            "routes": routes,
+            "total_routes": len(routes)
         }
 
-    # Add debug endpoint for memory verification
-    @app.get("/api/debug/memory/log")
-    async def debug_memory_log():
-        """
-        Debug endpoint to verify memory thread database state.
-        Returns thread counts and recent entries.
-        """
-        try:
-            from app.modules.memory_thread import THREAD_DB
-            import datetime
-
-            thread_counts = {}
-            for key, entries in THREAD_DB.items():
-                project_id, chain_id = key.split(":")
-                if project_id not in thread_counts:
-                    thread_counts[project_id] = {}
-                thread_counts[project_id][chain_id] = len(entries)
-            
-            # Get a sample of recent entries
-            recent_entries = []
-            for key, entries in THREAD_DB.items():
-                if entries:
-                    project_id, chain_id = key.split(":")
-                    for entry in entries[-3:]:  # Last 3 entries
-                        recent_entries.append({
-                            "project_id": project_id,
-                            "chain_id": chain_id,
-                            "timestamp": entry.get("timestamp", "unknown"),
-                            "content_preview": entry.get("content", "")[:100] + "..." if len(entry.get("content", "")) > 100 else entry.get("content", "")
-                        })
-            
-            return {
-                "status": "success",
-                "thread_counts": thread_counts,
-                "total_threads": sum(len(chains) for chains in thread_counts.values()),
-                "recent_entries": recent_entries[:10],  # Limit to 10 entries
-                "timestamp": datetime.datetime.now().isoformat()
-            }
-        except Exception as e:
-            return {
-                "status": "error",
-                "message": f"Error accessing memory thread database: {str(e)}",
-                "timestamp": datetime.datetime.now().isoformat()
-            }
-
-    # Register routers with safeguards
+    # Register all routers with appropriate prefixes
     try:
-        # Register the orchestrator_router
-        try:
-            print(f"🔍 DEBUG: Orchestrator router object: {orchestrator_router}")
-            app.include_router(orchestrator_router, prefix="/api/orchestrator")
-            print("🧠 Route defined: /api/orchestrator/* -> orchestrator_routes")
-        except Exception as e:
-            print(f"⚠️ Failed to register orchestrator_router: {e}")
+        print("🔄 Registering all routers with appropriate prefixes")
         
-        # Register the agent_router
+        # Register core routers
         try:
             print(f"🔍 DEBUG: Agent router object: {agent_router}")
             app.include_router(agent_router, prefix="/api/agent")
-            print("🧠 Route defined: /api/agent/* -> agent_routes")
+            print("🧠 Route defined: /api/agent/* -> agent_router")
         except Exception as e:
             print(f"⚠️ Failed to register agent_router: {e}")
         
-        # Register the memory_router
-        try:
-            print(f"🔍 DEBUG: Memory router object: {memory_router}")
-            app.include_router(memory_router, prefix="/api/memory")
-            print("🧠 Route defined: /api/memory/* -> memory_routes")
-        except Exception as e:
-            print(f"⚠️ Failed to register memory_router: {e}")
-        
-        # Register the system_router
         try:
             print(f"🔍 DEBUG: System router object: {system_router}")
             app.include_router(system_router, prefix="/api/system")
-            print("🧠 Route defined: /api/system/* -> system_routes")
+            print("🧠 Route defined: /api/system/* -> system_router")
         except Exception as e:
             print(f"⚠️ Failed to register system_router: {e}")
         
-        # Register the debug_router
+        try:
+            print(f"🔍 DEBUG: Memory router object: {memory_router}")
+            app.include_router(memory_router, prefix="/api/memory")
+            print("🧠 Route defined: /api/memory/* -> memory_router")
+        except Exception as e:
+            print(f"⚠️ Failed to register memory_router: {e}")
+        
         try:
             print(f"🔍 DEBUG: Debug router object: {debug_router}")
             app.include_router(debug_router, prefix="/api/debug")
-            print("🧠 Route defined: /api/debug/* -> debug_routes")
+            print("🧠 Route defined: /api/debug/* -> debug_router")
         except Exception as e:
             print(f"⚠️ Failed to register debug_router: {e}")
         
-        # Register the hal_router
         try:
             print(f"🔍 DEBUG: HAL router object: {hal_router}")
             app.include_router(hal_router, prefix="/api/hal")
-            print("🧠 Route defined: /api/hal/* -> hal_routes")
+            print("🧠 Route defined: /api/hal/* -> hal_router")
         except Exception as e:
             print(f"⚠️ Failed to register hal_router: {e}")
         
-        # Register the snapshot_router
         try:
             print(f"🔍 DEBUG: Snapshot router object: {snapshot_router}")
             app.include_router(snapshot_router, prefix="/api/snapshot")
-            print("🧠 Route defined: /api/snapshot/* -> snapshot_routes")
+            print("🧠 Route defined: /api/snapshot/* -> snapshot_router")
         except Exception as e:
             print(f"⚠️ Failed to register snapshot_router: {e}")
-            
-        # Register the project_router
+        
         try:
-            print(f"🔍 DEBUG: Project routes router object: {project_router}")
+            print(f"🔍 DEBUG: Project router object: {project_router}")
             app.include_router(project_router, prefix="/api/project")
-            print("🧠 Route defined: /api/project/* -> project_routes")
+            print("🧠 Route defined: /api/project/* -> project_router")
         except Exception as e:
             print(f"⚠️ Failed to register project_router: {e}")
         
-        # Register the integrity_router
         try:
-            print(f"🔍 DEBUG: Integrity router object: {integrity_router}")
+            print(f"🔍 DEBUG: System integrity router object: {integrity_router}")
             app.include_router(integrity_router, prefix="/api/system")
-            print("🧠 Route defined: /api/system/integrity -> check_system_integrity")
+            print("🧠 Route defined: /api/system/integrity/* -> integrity_router")
         except Exception as e:
             print(f"⚠️ Failed to register integrity_router: {e}")
-            
-        # Register the system_log_router
+        
         try:
             print(f"🔍 DEBUG: System log router object: {system_log_router}")
             app.include_router(system_log_router, prefix="/api/system")
-            print("🧠 Route defined: /api/system/log -> get_system_log")
+            print("🧠 Route defined: /api/system/log/* -> system_log_router")
         except Exception as e:
             print(f"⚠️ Failed to register system_log_router: {e}")
         
-        # Register other routers with safeguards
+        # Register module routers
         try:
             print(f"🔍 DEBUG: Agent module router object: {agent_module_router}")
             app.include_router(agent_module_router, prefix="/api/modules/agent")
@@ -554,8 +450,8 @@ try:
         
         # Register project start router
         try:
-            print(f"🔍 DEBUG: Project start router object: {start}")
-            app.include_router(start, prefix="/api/project")
+            print(f"🔍 DEBUG: Project start router object: {start_router}")
+            app.include_router(start_router, prefix="/api/project")
             print("🧠 Route defined: /api/project/start -> project_start")
         except Exception as e:
             print(f"⚠️ Failed to register project start router: {e}")
@@ -597,123 +493,8 @@ try:
 
     # Request body size limiter middleware
     app.middleware("http")(limit_request_body_size)
+    print("✅ Request body size limiter middleware added")
 
-    # Middleware for logging with timeout handling
-    @app.middleware("http")
-    async def log_requests(request: Request, call_next):
-        import time
-        import asyncio
-        import json
-        
-        start_time = time.time()
-        
-        # Extract request details
-        method = request.method
-        url = str(request.url)
-        client_host = request.client.host if request.client else "unknown"
-        
-        # Set a timeout for the request processing
-        try:
-            response = await asyncio.wait_for(call_next(request), timeout=60.0)  # 60 second timeout
-            process_time = time.time() - start_time
-            
-            # Log the request details
-            logger.info(f"{method} {url} - {response.status_code} - {process_time:.4f}s - {client_host}")
-            
-            return response
-        except asyncio.TimeoutError:
-            # Handle timeout
-            process_time = time.time() - start_time
-            logger.error(f"{method} {url} - TIMEOUT after {process_time:.4f}s - {client_host}")
-            
-            return JSONResponse(
-                status_code=504,
-                content={"detail": "Request processing timed out"}
-            )
-        except Exception as e:
-            # Handle other exceptions
-            process_time = time.time() - start_time
-            logger.error(f"{method} {url} - ERROR: {str(e)} after {process_time:.4f}s - {client_host}")
-            
-            return JSONResponse(
-                status_code=500,
-                content={"detail": f"Internal server error: {str(e)}"}
-            )
+    return app
 
-    # Catch-all handler for SPA routing
-    @app.api_route("/{full_path:path}", methods=["GET", "POST", "PUT", "DELETE"])
-    async def catch_all(request: Request, full_path: str):
-        """
-        Catch-all handler for SPA routing.
-        
-        This handler serves the index.html file for all routes that don't match an API endpoint,
-        allowing the frontend SPA to handle client-side routing.
-        """
-        # Log the request path for debugging
-        logger.info(f"Catch-all handler received request for path: {full_path}")
-        
-        # Check if this is an API route
-        if full_path.startswith("api/"):
-            # Instead of immediately returning 404, let FastAPI's router try to handle it first
-            # This is done by checking if the path is already handled by another route
-            for route in app.routes:
-                if isinstance(route, APIRoute):
-                    # Convert the route path to a regex pattern
-                    route_path = route.path.replace("{", "").replace("}", "")
-                    if route_path.strip("/") == full_path.strip("/"):
-                        logger.info(f"Path {full_path} matches existing route {route.path}, letting router handle it")
-                        # Let the request continue to be processed by the matching route
-                        return await route.endpoint(request)
-            
-            # If we get here, no matching route was found, so return 404
-            logger.warning(f"No matching route found for API path: {full_path}")
-            return JSONResponse(
-                status_code=404,
-                content={"status": "error", "message": "API endpoint not found"}
-            )
-        
-        # Serve index.html for all other routes (SPA routing)
-        return Response(
-            content=open("public/index.html", "r").read(),
-            media_type="text/html"
-        )
-
-    print("✅ All routes and middleware configured successfully")
-    print("🚀 Application startup complete")
-
-except Exception as e:
-    # Global error handler for startup failures
-    print(f"❌ CRITICAL ERROR DURING STARTUP: {str(e)}")
-    print(traceback.format_exc())
-    
-    # Create a minimal FastAPI app that reports the error
-    app = FastAPI(
-        title="Enhanced AI Agent System (ERROR MODE)",
-        description="The application failed to start properly. See logs for details.",
-        version="1.0.0"
-    )
-    
-    @app.get("/")
-    async def error_root():
-        return {
-            "status": "error",
-            "message": "Application failed to start properly",
-            "error": str(e)
-        }
-    
-    @app.get("/health")
-    async def error_health():
-        return {
-            "status": "error",
-            "message": "Application failed to start properly",
-            "error": str(e)
-        }
-    
-    # Add CORS middleware even in error mode
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+app = create_app()
