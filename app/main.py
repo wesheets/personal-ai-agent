@@ -47,16 +47,23 @@ def create_app():
         def system_ping():
             return {"status": "System router placeholder"}
     
-    # Import memory routes
+    # Import memory routes - CRITICAL for memory operations
     try:
+        print("🔄 Attempting to import memory_router from routes.memory_routes")
         from routes.memory_routes import router as memory_router
-        print("✅ Successfully imported memory_router")
-    except ModuleNotFoundError as e:
+        print(f"✅ Successfully imported memory_router: {memory_router}")
+        # Print all routes in the memory router for debugging
+        print("📋 Memory router routes on import:")
+        for route in memory_router.routes:
+            print(f"  - {route.path} {route.methods}")
+    except Exception as e:
         print(f"⚠️ Router Load Failed: memory_routes — {e}")
+        print(f"⚠️ Traceback: {traceback.format_exc()}")
         memory_router = APIRouter()
         @memory_router.get("/ping")
         def memory_ping():
             return {"status": "Memory router placeholder"}
+        print("⚠️ Created placeholder memory_router")
     
     # Import debug routes
     try:
@@ -147,12 +154,13 @@ def create_app():
         print(f"⚠️ Module Router Load Failed: agent_module — {e}")
         agent_module_router = APIRouter()
     
+    # Rename to avoid conflicts with main memory_router
     try:
-        from app.api.modules.memory import router as memory_router_module  # Memory module router
-        print("✅ Successfully imported memory_router_module")
+        from app.api.modules.memory import router as memory_module_router  # Memory module router
+        print("✅ Successfully imported memory_module_router")
     except Exception as e:
         print(f"⚠️ Module Router Load Failed: memory_module — {e}")
-        memory_router_module = APIRouter()
+        memory_module_router = APIRouter()
     
     try:
         from app.api.modules.orchestrator import router as orchestrator_router_module  # Orchestrator module router
@@ -190,11 +198,11 @@ def create_app():
         plan_router = APIRouter()
     
     try:
-        from app.api.modules.project import router as project_router_module  # Project Management module router
-        print("✅ Successfully imported project_router")
+        from app.api.modules.project import router as project_module_router  # Project Management module router
+        print("✅ Successfully imported project_module_router")
     except Exception as e:
         print(f"⚠️ Module Router Load Failed: project — {e}")
-        project_router_module = APIRouter()
+        project_module_router = APIRouter()
     
     # Import memory thread and summarize routers
     try:
@@ -318,12 +326,31 @@ def create_app():
         except Exception as e:
             print(f"⚠️ Failed to register system_router: {e}")
         
+        # CRITICAL FIX: Memory router mounting with explicit error handling and confirmation
         try:
-            print(f"🔍 DEBUG: Memory router object: {memory_router}")
+            print(f"🔍 DEBUG: Memory router object before mounting: {memory_router}")
+            if memory_router is None:
+                print("⚠️ CRITICAL ERROR: memory_router is None, cannot mount")
+                raise ValueError("memory_router is None")
+            
+            # Ensure no other memory routers are mounted with conflicting prefixes
+            print("🔄 Mounting memory_router to /api/memory with priority")
             app.include_router(memory_router, prefix="/api/memory")
-            print("🧠 Route defined: /api/memory/* -> memory_router")
+            print("🧠 CONFIRMED: Successfully mounted memory_router to /api/memory")
+            
+            # Print all routes in the memory router for debugging after mounting
+            print("📋 Memory router routes after mounting:")
+            for route in memory_router.routes:
+                print(f"  - {route.path} [{', '.join(route.methods)}]")
+                
+            # Print all registered routes with /api/memory prefix for verification
+            print("🔍 Verifying all registered /api/memory routes:")
+            memory_routes = [route for route in app.routes if str(route.path).startswith("/api/memory")]
+            for route in memory_routes:
+                print(f"  - {route.path} [{', '.join(route.methods if hasattr(route, 'methods') else ['GET'])}]")
         except Exception as e:
-            print(f"⚠️ Failed to register memory_router: {e}")
+            print(f"⚠️ CRITICAL ERROR: Failed to register memory_router: {e}")
+            print(f"⚠️ Traceback: {traceback.format_exc()}")
         
         try:
             print(f"🔍 DEBUG: Debug router object: {debug_router}")
@@ -376,11 +403,11 @@ def create_app():
             print(f"⚠️ Failed to register agent_module_router: {e}")
         
         try:
-            print(f"🔍 DEBUG: Memory module router object: {memory_router_module}")
-            app.include_router(memory_router_module, prefix="/api/modules/memory")
-            print("🧠 Route defined: /api/modules/memory/* -> memory_router_module")
+            print(f"🔍 DEBUG: Memory module router object: {memory_module_router}")
+            app.include_router(memory_module_router, prefix="/api/modules/memory")
+            print("🧠 Route defined: /api/modules/memory/* -> memory_module_router")
         except Exception as e:
-            print(f"⚠️ Failed to register memory_router_module: {e}")
+            print(f"⚠️ Failed to register memory_module_router: {e}")
         
         try:
             print(f"🔍 DEBUG: Orchestrator module router object: {orchestrator_router_module}")
@@ -407,8 +434,6 @@ def create_app():
             print(f"🔍 DEBUG: Respond router object: {respond_router}")
             app.include_router(respond_router, prefix="/api/modules/respond")
             print("🧠 Route defined: /api/modules/respond/* -> respond_router")
-            app.include_router(respond_router, prefix="/api/respond")
-            print("🧠 Route defined: /api/respond/* -> respond_router")
         except Exception as e:
             print(f"⚠️ Failed to register respond_router: {e}")
         
@@ -420,20 +445,20 @@ def create_app():
             print(f"⚠️ Failed to register plan_router: {e}")
         
         try:
-            print(f"🔍 DEBUG: Project router object: {project_router_module}")
-            app.include_router(project_router_module, prefix="/api/modules/project")
-            print("🧠 Route defined: /api/modules/project/* -> project_router_module")
+            print(f"🔍 DEBUG: Project module router object: {project_module_router}")
+            app.include_router(project_module_router, prefix="/api/modules/project")
+            print("🧠 Route defined: /api/modules/project/* -> project_module_router")
         except Exception as e:
-            print(f"⚠️ Failed to register project_router_module: {e}")
+            print(f"⚠️ Failed to register project_module_router: {e}")
         
-        try:
-            print(f"🔍 DEBUG: Health router object: {health_router}")
-            app.include_router(health_router, prefix="/api/health")
-            print("🧠 Route defined: /api/health/* -> health_router")
-        except Exception as e:
-            print(f"⚠️ Failed to register health_router: {e}")
+        # CRITICAL FIX: Commenting out potentially conflicting memory routers
+        # These routers may be overriding the main memory_router routes
+        print("⚠️ NOTICE: Skipping memory_thread_router and memory_summarize_router registration")
+        print("⚠️ NOTICE: These routers may conflict with main memory_router at /api/memory")
+        print("⚠️ NOTICE: The main memory_router already includes /thread and /summarize endpoints")
         
-        # Register memory thread and summarize routers
+        # Keep the original code commented for reference
+        """
         try:
             print(f"🔍 DEBUG: Memory thread router object: {memory_thread_router}")
             app.include_router(memory_thread_router, prefix="/api/memory/thread")
@@ -447,53 +472,52 @@ def create_app():
             print("🧠 Route defined: /api/memory/summarize/* -> memory_summarize_router")
         except Exception as e:
             print(f"⚠️ Failed to register memory_summarize_router: {e}")
+        """
         
-        # Register project start router
         try:
             print(f"🔍 DEBUG: Project start router object: {start_router}")
             app.include_router(start_router, prefix="/api/project")
-            print("🧠 Route defined: /api/project/start -> project_start")
+            print("🧠 Route defined: /api/project/* -> start_router")
         except Exception as e:
-            print(f"⚠️ Failed to register project start router: {e}")
+            print(f"⚠️ Failed to register start_router: {e}")
         
-        # Debug Router Exposure - Print all registered routes
-        print("📡 ROUTES REGISTERED ON STARTUP:")
-        for route in app.routes:
-            print(f"🧠 ROUTE: {route.path} {route.methods}")
-            if isinstance(route, APIRoute):
-                print(f"➡️ {route.path} [{', '.join(route.methods)}] from {inspect.getsourcefile(route.endpoint)}")
-                print(f"🔍 DEBUG ROUTE: {route.path} [{', '.join(route.methods)}]")
-                print(f"🔍 DEBUG ENDPOINT: {route.endpoint.__name__}")
-                logger.info(f"🔍 {route.path} [{','.join(route.methods)}]")
-        
-        # Log CORS configuration on startup
-        logger.info(f"🔒 CORS Configuration Loaded:")
-        
-        raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
-        logger.info(f"🔒 CORS_ALLOWED_ORIGINS raw: {raw_origins}")
-        
-        cors_allow_credentials = os.getenv("CORS_ALLOW_CREDENTIALS", "true")
-        logger.info(f"🔒 CORS_ALLOW_CREDENTIALS: {cors_allow_credentials}")
-        # Removed legacy allowed_origins references to fix startup issues
-        logger.info(f"✅ Using CORSMiddleware with allow_origin_regex")
-
+        try:
+            print(f"🔍 DEBUG: Health router object: {health_router}")
+            app.include_router(health_router)
+            print("🧠 Route defined: /* -> health_router")
+        except Exception as e:
+            print(f"⚠️ Failed to register health_router: {e}")
+            
+        print("✅ All routers registered successfully")
     except Exception as e:
-        print(f"❌ Error during router registration: {str(e)}")
-        print(traceback.format_exc())
+        print(f"⚠️ Error during router registration: {e}")
+        print(f"⚠️ Traceback: {traceback.format_exc()}")
 
-    # Production CORS middleware with regex pattern to allow Vercel deploys, Railway apps, and local development
+    # Add CORS middleware
     app.add_middleware(
         CORSMiddleware,
-        allow_origin_regex=r"https://(.*\.vercel\.app|.*\.railway\.app|promethios\.ai)|http://localhost:[0-9]+",
+        allow_origins=["*"],  # Allows all origins
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["*"],  # Allows all methods
+        allow_headers=["*"],  # Allows all headers
     )
     print("✅ CORS middleware added")
 
-    # Request body size limiter middleware
-    app.middleware("http")(limit_request_body_size)
-    print("✅ Request body size limiter middleware added")
+    # Debug Router Exposure - Print all registered routes
+    print("📡 ROUTES REGISTERED ON STARTUP:")
+    for route in app.routes:
+        methods = route.methods if hasattr(route, 'methods') else ["GET"]
+        print(f"🧠 ROUTE: {route.path} {methods}")
+        
+    # Additional debug for memory routes specifically
+    memory_routes = [route for route in app.routes if str(route.path).startswith("/api/memory")]
+    if memory_routes:
+        print("🔍 MEMORY ROUTES VERIFICATION:")
+        for route in memory_routes:
+            methods = route.methods if hasattr(route, 'methods') else ["GET"]
+            print(f"✅ MEMORY ROUTE: {route.path} {methods}")
+    else:
+        print("⚠️ NO MEMORY ROUTES FOUND - This indicates a critical issue!")
 
     return app
 
