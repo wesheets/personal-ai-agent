@@ -7,6 +7,7 @@ import logging
 import inspect
 import re
 import datetime
+import traceback
 from dotenv import load_dotenv
 from fastapi.responses import StreamingResponse, JSONResponse
 import json
@@ -366,38 +367,11 @@ try:
                 "timestamp": datetime.datetime.now().isoformat()
             }
         except Exception as e:
+            logger.error(f"Error in debug_memory_log: {str(e)}")
             return {
                 "status": "error",
-                "message": f"Failed to access memory thread database: {str(e)}",
-                "timestamp": datetime.datetime.now().isoformat()
+                "message": f"Failed to get memory log: {str(e)}"
             }
-
-    # Add startup delay to ensure FastAPI is fully initialized before healthcheck
-    import asyncio
-
-    @app.on_event("startup")
-    async def startup_delay():
-        """
-        Add a small delay during startup to ensure FastAPI is fully initialized
-        before Railway attempts the healthcheck.
-        """
-        logger.info("Adding startup delay to ensure application is fully initialized...")
-        await asyncio.sleep(1)  # give it breathing room before healthcheck
-        logger.info("Startup delay completed, application ready for healthcheck")
-
-    # Add new startup logging as required
-    @app.on_event("startup")
-    async def startup_log():
-        """
-        Log that the FastAPI application has started successfully.
-        """
-        print("✅ FastAPI application started")
-        logger.info("✅ FastAPI application started successfully")
-
-    # Route logger for debugging
-    @app.on_event("startup")
-    async def log_all_routes():
-        print("🚀 Booting Enhanced AI Agent System...")
         
         # Register the orchestrator_router
         try:
@@ -703,9 +677,25 @@ try:
 
     # Serve the React app for all other routes
     @app.get("/{full_path:path}", include_in_schema=False)
-    async def serve_react_app(full_path: str):
-        # Exclude API routes
+    async def serve_react_app(full_path: str, request: Request):
+        # Log the request path for debugging
+        logger.info(f"Catch-all handler received request for path: {full_path}")
+        
+        # Check if this is an API route
         if full_path.startswith("api/"):
+            # Instead of immediately returning 404, let FastAPI's router try to handle it first
+            # This is done by checking if the path is already handled by another route
+            for route in app.routes:
+                if isinstance(route, APIRoute):
+                    # Convert the route path to a regex pattern
+                    route_path = route.path.replace("{", "").replace("}", "")
+                    if route_path.strip("/") == full_path.strip("/"):
+                        logger.info(f"Path {full_path} matches existing route {route.path}, letting router handle it")
+                        # Let the request continue to be processed by the matching route
+                        return await route.endpoint(request)
+            
+            # If we get here, no matching route was found, so return 404
+            logger.warning(f"No matching route found for API path: {full_path}")
             return JSONResponse(
                 status_code=404,
                 content={"status": "error", "message": "API endpoint not found"}
@@ -716,7 +706,6 @@ try:
             content=open("public/index.html", "r").read(),
             media_type="text/html"
         )
-    print("✅ React app route configured")
 
     print("✅ All routes and middleware configured successfully")
     print("🚀 Application startup complete")
