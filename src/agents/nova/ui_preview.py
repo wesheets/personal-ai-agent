@@ -1,3 +1,7 @@
+__version__ = "3.5.0"
+__agent__ = "NOVA"
+__role__ = "strategist"
+
 """
 NOVA UI Preview Generator
 
