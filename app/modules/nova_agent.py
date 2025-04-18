@@ -92,58 +92,41 @@ def run_nova_agent(task, project_id, tools):
             print("✅ Memory logged for NOVA UI generation")
 
         if PROJECT_STATE_AVAILABLE:
-            # Call increment_loop_count and log the result
-            print("🔄 Calling increment_loop_count...")
+            # 1. Increment loop count
             increment_result = increment_loop_count(project_id, "nova")
             if increment_result.get("status") == "success":
-                print("✅ Loop count incremented and agent updated")
-                print(f"✅ increment_loop_count result: {increment_result}")
+                print("✅ Loop count incremented and agent set to nova")
             else:
-                print(f"❌ Failed to increment loop count: {increment_result.get('message')}")
-                logger.error(f"Failed to increment loop count: {increment_result}")
+                print(f"❌ Loop count increment failed: {increment_result}")
 
-            # Read the current state after increment
-            print("🔄 Reading state after increment_loop_count...")
+            # 2. Read current memory
             state = read_project_state(project_id)
-            print(f"📊 Current state after increment: loop_count={state.get('loop_count')}, last_agent={state.get('last_completed_agent')}")
-            print(f"📊 Current completed_steps: {state.get('completed_steps', [])}")
+            print("📥 Current project state (before update):", state)
 
-            # Update these fields in memory
-            print("🔄 Updating state in memory...")
+            # 3. Merge UI files and update keys
+            ui_files_created = [
+                "src/components/Dashboard.jsx",
+                "src/components/LoginForm.jsx"
+            ]
+
             state["files_created"] = state.get("files_created", []) + ui_files_created
-            state["loop_count"] = state.get("loop_count", 0) + 1  # Ensure loop_count is incremented
+            state["completed_steps"] = state.get("completed_steps", []) + ["nova"]
             state["last_completed_agent"] = "nova"
-            
-            # Ensure completed_steps exists and contains nova
-            completed_steps = state.get("completed_steps", [])
-            if "nova" not in completed_steps:
-                completed_steps.append("nova")
-            state["completed_steps"] = completed_steps
-            
             state["next_recommended_step"] = "Run CRITIC to review NOVA's UI output"
-            
-            print(f"📊 Updated memory state: loop_count={state.get('loop_count')}, last_agent={state.get('last_completed_agent')}")
-            print(f"📊 Updated completed_steps: {state.get('completed_steps')}")
-            print(f"📊 Updated files_created: {state.get('files_created')}")
-            
-            # Update the project state with the modified state
-            print("🔄 Calling update_project_state to persist changes...")
+
+            # 4. Write memory
             update_result = update_project_state(project_id, state)
-            if update_result.get("status") == "success":
-                print(f"✅ Project state updated — files: {ui_files_created}")
-                print(f"✅ Memory state updated: loop_count={state.get('loop_count')}, last_agent={state.get('last_completed_agent')}")
-                print(f"✅ update_project_state result: {update_result}")
-                print("➡️ Next: Run CRITIC to review NOVA's UI output")
+
+            if update_result.get("status") != "success":
+                print("❌ Failed to persist NOVA update:", update_result)
             else:
-                print(f"❌ Failed to update project state: {update_result.get('message')}")
-                logger.error(f"Failed to update project state: {update_result}")
-            
-            # Verify state was persisted by reading it again
-            print("🔄 Verifying state persistence by reading state again...")
-            final_state = read_project_state(project_id)
-            print(f"📊 Final state verification: loop_count={final_state.get('loop_count')}, last_agent={final_state.get('last_completed_agent')}")
-            print(f"📊 Final completed_steps: {final_state.get('completed_steps')}")
-            print(f"📊 Final files_created: {final_state.get('files_created')}")
+                print("✅ NOVA memory successfully persisted")
+                print("📤 Files created:", ui_files_created)
+                print("➡️ Next step:", state["next_recommended_step"])
+
+            # 5. Double-check final state
+            new_state = read_project_state(project_id)
+            print("🧠 Final memory snapshot:", new_state)
 
         if SYSTEM_LOG_AVAILABLE:
             log_event("NOVA", "Execution complete", project_id, {
