@@ -12,7 +12,7 @@ except ImportError:
 
 # Import project_state for tracking project status
 try:
-    from app.modules.project_state import update_project_state, read_project_state
+    from app.modules.project_state import update_project_state, read_project_state, increment_loop_count
     PROJECT_STATE_AVAILABLE = True
 except ImportError:
     PROJECT_STATE_AVAILABLE = False
@@ -95,26 +95,56 @@ def run_nova_agent(task, project_id, tools):
             print(f"✅ Memory entry created for design action")
             logger.info(f"NOVA logged memory entry for design action")
         
-        # Update project state
-        project_state_data = {
-            "agents_involved": ["nova"],
-            "latest_agent_action": {
-                "agent": "nova",
-                "action": design_action
-            },
-            "next_recommended_step": "Run CRITIC to review the design",
-            "tool_usage": {}
-        }
+        # Define UI files created by NOVA
+        ui_files_created = [
+            "src/components/Dashboard.jsx",
+            "src/components/LoginForm.jsx"
+        ]
         
+        # Update project state with memory updates for agent autonomy
         if PROJECT_STATE_AVAILABLE:
-            update_project_state(project_id, project_state_data)
-            print(f"✅ Project state updated")
-            logger.info(f"NOVA updated project state for {project_id}")
+            # First, increment loop count and update last_completed_agent
+            increment_result = increment_loop_count(project_id, "nova")
+            
+            if increment_result.get("status") != "success":
+                print(f"⚠️ Warning: Failed to increment loop count: {increment_result.get('message', 'Unknown error')}")
+                logger.warning(f"Failed to increment loop count: {increment_result.get('message', 'Unknown error')}")
+            else:
+                print(f"✅ Loop count incremented and last_completed_agent set to 'nova'")
+                logger.info(f"Loop count incremented and last_completed_agent set to 'nova' for {project_id}")
+            
+            # Next, update files_created and next_recommended_step
+            current_state = read_project_state(project_id)
+            current_files = current_state.get("files_created", [])
+            
+            # Update project state with additional data
+            project_state_data = {
+                "agents_involved": ["nova"],
+                "latest_agent_action": {
+                    "agent": "nova",
+                    "action": design_action
+                },
+                "files_created": current_files + ui_files_created,
+                "next_recommended_step": "Run CRITIC to review NOVA's UI output",
+                "tool_usage": {}
+            }
+            
+            update_result = update_project_state(project_id, project_state_data)
+            
+            if update_result.get("status") != "success":
+                print(f"⚠️ Warning: Failed to update project state: {update_result.get('message', 'Unknown error')}")
+                logger.warning(f"Failed to update project state: {update_result.get('message', 'Unknown error')}")
+            else:
+                print(f"✅ Project state updated with files_created and next_recommended_step")
+                print(f"📋 Files created: {ui_files_created}")
+                print(f"➡️ Next recommended step: Run CRITIC to review NOVA's UI output")
+                logger.info(f"Project state updated with files_created and next_recommended_step for {project_id}")
         
         # Log completion event to system delegation log
         if SYSTEM_LOG_AVAILABLE:
             log_event("NOVA", "Execution completed successfully", project_id, {
-                "design_action": design_action
+                "design_action": design_action,
+                "files_created": ui_files_created
             })
         
         return {
@@ -122,6 +152,8 @@ def run_nova_agent(task, project_id, tools):
             "message": f"NOVA successfully designed project {project_id}",
             "task": task,
             "tools": tools,
+            "files_created": ui_files_created,
+            "next_recommended_step": "Run CRITIC to review NOVA's UI output",
             "project_state": project_state
         }
     except Exception as e:
