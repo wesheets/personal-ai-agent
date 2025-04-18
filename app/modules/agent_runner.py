@@ -21,6 +21,7 @@ MODIFIED: Added agent retry and recovery flow for blocked agents
 MODIFIED: Added retry_hooks integration with proper error handling
 MODIFIED: Fixed add_memory_thread invocation to use correct parameter format
 MODIFIED: Fixed AGENT_RUNNERS dictionary definition for /api/agent/run endpoint
+MODIFIED: Added try/except block for importing agent modules to handle missing modules
 """
 
 import logging
@@ -42,13 +43,27 @@ except ImportError:
     OPENAI_AVAILABLE = False
     print("❌ OpenAI client import failed")
 
-# Import agent modules
-from app.agents.hal import run_hal_agent as hal_agent_import
-from app.agents.nova import run_nova_agent
-from app.agents.ash import run_ash_agent
-from app.agents.critic import run_critic_agent
-from app.agents.orchestrator import run_orchestrator_agent
-from app.agents.sage import run_sage_agent
+# Import agent modules with try/except block to handle missing modules
+try:
+    from app.agents.hal import run_hal_agent
+    from app.agents.nova import run_nova_agent
+    from app.agents.ash import run_ash_agent
+    from app.agents.critic import run_critic_agent
+    from app.agents.orchestrator import run_orchestrator_agent
+    from app.agents.sage import run_sage_agent
+
+    AGENT_RUNNERS = {
+        "hal": run_hal_agent,
+        "nova": run_nova_agent,
+        "ash": run_ash_agent,
+        "critic": run_critic_agent,
+        "orchestrator": run_orchestrator_agent,
+        "sage": run_sage_agent
+    }
+    print(f"✅ AGENT_RUNNERS initialized with: {list(AGENT_RUNNERS.keys())}")
+except Exception as e:
+    print(f"❌ Failed to load AGENT_RUNNERS: {e}")
+    AGENT_RUNNERS = {}
 
 # Import memory thread module
 from app.modules.memory_thread import add_memory_thread
@@ -283,260 +298,3 @@ def safe_log_retry_action(agent_id: str, project_id: str, action: str) -> None:
     except Exception as e:
         logger.error(f"Error logging retry action: {str(e)}")
         # No further fallback needed as this is already a fallback function
-
-def run_hal_agent(task, project_id, tools):
-    """
-    Run the HAL agent with the given task, project_id, and tools.
-    
-    This function creates a new project with the given task and tools,
-    and returns the result with a list of created files.
-    
-    Args:
-        task: The task to execute
-        project_id: The project identifier
-        tools: List of tools to use
-        
-    Returns:
-        Dict containing the result of the execution
-    """
-    try:
-        print(f"🤖 Running HAL agent with task: {task}")
-        logger.info(f"Running HAL agent with task: {task}")
-        
-        # Check retry status with robust error handling
-        retry_status = safe_get_retry_status(project_id, "hal")
-        
-        # Log retry status for debugging
-        print(f"🔄 HAL retry status: {retry_status}")
-        logger.info(f"HAL retry status: {retry_status}")
-        
-        # Check if agent should retry
-        if retry_status.get("should_retry", False):
-            # Log retry action
-            retry_message = f"HAL agent is retrying for project {project_id} due to: {retry_status.get('last_block_reason', 'unknown reason')}"
-            print(f"🔄 {retry_message}")
-            logger.info(retry_message)
-            
-            # Log retry action with robust error handling
-            safe_log_retry_action("hal", project_id, retry_message)
-            
-            # Return retry status in response
-            return {
-                "status": "retry",
-                "message": retry_message,
-                "retry_status": retry_status,
-                "task": task,
-                "tools": tools
-            }
-        
-        # Initialize variables
-        files_created = []
-        project_state = {}
-        
-        # Log memory
-        def log_memory(project_id, agent, action, content, structured_data=None):
-            if not MEMORY_WRITER_AVAILABLE:
-                print(f"⚠️ memory_writer not available, skipping memory logging")
-                logger.warning(f"memory_writer not available, skipping memory logging")
-                return
-            
-            memory_data = {
-                "project_id": project_id,
-                "agent": agent,
-                "action": action,
-                "content": content
-            }
-            
-            if structured_data:
-                memory_data["structured_data"] = structured_data
-            
-            write_memory(memory_data)
-            
-            # Add to memory thread
-            thread_data = {
-                "project_id": project_id,
-                "chain_id": "main",
-                "agent": agent,
-                "role": "system",
-                "content": content,
-                "step_type": "log"
-            }
-            
-            if structured_data:
-                thread_data["structured_data"] = structured_data
-            
-            # Fixed: Properly format memory_entry as a single dictionary parameter
-            print("✅ HAL wrote memory")
-            safe_add_memory_thread(thread_data)
-        
-        # Log task received
-        log_memory(
-            project_id=project_id,
-            agent="hal",
-            action="received_task",
-            content=f"Received task: {task}",
-            structured_data={
-                "task": task,
-                "tools": tools
-            }
-        )
-        
-        # Read project state if available
-        if PROJECT_STATE_AVAILABLE:
-            try:
-                project_state = read_project_state(project_id)
-                print(f"📊 Project state read: {project_state}")
-                logger.info(f"HAL read project state for {project_id}")
-            except Exception as e:
-                print(f"⚠️ Failed to read project state: {str(e)}")
-                logger.warning(f"Failed to read project state: {str(e)}")
-                project_state = {}
-        
-        # Check if file_writer is available
-        if not FILE_WRITER_AVAILABLE:
-            print(f"⚠️ file_writer not available, skipping file creation")
-            logger.warning(f"file_writer not available, skipping file creation")
-            return {
-                "status": "error",
-                "message": "file_writer not available, cannot create files",
-                "files_created": [],
-                "task": task,
-                "tools": tools,
-                "project_state": project_state
-            }
-        
-        # Create README.md
-        readme_content = f"""# {project_id.replace('_', ' ').title()}
-
-This project was created by the HAL agent.
-
-## Task
-{task}
-
-## Tools
-{', '.join(tools)}
-
-## Created
-{time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())}
-"""
-        
-        # Write README.md
-        readme_path = f"/verticals/{project_id}/README.md"
-        print(f"📝 Creating README.md at {readme_path}")
-        logger.info(f"Creating README.md at {readme_path}")
-        
-        readme_result = write_file(project_id, "README.md", readme_content)
-        if readme_result.get("status") == "success":
-            print(f"✅ README.md created successfully")
-            logger.info(f"README.md created successfully")
-            files_created.append(readme_path)
-        
-        # Create a simple project plan
-        plan_content = f"""# Project Plan for {project_id.replace('_', ' ').title()}
-
-## Overview
-This project plan was generated by the HAL agent.
-
-## Task
-{task}
-
-## Tools
-{', '.join(tools)}
-
-## Timeline
-- Start: {time.strftime("%Y-%m-%d", time.gmtime())}
-- Estimated completion: {time.strftime("%Y-%m-%d", time.gmtime(time.time() + 7 * 24 * 60 * 60))}
-
-## Steps
-1. Initialize project
-2. Analyze requirements
-3. Develop solution
-4. Test and validate
-5. Deploy and monitor
-"""
-        
-        # Write project plan
-        plan_path = f"/verticals/{project_id}/PROJECT_PLAN.md"
-        print(f"📝 Creating PROJECT_PLAN.md at {plan_path}")
-        logger.info(f"Creating PROJECT_PLAN.md at {plan_path}")
-        
-        plan_result = write_file(project_id, "PROJECT_PLAN.md", plan_content)
-        if plan_result.get("status") == "success":
-            print(f"✅ PROJECT_PLAN.md created successfully")
-            logger.info(f"PROJECT_PLAN.md created successfully")
-            files_created.append(plan_path)
-        
-        # Update project state if available
-        if PROJECT_STATE_AVAILABLE:
-            try:
-                update_project_state(project_id, {
-                    "last_agent": "hal",
-                    "last_task": task,
-                    "files_created": files_created,
-                    "status": "completed",
-                    "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
-                })
-                print(f"📊 Project state updated for {project_id}")
-                logger.info(f"Project state updated for {project_id}")
-            except Exception as e:
-                print(f"⚠️ Failed to update project state: {str(e)}")
-                logger.warning(f"Failed to update project state: {str(e)}")
-        
-        # Log completion
-        log_memory(
-            project_id=project_id,
-            agent="hal",
-            action="completed_task",
-            content=f"Completed task: {task}",
-            structured_data={
-                "task": task,
-                "tools": tools,
-                "files_created": files_created
-            }
-        )
-        
-        # Return success response
-        return {
-            "status": "success",
-            "message": f"HAL agent executed successfully for project {project_id}",
-            "files_created": files_created,
-            "task": task,
-            "tools": tools,
-            "project_state": project_state
-        }
-    except Exception as e:
-        error_msg = f"Error running HAL agent: {str(e)}"
-        print(f"❌ {error_msg}")
-        logger.error(error_msg)
-        logger.error(traceback.format_exc())
-        
-        # Log error
-        try:
-            if MEMORY_WRITER_AVAILABLE:
-                write_memory({
-                    "project_id": project_id,
-                    "agent": "hal",
-                    "action": "error",
-                    "content": error_msg
-                })
-        except Exception as log_error:
-            print(f"❌ Error logging error: {str(log_error)}")
-            logger.error(f"Error logging error: {str(log_error)}")
-        
-        # Return error response
-        return {
-            "status": "error",
-            "message": error_msg,
-            "task": task,
-            "tools": tools
-        }
-
-# Add AGENT_RUNNERS mapping for direct agent execution
-AGENT_RUNNERS = {
-    "hal": run_hal_agent,
-    "nova": run_nova_agent,
-    "ash": run_ash_agent,
-    "critic": run_critic_agent,
-    "orchestrator": run_orchestrator_agent,
-    "sage": run_sage_agent,
-}

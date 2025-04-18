@@ -1,7 +1,7 @@
 """
-HAL Agent Module
+NOVA Agent Module
 
-This module provides the HAL agent implementation for the agent runner system.
+This module provides a placeholder implementation for the NOVA agent.
 """
 
 import logging
@@ -9,11 +9,13 @@ import traceback
 from typing import Dict, Any, List, Optional
 
 # Configure logging
-logger = logging.getLogger("agents.hal")
+logger = logging.getLogger("agents.nova")
 
-def run_hal_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[str, Any]:
+def run_nova_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[str, Any]:
     """
-    Run the HAL agent with the given task, project_id, and tools.
+    Run the NOVA agent with the given task, project_id, and tools.
+    
+    This is a placeholder implementation that simply returns a success message.
     
     Args:
         task: The task to execute
@@ -24,8 +26,8 @@ def run_hal_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[s
         Dict containing the result of the execution
     """
     try:
-        logger.info(f"Running HAL agent with task: {task}, project_id: {project_id}")
-        print(f"🟥 HAL agent executing task '{task}' on project '{project_id}'")
+        logger.info(f"Running NOVA agent with task: {task}, project_id: {project_id}")
+        print(f"🟦 Placeholder NOVA agent running task '{task}' on project '{project_id}'")
         
         # Initialize tools if None
         if tools is None:
@@ -34,14 +36,14 @@ def run_hal_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[s
         # Return success response
         return {
             "status": "success",
-            "message": f"HAL agent executed successfully for project {project_id}",
-            "output": f"HAL executed task '{task}'",
+            "message": f"NOVA agent executed successfully for project {project_id}",
+            "output": f"NOVA agent placeholder executed task '{task}'",
             "task": task,
             "tools": tools,
             "project_id": project_id
         }
     except Exception as e:
-        error_msg = f"Error running HAL agent: {str(e)}"
+        error_msg = f"Error running NOVA agent: {str(e)}"
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         print(f"❌ {error_msg}")
