@@ -35,7 +35,7 @@ def create_app():
         @agent_router.get("/ping")
         def agent_ping():
             return {"status": "Agent router placeholder"}
-    
+
     # Import system routes
     try:
         from routes.system_routes import router as system_router
@@ -46,6 +46,17 @@ def create_app():
         @system_router.get("/ping")
         def system_ping():
             return {"status": "System router placeholder"}
+
+    # Import project routes
+    try:
+        from routes.project_routes import router as project_router
+        print("✅ Successfully imported project_router")
+    except ModuleNotFoundError as e:
+        print(f"⚠️ Router Load Failed: project_routes — {e}")
+        project_router = APIRouter()
+        @project_router.get("/project/ping")
+        def project_ping():
+            return {"status": "Project router placeholder"}
     
     # Import memory routes - CRITICAL for memory operations
     try:
