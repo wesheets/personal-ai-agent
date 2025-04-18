@@ -9,6 +9,7 @@ import TerminalDrawer from './TerminalDrawer';
 import ThemeToggle from './ThemeToggle';
 import SystemStatusPanel from './SystemStatusPanel';
 import SystemSummaryPanel from './SystemSummaryPanel';
+import AgentOutputPanel from './AgentOutputPanel';
 
 export default function ControlRoom() {
   const [data, setData] = useState(null);
@@ -49,10 +50,11 @@ export default function ControlRoom() {
           </p>
         </header>
 
-        {/* Ground Control Integration - System Status and Summary Panels */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Ground Control Integration - System Status, Summary, and Agent Output Panels */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <SystemStatusPanel projectId={data.project_id} />
           <SystemSummaryPanel projectId={data.project_id} />
+          <AgentOutputPanel projectId={data.project_id} />
         </div>
 
         <section className="space-y-4">
