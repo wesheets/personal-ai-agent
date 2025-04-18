@@ -21,6 +21,12 @@ logger = logging.getLogger("api.debug")
 # Create router
 router = APIRouter(tags=["Debug"])
 
+# Debug print to verify this file is loaded
+print("✅ DEBUG ROUTES LOADED - Version 2025-04-18-02")
+print("✅ Debug routes available:")
+print("  - /api/debug/agents")
+print("  - /api/debug/memory/log")
+
 @router.get("/agents")
 async def debug_agents():
     """
@@ -82,35 +88,45 @@ async def debug_agents():
         "status": "ok" if not (missing_in_profiles or missing_in_map) else "mismatched"
     }
 
+# Print debug info when this endpoint is defined
+print("✅ Registering /api/debug/memory/log endpoint")
+
 @router.get("/memory/log")
 async def get_memory_log():
     """
     Return the current in-memory debug log (or simulated log entries).
     """
     try:
+        print("🔍 Debug memory log endpoint called")
         logger.info(f"🔍 Debug memory log endpoint called")
         
         # Path to memory store file
         memory_file = os.path.join(os.path.dirname(__file__), "../app/modules/memory_store.json")
+        print(f"🔍 Looking for memory store at: {memory_file}")
         
         # Read memory entries from file
         memories = []
         if os.path.exists(memory_file):
             try:
+                print(f"✅ Memory store file found")
                 with open(memory_file, 'r') as f:
                     memories = json.load(f)
                     # Sort by timestamp (newest first)
                     memories.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
                     # Limit to most recent entries
                     memories = memories[:50]  # Return the 50 most recent entries
+                    print(f"✅ Retrieved {len(memories)} memory entries")
                     logger.info(f"🔍 Retrieved {len(memories)} memory entries")
             except json.JSONDecodeError:
+                print(f"⚠️ Could not decode memory store file")
                 logger.warning(f"⚠️ Could not decode memory store file")
                 memories = []
             except Exception as e:
+                print(f"❌ Error reading memory store: {str(e)}")
                 logger.error(f"❌ Error reading memory store: {str(e)}")
                 memories = []
         else:
+            print(f"⚠️ Memory store file not found at {memory_file}")
             logger.warning(f"⚠️ Memory store file not found at {memory_file}")
             # Generate synthetic entries if file doesn't exist
             memories = [
@@ -131,16 +147,22 @@ async def get_memory_log():
                     "content": "Another synthetic memory entry"
                 }
             ]
+            print(f"✅ Generated {len(memories)} synthetic memory entries")
             logger.info(f"🔍 Generated {len(memories)} synthetic memory entries")
         
+        print(f"✅ Returning memory log with {len(memories)} entries")
         return {
             "status": "success",
             "log": memories
         }
     except Exception as e:
         error_msg = f"Failed to retrieve memory log: {str(e)}"
+        print(f"❌ {error_msg}")
         logger.error(f"❌ {error_msg}")
         return {
             "status": "error",
             "message": error_msg
         }
+
+# Print confirmation after all endpoints are defined
+print("✅ All debug routes registered successfully")
