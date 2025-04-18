@@ -1,6 +1,8 @@
 """
 Agent Loop Module
 This module provides functionality for executing cognitive loops and agent autonomy.
+
+MODIFIED: Refactored to use unified agent registry instead of AGENT_RUNNERS
 """
 
 import logging
@@ -10,6 +12,9 @@ import requests
 import re
 from typing import Dict, Any, List, Optional
 from fastapi.responses import JSONResponse
+
+# Import the agent registry instead of AGENT_RUNNERS
+from app.modules.agent_registry import get_registered_agent, list_agents
 
 # Configure logging
 logger = logging.getLogger("modules.loop")
@@ -22,7 +27,7 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
     1. Calls GET /api/system/status to get the project state
     2. Extracts next_recommended_step from the project state
     3. Determines which agent to run based on the step description
-    4. Triggers the appropriate agent via the agent run endpoint
+    4. Triggers the appropriate agent via the agent registry
     
     Args:
         project_id: The project identifier
@@ -92,14 +97,14 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
         logger.info(f"Determined agent: {agent_id}")
         print(f"🤖 Determined agent: {agent_id}")
         
-        # Step 4: Trigger the agent via the agent run endpoint
+        # Step 4: Trigger the agent via the agent registry
         try:
-            # Using internal API call to avoid network overhead
-            from app.modules.agent_runner import AGENT_RUNNERS
+            # Get the agent handler function from the registry
+            agent_fn = get_registered_agent(agent_id)
             
-            # Check if agent exists in AGENT_RUNNERS
-            if agent_id not in AGENT_RUNNERS:
-                error_msg = f"Agent {agent_id} not found in AGENT_RUNNERS"
+            # Check if agent exists in registry
+            if not agent_fn:
+                error_msg = f"Agent {agent_id} not found in registry"
                 logger.error(error_msg)
                 print(f"❌ {error_msg}")
                 return {
@@ -107,9 +112,6 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
                     "message": error_msg,
                     "project_id": project_id
                 }
-            
-            # Get the agent runner function
-            runner_func = AGENT_RUNNERS[agent_id]
             
             # Prepare request data
             request_data = {
@@ -123,7 +125,7 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
             print(f"🏃 Running agent {agent_id} with task: {next_step}")
             
             # Execute the agent directly
-            result = runner_func(next_step, project_id)
+            result = agent_fn(next_step, project_id)
             
             # Check if agent run was successful
             if result.get("status") != "success":

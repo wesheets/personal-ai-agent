@@ -10,6 +10,7 @@ MODIFIED: Enhanced error handling for agent execution
 MODIFIED: Added detailed logging for agent run requests
 MODIFIED: Added debug trap to diagnose AGENT_RUNNERS loading failure
 MODIFIED: Updated /agent/loop endpoint to use run_agent_from_loop function
+MODIFIED: Refactored to use unified agent registry instead of AGENT_RUNNERS
 """
 
 from fastapi import APIRouter, HTTPException, Query
@@ -19,15 +20,8 @@ import traceback
 import uuid
 import json
 
-# Debug trap to diagnose AGENT_RUNNERS loading failure
-try:
-    from app.modules.agent_runner import AGENT_RUNNERS
-    print("✅ AGENT_RUNNERS loaded with keys:", list(AGENT_RUNNERS.keys()))
-    AGENT_RUNNERS_AVAILABLE = True
-except Exception as e:
-    print("❌ Failed to import AGENT_RUNNERS:", e)
-    AGENT_RUNNERS = {}
-    AGENT_RUNNERS_AVAILABLE = False
+# Import the agent registry instead of AGENT_RUNNERS
+from app.modules.agent_registry import get_registered_agent, list_agents
 
 # Import the run_agent_from_loop function
 from app.modules.loop import run_agent_from_loop
@@ -39,10 +33,7 @@ router = APIRouter()
 
 # Debug print to verify this file is loaded
 print("✅ AGENT ROUTES LOADED")
-if AGENT_RUNNERS_AVAILABLE:
-    print(f"✅ Available agents in AGENT_RUNNERS: {list(AGENT_RUNNERS.keys())}")
-else:
-    print("⚠️ AGENT_RUNNERS not available, agent execution will fail")
+print(f"✅ Available agents: {list_agents()}")
 
 @router.get("/ping")
 def agent_ping():
@@ -69,26 +60,14 @@ async def agent_run(request_data: dict):
         print(f"📋 Task: {task}")
         print(f"🧰 Tools: {tools}")
         
-        # Runtime check for AGENT_RUNNERS
-        print("🔍 Runtime AGENT_RUNNERS keys:", list(AGENT_RUNNERS.keys()))
-        
-        # Check if AGENT_RUNNERS is available
-        if not AGENT_RUNNERS_AVAILABLE:
-            error_msg = "AGENT_RUNNERS not available, cannot execute agent"
-            logger.error(error_msg)
-            print(f"❌ {error_msg}")
-            return {
-                "status": "error",
-                "message": error_msg,
-                "agent": agent_id,
-                "project_id": project_id,
-                "fallback_message": "The agent system is currently unavailable. Please try again later."
-            }
-        
-        print(f"🔍 Available agents: {list(AGENT_RUNNERS.keys())}")
+        # Runtime check for available agents
+        print(f"🔍 Available agents: {list_agents()}")
 
-        # Check if agent exists in AGENT_RUNNERS
-        if agent_id not in AGENT_RUNNERS:
+        # Get the agent handler function from the registry
+        agent_fn = get_registered_agent(agent_id)
+        
+        # Check if agent exists in registry
+        if not agent_fn:
             logger.warning(f"Unknown agent_id: {agent_id}")
             print(f"⚠️ Unknown agent_id: {agent_id}")
             return {
@@ -96,16 +75,15 @@ async def agent_run(request_data: dict):
                 "message": f"Unknown agent: {agent_id}",
                 "agent": agent_id,
                 "project_id": project_id,
-                "fallback_message": f"The requested agent '{agent_id}' is not available. Please try with one of these agents: {', '.join(AGENT_RUNNERS.keys())}"
+                "fallback_message": f"The requested agent '{agent_id}' is not available. Please try with one of these agents: {', '.join(list_agents())}"
             }
 
-        # Get the agent runner function
-        runner_func = AGENT_RUNNERS[agent_id]
+        # Log agent execution
         logger.info(f"Running {agent_id} agent with task: {task}")
         print(f"🏃 Running {agent_id} agent with task: {task}")
 
         # Execute the agent
-        result = runner_func(task, project_id, tools)
+        result = agent_fn(task, project_id, tools)
 
         # Log success
         logger.info(f"Agent {agent_id} executed successfully")
@@ -204,15 +182,15 @@ async def agent_list():
     """
     List all available agents.
     """
-    if not AGENT_RUNNERS_AVAILABLE:
+    agents = list_agents()
+    if not agents:
         return {
             "status": "error",
-            "message": "AGENT_RUNNERS not available",
+            "message": "No agents registered",
             "agents": [],
             "fallback_message": "The agent system is currently unavailable. Please try again later."
         }
     
-    agents = list(AGENT_RUNNERS.keys())
     print(f"📋 Listing available agents: {agents}")
     return {
         "status": "success",
