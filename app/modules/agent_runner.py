@@ -41,6 +41,14 @@ except ImportError:
     OPENAI_AVAILABLE = False
     print("❌ OpenAI client import failed")
 
+# Import agent modules
+from app.agents.hal import run_hal_agent as hal_agent_import
+from app.agents.nova import run_nova_agent
+from app.agents.ash import run_ash_agent
+from app.agents.critic import run_critic_agent
+from app.agents.orchestrator import run_orchestrator_agent
+from app.agents.sage import run_sage_agent
+
 # Import memory thread module
 from app.modules.memory_thread import add_memory_thread
 
@@ -499,3 +507,13 @@ This project was created by the HAL agent.
             "tools": tools,
             "error": str(e)
         }
+
+# Add AGENT_RUNNERS mapping for direct agent execution
+AGENT_RUNNERS = {
+    "hal": run_hal_agent,
+    "nova": run_nova_agent,
+    "ash": run_ash_agent,
+    "critic": run_critic_agent,
+    "orchestrator": run_orchestrator_agent,
+    "sage": run_sage_agent,
+}
