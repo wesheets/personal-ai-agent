@@ -1,9 +1,19 @@
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Path
 from typing import Optional, Dict, Any
 from app.modules.project_state import read_project_state
 
 router = APIRouter()
 
+@router.get("/test")
+async def test_project_route():
+    """
+    Simple test endpoint to verify the project router is mounted correctly.
+    
+    Returns:
+        Dict containing a status message
+    """
+    print("🔍 Test project route accessed")
+    return {"status": "Project router mounted successfully", "message": "This is a test endpoint"}
 
 @router.get("/state")
 async def get_project_state(
@@ -11,19 +21,112 @@ async def get_project_state(
 ):
     """
     Get the current state of a project.
-
     Args:
         project_id: The project identifier (e.g., "demo_writer_001")
-
     Returns:
         Dict containing the current project state
     """
     # Read the project state
     state = read_project_state(project_id)
-
     # Return the state
     return state
 
+@router.get("/{project_id}/status")
+async def get_project_status(
+    project_id: str = Path(..., description="The project identifier")
+):
+    """
+    Get the live status of a project.
+    
+    Args:
+        project_id: The project identifier (e.g., "loop_validation_001")
+        
+    Returns:
+        Dict containing the project status information
+        
+    Raises:
+        HTTPException: If the project is not found
+    """
+    try:
+        # Add debug logging to trace execution
+        print(f"🔍 Project route triggered for: {project_id}")
+        
+        # Read the project state
+        state = read_project_state(project_id)
+        
+        # Check if project exists
+        if not state:
+            print(f"🚫 No memory found for: {project_id}")
+            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+        
+        # Extract required fields
+        status = {
+            "project_id": project_id,
+            "loop_count": state.get("loop_count", 0),
+            "last_completed_agent": state.get("last_completed_agent"),
+            "completed_steps": state.get("completed_steps", []),
+            "files_created": state.get("files_created", []),
+            "next_recommended_step": state.get("next_recommended_step", "Operator review or new vertical launch")
+        }
+        
+        # Debug output to help diagnose issues
+        print(f"✅ Project status for {project_id}: {status}")
+        
+        return status
+    except Exception as e:
+        # Log the error
+        print(f"❌ Error getting project status for {project_id}: {str(e)}")
+        # Raise HTTP exception
+        raise HTTPException(status_code=500, detail=f"Error getting project status: {str(e)}")
+
+# Alternative implementation using query parameter instead of path parameter
+@router.get("/status")
+async def get_project_status_query(
+    project_id: str = Query(..., description="The project identifier")
+):
+    """
+    Get the live status of a project using query parameter.
+    
+    Args:
+        project_id: The project identifier (e.g., "loop_validation_001")
+        
+    Returns:
+        Dict containing the project status information
+        
+    Raises:
+        HTTPException: If the project is not found
+    """
+    try:
+        # Add debug logging to trace execution
+        print(f"🔍 Project route (query param) triggered for: {project_id}")
+        
+        # Read the project state
+        state = read_project_state(project_id)
+        
+        # Check if project exists
+        if not state:
+            print(f"🚫 No memory found for: {project_id}")
+            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+        
+        # Extract required fields
+        status = {
+            "project_id": project_id,
+            "loop_count": state.get("loop_count", 0),
+            "last_completed_agent": state.get("last_completed_agent"),
+            "completed_steps": state.get("completed_steps", []),
+            "files_created": state.get("files_created", []),
+            "next_recommended_step": state.get("next_recommended_step", "Operator review or new vertical launch")
+        }
+        
+        # Debug output to help diagnose issues
+        print(f"✅ Project status (query param) for {project_id}: {status}")
+        
+        return status
+    except Exception as e:
+        # Log the error
+        print(f"❌ Error getting project status (query param) for {project_id}: {str(e)}")
+        # Raise HTTP exception
+        raise HTTPException(status_code=500, detail=f"Error getting project status: {str(e)}")
 
 @router.post("/start")
 async def project_start(request: Dict[str, Any]):
