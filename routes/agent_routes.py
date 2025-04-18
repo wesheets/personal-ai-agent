@@ -13,6 +13,10 @@ logger = logging.getLogger("routes.agent_routes")
 
 router = APIRouter()
 
+# Debug print to verify this file is loaded
+print("✅ AGENT ROUTES LOADED")
+print(f"✅ Available agents in AGENT_RUNNERS: {list(AGENT_RUNNERS.keys())}")
+
 @router.get("/ping")
 def agent_ping():
     """
@@ -35,6 +39,7 @@ async def agent_run(request_data: dict):
         print(f"🤖 Agent run request received for agent_id={agent_id}, project_id={project_id}")
         print(f"📋 Task: {task}")
         print(f"🧰 Tools: {tools}")
+        print(f"🔍 Available agents: {list(AGENT_RUNNERS.keys())}")
 
         if agent_id not in AGENT_RUNNERS:
             logger.warning(f"Unknown agent_id: {agent_id}")
@@ -98,6 +103,7 @@ async def agent_list():
     List all available agents.
     """
     agents = list(AGENT_RUNNERS.keys())
+    print(f"📋 Listing available agents: {agents}")
     return {
         "status": "success",
         "agents": agents,
