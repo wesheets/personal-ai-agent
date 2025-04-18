@@ -9,9 +9,10 @@ MODIFIED: Added fallback message for missing agents
 MODIFIED: Enhanced error handling for agent execution
 MODIFIED: Added detailed logging for agent run requests
 MODIFIED: Added debug trap to diagnose AGENT_RUNNERS loading failure
+MODIFIED: Updated /agent/loop endpoint to use run_agent_from_loop function
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from typing import Dict, Any, List, Optional
 import logging
 import traceback
@@ -27,6 +28,9 @@ except Exception as e:
     print("❌ Failed to import AGENT_RUNNERS:", e)
     AGENT_RUNNERS = {}
     AGENT_RUNNERS_AVAILABLE = False
+
+# Import the run_agent_from_loop function
+from app.modules.loop import run_agent_from_loop
 
 # Configure logging
 logger = logging.getLogger("routes.agent_routes")
@@ -136,17 +140,64 @@ async def agent_run(request_data: dict):
         }
 
 @router.post("/loop")
-async def agent_loop(request_data: dict):
+async def agent_loop(request_data: dict = None, project_id: str = Query(None)):
     """
-    Continue an agent conversation loop.
+    Automatically trigger the appropriate agent based on project memory.
+    
+    This endpoint:
+    1. Gets the project state from system status
+    2. Extracts the next recommended step
+    3. Determines which agent to run
+    4. Triggers the appropriate agent
+    
+    Args:
+        request_data: Optional request body that may contain project_id
+        project_id: Project ID (can be provided as query parameter)
+        
+    Returns:
+        Dict containing the execution results
     """
-    return {
-        "status": "success",
-        "message": "Agent loop request received",
-        "agent": request_data.get("agent", "unknown"),
-        "input": request_data.get("input", ""),
-        "project_id": request_data.get("project_id", "default")
-    }
+    try:
+        # Extract project_id from either query parameter or request body
+        effective_project_id = project_id
+        if not effective_project_id and request_data:
+            effective_project_id = request_data.get("project_id")
+            
+        # Validate project_id
+        if not effective_project_id:
+            error_msg = "Missing project_id in both query and body"
+            logger.error(error_msg)
+            print(f"❌ {error_msg}")
+            return {
+                "status": "error",
+                "message": error_msg,
+                "fallback_message": "Project ID is required to run the agent loop."
+            }
+            
+        logger.info(f"Agent loop request received for project_id={effective_project_id}")
+        print(f"🔄 Agent loop request received for project_id={effective_project_id}")
+        
+        # Call run_agent_from_loop function
+        result = run_agent_from_loop(effective_project_id)
+        
+        # Return the result
+        return result
+        
+    except Exception as e:
+        # Log error
+        error_msg = f"Error in agent loop: {str(e)}"
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        print(f"❌ {error_msg}")
+        print(traceback.format_exc())
+        
+        # Return error response
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": effective_project_id if 'effective_project_id' in locals() else None,
+            "fallback_message": "An error occurred while executing the agent loop. Please try again later."
+        }
 
 @router.get("/list")
 async def agent_list():
