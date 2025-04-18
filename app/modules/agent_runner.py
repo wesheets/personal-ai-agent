@@ -44,6 +44,66 @@ except ImportError:
 # Import memory thread module
 from app.modules.memory_thread import add_memory_thread
 
+# Create a safe wrapper for add_memory_thread to ensure correct parameter format
+def safe_add_memory_thread(project_id=None, chain_id=None, agent=None, role=None, content=None, step_type=None, **kwargs):
+    """
+    Safe wrapper for add_memory_thread that ensures correct parameter format.
+    
+    This function accepts both positional and keyword arguments and converts them
+    to the correct single dictionary format expected by add_memory_thread.
+    
+    Args:
+        project_id: The project identifier
+        chain_id: The chain identifier
+        agent: The agent identifier
+        role: The role of the agent
+        content: The content of the memory
+        step_type: The type of step (e.g., "log", "reflection", "action")
+        **kwargs: Additional keyword arguments to include in the memory entry
+        
+    Returns:
+        Result from add_memory_thread
+    """
+    try:
+        # Check if first argument is already a dictionary (correct usage)
+        if len(kwargs) == 0 and isinstance(project_id, dict) and project_id is not None:
+            memory_entry = project_id
+            print("✅ Using provided dictionary format for add_memory_thread")
+        else:
+            # Convert positional/keyword arguments to dictionary format
+            memory_entry = {
+                "project_id": project_id or kwargs.get("project_id", "unknown"),
+                "chain_id": chain_id or kwargs.get("chain_id", "main"),
+                "agent": agent or kwargs.get("agent", "unknown"),
+                "role": role or kwargs.get("role", "system"),
+                "content": content or kwargs.get("content", ""),
+                "step_type": step_type or kwargs.get("step_type", "log")
+            }
+            
+            # Add any additional kwargs to the dictionary
+            for key, value in kwargs.items():
+                if key not in memory_entry:
+                    memory_entry[key] = value
+            
+            print(f"⚠️ Converting arguments to dictionary format for add_memory_thread: {memory_entry}")
+        
+        # Validate required fields
+        required_fields = ["project_id", "chain_id", "agent", "role", "content", "step_type"]
+        missing_fields = [field for field in required_fields if field not in memory_entry or not memory_entry[field]]
+        
+        if missing_fields:
+            print(f"❌ Missing required fields for add_memory_thread: {missing_fields}")
+            memory_entry.update({field: "unknown" for field in missing_fields if field not in memory_entry or not memory_entry[field]})
+        
+        # Call add_memory_thread with the properly formatted dictionary
+        print("✅ HAL memory thread written")
+        return add_memory_thread(memory_entry)
+    except Exception as e:
+        print(f"❌ Error in safe_add_memory_thread: {str(e)}")
+        print(traceback.format_exc())
+        # Return a dummy response to prevent further errors
+        return {"status": "error", "message": f"Error in safe_add_memory_thread: {str(e)}"}
+
 # Import toolkit registry
 try:
     from toolkit.registry import get_toolkit, get_agent_role, format_tools_prompt, format_nova_prompt, get_agent_themes
@@ -297,7 +357,7 @@ def run_hal_agent(task, project_id, tools):
             
             # Fixed: Properly format memory_entry as a single dictionary parameter
             print("✅ HAL wrote memory")
-            add_memory_thread(thread_data)
+            safe_add_memory_thread(thread_data)
         
         # Log task received
         log_memory(
