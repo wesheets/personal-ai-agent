@@ -3,6 +3,7 @@ Agent Loop Module
 This module provides functionality for executing cognitive loops and agent autonomy.
 
 MODIFIED: Refactored to use unified agent registry instead of AGENT_RUNNERS
+MODIFIED: Fixed determine_agent_from_step to prioritize exact agent ID matches
 """
 
 import logging
@@ -183,8 +184,24 @@ def determine_agent_from_step(step_description: str) -> Optional[str]:
     Returns:
         The agent_id to run, or None if no agent could be determined
     """
+    # Get list of registered agents
+    registered_agents = list_agents()
+    print(f"📋 Registered agents: {registered_agents}")
+    
+    # First, check if step_description is an exact match with a registered agent ID
+    # This handles the case where agents set clean agent IDs as next_recommended_step
+    if step_description in registered_agents:
+        print(f"✅ Found exact agent ID match: {step_description}")
+        return step_description
+    
     # Convert to lowercase for case-insensitive matching
     step_lower = step_description.lower()
+    
+    # Check for exact lowercase matches with agent IDs
+    for agent_id in registered_agents:
+        if step_lower == agent_id.lower():
+            print(f"✅ Found case-insensitive agent ID match: {agent_id}")
+            return agent_id
     
     # Check for explicit agent mentions - these take highest priority
     # Direct agent name mentions
