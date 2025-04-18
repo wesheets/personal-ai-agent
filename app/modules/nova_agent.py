@@ -47,77 +47,54 @@ def run_nova_agent(task, project_id, tools):
     print(f"🧰 Tools: {tools}")
     logger.info(f"NOVA agent execution started with task: {task}, project_id: {project_id}, tools: {tools}")
     
-    # Log event to system delegation log
     if SYSTEM_LOG_AVAILABLE:
         log_event("NOVA", f"Starting execution with task: {task}", project_id)
     
     try:
-        # Read project state if available
+        # Read current project state
         project_state = {}
         if PROJECT_STATE_AVAILABLE:
             project_state = read_project_state(project_id)
             print(f"📊 Project state read for {project_id}")
-            
-            # Check if HAL has created initial files
             if "hal" not in project_state.get("agents_involved", []):
-                print(f"⏩ HAL has not created initial files yet, cannot proceed")
-                
-                # Log blocked event to system delegation log
+                print("⏩ HAL has not created initial files yet, cannot proceed")
                 if SYSTEM_LOG_AVAILABLE:
-                    log_event("NOVA", "Execution blocked: HAL has not created initial files yet", project_id, {
-                        "blocking_condition": "hal_not_run"
-                    })
-                
+                    log_event("NOVA", "Blocked: HAL has not yet run", project_id, {"blocking_condition": "hal_not_run"})
                 return {
                     "status": "blocked",
-                    "notes": "Cannot create UI - HAL has not yet created initial project files.",
+                    "notes": "Cannot proceed — HAL has not yet initialized the project.",
                     "project_state": project_state
                 }
-        
-        # Simulate NOVA execution
-        design_action = f"Designed project architecture for {project_id}"
-        
-        # Log design action to system delegation log
+
+        # Simulate UI file generation
+        design_action = f"Created core UI components for {project_id}"
+        ui_files_created = [
+            "src/components/Dashboard.jsx",
+            "src/components/LoginForm.jsx"
+        ]
+
         if SYSTEM_LOG_AVAILABLE:
-            log_event("NOVA", f"Performing action: {design_action}", project_id)
-        
-        # Log memory entry if memory_writer is available
+            log_event("NOVA", f"Design action: {design_action}", project_id)
+
         if MEMORY_WRITER_AVAILABLE:
             memory_data = {
                 "agent": "nova",
                 "project_id": project_id,
                 "action": design_action,
                 "tool_used": "memory_writer",
-                "design_notes": f"NOVA design for {project_id}: Created architecture blueprint."
+                "design_notes": "NOVA designed the core UI structure for the app."
             }
-            
             write_memory(memory_data)
-            print(f"✅ Memory entry created for design action")
-            logger.info(f"NOVA logged memory entry for design action")
-        
-        # Define UI files created by NOVA
-        ui_files_created = [
-            "src/components/Dashboard.jsx",
-            "src/components/LoginForm.jsx"
-        ]
-        
-        # Update project state with memory updates for agent autonomy
+            print("✅ Memory logged for NOVA UI generation")
+
         if PROJECT_STATE_AVAILABLE:
-            # First, increment loop count and update last_completed_agent
             increment_result = increment_loop_count(project_id, "nova")
-            
-            if increment_result.get("status") != "success":
-                print(f"⚠️ Warning: Failed to increment loop count: {increment_result.get('message', 'Unknown error')}")
-                logger.warning(f"Failed to increment loop count: {increment_result.get('message', 'Unknown error')}")
-            else:
-                print(f"✅ Loop count incremented and last_completed_agent set to 'nova'")
-                logger.info(f"Loop count incremented and last_completed_agent set to 'nova' for {project_id}")
-            
-            # Next, update files_created and next_recommended_step
+            if increment_result.get("status") == "success":
+                print("✅ Loop count incremented and agent updated")
+
             current_state = read_project_state(project_id)
             current_files = current_state.get("files_created", [])
-            
-            # Update project state with additional data
+
             project_state_data = {
                 "agents_involved": ["nova"],
                 "latest_agent_action": {
@@ -128,49 +105,35 @@ def run_nova_agent(task, project_id, tools):
                 "next_recommended_step": "Run CRITIC to review NOVA's UI output",
                 "tool_usage": {}
             }
-            
+
             update_result = update_project_state(project_id, project_state_data)
-            
-            if update_result.get("status") != "success":
-                print(f"⚠️ Warning: Failed to update project state: {update_result.get('message', 'Unknown error')}")
-                logger.warning(f"Failed to update project state: {update_result.get('message', 'Unknown error')}")
-            else:
-                print(f"✅ Project state updated with files_created and next_recommended_step")
-                print(f"📋 Files created: {ui_files_created}")
-                print(f"➡️ Next recommended step: Run CRITIC to review NOVA's UI output")
-                logger.info(f"Project state updated with files_created and next_recommended_step for {project_id}")
-        
-        # Log completion event to system delegation log
+            if update_result.get("status") == "success":
+                print(f"✅ Project state updated — files: {ui_files_created}")
+                print("➡️ Next: Run CRITIC to review NOVA's UI output")
+
         if SYSTEM_LOG_AVAILABLE:
-            log_event("NOVA", "Execution completed successfully", project_id, {
-                "design_action": design_action,
+            log_event("NOVA", "Execution complete", project_id, {
                 "files_created": ui_files_created
             })
-        
+
         return {
             "status": "success",
-            "message": f"NOVA successfully designed project {project_id}",
-            "task": task,
-            "tools": tools,
+            "message": f"NOVA completed task for {project_id}",
             "files_created": ui_files_created,
             "next_recommended_step": "Run CRITIC to review NOVA's UI output",
             "project_state": project_state
         }
+
     except Exception as e:
         error_msg = f"Error in run_nova_agent: {str(e)}"
         print(f"❌ {error_msg}")
         logger.error(error_msg)
         logger.error(traceback.format_exc())
-        
-        # Log error event to system delegation log
         if SYSTEM_LOG_AVAILABLE:
-            log_event("NOVA", f"Execution failed: {str(e)}", project_id)
-        
+            log_event("NOVA", f"Error: {str(e)}", project_id)
+
         return {
             "status": "error",
-            "message": f"Error executing NOVA agent: {str(e)}",
-            "task": task,
-            "tools": tools,
-            "error": str(e),
+            "message": f"Execution failed for NOVA agent: {str(e)}",
             "project_state": project_state if 'project_state' in locals() else {}
         }
