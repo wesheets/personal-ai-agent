@@ -4,10 +4,12 @@ This module provides debug endpoints for the agent system.
 feature/phase-3.5-hardening
 SHA256: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b
 INTEGRITY: v3.5.0-debug-routes
-LAST_MODIFIED: 2025-04-17
+LAST_MODIFIED: 2025-04-18
 main
 """
 import logging
+import os
+import json
 from fastapi import APIRouter, Request, Response
 from typing import Dict, Any, List
 
@@ -79,3 +81,66 @@ async def debug_agents():
         "missing_in_map": missing_in_map,
         "status": "ok" if not (missing_in_profiles or missing_in_map) else "mismatched"
     }
+
+@router.get("/memory/log")
+async def get_memory_log():
+    """
+    Return the current in-memory debug log (or simulated log entries).
+    """
+    try:
+        logger.info(f"🔍 Debug memory log endpoint called")
+        
+        # Path to memory store file
+        memory_file = os.path.join(os.path.dirname(__file__), "../app/modules/memory_store.json")
+        
+        # Read memory entries from file
+        memories = []
+        if os.path.exists(memory_file):
+            try:
+                with open(memory_file, 'r') as f:
+                    memories = json.load(f)
+                    # Sort by timestamp (newest first)
+                    memories.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+                    # Limit to most recent entries
+                    memories = memories[:50]  # Return the 50 most recent entries
+                    logger.info(f"🔍 Retrieved {len(memories)} memory entries")
+            except json.JSONDecodeError:
+                logger.warning(f"⚠️ Could not decode memory store file")
+                memories = []
+            except Exception as e:
+                logger.error(f"❌ Error reading memory store: {str(e)}")
+                memories = []
+        else:
+            logger.warning(f"⚠️ Memory store file not found at {memory_file}")
+            # Generate synthetic entries if file doesn't exist
+            memories = [
+                {
+                    "memory_id": "synthetic-1",
+                    "timestamp": "2025-04-18T02:28:00.000000",
+                    "agent": "hal",
+                    "project_id": "demo_001",
+                    "action": "received_task",
+                    "content": "Synthetic memory entry for testing"
+                },
+                {
+                    "memory_id": "synthetic-2",
+                    "timestamp": "2025-04-18T02:27:00.000000",
+                    "agent": "nova",
+                    "project_id": "demo_001",
+                    "action": "created",
+                    "content": "Another synthetic memory entry"
+                }
+            ]
+            logger.info(f"🔍 Generated {len(memories)} synthetic memory entries")
+        
+        return {
+            "status": "success",
+            "log": memories
+        }
+    except Exception as e:
+        error_msg = f"Failed to retrieve memory log: {str(e)}"
+        logger.error(f"❌ {error_msg}")
+        return {
+            "status": "error",
+            "message": error_msg
+        }
