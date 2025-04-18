@@ -39,52 +39,107 @@ async def project_start(request: Dict[str, Any]):
     Returns:
         Dict containing the project start status and details
     """
+    # Extract required parameters
+    project_id = request.get("project_id")
+    goal = request.get("goal")
+    agent = request.get("agent")
+    
+    # Add debug logging for project start
+    print(f"🧪 Project start triggered: {project_id} {goal} {agent}")
+    
     try:
-        # Extract required parameters
-        project_id = request.get("project_id")
-        goal = request.get("goal")
-        agent = request.get("agent")
-        
         # Validate required parameters
         if not project_id:
-            raise HTTPException(status_code=400, detail="project_id is required")
+            return {
+                "status": "error",
+                "message": "project_id is required",
+                "agent": agent or "unknown",
+                "goal": goal or "unknown",
+                "project_id": "missing"
+            }
         if not goal:
-            raise HTTPException(status_code=400, detail="goal is required")
+            return {
+                "status": "error",
+                "message": "goal is required",
+                "agent": agent or "unknown",
+                "goal": "missing",
+                "project_id": project_id
+            }
         if not agent:
-            raise HTTPException(status_code=400, detail="agent is required")
+            return {
+                "status": "error",
+                "message": "agent is required",
+                "agent": "missing",
+                "goal": goal,
+                "project_id": project_id
+            }
         
         # Try to import agent runner
         try:
             from app.api.agent.run import run_agent
+            from app.modules.agent_runner import AGENT_RUNNERS
             
-            # Run the specified agent
-            result = run_agent(
-                agent_id=agent,
-                project_id=project_id,
-                goal=goal,
-                additional_context=request.get("additional_context", {})
-            )
+            # Validate agent exists in AGENT_RUNNERS
+            if agent not in AGENT_RUNNERS:
+                return {
+                    "status": "error",
+                    "message": f"Unknown agent: {agent}",
+                    "agent": agent,
+                    "goal": goal,
+                    "project_id": project_id
+                }
             
-            return {
-                "status": "success",
-                "message": f"Project {project_id} started with {agent} agent",
-                "project_id": project_id,
-                "agent": agent,
-                "goal": goal,
-                "result": result
-            }
-        except ImportError:
+            # Log orchestrator function call
+            print(f"⚙️ Calling orchestrator agent...")
+            
+            try:
+                # Run the specified agent
+                result = run_agent(
+                    agent_id=agent,
+                    project_id=project_id,
+                    goal=goal,
+                    additional_context=request.get("additional_context", {})
+                )
+                
+                # Log orchestrator result
+                print(f"✅ Orchestrator result: {result}")
+                
+                return {
+                    "status": "success",
+                    "message": f"Project {project_id} started with {agent} agent",
+                    "project_id": project_id,
+                    "agent": agent,
+                    "goal": goal,
+                    "result": result
+                }
+            except Exception as e:
+                print(f"❌ Agent execution failed: {e}")
+                return {
+                    "status": "error",
+                    "message": "Agent execution failed",
+                    "error_details": str(e),
+                    "project_id": project_id,
+                    "agent": agent,
+                    "goal": goal
+                }
+        except ImportError as e:
+            print(f"❌ Import error: {e}")
             # Fallback if agent runner is not available
             return {
-                "status": "success",
-                "message": f"Project {project_id} start request received (fallback implementation)",
+                "status": "error",
+                "message": f"Failed to import agent runner: {str(e)}",
+                "error_details": str(e),
                 "project_id": project_id,
                 "agent": agent,
                 "goal": goal
             }
     except Exception as e:
+        print(f"❌ Unexpected error in project_start: {e}")
         return {
             "status": "error",
-            "message": f"Failed to start project: {str(e)}",
-            "error_details": str(e)
+            "message": f"Failed to start project",
+            "error_details": str(e),
+            "project_id": project_id or "unknown",
+            "agent": agent or "unknown",
+            "goal": goal or "unknown"
         }
