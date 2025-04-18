@@ -1,12 +1,14 @@
 """
 CRITIC Agent Module
 
-This module provides a placeholder implementation for the CRITIC agent.
+This module provides the routing to the real CRITIC agent implementation.
 """
 
 import logging
 import traceback
 from typing import Dict, Any, List, Optional
+
+from app.modules.critic_agent import run_critic_agent as critic_agent_impl
 
 # Configure logging
 logger = logging.getLogger("agents.critic")
@@ -15,7 +17,7 @@ def run_critic_agent(task: str, project_id: str, tools: List[str] = None) -> Dic
     """
     Run the CRITIC agent with the given task, project_id, and tools.
     
-    This is a placeholder implementation that simply returns a success message.
+    This function routes to the real implementation in app.modules.critic_agent.
     
     Args:
         task: The task to execute
@@ -26,21 +28,15 @@ def run_critic_agent(task: str, project_id: str, tools: List[str] = None) -> Dic
         Dict containing the result of the execution
     """
     try:
-        logger.info(f"Running CRITIC agent with task: {task}, project_id: {project_id}")
-        print(f"🟨 CRITIC agent placeholder running task '{task}' on project '{project_id}'")
+        logger.info(f"Routing CRITIC agent call to real implementation for task: {task}, project_id: {project_id}")
+        print(f"🔍 Calling real CRITIC agent implementation for task '{task}' on project '{project_id}'")
         
         # Initialize tools if None
         if tools is None:
             tools = []
         
-        # Return success response
-        return {
-            "status": "success",
-            "output": f"CRITIC agent placeholder executed task '{task}'",
-            "task": task,
-            "tools": tools,
-            "project_id": project_id
-        }
+        # Call the real implementation
+        return critic_agent_impl(task, project_id, tools)
     except Exception as e:
         error_msg = f"Error running CRITIC agent: {str(e)}"
         logger.error(error_msg)

@@ -1,12 +1,14 @@
 """
 ASH Agent Module
 
-This module provides a placeholder implementation for the ASH agent.
+This module provides the routing to the real ASH agent implementation.
 """
 
 import logging
 import traceback
 from typing import Dict, Any, List, Optional
+
+from app.modules.ash_agent import run_ash_agent as ash_agent_impl
 
 # Configure logging
 logger = logging.getLogger("agents.ash")
@@ -15,7 +17,7 @@ def run_ash_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[s
     """
     Run the ASH agent with the given task, project_id, and tools.
     
-    This is a placeholder implementation that simply returns a success message.
+    This function routes to the real implementation in app.modules.ash_agent.
     
     Args:
         task: The task to execute
@@ -26,22 +28,15 @@ def run_ash_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[s
         Dict containing the result of the execution
     """
     try:
-        logger.info(f"Running ASH agent with task: {task}, project_id: {project_id}")
-        print(f"🟨 ASH agent executing task '{task}' on project '{project_id}'")
+        logger.info(f"Routing ASH agent call to real implementation for task: {task}, project_id: {project_id}")
+        print(f"📝 Calling real ASH agent implementation for task '{task}' on project '{project_id}'")
         
         # Initialize tools if None
         if tools is None:
             tools = []
         
-        # Return success response
-        return {
-            "status": "success",
-            "message": f"ASH agent executed successfully for project {project_id}",
-            "output": f"ASH executed task '{task}'",
-            "task": task,
-            "tools": tools,
-            "project_id": project_id
-        }
+        # Call the real implementation
+        return ash_agent_impl(task, project_id, tools)
     except Exception as e:
         error_msg = f"Error running ASH agent: {str(e)}"
         logger.error(error_msg)
