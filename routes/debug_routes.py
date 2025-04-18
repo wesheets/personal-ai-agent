@@ -10,19 +10,20 @@ main
 import logging
 import os
 import json
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Request, Response, HTTPException
 from typing import Dict, Any, List
 
 from app.core.agent_router import get_agent_router
 
 # Set up logging
 logger = logging.getLogger("api.debug")
+logger.setLevel(logging.DEBUG)  # Ensure debug level logging is enabled
 
 # Create router
 router = APIRouter(tags=["Debug"])
 
 # Debug print to verify this file is loaded
-print("✅ DEBUG ROUTES LOADED - Version 2025-04-18-02")
+print("✅ DEBUG ROUTES LOADED - Version 2025-04-18-03")
 print("✅ Debug routes available:")
 print("  - /api/debug/agents")
 print("  - /api/debug/memory/log")
@@ -100,13 +101,41 @@ async def get_memory_log():
         print("🔍 Debug memory log endpoint called")
         logger.info(f"🔍 Debug memory log endpoint called")
         
-        # Path to memory store file
-        memory_file = os.path.join(os.path.dirname(__file__), "../app/modules/memory_store.json")
-        print(f"🔍 Looking for memory store at: {memory_file}")
+        # Enhanced logging for debugging
+        print(f"🔍 Current working directory: {os.getcwd()}")
+        logger.debug(f"Current working directory: {os.getcwd()}")
+        
+        # Try multiple potential paths for memory store file
+        potential_paths = [
+            os.path.join(os.path.dirname(__file__), "../app/modules/memory_store.json"),  # Relative to routes dir
+            "/app/app/modules/memory_store.json",  # Absolute path in container
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "../app/modules/memory_store.json")),  # Absolute path
+            os.path.join(os.getcwd(), "app/modules/memory_store.json")  # Relative to working dir
+        ]
+        
+        # Log all potential paths
+        for i, path in enumerate(potential_paths):
+            print(f"🔍 Potential memory store path {i+1}: {path}")
+            logger.debug(f"Potential memory store path {i+1}: {path}")
+        
+        # Try each path until we find the file
+        memory_file = None
+        for path in potential_paths:
+            if os.path.exists(path):
+                memory_file = path
+                print(f"✅ Memory store file found at: {memory_file}")
+                logger.info(f"Memory store file found at: {memory_file}")
+                break
+        
+        # If no file found, use the first path for error reporting
+        if memory_file is None:
+            memory_file = potential_paths[0]
+            print(f"⚠️ Memory store file not found in any potential location")
+            logger.warning(f"Memory store file not found in any potential location")
         
         # Read memory entries from file
         memories = []
-        if os.path.exists(memory_file):
+        if memory_file and os.path.exists(memory_file):
             try:
                 print(f"✅ Memory store file found")
                 with open(memory_file, 'r') as f:
@@ -145,6 +174,14 @@ async def get_memory_log():
                     "project_id": "demo_001",
                     "action": "created",
                     "content": "Another synthetic memory entry"
+                },
+                {
+                    "memory_id": "synthetic-3",
+                    "timestamp": "2025-04-18T02:26:00.000000",
+                    "agent": "sage",
+                    "project_id": "demo_001",
+                    "action": "summarized",
+                    "content": "Third synthetic memory entry for testing"
                 }
             ]
             print(f"✅ Generated {len(memories)} synthetic memory entries")
@@ -159,10 +196,74 @@ async def get_memory_log():
         error_msg = f"Failed to retrieve memory log: {str(e)}"
         print(f"❌ {error_msg}")
         logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return {
             "status": "error",
             "message": error_msg
         }
+
+# Fallback endpoint for memory log
+@router.get("/memory/log/fallback")
+async def get_memory_log_fallback():
+    """
+    Fallback endpoint for memory log that always returns synthetic entries.
+    This endpoint is used when the main memory log endpoint fails.
+    """
+    print("🔍 Debug memory log fallback endpoint called")
+    logger.info(f"🔍 Debug memory log fallback endpoint called")
+    
+    # Generate synthetic entries
+    memories = [
+        {
+            "memory_id": "fallback-1",
+            "timestamp": "2025-04-18T02:28:00.000000",
+            "agent": "hal",
+            "project_id": "demo_001",
+            "action": "received_task",
+            "content": "Fallback memory entry for testing"
+        },
+        {
+            "memory_id": "fallback-2",
+            "timestamp": "2025-04-18T02:27:00.000000",
+            "agent": "nova",
+            "project_id": "demo_001",
+            "action": "created",
+            "content": "Another fallback memory entry"
+        },
+        {
+            "memory_id": "fallback-3",
+            "timestamp": "2025-04-18T02:26:00.000000",
+            "agent": "sage",
+            "project_id": "demo_001",
+            "action": "summarized",
+            "content": "Third fallback memory entry for testing"
+        }
+    ]
+    
+    print(f"✅ Generated {len(memories)} fallback memory entries")
+    logger.info(f"🔍 Generated {len(memories)} fallback memory entries")
+    
+    return {
+        "status": "success",
+        "log": memories,
+        "source": "fallback"
+    }
+
+# Simple health check endpoint for the debug router
+@router.get("/ping")
+async def debug_ping():
+    """
+    Simple health check endpoint for the debug router.
+    """
+    print("🔍 Debug ping endpoint called")
+    logger.info(f"🔍 Debug ping endpoint called")
+    
+    return {
+        "status": "ok",
+        "message": "Debug router is working",
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+    }
 
 # Print confirmation after all endpoints are defined
 print("✅ All debug routes registered successfully")
