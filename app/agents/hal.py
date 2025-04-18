@@ -1,12 +1,13 @@
 """
 HAL Agent Module
-
 This module provides the HAL agent implementation for the agent runner system.
 """
-
 import logging
 import traceback
 from typing import Dict, Any, List, Optional
+
+# Import the memory patch module
+from app.modules.hal_memory_patch import update_hal_memory
 
 # Configure logging
 logger = logging.getLogger("agents.hal")
@@ -31,6 +32,32 @@ def run_hal_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[s
         if tools is None:
             tools = []
         
+        # Simulate HAL's work - in a real implementation, this would be actual task execution
+        # For demonstration purposes, we'll assume HAL created some files
+        files_created = ["api/crm.py", "README.md"]
+        
+        # Determine next recommended step based on the task
+        if "ui" in task.lower() or "interface" in task.lower():
+            next_step = "Run NOVA to build UI components based on HAL's implementation"
+        elif "document" in task.lower() or "documentation" in task.lower():
+            next_step = "Run ASH to document the implementation created by HAL"
+        elif "review" in task.lower() or "evaluate" in task.lower():
+            next_step = "Run CRITIC to review the implementation created by HAL"
+        else:
+            # Default next step
+            next_step = "Run NOVA to build UI components for the project"
+        
+        # Update project state in memory
+        memory_result = update_hal_memory(
+            project_id=project_id,
+            files_created=files_created,
+            next_step=next_step
+        )
+        
+        if memory_result.get("status") != "success":
+            logger.warning(f"Memory update warning: {memory_result.get('message', 'Unknown issue')}")
+            print(f"⚠️ Memory update warning: {memory_result.get('message', 'Unknown issue')}")
+        
         # Return success response
         return {
             "status": "success",
@@ -38,7 +65,9 @@ def run_hal_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[s
             "output": f"HAL executed task '{task}'",
             "task": task,
             "tools": tools,
-            "project_id": project_id
+            "project_id": project_id,
+            "files_created": files_created,
+            "next_recommended_step": next_step
         }
     except Exception as e:
         error_msg = f"Error running HAL agent: {str(e)}"
