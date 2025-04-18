@@ -4,6 +4,7 @@ This module provides functionality for executing cognitive loops and agent auton
 
 MODIFIED: Refactored to use unified agent registry instead of AGENT_RUNNERS
 MODIFIED: Fixed determine_agent_from_step to prioritize exact agent ID matches
+MODIFIED: Added enhanced logging for agent resolution and fallback behavior
 """
 
 import logging
@@ -82,10 +83,16 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
             }
             
         logger.info(f"Next recommended step: {next_step}")
-        print(f"📋 Next recommended step: {next_step}")
+        print(f"[LOOP] next_recommended_step: {next_step}")
         
         # Step 3: Determine which agent to run based on the step description
         agent_id = determine_agent_from_step(next_step)
+        print(f"[LOOP] resolved agent_id: {agent_id}")
+        
+        # Get list of registered agents for verification
+        registered_agents = list_agents()
+        print(f"[LOOP] agent_id in registered_agents: {agent_id in registered_agents}")
+        
         if not agent_id:
             logger.warning(f"Could not determine agent from step: {next_step}")
             print(f"⚠️ Could not determine agent from step: {next_step}")
@@ -93,6 +100,19 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
                 "status": "error",
                 "message": f"Could not determine agent from step: {next_step}",
                 "project_id": project_id
+            }
+            
+        # Verify agent exists in registry before proceeding
+        if agent_id not in registered_agents:
+            error_msg = f"Resolved agent '{agent_id}' not found in registry. Available agents: {registered_agents}"
+            logger.error(error_msg)
+            print(f"❌ {error_msg}")
+            # Do not silently rerun the last agent - abort with clear error
+            return {
+                "status": "error",
+                "message": error_msg,
+                "project_id": project_id,
+                "available_agents": registered_agents
             }
             
         logger.info(f"Determined agent: {agent_id}")
@@ -103,9 +123,9 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
             # Get the agent handler function from the registry
             agent_fn = get_registered_agent(agent_id)
             
-            # Check if agent exists in registry
+            # Double-check if agent exists in registry (should never fail at this point)
             if not agent_fn:
-                error_msg = f"Agent {agent_id} not found in registry"
+                error_msg = f"Agent {agent_id} not found in registry despite earlier check"
                 logger.error(error_msg)
                 print(f"❌ {error_msg}")
                 return {
@@ -203,37 +223,52 @@ def determine_agent_from_step(step_description: str) -> Optional[str]:
             print(f"✅ Found case-insensitive agent ID match: {agent_id}")
             return agent_id
     
+    # Enhanced logging for debugging
+    print(f"⚠️ No exact match found for '{step_description}', trying pattern matching")
+    
     # Check for explicit agent mentions - these take highest priority
     # Direct agent name mentions
     if "hal" in step_lower:
+        print(f"✅ Found pattern match: 'hal' in '{step_lower}'")
         return "hal"
     elif "nova" in step_lower:
+        print(f"✅ Found pattern match: 'nova' in '{step_lower}'")
         return "nova"
     elif "ash" in step_lower:
+        print(f"✅ Found pattern match: 'ash' in '{step_lower}'")
         return "ash"
     elif "critic" in step_lower:
+        print(f"✅ Found pattern match: 'critic' in '{step_lower}'")
         return "critic"
     elif "sage" in step_lower:
+        print(f"✅ Found pattern match: 'sage' in '{step_lower}'")
         return "sage"
     elif "orchestrator" in step_lower:
+        print(f"✅ Found pattern match: 'orchestrator' in '{step_lower}'")
         return "orchestrator"
     
     # Check for task-based patterns - these are secondary priority
-    if any(term in step_lower for term in ["create", "generate", "build", "develop", "implement", "code"]):
-        return "hal"
-    elif any(term in step_lower for term in ["design", "ui", "interface", "layout", "component"]):
-        return "nova"
-    elif any(term in step_lower for term in ["document", "documentation", "explain", "describe"]):
-        return "ash"
-    elif any(term in step_lower for term in ["review", "evaluate", "assess", "critique"]):
-        return "critic"
-    elif any(term in step_lower for term in ["summarize", "summary", "overview"]):
-        return "sage"
-    elif any(term in step_lower for term in ["coordinate", "orchestrate", "manage", "plan"]):
-        return "orchestrator"
-        
+    task_patterns = {
+        "hal": ["create", "generate", "build", "develop", "implement", "code"],
+        "nova": ["design", "ui", "interface", "layout", "component"],
+        "ash": ["document", "documentation", "explain", "describe"],
+        "critic": ["review", "evaluate", "assess", "critique"],
+        "sage": ["summarize", "summary", "overview"],
+        "orchestrator": ["coordinate", "orchestrate", "manage", "plan"]
+    }
+    
+    for agent, patterns in task_patterns.items():
+        for pattern in patterns:
+            if pattern in step_lower:
+                print(f"✅ Found task pattern match: '{pattern}' in '{step_lower}' -> {agent}")
+                return agent
+    
+    # If we get here, no pattern matched
+    print(f"⚠️ No pattern match found for '{step_description}'")
+    
     # Default to orchestrator if no specific agent could be determined
     logger.warning(f"Could not determine specific agent from step: {step_description}, defaulting to orchestrator")
+    print(f"ℹ️ Defaulting to orchestrator for step: '{step_description}'")
     return "orchestrator"
 
 # Original execute_cognitive_loop function remains unchanged
