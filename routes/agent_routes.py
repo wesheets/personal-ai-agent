@@ -8,6 +8,7 @@ MODIFIED: Added debug logs to confirm agent_runner is being called
 MODIFIED: Added fallback message for missing agents
 MODIFIED: Enhanced error handling for agent execution
 MODIFIED: Added detailed logging for agent run requests
+MODIFIED: Added debug trap to diagnose AGENT_RUNNERS loading failure
 """
 
 from fastapi import APIRouter, HTTPException
@@ -17,16 +18,15 @@ import traceback
 import uuid
 import json
 
-# Import agent runner module
+# Debug trap to diagnose AGENT_RUNNERS loading failure
 try:
     from app.modules.agent_runner import AGENT_RUNNERS
+    print("✅ AGENT_RUNNERS loaded with keys:", list(AGENT_RUNNERS.keys()))
     AGENT_RUNNERS_AVAILABLE = True
-    print("✅ AGENT_RUNNERS imported successfully")
-    print(f"✅ Available agents in AGENT_RUNNERS: {list(AGENT_RUNNERS.keys())}")
-except ImportError:
-    AGENT_RUNNERS_AVAILABLE = False
+except Exception as e:
+    print("❌ Failed to import AGENT_RUNNERS:", e)
     AGENT_RUNNERS = {}
-    print("❌ Failed to import AGENT_RUNNERS, using empty dictionary")
+    AGENT_RUNNERS_AVAILABLE = False
 
 # Configure logging
 logger = logging.getLogger("routes.agent_routes")
@@ -64,6 +64,9 @@ async def agent_run(request_data: dict):
         print(f"🤖 Agent run request received for agent_id={agent_id}, project_id={project_id}")
         print(f"📋 Task: {task}")
         print(f"🧰 Tools: {tools}")
+        
+        # Runtime check for AGENT_RUNNERS
+        print("🔍 Runtime AGENT_RUNNERS keys:", list(AGENT_RUNNERS.keys()))
         
         # Check if AGENT_RUNNERS is available
         if not AGENT_RUNNERS_AVAILABLE:

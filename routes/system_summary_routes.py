@@ -3,7 +3,12 @@ import logging
 import traceback
 
 # Import agent runner module
-from app.modules.agent_runner import AGENT_RUNNERS
+try:
+    from app.modules.agent_runner import AGENT_RUNNERS
+    print("✅ AGENT_RUNNERS loaded with keys:", list(AGENT_RUNNERS.keys()))
+except Exception as e:
+    print("❌ Failed to import AGENT_RUNNERS:", e)
+    AGENT_RUNNERS = {}
 
 # Configure logging
 logger = logging.getLogger("routes.system_summary_routes")
@@ -12,6 +17,7 @@ router = APIRouter()
 
 # Debug print to verify this file is loaded
 print("✅ SYSTEM SUMMARY ROUTES LOADED")
+print("🔍 Checking for 'sage' in AGENT_RUNNERS:", "sage" in AGENT_RUNNERS)
 
 @router.post("/summary")
 def generate_system_summary(project_id: str):
@@ -32,6 +38,7 @@ def generate_system_summary(project_id: str):
         logger.info(f"Generating new system summary for project: {project_id}")
         print(f"🔍 Generating system summary for project: {project_id}")
         print(f"🔍 Available agents: {list(AGENT_RUNNERS.keys())}")
+        print("🔍 Checking for 'sage' in AGENT_RUNNERS:", "sage" in AGENT_RUNNERS)
         
         # Check if SAGE agent is available in AGENT_RUNNERS
         if "sage" not in AGENT_RUNNERS:
