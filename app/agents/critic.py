@@ -1,7 +1,7 @@
 """
-SAGE Agent Module
+CRITIC Agent Module
 
-This module provides a placeholder implementation for the SAGE agent.
+This module provides a placeholder implementation for the CRITIC agent.
 """
 
 import logging
@@ -9,11 +9,11 @@ import traceback
 from typing import Dict, Any, List, Optional
 
 # Configure logging
-logger = logging.getLogger("agents.sage")
+logger = logging.getLogger("agents.critic")
 
-def run_sage_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[str, Any]:
+def run_critic_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[str, Any]:
     """
-    Run the SAGE agent with the given task, project_id, and tools.
+    Run the CRITIC agent with the given task, project_id, and tools.
     
     This is a placeholder implementation that simply returns a success message.
     
@@ -26,8 +26,8 @@ def run_sage_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[
         Dict containing the result of the execution
     """
     try:
-        logger.info(f"Running SAGE agent with task: {task}, project_id: {project_id}")
-        print(f"🟩 SAGE agent placeholder running task '{task}' on project '{project_id}'")
+        logger.info(f"Running CRITIC agent with task: {task}, project_id: {project_id}")
+        print(f"🟨 CRITIC agent placeholder running task '{task}' on project '{project_id}'")
         
         # Initialize tools if None
         if tools is None:
@@ -36,13 +36,13 @@ def run_sage_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[
         # Return success response
         return {
             "status": "success",
-            "output": f"SAGE agent placeholder executed task '{task}'",
+            "output": f"CRITIC agent placeholder executed task '{task}'",
             "task": task,
             "tools": tools,
             "project_id": project_id
         }
     except Exception as e:
-        error_msg = f"Error running SAGE agent: {str(e)}"
+        error_msg = f"Error running CRITIC agent: {str(e)}"
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         print(f"❌ {error_msg}")
