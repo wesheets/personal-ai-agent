@@ -1,12 +1,15 @@
 """
 NOVA Agent Module
 
-This module provides a placeholder implementation for the NOVA agent.
+This module provides the implementation for the NOVA agent by calling the real run_nova_agent function.
 """
 
 import logging
 import traceback
 from typing import Dict, Any, List, Optional
+
+# Import the real NOVA agent implementation
+from app.modules.nova_agent import run_nova_agent as nova_agent_impl
 
 # Configure logging
 logger = logging.getLogger("agents.nova")
@@ -15,7 +18,7 @@ def run_nova_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[
     """
     Run the NOVA agent with the given task, project_id, and tools.
     
-    This is a placeholder implementation that simply returns a success message.
+    This function calls the real NOVA agent implementation from app.modules.nova_agent.
     
     Args:
         task: The task to execute
@@ -27,21 +30,21 @@ def run_nova_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[
     """
     try:
         logger.info(f"Running NOVA agent with task: {task}, project_id: {project_id}")
-        print(f"🟦 Placeholder NOVA agent running task '{task}' on project '{project_id}'")
+        print(f"🚀 Calling real NOVA agent implementation for task '{task}' on project '{project_id}'")
         
         # Initialize tools if None
         if tools is None:
             tools = []
         
-        # Return success response
-        return {
-            "status": "success",
-            "message": f"NOVA agent executed successfully for project {project_id}",
-            "output": f"NOVA agent placeholder executed task '{task}'",
-            "task": task,
-            "tools": tools,
-            "project_id": project_id
-        }
+        # Call the real NOVA agent implementation
+        result = nova_agent_impl(task, project_id, tools)
+        
+        # Log success
+        logger.info(f"NOVA agent executed successfully for project {project_id}")
+        print(f"✅ NOVA agent executed successfully for project {project_id}")
+        
+        return result
+        
     except Exception as e:
         error_msg = f"Error running NOVA agent: {str(e)}"
         logger.error(error_msg)
