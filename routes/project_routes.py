@@ -1,11 +1,7 @@
 from fastapi import APIRouter, Query, HTTPException, Path
 from typing import Optional, Dict, Any
 from app.modules.project_state import read_project_state, write_project_state
-from pydantic import BaseModel
-
-class PatchProjectStateRequest(BaseModel):
-    project_id: str
-    patch: Dict[str, Any]
+from app.models.project_state import PatchProjectStateRequest
 
 router = APIRouter()
 
