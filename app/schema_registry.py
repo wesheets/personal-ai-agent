@@ -3,7 +3,8 @@ Schema Registry Module
 
 This module defines the schema registry for validating various data structures
 in the application. It provides type definitions for expected fields in different
-parts of the system, particularly for project memory validation and API request validation.
+parts of the system, particularly for project memory validation, API request validation,
+and agent role validation.
 """
 
 from typing import Dict, Any, Type
@@ -44,6 +45,38 @@ SCHEMA_REGISTRY = {
                 "status": str,
                 "details": dict
             }
+        }
+    },
+    "agents": {
+        "hal": {
+            "role": "initial builder",
+            "dependencies": [],
+            "produces": ["README.md", "requirements.txt"],
+            "unlocks": ["nova"]
+        },
+        "nova": {
+            "role": "logic writer",
+            "dependencies": ["hal"],
+            "produces": ["api_routes", "logic_modules"],
+            "unlocks": ["critic"]
+        },
+        "critic": {
+            "role": "review + logic auditor",
+            "dependencies": ["nova"],
+            "produces": ["feedback_log", "next_agent_recommendation"],
+            "unlocks": ["ash", "orchestrator"]
+        },
+        "ash": {
+            "role": "documenter",
+            "dependencies": ["critic"],
+            "produces": ["README updates", "documentation"],
+            "unlocks": ["sage"]
+        },
+        "sage": {
+            "role": "reflection + loop closer",
+            "dependencies": ["ash"],
+            "produces": ["summary", "final reflections"],
+            "unlocks": ["hal"]
         }
     }
 }

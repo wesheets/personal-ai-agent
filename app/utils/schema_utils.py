@@ -4,10 +4,11 @@ Schema Utilities Module
 This module provides utility functions for schema validation in the application.
 It helps ensure that data structures conform to expected schemas, particularly
 for project memory validation to prevent missing or malformed memory fields
-from breaking agent logic, and API request validation to prevent invalid requests.
+from breaking agent logic, API request validation to prevent invalid requests,
+and agent role validation to ensure proper execution order.
 """
 
-from typing import Dict, Any
+from typing import Dict, Any, List
 from app.schema_registry import SCHEMA_REGISTRY
 
 def validate_schema(data: Dict[str, Any], schema: Dict[str, Any]) -> Dict[str, str]:
@@ -69,3 +70,37 @@ def validate_api_request(path: str, method: str, payload: Dict[str, Any]) -> Dic
         return {"error": f"Invalid method: expected {api_def['method']}"}
     
     return validate_schema(payload, api_def.get("input", {}))
+
+def get_agent_schema(agent_name: str) -> dict:
+    """
+    Retrieves the schema definition for a specific agent.
+    
+    Args:
+        agent_name: The name of the agent (e.g., "hal", "nova")
+        
+    Returns:
+        Dictionary containing the agent's schema definition, or empty dict if not found
+    """
+    from app.schema_registry import SCHEMA_REGISTRY
+    return SCHEMA_REGISTRY.get("agents", {}).get(agent_name, {})
+
+def validate_agent_action(agent_name: str, project_memory: dict) -> Dict[str, str]:
+    """
+    Validates if an agent can be executed based on its dependencies.
+    
+    Args:
+        agent_name: The name of the agent to validate
+        project_memory: The project memory containing completed steps
+        
+    Returns:
+        Dictionary of validation errors, where keys are dependency names and values are error messages.
+        Empty dictionary means the agent can be executed.
+    """
+    schema = get_agent_schema(agent_name)
+    errors = {}
+
+    for dep in schema.get("dependencies", []):
+        if dep not in project_memory.get("completed_steps", []):
+            errors[dep] = f"Required dependency '{dep}' not completed"
+    
+    return errors

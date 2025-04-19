@@ -33,6 +33,7 @@ print("  - /api/debug/memory/log")
 print("  - /api/debug/routes")
 print("  - /api/debug/memory/validate/{project_id}")
 print("  - /api/debug/schema/validate")
+print("  - /api/debug/agent/schema/{agent}")
 
 @router.get("/routes")
 def list_routes():
@@ -413,6 +414,57 @@ def debug_api_validation(path: str = Body(...), method: str = Body(...), payload
             "message": error_msg,
             "path": path,
             "method": method
+        }
+
+# Agent Schema endpoint
+print("✅ Registering /api/debug/agent/schema/{agent} endpoint")
+
+@router.get("/agent/schema/{agent}")
+def get_agent_schema_endpoint(agent: str):
+    """
+    Returns the schema definition for a specific agent.
+    
+    This endpoint helps understand what each agent does, when it runs,
+    what it depends on, and what it produces.
+    
+    Args:
+        agent: The name of the agent (e.g., "hal", "nova")
+        
+    Returns:
+        The agent's schema definition, or an empty object if not found
+    """
+    try:
+        print(f"🔍 Debug agent schema endpoint called for agent: {agent}")
+        logger.info(f"🔍 Debug agent schema endpoint called for agent: {agent}")
+        
+        from app.utils.schema_utils import get_agent_schema
+        
+        # Get the agent schema
+        schema = get_agent_schema(agent)
+        
+        # Log the schema retrieval
+        if schema:
+            print(f"✅ Agent schema found for {agent}")
+            logger.info(f"Agent schema found for {agent}")
+        else:
+            print(f"⚠️ No schema found for agent {agent}")
+            logger.warning(f"No schema found for agent {agent}")
+        
+        return {
+            "agent": agent,
+            "schema": schema,
+            "found": bool(schema)
+        }
+    except Exception as e:
+        error_msg = f"Failed to retrieve agent schema: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "agent": agent
         }
 
 # Simple health check endpoint for the debug router
