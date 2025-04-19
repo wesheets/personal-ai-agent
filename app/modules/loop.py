@@ -6,6 +6,8 @@ MODIFIED: Refactored to use unified agent registry instead of AGENT_RUNNERS
 MODIFIED: Fixed determine_agent_from_step to prioritize exact agent ID matches
 MODIFIED: Added enhanced logging for agent resolution and fallback behavior
 MODIFIED: Added automatic loop continuation when loop_complete=true
+MODIFIED: Added timeout guard to stuck loops
+MODIFIED: Added agent registry validation before execution
 """
 
 import logging
@@ -14,12 +16,14 @@ import traceback
 import requests
 import re
 import json
+import time
+from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from fastapi.responses import JSONResponse
 
 # Import the agent registry instead of AGENT_RUNNERS
 from app.modules.agent_registry import get_registered_agent, list_agents
-from app.modules.project_state import read_project_state
+from app.modules.project_state import read_project_state, update_project_state
 
 # Configure logging
 logger = logging.getLogger("modules.loop")
@@ -74,6 +78,41 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
                     "project_id": project_id
                 }
             
+            # NEW: Check for timeout - if last_agent_triggered_at is more than 5 minutes ago
+            last_triggered_at = project_state.get("last_agent_triggered_at")
+            if last_triggered_at:
+                try:
+                    last_triggered_time = datetime.fromisoformat(last_triggered_at)
+                    current_time = datetime.utcnow()
+                    time_diff = current_time - last_triggered_time
+                    
+                    # If more than 5 minutes have passed, consider the loop stalled
+                    if time_diff > timedelta(minutes=5):
+                        logger.warning(f"[LOOP] Agent timeout detected for project {project_id}. Last triggered: {last_triggered_at}")
+                        print(f"⚠️ [LOOP] Agent timeout detected for project {project_id}. Last triggered: {last_triggered_at}")
+                        
+                        # Update project state with stalled status
+                        update_project_state(project_id, {
+                            "loop_status": "stalled",
+                            "halt_reason": "Agent timeout"
+                        })
+                        
+                        return {
+                            "status": "error",
+                            "message": f"Agent timeout detected. Loop halted.",
+                            "project_id": project_id,
+                            "loop_status": "stalled",
+                            "halt_reason": "Agent timeout"
+                        }
+                except Exception as e:
+                    logger.error(f"Error parsing last_agent_triggered_at: {str(e)}")
+            
+            # Update last_agent_triggered_at timestamp
+            update_project_state(project_id, {
+                "last_agent_triggered_at": datetime.utcnow().isoformat(),
+                "loop_status": "running"
+            })
+            
         except Exception as e:
             error_msg = f"Error getting system status: {str(e)}"
             logger.error(error_msg)
@@ -116,17 +155,26 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
                 "project_id": project_id
             }
             
-        # Verify agent exists in registry before proceeding
+        # NEW: Validate agent registry before execution
         if agent_id not in registered_agents:
             error_msg = f"Resolved agent '{agent_id}' not found in registry. Available agents: {registered_agents}"
             logger.error(error_msg)
             print(f"❌ {error_msg}")
+            
+            # Update project state with halted status
+            update_project_state(project_id, {
+                "loop_status": "halted",
+                "error": "Invalid agent_id referenced"
+            })
+            
             # Do not silently rerun the last agent - abort with clear error
             return {
                 "status": "error",
                 "message": error_msg,
                 "project_id": project_id,
-                "available_agents": registered_agents
+                "available_agents": registered_agents,
+                "loop_status": "halted",
+                "error": "Invalid agent_id referenced"
             }
             
         logger.info(f"Determined agent: {agent_id}")
@@ -142,10 +190,19 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
                 error_msg = f"Agent {agent_id} not found in registry despite earlier check"
                 logger.error(error_msg)
                 print(f"❌ {error_msg}")
+                
+                # Update project state with halted status
+                update_project_state(project_id, {
+                    "loop_status": "halted",
+                    "error": "Invalid agent_id referenced"
+                })
+                
                 return {
                     "status": "error",
                     "message": error_msg,
-                    "project_id": project_id
+                    "project_id": project_id,
+                    "loop_status": "halted",
+                    "error": "Invalid agent_id referenced"
                 }
             
             # Prepare request data
@@ -167,6 +224,13 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
                 error_msg = f"Agent run failed: {result.get('message', 'Unknown error')}"
                 logger.error(error_msg)
                 print(f"❌ {error_msg}")
+                
+                # Update project state with error status
+                update_project_state(project_id, {
+                    "loop_status": "error",
+                    "error": error_msg
+                })
+                
                 return {
                     "status": "error",
                     "message": error_msg,
@@ -185,6 +249,12 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
             logger.info(f"Updated next recommended step: {step_description}")
             print(f"🔄 Updated next recommended step: {step_description}")
             
+            # Update loop status to completed for this agent
+            update_project_state(project_id, {
+                "loop_status": "completed",
+                "last_agent_triggered_at": datetime.utcnow().isoformat()
+            })
+            
             # Step 5: Check if loop is complete and trigger next loop if conditions are met
             check_and_trigger_next_loop(project_id)
             
@@ -201,6 +271,13 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
             logger.error(error_msg)
             logger.error(traceback.format_exc())
             print(f"❌ {error_msg}")
+            
+            # Update project state with error status
+            update_project_state(project_id, {
+                "loop_status": "error",
+                "error": error_msg
+            })
+            
             return {
                 "status": "error",
                 "message": error_msg,

@@ -2,12 +2,15 @@
 Project State Module
 This module provides functionality for tracking and persisting the evolving state of a vertical build.
 It maintains a centralized record of project status, files created, agents involved, and other metadata.
+
+MODIFIED: Added auto-expiration of orphaned projects after 24h of inactivity
 """
 import logging
 import json
 import os
 import uuid
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List
 
 # Configure logging
@@ -40,6 +43,9 @@ def read_project_state(project_id: str) -> Dict[str, Any]:
                 "next_recommended_step": "Run HAL to create initial files",
                 "tool_usage": {},
                 "timestamp": datetime.utcnow().isoformat(),
+                "last_updated_at": datetime.utcnow().isoformat(),
+                "last_agent_triggered_at": datetime.utcnow().isoformat(),
+                "loop_status": "initialized",
                 # Agent Loop Autonomy Core - New fields
                 "loop_count": 0,
                 "max_loops": 5,
@@ -61,6 +67,12 @@ def read_project_state(project_id: str) -> Dict[str, Any]:
                 state["last_completed_agent"] = None
             if "completed_steps" not in state:
                 state["completed_steps"] = []
+            if "last_updated_at" not in state:
+                state["last_updated_at"] = datetime.utcnow().isoformat()
+            if "last_agent_triggered_at" not in state:
+                state["last_agent_triggered_at"] = datetime.utcnow().isoformat()
+            if "loop_status" not in state:
+                state["loop_status"] = "initialized"
                 
             return state
             
@@ -79,6 +91,9 @@ def read_project_state(project_id: str) -> Dict[str, Any]:
             "next_recommended_step": "Retry after resolving error",
             "tool_usage": {},
             "timestamp": datetime.utcnow().isoformat(),
+            "last_updated_at": datetime.utcnow().isoformat(),
+            "last_agent_triggered_at": datetime.utcnow().isoformat(),
+            "loop_status": "error",
             "error": str(e),
             # Agent Loop Autonomy Core - New fields
             "loop_count": 0,
@@ -111,6 +126,7 @@ def write_project_state(project_id: str, state_dict: Dict[str, Any]) -> Dict[str
         
         # Update timestamp
         state_dict["timestamp"] = datetime.utcnow().isoformat()
+        state_dict["last_updated_at"] = datetime.utcnow().isoformat()
         
         # Write the state to the file
         with open(state_file, 'w') as f:
@@ -202,6 +218,9 @@ def update_project_state(project_id: str, patch_dict: Dict[str, Any]) -> Dict[st
         for key, value in patch_dict.items():
             current_state[key] = value
         
+        # Always update last_updated_at timestamp
+        current_state["last_updated_at"] = datetime.utcnow().isoformat()
+        
         # Write the updated state
         return write_project_state(project_id, current_state)
             
@@ -249,6 +268,10 @@ def increment_loop_count(project_id: str, agent_id: str) -> Dict[str, Any]:
         if agent_id not in agents_involved:
             agents_involved.append(agent_id)
         current_state["agents_involved"] = agents_involved
+        
+        # Update timestamps
+        current_state["last_updated_at"] = datetime.utcnow().isoformat()
+        current_state["last_agent_triggered_at"] = datetime.utcnow().isoformat()
         
         # Write the updated state
         return write_project_state(project_id, current_state)
@@ -303,3 +326,76 @@ def should_continue_loop(project_id: str) -> bool:
         
         # Default to stopping the loop in case of error
         return False
+
+def cleanup_orphaned_projects() -> Dict[str, Any]:
+    """
+    Clean up orphaned projects that haven't been updated in 24 hours.
+    
+    Returns:
+        Dict containing the result of the operation
+    """
+    try:
+        # Get the project states directory
+        states_dir = os.path.join(os.path.dirname(__file__), "project_states")
+        if not os.path.exists(states_dir):
+            logger.info("No project states directory found, nothing to clean up")
+            return {
+                "status": "success",
+                "message": "No project states directory found, nothing to clean up",
+                "deleted_projects": []
+            }
+        
+        # Get all project state files
+        project_files = [f for f in os.listdir(states_dir) if f.endswith('.json')]
+        
+        deleted_projects = []
+        current_time = datetime.utcnow()
+        
+        for project_file in project_files:
+            try:
+                # Extract project_id from filename
+                project_id = project_file.replace('.json', '')
+                
+                # Read the project state
+                project_state = read_project_state(project_id)
+                
+                # Check if the project has been updated in the last 24 hours
+                last_updated_at = project_state.get("last_updated_at")
+                if last_updated_at:
+                    try:
+                        last_updated_time = datetime.fromisoformat(last_updated_at)
+                        time_diff = current_time - last_updated_time
+                        
+                        # If more than 24 hours have passed, delete the project
+                        if time_diff > timedelta(hours=24):
+                            logger.info(f"Deleting orphaned project {project_id}. Last updated: {last_updated_at}")
+                            print(f"🧹 Deleting orphaned project {project_id}. Last updated: {last_updated_at}")
+                            
+                            # Delete the project state file
+                            os.remove(os.path.join(states_dir, project_file))
+                            deleted_projects.append(project_id)
+                    except Exception as e:
+                        logger.error(f"Error parsing last_updated_at for project {project_id}: {str(e)}")
+            except Exception as e:
+                logger.error(f"Error processing project file {project_file}: {str(e)}")
+        
+        logger.info(f"Cleanup completed. Deleted {len(deleted_projects)} orphaned projects.")
+        print(f"✅ Cleanup completed. Deleted {len(deleted_projects)} orphaned projects.")
+        
+        return {
+            "status": "success",
+            "message": f"Cleanup completed. Deleted {len(deleted_projects)} orphaned projects.",
+            "deleted_projects": deleted_projects
+        }
+            
+    except Exception as e:
+        error_msg = f"Error cleaning up orphaned projects: {str(e)}"
+        logger.error(error_msg)
+        print(f"❌ {error_msg}")
+        
+        return {
+            "status": "error",
+            "message": error_msg,
+            "error": str(e),
+            "deleted_projects": []
+        }

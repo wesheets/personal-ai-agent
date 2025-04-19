@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 from app.core.orchestrator import get_orchestrator
 from app.modules.project_state import write_project_state
+from app.modules.loop import run_agent_from_loop  # ✅ Loop trigger import
 import uuid
 
 # Create router
