@@ -12,7 +12,7 @@ import os
 import json
 import time
 import traceback
-from fastapi import APIRouter, Request, Response, HTTPException
+from fastapi import APIRouter, Request, Response, HTTPException, Body
 from fastapi.routing import APIRoute
 from typing import Dict, Any, List
 
@@ -32,6 +32,7 @@ print("  - /api/debug/agents")
 print("  - /api/debug/memory/log")
 print("  - /api/debug/routes")
 print("  - /api/debug/memory/validate/{project_id}")
+print("  - /api/debug/schema/validate")
 
 @router.get("/routes")
 def list_routes():
@@ -357,6 +358,61 @@ def validate_memory_route(project_id: str):
             "status": "error",
             "message": error_msg,
             "project_id": project_id
+        }
+
+# API Schema validation endpoint
+print("✅ Registering /api/debug/schema/validate endpoint")
+
+@router.post("/schema/validate")
+def debug_api_validation(path: str = Body(...), method: str = Body(...), payload: Dict[str, Any] = Body(...)):
+    """
+    Validates an API request against the expected schema.
+    
+    This endpoint helps identify invalid requests, method mismatches, and unregistered endpoints
+    that could potentially cause system failures.
+    
+    Args:
+        path: The API endpoint path (e.g., "/api/agent/run")
+        method: The HTTP method (e.g., "POST", "GET")
+        payload: The request payload to validate
+        
+    Returns:
+        Validation results including whether the request is valid and any errors found
+    """
+    try:
+        print(f"🔍 Debug API schema validation endpoint called for path: {path}, method: {method}")
+        logger.info(f"🔍 Debug API schema validation endpoint called for path: {path}, method: {method}")
+        
+        from app.utils.schema_utils import validate_api_request
+        
+        # Validate the API request
+        errors = validate_api_request(path, method, payload)
+        
+        # Log the validation results
+        if errors:
+            print(f"⚠️ API validation errors found for {method} {path}: {errors}")
+            logger.warning(f"API validation errors found for {method} {path}: {errors}")
+        else:
+            print(f"✅ API validation passed for {method} {path}")
+            logger.info(f"API validation passed for {method} {path}")
+        
+        return {
+            "path": path,
+            "method": method,
+            "valid": not bool(errors),
+            "errors": errors
+        }
+    except Exception as e:
+        error_msg = f"Failed to validate API request: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "path": path,
+            "method": method
         }
 
 # Simple health check endpoint for the debug router

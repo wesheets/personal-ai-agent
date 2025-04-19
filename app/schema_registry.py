@@ -3,7 +3,7 @@ Schema Registry Module
 
 This module defines the schema registry for validating various data structures
 in the application. It provides type definitions for expected fields in different
-parts of the system, particularly for project memory validation.
+parts of the system, particularly for project memory validation and API request validation.
 """
 
 from typing import Dict, Any, Type
@@ -21,6 +21,29 @@ SCHEMA_REGISTRY = {
             "task_log": list,
             "logic_modules": dict,
             "registry": dict
+        }
+    },
+    "api": {
+        "/api/agent/run": {
+            "method": "POST",
+            "input": {
+                "project_id": str,
+                "agent": str
+            },
+            "output": {
+                "status": str,
+                "message": str
+            }
+        },
+        "/api/loop/start": {
+            "method": "POST",
+            "input": {
+                "project_id": str
+            },
+            "output": {
+                "status": str,
+                "details": dict
+            }
         }
     }
 }
