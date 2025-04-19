@@ -64,6 +64,16 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
                 
             project_state = status_response.get("project_state", {})
             
+            # NEW: If project doesn't exist, stop loop execution
+            if not project_state:
+                logger.warning(f"[LOOP] Ignoring loop trigger for unknown project_id: {project_id}")
+                print(f"⚠️ [LOOP] Ignoring loop trigger for unknown project_id: {project_id}")
+                return {
+                    "status": "error",
+                    "message": f"Project '{project_id}' not found. Loop ignored.",
+                    "project_id": project_id
+                }
+            
         except Exception as e:
             error_msg = f"Error getting system status: {str(e)}"
             logger.error(error_msg)
