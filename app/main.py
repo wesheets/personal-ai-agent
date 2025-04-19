@@ -5,6 +5,7 @@ This module serves as the entry point for the application.
 It initializes all required components and starts the server.
 
 MODIFIED: Added agent registry initialization
+MODIFIED: Added loop router registration
 """
 
 import os
@@ -47,6 +48,7 @@ from routes.system_routes import router as system_router
 from routes.project_routes import router as project_router
 from routes.orchestrator_routes import router as orchestrator_router
 from routes.debug_routes import router as debug_router
+from routes.loop_routes import router as loop_router
 
 # Include routers
 app.include_router(agent_router, prefix="/api/agent", tags=["agent"])
@@ -54,6 +56,7 @@ app.include_router(system_router, prefix="/api/system", tags=["system"])
 app.include_router(project_router, prefix="/api/project", tags=["project"])
 app.include_router(orchestrator_router, prefix="/api/orchestrator", tags=["orchestrator"])
 app.include_router(debug_router, prefix="/api/debug", tags=["debug"])
+app.include_router(loop_router, prefix="/api/loop", tags=["loop"])
 
 @app.get("/")
 async def root():
@@ -69,7 +72,8 @@ async def root():
             "/api/system",
             "/api/project",
             "/api/orchestrator",
-            "/api/debug"
+            "/api/debug",
+            "/api/loop"
         ]
     }
 
