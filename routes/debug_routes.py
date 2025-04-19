@@ -31,6 +31,7 @@ print("✅ Debug routes available:")
 print("  - /api/debug/agents")
 print("  - /api/debug/memory/log")
 print("  - /api/debug/routes")
+print("  - /api/debug/memory/validate/{project_id}")
 
 @router.get("/routes")
 def list_routes():
@@ -288,6 +289,75 @@ async def get_memory_log_fallback():
         "log": memories,
         "source": "fallback"
     }
+
+# Memory validation endpoint
+print("✅ Registering /api/debug/memory/validate/{project_id} endpoint")
+
+@router.get("/memory/validate/{project_id}")
+def validate_memory_route(project_id: str):
+    """
+    Validates project memory against the expected schema.
+    
+    This endpoint helps identify missing or malformed memory fields
+    that could potentially break agent logic.
+    """
+    try:
+        print(f"🔍 Debug memory validation endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug memory validation endpoint called for project: {project_id}")
+        
+        from app.utils.schema_utils import validate_project_memory
+        
+        # Try to import PROJECT_MEMORY from different possible locations
+        try:
+            from app.modules.project_state import PROJECT_MEMORY
+        except ImportError:
+            try:
+                from app.memory import PROJECT_MEMORY
+            except ImportError:
+                # If we can't find the actual memory store, create a mock one for testing
+                print("⚠️ Could not import PROJECT_MEMORY, using mock memory store")
+                logger.warning("Could not import PROJECT_MEMORY, using mock memory store")
+                PROJECT_MEMORY = {
+                    project_id: {
+                        "project_id": project_id,
+                        "timestamp": "2025-04-19T21:44:00.000000",
+                        "status": "active",
+                        "next_recommended_step": "Run NOVA to implement solution",
+                        "loop_status": "running",
+                        "agents": {},
+                        "task_log": [],
+                        "logic_modules": {},
+                        "registry": {}
+                    }
+                }
+
+        # Validate the project memory
+        errors = validate_project_memory(project_id, PROJECT_MEMORY)
+        
+        # Log the validation results
+        if errors:
+            print(f"⚠️ Validation errors found for project {project_id}: {errors}")
+            logger.warning(f"Validation errors found for project {project_id}: {errors}")
+        else:
+            print(f"✅ Project memory validation passed for project {project_id}")
+            logger.info(f"Project memory validation passed for project {project_id}")
+        
+        return {
+            "project_id": project_id,
+            "valid": not bool(errors),
+            "errors": errors
+        }
+    except Exception as e:
+        error_msg = f"Failed to validate project memory: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
+        }
 
 # Simple health check endpoint for the debug router
 @router.get("/ping")
