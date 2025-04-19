@@ -5,6 +5,7 @@ This module provides functionality for executing cognitive loops and agent auton
 MODIFIED: Refactored to use unified agent registry instead of AGENT_RUNNERS
 MODIFIED: Fixed determine_agent_from_step to prioritize exact agent ID matches
 MODIFIED: Added enhanced logging for agent resolution and fallback behavior
+MODIFIED: Added automatic loop continuation when loop_complete=true
 """
 
 import logging
@@ -12,11 +13,13 @@ import uuid
 import traceback
 import requests
 import re
+import json
 from typing import Dict, Any, List, Optional
 from fastapi.responses import JSONResponse
 
 # Import the agent registry instead of AGENT_RUNNERS
 from app.modules.agent_registry import get_registered_agent, list_agents
+from app.modules.project_state import read_project_state
 
 # Configure logging
 logger = logging.getLogger("modules.loop")
@@ -30,6 +33,7 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
     2. Extracts next_recommended_step from the project state
     3. Determines which agent to run based on the step description
     4. Triggers the appropriate agent via the agent registry
+    5. Checks if loop is complete and triggers next loop if conditions are met
     
     Args:
         project_id: The project identifier
@@ -163,6 +167,9 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
             logger.info(f"Agent run successful: {agent_id}")
             print(f"✅ Agent run successful: {agent_id}")
             
+            # Step 5: Check if loop is complete and trigger next loop if conditions are met
+            check_and_trigger_next_loop(project_id)
+            
             return {
                 "status": "running",
                 "message": f"Agent {agent_id} triggered successfully",
@@ -185,6 +192,160 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
             
     except Exception as e:
         error_msg = f"Error in agent loop: {str(e)}"
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
+        print(f"❌ {error_msg}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
+        }
+
+def check_and_trigger_next_loop(project_id: str) -> Dict[str, Any]:
+    """
+    Check if loop is complete and trigger next loop if conditions are met.
+    
+    This function:
+    1. Reads the current project state
+    2. Checks if loop_complete=true
+    3. Looks for next_loop_goal or proposed_next_task
+    4. Generates a unique project ID for the new loop
+    5. Triggers a new project via POST to /api/project/start
+    6. Immediately follows with POST to /api/agent/loop
+    
+    Args:
+        project_id: The current project identifier
+        
+    Returns:
+        Dict containing the result of the operation
+    """
+    try:
+        # Read the current project state
+        project_state = read_project_state(project_id)
+        
+        # Check if loop is complete
+        loop_complete = project_state.get("loop_complete", False)
+        if not loop_complete:
+            # Loop is not complete, nothing to do
+            return {
+                "status": "skipped",
+                "message": "Loop is not complete, skipping next loop trigger",
+                "project_id": project_id
+            }
+        
+        # Check if we have a next_loop_goal or proposed_next_task
+        next_loop_goal = project_state.get("next_loop_goal")
+        proposed_next_task = project_state.get("proposed_next_task")
+        
+        if not next_loop_goal and not proposed_next_task:
+            # No next loop goal or task, nothing to do
+            logger.info(f"No next_loop_goal or proposed_next_task found for project {project_id}")
+            print(f"ℹ️ No next_loop_goal or proposed_next_task found for project {project_id}")
+            return {
+                "status": "skipped",
+                "message": "No next_loop_goal or proposed_next_task found, skipping next loop trigger",
+                "project_id": project_id
+            }
+        
+        # Generate a unique project ID for the new loop
+        # Use the format suggested in the requirements: loop_004_autospawned
+        loop_count = project_state.get("loop_count", 1)
+        new_project_id = f"loop_{loop_count + 1:03d}_autospawned"
+        
+        # Determine the goal for the new project
+        goal = ""
+        challenge_mode = "off"
+        
+        if next_loop_goal:
+            # Use next_loop_goal directly
+            goal = next_loop_goal
+        elif proposed_next_task and isinstance(proposed_next_task, dict):
+            # Convert proposed_next_task into a lightweight project
+            goal = proposed_next_task.get("task", "")
+            challenge_mode = proposed_next_task.get("challenge_mode", "off")
+        
+        if not goal:
+            # No valid goal, nothing to do
+            logger.warning(f"No valid goal found in next_loop_goal or proposed_next_task for project {project_id}")
+            print(f"⚠️ No valid goal found in next_loop_goal or proposed_next_task for project {project_id}")
+            return {
+                "status": "skipped",
+                "message": "No valid goal found, skipping next loop trigger",
+                "project_id": project_id
+            }
+        
+        # Log the auto-spawning of the next loop
+        logger.info(f"[LOOP ENGINE] Auto-spawning next loop: {new_project_id} → goal: {goal}")
+        print(f"[LOOP ENGINE] Auto-spawning next loop: {new_project_id} → goal: {goal}")
+        
+        # Trigger a new project via POST to /api/project/start
+        try:
+            # Prepare the request data
+            project_start_data = {
+                "project_id": new_project_id,
+                "goal": goal,
+                "agent": "orchestrator",
+                "challenge_mode": challenge_mode
+            }
+            
+            # Make the request to start the new project
+            # Using internal API call to avoid network overhead
+            from routes.project_routes import project_start
+            project_start_result = project_start(project_start_data)
+            
+            # Check if project start was successful
+            if project_start_result.get("status") != "success":
+                error_msg = f"Failed to start new project: {project_start_result.get('message', 'Unknown error')}"
+                logger.error(error_msg)
+                print(f"❌ {error_msg}")
+                return {
+                    "status": "error",
+                    "message": error_msg,
+                    "project_id": project_id,
+                    "new_project_id": new_project_id
+                }
+            
+            # Immediately follow with POST to /api/agent/loop
+            from routes.agent_routes import agent_loop
+            agent_loop_result = agent_loop({"project_id": new_project_id})
+            
+            # Check if agent loop was successful
+            if agent_loop_result.get("status") not in ["success", "running"]:
+                error_msg = f"Failed to trigger agent loop for new project: {agent_loop_result.get('message', 'Unknown error')}"
+                logger.error(error_msg)
+                print(f"❌ {error_msg}")
+                return {
+                    "status": "error",
+                    "message": error_msg,
+                    "project_id": project_id,
+                    "new_project_id": new_project_id
+                }
+            
+            # Success!
+            logger.info(f"Successfully triggered next loop for project {new_project_id}")
+            print(f"✅ Successfully triggered next loop for project {new_project_id}")
+            return {
+                "status": "success",
+                "message": f"Successfully triggered next loop for project {new_project_id}",
+                "project_id": project_id,
+                "new_project_id": new_project_id,
+                "goal": goal
+            }
+            
+        except Exception as e:
+            error_msg = f"Error triggering next loop: {str(e)}"
+            logger.error(error_msg)
+            logger.error(traceback.format_exc())
+            print(f"❌ {error_msg}")
+            return {
+                "status": "error",
+                "message": error_msg,
+                "project_id": project_id,
+                "new_project_id": new_project_id if 'new_project_id' in locals() else None
+            }
+            
+    except Exception as e:
+        error_msg = f"Error checking for next loop: {str(e)}"
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         print(f"❌ {error_msg}")
