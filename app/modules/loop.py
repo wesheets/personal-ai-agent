@@ -10,6 +10,8 @@ MODIFIED: Added timeout guard to stuck loops
 MODIFIED: Added agent registry validation before execution
 MODIFIED: Added support for modular logic registry
 MODIFIED: Enhanced to support project memory-based logic module resolution and task logging
+MODIFIED: Added vision deviation detection after CRITIC/ASH execution
+MODIFIED: Added loop drift detection for Cognitive Paradox Protocol
 """
 
 import logging
@@ -27,6 +29,8 @@ from fastapi.responses import JSONResponse
 from app.modules.agent_registry import get_registered_agent, list_agents
 from app.modules.project_state import read_project_state, update_project_state
 from app.modules.logic_loader import load_logic_module, run_agent_default, log_task_execution, get_logic_module_from_registry
+from modules.logic.evaluate_deviation_v1 import evaluate_deviation
+from modules.logic.loop_drift import detect_loop_drift
 
 # Configure logging
 logger = logging.getLogger("modules.loop")
@@ -269,6 +273,89 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
             
             # 🧠 Re-fetch updated state to avoid stale memory
             project_state = read_project_state(project_id)  # Re-fetch updated state
+            
+            # Run loop drift detection to check for potential regression or stagnation
+            try:
+                drift_result = detect_loop_drift(project_state)
+                
+                # Log the drift detection result
+                logger.info(f"Loop drift check for project {project_id}: {drift_result}")
+                print(f"🔄 Loop drift check for project {project_id}: {drift_result['reflection_recommended']}")
+                
+                # If reflection is recommended, update project state
+                if drift_result["reflection_recommended"]:
+                    logger.warning(f"Loop reflection recommended for project {project_id}: {drift_result['reason']}")
+                    print(f"⚠️ Loop reflection recommended for project {project_id}: {drift_result['reason']}")
+                    
+                    # Update project state with reflection trigger
+                    update_project_state(project_id, {
+                        "loop_reflection_triggered": True,
+                        "loop_reflection_reason": drift_result["reason"]
+                    })
+                    
+                    logger.info(f"Loop reflection flag set for project {project_id}")
+                    print(f"🚩 Loop reflection flag set for project {project_id}")
+            except Exception as e:
+                # Log error but continue execution
+                error_msg = f"Error in loop drift detection: {str(e)}"
+                logger.error(error_msg)
+                print(f"❌ {error_msg}")
+                # Don't halt the loop for drift detection errors
+            
+            # Check if the agent that just ran was CRITIC or ASH, and run deviation detection
+            if agent_id.lower() in ["critic", "ash"]:
+                logger.info(f"Running deviation detection after {agent_id} execution")
+                print(f"🔍 Running deviation detection after {agent_id} execution")
+                
+                # Get feature_id from project state or use a default
+                feature_id = project_state.get("current_feature", "main")
+                
+                # Run deviation detection
+                try:
+                    deviation_result = evaluate_deviation(project_state, feature_id)
+                    
+                    # Log the deviation check result
+                    logger.info(f"Deviation check for {feature_id}: {deviation_result}")
+                    print(f"📊 Deviation check for {feature_id}: {deviation_result['deviation_detected']}")
+                    
+                    # If deviation detected, add repair instruction to queue
+                    if deviation_result["deviation_detected"]:
+                        logger.warning(f"Deviation detected for feature {feature_id}")
+                        print(f"⚠️ Deviation detected for feature {feature_id}")
+                        
+                        # Initialize repair_queue if it doesn't exist
+                        if "repair_queue" not in project_state:
+                            project_state["repair_queue"] = []
+                        
+                        # Create repair instruction
+                        repair = {
+                            "feature": feature_id,
+                            "instruction": deviation_result["repair_instruction"],
+                            "assigned_agent": deviation_result["assigned_agent"],
+                            "status": "queued",
+                            "timestamp": datetime.utcnow().isoformat()
+                        }
+                        
+                        # Add to repair queue
+                        project_state["repair_queue"].append(repair)
+                        
+                        # Update project state with repair queue
+                        update_project_state(project_id, {
+                            "repair_queue": project_state["repair_queue"]
+                        })
+                        
+                        logger.info(f"Added repair instruction to queue for feature {feature_id}")
+                        print(f"✅ Added repair instruction to queue for feature {feature_id}")
+                    else:
+                        logger.info(f"No deviation detected for feature {feature_id}")
+                        print(f"✅ No deviation detected for feature {feature_id}")
+                        
+                except Exception as e:
+                    # Log error but continue execution
+                    error_msg = f"Error in deviation detection: {str(e)}"
+                    logger.error(error_msg)
+                    print(f"❌ {error_msg}")
+                    # Don't halt the loop for deviation detection errors
             
             # Now determine next step from fresh memory
             step_description = project_state.get("next_recommended_step", "")
