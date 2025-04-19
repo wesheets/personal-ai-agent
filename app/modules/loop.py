@@ -77,15 +77,42 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
                 
             project_state = status_response.get("project_state", {})
             
-            # NEW: If project doesn't exist, stop loop execution
-            if not project_state:
-                logger.warning(f"[LOOP] Ignoring loop trigger for unknown project_id: {project_id}")
-                print(f"⚠️ [LOOP] Ignoring loop trigger for unknown project_id: {project_id}")
+            # Active project guard: Check if project doesn't exist or is deleted
+            if not project_state or project_state.get("status") == "deleted":
+                logger.warn(f"Ignoring loop request for invalid or deleted project: {project_id}")
+                print(f"⚠️ [LOOP] Ignoring loop request for invalid or deleted project: {project_id}")
                 return {
-                    "status": "error",
-                    "message": f"Project '{project_id}' not found. Loop ignored.",
+                    "status": "ignored", 
+                    "message": "Project no longer active",
                     "project_id": project_id
                 }
+                
+            # Max age guard: Check if project is older than 24 hours
+            if "timestamp" in project_state:
+                try:
+                    project_timestamp = datetime.fromisoformat(project_state["timestamp"])
+                    current_time = datetime.utcnow()
+                    age = current_time - project_timestamp
+                    
+                    if age > timedelta(hours=24):
+                        logger.warn(f"Aborting loop execution for expired project (age > 24h): {project_id}")
+                        print(f"⚠️ [LOOP] Aborting loop execution for expired project (age > 24h): {project_id}")
+                        
+                        # Update project state with expired status
+                        update_project_state(project_id, {
+                            "status": "expired",
+                            "loop_status": "halted",
+                            "halt_reason": "Project expired (age > 24h)"
+                        })
+                        
+                        return {
+                            "status": "ignored",
+                            "message": "Project expired (age > 24h)",
+                            "project_id": project_id
+                        }
+                except Exception as e:
+                    logger.error(f"Error checking project age: {str(e)}")
+                    # Continue execution if we can't parse the timestamp
             
             # NEW: Check for timeout - if last_agent_triggered_at is more than 5 minutes ago
             last_triggered_at = project_state.get("last_agent_triggered_at")
