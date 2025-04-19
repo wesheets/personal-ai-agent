@@ -5,7 +5,8 @@ This module provides utility functions for schema validation in the application.
 It helps ensure that data structures conform to expected schemas, particularly
 for project memory validation to prevent missing or malformed memory fields
 from breaking agent logic, API request validation to prevent invalid requests,
-and agent role validation to ensure proper execution order.
+agent role validation to ensure proper execution order, and loop structure validation
+to ensure loop integrity.
 """
 
 from typing import Dict, Any, List
@@ -103,4 +104,46 @@ def validate_agent_action(agent_name: str, project_memory: dict) -> Dict[str, st
         if dep not in project_memory.get("completed_steps", []):
             errors[dep] = f"Required dependency '{dep}' not completed"
     
+    return errors
+
+def get_loop_schema() -> dict:
+    """
+    Retrieves the schema definition for loop structure.
+    
+    Returns:
+        Dictionary containing the loop structure schema definition
+    """
+    from app.schema_registry import SCHEMA_REGISTRY
+    return SCHEMA_REGISTRY.get("loop", {})
+
+def validate_loop_state(project_id: str, memory_store: dict) -> Dict[str, Any]:
+    """
+    Validates the loop state for a project against the expected schema.
+    
+    Args:
+        project_id: The ID of the project to validate
+        memory_store: The memory store containing project memories
+        
+    Returns:
+        Dictionary of validation errors, where keys are error types and values are error details.
+        Empty dictionary means the loop state is valid.
+    """
+    memory = memory_store.get(project_id, {})
+    loop_schema = get_loop_schema()
+    errors = {}
+
+    # Validate required agents completed
+    required = set(loop_schema.get("required_agents", []))
+    completed = set(memory.get("completed_steps", []))
+    missing = required - completed
+    if missing:
+        errors["missing_agents"] = list(missing)
+
+    # Validate loop exit conditions
+    if memory.get("loop_count", 0) >= loop_schema.get("max_loops", 5):
+        errors["loop_depth_exceeded"] = f"{memory.get('loop_count')} >= {loop_schema['max_loops']}"
+    
+    if memory.get("loop_complete", False):
+        errors["loop_marked_complete"] = "Loop is already marked complete"
+
     return errors

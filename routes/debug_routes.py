@@ -34,6 +34,8 @@ print("  - /api/debug/routes")
 print("  - /api/debug/memory/validate/{project_id}")
 print("  - /api/debug/schema/validate")
 print("  - /api/debug/agent/schema/{agent}")
+print("  - /api/debug/loop/schema")
+print("  - /api/debug/loop/validate/{project_id}")
 
 @router.get("/routes")
 def list_routes():
@@ -465,6 +467,130 @@ def get_agent_schema_endpoint(agent: str):
             "status": "error",
             "message": error_msg,
             "agent": agent
+        }
+
+# Loop Schema endpoint
+print("✅ Registering /api/debug/loop/schema endpoint")
+
+@router.get("/loop/schema")
+def get_loop_schema_route():
+    """
+    Returns the schema definition for loop structure.
+    
+    This endpoint helps understand what a valid loop should look like,
+    including required agents, allowed depth, and exit conditions.
+    
+    Returns:
+        The loop structure schema definition
+    """
+    try:
+        print(f"🔍 Debug loop schema endpoint called")
+        logger.info(f"🔍 Debug loop schema endpoint called")
+        
+        from app.utils.schema_utils import get_loop_schema
+        
+        # Get the loop schema
+        schema = get_loop_schema()
+        
+        # Log the schema retrieval
+        if schema:
+            print(f"✅ Loop schema found")
+            logger.info(f"Loop schema found")
+        else:
+            print(f"⚠️ No loop schema found")
+            logger.warning(f"No loop schema found")
+        
+        return {
+            "schema": schema,
+            "found": bool(schema)
+        }
+    except Exception as e:
+        error_msg = f"Failed to retrieve loop schema: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg
+        }
+
+# Loop validation endpoint
+print("✅ Registering /api/debug/loop/validate/{project_id} endpoint")
+
+@router.get("/loop/validate/{project_id}")
+def validate_loop_route(project_id: str):
+    """
+    Validates the loop state for a project against the expected schema.
+    
+    This endpoint helps identify if a loop is healthy, complete, or broken
+    based on required agents, allowed depth, and exit conditions.
+    
+    Args:
+        project_id: The ID of the project to validate
+        
+    Returns:
+        Validation results including whether the loop state is valid and any errors found
+    """
+    try:
+        print(f"🔍 Debug loop validation endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug loop validation endpoint called for project: {project_id}")
+        
+        from app.utils.schema_utils import validate_loop_state
+        
+        # Try to import PROJECT_MEMORY from different possible locations
+        try:
+            from app.modules.project_state import PROJECT_MEMORY
+        except ImportError:
+            try:
+                from app.memory import PROJECT_MEMORY
+            except ImportError:
+                # If we can't find the actual memory store, create a mock one for testing
+                print("⚠️ Could not import PROJECT_MEMORY, using mock memory store")
+                logger.warning("Could not import PROJECT_MEMORY, using mock memory store")
+                PROJECT_MEMORY = {
+                    project_id: {
+                        "project_id": project_id,
+                        "timestamp": "2025-04-19T21:44:00.000000",
+                        "status": "active",
+                        "next_recommended_step": "Run NOVA to implement solution",
+                        "loop_status": "running",
+                        "completed_steps": ["hal", "nova"],
+                        "loop_count": 1,
+                        "loop_complete": False,
+                        "agents": {},
+                        "task_log": [],
+                        "logic_modules": {},
+                        "registry": {}
+                    }
+                }
+
+        # Validate the loop state
+        errors = validate_loop_state(project_id, PROJECT_MEMORY)
+        
+        # Log the validation results
+        if errors:
+            print(f"⚠️ Loop validation errors found for project {project_id}: {errors}")
+            logger.warning(f"Loop validation errors found for project {project_id}: {errors}")
+        else:
+            print(f"✅ Loop validation passed for project {project_id}")
+            logger.info(f"Loop validation passed for project {project_id}")
+        
+        return {
+            "project_id": project_id,
+            "valid": not bool(errors),
+            "errors": errors
+        }
+    except Exception as e:
+        error_msg = f"Failed to validate loop state: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
         }
 
 # Simple health check endpoint for the debug router
