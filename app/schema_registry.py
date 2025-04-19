@@ -4,7 +4,8 @@ Schema Registry Module
 This module defines the schema registry for validating various data structures
 in the application. It provides type definitions for expected fields in different
 parts of the system, particularly for project memory validation, API request validation,
-agent role validation, loop structure validation, reflection validation, and tool validation.
+agent role validation, loop structure validation, reflection validation, tool validation,
+and UI component validation.
 """
 
 from typing import Dict, Any, Type
@@ -105,6 +106,26 @@ SCHEMA_REGISTRY = {
             "input": ["project_id"],
             "output": ["deployment_url", "status"],
             "errors": True
+        }
+    },
+    "ui": {
+        "FileTreeVisualizer": {
+            "props": ["projectId"],
+            "outputs": ["nodeStatus"],
+            "used_by": ["OperatorConsole"],
+            "description": "Displays file state by loop/agent context"
+        },
+        "MemoryDebugger": {
+            "props": ["projectId"],
+            "outputs": ["memorySnapshot"],
+            "used_by": ["DebugDashboard"],
+            "description": "Renders a snapshot of current memory state"
+        },
+        "AgentPulseBar": {
+            "props": ["activeAgent", "status"],
+            "outputs": ["pulseStatus"],
+            "used_by": ["AgentConsole"],
+            "description": "Shows agent loop activity in real time"
         }
     }
 }

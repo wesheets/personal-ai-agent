@@ -7,7 +7,8 @@ for project memory validation to prevent missing or malformed memory fields
 from breaking agent logic, API request validation to prevent invalid requests,
 agent role validation to ensure proper execution order, loop structure validation
 to ensure loop integrity, reflection validation to ensure structured agent reflections,
-and tool validation to ensure proper tool usage.
+tool validation to ensure proper tool usage, and UI component validation to ensure
+proper frontend component usage.
 """
 
 from typing import Dict, Any, List
@@ -210,3 +211,18 @@ def validate_tool_call(tool_name: str, payload: Dict[str, Any]) -> Dict[str, str
             errors[key] = "Missing required input"
 
     return errors
+
+def get_ui_schema(component: str = None) -> Dict[str, Any]:
+    """
+    Retrieves the schema definition for UI components.
+    
+    Args:
+        component: The name of the UI component (e.g., "FileTreeVisualizer")
+                  If None, returns the entire UI schema
+        
+    Returns:
+        Dictionary containing the UI component schema definition(s)
+    """
+    from app.schema_registry import SCHEMA_REGISTRY
+    ui = SCHEMA_REGISTRY.get("ui", {})
+    return ui.get(component) if component else ui

@@ -38,6 +38,7 @@ print("  - /api/debug/loop/schema")
 print("  - /api/debug/loop/validate/{project_id}")
 print("  - /api/debug/reflection/validate")
 print("  - /api/debug/tool/validate/{tool}")
+print("  - /api/debug/ui/schema/{component}")
 
 @router.get("/routes")
 def list_routes():
@@ -694,6 +695,58 @@ def validate_tool_usage(tool: str, payload: Dict[str, Any] = Body(...)):
             "status": "error",
             "message": error_msg,
             "tool": tool
+        }
+
+# UI Component Schema endpoint
+print("✅ Registering /api/debug/ui/schema/{component} endpoint")
+
+@router.get("/ui/schema/{component}")
+def get_ui_schema_route(component: str = None):
+    """
+    Returns the schema definition for UI components.
+    
+    This endpoint helps understand the structure, props, outputs, and usage rules
+    for core frontend components, making them self-describing and agent-readable.
+    
+    Args:
+        component: The name of the UI component (e.g., "FileTreeVisualizer")
+                  If not provided, returns all UI component schemas
+        
+    Returns:
+        The UI component schema definition(s)
+    """
+    try:
+        print(f"🔍 Debug UI schema endpoint called for component: {component}")
+        logger.info(f"🔍 Debug UI schema endpoint called for component: {component}")
+        
+        from app.utils.schema_utils import get_ui_schema
+        
+        # Get the UI schema
+        schema = get_ui_schema(component)
+        
+        # Log the schema retrieval
+        if schema:
+            print(f"✅ UI schema found for {component if component else 'all components'}")
+            logger.info(f"UI schema found for {component if component else 'all components'}")
+        else:
+            print(f"⚠️ No UI schema found for {component if component else 'any component'}")
+            logger.warning(f"No UI schema found for {component if component else 'any component'}")
+        
+        return {
+            "component": component,
+            "schema": schema,
+            "found": bool(schema)
+        }
+    except Exception as e:
+        error_msg = f"Failed to retrieve UI schema: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "component": component
         }
 
 # Simple health check endpoint for the debug router
