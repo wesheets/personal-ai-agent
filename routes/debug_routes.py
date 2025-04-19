@@ -4,13 +4,16 @@ This module provides debug endpoints for the agent system.
 feature/phase-3.5-hardening
 SHA256: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b
 INTEGRITY: v3.5.0-debug-routes
-LAST_MODIFIED: 2025-04-18
+LAST_MODIFIED: 2025-04-19
 main
 """
 import logging
 import os
 import json
+import time
+import traceback
 from fastapi import APIRouter, Request, Response, HTTPException
+from fastapi.routing import APIRoute
 from typing import Dict, Any, List
 
 from app.core.agent_router import get_agent_router
@@ -23,10 +26,46 @@ logger.setLevel(logging.DEBUG)  # Ensure debug level logging is enabled
 router = APIRouter(tags=["Debug"])
 
 # Debug print to verify this file is loaded
-print("✅ DEBUG ROUTES LOADED - Version 2025-04-18-03")
+print("✅ DEBUG ROUTES LOADED - Version 2025-04-19-01")
 print("✅ Debug routes available:")
 print("  - /api/debug/agents")
 print("  - /api/debug/memory/log")
+print("  - /api/debug/routes")
+
+@router.get("/routes")
+def list_routes():
+    """
+    Returns a list of all registered FastAPI routes.
+    
+    This endpoint helps verify whether critical routes like /api/orchestrator/interpret
+    are properly registered and deployed in production.
+    """
+    try:
+        from app.main import app
+        routes = []
+        for route in app.routes:
+            if isinstance(route, APIRoute):
+                routes.append({
+                    "path": route.path,
+                    "methods": list(route.methods),
+                    "name": route.name
+                })
+        
+        # Log the debug information
+        logger.info(f"🔍 Debug routes endpoint called")
+        logger.info(f"🔍 Found {len(routes)} registered routes")
+        
+        return routes
+    except Exception as e:
+        error_msg = f"Failed to list routes: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg
+        }
 
 @router.get("/agents")
 async def debug_agents():
