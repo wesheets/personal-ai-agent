@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Query, HTTPException, Path
 from typing import Optional, Dict, Any
-from app.modules.project_state import read_project_state
+from app.modules.project_state import read_project_state, write_project_state
+from pydantic import BaseModel
+
+class PatchProjectStateRequest(BaseModel):
+    project_id: str
+    patch: Dict[str, Any]
 
 router = APIRouter()
 
@@ -246,3 +251,24 @@ async def project_start(request: Dict[str, Any]):
             "agent": agent or "unknown",
             "goal": goal or "unknown"
         }
+
+@router.patch("/state")
+async def patch_project_state(payload: PatchProjectStateRequest):
+    project_id = payload.project_id
+    patch = payload.patch
+
+    state = read_project_state(project_id)
+    if not state:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # Apply patch keys to existing state
+    for key, value in patch.items():
+        state[key] = value
+
+    write_project_state(project_id, state)
+    return {
+        "status": "success",
+        "message": "Project state updated",
+        "project_id": project_id,
+        "updated_fields": list(patch.keys())
+    }
