@@ -10,6 +10,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 from app.core.orchestrator import get_orchestrator
+from app.modules.project_state import write_project_state
 import uuid
 
 # Create router
@@ -134,6 +135,35 @@ async def interpret_user_prompt(request: Request):
             "Set up authentication system",
             "Develop API endpoints"
         ]
+        
+        # Initialize the project in memory
+        # This ensures the project exists and can be accessed by /system/status and /project/state
+        print(f"🧠 Creating project memory for {project_id} with goal: {proposed_goal}")
+        
+        # Create initial project state
+        initial_state = {
+            "project_id": project_id,
+            "status": "initialized",
+            "goal": proposed_goal,
+            "files_created": [],
+            "agents_involved": ["orchestrator"],
+            "latest_agent_action": "Project initialized by orchestrator",
+            "next_recommended_step": "hal",  # Start with HAL agent
+            "tool_usage": {},
+            "loop_count": 0,
+            "max_loops": 5,
+            "last_completed_agent": None,
+            "completed_steps": [],
+            "challenge_insights": challenge_insights,
+            "task_list": task_list
+        }
+        
+        # Write the project state to memory
+        write_result = write_project_state(project_id, initial_state)
+        
+        if write_result["status"] != "success":
+            print(f"⚠️ Warning: Failed to initialize project memory: {write_result}")
+            # Continue anyway, as we want to return the project_id even if memory initialization fails
         
         # Create and return the response
         return {
