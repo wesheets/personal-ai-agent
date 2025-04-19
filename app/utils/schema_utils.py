@@ -6,7 +6,8 @@ It helps ensure that data structures conform to expected schemas, particularly
 for project memory validation to prevent missing or malformed memory fields
 from breaking agent logic, API request validation to prevent invalid requests,
 agent role validation to ensure proper execution order, loop structure validation
-to ensure loop integrity, and reflection validation to ensure structured agent reflections.
+to ensure loop integrity, reflection validation to ensure structured agent reflections,
+and tool validation to ensure proper tool usage.
 """
 
 from typing import Dict, Any, List
@@ -171,3 +172,41 @@ def validate_reflection(reflection_entry: dict) -> Dict[str, str]:
     """
     schema = get_reflection_schema()
     return validate_schema(reflection_entry, schema)
+
+def get_tool_schema(tool_name: str) -> dict:
+    """
+    Retrieves the schema definition for a specific tool.
+    
+    Args:
+        tool_name: The name of the tool (e.g., "file_writer", "repo_tools")
+        
+    Returns:
+        Dictionary containing the tool's schema definition, or empty dict if not found
+    """
+    from app.schema_registry import SCHEMA_REGISTRY
+    return SCHEMA_REGISTRY.get("tools", {}).get(tool_name, {})
+
+def validate_tool_call(tool_name: str, payload: Dict[str, Any]) -> Dict[str, str]:
+    """
+    Validates a tool call against the expected schema.
+    
+    Args:
+        tool_name: The name of the tool to validate
+        payload: The payload to validate
+        
+    Returns:
+        Dictionary of validation errors, where keys are field names and values are error messages.
+        Empty dictionary means the tool call is valid.
+    """
+    schema = get_tool_schema(tool_name)
+    errors = {}
+
+    if not schema:
+        errors["tool"] = "Tool not registered in schema"
+        return errors
+
+    for key in schema.get("input", []):
+        if key not in payload:
+            errors[key] = "Missing required input"
+
+    return errors

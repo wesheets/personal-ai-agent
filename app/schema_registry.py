@@ -4,7 +4,7 @@ Schema Registry Module
 This module defines the schema registry for validating various data structures
 in the application. It provides type definitions for expected fields in different
 parts of the system, particularly for project memory validation, API request validation,
-agent role validation, loop structure validation, and reflection validation.
+agent role validation, loop structure validation, reflection validation, and tool validation.
 """
 
 from typing import Dict, Any, Type
@@ -89,5 +89,22 @@ SCHEMA_REGISTRY = {
         "summary": str,
         "confidence": float,
         "tags": list
+    },
+    "tools": {
+        "file_writer": {
+            "input": ["filename", "content"],
+            "output": ["status", "path"],
+            "errors": True
+        },
+        "repo_tools": {
+            "input": ["project_id", "commit_message"],
+            "output": ["git_url", "status"],
+            "errors": True
+        },
+        "vercel_deploy": {
+            "input": ["project_id"],
+            "output": ["deployment_url", "status"],
+            "errors": True
+        }
     }
 }

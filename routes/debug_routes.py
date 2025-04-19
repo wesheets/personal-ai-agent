@@ -37,6 +37,7 @@ print("  - /api/debug/agent/schema/{agent}")
 print("  - /api/debug/loop/schema")
 print("  - /api/debug/loop/validate/{project_id}")
 print("  - /api/debug/reflection/validate")
+print("  - /api/debug/tool/validate/{tool}")
 
 @router.get("/routes")
 def list_routes():
@@ -641,6 +642,58 @@ def validate_reflection_route(payload: Dict[str, Any] = Body(...)):
         return {
             "status": "error",
             "message": error_msg
+        }
+
+# Tool validation endpoint
+print("✅ Registering /api/debug/tool/validate/{tool} endpoint")
+
+@router.post("/tool/validate/{tool}")
+def validate_tool_usage(tool: str, payload: Dict[str, Any] = Body(...)):
+    """
+    Validates a tool call against the expected schema.
+    
+    This endpoint helps ensure all tool calls follow the defined format,
+    with required inputs and expected outputs, making tool usage safer and more predictable.
+    
+    Args:
+        tool: The name of the tool to validate (e.g., "file_writer", "repo_tools")
+        payload: The payload to validate
+        
+    Returns:
+        Validation results including whether the tool call is valid and any errors found
+    """
+    try:
+        print(f"🔍 Debug tool validation endpoint called for tool: {tool}")
+        logger.info(f"🔍 Debug tool validation endpoint called for tool: {tool}")
+        
+        from app.utils.schema_utils import validate_tool_call
+        
+        # Validate the tool call
+        errors = validate_tool_call(tool, payload)
+        
+        # Log the validation results
+        if errors:
+            print(f"⚠️ Tool validation errors found for {tool}: {errors}")
+            logger.warning(f"Tool validation errors found for {tool}: {errors}")
+        else:
+            print(f"✅ Tool validation passed for {tool}")
+            logger.info(f"Tool validation passed for {tool}")
+        
+        return {
+            "tool": tool,
+            "valid": not bool(errors),
+            "errors": errors
+        }
+    except Exception as e:
+        error_msg = f"Failed to validate tool call: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "tool": tool
         }
 
 # Simple health check endpoint for the debug router
