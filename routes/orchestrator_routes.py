@@ -6,10 +6,11 @@ including the /api/orchestrator/consult endpoint that allows the Orchestrator
 to reflect, route tasks, and respond to operator input.
 """
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 from app.core.orchestrator import get_orchestrator
+import uuid
 
 # Create router
 router = APIRouter()
@@ -22,6 +23,10 @@ class OrchestratorConsultRequest(BaseModel):
     task: str = Field(..., description="Primary task to evaluate")
     objective: Optional[str] = Field(None, description="Optional objective")
     context: Optional[str] = Field(None, description="Optional context")
+
+class OrchestratorInterpretRequest(BaseModel):
+    """Request model for the orchestrator/interpret endpoint"""
+    input: str = Field(..., description="User input to interpret")
 
 @router.post("/orchestrator/consult")
 async def orchestrator_consult(request: OrchestratorConsultRequest, background_tasks: BackgroundTasks = None):
@@ -81,3 +86,68 @@ async def orchestrator_consult(request: OrchestratorConsultRequest, background_t
         print(f"Error in orchestrator_consult: {str(e)}")
         # Raise HTTP exception
         raise HTTPException(status_code=500, detail=f"Consultation failed: {str(e)}")
+
+@router.post("/interpret")
+async def interpret_user_prompt(request: Request):
+    """
+    Interpret user prompt and generate a project proposal.
+    
+    This endpoint takes a user's input text and generates a proposed goal,
+    challenge insights, and task list for a new project.
+    
+    Args:
+        request: The request containing the user input
+        
+    Returns:
+        JSON response with project_id, proposed_goal, challenge_insights, and task_list
+    """
+    try:
+        # Parse the request body
+        body = await request.json()
+        input_text = body.get("input", "")
+        
+        if not input_text:
+            raise HTTPException(status_code=400, detail="Input text is required")
+        
+        # Generate a unique project ID
+        project_id = f"loop_autospawned_{str(uuid.uuid4())[:8]}"
+        
+        # MOCK LOGIC: Replace this with real orchestrator logic when ready
+        # In a real implementation, this would use NLP or LLM to analyze the input
+        # and generate appropriate responses
+        
+        # For now, we'll return a mock response based on the input
+        proposed_goal = f"Build a solution based on: {input_text}"
+        
+        # Generate some mock challenge insights
+        challenge_insights = [
+            "This may require integration with external APIs.",
+            "Consider user authentication and data privacy.",
+            "Mobile responsiveness will be important for this project."
+        ]
+        
+        # Generate a mock task list
+        task_list = [
+            "Design user interface mockups",
+            "Implement core functionality",
+            "Create database schema",
+            "Set up authentication system",
+            "Develop API endpoints"
+        ]
+        
+        # Create and return the response
+        return {
+            "project_id": project_id,
+            "proposed_goal": proposed_goal,
+            "challenge_insights": challenge_insights,
+            "task_list": task_list
+        }
+        
+    except HTTPException as he:
+        # Re-raise HTTP exceptions
+        raise he
+    except Exception as e:
+        # Log the error
+        print(f"Error in interpret_user_prompt: {str(e)}")
+        # Raise HTTP exception
+        raise HTTPException(status_code=500, detail=f"Interpretation failed: {str(e)}")
