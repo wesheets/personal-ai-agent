@@ -167,6 +167,14 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
             logger.info(f"Agent run successful: {agent_id}")
             print(f"✅ Agent run successful: {agent_id}")
             
+            # 🧠 Re-fetch updated state to avoid stale memory
+            project_state = read_project_state(project_id)  # Re-fetch updated state
+            
+            # Now determine next step from fresh memory
+            step_description = project_state.get("next_recommended_step", "")
+            logger.info(f"Updated next recommended step: {step_description}")
+            print(f"🔄 Updated next recommended step: {step_description}")
+            
             # Step 5: Check if loop is complete and trigger next loop if conditions are met
             check_and_trigger_next_loop(project_id)
             
