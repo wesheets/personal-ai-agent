@@ -29,19 +29,21 @@ def run_critic_agent(task, project_id, tools):
     # Generate summary feedback
     feedback = f"CRITIC reviewed {len(frontend_files)} UI components and identified potential improvements."
 
-    # Memory log
-    state["loop_count"] += 1
-    state["last_completed_agent"] = "critic"
-    state["completed_steps"] = state.get("completed_steps", []) + ["critic"]
-    state["next_recommended_step"] = "ash"
-    state["latest_agent_action"] = {
-        "agent": "critic",
-        "feedback": feedback
+    # Create a patch dictionary with only the fields to update
+    patch = {
+        "loop_count": state.get("loop_count", 0) + 1,
+        "last_completed_agent": "critic",
+        "completed_steps": state.get("completed_steps", []) + ["critic"],
+        "next_recommended_step": "ash",
+        "latest_agent_action": {
+            "agent": "critic",
+            "feedback": feedback
+        },
+        "feedback_log": feedback_log
     }
-    # Add feedback log to state
-    state["feedback_log"] = feedback_log
-
-    result = update_project_state(project_id, state)
+    
+    # Update project state with the patch
+    result = update_project_state(project_id, patch)
     print("✅ CRITIC updated memory:", result)
 
     return {
@@ -51,5 +53,5 @@ def run_critic_agent(task, project_id, tools):
         "agent": "critic",
         "feedback": feedback,
         "feedback_log": feedback_log,
-        "next_recommended_step": state["next_recommended_step"]
+        "next_recommended_step": "ash"
     }
