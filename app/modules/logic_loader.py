@@ -2,6 +2,8 @@
 Logic Loader Module
 This module provides functionality for loading logic modules dynamically based on project context.
 It enables modular agent behavior by loading different strategy implementations at runtime.
+
+MODIFIED: Enhanced to support project memory-based module resolution and task logging
 """
 
 import logging
@@ -14,34 +16,34 @@ from typing import Dict, Any, Optional, Callable
 # Configure logging
 logger = logging.getLogger("app.modules.logic_loader")
 
-def load_logic_module(module_path: str) -> Optional[Any]:
+def load_logic_module(path: str) -> Optional[Any]:
     """
     Dynamically load a logic module from a file path.
     
     Args:
-        module_path: Path to the module file (e.g., "modules/logic/nova_strategy_default.py")
+        path: Path to the module file (e.g., "modules/logic/nova_strategy_default.py")
             
     Returns:
         The loaded module object or None if loading fails
     """
     try:
-        logger.info(f"Loading logic module from path: {module_path}")
-        print(f"🔍 Loading logic module from path: {module_path}")
+        logger.info(f"Loading logic module from path: {path}")
+        print(f"🔍 Loading logic module from path: {path}")
         
         # Ensure the path exists
-        if not os.path.exists(module_path):
-            logger.warning(f"Logic module path does not exist: {module_path}")
-            print(f"⚠️ Logic module path does not exist: {module_path}")
+        if not os.path.exists(path):
+            logger.warning(f"Logic module path does not exist: {path}")
+            print(f"⚠️ Logic module path does not exist: {path}")
             return None
         
         # Extract module name from path
-        module_name = os.path.splitext(os.path.basename(module_path))[0]
+        module_name = os.path.splitext(os.path.basename(path))[0]
         
         # Load the module spec
-        spec = importlib.util.spec_from_file_location(module_name, module_path)
+        spec = importlib.util.spec_from_file_location(module_name, path)
         if spec is None:
-            logger.error(f"Failed to create module spec for: {module_path}")
-            print(f"❌ Failed to create module spec for: {module_path}")
+            logger.error(f"Failed to create module spec for: {path}")
+            print(f"❌ Failed to create module spec for: {path}")
             return None
         
         # Create the module
@@ -59,7 +61,7 @@ def load_logic_module(module_path: str) -> Optional[Any]:
         return module
         
     except Exception as e:
-        error_msg = f"Error loading logic module from {module_path}: {str(e)}"
+        error_msg = f"Error loading logic module from {path}: {str(e)}"
         logger.error(error_msg)
         print(f"❌ {error_msg}")
         return None
@@ -133,6 +135,9 @@ def run_agent_default(agent_id: str, task: str, project_id: str) -> Dict[str, An
         # Execute the agent directly
         result = agent_fn(task, project_id)
         
+        # Log the task execution with default logic module
+        log_task_execution(project_id, agent_id, task, "default")
+        
         return result
         
     except Exception as e:
@@ -145,3 +150,95 @@ def run_agent_default(agent_id: str, task: str, project_id: str) -> Dict[str, An
             "project_id": project_id,
             "agent": agent_id
         }
+
+def log_task_execution(project_id: str, agent_id: str, task: str, logic_module: str) -> None:
+    """
+    Log the task execution with the logic module used.
+    
+    Args:
+        project_id: The project identifier
+        agent_id: The agent identifier
+        task: The task performed
+        logic_module: The logic module used (key or "default")
+    """
+    try:
+        # Import project_state here to avoid circular imports
+        from app.modules.project_state import read_project_state, update_project_state
+        
+        # Read current project state
+        project_state = read_project_state(project_id)
+        
+        # Initialize task_log if it doesn't exist
+        if "task_log" not in project_state:
+            project_state["task_log"] = []
+        
+        # Create task log entry
+        task_entry = {
+            "agent": agent_id,
+            "task": task,
+            "logic_module": logic_module,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        # Add entry to task log
+        project_state["task_log"].append(task_entry)
+        
+        # Update project state
+        update_project_state(project_id, {"task_log": project_state["task_log"]})
+        
+        logger.info(f"Task execution logged for project {project_id}: {agent_id} using {logic_module}")
+        print(f"📝 Task execution logged: {agent_id} using {logic_module}")
+        
+    except Exception as e:
+        error_msg = f"Error logging task execution: {str(e)}"
+        logger.error(error_msg)
+        print(f"⚠️ {error_msg}")
+
+def get_logic_module_from_registry(project_id: str, agent_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Get the logic module entry from the project registry based on the agent ID.
+    
+    Args:
+        project_id: The project identifier
+        agent_id: The agent identifier
+            
+    Returns:
+        Dict containing the logic module entry or None if not found
+    """
+    try:
+        # Import project_state here to avoid circular imports
+        from app.modules.project_state import read_project_state
+        
+        # Read current project state
+        project_state = read_project_state(project_id)
+        
+        # Check if logic_modules and registry exist
+        if "logic_modules" not in project_state or "registry" not in project_state:
+            logger.info(f"No logic modules or registry found for project {project_id}")
+            return None
+        
+        # Get the logic module key for this agent
+        logic_module_key = project_state["logic_modules"].get(agent_id)
+        if not logic_module_key:
+            logger.info(f"No logic module key found for agent {agent_id}")
+            return None
+        
+        # Get the logic module entry from the registry
+        logic_entry = project_state["registry"].get(logic_module_key)
+        if not logic_entry:
+            logger.warning(f"Logic module key {logic_module_key} not found in registry")
+            return None
+        
+        return {
+            "key": logic_module_key,
+            "entry": logic_entry
+        }
+        
+    except Exception as e:
+        error_msg = f"Error getting logic module from registry: {str(e)}"
+        logger.error(error_msg)
+        print(f"❌ {error_msg}")
+        return None
+
+# Import datetime for timestamp in log_task_execution
+from datetime import datetime

@@ -9,6 +9,7 @@ MODIFIED: Added automatic loop continuation when loop_complete=true
 MODIFIED: Added timeout guard to stuck loops
 MODIFIED: Added agent registry validation before execution
 MODIFIED: Added support for modular logic registry
+MODIFIED: Enhanced to support project memory-based logic module resolution and task logging
 """
 
 import logging
@@ -25,7 +26,7 @@ from fastapi.responses import JSONResponse
 # Import the agent registry instead of AGENT_RUNNERS
 from app.modules.agent_registry import get_registered_agent, list_agents
 from app.modules.project_state import read_project_state, update_project_state
-from app.modules.logic_loader import load_logic_module, run_agent_default
+from app.modules.logic_loader import load_logic_module, run_agent_default, log_task_execution, get_logic_module_from_registry
 
 # Configure logging
 logger = logging.getLogger("modules.loop")
@@ -38,9 +39,10 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
     1. Calls GET /api/system/status to get the project state
     2. Extracts next_recommended_step from the project state
     3. Determines which agent to run based on the step description
-    4. Checks if a logic module is specified for that agent
+    4. Checks if a logic module is specified for that agent in project memory
     5. Loads and runs the logic module if specified, otherwise runs default agent
-    6. Checks if loop is complete and triggers next loop if conditions are met
+    6. Logs the task execution with the logic module used
+    7. Checks if loop is complete and triggers next loop if conditions are met
     
     Args:
         project_id: The project identifier
@@ -183,38 +185,60 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
         logger.info(f"Determined agent: {agent_id}")
         print(f"🤖 Determined agent: {agent_id}")
         
-        # Step 4: Check if a logic module is specified for that agent
+        # Step 4: Check if a logic module is specified for that agent in project memory
         try:
+            # Get logic module from project memory
+            logic_module_info = None
+            logic_module_key = None
+            
             # Check if logic_modules exists in project state
-            logic_modules = project_state.get("logic_modules", {})
-            
-            # Check if a module path is specified for this agent
-            module_path = logic_modules.get(agent_id)
-            
-            if module_path:
-                # Load and run the logic module
-                logger.info(f"Logic module specified for agent {agent_id}: {module_path}")
-                print(f"🧩 Logic module specified for agent {agent_id}: {module_path}")
+            if "logic_modules" in project_state and agent_id in project_state["logic_modules"]:
+                logic_module_key = project_state["logic_modules"].get(agent_id)
                 
-                # Load the logic module
-                logic = load_logic_module(module_path)
-                
-                if logic and hasattr(logic, 'run') and callable(getattr(logic, 'run')):
-                    # Run the logic module
-                    logger.info(f"Running logic module for agent {agent_id}")
-                    print(f"🏃 Running logic module for agent {agent_id}")
-                    
-                    # Call the run method of the logic module
-                    result = logic.run(next_step, project_id)
+                # If registry exists, get the logic entry
+                if "registry" in project_state and logic_module_key in project_state["registry"]:
+                    logic_entry = project_state["registry"].get(logic_module_key)
+                    if "path" in logic_entry:
+                        module_path = logic_entry["path"]
+                        logger.info(f"Logic module found in registry: {logic_module_key} -> {module_path}")
+                        print(f"🧩 Logic module found in registry: {logic_module_key} -> {module_path}")
+                        
+                        # Load the logic module
+                        logic = load_logic_module(module_path)
+                        
+                        if logic and hasattr(logic, 'run') and callable(getattr(logic, 'run')):
+                            # Run the logic module
+                            logger.info(f"Running logic module {logic_module_key} for agent {agent_id}")
+                            print(f"🏃 Running logic module {logic_module_key} for agent {agent_id}")
+                            
+                            # Call the run method of the logic module
+                            result = logic.run(project_id, next_step)
+                            
+                            # Log the task execution with the logic module used
+                            log_task_execution(project_id, agent_id, next_step, logic_module_key)
+                        else:
+                            # Fallback to default agent behavior
+                            logger.warning(f"Logic module could not be loaded or does not have a run method: {module_path}")
+                            print(f"⚠️ Logic module could not be loaded or does not have a run method: {module_path}")
+                            
+                            # Run default agent behavior
+                            result = run_agent_default(agent_id, next_step, project_id)
+                    else:
+                        # No path in logic entry, fallback to default
+                        logger.warning(f"Logic entry does not contain a path: {logic_entry}")
+                        print(f"⚠️ Logic entry does not contain a path: {logic_entry}")
+                        
+                        # Run default agent behavior
+                        result = run_agent_default(agent_id, next_step, project_id)
                 else:
-                    # Fallback to default agent behavior
-                    logger.warning(f"Logic module could not be loaded or does not have a run method: {module_path}")
-                    print(f"⚠️ Logic module could not be loaded or does not have a run method: {module_path}")
+                    # No registry or logic_module_key not in registry, fallback to default
+                    logger.warning(f"Logic module key {logic_module_key} not found in registry")
+                    print(f"⚠️ Logic module key {logic_module_key} not found in registry")
                     
                     # Run default agent behavior
                     result = run_agent_default(agent_id, next_step, project_id)
             else:
-                # No logic module specified, run default agent behavior
+                # No logic_modules or agent_id not in logic_modules, run default agent behavior
                 logger.info(f"No logic module specified for agent {agent_id}, running default behavior")
                 print(f"ℹ️ No logic module specified for agent {agent_id}, running default behavior")
                 
@@ -265,7 +289,8 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
                 "message": f"Agent {agent_id} triggered successfully",
                 "project_id": project_id,
                 "agent": agent_id,
-                "task": next_step
+                "task": next_step,
+                "logic_module": logic_module_key or "default"
             }
             
         except Exception as e:
@@ -385,9 +410,12 @@ def check_and_trigger_next_loop(project_id: str) -> Dict[str, Any]:
                 "challenge_mode": challenge_mode
             }
             
-            # Inherit logic modules from parent project if they exist
+            # Inherit logic modules and registry from parent project if they exist
             if "logic_modules" in project_state:
                 project_start_data["logic_modules"] = project_state["logic_modules"]
+            
+            if "registry" in project_state:
+                project_start_data["registry"] = project_state["registry"]
             
             # Use internal API call to avoid network overhead
             from routes.project_routes import start_project
