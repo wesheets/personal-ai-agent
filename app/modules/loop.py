@@ -8,6 +8,7 @@ MODIFIED: Added enhanced logging for agent resolution and fallback behavior
 MODIFIED: Added automatic loop continuation when loop_complete=true
 MODIFIED: Added timeout guard to stuck loops
 MODIFIED: Added agent registry validation before execution
+MODIFIED: Added support for modular logic registry
 """
 
 import logging
@@ -24,6 +25,7 @@ from fastapi.responses import JSONResponse
 # Import the agent registry instead of AGENT_RUNNERS
 from app.modules.agent_registry import get_registered_agent, list_agents
 from app.modules.project_state import read_project_state, update_project_state
+from app.modules.logic_loader import load_logic_module, run_agent_default
 
 # Configure logging
 logger = logging.getLogger("modules.loop")
@@ -36,8 +38,9 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
     1. Calls GET /api/system/status to get the project state
     2. Extracts next_recommended_step from the project state
     3. Determines which agent to run based on the step description
-    4. Triggers the appropriate agent via the agent registry
-    5. Checks if loop is complete and triggers next loop if conditions are met
+    4. Checks if a logic module is specified for that agent
+    5. Loads and runs the logic module if specified, otherwise runs default agent
+    6. Checks if loop is complete and triggers next loop if conditions are met
     
     Args:
         project_id: The project identifier
@@ -180,44 +183,43 @@ def run_agent_from_loop(project_id: str) -> Dict[str, Any]:
         logger.info(f"Determined agent: {agent_id}")
         print(f"🤖 Determined agent: {agent_id}")
         
-        # Step 4: Trigger the agent via the agent registry
+        # Step 4: Check if a logic module is specified for that agent
         try:
-            # Get the agent handler function from the registry
-            agent_fn = get_registered_agent(agent_id)
+            # Check if logic_modules exists in project state
+            logic_modules = project_state.get("logic_modules", {})
             
-            # Double-check if agent exists in registry (should never fail at this point)
-            if not agent_fn:
-                error_msg = f"Agent {agent_id} not found in registry despite earlier check"
-                logger.error(error_msg)
-                print(f"❌ {error_msg}")
+            # Check if a module path is specified for this agent
+            module_path = logic_modules.get(agent_id)
+            
+            if module_path:
+                # Load and run the logic module
+                logger.info(f"Logic module specified for agent {agent_id}: {module_path}")
+                print(f"🧩 Logic module specified for agent {agent_id}: {module_path}")
                 
-                # Update project state with halted status
-                update_project_state(project_id, {
-                    "loop_status": "halted",
-                    "error": "Invalid agent_id referenced"
-                })
+                # Load the logic module
+                logic = load_logic_module(module_path)
                 
-                return {
-                    "status": "error",
-                    "message": error_msg,
-                    "project_id": project_id,
-                    "loop_status": "halted",
-                    "error": "Invalid agent_id referenced"
-                }
-            
-            # Prepare request data
-            request_data = {
-                "agent_id": agent_id,
-                "project_id": project_id,
-                "task": next_step
-            }
-            
-            # Call agent run
-            logger.info(f"Running agent {agent_id} with task: {next_step}")
-            print(f"🏃 Running agent {agent_id} with task: {next_step}")
-            
-            # Execute the agent directly
-            result = agent_fn(next_step, project_id)
+                if logic and hasattr(logic, 'run') and callable(getattr(logic, 'run')):
+                    # Run the logic module
+                    logger.info(f"Running logic module for agent {agent_id}")
+                    print(f"🏃 Running logic module for agent {agent_id}")
+                    
+                    # Call the run method of the logic module
+                    result = logic.run(next_step, project_id)
+                else:
+                    # Fallback to default agent behavior
+                    logger.warning(f"Logic module could not be loaded or does not have a run method: {module_path}")
+                    print(f"⚠️ Logic module could not be loaded or does not have a run method: {module_path}")
+                    
+                    # Run default agent behavior
+                    result = run_agent_default(agent_id, next_step, project_id)
+            else:
+                # No logic module specified, run default agent behavior
+                logger.info(f"No logic module specified for agent {agent_id}, running default behavior")
+                print(f"ℹ️ No logic module specified for agent {agent_id}, running default behavior")
+                
+                # Run default agent behavior
+                result = run_agent_default(agent_id, next_step, project_id)
             
             # Check if agent run was successful
             if result.get("status") != "success":
@@ -383,64 +385,66 @@ def check_and_trigger_next_loop(project_id: str) -> Dict[str, Any]:
                 "challenge_mode": challenge_mode
             }
             
-            # Make the request to start the new project
-            # Using internal API call to avoid network overhead
-            from routes.project_routes import project_start
-            project_start_result = project_start(project_start_data)
+            # Inherit logic modules from parent project if they exist
+            if "logic_modules" in project_state:
+                project_start_data["logic_modules"] = project_state["logic_modules"]
             
-            # Check if project start was successful
-            if project_start_result.get("status") != "success":
-                error_msg = f"Failed to start new project: {project_start_result.get('message', 'Unknown error')}"
-                logger.error(error_msg)
-                print(f"❌ {error_msg}")
+            # Use internal API call to avoid network overhead
+            from routes.project_routes import start_project
+            start_result = start_project(project_start_data)
+            
+            if start_result.get("status") != "success":
+                logger.error(f"Failed to start new project: {start_result}")
+                print(f"❌ Failed to start new project: {start_result}")
                 return {
                     "status": "error",
-                    "message": error_msg,
-                    "project_id": project_id,
-                    "new_project_id": new_project_id
+                    "message": f"Failed to start new project: {start_result.get('message', 'Unknown error')}",
+                    "project_id": project_id
                 }
+                
+            logger.info(f"New project started: {new_project_id}")
+            print(f"✅ New project started: {new_project_id}")
             
-            # Immediately follow with POST to /api/agent/loop
-            from routes.agent_routes import agent_loop
-            agent_loop_result = agent_loop({"project_id": new_project_id})
+            # Immediately trigger the agent loop for the new project
+            try:
+                # Use internal API call to avoid network overhead
+                loop_result = run_agent_from_loop(new_project_id)
+                
+                if loop_result.get("status") not in ["success", "running"]:
+                    logger.warning(f"Loop trigger for new project returned non-success status: {loop_result}")
+                    print(f"⚠️ Loop trigger for new project returned non-success status: {loop_result}")
+                    # Continue anyway, as the project was created successfully
+                
+                logger.info(f"Loop triggered for new project: {new_project_id}")
+                print(f"✅ Loop triggered for new project: {new_project_id}")
+                
+            except Exception as e:
+                logger.error(f"Error triggering loop for new project: {str(e)}")
+                print(f"❌ Error triggering loop for new project: {str(e)}")
+                # Continue anyway, as the project was created successfully
             
-            # Check if agent loop was successful
-            if agent_loop_result.get("status") not in ["success", "running"]:
-                error_msg = f"Failed to trigger agent loop for new project: {agent_loop_result.get('message', 'Unknown error')}"
-                logger.error(error_msg)
-                print(f"❌ {error_msg}")
-                return {
-                    "status": "error",
-                    "message": error_msg,
-                    "project_id": project_id,
-                    "new_project_id": new_project_id
-                }
-            
-            # Success!
-            logger.info(f"Successfully triggered next loop for project {new_project_id}")
-            print(f"✅ Successfully triggered next loop for project {new_project_id}")
+            # Return success
             return {
                 "status": "success",
-                "message": f"Successfully triggered next loop for project {new_project_id}",
+                "message": f"Next loop triggered with project ID: {new_project_id}",
                 "project_id": project_id,
                 "new_project_id": new_project_id,
                 "goal": goal
             }
             
         except Exception as e:
-            error_msg = f"Error triggering next loop: {str(e)}"
+            error_msg = f"Error starting new project: {str(e)}"
             logger.error(error_msg)
             logger.error(traceback.format_exc())
             print(f"❌ {error_msg}")
             return {
                 "status": "error",
                 "message": error_msg,
-                "project_id": project_id,
-                "new_project_id": new_project_id if 'new_project_id' in locals() else None
+                "project_id": project_id
             }
             
     except Exception as e:
-        error_msg = f"Error checking for next loop: {str(e)}"
+        error_msg = f"Error checking and triggering next loop: {str(e)}"
         logger.error(error_msg)
         logger.error(traceback.format_exc())
         print(f"❌ {error_msg}")
@@ -456,76 +460,40 @@ def determine_agent_from_step(step_description: str) -> Optional[str]:
     
     Args:
         step_description: The step description from next_recommended_step
-        
+            
     Returns:
-        The agent_id to run, or None if no agent could be determined
+        String containing the agent ID or None if no agent could be determined
     """
+    if not step_description:
+        return None
+    
     # Get list of registered agents
     registered_agents = list_agents()
-    print(f"📋 Registered agents: {registered_agents}")
     
-    # First, check if step_description is an exact match with a registered agent ID
-    # This handles the case where agents set clean agent IDs as next_recommended_step
-    if step_description in registered_agents:
-        print(f"✅ Found exact agent ID match: {step_description}")
-        return step_description
-    
-    # Convert to lowercase for case-insensitive matching
+    # First, check for exact matches with registered agent IDs (case-insensitive)
     step_lower = step_description.lower()
-    
-    # Check for exact lowercase matches with agent IDs
     for agent_id in registered_agents:
-        if step_lower == agent_id.lower():
-            print(f"✅ Found case-insensitive agent ID match: {agent_id}")
+        if agent_id.lower() == step_lower:
+            logger.info(f"Exact match found for agent ID: {agent_id}")
             return agent_id
     
-    # Enhanced logging for debugging
-    print(f"⚠️ No exact match found for '{step_description}', trying pattern matching")
+    # If no exact match, look for agent IDs within the step description
+    for agent_id in registered_agents:
+        # Check if the agent ID appears in the step description (case-insensitive)
+        if re.search(r'\b' + re.escape(agent_id) + r'\b', step_description, re.IGNORECASE):
+            logger.info(f"Agent ID found in step description: {agent_id}")
+            return agent_id
     
-    # Check for explicit agent mentions - these take highest priority
-    # Direct agent name mentions
-    if "hal" in step_lower:
-        print(f"✅ Found pattern match: 'hal' in '{step_lower}'")
+    # If still no match, use some heuristics based on common patterns
+    if re.search(r'\bhal\b', step_description, re.IGNORECASE) or "initial files" in step_description.lower():
         return "hal"
-    elif "nova" in step_lower:
-        print(f"✅ Found pattern match: 'nova' in '{step_lower}'")
+    elif re.search(r'\bnova\b', step_description, re.IGNORECASE) or "implement" in step_description.lower():
         return "nova"
-    elif "ash" in step_lower:
-        print(f"✅ Found pattern match: 'ash' in '{step_lower}'")
-        return "ash"
-    elif "critic" in step_lower:
-        print(f"✅ Found pattern match: 'critic' in '{step_lower}'")
+    elif re.search(r'\bcritic\b', step_description, re.IGNORECASE) or "review" in step_description.lower() or "test" in step_description.lower():
         return "critic"
-    elif "sage" in step_lower:
-        print(f"✅ Found pattern match: 'sage' in '{step_lower}'")
-        return "sage"
-    elif "orchestrator" in step_lower:
-        print(f"✅ Found pattern match: 'orchestrator' in '{step_lower}'")
-        return "orchestrator"
+    elif re.search(r'\bash\b', step_description, re.IGNORECASE) or "fix" in step_description.lower() or "improve" in step_description.lower():
+        return "ash"
     
-    # Check for task-based patterns - these are secondary priority
-    task_patterns = {
-        "hal": ["create", "generate", "build", "develop", "implement", "code"],
-        "nova": ["design", "ui", "interface", "layout", "component"],
-        "ash": ["document", "documentation", "explain", "describe"],
-        "critic": ["review", "evaluate", "assess", "critique"],
-        "sage": ["summarize", "summary", "overview"],
-        "orchestrator": ["coordinate", "orchestrate", "manage", "plan"]
-    }
-    
-    for agent, patterns in task_patterns.items():
-        for pattern in patterns:
-            if pattern in step_lower:
-                print(f"✅ Found task pattern match: '{pattern}' in '{step_lower}' -> {agent}")
-                return agent
-    
-    # If we get here, no pattern matched
-    print(f"⚠️ No pattern match found for '{step_description}'")
-    
-    # Default to orchestrator if no specific agent could be determined
-    logger.warning(f"Could not determine specific agent from step: {step_description}, defaulting to orchestrator")
-    print(f"ℹ️ Defaulting to orchestrator for step: '{step_description}'")
-    return "orchestrator"
-
-# Original execute_cognitive_loop function remains unchanged
-# ... (rest of the original file)
+    # If no agent could be determined, return None
+    logger.warning(f"Could not determine agent from step: {step_description}")
+    return None

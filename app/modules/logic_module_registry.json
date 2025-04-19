@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Logic Module Registry",
+  "description": "Registry of logic modules for agent and system component behavior",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Version of the logic module registry schema"
+    },
+    "modules": {
+      "type": "object",
+      "description": "Map of agent IDs to logic module paths",
+      "additionalProperties": {
+        "type": "string",
+        "description": "Path to the logic module file"
+      }
+    },
+    "default_modules": {
+      "type": "object",
+      "description": "Default logic modules to use when not specified in project state",
+      "additionalProperties": {
+        "type": "string",
+        "description": "Path to the default logic module file"
+      }
+    }
+  },
+  "required": ["version", "modules"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "version": "1.0.0",
+      "modules": {
+        "nova": "/app/modules/logic/nova_strategy_default.py",
+        "hal": "/app/modules/logic/hal_strategy_default.py",
+        "critic": "/app/modules/logic/critic_strategy_default.py"
+      },
+      "default_modules": {
+        "nova": "/app/modules/logic/nova_strategy_default.py",
+        "hal": "/app/modules/logic/hal_strategy_default.py",
+        "critic": "/app/modules/logic/critic_strategy_default.py"
+      }
+    }
+  ]
+}

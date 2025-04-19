@@ -107,6 +107,7 @@ async def interpret_user_prompt(request: Request):
         # Parse the request body
         body = await request.json()
         input_text = body.get("input", "")
+        logic_modules = body.get("logic_modules", {})
         
         if not input_text:
             raise HTTPException(status_code=400, detail="Input text is required")
@@ -158,6 +159,11 @@ async def interpret_user_prompt(request: Request):
             "challenge_insights": challenge_insights,
             "task_list": task_list
         }
+        
+        # Add logic modules if provided
+        if logic_modules:
+            initial_state["logic_modules"] = logic_modules
+            print(f"🧩 Adding logic modules to project: {logic_modules}")
         
         # Write the project state to memory
         write_result = write_project_state(project_id, initial_state)
