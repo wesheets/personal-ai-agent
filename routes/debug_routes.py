@@ -36,6 +36,7 @@ print("  - /api/debug/schema/validate")
 print("  - /api/debug/agent/schema/{agent}")
 print("  - /api/debug/loop/schema")
 print("  - /api/debug/loop/validate/{project_id}")
+print("  - /api/debug/reflection/validate")
 
 @router.get("/routes")
 def list_routes():
@@ -591,6 +592,55 @@ def validate_loop_route(project_id: str):
             "status": "error",
             "message": error_msg,
             "project_id": project_id
+        }
+
+# Reflection validation endpoint
+print("✅ Registering /api/debug/reflection/validate endpoint")
+
+@router.post("/reflection/validate")
+def validate_reflection_route(payload: Dict[str, Any] = Body(...)):
+    """
+    Validates an agent reflection entry against the expected schema.
+    
+    This endpoint helps ensure all reflective memory entries (from HAL, SAGE, CRITIC, etc.)
+    follow the defined format, making reflections structured, traceable, and analyzable.
+    
+    Args:
+        payload: The reflection entry to validate
+        
+    Returns:
+        Validation results including whether the reflection is valid and any errors found
+    """
+    try:
+        print(f"🔍 Debug reflection validation endpoint called")
+        logger.info(f"🔍 Debug reflection validation endpoint called")
+        
+        from app.utils.schema_utils import validate_reflection
+        
+        # Validate the reflection entry
+        errors = validate_reflection(payload)
+        
+        # Log the validation results
+        if errors:
+            print(f"⚠️ Reflection validation errors found: {errors}")
+            logger.warning(f"Reflection validation errors found: {errors}")
+        else:
+            print(f"✅ Reflection validation passed")
+            logger.info(f"Reflection validation passed")
+        
+        return {
+            "valid": not bool(errors),
+            "errors": errors
+        }
+    except Exception as e:
+        error_msg = f"Failed to validate reflection: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg
         }
 
 # Simple health check endpoint for the debug router

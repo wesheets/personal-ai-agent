@@ -5,8 +5,8 @@ This module provides utility functions for schema validation in the application.
 It helps ensure that data structures conform to expected schemas, particularly
 for project memory validation to prevent missing or malformed memory fields
 from breaking agent logic, API request validation to prevent invalid requests,
-agent role validation to ensure proper execution order, and loop structure validation
-to ensure loop integrity.
+agent role validation to ensure proper execution order, loop structure validation
+to ensure loop integrity, and reflection validation to ensure structured agent reflections.
 """
 
 from typing import Dict, Any, List
@@ -147,3 +147,27 @@ def validate_loop_state(project_id: str, memory_store: dict) -> Dict[str, Any]:
         errors["loop_marked_complete"] = "Loop is already marked complete"
 
     return errors
+
+def get_reflection_schema() -> dict:
+    """
+    Retrieves the schema definition for agent reflection.
+    
+    Returns:
+        Dictionary containing the reflection schema definition
+    """
+    from app.schema_registry import SCHEMA_REGISTRY
+    return SCHEMA_REGISTRY.get("reflection", {})
+
+def validate_reflection(reflection_entry: dict) -> Dict[str, str]:
+    """
+    Validates an agent reflection entry against the expected schema.
+    
+    Args:
+        reflection_entry: The reflection entry to validate
+        
+    Returns:
+        Dictionary of validation errors, where keys are field names and values are error messages.
+        Empty dictionary means the reflection entry is valid.
+    """
+    schema = get_reflection_schema()
+    return validate_schema(reflection_entry, schema)
