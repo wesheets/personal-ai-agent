@@ -1,36 +1,12 @@
-# Server Port Configuration
+# React + Vite
 
-# trigger redeploy
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-The backend server is configured to run on port 8001.
+Currently, two official plugins are available:
 
-## Accessing the Server
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-- API Endpoints: http://localhost:8001/
-- Swagger Documentation: http://localhost:8001/docs
-- OpenAPI Schema: http://localhost:8001/openapi.json
+## Expanding the ESLint configuration
 
-## Memory Module Endpoints
-
-The memory module endpoints are available at:
-
-- `/api/modules/memory/summarize` - Summarize agent memories
-- Other memory endpoints as documented in the API
-
-## Starting the Server
-
-To start the server, use the following command:
-
-```bash
-cd personal-ai-agent
-python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8001
-```
-
-## Troubleshooting Connection Issues
-
-If you're unable to connect to the server:
-
-1. Verify the server is running with `ps aux | grep uvicorn`
-2. Check if the port is accessible with `curl http://localhost:8001/health`
-3. Ensure no firewall is blocking the connection
-4. Try accessing via 127.0.0.1 instead of localhost if DNS resolution is an issue
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
