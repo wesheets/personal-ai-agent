@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Nested Message Schema",
+  "description": "Schema for validating nested message threads in Promethios",
+  "type": "object",
+  "required": [
+    "message_id",
+    "loop_id",
+    "thread_id",
+    "agent",
+    "role",
+    "message",
+    "timestamp",
+    "depth",
+    "status"
+  ],
+  "properties": {
+    "message_id": {
+      "type": "string",
+      "description": "Unique identifier for the message",
+      "format": "uuid"
+    },
+    "loop_id": {
+      "type": "integer",
+      "description": "Identifier for the loop this message belongs to"
+    },
+    "thread_id": {
+      "type": "string",
+      "description": "Identifier for the thread this message belongs to",
+      "format": "uuid"
+    },
+    "parent_id": {
+      "type": ["string", "null"],
+      "description": "Identifier of the parent message, or null if this is a root message",
+      "format": "uuid"
+    },
+    "agent": {
+      "type": "string",
+      "description": "The agent that created this message",
+      "enum": ["hal", "nova", "critic", "ash", "operator", "cto", "orchestrator"]
+    },
+    "role": {
+      "type": "string",
+      "description": "The role of the message creator",
+      "enum": ["agent", "operator", "orchestrator"]
+    },
+    "message": {
+      "type": "string",
+      "description": "The content of the message"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "When the message was created",
+      "format": "date-time"
+    },
+    "depth": {
+      "type": "integer",
+      "description": "Nesting depth of the message (0 for root messages)",
+      "minimum": 0
+    },
+    "status": {
+      "type": "string",
+      "description": "Status of the thread or message",
+      "enum": ["open", "closed", "integrated", "discarded"]
+    },
+    "file": {
+      "type": ["string", "null"],
+      "description": "Optional file attachment"
+    },
+    "summary": {
+      "type": ["string", "null"],
+      "description": "Optional summary for closed threads"
+    },
+    "actionable": {
+      "type": "boolean",
+      "description": "Whether the thread contains actionable insights for plan revision",
+      "default": false
+    },
+    "tags": {
+      "type": "array",
+      "description": "Optional tags for categorizing the thread",
+      "items": {
+        "type": "string"
+      }
+    },
+    "topic_hash": {
+      "type": ["string", "null"],
+      "description": "Hash of the thread topic for future reference"
+    },
+    "plan_integration": {
+      "type": ["object", "null"],
+      "description": "Information about how this thread was integrated into a plan",
+      "properties": {
+        "integrated_at": {
+          "type": "string",
+          "description": "When the thread was integrated into a plan",
+          "format": "date-time"
+        },
+        "plan_step": {
+          "type": ["integer", "null"],
+          "description": "The plan step that was affected by this thread"
+        },
+        "integration_type": {
+          "type": "string",
+          "description": "How the thread was integrated into the plan",
+          "enum": ["addition", "modification", "removal", "clarification"]
+        },
+        "integration_summary": {
+          "type": "string",
+          "description": "Summary of how the thread was integrated into the plan"
+        }
+      },
+      "required": ["integrated_at", "integration_type"]
+    },
+    "thread_metadata": {
+      "type": ["object", "null"],
+      "description": "Additional metadata about the thread",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "description": "When the thread was created",
+          "format": "date-time"
+        },
+        "last_updated_at": {
+          "type": "string",
+          "description": "When the thread was last updated",
+          "format": "date-time"
+        },
+        "reply_count": {
+          "type": "integer",
+          "description": "Number of replies in the thread",
+          "minimum": 0
+        },
+        "participants": {
+          "type": "array",
+          "description": "List of agents participating in the thread",
+          "items": {
+            "type": "string",
+            "enum": ["hal", "nova", "critic", "ash", "operator", "cto", "orchestrator"]
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
