@@ -52,6 +52,10 @@ def initialize_orchestrator_memory(project_id: str) -> None:
     if "autospawn" not in memory:
         memory["autospawn"] = False
     
+    # Initialize reflections array if it doesn't exist
+    if "reflections" not in memory:
+        memory["reflections"] = []
+    
     logger.debug(f"Initialized orchestrator memory for project {project_id}")
 
 
@@ -210,6 +214,9 @@ def start_new_loop(project_id: str) -> int:
     # Ensure memory structures are initialized
     initialize_orchestrator_memory(project_id)
     
+    # Reflect on the last loop before starting a new one
+    reflect_on_last_loop(project_id)
+    
     memory = PROJECT_MEMORY[project_id]
     
     # Increment loop count
@@ -256,6 +263,9 @@ def mark_loop_complete(project_id: str) -> None:
         None,
         f"Loop {memory.get('loop_count', 1)} marked as complete"
     )
+    
+    # Reflect on the completed loop
+    reflect_on_last_loop(project_id)
     
     logger.info(f"Marked loop {memory.get('loop_count', 1)} as complete for project {project_id}")
 
@@ -406,3 +416,85 @@ def validate_next_agent_selection(project_id: str, next_agent: Optional[str]) ->
         return False, error_msg
     
     return True, ""
+
+
+def reflect_on_last_loop(project_id: str) -> Dict[str, Any]:
+    """
+    Reflect on the last loop cycle and write a structured memory object summarizing what happened.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        The reflection record that was created
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    # Access project memory
+    memory = PROJECT_MEMORY[project_id]
+    loop_count = memory.get("loop_count", 0)
+    completed = memory.get("completed_steps", [])
+    files = memory.get("file_tree", {}).get("files", [])
+    
+    # Create summary text
+    summary = f"Loop {loop_count} completed. Agents executed: {', '.join(completed)}. " \
+              f"{len(files)} files present in file tree."
+    
+    # Create reflection record
+    reflection = {
+        "goal": memory.get("project_goal", "Autonomous loop execution"),
+        "summary": summary,
+        "confidence": 0.9,  # (optional: computed based on loop result quality)
+        "tags": ["reflection", f"loop:{loop_count}", "orchestrator"],
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    # Log the reflection
+    memory.setdefault("reflections", []).append(reflection)
+    memory["last_reflection"] = reflection
+    
+    logger.info(f"Created reflection for loop {loop_count} of project {project_id}")
+    
+    return reflection
+
+
+def get_reflections(
+    project_id: str, 
+    limit: Optional[int] = None
+) -> List[Dict[str, Any]]:
+    """
+    Retrieve the reflection history for a project.
+    
+    Args:
+        project_id: The project identifier
+        limit: Optional limit on the number of reflections to return (most recent first)
+        
+    Returns:
+        List of reflection records
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    reflections = PROJECT_MEMORY[project_id].get("reflections", [])
+    
+    if limit is not None:
+        return reflections[-limit:]
+    
+    return reflections
+
+
+def get_last_reflection(project_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Retrieve the most recent reflection for a project.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        The most recent reflection record, or None if no reflections exist
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    return PROJECT_MEMORY[project_id].get("last_reflection")
