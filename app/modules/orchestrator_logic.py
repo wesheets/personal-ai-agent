@@ -2,7 +2,8 @@
 Orchestrator Logic Module
 
 This module provides the core logic for the Orchestrator Next Agent Planner,
-including memory management, agent selection, decision logging, and deviation detection.
+including memory management, agent selection, decision logging, deviation detection,
+and operator override functionality.
 """
 
 import logging
@@ -68,6 +69,10 @@ def initialize_orchestrator_memory(project_id: str) -> None:
     # Initialize reroute trace array if it doesn't exist
     if "reroute_trace" not in memory:
         memory["reroute_trace"] = []
+    
+    # Initialize operator actions array if it doesn't exist
+    if "operator_actions" not in memory:
+        memory["operator_actions"] = []
     
     logger.debug(f"Initialized orchestrator memory for project {project_id}")
 
@@ -450,6 +455,13 @@ def reflect_on_last_loop(project_id: str) -> Dict[str, Any]:
     completed = memory.get("completed_steps", [])
     files = memory.get("file_tree", {}).get("files", [])
     
+    # Check for operator actions in this loop
+    operator_actions = memory.get("operator_actions", [])
+    has_operator_override = any(
+        action.get("loop_count", 0) == loop_count 
+        for action in operator_actions
+    )
+    
     # Create summary text
     summary = f"Loop {loop_count} completed. Agents executed: {', '.join(completed)}. " \
               f"{len(files)} files present in file tree."
@@ -462,6 +474,10 @@ def reflect_on_last_loop(project_id: str) -> Dict[str, Any]:
         "tags": ["reflection", f"loop:{loop_count}", "orchestrator"],
         "timestamp": datetime.utcnow().isoformat()
     }
+    
+    # Add manual_override tag if operator actions were present
+    if has_operator_override:
+        reflection["tags"].extend(["manual_override", "operator_reroute"])
     
     # Log the reflection
     memory.setdefault("reflections", []).append(reflection)
@@ -868,3 +884,197 @@ def get_reroute_trace(
         return traces[-limit:]
     
     return traces
+
+
+# Operator Override Functions
+
+def set_next_agent(project_id: str, agent: str, reason: str) -> Dict[str, Any]:
+    """
+    Override the next recommended agent for a project.
+    
+    Args:
+        project_id: The project identifier
+        agent: The agent to set as next recommended
+        reason: The reason for the override
+        
+    Returns:
+        Dict containing the override action record
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    # Access project memory
+    memory = PROJECT_MEMORY[project_id]
+    
+    # Create override action record
+    action = {
+        "type": "override_next_agent",
+        "agent": agent,
+        "reason": reason,
+        "timestamp": datetime.utcnow().isoformat(),
+        "loop_count": memory.get("loop_count", 1)
+    }
+    
+    # Update next recommended agent
+    memory["next_recommended_agent"] = agent
+    
+    # Log the override action
+    memory.setdefault("operator_actions", []).append(action)
+    
+    logger.info(f"Operator override: set next agent to {agent} for project {project_id} ({reason})")
+    
+    return action
+
+
+def force_loop_complete(project_id: str, status: bool) -> Dict[str, Any]:
+    """
+    Override the loop complete status for a project.
+    
+    Args:
+        project_id: The project identifier
+        status: The loop complete status to set (True or False)
+        
+    Returns:
+        Dict containing the override action record
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    # Access project memory
+    memory = PROJECT_MEMORY[project_id]
+    
+    # Create override action record
+    action = {
+        "type": "set_loop_complete",
+        "value": status,
+        "timestamp": datetime.utcnow().isoformat(),
+        "loop_count": memory.get("loop_count", 1)
+    }
+    
+    # Update loop complete status
+    memory["loop_complete"] = status
+    
+    # Log the override action
+    memory.setdefault("operator_actions", []).append(action)
+    
+    logger.info(f"Operator override: set loop_complete to {status} for project {project_id}")
+    
+    return action
+
+
+def force_loop_skip(project_id: str, reason: str) -> Dict[str, Any]:
+    """
+    Force a loop skip by marking the current loop as complete and starting a new one.
+    
+    Args:
+        project_id: The project identifier
+        reason: The reason for the loop skip
+        
+    Returns:
+        Dict containing the override action record
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    # Access project memory
+    memory = PROJECT_MEMORY[project_id]
+    
+    # Create override action record
+    action = {
+        "type": "force_loop_skip",
+        "reason": reason,
+        "timestamp": datetime.utcnow().isoformat(),
+        "loop_count": memory.get("loop_count", 1)
+    }
+    
+    # Log the override action
+    memory.setdefault("operator_actions", []).append(action)
+    
+    # Mark current loop as complete
+    memory["loop_complete"] = True
+    
+    # Start a new loop
+    new_loop_count = start_new_loop(project_id)
+    
+    # Update the action with the new loop count
+    action["new_loop_count"] = new_loop_count
+    
+    logger.info(f"Operator override: forced loop skip for project {project_id} ({reason})")
+    
+    return action
+
+
+def force_loop_reroute(project_id: str, agent: str, reason: str) -> Dict[str, Any]:
+    """
+    Force a loop reroute by setting the next recommended agent and creating a reroute trace.
+    
+    Args:
+        project_id: The project identifier
+        agent: The agent to reroute to
+        reason: The reason for the reroute
+        
+    Returns:
+        Dict containing the override action record
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    # Access project memory
+    memory = PROJECT_MEMORY[project_id]
+    
+    # Create override action record
+    action = {
+        "type": "force_loop_reroute",
+        "agent": agent,
+        "reason": reason,
+        "timestamp": datetime.utcnow().isoformat(),
+        "loop_count": memory.get("loop_count", 1)
+    }
+    
+    # Log the override action
+    memory.setdefault("operator_actions", []).append(action)
+    
+    # Create reroute plan
+    plan = {
+        "status": "reroute",
+        "trigger": "operator_override",
+        "issues": {"operator_override": True},
+        "proposed_next_agent": agent,
+        "timestamp": datetime.utcnow().isoformat(),
+        "loop_count": memory.get("loop_count", 1)
+    }
+    
+    # Log the reroute plan
+    memory.setdefault("reroute_trace", []).append(plan)
+    
+    # Update next recommended agent
+    memory["next_recommended_agent"] = agent
+    
+    logger.info(f"Operator override: forced loop reroute to {agent} for project {project_id} ({reason})")
+    
+    return action
+
+
+def get_operator_actions(
+    project_id: str, 
+    limit: Optional[int] = None
+) -> List[Dict[str, Any]]:
+    """
+    Retrieve the operator actions for a project.
+    
+    Args:
+        project_id: The project identifier
+        limit: Optional limit on the number of actions to return (most recent first)
+        
+    Returns:
+        List of operator action records
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    actions = PROJECT_MEMORY[project_id].get("operator_actions", [])
+    
+    if limit is not None:
+        return actions[-limit:]
+    
+    return actions
