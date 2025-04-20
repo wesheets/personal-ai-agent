@@ -4,7 +4,7 @@ This module provides debug endpoints for the agent system.
 feature/phase-3.5-hardening
 SHA256: 9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b
 INTEGRITY: v3.5.0-debug-routes
-LAST_MODIFIED: 2025-04-19
+LAST_MODIFIED: 2025-04-20
 main
 """
 import logging
@@ -26,7 +26,7 @@ logger.setLevel(logging.DEBUG)  # Ensure debug level logging is enabled
 router = APIRouter(tags=["Debug"])
 
 # Debug print to verify this file is loaded
-print("✅ DEBUG ROUTES LOADED - Version 2025-04-19-01")
+print("✅ DEBUG ROUTES LOADED - Version 2025-04-20-01")
 print("✅ Debug routes available:")
 print("  - /api/debug/agents")
 print("  - /api/debug/memory/log")
@@ -39,6 +39,11 @@ print("  - /api/debug/loop/validate/{project_id}")
 print("  - /api/debug/reflection/validate")
 print("  - /api/debug/tool/validate/{tool}")
 print("  - /api/debug/ui/schema/{component}")
+print("  - /api/debug/project/drift/{project_id}")
+print("  - /api/debug/project/snapshot/{project_id}")
+print("  - /api/debug/agent/timeout/{project_id}")
+print("  - /api/debug/agent/execution/{project_id}")
+print("  - /api/debug/agent/reset/{project_id}")
 
 @router.get("/routes")
 def list_routes():
@@ -747,6 +752,326 @@ def get_ui_schema_route(component: str = None):
             "status": "error",
             "message": error_msg,
             "component": component
+        }
+
+# Project drift detection endpoint
+print("✅ Registering /api/debug/project/drift/{project_id} endpoint")
+
+@router.get("/project/drift/{project_id}")
+def check_project_drift(project_id: str):
+    """
+    Checks for schema drift in a project's memory state.
+    
+    This endpoint helps detect when a project's memory state deviates from
+    the expected schema, which could indicate potential issues.
+    
+    Args:
+        project_id: The ID of the project to check
+        
+    Returns:
+        Drift detection results including whether drift was detected and details
+    """
+    try:
+        print(f"🔍 Debug project drift endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug project drift endpoint called for project: {project_id}")
+        
+        from app.modules.drift_monitor import monitor_project_state
+        
+        # Check for drift
+        drift_result = monitor_project_state(project_id)
+        
+        # Log the drift detection results
+        if drift_result.get("drift_detected", False):
+            print(f"⚠️ Schema drift detected for project {project_id}")
+            logger.warning(f"Schema drift detected for project {project_id}")
+        else:
+            print(f"✅ No schema drift detected for project {project_id}")
+            logger.info(f"No schema drift detected for project {project_id}")
+        
+        return drift_result
+    except Exception as e:
+        error_msg = f"Failed to check project drift: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
+        }
+
+# Project snapshot endpoint
+print("✅ Registering /api/debug/project/snapshot/{project_id} endpoint")
+
+@router.get("/project/snapshot/{project_id}")
+def get_project_snapshot(project_id: str):
+    """
+    Retrieves a snapshot of a project's memory state.
+    
+    This endpoint helps capture the current state of a project for
+    debugging, auditing, or recovery purposes.
+    
+    Args:
+        project_id: The ID of the project to snapshot
+        
+    Returns:
+        The project snapshot data
+    """
+    try:
+        print(f"🔍 Debug project snapshot endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug project snapshot endpoint called for project: {project_id}")
+        
+        from app.modules.drift_monitor import snapshot_project_state
+        
+        # Get snapshot
+        snapshot = snapshot_project_state(project_id)
+        
+        # Log the snapshot retrieval
+        print(f"✅ Project snapshot captured for {project_id}")
+        logger.info(f"Project snapshot captured for {project_id}")
+        
+        return snapshot
+    except Exception as e:
+        error_msg = f"Failed to get project snapshot: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
+        }
+
+# Agent timeout detection endpoint
+print("✅ Registering /api/debug/agent/timeout/{project_id} endpoint")
+
+@router.get("/agent/timeout/{project_id}")
+def check_agent_timeouts(project_id: str):
+    """
+    Checks for agents that have exceeded their execution timeout.
+    
+    This endpoint helps detect when agents are taking longer than expected
+    to complete their tasks, which could indicate they are stuck or frozen.
+    
+    Args:
+        project_id: The ID of the project to check
+        
+    Returns:
+        List of frozen agents with their details
+    """
+    try:
+        print(f"🔍 Debug agent timeout endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug agent timeout endpoint called for project: {project_id}")
+        
+        from app.modules.loop_monitor import check_for_frozen_agents
+        
+        # Check for frozen agents
+        frozen_agents = check_for_frozen_agents(project_id)
+        
+        # Log the timeout detection results
+        if frozen_agents:
+            print(f"⚠️ Detected {len(frozen_agents)} frozen agents in project {project_id}")
+            logger.warning(f"Detected {len(frozen_agents)} frozen agents in project {project_id}")
+        else:
+            print(f"✅ No frozen agents detected in project {project_id}")
+            logger.info(f"No frozen agents detected in project {project_id}")
+        
+        return {
+            "project_id": project_id,
+            "frozen_agents": frozen_agents,
+            "count": len(frozen_agents),
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        }
+    except Exception as e:
+        error_msg = f"Failed to check agent timeouts: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
+        }
+
+# Agent execution status endpoint
+print("✅ Registering /api/debug/agent/execution/{project_id} endpoint")
+
+@router.get("/agent/execution/{project_id}")
+def get_agent_execution_status(project_id: str, agent: str = None):
+    """
+    Gets the execution status for all agents or a specific agent.
+    
+    This endpoint helps track the execution history and current status
+    of agents in a project, including any timeouts or errors.
+    
+    Args:
+        project_id: The ID of the project
+        agent: Optional name of a specific agent to check
+        
+    Returns:
+        Dict containing execution status information
+    """
+    try:
+        print(f"🔍 Debug agent execution status endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug agent execution status endpoint called for project: {project_id}")
+        
+        from app.modules.loop_monitor import get_agent_execution_status as get_status
+        
+        # Get execution status
+        status = get_status(project_id, agent)
+        
+        # Log the status retrieval
+        print(f"✅ Agent execution status retrieved for project {project_id}")
+        logger.info(f"Agent execution status retrieved for project {project_id}")
+        
+        return status
+    except Exception as e:
+        error_msg = f"Failed to get agent execution status: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
+        }
+
+# Reset frozen agents endpoint
+print("✅ Registering /api/debug/agent/reset/{project_id} endpoint")
+
+@router.post("/agent/reset/{project_id}")
+def reset_frozen_agents_route(project_id: str):
+    """
+    Resets the status of frozen agents to allow them to be run again.
+    
+    This endpoint helps recover from situations where agents have become
+    stuck or frozen, allowing the loop to continue.
+    
+    Args:
+        project_id: The ID of the project
+        
+    Returns:
+        Dict containing the result of the operation
+    """
+    try:
+        print(f"🔍 Debug reset frozen agents endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug reset frozen agents endpoint called for project: {project_id}")
+        
+        from app.modules.loop_monitor import reset_frozen_agents
+        
+        # Reset frozen agents
+        result = reset_frozen_agents(project_id)
+        
+        # Log the reset operation
+        print(f"✅ Reset {result.get('reset_count', 0)} frozen agents in project {project_id}")
+        logger.info(f"Reset {result.get('reset_count', 0)} frozen agents in project {project_id}")
+        
+        return result
+    except Exception as e:
+        error_msg = f"Failed to reset frozen agents: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
+        }
+
+# Log agent execution start endpoint
+print("✅ Registering /api/debug/agent/start/{project_id}/{agent} endpoint")
+
+@router.post("/agent/start/{project_id}/{agent}")
+def log_agent_start_route(project_id: str, agent: str):
+    """
+    Logs the start of an agent execution.
+    
+    This endpoint helps track when agents start running,
+    which is used for timeout detection.
+    
+    Args:
+        project_id: The ID of the project
+        agent: The name of the agent (e.g., "hal", "nova")
+        
+    Returns:
+        Dict containing the result of the operation
+    """
+    try:
+        print(f"🔍 Debug log agent start endpoint called for project: {project_id}, agent: {agent}")
+        logger.info(f"🔍 Debug log agent start endpoint called for project: {project_id}, agent: {agent}")
+        
+        from app.modules.loop_monitor import log_agent_execution_start
+        
+        # Log agent execution start
+        result = log_agent_execution_start(project_id, agent)
+        
+        # Log the operation
+        print(f"✅ Logged execution start for agent {agent} in project {project_id}")
+        logger.info(f"Logged execution start for agent {agent} in project {project_id}")
+        
+        return result
+    except Exception as e:
+        error_msg = f"Failed to log agent execution start: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id,
+            "agent": agent
+        }
+
+# Log agent execution complete endpoint
+print("✅ Registering /api/debug/agent/complete/{project_id}/{agent} endpoint")
+
+@router.post("/agent/complete/{project_id}/{agent}")
+def log_agent_complete_route(project_id: str, agent: str, status: str = "completed"):
+    """
+    Logs the completion of an agent execution.
+    
+    This endpoint helps track when agents finish running,
+    which is used for execution history and status tracking.
+    
+    Args:
+        project_id: The ID of the project
+        agent: The name of the agent (e.g., "hal", "nova")
+        status: The completion status (e.g., "completed", "error", "timeout")
+        
+    Returns:
+        Dict containing the result of the operation
+    """
+    try:
+        print(f"🔍 Debug log agent complete endpoint called for project: {project_id}, agent: {agent}, status: {status}")
+        logger.info(f"🔍 Debug log agent complete endpoint called for project: {project_id}, agent: {agent}, status: {status}")
+        
+        from app.modules.loop_monitor import log_agent_execution_complete
+        
+        # Log agent execution complete
+        result = log_agent_execution_complete(project_id, agent, status)
+        
+        # Log the operation
+        print(f"✅ Logged execution completion for agent {agent} in project {project_id} with status {status}")
+        logger.info(f"Logged execution completion for agent {agent} in project {project_id} with status {status}")
+        
+        return result
+    except Exception as e:
+        error_msg = f"Failed to log agent execution completion: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id,
+            "agent": agent
         }
 
 # Simple health check endpoint for the debug router
