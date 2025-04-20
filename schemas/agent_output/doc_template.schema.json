@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Documentation Template Schema",
+  "description": "Schema for validating documentation files (.md)",
+  "type": "object",
+  "required": ["fileContent"],
+  "properties": {
+    "fileContent": {
+      "type": "string",
+      "description": "The content of the documentation file",
+      "minLength": 10
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Metadata about the documentation",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the documentation"
+        },
+        "sections": {
+          "type": "array",
+          "description": "List of sections in the documentation",
+          "items": {
+            "type": "string"
+          }
+        },
+        "hasCodeExamples": {
+          "type": "boolean",
+          "description": "Whether the documentation includes code examples"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation results",
+      "properties": {
+        "markdownValid": {
+          "type": "boolean",
+          "description": "Whether the markdown is valid"
+        },
+        "linksValid": {
+          "type": "boolean",
+          "description": "Whether all links are valid"
+        },
+        "hasRequiredSections": {
+          "type": "boolean",
+          "description": "Whether the documentation has all required sections"
+        },
+        "errors": {
+          "type": "array",
+          "description": "List of validation errors",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
