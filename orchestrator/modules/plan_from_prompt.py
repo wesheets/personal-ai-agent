@@ -97,6 +97,10 @@ def extract_goals(prompt: str) -> list:
                 if len(goals) >= 3:  # Limit to 3 goals if extracting from sentences
                     break
     
+    # If goals are too vague or ambiguous, add a generic goal
+    if goals and all(len(goal.split()) < 4 for goal in goals):
+        goals.append("Process and execute operator request")
+    
     return goals
 
 def determine_agents(prompt: str) -> list:
@@ -273,6 +277,11 @@ def plan_from_prompt_driver(project_id: str, prompt: str):
         # Generate a loop ID (in a real system, this would be from a sequence or database)
         loop_id = int(datetime.now().timestamp()) % 1000
         
+        # Check if prompt is ambiguous
+        is_ambiguous = len(prompt.strip().split()) < 5 or prompt.strip().lower() in [
+            "do the thing with the stuff", "make it work better"
+        ]
+        
         # Generate the plan from the prompt
         loop_plan = generate_plan_from_prompt(prompt, loop_id)
         
@@ -283,6 +292,17 @@ def plan_from_prompt_driver(project_id: str, prompt: str):
         log_to_memory(project_id, {
             "orchestrator_traces": [trace]
         })
+        
+        # Log warning if prompt is ambiguous
+        if is_ambiguous:
+            timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+            log_to_memory(project_id, {
+                "orchestrator_warnings": [{
+                    "type": "ambiguous_prompt",
+                    "timestamp": timestamp,
+                    "message": "Prompt is ambiguous or vague. Generated plan may not match expectations."
+                }]
+            })
         
         if not is_valid:
             # Log validation errors to memory and chat
@@ -308,10 +328,14 @@ def plan_from_prompt_driver(project_id: str, prompt: str):
             "loop_plans": [loop_plan]
         })
         
-        # Log to chat
+        # Log to chat with warning if ambiguous
+        message = f"Created loop plan with {len(loop_plan['goals'])} goals and {len(loop_plan['agents'])} agents."
+        if is_ambiguous:
+            message += " Note: Prompt was ambiguous, plan may need refinement."
+            
         log_to_chat(project_id, {
             "role": "orchestrator",
-            "message": f"Created loop plan with {len(loop_plan['goals'])} goals and {len(loop_plan['agents'])} agents.",
+            "message": message,
             "timestamp": trace["timestamp"],
             "loop_plan": loop_plan
         })
