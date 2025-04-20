@@ -115,6 +115,62 @@ def get_orchestrator_exec_log(project_id: str) -> Dict[str, Any]:
     return {"execution_log": execution_log, "count": len(execution_log)}
 
 
+@router.get("/orchestrator/deviation/{project_id}")
+def check_deviation(project_id: str) -> Dict[str, Any]:
+    """
+    Check for deviations in the project state that might require intervention.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dict containing identified issues, empty if no issues found
+        
+    Raises:
+        HTTPException: If the project doesn't exist
+    """
+    # Check if project exists
+    if project_id not in PROJECT_MEMORY:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    
+    # Import detect_deviation function
+    from app.modules.orchestrator_logic import detect_deviation
+    
+    # Detect deviations
+    issues = detect_deviation(project_id)
+    
+    return {
+        "issues": issues,
+        "has_deviations": bool(issues),
+        "timestamp": PROJECT_MEMORY[project_id].get("last_check_time", None)
+    }
+
+
+@router.get("/orchestrator/reroute/{project_id}")
+def get_reroute_trace(project_id: str) -> Dict[str, Any]:
+    """
+    Get the reroute trace for a project.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dict containing the reroute trace
+        
+    Raises:
+        HTTPException: If the project doesn't exist
+    """
+    # Check if project exists
+    if project_id not in PROJECT_MEMORY:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    
+    # Get reroute trace
+    from app.modules.orchestrator_logic import get_reroute_trace
+    reroute_trace = get_reroute_trace(project_id)
+    
+    return {"reroute_trace": reroute_trace, "count": len(reroute_trace)}
+
+
 @router.get("/memory/{project_id}")
 def get_project_memory(project_id: str) -> Dict[str, Any]:
     """
