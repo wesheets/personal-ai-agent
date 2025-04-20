@@ -1,8 +1,6 @@
 import { useState } from 'react';
 
-function Sidebar() {
-  const [activeTab, setActiveTab] = useState('loops');
-
+function Sidebar({ activeTab, onTabChange }) {
   const tabs = [
     { id: 'loops', label: 'Loops', icon: '🔄' },
     { id: 'files', label: 'Files', icon: '📁' },
@@ -11,7 +9,7 @@ function Sidebar() {
     { id: 'settings', label: 'Settings', icon: '⚙️' },
     { id: 'projects', label: 'Projects', icon: '📊' },
   ];
-
+  
   return (
     <div className="h-full bg-gray-900 border-r border-gray-800 w-full">
       <div className="p-4 border-b border-gray-800">
@@ -21,10 +19,14 @@ function Sidebar() {
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={`sidebar-tab w-full text-left mb-1 ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+            className={`w-full text-left mb-1 p-2 rounded flex items-center ${
+              activeTab === tab.id 
+                ? 'bg-gray-800 text-cyan-400' 
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+            onClick={() => onTabChange(tab.id)}
           >
-            <span className="text-lg">{tab.icon}</span>
+            <span className="text-lg mr-2">{tab.icon}</span>
             <span>{tab.label}</span>
           </button>
         ))}

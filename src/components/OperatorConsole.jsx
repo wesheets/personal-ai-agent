@@ -1,14 +1,32 @@
+import { useState } from 'react';
 import Sidebar from './Sidebar';
 import MainConsolePanel from './MainConsolePanel';
 import FileTreePanel from './FileTreePanel';
+import SystemIntegrityPanel from './SystemIntegrityPanel';
 import OrchestratorSandbox from './OrchestratorSandbox';
 
 function OperatorConsole() {
+  const [activeTab, setActiveTab] = useState('loops');
+
+  // Function to handle tab changes from Sidebar
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+  };
+
+  // Determine which right panel to show based on active tab
+  const renderRightPanel = () => {
+    if (activeTab === 'health') {
+      return <SystemIntegrityPanel />;
+    } else {
+      return <FileTreePanel />;
+    }
+  };
+
   return (
     <div className="flex h-screen w-full bg-gray-900 text-white">
       {/* Sidebar - 20% */}
       <div className="w-1/5 h-full">
-        <Sidebar />
+        <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
       
       {/* Main Console Panel - 60% */}
@@ -16,10 +34,10 @@ function OperatorConsole() {
         <MainConsolePanel />
       </div>
       
-      {/* File Tree Panel - 20% */}
+      {/* Right Panel - 20% (FileTree or SystemIntegrity) */}
       <div className="w-1/5 h-full flex flex-col">
         <div className="flex-grow">
-          <FileTreePanel />
+          {renderRightPanel()}
         </div>
         
         {/* Orchestrator Sandbox - pinned to bottom right */}
