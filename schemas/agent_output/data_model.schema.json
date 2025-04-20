@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Data Model Schema",
+  "description": "Schema for validating data model files (.json)",
+  "type": "object",
+  "required": ["fileContent"],
+  "properties": {
+    "fileContent": {
+      "type": "string",
+      "description": "The content of the data model file",
+      "minLength": 2
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Metadata about the data model",
+      "properties": {
+        "modelName": {
+          "type": "string",
+          "description": "The name of the data model"
+        },
+        "fields": {
+          "type": "array",
+          "description": "List of fields in the data model",
+          "items": {
+            "type": "string"
+          }
+        },
+        "relationships": {
+          "type": "array",
+          "description": "List of relationships to other models",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation results",
+      "properties": {
+        "jsonValid": {
+          "type": "boolean",
+          "description": "Whether the JSON is valid"
+        },
+        "schemaValid": {
+          "type": "boolean",
+          "description": "Whether the model conforms to expected schema"
+        },
+        "errors": {
+          "type": "array",
+          "description": "List of validation errors",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

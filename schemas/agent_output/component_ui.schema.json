@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "React Component Schema",
+  "description": "Schema for validating React component files (.jsx)",
+  "type": "object",
+  "required": ["fileContent"],
+  "properties": {
+    "fileContent": {
+      "type": "string",
+      "description": "The content of the React component file",
+      "minLength": 10,
+      "pattern": "(?s).*import.*React.*"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Metadata about the component",
+      "properties": {
+        "componentName": {
+          "type": "string",
+          "description": "The name of the component",
+          "pattern": "^[A-Z][A-Za-z0-9]*$"
+        },
+        "hasProps": {
+          "type": "boolean",
+          "description": "Whether the component accepts props"
+        },
+        "hasState": {
+          "type": "boolean",
+          "description": "Whether the component has state"
+        },
+        "dependencies": {
+          "type": "array",
+          "description": "List of dependencies used by the component",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation results",
+      "properties": {
+        "syntaxValid": {
+          "type": "boolean",
+          "description": "Whether the component has valid syntax"
+        },
+        "importsValid": {
+          "type": "boolean",
+          "description": "Whether all imports are valid"
+        },
+        "exportsValid": {
+          "type": "boolean",
+          "description": "Whether the component is properly exported"
+        },
+        "errors": {
+          "type": "array",
+          "description": "List of validation errors",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
