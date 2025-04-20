@@ -113,7 +113,10 @@ function OrchestratorSandbox({ orchestratorData, onPlanConfirm, pendingConfirmat
             <div className="mt-2">
               <SendToAgentsButton 
                 loopId={data.loop}
+                loopPlan={data.loop_plan}
                 onConfirm={onPlanConfirm}
+                onModify={onPlanModify}
+                onReject={onPlanReject}
                 visible={true}
               />
             </div>
