@@ -1,12 +1,69 @@
-# React + Vite
+# System Integrity Test Suite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project implements a comprehensive test suite for ensuring the Promethios cognitive OS is healthy, aligned, and schema-compliant.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Validates project memory against schema
+- Grades reflection quality and ensures minimum confidence threshold
+- Checks loop snapshot consistency
+- Confirms orchestrator decisions exist and are traceable
+- Verifies CTO system health is above minimum threshold
+- Confirms drift logs are empty or non-critical
+- Validates agents are triggered in correct dependency order
+- Monitors memory growth rate
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```
+tests/
+├── test_system_integrity.py  # Main integrity test suite
+└── test_meta_integrity.py    # Meta-tests to verify test suite functionality
+
+.github/
+└── workflows/
+    └── system-health-check.yml  # GitHub Action for automated testing
+```
+
+## Test Functions
+
+The test suite includes the following validation functions:
+
+- `test_project_memory_schema()`: Validates memory against schema
+- `test_reflection_confidence()`: Ensures reflection quality is above threshold
+- `test_snapshot_presence()`: Verifies loop snapshots exist
+- `test_orchestrator_decisions()`: Confirms decisions exist and are traceable
+- `test_system_health_score()`: Checks CTO health score is above threshold
+- `test_drift_logs_status()`: Confirms no critical drift logs
+- `test_agent_dependency_order()`: Validates correct agent execution order
+- `test_loop_snapshot_consistency()`: Checks snapshots are sequential
+- `test_memory_growth_rate()`: Monitors for excessive memory growth
+
+## GitHub Action
+
+The included GitHub Action runs the test suite:
+- On every push to the main branch
+- Once per day via scheduled cron job
+
+## Usage
+
+Run the test suite locally:
+
+```bash
+pytest tests/test_system_integrity.py -v
+```
+
+Run meta-tests to verify test suite functionality:
+
+```bash
+pytest tests/test_meta_integrity.py -v
+```
+
+## Integration
+
+To integrate with your existing Promethios system:
+
+1. Copy the test files to your project's test directory
+2. Copy the GitHub Action workflow to your .github/workflows directory
+3. Ensure your project has the necessary dependencies (pytest)
+4. Run the tests to verify system integrity
