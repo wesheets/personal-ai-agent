@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loop Plan Schema",
+  "description": "Schema for validating Orchestrator loop plans",
+  "type": "object",
+  "required": [
+    "loop_id",
+    "agents",
+    "goals",
+    "planned_files",
+    "confirmed",
+    "confirmed_by",
+    "confirmed_at"
+  ],
+  "properties": {
+    "loop_id": {
+      "type": "number",
+      "description": "Unique identifier for the loop"
+    },
+    "agents": {
+      "type": "array",
+      "description": "Ordered list of agents that will execute the loop",
+      "items": {
+        "type": "string",
+        "enum": ["hal", "nova", "critic", "ash", "operator", "cto", "orchestrator"]
+      },
+      "minItems": 1
+    },
+    "goals": {
+      "type": "array",
+      "description": "List of goals for the loop",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "planned_files": {
+      "type": "array",
+      "description": "List of files that will be created or modified during the loop",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confirmed": {
+      "type": "boolean",
+      "description": "Whether the loop plan has been confirmed"
+    },
+    "confirmed_by": {
+      "type": "string",
+      "description": "Who confirmed the loop plan"
+    },
+    "confirmed_at": {
+      "type": "string",
+      "description": "When the loop plan was confirmed",
+      "format": "date-time"
+    },
+    "tool_requirements": {
+      "type": "array",
+      "description": "Optional list of tools required for the loop",
+      "items": {
+        "type": "string"
+      }
+    },
+    "plan_score": {
+      "type": "number",
+      "description": "Optional score for the plan quality",
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "additionalProperties": false
+}
