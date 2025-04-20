@@ -91,6 +91,30 @@ def get_orchestrator_decisions(project_id: str) -> Dict[str, Any]:
     return {"decisions": decisions, "count": len(decisions)}
 
 
+@router.get("/orchestrator/execution/{project_id}")
+def get_orchestrator_exec_log(project_id: str) -> Dict[str, Any]:
+    """
+    Get all execution log entries for a project.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dict containing all execution log entries
+        
+    Raises:
+        HTTPException: If the project doesn't exist
+    """
+    # Check if project exists
+    if project_id not in PROJECT_MEMORY:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    
+    # Get all execution log entries
+    execution_log = PROJECT_MEMORY[project_id].get("orchestrator_execution_log", [])
+    
+    return {"execution_log": execution_log, "count": len(execution_log)}
+
+
 @router.get("/memory/{project_id}")
 def get_project_memory(project_id: str) -> Dict[str, Any]:
     """

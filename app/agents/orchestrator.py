@@ -25,7 +25,8 @@ from app.modules.orchestrator_logic import (
     mark_loop_complete,
     get_last_completed_agent,
     determine_next_agent,
-    validate_next_agent_selection
+    validate_next_agent_selection,
+    trigger_next_agent
 )
 
 # Import schema registry and project memory
@@ -74,12 +75,17 @@ def run_orchestrator_agent(task: str, project_id: str, tools: List[str] = None) 
                     "project_id": project_id
                 }
             
+            # Automatically trigger the next agent
+            trigger_result = trigger_next_agent(project_id)
+            PROJECT_MEMORY[project_id]["last_orchestrator_trigger"] = trigger_result
+            
             # Return the result
             return {
                 "status": "success",
-                "output": f"Next agent determined: {next_agent}",
+                "output": f"Next agent determined: {next_agent} and triggered automatically",
                 "next_agent": next_agent,
                 "reason": reason,
+                "trigger_result": trigger_result,
                 "task": task,
                 "tools": tools,
                 "project_id": project_id
@@ -105,11 +111,19 @@ def run_orchestrator_agent(task: str, project_id: str, tools: List[str] = None) 
                 if loop_count < max_loops:
                     # Start a new loop
                     new_loop_count = start_new_loop(project_id)
+                    
+                    # Determine and trigger the next agent for the new loop
+                    next_agent, reason = determine_next_agent(project_id)
+                    trigger_result = trigger_next_agent(project_id)
+                    PROJECT_MEMORY[project_id]["last_orchestrator_trigger"] = trigger_result
+                    
                     return {
                         "status": "success",
-                        "output": f"Agent {agent_name} marked as completed. Loop {loop_count} complete. Starting new loop {new_loop_count}.",
+                        "output": f"Agent {agent_name} marked as completed. Loop {loop_count} complete. Starting new loop {new_loop_count}. Next agent triggered: {next_agent}",
                         "loop_transition": True,
                         "new_loop_count": new_loop_count,
+                        "next_agent": next_agent,
+                        "trigger_result": trigger_result,
                         "task": task,
                         "tools": tools,
                         "project_id": project_id
@@ -125,15 +139,22 @@ def run_orchestrator_agent(task: str, project_id: str, tools: List[str] = None) 
                         "tools": tools,
                         "project_id": project_id
                     }
+            else:
+                # Determine and trigger the next agent
+                next_agent, reason = determine_next_agent(project_id)
+                trigger_result = trigger_next_agent(project_id)
+                PROJECT_MEMORY[project_id]["last_orchestrator_trigger"] = trigger_result
             
-            # Return success response
-            return {
-                "status": "success",
-                "output": f"Agent {agent_name} marked as completed.",
-                "task": task,
-                "tools": tools,
-                "project_id": project_id
-            }
+                # Return success response
+                return {
+                    "status": "success",
+                    "output": f"Agent {agent_name} marked as completed. Next agent triggered: {next_agent}",
+                    "next_agent": next_agent,
+                    "trigger_result": trigger_result,
+                    "task": task,
+                    "tools": tools,
+                    "project_id": project_id
+                }
         
         # If task is to get orchestrator decisions
         elif task == "get_decisions":
@@ -188,6 +209,22 @@ def run_orchestrator_agent(task: str, project_id: str, tools: List[str] = None) 
                 "status": "success",
                 "output": visualization,
                 "decisions": decisions,
+                "task": task,
+                "tools": tools,
+                "project_id": project_id
+            }
+        
+        # If task is to manually trigger the next agent
+        elif task == "trigger_next_agent":
+            # Trigger the next agent
+            trigger_result = trigger_next_agent(project_id)
+            PROJECT_MEMORY[project_id]["last_orchestrator_trigger"] = trigger_result
+            
+            # Return the result
+            return {
+                "status": "success",
+                "output": f"Triggered next agent: {trigger_result.get('triggered_agent')}",
+                "trigger_result": trigger_result,
                 "task": task,
                 "tools": tools,
                 "project_id": project_id

@@ -6,6 +6,7 @@ including memory management, agent selection, and decision logging.
 """
 
 import logging
+import requests
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Tuple
 
@@ -55,6 +56,10 @@ def initialize_orchestrator_memory(project_id: str) -> None:
     # Initialize reflections array if it doesn't exist
     if "reflections" not in memory:
         memory["reflections"] = []
+    
+    # Initialize orchestrator execution log if it doesn't exist
+    if "orchestrator_execution_log" not in memory:
+        memory["orchestrator_execution_log"] = []
     
     logger.debug(f"Initialized orchestrator memory for project {project_id}")
 
@@ -498,3 +503,125 @@ def get_last_reflection(project_id: str) -> Optional[Dict[str, Any]]:
     initialize_orchestrator_memory(project_id)
     
     return PROJECT_MEMORY[project_id].get("last_reflection")
+
+
+def trigger_next_agent(project_id: str) -> Dict[str, Any]:
+    """
+    Trigger the next agent to run automatically based on the next_recommended_agent in memory.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        Dict containing the result of the trigger operation
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    # Get the next recommended agent from memory
+    memory = PROJECT_MEMORY[project_id]
+    next_agent = memory.get("next_recommended_agent")
+    
+    # If no agent to run, return early
+    if not next_agent:
+        logger.info(f"No agent to trigger for project {project_id}")
+        result = {
+            "status": "no agent to run",
+            "agent": None,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        memory.setdefault("orchestrator_execution_log", []).append(result)
+        return result
+    
+    # Prepare payload for API call
+    payload = {
+        "project_id": project_id,
+        "agent": next_agent
+    }
+    
+    # Optional: validate with API schema here
+    # This could be implemented using schema validation from SCHEMA_REGISTRY
+    
+    try:
+        # Make API call to trigger agent
+        logger.info(f"Triggering agent {next_agent} for project {project_id}")
+        response = requests.post(
+            "http://localhost:8080/api/agent/run",
+            json=payload
+        )
+        
+        # Create result record
+        result = {
+            "triggered_agent": next_agent,
+            "status_code": response.status_code,
+            "response": response.json(),
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        # Log the result
+        memory.setdefault("orchestrator_execution_log", []).append(result)
+        memory["last_orchestrator_trigger"] = result
+        
+        logger.info(f"Agent {next_agent} triggered for project {project_id} with status code {response.status_code}")
+        
+        return result
+    
+    except Exception as e:
+        # Handle errors
+        error_msg = f"Error triggering agent {next_agent}: {str(e)}"
+        logger.error(error_msg)
+        
+        # Create error result record
+        result = {
+            "triggered_agent": next_agent,
+            "status": "error",
+            "error_message": error_msg,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        # Log the error result
+        memory.setdefault("orchestrator_execution_log", []).append(result)
+        memory["last_orchestrator_trigger"] = result
+        
+        return result
+
+
+def get_execution_log(
+    project_id: str, 
+    limit: Optional[int] = None
+) -> List[Dict[str, Any]]:
+    """
+    Retrieve the execution log for a project.
+    
+    Args:
+        project_id: The project identifier
+        limit: Optional limit on the number of log entries to return (most recent first)
+        
+    Returns:
+        List of execution log entries
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    log_entries = PROJECT_MEMORY[project_id].get("orchestrator_execution_log", [])
+    
+    if limit is not None:
+        return log_entries[-limit:]
+    
+    return log_entries
+
+
+def get_last_execution(project_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Retrieve the most recent execution log entry for a project.
+    
+    Args:
+        project_id: The project identifier
+        
+    Returns:
+        The most recent execution log entry, or None if no entries exist
+    """
+    # Ensure memory structures are initialized
+    initialize_orchestrator_memory(project_id)
+    
+    return PROJECT_MEMORY[project_id].get("last_orchestrator_trigger")
