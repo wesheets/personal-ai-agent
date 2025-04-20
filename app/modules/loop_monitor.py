@@ -204,6 +204,14 @@ def check_for_frozen_agents(project_id: str) -> List[Dict[str, Any]]:
             })
             
             logger.warning(f"Detected {len(frozen)} frozen agents in project {project_id}: {[f['agent'] for f in frozen]}")
+            
+            # Hook into loop resume engine for timeout handling
+            try:
+                from app.modules.loop_resume_engine import auto_restore_if_configured
+                resume_result = auto_restore_if_configured(project_id, "timeout")
+                logger.info(f"Loop resume engine result: {resume_result.get('status', 'unknown')}")
+            except Exception as resume_error:
+                logger.error(f"Error triggering loop resume for frozen agents: {str(resume_error)}")
 
         return frozen
         
@@ -254,7 +262,8 @@ def get_agent_execution_status(project_id: str, agent: Optional[str] = None) -> 
                 "agent_executions": agent_status,
                 "current_status": current_status,
                 "has_frozen_agents": project_state.get("has_frozen_agents", False),
-                "loop_alerts": project_state.get("loop_alerts", [])
+                "loop_alerts": project_state.get("loop_alerts", []),
+                "restore_prompt": project_state.get("restore_prompt", None)
             }
     
     except Exception as e:
@@ -304,6 +313,35 @@ def reset_frozen_agents(project_id: str) -> Dict[str, Any]:
     
     except Exception as e:
         error_msg = f"Error resetting frozen agents for project {project_id}: {str(e)}"
+        logger.error(error_msg)
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id,
+            "error": str(e)
+        }
+
+def save_snapshot_on_agent_complete(project_id: str, agent: str) -> Dict[str, Any]:
+    """
+    Saves a snapshot when an agent completes execution.
+    
+    Args:
+        project_id: The ID of the project
+        agent: The name of the agent that completed
+        
+    Returns:
+        Dict containing the result of the operation
+    """
+    try:
+        # Save snapshot using loop resume engine
+        from app.modules.loop_resume_engine import save_loop_snapshot
+        result = save_loop_snapshot(project_id)
+        
+        logger.info(f"Saved snapshot after agent {agent} completed in project {project_id}")
+        return result
+    
+    except Exception as e:
+        error_msg = f"Error saving snapshot after agent completion for {agent} in project {project_id}: {str(e)}"
         logger.error(error_msg)
         return {
             "status": "error",

@@ -26,7 +26,7 @@ logger.setLevel(logging.DEBUG)  # Ensure debug level logging is enabled
 router = APIRouter(tags=["Debug"])
 
 # Debug print to verify this file is loaded
-print("✅ DEBUG ROUTES LOADED - Version 2025-04-20-01")
+print("✅ DEBUG ROUTES LOADED - Version 2025-04-20-02")
 print("✅ Debug routes available:")
 print("  - /api/debug/agents")
 print("  - /api/debug/memory/log")
@@ -44,6 +44,9 @@ print("  - /api/debug/project/snapshot/{project_id}")
 print("  - /api/debug/agent/timeout/{project_id}")
 print("  - /api/debug/agent/execution/{project_id}")
 print("  - /api/debug/agent/reset/{project_id}")
+print("  - /api/debug/loop/snapshot/save/{project_id}")
+print("  - /api/debug/loop/snapshot/restore/{project_id}")
+print("  - /api/debug/loop/snapshot/history/{project_id}")
 
 @router.get("/routes")
 def list_routes():
@@ -1051,10 +1054,16 @@ def log_agent_complete_route(project_id: str, agent: str, status: str = "complet
         print(f"🔍 Debug log agent complete endpoint called for project: {project_id}, agent: {agent}, status: {status}")
         logger.info(f"🔍 Debug log agent complete endpoint called for project: {project_id}, agent: {agent}, status: {status}")
         
-        from app.modules.loop_monitor import log_agent_execution_complete
+        from app.modules.loop_monitor import log_agent_execution_complete, save_snapshot_on_agent_complete
         
         # Log agent execution complete
         result = log_agent_execution_complete(project_id, agent, status)
+        
+        # Save snapshot after agent completion
+        if status == "completed":
+            snapshot_result = save_snapshot_on_agent_complete(project_id, agent)
+            print(f"✅ Saved snapshot after agent {agent} completed in project {project_id}")
+            logger.info(f"Saved snapshot after agent {agent} completed in project {project_id}")
         
         # Log the operation
         print(f"✅ Logged execution completion for agent {agent} in project {project_id} with status {status}")
@@ -1072,6 +1081,139 @@ def log_agent_complete_route(project_id: str, agent: str, status: str = "complet
             "message": error_msg,
             "project_id": project_id,
             "agent": agent
+        }
+
+# Loop snapshot save endpoint
+print("✅ Registering /api/debug/loop/snapshot/save/{project_id} endpoint")
+
+@router.get("/loop/snapshot/save/{project_id}")
+def save_snapshot_route(project_id: str):
+    """
+    Saves a snapshot of the current project state.
+    
+    This endpoint helps capture the current state of a project for
+    recovery purposes in case of crashes, freezes, or operator interventions.
+    
+    Args:
+        project_id: The ID of the project
+        
+    Returns:
+        Dict containing the snapshot data
+    """
+    try:
+        print(f"🔍 Debug save snapshot endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug save snapshot endpoint called for project: {project_id}")
+        
+        from app.modules.loop_resume_engine import save_loop_snapshot
+        
+        # Save snapshot
+        snapshot = save_loop_snapshot(project_id)
+        
+        # Log the snapshot save
+        print(f"✅ Saved loop snapshot for project {project_id}")
+        logger.info(f"Saved loop snapshot for project {project_id}")
+        
+        return snapshot
+    except Exception as e:
+        error_msg = f"Failed to save loop snapshot: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
+        }
+
+# Loop snapshot restore endpoint
+print("✅ Registering /api/debug/loop/snapshot/restore/{project_id} endpoint")
+
+@router.get("/loop/snapshot/restore/{project_id}")
+def restore_snapshot_route(project_id: str):
+    """
+    Restores the project state from the last saved snapshot.
+    
+    This endpoint helps recover from crashes, freezes, or operator interventions
+    by restoring the project to its last known-good state.
+    
+    Args:
+        project_id: The ID of the project
+        
+    Returns:
+        Dict containing the result of the operation
+    """
+    try:
+        print(f"🔍 Debug restore snapshot endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug restore snapshot endpoint called for project: {project_id}")
+        
+        from app.modules.loop_resume_engine import restore_last_snapshot
+        
+        # Restore snapshot
+        result = restore_last_snapshot(project_id)
+        
+        # Log the restore operation
+        if result["status"] == "restored":
+            print(f"✅ Restored project {project_id} to snapshot from {result['timestamp']}")
+            logger.info(f"Restored project {project_id} to snapshot from {result['timestamp']}")
+        else:
+            print(f"⚠️ Failed to restore project {project_id}: {result['status']}")
+            logger.warning(f"Failed to restore project {project_id}: {result['status']}")
+        
+        return result
+    except Exception as e:
+        error_msg = f"Failed to restore snapshot: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
+        }
+
+# Loop snapshot history endpoint
+print("✅ Registering /api/debug/loop/snapshot/history/{project_id} endpoint")
+
+@router.get("/loop/snapshot/history/{project_id}")
+def get_snapshot_history_route(project_id: str):
+    """
+    Gets the snapshot history for a project.
+    
+    This endpoint helps track the evolution of a project's state over time,
+    which is useful for debugging and auditing purposes.
+    
+    Args:
+        project_id: The ID of the project
+        
+    Returns:
+        Dict containing the snapshot history
+    """
+    try:
+        print(f"🔍 Debug snapshot history endpoint called for project: {project_id}")
+        logger.info(f"🔍 Debug snapshot history endpoint called for project: {project_id}")
+        
+        from app.modules.loop_resume_engine import get_snapshot_history
+        
+        # Get snapshot history
+        history = get_snapshot_history(project_id)
+        
+        # Log the history retrieval
+        print(f"✅ Retrieved snapshot history for project {project_id}: {history.get('snapshot_count', 0)} snapshots")
+        logger.info(f"Retrieved snapshot history for project {project_id}: {history.get('snapshot_count', 0)} snapshots")
+        
+        return history
+    except Exception as e:
+        error_msg = f"Failed to get snapshot history: {str(e)}"
+        print(f"❌ {error_msg}")
+        logger.error(f"❌ {error_msg}")
+        print(f"❌ Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return {
+            "status": "error",
+            "message": error_msg,
+            "project_id": project_id
         }
 
 # Simple health check endpoint for the debug router
