@@ -7,12 +7,12 @@ import OrchestratorSandbox from './OrchestratorSandbox';
 
 function OperatorConsole() {
   const [activeTab, setActiveTab] = useState('loops');
-
+  
   // Function to handle tab changes from Sidebar
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
   };
-
+  
   // Determine which right panel to show based on active tab
   const renderRightPanel = () => {
     if (activeTab === 'health') {
@@ -21,7 +21,7 @@ function OperatorConsole() {
       return <FileTreePanel />;
     }
   };
-
+  
   return (
     <div className="flex h-screen w-full bg-gray-900 text-white">
       {/* Sidebar - 20% */}
@@ -31,7 +31,7 @@ function OperatorConsole() {
       
       {/* Main Console Panel - 60% */}
       <div className="w-3/5 h-full">
-        <MainConsolePanel />
+        <MainConsolePanel activeTab={activeTab} />
       </div>
       
       {/* Right Panel - 20% (FileTree or SystemIntegrity) */}
