@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import LoopStatusPanel from './LoopStatusPanel';
 import InputBar from './InputBar';
+import ChatMessageFeed from './ChatMessageFeed';
 
 function MainConsolePanel() {
   const [messages, setMessages] = useState([]);
@@ -8,10 +9,12 @@ function MainConsolePanel() {
   // Handler for new messages from InputBar
   const handleNewMessage = (message, file) => {
     const newMessage = {
-      type: "operator_input",
+      role: "operator",
+      agent: "operator",
       message,
       file: file ? file.name : null,
       timestamp: new Date().toISOString(),
+      loop: 23, // This would be dynamic in a real implementation
     };
     
     // Add message to the list
@@ -28,32 +31,22 @@ function MainConsolePanel() {
       </div>
       
       {/* Scrollable content area */}
-      <div className="flex-grow overflow-y-auto mb-4">
+      <div className="flex-grow overflow-y-auto mb-4 flex flex-col">
         {/* Loop Status Panel */}
         <LoopStatusPanel />
         
-        {/* Welcome message */}
-        <div className="bg-gray-800 rounded-lg p-4 mb-4">
-          <p className="text-gray-400">Welcome to Promethios Console</p>
-          <p className="text-gray-400 mt-2">This is the main console panel where conversation threads will appear.</p>
-        </div>
-        
-        {/* Message history */}
-        {messages.map((msg, index) => (
-          <div key={index} className="bg-gray-800/70 rounded-lg p-3 mb-3">
-            <div className="flex justify-between text-xs text-gray-500 mb-1">
-              <span>Operator</span>
-              <span>{new Date(msg.timestamp).toLocaleTimeString()}</span>
-            </div>
-            {msg.file && (
-              <div className="mb-2 px-2 py-1 bg-gray-700 rounded inline-flex items-center">
-                <span className="text-cyan-400 mr-1">📎</span>
-                <span className="text-xs text-gray-300">{msg.file}</span>
-              </div>
-            )}
-            <p className="text-white whitespace-pre-wrap">{msg.message}</p>
+        {/* Welcome message - only show if no messages */}
+        {messages.length === 0 && (
+          <div className="bg-gray-800 rounded-lg p-4 mb-4">
+            <p className="text-gray-400">Welcome to Promethios Console</p>
+            <p className="text-gray-400 mt-2">This is the main console panel where conversation threads will appear.</p>
           </div>
-        ))}
+        )}
+        
+        {/* Chat Message Feed */}
+        <div className="flex-grow">
+          <ChatMessageFeed userMessages={messages} />
+        </div>
       </div>
       
       {/* Input bar fixed at bottom */}
