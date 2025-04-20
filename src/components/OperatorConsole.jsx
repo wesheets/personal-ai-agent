@@ -1,6 +1,7 @@
 import Sidebar from './Sidebar';
 import MainConsolePanel from './MainConsolePanel';
 import FileTreePanel from './FileTreePanel';
+import OrchestratorSandbox from './OrchestratorSandbox';
 
 function OperatorConsole() {
   return (
@@ -16,8 +17,15 @@ function OperatorConsole() {
       </div>
       
       {/* File Tree Panel - 20% */}
-      <div className="w-1/5 h-full">
-        <FileTreePanel />
+      <div className="w-1/5 h-full flex flex-col">
+        <div className="flex-grow">
+          <FileTreePanel />
+        </div>
+        
+        {/* Orchestrator Sandbox - pinned to bottom right */}
+        <div className="mb-4 mx-4">
+          <OrchestratorSandbox />
+        </div>
       </div>
     </div>
   );
