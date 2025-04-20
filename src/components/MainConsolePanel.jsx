@@ -12,7 +12,7 @@ function MainConsolePanel({ activeTab }) {
   const [pendingConfirmation, setPendingConfirmation] = useState(false);
   const [executionStarted, setExecutionStarted] = useState(false);
   
-  // Handler for plan confirmation
+  // Handler for plan confirmation (Approve)
   const handlePlanConfirm = (loopId) => {
     // Create a confirmation message from the orchestrator
     const confirmationMessage = {
@@ -33,6 +33,51 @@ function MainConsolePanel({ activeTab }) {
     
     // In a real implementation, this would trigger the actual execution
     console.log('Execution started for loop:', loopId);
+  };
+  
+  // Handler for plan modification
+  const handlePlanModify = (modifiedPlan) => {
+    // Create a modification message from the orchestrator
+    const modificationMessage = {
+      role: "orchestrator",
+      agent: "orchestrator",
+      message: "Plan modified by operator. Updating loop plan...",
+      timestamp: new Date().toISOString(),
+      loop: modifiedPlan.loop_id,
+      loop_plan: modifiedPlan
+    };
+    
+    // Add the modification message to the chat
+    setMessages(prev => [...prev, modificationMessage]);
+    
+    // Update orchestrator data with the modified plan
+    setOrchestratorData(prevData => ({
+      ...prevData,
+      loop_plan: modifiedPlan
+    }));
+    
+    console.log('Plan modified:', modifiedPlan);
+  };
+  
+  // Handler for plan rejection
+  const handlePlanReject = (loopId) => {
+    // Create a rejection message from the orchestrator
+    const rejectionMessage = {
+      role: "orchestrator",
+      agent: "orchestrator",
+      message: `Operator has rejected Loop ${loopId}. Awaiting new instruction.`,
+      timestamp: new Date().toISOString(),
+      loop: loopId
+    };
+    
+    // Add the rejection message to the chat
+    setMessages(prev => [...prev, rejectionMessage]);
+    
+    // Clear the orchestrator data and pending confirmation
+    setOrchestratorData(null);
+    setPendingConfirmation(false);
+    
+    console.log('Plan rejected for loop:', loopId);
   };
   
   // Handler for new messages from InputBar
@@ -104,7 +149,10 @@ function MainConsolePanel({ activeTab }) {
             <div className="mt-4 mb-4 mx-auto max-w-md">
               <SendToAgentsButton 
                 loopId={orchestratorData.loop}
+                loopPlan={orchestratorData.loop_plan}
                 onConfirm={handlePlanConfirm}
+                onModify={handlePlanModify}
+                onReject={handlePlanReject}
                 visible={true}
               />
             </div>
