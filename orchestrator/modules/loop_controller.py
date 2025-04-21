@@ -2,7 +2,8 @@
 Loop Controller Module
 
 This module provides functionality to control loop execution, including
-delusion detection, failure debugging, belief alignment tracking, and CEO insights.
+delusion detection, failure debugging, belief alignment tracking, CEO insights,
+and CTO health monitoring.
 """
 
 import json
@@ -14,6 +15,7 @@ from orchestrator.modules.delusion_detector import detect_plan_delusion, store_r
 from agents.debugger_agent import debug_loop_failure
 from agents.historian_agent import analyze_loop_summary
 from agents.ceo_agent import analyze_loop_with_ceo_agent
+from agents.cto_agent import analyze_loop_with_cto_agent
 from memory.belief_reference import load_beliefs_from_file, get_recent_loops
 
 def evaluate_plan_with_delusion_detector(
@@ -432,18 +434,116 @@ def process_loop_with_ceo_agent(
             "message": "No CEO insights generated (alignment within acceptable threshold)"
         }
 
-def handle_loop_completion(
+def process_loop_with_cto_agent(
     loop_id: str,
-    loop_summary: str,
+    loop: Dict[str, Any],
+    plan: Dict[str, Any],
+    summary: str,
+    agent_logs: List[Dict[str, Any]],
     memory: Dict[str, Any],
     config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
-    Handles loop completion with historian agent and CEO agent analysis.
+    Processes a loop using the CTO agent to evaluate loop health and system integrity.
+    
+    Args:
+        loop_id (str): The loop identifier
+        loop (Dict[str, Any]): The loop data
+        plan (Dict[str, Any]): The original plan
+        summary (str): The execution summary
+        agent_logs (List[Dict[str, Any]]): List of agent execution logs
+        memory (Dict[str, Any]): The memory dictionary
+        config (Optional[Dict[str, Any]]): Configuration options
+        
+    Returns:
+        Dict[str, Any]: Result of the processing, including updated memory with CTO reports
+    """
+    # Use default config if none provided
+    if config is None:
+        config = {
+            "enabled": True,
+            "health_threshold": 0.6,
+            "divergence_threshold": 0.4,
+            "trust_decay_threshold": 0.1,
+            "warning_threshold": 0.4
+        }
+    
+    # Skip processing if disabled
+    if not config.get("enabled", True):
+        return {
+            "status": "skipped",
+            "memory": memory,
+            "message": "CTO agent is disabled"
+        }
+    
+    # Analyze loop with CTO agent
+    updated_memory = analyze_loop_with_cto_agent(
+        loop_id,
+        loop,
+        plan,
+        summary,
+        agent_logs,
+        memory,
+        config
+    )
+    
+    # Check if reports were generated
+    has_reports = False
+    if "cto_reports" in updated_memory:
+        for report in updated_memory["cto_reports"]:
+            if report["loop_id"] == loop_id:
+                has_reports = True
+                health_score = report["health_score"]
+                alignment_score = report["plan_summary_alignment_score"]
+                break
+    
+    # Check if warnings were generated
+    has_warnings = False
+    if "cto_warnings" in updated_memory:
+        for warning in updated_memory["cto_warnings"]:
+            if warning["loop_id"] == loop_id:
+                has_warnings = True
+                break
+    
+    # Return result
+    if has_reports:
+        if has_warnings:
+            return {
+                "status": "warning",
+                "memory": updated_memory,
+                "message": f"CTO analysis: health score {health_score:.2f}, alignment score {alignment_score:.2f} - WARNING: critical health issues detected"
+            }
+        else:
+            return {
+                "status": "analyzed",
+                "memory": updated_memory,
+                "message": f"CTO analysis: health score {health_score:.2f}, alignment score {alignment_score:.2f}"
+            }
+    else:
+        return {
+            "status": "error",
+            "memory": updated_memory,
+            "message": "Failed to generate CTO report"
+        }
+
+def handle_loop_completion(
+    loop_id: str,
+    loop_summary: str,
+    loop: Dict[str, Any],
+    plan: Dict[str, Any],
+    agent_logs: List[Dict[str, Any]],
+    memory: Dict[str, Any],
+    config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Handles loop completion with historian agent, CEO agent, and CTO agent analysis.
     
     Args:
         loop_id (str): The loop identifier
         loop_summary (str): The summary text of the completed loop
+        loop (Dict[str, Any]): The loop data
+        plan (Dict[str, Any]): The original plan
+        agent_logs (List[Dict[str, Any]]): List of agent execution logs
         memory (Dict[str, Any]): The memory dictionary
         config (Optional[Dict[str, Any]]): Configuration options
         
@@ -464,6 +564,13 @@ def handle_loop_completion(
                 "alignment_threshold": 0.6,
                 "recent_loops_count": 10,
                 "review_window_size": 5
+            },
+            "cto_agent": {
+                "enabled": True,
+                "health_threshold": 0.6,
+                "divergence_threshold": 0.4,
+                "trust_decay_threshold": 0.1,
+                "warning_threshold": 0.4
             }
         }
     
@@ -488,11 +595,26 @@ def handle_loop_completion(
         ceo_config
     )
     
+    # Update memory with CEO analysis results
+    memory = ceo_result["memory"]
+    
+    # Analyze loop with CTO agent
+    cto_config = config.get("cto_agent", {"enabled": True})
+    cto_result = process_loop_with_cto_agent(
+        loop_id,
+        loop,
+        plan,
+        loop_summary,
+        agent_logs,
+        memory,
+        cto_config
+    )
+    
     # Combine results
     combined_result = {
         "status": "completed",
-        "memory": ceo_result["memory"],
-        "message": f"Historian: {historian_result['message']}; CEO: {ceo_result['message']}"
+        "memory": cto_result["memory"],
+        "message": f"Historian: {historian_result['message']}; CEO: {ceo_result['message']}; CTO: {cto_result['message']}"
     }
     
     # Return combined result
