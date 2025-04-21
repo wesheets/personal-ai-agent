@@ -1,0 +1,186 @@
+{
+  "timestamp": "2025-04-21T18:08:31.000Z",
+  "base_url": "https://web-production-2639.up.railway.app",
+  "routes": {
+    "Health Check": {
+      "url": "https://web-production-2639.up.railway.app/health",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    },
+    "Root Endpoint": {
+      "url": "https://web-production-2639.up.railway.app/",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    },
+    "System Status": {
+      "url": "https://web-production-2639.up.railway.app/system/status",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    },
+    "OpenAPI Schema": {
+      "url": "https://web-production-2639.up.railway.app/openapi.json",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    },
+    "API Documentation": {
+      "url": "https://web-production-2639.up.railway.app/docs",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    },
+    "Redoc Documentation": {
+      "url": "https://web-production-2639.up.railway.app/redoc",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    },
+    "Memory Read": {
+      "url": "https://web-production-2639.up.railway.app/memory/read",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Memory Write": {
+      "url": "https://web-production-2639.up.railway.app/memory/write",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Memory Delete": {
+      "url": "https://web-production-2639.up.railway.app/memory/delete",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Loop Trace (GET)": {
+      "url": "https://web-production-2639.up.railway.app/loop/trace",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    },
+    "Loop Trace (POST)": {
+      "url": "https://web-production-2639.up.railway.app/loop/trace",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Loop Reset": {
+      "url": "https://web-production-2639.up.railway.app/loop/reset",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Loop Persona Reflect": {
+      "url": "https://web-production-2639.up.railway.app/loop/persona-reflect",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Analyze Prompt": {
+      "url": "https://web-production-2639.up.railway.app/analyze-prompt",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Generate Variants": {
+      "url": "https://web-production-2639.up.railway.app/generate-variants",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Plan and Execute": {
+      "url": "https://web-production-2639.up.railway.app/plan-and-execute",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Run Critic": {
+      "url": "https://web-production-2639.up.railway.app/run-critic",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "CEO Review": {
+      "url": "https://web-production-2639.up.railway.app/ceo-review",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "CTO Review": {
+      "url": "https://web-production-2639.up.railway.app/cto-review",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Historian Check": {
+      "url": "https://web-production-2639.up.railway.app/historian-check",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Pessimist Check": {
+      "url": "https://web-production-2639.up.railway.app/pessimist-check",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Drift Summary": {
+      "url": "https://web-production-2639.up.railway.app/drift-summary",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Generate Weekly Drift Report": {
+      "url": "https://web-production-2639.up.railway.app/generate-weekly-drift-report",
+      "method": "POST",
+      "status": 200,
+      "success": true
+    },
+    "Current Persona": {
+      "url": "https://web-production-2639.up.railway.app/persona/current",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    },
+    "Switch Persona": {
+      "url": "https://web-production-2639.up.railway.app/persona/switch",
+      "method": "POST",
+      "status": 400,
+      "success": false
+    },
+    "Mode Trace": {
+      "url": "https://web-production-2639.up.railway.app/mode/trace",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    },
+    "Schema Injection Test": {
+      "url": "https://web-production-2639.up.railway.app/schema-injection-test",
+      "method": "GET",
+      "status": 200,
+      "success": true
+    }
+  },
+  "summary": {
+    "total_routes": 27,
+    "successful_routes": 26,
+    "failed_routes": 1,
+    "success_rate": "96.30%",
+    "critical_routes_status": {
+      "Health Check": true,
+      "Memory Read": true,
+      "Memory Write": true,
+      "Loop Trace (GET)": true,
+      "Analyze Prompt": true,
+      "CEO Review": true,
+      "CTO Review": true,
+      "Generate Variants": true,
+      "Plan and Execute": true
+    },
+    "ready_for_loop_001": true
+  }
+}

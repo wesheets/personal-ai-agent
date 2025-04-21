@@ -1,0 +1,157 @@
+{
+  "timestamp": "2025-04-21T18:09:24.000Z",
+  "base_url": "https://web-production-2639.up.railway.app",
+  "validation_results": {
+    "agent_response_schema": {
+      "status": "valid",
+      "endpoints_tested": [
+        "analyze-prompt",
+        "generate-variants",
+        "plan-and-execute",
+        "run-critic"
+      ],
+      "validation_details": {
+        "analyze-prompt": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "generate-variants": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "plan-and-execute": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "run-critic": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        }
+      }
+    },
+    "specialized_agent_schema": {
+      "status": "valid",
+      "endpoints_tested": [
+        "ceo-review",
+        "cto-review",
+        "historian-check",
+        "pessimist-check"
+      ],
+      "validation_details": {
+        "ceo-review": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "cto-review": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "historian-check": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "pessimist-check": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        }
+      }
+    },
+    "memory_operations_schema": {
+      "status": "valid",
+      "endpoints_tested": [
+        "memory/read",
+        "memory/write",
+        "memory/delete"
+      ],
+      "validation_details": {
+        "memory/read": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true,
+          "query_parameter_validation": true
+        },
+        "memory/write": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "memory/delete": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        }
+      }
+    },
+    "loop_operations_schema": {
+      "status": "valid",
+      "endpoints_tested": [
+        "loop/trace",
+        "loop/reset",
+        "loop/persona-reflect"
+      ],
+      "validation_details": {
+        "loop/trace": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "loop/reset": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "loop/persona-reflect": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        }
+      }
+    },
+    "persona_operations_schema": {
+      "status": "partially_valid",
+      "endpoints_tested": [
+        "persona/current",
+        "persona/switch",
+        "mode/trace"
+      ],
+      "validation_details": {
+        "persona/current": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        },
+        "persona/switch": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": false,
+          "validation_error": "Invalid persona value. Must be one of: SAGE, ARCHITECT, RESEARCHER, RITUALIST, INVENTOR"
+        },
+        "mode/trace": {
+          "required_fields_present": true,
+          "field_types_correct": true,
+          "response_structure_valid": true
+        }
+      }
+    }
+  },
+  "summary": {
+    "total_schemas_tested": 5,
+    "valid_schemas": 4,
+    "partially_valid_schemas": 1,
+    "invalid_schemas": 0,
+    "overall_validation_status": "PASS",
+    "critical_validation_status": "PASS",
+    "ready_for_loop_001": true
+  },
+  "recommendations": {
+    "persona_operations": "Update the Switch Persona endpoint to use one of the valid persona values: SAGE, ARCHITECT, RESEARCHER, RITUALIST, INVENTOR"
+  }
+}

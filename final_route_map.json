@@ -1,0 +1,247 @@
+{
+  "timestamp": "2025-04-21T18:09:51.000Z",
+  "base_url": "https://web-production-2639.up.railway.app",
+  "total_routes": 27,
+  "visible_routes": 26,
+  "route_map": {
+    "core": {
+      "health": {
+        "path": "/health",
+        "method": "GET",
+        "status": "active",
+        "description": "Health check endpoint"
+      },
+      "root": {
+        "path": "/",
+        "method": "GET",
+        "status": "active",
+        "description": "Root endpoint"
+      },
+      "system_status": {
+        "path": "/system/status",
+        "method": "GET",
+        "status": "active",
+        "description": "System status endpoint"
+      },
+      "openapi_schema": {
+        "path": "/openapi.json",
+        "method": "GET",
+        "status": "active",
+        "description": "OpenAPI schema"
+      },
+      "api_docs": {
+        "path": "/docs",
+        "method": "GET",
+        "status": "active",
+        "description": "API documentation"
+      },
+      "redoc": {
+        "path": "/redoc",
+        "method": "GET",
+        "status": "active",
+        "description": "ReDoc documentation"
+      }
+    },
+    "memory": {
+      "read": {
+        "path": "/memory/read",
+        "method": "POST",
+        "status": "active",
+        "description": "Read from memory",
+        "parameters": {
+          "query": ["key"]
+        }
+      },
+      "write": {
+        "path": "/memory/write",
+        "method": "POST",
+        "status": "active",
+        "description": "Write to memory",
+        "parameters": {
+          "body": ["key", "value"]
+        }
+      },
+      "delete": {
+        "path": "/memory/delete",
+        "method": "POST",
+        "status": "active",
+        "description": "Delete from memory",
+        "parameters": {
+          "body": ["key"]
+        }
+      }
+    },
+    "loop": {
+      "trace_get": {
+        "path": "/loop/trace",
+        "method": "GET",
+        "status": "active",
+        "description": "Get loop trace"
+      },
+      "trace_post": {
+        "path": "/loop/trace",
+        "method": "POST",
+        "status": "active",
+        "description": "Update loop trace",
+        "parameters": {
+          "body": ["loop_id", "status", "timestamp"]
+        }
+      },
+      "reset": {
+        "path": "/loop/reset",
+        "method": "POST",
+        "status": "active",
+        "description": "Reset loop"
+      },
+      "persona_reflect": {
+        "path": "/loop/persona-reflect",
+        "method": "POST",
+        "status": "active",
+        "description": "Persona reflection for loop",
+        "parameters": {
+          "body": ["persona", "reflection", "loop_id"]
+        }
+      }
+    },
+    "agent": {
+      "analyze_prompt": {
+        "path": "/analyze-prompt",
+        "method": "POST",
+        "status": "active",
+        "description": "Analyze prompt",
+        "parameters": {
+          "body": ["prompt", "loop_id"]
+        }
+      },
+      "generate_variants": {
+        "path": "/generate-variants",
+        "method": "POST",
+        "status": "active",
+        "description": "Generate variants",
+        "parameters": {
+          "body": ["plan", "loop_id"]
+        }
+      },
+      "plan_and_execute": {
+        "path": "/plan-and-execute",
+        "method": "POST",
+        "status": "active",
+        "description": "Plan and execute",
+        "parameters": {
+          "body": ["prompt", "loop_id"]
+        }
+      },
+      "run_critic": {
+        "path": "/run-critic",
+        "method": "POST",
+        "status": "active",
+        "description": "Run critic",
+        "parameters": {
+          "body": ["summary", "loop_id"]
+        }
+      }
+    },
+    "specialized_agents": {
+      "ceo_review": {
+        "path": "/ceo-review",
+        "method": "POST",
+        "status": "active",
+        "description": "CEO review",
+        "parameters": {
+          "body": ["summary", "loop_id"]
+        }
+      },
+      "cto_review": {
+        "path": "/cto-review",
+        "method": "POST",
+        "status": "active",
+        "description": "CTO review",
+        "parameters": {
+          "body": ["summary", "loop_id", "plan"]
+        }
+      },
+      "historian_check": {
+        "path": "/historian-check",
+        "method": "POST",
+        "status": "active",
+        "description": "Historian check",
+        "parameters": {
+          "body": ["summary", "loop_id"]
+        }
+      },
+      "pessimist_check": {
+        "path": "/pessimist-check",
+        "method": "POST",
+        "status": "active",
+        "description": "Pessimist check",
+        "parameters": {
+          "body": ["summary", "loop_id"]
+        }
+      }
+    },
+    "reports": {
+      "drift_summary": {
+        "path": "/drift-summary",
+        "method": "POST",
+        "status": "active",
+        "description": "Drift summary",
+        "parameters": {
+          "body": ["loop_id"]
+        }
+      },
+      "weekly_drift_report": {
+        "path": "/generate-weekly-drift-report",
+        "method": "POST",
+        "status": "active",
+        "description": "Generate weekly drift report",
+        "parameters": {
+          "body": ["loop_id"]
+        }
+      }
+    },
+    "persona": {
+      "current": {
+        "path": "/persona/current",
+        "method": "GET",
+        "status": "active",
+        "description": "Get current persona"
+      },
+      "switch": {
+        "path": "/persona/switch",
+        "method": "POST",
+        "status": "active",
+        "description": "Switch persona",
+        "parameters": {
+          "body": ["persona", "loop_id"]
+        },
+        "notes": "Valid persona values: SAGE, ARCHITECT, RESEARCHER, RITUALIST, INVENTOR"
+      },
+      "mode_trace": {
+        "path": "/mode/trace",
+        "method": "GET",
+        "status": "active",
+        "description": "Get mode trace"
+      }
+    },
+    "debug": {
+      "schema_injection_test": {
+        "path": "/schema-injection-test",
+        "method": "GET",
+        "status": "active",
+        "description": "Schema injection test"
+      }
+    }
+  },
+  "critical_routes": [
+    "/health",
+    "/memory/read",
+    "/memory/write",
+    "/loop/trace",
+    "/analyze-prompt",
+    "/ceo-review",
+    "/cto-review",
+    "/generate-variants",
+    "/plan-and-execute"
+  ],
+  "ready_for_loop_001": true
+}
