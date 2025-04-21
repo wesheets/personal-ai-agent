@@ -14,17 +14,23 @@ import re
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from orchestrator.modules.plan_validator import validate_and_log
+from orchestrator.modules.agent_performance_tracker import get_all_agent_reports
 
 # Available agent types
 AVAILABLE_AGENTS = ["hal", "nova", "critic", "ash", "operator", "cto", "orchestrator"]
 
-def generate_plan_from_prompt(prompt: str, loop_id: int) -> dict:
+# Trust score threshold for agent exclusion
+TRUST_SCORE_THRESHOLD = 0.4
+
+def generate_plan_from_prompt(prompt: str, loop_id: int, memory: dict = None, override_agents: list = None) -> dict:
     """
     Generates a structured loop plan from a natural language prompt.
     
     Args:
         prompt (str): The natural language prompt from the operator
         loop_id (int): The unique identifier for this loop
+        memory (dict, optional): The memory dictionary containing agent performance data
+        override_agents (list, optional): List of agent IDs to include regardless of trust score
         
     Returns:
         dict: A structured loop plan object
@@ -37,8 +43,8 @@ def generate_plan_from_prompt(prompt: str, loop_id: int) -> dict:
     if not goals:
         goals = ["Process and execute operator request"]
     
-    # Determine appropriate agents based on the prompt content
-    agents = determine_agents(prompt)
+    # Determine appropriate agents based on the prompt content and trust scores
+    agents, agent_selection_trace = determine_agents(prompt, memory, override_agents)
     
     # Predict files that will be created or modified
     planned_files = predict_files(prompt)
@@ -53,8 +59,10 @@ def generate_plan_from_prompt(prompt: str, loop_id: int) -> dict:
         "goals": goals,
         "planned_files": planned_files,
         "confirmed": False,
-        "confirmed_by": "",
-        "confirmed_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        "confirmed_by": None,
+        "confirmed_at": None,
+        "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "agent_selection_trace": agent_selection_trace
     }
     
     # Add optional fields if they have values
@@ -103,37 +111,68 @@ def extract_goals(prompt: str) -> list:
     
     return goals
 
-def determine_agents(prompt: str) -> list:
+def determine_agents(prompt: str, memory: dict = None, override_agents: list = None) -> tuple:
     """
-    Determines which agents should be involved based on the prompt content.
+    Determines which agents should be involved based on the prompt content and trust scores.
     
     Args:
         prompt (str): The natural language prompt
+        memory (dict, optional): The memory dictionary containing agent performance data
+        override_agents (list, optional): List of agent IDs to include regardless of trust score
         
     Returns:
-        list: List of agent names
+        tuple: (list of agent names, list of selection trace dictionaries)
     """
     # Default agent sequence for most tasks
     default_agents = ["hal", "nova", "critic"]
     
+    # Initialize agent selection trace
+    agent_selection_trace = []
+    
+    # Initialize excluded agents list
+    excluded_agents = []
+    
+    # Ensure override_agents is a list
+    if override_agents is None:
+        override_agents = []
+    
+    # Get agent trust scores if memory is provided
+    agent_trust_scores = {}
+    if memory and "agent_performance" in memory:
+        try:
+            agent_reports = get_all_agent_reports(memory)
+            for agent_id, report in agent_reports.items():
+                agent_trust_scores[agent_id] = report["trust_score"]
+        except Exception as e:
+            # If there's an error getting trust scores, log it and continue with default agents
+            print(f"Error getting agent trust scores: {str(e)}")
+    
     # Check if specific agents are mentioned or implied
     prompt_lower = prompt.lower()
     
+    # Determine task type and initial agent selection
+    task_type = "general"
+    initial_agents = []
+    
     # Check for specific development tasks
     if any(term in prompt_lower for term in ["code", "develop", "implement", "programming", "software", "application"]):
-        return ["hal", "nova", "critic"]
+        task_type = "development"
+        initial_agents = ["hal", "nova", "critic"]
     
     # Check for design or UI tasks
-    if any(term in prompt_lower for term in ["design", "ui", "interface", "layout", "visual", "css", "style"]):
-        return ["nova", "hal", "critic"]
+    elif any(term in prompt_lower for term in ["design", "ui", "interface", "layout", "visual", "css", "style"]):
+        task_type = "design"
+        initial_agents = ["nova", "hal", "critic"]
     
     # Check for analysis or research tasks
-    if any(term in prompt_lower for term in ["analyze", "research", "investigate", "study", "report", "data"]):
-        return ["hal", "critic", "nova"]
+    elif any(term in prompt_lower for term in ["analyze", "research", "investigate", "study", "report", "data"]):
+        task_type = "analysis"
+        initial_agents = ["hal", "critic", "nova"]
     
     # Check for system or architecture tasks
-    if any(term in prompt_lower for term in ["system", "architecture", "infrastructure", "performance", "optimize"]):
-        return ["hal", "critic", "cto"]
+    elif any(term in prompt_lower for term in ["system", "architecture", "infrastructure", "performance", "optimize"]):
+        task_type = "system"
+        initial_agents = ["hal", "critic", "cto"]
     
     # If specific agents are mentioned, include them
     mentioned_agents = []
@@ -146,9 +185,122 @@ def determine_agents(prompt: str) -> list:
         for agent in default_agents:
             if agent not in mentioned_agents:
                 mentioned_agents.append(agent)
-        return mentioned_agents[:5]  # Limit to 5 agents
+        initial_agents = mentioned_agents[:5]  # Limit to 5 agents
     
-    return default_agents
+    # If no specific task type was identified, use default agents
+    if not initial_agents:
+        initial_agents = default_agents
+    
+    # Apply trust scores to filter and sort agents
+    final_agents = []
+    
+    # First, process override agents - these are included regardless of trust score
+    for agent in override_agents:
+        if agent in AVAILABLE_AGENTS and agent not in final_agents:
+            final_agents.append(agent)
+            
+            # Determine reason for inclusion
+            trust_score = agent_trust_scores.get(agent)
+            if trust_score is not None and trust_score < TRUST_SCORE_THRESHOLD:
+                reason = "Included due to operator override"
+            else:
+                reason = "Included due to operator override"
+                
+            agent_selection_trace.append({
+                "agent": agent,
+                "trust_score": trust_score,
+                "reason": reason
+            })
+    
+    # Process each agent based on trust score
+    for agent in initial_agents:
+        # Skip if agent already included via override
+        if agent in final_agents:
+            continue
+            
+        # Skip system agents that are always included
+        if agent in ["operator", "orchestrator"]:
+            final_agents.append(agent)
+            agent_selection_trace.append({
+                "agent": agent,
+                "trust_score": None,
+                "reason": "System agent always included"
+            })
+            continue
+        
+        # Check if agent has trust score data
+        if agent in agent_trust_scores:
+            trust_score = agent_trust_scores[agent]
+            
+            # Check if agent should be excluded based on trust score
+            if trust_score < TRUST_SCORE_THRESHOLD:
+                excluded_agents.append(agent)
+                agent_selection_trace.append({
+                    "agent": agent,
+                    "trust_score": trust_score,
+                    "excluded": True,
+                    "reason": f"Trust score below threshold ({trust_score:.2f} < {TRUST_SCORE_THRESHOLD})"
+                })
+            else:
+                final_agents.append(agent)
+                
+                # Determine reason for inclusion
+                reason = "Sufficient trust score"
+                if trust_score > 0.8:
+                    reason = "High trust score"
+                elif trust_score > 0.6:
+                    reason = "Good trust score"
+                
+                agent_selection_trace.append({
+                    "agent": agent,
+                    "trust_score": trust_score,
+                    "reason": reason
+                })
+        else:
+            # No trust data available for this agent
+            final_agents.append(agent)
+            agent_selection_trace.append({
+                "agent": agent,
+                "trust_score": None,
+                "reason": "No trust data available, using default inclusion"
+            })
+    
+    # Ensure we have at least the critic agent for validation
+    if "critic" not in final_agents:
+        final_agents.append("critic")
+        agent_selection_trace.append({
+            "agent": "critic",
+            "trust_score": agent_trust_scores.get("critic"),
+            "reason": "Critical agent added for validation purposes"
+        })
+    
+    # Ensure we have at least one primary agent (hal or nova)
+    if "hal" not in final_agents and "nova" not in final_agents:
+        # Add the agent with the highest trust score, or hal by default
+        if "hal" in agent_trust_scores and "nova" in agent_trust_scores:
+            if agent_trust_scores["hal"] >= agent_trust_scores["nova"]:
+                final_agents.append("hal")
+                agent_selection_trace.append({
+                    "agent": "hal",
+                    "trust_score": agent_trust_scores["hal"],
+                    "reason": "Added as primary agent (higher trust than nova)"
+                })
+            else:
+                final_agents.append("nova")
+                agent_selection_trace.append({
+                    "agent": "nova",
+                    "trust_score": agent_trust_scores["nova"],
+                    "reason": "Added as primary agent (higher trust than hal)"
+                })
+        else:
+            final_agents.append("hal")
+            agent_selection_trace.append({
+                "agent": "hal",
+                "trust_score": agent_trust_scores.get("hal"),
+                "reason": "Added as default primary agent"
+            })
+    
+    return final_agents, agent_selection_trace
 
 def predict_files(prompt: str) -> list:
     """
@@ -262,13 +414,15 @@ def predict_tools(prompt: str) -> list:
     
     return tools_required
 
-def plan_from_prompt_driver(project_id: str, prompt: str):
+def plan_from_prompt_driver(project_id: str, prompt: str, memory: dict = None, override_agents: list = None):
     """
     Orchestrator-facing entrypoint for generating loop plans from prompts.
     
     Args:
         project_id (str): The project identifier
         prompt (str): The natural language prompt
+        memory (dict, optional): The memory dictionary containing agent performance data
+        override_agents (list, optional): List of agent IDs to include regardless of trust score
         
     Returns:
         dict or None: The validated loop plan or None if validation fails
@@ -283,7 +437,7 @@ def plan_from_prompt_driver(project_id: str, prompt: str):
         ]
         
         # Generate the plan from the prompt
-        loop_plan = generate_plan_from_prompt(prompt, loop_id)
+        loop_plan = generate_plan_from_prompt(prompt, loop_id, memory, override_agents)
         
         # Validate the plan
         is_valid, errors, trace = validate_and_log(loop_plan)
@@ -328,16 +482,44 @@ def plan_from_prompt_driver(project_id: str, prompt: str):
             "loop_plans": [loop_plan]
         })
         
+        # Log agent selection trace to memory
+        if "agent_selection_trace" in loop_plan:
+            log_to_memory(project_id, {
+                "loop_trace": {
+                    str(loop_id): {
+                        "agent_selection_trace": loop_plan["agent_selection_trace"]
+                    }
+                }
+            })
+        
+        # Extract excluded agents from trace
+        excluded_agents = [entry["agent"] for entry in loop_plan.get("agent_selection_trace", []) 
+                          if entry.get("excluded", False)]
+        
         # Log to chat with warning if ambiguous
         message = f"Created loop plan with {len(loop_plan['goals'])} goals and {len(loop_plan['agents'])} agents."
+        
+        # Add information about agent selection based on trust
+        if excluded_agents:
+            message += f" Excluded {len(excluded_agents)} agent(s) due to low trust scores: {', '.join(excluded_agents)}."
+            
+        if override_agents:
+            message += f" Operator override applied for: {', '.join(override_agents)}."
+            
         if is_ambiguous:
             message += " Note: Prompt was ambiguous, plan may need refinement."
             
+        # Log to chat with the message and loop plan
         log_to_chat(project_id, {
             "role": "orchestrator",
             "message": message,
             "timestamp": trace["timestamp"],
-            "loop_plan": loop_plan
+            "loop_plan": loop_plan,
+            "agent_selection_info": {
+                "included_agents": loop_plan["agents"],
+                "excluded_agents": excluded_agents,
+                "override_agents": override_agents if override_agents else []
+            }
         })
         
         # Log to sandbox
@@ -425,7 +607,46 @@ if __name__ == "__main__":
     prompt = "Create a new React component for displaying user profiles with avatar, name, and bio."
     project_id = "lifetree_001"
     
-    plan = plan_from_prompt_driver(project_id, prompt)
+    # Example memory with agent performance data
+    example_memory = {
+        "agent_performance": {
+            "hal": {
+                "trust_score": 0.85,
+                "loops_participated": 10,
+                "schema_validations": {"passed": 9, "failed": 1},
+                "reflection_validations": {"passed": 8, "failed": 2},
+                "critic_rejections": 1,
+                "operator_rejections": 0,
+                "history": [],
+                "last_updated": datetime.utcnow().isoformat() + "Z"
+            },
+            "nova": {
+                "trust_score": 0.92,
+                "loops_participated": 8,
+                "schema_validations": {"passed": 8, "failed": 0},
+                "reflection_validations": {"passed": 7, "failed": 1},
+                "critic_rejections": 0,
+                "operator_rejections": 0,
+                "history": [],
+                "last_updated": datetime.utcnow().isoformat() + "Z"
+            },
+            "ash": {
+                "trust_score": 0.38,
+                "loops_participated": 5,
+                "schema_validations": {"passed": 2, "failed": 3},
+                "reflection_validations": {"passed": 1, "failed": 4},
+                "critic_rejections": 2,
+                "operator_rejections": 1,
+                "history": [],
+                "last_updated": datetime.utcnow().isoformat() + "Z"
+            }
+        }
+    }
+    
+    # Example override
+    override_agents = ["ash"]
+    
+    plan = plan_from_prompt_driver(project_id, prompt, example_memory, override_agents)
     
     if plan:
         print("\nSuccessfully created loop plan:")
