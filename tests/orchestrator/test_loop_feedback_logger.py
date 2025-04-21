@@ -76,7 +76,7 @@ class TestLoopFeedbackLogger(unittest.TestCase):
         # Check that CTO warning was added
         self.assertIn("cto_warnings", self.memory)
         self.assertEqual(len(self.memory["cto_warnings"]), 1)
-        self.assertEqual(self.memory["cto_warnings"][0]["type"], "loop_rejection")
+        self.assertEqual(self.memory["cto_warnings"][0]["type"], "summary_rejection")
         self.assertEqual(self.memory["cto_warnings"][0]["loop_id"], 1)
     
     def test_record_loop_feedback_missing_fields(self):
