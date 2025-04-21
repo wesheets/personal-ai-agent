@@ -22,7 +22,18 @@ from app.modules.core_beliefs_integration import (
     get_belief_priority,
     get_violation_handling
 )
-from app.modules.depth_controller import enrich_loop_with_depth, preload_depth_for_rerun
+from app.modules.depth_controller import (
+    enrich_loop_with_depth, 
+    preload_depth_for_rerun,
+    enrich_loop_with_mode,
+    preload_mode_for_rerun,
+    get_depth_for_mode
+)
+from app.modules.tiered_orchestrator import (
+    TieredOrchestrator,
+    determine_optimal_mode,
+    get_mode_config
+)
 from app.modules.agent_dispatch import create_dispatcher
 from app.modules.agent_permission_validator import enforce_agent_permissions
 
@@ -39,22 +50,29 @@ class OrchestratorIntegration:
     core beliefs and operational thresholds.
     """
     
-    def __init__(self, loop_id: str):
+    def __init__(self, loop_id: str, mode: Optional[str] = None):
         """
         Initialize the orchestrator integration.
         
         Args:
             loop_id: The ID of the current loop
+            mode: Optional orchestrator mode (fast, balanced, thorough, research)
         """
         self.loop_id = loop_id
         self.agent_dispatcher = create_dispatcher(loop_id)
         self.validation_results = {}
+        
+        # Initialize tiered orchestrator with specified or default mode
+        self.mode = mode if mode else "balanced"
+        self.tiered_orchestrator = TieredOrchestrator(loop_id, self.mode)
+        
         self.integration_metadata = {
             "initialized_at": datetime.utcnow().isoformat(),
             "loop_id": loop_id,
+            "mode": self.mode,
             "version": "1.0"
         }
-        logger.info(f"Initialized OrchestratorIntegration for loop {loop_id}")
+        logger.info(f"Initialized OrchestratorIntegration for loop {loop_id} with mode {self.mode}")
     
     def validate_and_prepare_loop(self, loop_data: Dict[str, Any]) -> Tuple[bool, Optional[str], Dict[str, Any]]:
         """
@@ -69,7 +87,7 @@ class OrchestratorIntegration:
             - Optional string with reason for failure
             - Dictionary with prepared loop data
         """
-        logger.info(f"Validating and preparing loop {self.loop_id}")
+        logger.info(f"Validating and preparing loop {self.loop_id} with mode {self.mode}")
         
         # Add validation timestamp
         loop_data["validation_timestamp"] = datetime.utcnow().isoformat()
@@ -101,34 +119,65 @@ class OrchestratorIntegration:
             
             logger.info(f"Loop {self.loop_id} passed basic validation")
             
-            # Step 2: Enrich with depth information
-            loop_data = enrich_loop_with_depth(loop_data)
-            logger.debug(f"Loop {self.loop_id} enriched with depth: {loop_data.get('depth', 'standard')}")
+            # Step 2: Determine optimal mode if not explicitly set
+            if "mode" not in loop_data:
+                task_description = loop_data.get("task_description", "")
+                complexity = loop_data.get("complexity_score")
+                sensitivity = loop_data.get("sensitivity_score")
+                time_constraint = loop_data.get("time_constraint_score")
+                user_preference = loop_data.get("user_mode_preference")
+                
+                optimal_mode = determine_optimal_mode(
+                    task_description, 
+                    complexity, 
+                    sensitivity, 
+                    time_constraint,
+                    user_preference
+                )
+                
+                # Update the tiered orchestrator with the optimal mode
+                if optimal_mode != self.mode:
+                    self.tiered_orchestrator.change_mode(optimal_mode)
+                    self.mode = optimal_mode
+                    logger.info(f"Automatically selected optimal mode {optimal_mode} for loop {self.loop_id}")
+            else:
+                # Use the mode specified in loop_data
+                specified_mode = loop_data["mode"]
+                if specified_mode != self.mode:
+                    self.tiered_orchestrator.change_mode(specified_mode)
+                    self.mode = specified_mode
+                    logger.info(f"Using specified mode {specified_mode} for loop {self.loop_id}")
             
-            # Step 3: Inject belief references
+            # Step 3: Prepare loop with tiered orchestrator
+            loop_data = self.tiered_orchestrator.prepare_loop(loop_data)
+            logger.debug(f"Loop {self.loop_id} prepared with mode: {self.mode}")
+            
+            # Step 4: Inject belief references
             loop_data = inject_belief_references(loop_data)
             belief_count = len(loop_data.get("belief_reference", []))
             logger.debug(f"Loop {self.loop_id} injected with {belief_count} belief references")
             
-            # Step 4: Add validation results
+            # Step 5: Add validation results
             loop_data["loop_validation"] = "passed"
             loop_data["validation_status"] = {
                 "status": "passed",
                 "timestamp": datetime.utcnow().isoformat(),
                 "checked_components": validation_result.get("checked_components", []),
-                "depth": loop_data.get("depth", "standard"),
+                "mode": self.mode,
+                "depth": get_depth_for_mode(self.mode),
                 "belief_count": belief_count
             }
             
-            # Step 5: Add orchestrator metadata
+            # Step 6: Add orchestrator metadata
             loop_data["orchestrator_metadata"] = {
                 "processed_by": "cognitive_control_layer",
                 "processed_at": datetime.utcnow().isoformat(),
                 "loop_id": self.loop_id,
+                "mode": self.mode,
                 "validation_version": "1.0"
             }
             
-            logger.info(f"Loop {self.loop_id} successfully prepared with cognitive controls")
+            logger.info(f"Loop {self.loop_id} successfully prepared with cognitive controls in {self.mode} mode")
             return True, None, loop_data
             
         except Exception as e:
@@ -148,7 +197,7 @@ class OrchestratorIntegration:
         Returns:
             Updated loop data with belief conflict information
         """
-        logger.info(f"Processing reflection results for loop {self.loop_id}")
+        logger.info(f"Processing reflection results for loop {self.loop_id} in {self.mode} mode")
         
         try:
             # Add processing timestamp
@@ -198,10 +247,21 @@ class OrchestratorIntegration:
                 "processed_by": "cognitive_control_layer",
                 "processed_at": datetime.utcnow().isoformat(),
                 "loop_id": self.loop_id,
+                "mode": self.mode,
                 "has_conflicts": bool(conflicts),
                 "has_violations": bool(violations),
                 "severity": conflict_details.get("severity", "none") if conflicts else "none"
             }
+            
+            # Update visualization if needed based on mode
+            if self.tiered_orchestrator.should_visualize_step("reflection"):
+                loop_data["visualization_update_required"] = True
+                loop_data["visualization_trigger"] = "reflection_processed"
+            
+            # Update memory snapshot if needed based on mode
+            if self.tiered_orchestrator.should_snapshot_memory("reflection"):
+                loop_data["memory_snapshot_required"] = True
+                loop_data["memory_snapshot_trigger"] = "reflection_processed"
             
             logger.info(f"Reflection processing completed for loop {self.loop_id}")
             return loop_data
@@ -253,14 +313,62 @@ class OrchestratorIntegration:
             logger.error(f"Error determining rerun depth: {str(e)}")
             # Default to deep depth on error to be safe
             return "deep"
+    
+    def determine_rerun_mode(self, loop_data: Dict[str, Any], rerun_reason: str) -> str:
+        """
+        Determine the appropriate mode for a loop rerun.
+        
+        Args:
+            loop_data: The original loop data
+            rerun_reason: The reason for the rerun
+            
+        Returns:
+            Appropriate orchestrator mode for the rerun
+        """
+        logger.info(f"Determining rerun mode for loop {self.loop_id} with reason: {rerun_reason}")
+        
+        try:
+            # Get the appropriate mode from the depth controller
+            new_mode = preload_mode_for_rerun(loop_data, rerun_reason)
+            
+            # Log the mode change if applicable
+            original_mode = loop_data.get("mode", "balanced")
+            if new_mode != original_mode:
+                logger.info(f"Mode escalation for loop {self.loop_id}: {original_mode} -> {new_mode} due to {rerun_reason}")
+                
+                # Update the tiered orchestrator with the new mode
+                self.tiered_orchestrator.change_mode(new_mode)
+                self.mode = new_mode
+            else:
+                logger.debug(f"Maintaining mode {new_mode} for loop {self.loop_id} rerun")
+            
+            # Add rerun metadata
+            if "rerun_mode_metadata" not in loop_data:
+                loop_data["rerun_mode_metadata"] = []
+            
+            loop_data["rerun_mode_metadata"].append({
+                "rerun_reason": rerun_reason,
+                "original_mode": original_mode,
+                "new_mode": new_mode,
+                "determined_at": datetime.utcnow().isoformat(),
+                "escalated": new_mode != original_mode
+            })
+            
+            return new_mode
+            
+        except Exception as e:
+            logger.error(f"Error determining rerun mode: {str(e)}")
+            # Default to thorough mode on error to be safe
+            return "thorough"
 
-def integrate_with_orchestrator(loop_id: str, loop_data: Dict[str, Any]) -> Dict[str, Any]:
+def integrate_with_orchestrator(loop_id: str, loop_data: Dict[str, Any], mode: Optional[str] = None) -> Dict[str, Any]:
     """
     Integrate cognitive control components with the orchestrator for a specific loop.
     
     Args:
         loop_id: The ID of the loop
         loop_data: The loop data
+        mode: Optional orchestrator mode (fast, balanced, thorough, research)
         
     Returns:
         Prepared loop data with all cognitive controls applied
@@ -268,7 +376,7 @@ def integrate_with_orchestrator(loop_id: str, loop_data: Dict[str, Any]) -> Dict
     logger.info(f"Integrating cognitive control layer with orchestrator for loop {loop_id}")
     
     try:
-        integration = OrchestratorIntegration(loop_id)
+        integration = OrchestratorIntegration(loop_id, mode)
         is_valid, reason, prepared_data = integration.validate_and_prepare_loop(loop_data)
         
         if not is_valid:
@@ -313,14 +421,17 @@ def process_reflection_with_controls(loop_id: str, loop_data: Dict[str, Any], re
     logger.info(f"Processing reflection with cognitive controls for loop {loop_id}")
     
     try:
-        integration = OrchestratorIntegration(loop_id)
+        # Use the mode from loop_data if available
+        mode = loop_data.get("mode", "balanced")
+        integration = OrchestratorIntegration(loop_id, mode)
         processed_data = integration.process_reflection_result(loop_data, reflection_result)
         
         # Add processing metadata
         processed_data["reflection_processing_status"] = {
             "status": "completed",
             "timestamp": datetime.utcnow().isoformat(),
-            "processor": "cognitive_control_layer"
+            "processor": "cognitive_control_layer",
+            "mode": mode
         }
         
         return processed_data
@@ -350,7 +461,9 @@ def determine_rerun_depth_with_controls(loop_id: str, loop_data: Dict[str, Any],
     logger.info(f"Determining rerun depth with cognitive controls for loop {loop_id}")
     
     try:
-        integration = OrchestratorIntegration(loop_id)
+        # Use the mode from loop_data if available
+        mode = loop_data.get("mode", "balanced")
+        integration = OrchestratorIntegration(loop_id, mode)
         depth = integration.determine_rerun_depth(loop_data, rerun_reason)
         
         # Log the determined depth
@@ -373,3 +486,44 @@ def determine_rerun_depth_with_controls(loop_id: str, loop_data: Dict[str, Any],
         logger.error(f"Error determining rerun depth with controls: {str(e)}")
         # Default to deep depth on error to be safe
         return "deep"
+
+def determine_rerun_mode_with_controls(loop_id: str, loop_data: Dict[str, Any], rerun_reason: str) -> str:
+    """
+    Determine the appropriate mode for a loop rerun with cognitive controls.
+    
+    Args:
+        loop_id: The ID of the loop
+        loop_data: The original loop data
+        rerun_reason: The reason for the rerun
+        
+    Returns:
+        Appropriate orchestrator mode for the rerun
+    """
+    logger.info(f"Determining rerun mode with cognitive controls for loop {loop_id}")
+    
+    try:
+        # Use the mode from loop_data if available
+        current_mode = loop_data.get("mode", "balanced")
+        integration = OrchestratorIntegration(loop_id, current_mode)
+        mode = integration.determine_rerun_mode(loop_data, rerun_reason)
+        
+        # Log the determined mode
+        logger.info(f"Determined rerun mode for loop {loop_id}: {mode}")
+        
+        # Add a timestamp to loop data for when mode was determined
+        if "mode_determination_history" not in loop_data:
+            loop_data["mode_determination_history"] = []
+            
+        loop_data["mode_determination_history"].append({
+            "determined_at": datetime.utcnow().isoformat(),
+            "mode": mode,
+            "reason": rerun_reason,
+            "determined_by": "cognitive_control_layer"
+        })
+        
+        return mode
+        
+    except Exception as e:
+        logger.error(f"Error determining rerun mode with controls: {str(e)}")
+        # Default to thorough mode on error to be safe
+        return "thorough"
