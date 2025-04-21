@@ -74,6 +74,13 @@ async def root():
         "health": "/health"
     }
 
+@app.get("/health")
+async def health_check():
+    """
+    Health check endpoint that returns the API status.
+    """
+    return {"status": "ok"}
+
 # Add exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
