@@ -95,7 +95,7 @@ def record_loop_feedback(memory: Dict[str, Any], project_id: str, loop_id: int, 
             memory["cto_warnings"] = []
         
         warning = {
-            "type": "loop_rejection",
+            "type": "summary_rejection",
             "loop_id": loop_id,
             "reason": feedback["reason"],
             "timestamp": feedback_entry["timestamp"]
