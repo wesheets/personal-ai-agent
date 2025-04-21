@@ -1,0 +1,61 @@
+{
+  "diagnostic_timestamp": "2025-04-21T13:59:18Z",
+  "deployment_url": "https://web-production-2639.up.railway.app",
+  "diagnostic_results": {
+    "health_endpoint": {
+      "status": "working",
+      "response": {"status": "ok"},
+      "notes": "Basic health endpoint is functioning correctly"
+    },
+    "diagnostics_router_check": {
+      "status": "error",
+      "error_type": "TypeError",
+      "error_message": "object of type 'method' has no len()",
+      "notes": "Diagnostic endpoint was deployed but encountered runtime error when accessing app.middleware"
+    },
+    "schema_injection_test": {
+      "status": "not_tested",
+      "notes": "Could not test due to deployment issues"
+    },
+    "router_registration_analysis": {
+      "status": "partial_diagnosis",
+      "findings": [
+        "Enhanced main.py was successfully deployed",
+        "Test router was registered but encountered runtime error",
+        "Error occurs in the diagnostic endpoint code, not during router registration",
+        "Environment differences between local and production confirmed"
+      ],
+      "likely_causes": [
+        "FastAPI version differences between local and production environments",
+        "Different middleware implementation in production FastAPI version",
+        "Python version differences (local vs Python 3.9 in production)",
+        "Silent import failures during router registration"
+      ]
+    }
+  },
+  "environment_info": {
+    "python_version": "3.9 (confirmed from error traceback)",
+    "fastapi_location": "/usr/local/lib/python3.9/site-packages/fastapi",
+    "starlette_location": "/usr/local/lib/python3.9/site-packages/starlette",
+    "app_location": "/app/app/main.py"
+  },
+  "error_analysis": {
+    "error_location": "router_diagnostics function in main.py",
+    "error_line": "\"middleware_count\": len(app.middleware),",
+    "error_cause": "In production, app.middleware appears to be a method rather than a list/collection",
+    "significance": "Confirms environment differences between local and production"
+  },
+  "deployment_status": {
+    "routes_visible": 5,
+    "diagnostic_routes_working": 0,
+    "core_routes_working": 2,
+    "deployment_success": "partial"
+  },
+  "next_steps": [
+    "Fix middleware access in diagnostic endpoint",
+    "Simplify diagnostic endpoint to avoid environment-specific code",
+    "Add explicit try/except blocks around each middleware access",
+    "Investigate FastAPI version differences between environments",
+    "Test with minimal router implementation focusing only on core functionality"
+  ]
+}
