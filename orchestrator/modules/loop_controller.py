@@ -2,7 +2,7 @@
 Loop Controller Module
 
 This module provides functionality to control loop execution, including
-delusion detection, failure debugging, and belief alignment tracking.
+delusion detection, failure debugging, belief alignment tracking, and CEO insights.
 """
 
 import json
@@ -13,6 +13,7 @@ from typing import Dict, List, Any, Optional, Tuple
 from orchestrator.modules.delusion_detector import detect_plan_delusion, store_rejected_plan
 from agents.debugger_agent import debug_loop_failure
 from agents.historian_agent import analyze_loop_summary
+from agents.ceo_agent import analyze_loop_with_ceo_agent
 from memory.belief_reference import load_beliefs_from_file, get_recent_loops
 
 def evaluate_plan_with_delusion_detector(
@@ -350,6 +351,87 @@ def handle_loop_failure(
     # Return result
     return debug_result
 
+def process_loop_with_ceo_agent(
+    loop_id: str,
+    loop_summary: str,
+    memory: Dict[str, Any],
+    config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Analyzes a loop summary using the CEO agent to evaluate alignment with system beliefs
+    and track operator satisfaction.
+    
+    Args:
+        loop_id (str): The loop identifier
+        loop_summary (str): The summary text of the completed loop
+        memory (Dict[str, Any]): The memory dictionary
+        config (Optional[Dict[str, Any]]): Configuration options
+        
+    Returns:
+        Dict[str, Any]: Result of the analysis, including updated memory with CEO insights
+    """
+    # Use default config if none provided
+    if config is None:
+        config = {
+            "enabled": True,
+            "beliefs_file": "orchestrator_beliefs.json",
+            "alignment_threshold": 0.6,
+            "recent_loops_count": 10,
+            "review_window_size": 5
+        }
+    
+    # Skip analysis if disabled
+    if not config.get("enabled", True):
+        return {
+            "status": "skipped",
+            "memory": memory,
+            "message": "CEO agent is disabled"
+        }
+    
+    # Load beliefs from file
+    beliefs_file = config.get("beliefs_file", "orchestrator_beliefs.json")
+    beliefs = load_beliefs_from_file(beliefs_file)
+    
+    if not beliefs:
+        return {
+            "status": "error",
+            "memory": memory,
+            "message": f"Failed to load beliefs from {beliefs_file}"
+        }
+    
+    # Analyze loop summary with CEO agent
+    updated_memory = analyze_loop_with_ceo_agent(
+        loop_id,
+        loop_summary,
+        beliefs,
+        memory,
+        config
+    )
+    
+    # Check if insights were generated
+    has_insights = False
+    if "ceo_insights" in updated_memory:
+        for insight in updated_memory["ceo_insights"]:
+            if insight["loop_id"] == loop_id:
+                has_insights = True
+                alignment_score = insight["alignment_score"]
+                insight_type = insight["insight_type"]
+                break
+    
+    # Return result
+    if has_insights:
+        return {
+            "status": "analyzed",
+            "memory": updated_memory,
+            "message": f"Loop analyzed by CEO: {insight_type} with alignment score {alignment_score:.2f}"
+        }
+    else:
+        return {
+            "status": "ok",
+            "memory": updated_memory,
+            "message": "No CEO insights generated (alignment within acceptable threshold)"
+        }
+
 def handle_loop_completion(
     loop_id: str,
     loop_summary: str,
@@ -357,7 +439,7 @@ def handle_loop_completion(
     config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
-    Handles loop completion with historian agent analysis.
+    Handles loop completion with historian agent and CEO agent analysis.
     
     Args:
         loop_id (str): The loop identifier
@@ -375,17 +457,43 @@ def handle_loop_completion(
                 "enabled": True,
                 "beliefs_file": "orchestrator_beliefs.json",
                 "recent_loops_count": 10
+            },
+            "ceo_agent": {
+                "enabled": True,
+                "beliefs_file": "orchestrator_beliefs.json",
+                "alignment_threshold": 0.6,
+                "recent_loops_count": 10,
+                "review_window_size": 5
             }
         }
     
     # Analyze loop with historian agent
     historian_config = config.get("historian_agent", {"enabled": True})
-    analysis_result = analyze_loop_with_historian_agent(
+    historian_result = analyze_loop_with_historian_agent(
         loop_id,
         loop_summary,
         memory,
         historian_config
     )
     
-    # Return result
-    return analysis_result
+    # Update memory with historian analysis results
+    memory = historian_result["memory"]
+    
+    # Analyze loop with CEO agent
+    ceo_config = config.get("ceo_agent", {"enabled": True})
+    ceo_result = process_loop_with_ceo_agent(
+        loop_id,
+        loop_summary,
+        memory,
+        ceo_config
+    )
+    
+    # Combine results
+    combined_result = {
+        "status": "completed",
+        "memory": ceo_result["memory"],
+        "message": f"Historian: {historian_result['message']}; CEO: {ceo_result['message']}"
+    }
+    
+    # Return combined result
+    return combined_result
