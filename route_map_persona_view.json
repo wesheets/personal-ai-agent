@@ -1,0 +1,1963 @@
+{
+  "metadata": {
+    "total_routes": 33,
+    "generated_at": "2025-04-21T09:02:28.676678",
+    "version": "1.0.0"
+  },
+  "personas": {
+    "SAGE": {
+      "description": "Default mode focused on balanced execution",
+      "capabilities": [
+        "Persona management",
+        "Loop execution control",
+        "System health monitoring",
+        "Memory management"
+      ],
+      "routes": [
+        {
+          "path": "/health",
+          "name": "health_check",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "health_check",
+          "tags": [
+            "core"
+          ],
+          "description": "Health check endpoint.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/system/status",
+          "name": "system_status",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "system_status",
+          "tags": [
+            "core"
+          ],
+          "description": "Get system status including environment and module load state.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/memory/read",
+          "name": "read_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "read_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Retrieve memory by key.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "key",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/write",
+          "name": "write_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "write_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Direct memory injection.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/delete",
+          "name": "delete_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "delete_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Clear keys from memory.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, str]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/loop/trace",
+          "name": "get_loop_trace",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_loop_trace",
+          "tags": [
+            "loop"
+          ],
+          "description": "Get loop memory trace log.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/loop/trace",
+          "name": "add_loop_trace",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "add_loop_trace",
+          "tags": [
+            "loop"
+          ],
+          "description": "Inject synthetic loop trace.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/loop/reset",
+          "name": "reset_loop",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "reset_loop",
+          "tags": [
+            "loop"
+          ],
+          "description": "Memory reset for clean test runs.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/loop/persona-reflect",
+          "name": "persona_reflect",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "persona_reflect",
+          "tags": [
+            "loop"
+          ],
+          "description": "Inject mode-aligned reflection trace.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/analyze-prompt",
+          "name": "analyze_prompt",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "analyze_prompt",
+          "tags": [
+            "agent"
+          ],
+          "description": "Thought Partner prompt analysis.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/generate-variants",
+          "name": "generate_variants",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "generate_variants",
+          "tags": [
+            "agent"
+          ],
+          "description": "Thought Variant Generator.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/plan-and-execute",
+          "name": "plan_and_execute",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "plan_and_execute",
+          "tags": [
+            "agent"
+          ],
+          "description": "HAL, ASH, NOVA execution.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/run-critic",
+          "name": "run_critic",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "run_critic",
+          "tags": [
+            "agent"
+          ],
+          "description": "Loop summary review.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/pessimist-check",
+          "name": "pessimist_check",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "pessimist_check",
+          "tags": [
+            "agent"
+          ],
+          "description": "Tone realism scoring.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/ceo-review",
+          "name": "ceo_review",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "ceo_review",
+          "tags": [
+            "agent"
+          ],
+          "description": "Alignment + Operator satisfaction.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/cto-review",
+          "name": "cto_review",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "cto_review",
+          "tags": [
+            "agent"
+          ],
+          "description": "Trust decay + loop health.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/historian-check",
+          "name": "historian_check",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "historian_check",
+          "tags": [
+            "agent"
+          ],
+          "description": "Forgotten belief analysis.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/drift-summary",
+          "name": "drift_summary",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "drift_summary",
+          "tags": [
+            "agent"
+          ],
+          "description": "Aggregated loop-level drift.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/generate-weekly-drift-report",
+          "name": "generate_weekly_drift_report",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "generate_weekly_drift_report",
+          "tags": [
+            "agent"
+          ],
+          "description": "Weekly system meta-summary.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/switch",
+          "name": "switch_persona",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "switch_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Change active mode.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/current",
+          "name": "get_current_persona",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_current_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Return current orchestrator_persona.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/mode/trace",
+          "name": "get_mode_trace",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_mode_trace",
+          "tags": [
+            "persona"
+          ],
+          "description": "Trace of persona usage over loops.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        }
+      ],
+      "route_count": 22
+    },
+    "ARCHITECT": {
+      "description": "Focused on system design and structure",
+      "capabilities": [
+        "Persona management",
+        "System debugging",
+        "System health monitoring",
+        "Memory management"
+      ],
+      "routes": [
+        {
+          "path": "/health",
+          "name": "health_check",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "health_check",
+          "tags": [
+            "core"
+          ],
+          "description": "Health check endpoint.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/system/status",
+          "name": "system_status",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "system_status",
+          "tags": [
+            "core"
+          ],
+          "description": "Get system status including environment and module load state.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/memory/read",
+          "name": "read_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "read_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Retrieve memory by key.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "key",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/write",
+          "name": "write_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "write_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Direct memory injection.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/delete",
+          "name": "delete_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "delete_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Clear keys from memory.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, str]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/switch",
+          "name": "switch_persona",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "switch_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Change active mode.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/current",
+          "name": "get_current_persona",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_current_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Return current orchestrator_persona.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/mode/trace",
+          "name": "get_mode_trace",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_mode_trace",
+          "tags": [
+            "persona"
+          ],
+          "description": "Trace of persona usage over loops.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/api/debug/orchestrator/reflection/{project_id}",
+          "name": "get_last_reflection",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_last_reflection",
+          "tags": [
+            "debug"
+          ],
+          "description": "Get the last reflection for a project.\n\nArgs:\n    project_id: The project identifier\n    \nReturns:\n    The last reflection record\n    \nRaises:\n    HTTPException: If the project doesn't exist or has no reflection",
+          "response_model": "Dict",
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "project_id",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/api/debug/orchestrator/reflections/{project_id}",
+          "name": "get_all_reflections",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_all_reflections",
+          "tags": [
+            "debug"
+          ],
+          "description": "Get all reflections for a project.\n\nArgs:\n    project_id: The project identifier\n    \nReturns:\n    Dict containing all reflection records\n    \nRaises:\n    HTTPException: If the project doesn't exist",
+          "response_model": "Dict",
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "project_id",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/api/debug/orchestrator/decisions/{project_id}",
+          "name": "get_orchestrator_decisions",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_orchestrator_decisions",
+          "tags": [
+            "debug"
+          ],
+          "description": "Get all orchestrator decisions for a project.\n\nArgs:\n    project_id: The project identifier\n    \nReturns:\n    Dict containing all decision records\n    \nRaises:\n    HTTPException: If the project doesn't exist",
+          "response_model": "Dict",
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "project_id",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/api/debug/orchestrator/execution/{project_id}",
+          "name": "get_orchestrator_exec_log",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_orchestrator_exec_log",
+          "tags": [
+            "debug"
+          ],
+          "description": "Get all execution log entries for a project.\n\nArgs:\n    project_id: The project identifier\n    \nReturns:\n    Dict containing all execution log entries\n    \nRaises:\n    HTTPException: If the project doesn't exist",
+          "response_model": "Dict",
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "project_id",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/api/debug/orchestrator/deviation/{project_id}",
+          "name": "check_deviation",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "check_deviation",
+          "tags": [
+            "debug"
+          ],
+          "description": "Check for deviations in the project state that might require intervention.\n\nArgs:\n    project_id: The project identifier\n    \nReturns:\n    Dict containing identified issues, empty if no issues found\n    \nRaises:\n    HTTPException: If the project doesn't exist",
+          "response_model": "Dict",
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "project_id",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/api/debug/orchestrator/reroute/{project_id}",
+          "name": "get_reroute_trace",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_reroute_trace",
+          "tags": [
+            "debug"
+          ],
+          "description": "Get the reroute trace for a project.\n\nArgs:\n    project_id: The project identifier\n    \nReturns:\n    Dict containing the reroute trace\n    \nRaises:\n    HTTPException: If the project doesn't exist",
+          "response_model": "Dict",
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "project_id",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/api/debug/memory/{project_id}",
+          "name": "get_project_memory",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_project_memory",
+          "tags": [
+            "debug"
+          ],
+          "description": "Get the entire memory for a project.\n\nArgs:\n    project_id: The project identifier\n    \nReturns:\n    The project memory\n    \nRaises:\n    HTTPException: If the project doesn't exist",
+          "response_model": "Dict",
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "project_id",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "route_count": 15
+    },
+    "RESEARCHER": {
+      "description": "Focused on information gathering and analysis",
+      "capabilities": [
+        "Persona management",
+        "System health monitoring",
+        "Memory management"
+      ],
+      "routes": [
+        {
+          "path": "/health",
+          "name": "health_check",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "health_check",
+          "tags": [
+            "core"
+          ],
+          "description": "Health check endpoint.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/system/status",
+          "name": "system_status",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "system_status",
+          "tags": [
+            "core"
+          ],
+          "description": "Get system status including environment and module load state.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/memory/read",
+          "name": "read_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "read_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Retrieve memory by key.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "key",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/write",
+          "name": "write_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "write_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Direct memory injection.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/delete",
+          "name": "delete_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "delete_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Clear keys from memory.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, str]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/analyze-prompt",
+          "name": "analyze_prompt",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "analyze_prompt",
+          "tags": [
+            "agent"
+          ],
+          "description": "Thought Partner prompt analysis.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/generate-variants",
+          "name": "generate_variants",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "generate_variants",
+          "tags": [
+            "agent"
+          ],
+          "description": "Thought Variant Generator.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/plan-and-execute",
+          "name": "plan_and_execute",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "plan_and_execute",
+          "tags": [
+            "agent"
+          ],
+          "description": "HAL, ASH, NOVA execution.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/run-critic",
+          "name": "run_critic",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "run_critic",
+          "tags": [
+            "agent"
+          ],
+          "description": "Loop summary review.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/pessimist-check",
+          "name": "pessimist_check",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "pessimist_check",
+          "tags": [
+            "agent"
+          ],
+          "description": "Tone realism scoring.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/ceo-review",
+          "name": "ceo_review",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "ceo_review",
+          "tags": [
+            "agent"
+          ],
+          "description": "Alignment + Operator satisfaction.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/cto-review",
+          "name": "cto_review",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "cto_review",
+          "tags": [
+            "agent"
+          ],
+          "description": "Trust decay + loop health.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/historian-check",
+          "name": "historian_check",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "historian_check",
+          "tags": [
+            "agent"
+          ],
+          "description": "Forgotten belief analysis.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/drift-summary",
+          "name": "drift_summary",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "drift_summary",
+          "tags": [
+            "agent"
+          ],
+          "description": "Aggregated loop-level drift.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/generate-weekly-drift-report",
+          "name": "generate_weekly_drift_report",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "generate_weekly_drift_report",
+          "tags": [
+            "agent"
+          ],
+          "description": "Weekly system meta-summary.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/switch",
+          "name": "switch_persona",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "switch_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Change active mode.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/current",
+          "name": "get_current_persona",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_current_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Return current orchestrator_persona.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/mode/trace",
+          "name": "get_mode_trace",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_mode_trace",
+          "tags": [
+            "persona"
+          ],
+          "description": "Trace of persona usage over loops.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        }
+      ],
+      "route_count": 18
+    },
+    "RITUALIST": {
+      "description": "Focused on precise, methodical execution",
+      "capabilities": [
+        "Persona management",
+        "Loop execution control",
+        "System health monitoring",
+        "Memory management"
+      ],
+      "routes": [
+        {
+          "path": "/health",
+          "name": "health_check",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "health_check",
+          "tags": [
+            "core"
+          ],
+          "description": "Health check endpoint.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/system/status",
+          "name": "system_status",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "system_status",
+          "tags": [
+            "core"
+          ],
+          "description": "Get system status including environment and module load state.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/memory/read",
+          "name": "read_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "read_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Retrieve memory by key.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "key",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/write",
+          "name": "write_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "write_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Direct memory injection.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/delete",
+          "name": "delete_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "delete_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Clear keys from memory.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, str]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/loop/trace",
+          "name": "get_loop_trace",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_loop_trace",
+          "tags": [
+            "loop"
+          ],
+          "description": "Get loop memory trace log.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/loop/trace",
+          "name": "add_loop_trace",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "add_loop_trace",
+          "tags": [
+            "loop"
+          ],
+          "description": "Inject synthetic loop trace.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/loop/reset",
+          "name": "reset_loop",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "reset_loop",
+          "tags": [
+            "loop"
+          ],
+          "description": "Memory reset for clean test runs.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/loop/persona-reflect",
+          "name": "persona_reflect",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "persona_reflect",
+          "tags": [
+            "loop"
+          ],
+          "description": "Inject mode-aligned reflection trace.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/switch",
+          "name": "switch_persona",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "switch_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Change active mode.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/current",
+          "name": "get_current_persona",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_current_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Return current orchestrator_persona.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/mode/trace",
+          "name": "get_mode_trace",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_mode_trace",
+          "tags": [
+            "persona"
+          ],
+          "description": "Trace of persona usage over loops.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        }
+      ],
+      "route_count": 12
+    },
+    "INVENTOR": {
+      "description": "Focused on creative problem-solving",
+      "capabilities": [
+        "Persona management",
+        "System health monitoring",
+        "Memory management"
+      ],
+      "routes": [
+        {
+          "path": "/health",
+          "name": "health_check",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "health_check",
+          "tags": [
+            "core"
+          ],
+          "description": "Health check endpoint.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/system/status",
+          "name": "system_status",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "system_status",
+          "tags": [
+            "core"
+          ],
+          "description": "Get system status including environment and module load state.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/memory/read",
+          "name": "read_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "read_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Retrieve memory by key.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "key",
+              "type": "<class 'str'>",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/write",
+          "name": "write_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "write_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Direct memory injection.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/memory/delete",
+          "name": "delete_memory",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "delete_memory",
+          "tags": [
+            "core"
+          ],
+          "description": "Clear keys from memory.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, str]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/analyze-prompt",
+          "name": "analyze_prompt",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "analyze_prompt",
+          "tags": [
+            "agent"
+          ],
+          "description": "Thought Partner prompt analysis.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/generate-variants",
+          "name": "generate_variants",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "generate_variants",
+          "tags": [
+            "agent"
+          ],
+          "description": "Thought Variant Generator.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/plan-and-execute",
+          "name": "plan_and_execute",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "plan_and_execute",
+          "tags": [
+            "agent"
+          ],
+          "description": "HAL, ASH, NOVA execution.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/run-critic",
+          "name": "run_critic",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "run_critic",
+          "tags": [
+            "agent"
+          ],
+          "description": "Loop summary review.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/pessimist-check",
+          "name": "pessimist_check",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "pessimist_check",
+          "tags": [
+            "agent"
+          ],
+          "description": "Tone realism scoring.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/ceo-review",
+          "name": "ceo_review",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "ceo_review",
+          "tags": [
+            "agent"
+          ],
+          "description": "Alignment + Operator satisfaction.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/cto-review",
+          "name": "cto_review",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "cto_review",
+          "tags": [
+            "agent"
+          ],
+          "description": "Trust decay + loop health.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/historian-check",
+          "name": "historian_check",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "historian_check",
+          "tags": [
+            "agent"
+          ],
+          "description": "Forgotten belief analysis.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/drift-summary",
+          "name": "drift_summary",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "drift_summary",
+          "tags": [
+            "agent"
+          ],
+          "description": "Aggregated loop-level drift.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/generate-weekly-drift-report",
+          "name": "generate_weekly_drift_report",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "generate_weekly_drift_report",
+          "tags": [
+            "agent"
+          ],
+          "description": "Weekly system meta-summary.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/switch",
+          "name": "switch_persona",
+          "methods": [
+            "POST"
+          ],
+          "endpoint": "switch_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Change active mode.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": [
+            {
+              "name": "data",
+              "type": "typing.Dict[str, typing.Any]",
+              "required": true
+            }
+          ]
+        },
+        {
+          "path": "/persona/current",
+          "name": "get_current_persona",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_current_persona",
+          "tags": [
+            "persona"
+          ],
+          "description": "Return current orchestrator_persona.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        },
+        {
+          "path": "/mode/trace",
+          "name": "get_mode_trace",
+          "methods": [
+            "GET"
+          ],
+          "endpoint": "get_mode_trace",
+          "tags": [
+            "persona"
+          ],
+          "description": "Trace of persona usage over loops.",
+          "response_model": null,
+          "status_code": null,
+          "deprecated": null,
+          "operation_id": null,
+          "include_in_schema": true,
+          "parameters": []
+        }
+      ],
+      "route_count": 18
+    }
+  }
+}
