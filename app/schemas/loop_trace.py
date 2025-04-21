@@ -67,6 +67,26 @@ class LoopTraceItem(BaseModel):
     orchestrator_persona: Optional[str] = Field(default="SAGE", description="Active persona during loop execution")
     persona_switch_reason: Optional[str] = Field(default="default", description="Reason for persona selection")
     reflection_persona: Optional[str] = None
+    
+    # NEW FIELDS FOR COGNITIVE CONTROL LAYER
+    
+    # Fields for belief reference
+    belief_reference: Optional[List[str]] = Field(default_factory=list, description="Core beliefs referenced during execution")
+    belief_conflict: Optional[bool] = Field(default=False, description="Whether a belief conflict was detected")
+    
+    # Fields for agent permission enforcement
+    agent_violations: Optional[List[Dict[str, Any]]] = Field(default_factory=list, description="Record of agent permission violations")
+    permission_violation: Optional[bool] = Field(default=False, description="Whether any agent permission violations occurred")
+    
+    # Fields for loop validation
+    loop_validation: Optional[str] = Field(default="passed", description="Result of loop validation (passed/failed)")
+    validation_reason: Optional[str] = Field(default=None, description="Reason for validation failure, if applicable")
+    
+    # Fields for reflection depth control
+    depth: Optional[str] = Field(default="standard", description="Reflection depth (shallow/standard/deep)")
+    reflection_agents: Optional[List[str]] = Field(default_factory=list, description="Agents involved in reflection")
+    depth_escalation: Optional[bool] = Field(default=False, description="Whether depth was escalated during processing")
+    depth_escalation_reason: Optional[str] = Field(default=None, description="Reason for depth escalation, if applicable")
 
 class LoopReflectionResult(BaseModel):
     """
@@ -93,6 +113,19 @@ class LoopReflectionResult(BaseModel):
     # Fields for rerun reasoning
     rerun_trigger: Optional[List[str]] = Field(default_factory=list, description="Components that triggered the rerun")
     rerun_reason_detail: Optional[str] = Field(default=None, description="Detailed reason for the rerun")
+    
+    # NEW FIELDS FOR COGNITIVE CONTROL LAYER
+    
+    # Fields for belief reference
+    belief_reference: Optional[List[str]] = Field(default_factory=list, description="Core beliefs referenced during reflection")
+    belief_conflict: Optional[bool] = Field(default=False, description="Whether a belief conflict was detected")
+    
+    # Fields for agent permission enforcement
+    agent_violations: Optional[List[Dict[str, Any]]] = Field(default_factory=list, description="Record of agent permission violations")
+    
+    # Fields for reflection depth control
+    depth: Optional[str] = Field(default="standard", description="Reflection depth used (shallow/standard/deep)")
+    reflection_agents: Optional[List[str]] = Field(default_factory=list, description="Agents involved in reflection")
 
 class LoopCompleteRequest(BaseModel):
     """
@@ -109,6 +142,12 @@ class LoopCompleteRequest(BaseModel):
     override_max_reruns: Optional[bool] = Field(default=False, description="Whether to override max reruns limit")
     override_reason: Optional[str] = Field(default=None, description="Reason for the override")
     override_by: Optional[str] = Field(default=None, description="Who performed the override")
+    
+    # NEW FIELDS FOR COGNITIVE CONTROL LAYER
+    
+    # Fields for reflection depth control
+    depth: Optional[str] = Field(default="standard", description="Requested reflection depth (shallow/standard/deep)")
+    belief_reference: Optional[List[str]] = Field(default_factory=list, description="Core beliefs to reference during reflection")
 
 class RerunDecision(BaseModel):
     """
@@ -135,6 +174,15 @@ class RerunDecision(BaseModel):
     rerun_trigger: Optional[List[str]] = Field(default_factory=list, description="Components that triggered the rerun")
     rerun_reason_detail: Optional[str] = Field(default=None, description="Detailed reason for the rerun")
     overridden_by: Optional[str] = Field(default=None, description="Who overrode the rerun decision, if applicable")
+    
+    # NEW FIELDS FOR COGNITIVE CONTROL LAYER
+    
+    # Fields for belief reference
+    belief_reference: Optional[List[str]] = Field(default_factory=list, description="Core beliefs referenced in decision")
+    
+    # Fields for reflection depth control
+    depth: Optional[str] = Field(default="standard", description="Reflection depth for rerun (shallow/standard/deep)")
+    depth_escalation: Optional[bool] = Field(default=False, description="Whether depth was escalated for rerun")
 
 class BiasTag(BaseModel):
     """
@@ -149,3 +197,21 @@ class BiasTag(BaseModel):
     first_detected: Optional[str] = Field(default=None, description="Timestamp when this bias was first detected")
     last_detected: Optional[str] = Field(default=None, description="Timestamp when this bias was last detected")
     loops_affected: Optional[List[str]] = Field(default_factory=list, description="List of loop IDs where this bias was detected")
+    
+    # NEW FIELDS FOR COGNITIVE CONTROL LAYER
+    
+    # Fields for belief conflict
+    belief_conflicts: Optional[List[str]] = Field(default_factory=list, description="Core beliefs that conflict with this bias")
+
+class AgentPermissionViolation(BaseModel):
+    """
+    Model for an agent permission violation.
+    
+    Represents a case where an agent attempted an action not in its allowlist.
+    """
+    agent: str = Field(..., description="The agent that attempted the action")
+    attempted_action: str = Field(..., description="The action that was attempted")
+    allowed_actions: List[str] = Field(..., description="The actions that are allowed for this agent")
+    timestamp: str = Field(..., description="When the violation occurred")
+    loop_id: str = Field(..., description="The loop in which the violation occurred")
+    substituted_action: Optional[str] = Field(default=None, description="The action that was substituted, if any")
