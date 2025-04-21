@@ -6,6 +6,7 @@ This module defines the agent-related routes for the Promethios API.
 
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional, List
+from app.utils.persona_utils import get_current_persona
 
 router = APIRouter(tags=["agent"])
 
@@ -20,6 +21,11 @@ async def analyze_prompt(data: Dict[str, Any]):
     if not prompt or not loop_id:
         raise HTTPException(status_code=400, detail="prompt and loop_id are required")
     
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
+    
     # This would normally analyze the prompt
     # For now, return a mock response
     return {
@@ -31,6 +37,7 @@ async def analyze_prompt(data: Dict[str, Any]):
             "required_agents": ["researcher", "planner", "critic"]
         },
         "loop_id": loop_id,
+        "orchestrator_persona": orchestrator_persona,
         "status": "success"
     }
 
@@ -44,6 +51,11 @@ async def generate_variants(data: Dict[str, Any]):
     
     if not plan or not loop_id:
         raise HTTPException(status_code=400, detail="plan and loop_id are required")
+    
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
     
     # This would normally generate plan variants
     # For now, return a mock response
@@ -65,6 +77,7 @@ async def generate_variants(data: Dict[str, Any]):
             }
         ],
         "loop_id": loop_id,
+        "orchestrator_persona": orchestrator_persona,
         "status": "success"
     }
 
@@ -78,6 +91,11 @@ async def plan_and_execute(data: Dict[str, Any]):
     
     if not prompt or not loop_id:
         raise HTTPException(status_code=400, detail="prompt and loop_id are required")
+    
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
     
     # This would normally plan and execute
     # For now, return a mock response
@@ -95,6 +113,7 @@ async def plan_and_execute(data: Dict[str, Any]):
             "agents_used": ["HAL", "ASH", "NOVA"]
         },
         "loop_id": loop_id,
+        "orchestrator_persona": orchestrator_persona,
         "status": "success"
     }
 
@@ -109,6 +128,11 @@ async def run_critic(data: Dict[str, Any]):
     if not summary or not loop_id:
         raise HTTPException(status_code=400, detail="summary and loop_id are required")
     
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
+    
     # This would normally run the critic
     # For now, return a mock response
     return {
@@ -120,6 +144,7 @@ async def run_critic(data: Dict[str, Any]):
             "suggestions": []
         },
         "loop_id": loop_id,
+        "reflection_persona": orchestrator_persona,
         "status": "success"
     }
 
@@ -134,6 +159,11 @@ async def pessimist_check(data: Dict[str, Any]):
     if not summary or not loop_id:
         raise HTTPException(status_code=400, detail="summary and loop_id are required")
     
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
+    
     # This would normally run the pessimist check
     # For now, return a mock response
     return {
@@ -144,6 +174,7 @@ async def pessimist_check(data: Dict[str, Any]):
             "warnings": []
         },
         "loop_id": loop_id,
+        "reflection_persona": orchestrator_persona,
         "status": "success"
     }
 
@@ -158,6 +189,11 @@ async def ceo_review(data: Dict[str, Any]):
     if not summary or not loop_id:
         raise HTTPException(status_code=400, detail="summary and loop_id are required")
     
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
+    
     # This would normally run the CEO review
     # For now, return a mock response
     return {
@@ -168,6 +204,7 @@ async def ceo_review(data: Dict[str, Any]):
             "recommendations": []
         },
         "loop_id": loop_id,
+        "reflection_persona": orchestrator_persona,
         "status": "success"
     }
 
@@ -183,6 +220,11 @@ async def cto_review(data: Dict[str, Any]):
     if not summary or not loop_id or not plan:
         raise HTTPException(status_code=400, detail="summary, loop_id, and plan are required")
     
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
+    
     # This would normally run the CTO review
     # For now, return a mock response
     return {
@@ -194,6 +236,7 @@ async def cto_review(data: Dict[str, Any]):
             "recommendations": []
         },
         "loop_id": loop_id,
+        "reflection_persona": orchestrator_persona,
         "status": "success"
     }
 
@@ -208,6 +251,11 @@ async def historian_check(data: Dict[str, Any]):
     if not summary or not loop_id:
         raise HTTPException(status_code=400, detail="summary and loop_id are required")
     
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
+    
     # This would normally run the historian check
     # For now, return a mock response
     return {
@@ -218,6 +266,7 @@ async def historian_check(data: Dict[str, Any]):
             "warnings": []
         },
         "loop_id": loop_id,
+        "reflection_persona": orchestrator_persona,
         "status": "success"
     }
 
@@ -231,6 +280,11 @@ async def drift_summary(data: Dict[str, Any]):
     if not loop_id:
         raise HTTPException(status_code=400, detail="loop_id is required")
     
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
+    
     # This would normally generate a drift summary
     # For now, return a mock response
     return {
@@ -242,6 +296,7 @@ async def drift_summary(data: Dict[str, Any]):
             "recommendations": []
         },
         "loop_id": loop_id,
+        "reflection_persona": orchestrator_persona,
         "status": "success"
     }
 
@@ -254,6 +309,11 @@ async def generate_weekly_drift_report(data: Dict[str, Any]):
     
     if not loop_id:
         raise HTTPException(status_code=400, detail="loop_id is required")
+    
+    # Get the current persona for this loop
+    orchestrator_persona = data.get("orchestrator_persona")
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(loop_id)
     
     # This would normally generate a weekly drift report
     # For now, return a mock response
@@ -273,5 +333,6 @@ async def generate_weekly_drift_report(data: Dict[str, Any]):
             },
             "recommendations": []
         },
+        "orchestrator_persona": orchestrator_persona,
         "status": "success"
     }

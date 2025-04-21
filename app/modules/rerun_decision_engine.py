@@ -9,6 +9,7 @@ from typing import Dict, Any, Optional
 import asyncio
 import json
 import re
+from app.utils.persona_utils import get_current_persona, preload_persona_for_deep_loop
 
 # Configuration for rerun thresholds
 # These could be moved to a config file in a real implementation
@@ -31,7 +32,8 @@ async def read_from_memory(key: str) -> Optional[Any]:
             "loop_id": "loop_001",
             "status": "completed",
             "timestamp": "2025-04-21T12:00:00Z",
-            "summary": "Analyzed quantum computing concepts"
+            "summary": "Analyzed quantum computing concepts",
+            "orchestrator_persona": "SAGE"
         }
     elif key.startswith("loop_trace[loop_001_r"):
         rerun_num = int(key.split("_r")[1].split("]")[0])
@@ -41,7 +43,8 @@ async def read_from_memory(key: str) -> Optional[Any]:
                 "rerun_of": f"loop_001_r{rerun_num-1}" if rerun_num > 1 else "loop_001",
                 "status": "completed",
                 "timestamp": "2025-04-21T12:30:00Z",
-                "summary": f"Reanalyzed quantum computing concepts (rerun {rerun_num})"
+                "summary": f"Reanalyzed quantum computing concepts (rerun {rerun_num})",
+                "orchestrator_persona": "SAGE"
             }
     
     return None
@@ -143,6 +146,9 @@ async def evaluate_rerun_decision(
         current_trace = await read_from_memory(f"loop_trace[{loop_id}]")
         
         if current_trace:
+            # Get the current persona or preload for deep loop
+            orchestrator_persona = preload_persona_for_deep_loop(loop_id, current_rerun_num + 1)
+            
             # Create a new trace for the rerun
             new_trace = {
                 "loop_id": next_loop_id,
@@ -150,7 +156,9 @@ async def evaluate_rerun_decision(
                 "rerun_reason": rerun_reason,
                 "status": "pending",
                 "timestamp": "2025-04-21T12:45:00Z",  # This would be the current time in a real implementation
-                "depth": "deep"  # As specified in requirements
+                "depth": "deep",  # As specified in requirements
+                "orchestrator_persona": orchestrator_persona,  # Include persona in rerun
+                "rerun_depth": current_rerun_num + 1
             }
             
             # Store the new trace
@@ -161,14 +169,19 @@ async def evaluate_rerun_decision(
                 "original_loop_id": loop_id,
                 "new_loop_id": next_loop_id,
                 "rerun_reason": rerun_reason,
-                "rerun_number": current_rerun_num + 1
+                "rerun_number": current_rerun_num + 1,
+                "orchestrator_persona": orchestrator_persona  # Include persona in response
             }
     
     # If no rerun is needed, finalize the loop
     await write_to_memory(f"loop_trace[{loop_id}].status", "finalized")
     
+    # Get the current persona
+    orchestrator_persona = get_current_persona(loop_id)
+    
     return {
         "decision": "finalize",
         "loop_id": loop_id,
-        "reason": rerun_reason if rerun_reason == "max_reruns_reached" else "no_issues_detected"
+        "reason": rerun_reason if rerun_reason == "max_reruns_reached" else "no_issues_detected",
+        "orchestrator_persona": orchestrator_persona  # Include persona in response
     }

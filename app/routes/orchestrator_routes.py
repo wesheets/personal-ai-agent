@@ -9,9 +9,9 @@ from typing import Dict, Any, Optional, List
 from pydantic import BaseModel
 
 # Import the post_loop_summary_handler and rerun_decision_engine modules
-# These will be created in subsequent steps
 from app.modules.post_loop_summary_handler import process_loop_reflection
 from app.modules.rerun_decision_engine import evaluate_rerun_decision
+from app.utils.persona_utils import get_current_persona
 
 router = APIRouter(tags=["orchestrator"])
 
@@ -19,6 +19,7 @@ class LoopCompleteRequest(BaseModel):
     """Request model for loop-complete endpoint."""
     loop_id: str
     reflection_status: str
+    orchestrator_persona: Optional[str] = None
 
 @router.post("/orchestrator/loop-complete")
 async def loop_complete(request: LoopCompleteRequest):
@@ -40,6 +41,11 @@ async def loop_complete(request: LoopCompleteRequest):
     if request.reflection_status != "done":
         raise HTTPException(status_code=400, detail="reflection_status must be 'done'")
     
+    # Get the current persona for this loop if not provided
+    orchestrator_persona = request.orchestrator_persona
+    if not orchestrator_persona:
+        orchestrator_persona = get_current_persona(request.loop_id)
+    
     try:
         # Process loop reflection by gathering outputs from all reflection agents
         reflection_result = await process_loop_reflection(request.loop_id)
@@ -55,6 +61,7 @@ async def loop_complete(request: LoopCompleteRequest):
         return {
             "status": "success",
             "loop_id": request.loop_id,
+            "orchestrator_persona": orchestrator_persona,
             "reflection_result": reflection_result,
             "rerun_decision": rerun_decision
         }

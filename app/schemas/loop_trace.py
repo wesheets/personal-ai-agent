@@ -43,6 +43,11 @@ class LoopTraceItem(BaseModel):
     drift_score: Optional[float] = None
     summary_valid: Optional[bool] = None
     belief_conflict_flags: Optional[List[str]] = None
+    
+    # Fields for persona tracking
+    orchestrator_persona: Optional[str] = Field(default="SAGE", description="Active persona during loop execution")
+    persona_switch_reason: Optional[str] = Field(default="default", description="Reason for persona selection")
+    reflection_persona: Optional[str] = None
 
 class LoopReflectionResult(BaseModel):
     """
@@ -56,6 +61,7 @@ class LoopReflectionResult(BaseModel):
     summary_valid: bool
     belief_conflict_flags: Optional[List[str]] = None
     agent_results: Optional[Dict[str, Any]] = None
+    reflection_persona: Optional[str] = Field(default="SAGE", description="Persona used for reflection")
 
 class LoopCompleteRequest(BaseModel):
     """
@@ -65,6 +71,7 @@ class LoopCompleteRequest(BaseModel):
     """
     loop_id: str
     reflection_status: str = Field(..., description="Must be 'done' to trigger reflection")
+    orchestrator_persona: Optional[str] = Field(default="SAGE", description="Persona to use for reflection")
 
 class RerunDecision(BaseModel):
     """
@@ -79,3 +86,4 @@ class RerunDecision(BaseModel):
     rerun_reason: Optional[str] = None
     rerun_number: Optional[int] = None
     reason: Optional[str] = None
+    orchestrator_persona: Optional[str] = Field(default="SAGE", description="Persona to use for rerun")
