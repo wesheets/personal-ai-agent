@@ -42,12 +42,14 @@ from app.routes.core_routes import router as core_router
 from app.routes.loop_routes import router as loop_router
 from app.routes.agent_routes import router as agent_router
 from app.routes.persona_routes import router as persona_router
+from app.routes import debug_routes
 
 # Include routers with correct prefixes (no /api/ prefix)
 app.include_router(core_router)
 app.include_router(loop_router)
 app.include_router(agent_router)
 app.include_router(persona_router)
+app.include_router(debug_routes.router)
 
 # Custom docs endpoint
 @app.get("/docs", include_in_schema=False)
