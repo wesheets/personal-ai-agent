@@ -89,11 +89,17 @@ async def get_previous_loop_trace(loop_id: str) -> Optional[Dict[str, Any]]:
     # Get the current loop trace
     current_trace = await read_from_memory(f"loop_trace[{loop_id}]")
     
-    if not current_trace or not current_trace.get("rerun_of"):
+    # Add type safety check
+    if not isinstance(current_trace, dict):
+        return None
+    
+    # Check if this is a rerun
+    rerun_of = current_trace.get("rerun_of")
+    if not rerun_of:
         return None
     
     # Get the previous loop trace
-    previous_loop_id = current_trace["rerun_of"]
+    previous_loop_id = rerun_of
     previous_trace = await read_from_memory(f"loop_trace[{previous_loop_id}]")
     
     return previous_trace
@@ -151,18 +157,27 @@ async def calculate_fatigue_score(
     fatigue_increased = False
     improvement_detected = False
     
-    # If this is a rerun, calculate improvement and fatigue
-    if previous_trace:
-        # Calculate improvements
+    # If this is a rerun and previous_trace is a dictionary, calculate improvement and fatigue
+    if isinstance(previous_trace, dict):
+        # Calculate improvements with type safety
+        prev_alignment = previous_trace.get("alignment_score", 0.0)
+        prev_drift = previous_trace.get("drift_score", 1.0)
+        
+        # Ensure values are numeric
+        if not isinstance(prev_alignment, (int, float)):
+            prev_alignment = 0.0
+        if not isinstance(prev_drift, (int, float)):
+            prev_drift = 1.0
+            
         alignment_improvement = calculate_improvement(
             alignment_score, 
-            previous_trace.get("alignment_score", 0.0),
+            prev_alignment,
             is_alignment=True
         )
         
         drift_improvement = calculate_improvement(
             drift_score, 
-            previous_trace.get("drift_score", 1.0),
+            prev_drift,
             is_alignment=False
         )
         
@@ -215,13 +230,20 @@ async def update_loop_with_fatigue(
     # Get the current loop trace
     trace = await read_from_memory(f"loop_trace[{loop_id}]")
     
-    if not trace:
+    # Add type safety check
+    if not isinstance(trace, dict):
         return False
     
     # Update the trace with fatigue information
     trace["reflection_fatigue"] = fatigue_result["reflection_fatigue"]
     trace["fatigue_increased"] = fatigue_result["fatigue_increased"]
-    trace["force_finalize"] = trace.get("force_finalize", False) or fatigue_result["force_finalize"]
+    
+    # Safely get force_finalize with type checking
+    force_finalize = trace.get("force_finalize", False)
+    if not isinstance(force_finalize, bool):
+        force_finalize = False
+        
+    trace["force_finalize"] = force_finalize or fatigue_result["force_finalize"]
     
     # Write the updated trace back to memory
     return await write_to_memory(f"loop_trace[{loop_id}]", trace)
@@ -249,8 +271,12 @@ async def process_reflection_fatigue(
     # Get the current loop trace
     trace = await read_from_memory(f"loop_trace[{loop_id}]")
     
-    # Get the previous fatigue score if available
-    previous_fatigue = trace.get("reflection_fatigue", 0.0) if trace else 0.0
+    # Get the previous fatigue score if available with type safety
+    previous_fatigue = 0.0
+    if isinstance(trace, dict):
+        reflection_fatigue = trace.get("reflection_fatigue")
+        if isinstance(reflection_fatigue, (int, float)):
+            previous_fatigue = reflection_fatigue
     
     # Calculate the new fatigue score
     fatigue_result = await calculate_fatigue_score(

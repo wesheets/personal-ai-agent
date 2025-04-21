@@ -148,9 +148,11 @@ async def process_loop_reflection(
     
     if "bias_analysis" in pessimist_result:
         bias_analysis = pessimist_result["bias_analysis"]
-        bias_echo = bias_analysis.get("bias_echo", False)
-        bias_tags = bias_analysis.get("bias_tags", [])
-        bias_repetition_count = bias_analysis.get("repetition_counts", {})
+        # Add type safety checks for bias_analysis
+        if isinstance(bias_analysis, dict):
+            bias_echo = bias_analysis.get("bias_echo", False)
+            bias_tags = bias_analysis.get("bias_tags", [])
+            bias_repetition_count = bias_analysis.get("repetition_counts", {})
     
     ceo_alignment = ceo_result["executive_review"]["alignment_score"]
     drift_score = drift_result["drift_analysis"]["drift_score"]
@@ -178,6 +180,11 @@ async def process_loop_reflection(
         override_fatigue
     )
     
+    # Add type safety check for fatigue_result
+    threshold_exceeded = False
+    if isinstance(fatigue_result, dict):
+        threshold_exceeded = fatigue_result.get("threshold_exceeded", False)
+    
     # Create the reflection result
     reflection_result = {
         "alignment_score": round(alignment_score, 2),
@@ -195,9 +202,9 @@ async def process_loop_reflection(
         "bias_echo": bias_echo,
         "bias_tags": bias_tags,
         "bias_repetition_count": bias_repetition_count,
-        "reflection_fatigue": fatigue_result["reflection_fatigue"],
-        "fatigue_increased": fatigue_result["fatigue_increased"],
-        "threshold_exceeded": fatigue_result.get("threshold_exceeded", False)
+        "reflection_fatigue": fatigue_result["reflection_fatigue"] if isinstance(fatigue_result, dict) else 0.0,
+        "fatigue_increased": fatigue_result["fatigue_increased"] if isinstance(fatigue_result, dict) else False,
+        "threshold_exceeded": threshold_exceeded
     }
     
     # Determine rerun triggers
@@ -215,7 +222,7 @@ async def process_loop_reflection(
     rerun_reason = None
     if bias_echo:
         rerun_reason = "bias_echo_detected"
-    elif fatigue_result.get("threshold_exceeded", False) and not override_fatigue:
+    elif threshold_exceeded and not override_fatigue:
         rerun_reason = "fatigue_threshold_exceeded"
     elif not summary_valid:
         rerun_reason = "summary_invalid"

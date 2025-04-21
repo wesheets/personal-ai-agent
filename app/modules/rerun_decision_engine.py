@@ -134,7 +134,7 @@ async def get_original_loop_id(loop_id: str) -> str:
     current_id = loop_id
     while True:
         trace = await read_from_memory(f"loop_trace[{current_id}]")
-        if not trace or not trace.get("rerun_of"):
+        if not isinstance(trace, dict) or "rerun_of" not in trace:
             break
         current_id = trace["rerun_of"]
     
@@ -163,8 +163,10 @@ async def get_total_rerun_count(loop_id: str) -> int:
     
     # Check the original loop
     original_trace = await read_from_memory(f"loop_trace[{original_id}]")
-    if original_trace:
-        count = original_trace.get("rerun_count", 0)
+    if isinstance(original_trace, dict):
+        rerun_count = original_trace.get("rerun_count")
+        if isinstance(rerun_count, (int, float)):
+            count = int(rerun_count)
     
     # In a real implementation, we would query all loops with the same original ID
     # For this mock implementation, we'll just return the count from the original loop
@@ -189,11 +191,13 @@ async def enforce_rerun_limits(
     # Get the total rerun count for this loop family
     total_reruns = await get_total_rerun_count(loop_id)
     
-    # Get the max reruns limit
-    trace = await read_from_memory(f"loop_trace[{loop_id}]")
+    # Get the max reruns limit with type safety
     max_reruns = RERUN_CONFIG["max_reruns"]
-    if trace and "max_reruns" in trace:
-        max_reruns = trace["max_reruns"]
+    trace = await read_from_memory(f"loop_trace[{loop_id}]")
+    if isinstance(trace, dict) and "max_reruns" in trace:
+        trace_max_reruns = trace.get("max_reruns")
+        if isinstance(trace_max_reruns, (int, float)):
+            max_reruns = int(trace_max_reruns)
     
     # Check if we've hit the limit
     limit_reached = total_reruns >= max_reruns
@@ -202,7 +206,7 @@ async def enforce_rerun_limits(
     force_finalize = limit_reached and not override_max_reruns
     
     # Update the trace with the latest rerun count and limit status
-    if trace:
+    if isinstance(trace, dict):
         trace["rerun_count"] = total_reruns
         trace["max_reruns"] = max_reruns
         trace["force_finalize"] = force_finalize
@@ -248,14 +252,49 @@ async def evaluate_rerun_decision(
     Returns:
         Dict containing the decision and related information
     """
-    # Extract key metrics from reflection result
-    alignment_score = reflection_result.get("alignment_score", 0.0)
-    drift_score = reflection_result.get("drift_score", 1.0)
-    summary_valid = reflection_result.get("summary_valid", False)
-    bias_echo = reflection_result.get("bias_echo", False)
-    reflection_fatigue = reflection_result.get("reflection_fatigue", 0.0)
-    rerun_trigger = reflection_result.get("rerun_trigger", [])
-    rerun_reason = reflection_result.get("rerun_reason")
+    # Extract key metrics from reflection result with type safety
+    alignment_score = 0.0
+    drift_score = 1.0
+    summary_valid = False
+    bias_echo = False
+    reflection_fatigue = 0.0
+    rerun_trigger = []
+    rerun_reason = None
+    reflection_persona = None
+    
+    # Safely extract values if reflection_result is a dictionary
+    if isinstance(reflection_result, dict):
+        # Get alignment score
+        alignment_value = reflection_result.get("alignment_score", 0.0)
+        if isinstance(alignment_value, (int, float)):
+            alignment_score = alignment_value
+            
+        # Get drift score
+        drift_value = reflection_result.get("drift_score", 1.0)
+        if isinstance(drift_value, (int, float)):
+            drift_score = drift_value
+            
+        # Get summary validity
+        summary_valid = reflection_result.get("summary_valid", False)
+        
+        # Get bias echo
+        bias_echo = reflection_result.get("bias_echo", False)
+        
+        # Get reflection fatigue
+        fatigue_value = reflection_result.get("reflection_fatigue", 0.0)
+        if isinstance(fatigue_value, (int, float)):
+            reflection_fatigue = fatigue_value
+            
+        # Get rerun trigger
+        trigger_value = reflection_result.get("rerun_trigger")
+        if isinstance(trigger_value, list):
+            rerun_trigger = trigger_value
+        
+        # Get rerun reason
+        rerun_reason = reflection_result.get("rerun_reason")
+        
+        # Get reflection persona
+        reflection_persona = reflection_result.get("reflection_persona")
     
     # Enforce rerun limits
     rerun_limits = await enforce_rerun_limits(
@@ -316,7 +355,7 @@ async def evaluate_rerun_decision(
             finalize_reason,
             rerun_trigger,
             f"Forced finalization due to {finalize_reason}",
-            reflection_result.get("reflection_persona")
+            reflection_persona
         )
     
     # If rerun is needed, prepare the new loop
@@ -327,7 +366,7 @@ async def evaluate_rerun_decision(
         # Read the current loop trace
         current_trace = await read_from_memory(f"loop_trace[{loop_id}]")
         
-        if current_trace:
+        if isinstance(current_trace, dict):
             # Get the current persona or preload for deep loop
             current_rerun_num = get_rerun_number(loop_id)
             orchestrator_persona = preload_persona_for_deep_loop(loop_id, current_rerun_num + 1)
@@ -361,7 +400,7 @@ async def evaluate_rerun_decision(
             # Update the rerun count on the original loop
             original_id = await get_original_loop_id(loop_id)
             original_trace = await read_from_memory(f"loop_trace[{original_id}]")
-            if original_trace:
+            if isinstance(original_trace, dict):
                 original_trace["rerun_count"] = rerun_limits["rerun_count"] + 1
                 await write_to_memory(f"loop_trace[{original_id}]", original_trace)
             
@@ -373,7 +412,7 @@ async def evaluate_rerun_decision(
                 f"Triggered by {', '.join(rerun_trigger)}",
                 override_by if (override_fatigue and reflection_fatigue > RERUN_CONFIG["fatigue_threshold"]) or 
                                (override_max_reruns and rerun_limits["limit_reached"]) else None,
-                reflection_result.get("reflection_persona")
+                reflection_persona
             )
             
             return {
@@ -412,7 +451,7 @@ async def evaluate_rerun_decision(
             finalize_reason,
             rerun_trigger if rerun_trigger else [],
             f"Finalized due to {finalize_reason}",
-            reflection_result.get("reflection_persona")
+            reflection_persona
         )
     
     return {
@@ -451,8 +490,8 @@ async def make_rerun_decision(
     # Get the reflection result
     reflection_result = await read_from_memory(f"loop_summary[{loop_id}]")
     
-    if not reflection_result:
-        # If no reflection result is available, finalize the loop
+    if not isinstance(reflection_result, dict):
+        # If no reflection result is available or it's not a dictionary, finalize the loop
         return {
             "decision": "finalize",
             "loop_id": loop_id,

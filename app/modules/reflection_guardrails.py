@@ -86,19 +86,24 @@ async def process_loop_completion(
     
     # Extract bias tags for tracking
     bias_tags = []
-    if "agent_results" in reflection_result and "pessimist" in reflection_result["agent_results"]:
-        pessimist_result = reflection_result["agent_results"]["pessimist"]
-        if "bias_analysis" in pessimist_result and "bias_tags_detail" in pessimist_result["bias_analysis"]:
-            bias_tags = pessimist_result["bias_analysis"]["bias_tags_detail"]
+    if isinstance(reflection_result, dict) and "agent_results" in reflection_result:
+        agent_results = reflection_result["agent_results"]
+        if isinstance(agent_results, dict) and "pessimist" in agent_results:
+            pessimist_result = agent_results["pessimist"]
+            if isinstance(pessimist_result, dict) and "bias_analysis" in pessimist_result:
+                bias_analysis = pessimist_result["bias_analysis"]
+                if isinstance(bias_analysis, dict) and "bias_tags_detail" in bias_analysis:
+                    bias_tags = bias_analysis["bias_tags_detail"]
     
     # Track bias if tags are available
     if bias_tags:
         bias_tracking_result = await track_bias(loop_id, bias_tags)
         
         # Update reflection result with bias tracking information
-        reflection_result["bias_echo"] = bias_tracking_result["bias_echo"]
-        reflection_result["repeated_tags"] = bias_tracking_result["repeated_tags"]
-        reflection_result["repetition_counts"] = bias_tracking_result["repetition_counts"]
+        if isinstance(reflection_result, dict) and isinstance(bias_tracking_result, dict):
+            reflection_result["bias_echo"] = bias_tracking_result.get("bias_echo", False)
+            reflection_result["repeated_tags"] = bias_tracking_result.get("repeated_tags", [])
+            reflection_result["repetition_counts"] = bias_tracking_result.get("repetition_counts", {})
     
     # Make rerun decision
     decision_result = await make_rerun_decision(
@@ -108,13 +113,18 @@ async def process_loop_completion(
         override_by
     )
     
+    # Get reflection persona safely
+    reflection_persona = None
+    if isinstance(reflection_result, dict):
+        reflection_persona = reflection_result.get("reflection_persona")
+    
     # Create the complete result
     result = {
         "status": "success",
         "loop_id": loop_id,
         "reflection_result": reflection_result,
         "decision_result": decision_result,
-        "orchestrator_persona": orchestrator_persona or reflection_result.get("reflection_persona"),
+        "orchestrator_persona": orchestrator_persona or reflection_persona,
         "timestamp": datetime.utcnow().isoformat()
     }
     
@@ -146,23 +156,36 @@ async def get_guardrails_status(loop_id: str) -> Dict[str, Any]:
     # Get the reflection result
     reflection_result = await read_from_memory(f"loop_summary[{loop_id}]")
     
-    # Create the guardrails status
+    # Create the guardrails status with type safety
     status = {
         "loop_id": loop_id,
-        "rerun_count": loop_trace.get("rerun_count", 0),
-        "max_reruns": loop_trace.get("max_reruns", 3),
-        "rerun_limit_reached": loop_trace.get("rerun_count", 0) >= loop_trace.get("max_reruns", 3),
-        "bias_echo": loop_trace.get("bias_echo", False),
-        "reflection_fatigue": loop_trace.get("reflection_fatigue", 0.0),
-        "fatigue_threshold_exceeded": loop_trace.get("reflection_fatigue", 0.0) >= 0.5,
-        "force_finalize": loop_trace.get("force_finalize", False),
-        "rerun_reason": loop_trace.get("rerun_reason"),
-        "rerun_trigger": loop_trace.get("rerun_trigger", []),
-        "overridden_by": loop_trace.get("overridden_by")
+        "rerun_count": 0,
+        "max_reruns": 3,
+        "rerun_limit_reached": False,
+        "bias_echo": False,
+        "reflection_fatigue": 0.0,
+        "fatigue_threshold_exceeded": False,
+        "force_finalize": False,
+        "rerun_reason": None,
+        "rerun_trigger": [],
+        "overridden_by": None
     }
     
-    # Add reflection result information if available
-    if reflection_result:
+    # Safely update with loop_trace values if it's a dictionary
+    if isinstance(loop_trace, dict):
+        status["rerun_count"] = loop_trace.get("rerun_count", 0)
+        status["max_reruns"] = loop_trace.get("max_reruns", 3)
+        status["rerun_limit_reached"] = status["rerun_count"] >= status["max_reruns"]
+        status["bias_echo"] = loop_trace.get("bias_echo", False)
+        status["reflection_fatigue"] = loop_trace.get("reflection_fatigue", 0.0)
+        status["fatigue_threshold_exceeded"] = status["reflection_fatigue"] >= 0.5
+        status["force_finalize"] = loop_trace.get("force_finalize", False)
+        status["rerun_reason"] = loop_trace.get("rerun_reason")
+        status["rerun_trigger"] = loop_trace.get("rerun_trigger", [])
+        status["overridden_by"] = loop_trace.get("overridden_by")
+    
+    # Add reflection result information if available and is a dictionary
+    if isinstance(reflection_result, dict):
         status["alignment_score"] = reflection_result.get("alignment_score")
         status["drift_score"] = reflection_result.get("drift_score")
         status["summary_valid"] = reflection_result.get("summary_valid")
@@ -203,20 +226,22 @@ async def override_guardrails(
             "loop_id": loop_id
         }
     
-    # Apply overrides
-    if override_fatigue:
-        loop_trace["fatigue_override"] = True
-    
-    if override_max_reruns:
-        loop_trace["max_reruns_override"] = True
-    
-    if override_fatigue or override_max_reruns:
-        loop_trace["overridden_by"] = override_by
-        loop_trace["override_reason"] = override_reason or "Manual override by operator"
-        loop_trace["force_finalize"] = False
+    # Apply overrides only if loop_trace is a dictionary
+    if isinstance(loop_trace, dict):
+        # Apply overrides
+        if override_fatigue:
+            loop_trace["fatigue_override"] = True
         
-        # Store the updated trace
-        await write_to_memory(f"loop_trace[{loop_id}]", loop_trace)
+        if override_max_reruns:
+            loop_trace["max_reruns_override"] = True
+        
+        if override_fatigue or override_max_reruns:
+            loop_trace["overridden_by"] = override_by
+            loop_trace["override_reason"] = override_reason or "Manual override by operator"
+            loop_trace["force_finalize"] = False
+            
+            # Store the updated trace
+            await write_to_memory(f"loop_trace[{loop_id}]", loop_trace)
     
     return {
         "status": "success",
