@@ -3,7 +3,7 @@ Loop Controller Module
 
 This module provides functionality to control loop execution, including
 delusion detection, failure debugging, belief alignment tracking, CEO insights,
-and CTO health monitoring.
+CTO health monitoring, and system-level drift analysis.
 """
 
 import json
@@ -12,6 +12,7 @@ from typing import Dict, List, Any, Optional, Tuple
 
 # Import delusion detection and debugger agent modules
 from orchestrator.modules.delusion_detector import detect_plan_delusion, store_rejected_plan
+from orchestrator.modules.drift_summary_engine import process_loop_with_drift_engine
 from agents.debugger_agent import debug_loop_failure
 from agents.historian_agent import analyze_loop_summary
 from agents.ceo_agent import analyze_loop_with_ceo_agent
@@ -536,7 +537,7 @@ def handle_loop_completion(
     config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
-    Handles loop completion with historian agent, CEO agent, and CTO agent analysis.
+    Handles loop completion with historian agent, CEO agent, CTO agent, and drift summary analysis.
     
     Args:
         loop_id (str): The loop identifier
@@ -571,6 +572,23 @@ def handle_loop_completion(
                 "divergence_threshold": 0.4,
                 "trust_decay_threshold": 0.1,
                 "warning_threshold": 0.4
+            },
+            "drift_summary_engine": {
+                "enabled": True,
+                "severity_thresholds": {
+                    "critical": {
+                        "alignment_score": 0.4,
+                        "belief_alignment_score": 0.4,
+                        "health_score": 0.5,
+                        "trust_decay": 0.2
+                    },
+                    "moderate": {
+                        "alignment_score": 0.6,
+                        "belief_alignment_score": 0.6,
+                        "health_score": 0.7,
+                        "trust_decay": 0.1
+                    }
+                }
             }
         }
     
@@ -610,11 +628,25 @@ def handle_loop_completion(
         cto_config
     )
     
+    # Update memory with CTO analysis results
+    memory = cto_result["memory"]
+    
+    # Process loop with drift summary engine
+    drift_config = config.get("drift_summary_engine", {"enabled": True})
+    drift_result = process_loop_with_drift_engine(
+        loop_id,
+        memory,
+        drift_config
+    )
+    
+    # Update memory with drift summary results
+    memory = drift_result
+    
     # Combine results
     combined_result = {
         "status": "completed",
-        "memory": cto_result["memory"],
-        "message": f"Historian: {historian_result['message']}; CEO: {ceo_result['message']}; CTO: {cto_result['message']}"
+        "memory": memory,
+        "message": f"Historian: {historian_result['message']}; CEO: {ceo_result['message']}; CTO: {cto_result['message']}; Drift analysis completed"
     }
     
     # Return combined result
