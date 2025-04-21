@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Intent Impact Schema",
+  "description": "Schema for intent-impact emotional feedback analysis",
+  "type": "object",
+  "required": [
+    "loop_id",
+    "intent_tone",
+    "summary_tone",
+    "impact_confidence_delta",
+    "recommendation",
+    "timestamp"
+  ],
+  "properties": {
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier of the loop"
+    },
+    "intent_tone": {
+      "type": "string",
+      "description": "Detected tone of the original user intent"
+    },
+    "summary_tone": {
+      "type": "string",
+      "description": "Detected tone of the loop summary"
+    },
+    "impact_confidence_delta": {
+      "type": "number",
+      "description": "Difference between summary confidence and intent confidence scores"
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "Recommendation for addressing the intent-impact mismatch"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when the analysis was performed",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}
