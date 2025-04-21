@@ -103,6 +103,21 @@ AGENT_REGISTRY = {
         "persona": "reflective historian",
         "availability": "active",
         "contract_version": "v1.0.0"
+    },
+    "pessimist-agent": {
+        "name": "PessimistAgent",
+        "model": "gpt-4",
+        "description": "Evaluates loop summaries, flags overconfidence, and injects memory tags for tone realism and self-auditing.",
+        "tone": "skeptical",
+        "system_prompt": "You are PessimistAgent. Your job is to detect optimism bias, vague accomplishments, and inject realism into system self-evaluation.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["evaluate", "detect", "flag"],
+        "input_schema": ["loop_summary", "operator_feedback", "plan_confidence_score"],
+        "output_schema": ["pessimist_alert", "bias_tags"],
+        "persona": "skeptical auditor",
+        "availability": "active",
+        "contract_version": "v1.0.0"
     }
 }
 
@@ -179,6 +194,21 @@ AGENT_PERSONALITIES = {
         "input_schema": ["agent_output", "quality_criteria"],
         "output_schema": ["evaluation", "improvement_suggestions"],
         "persona": "thoughtful reviewer",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "pessimist-agent": {
+        "name": "PessimistAgent",
+        "type": "persona",
+        "tone": "skeptical",
+        "description": "Evaluates summaries for bias and injects realism.",
+        "system_prompt": "You are PessimistAgent. Your role is to detect optimism bias and inject realism into system self-evaluation.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["evaluate", "detect", "flag"],
+        "input_schema": ["loop_summary", "operator_feedback"],
+        "output_schema": ["pessimist_alert", "bias_tags"],
+        "persona": "skeptical auditor",
         "availability": "active",
         "contract_version": "v1.0.0"
     }
