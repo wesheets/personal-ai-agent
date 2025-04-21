@@ -2,7 +2,7 @@
 Loop Controller Module
 
 This module provides functionality to control loop execution, including
-delusion detection and failure debugging.
+delusion detection, failure debugging, and belief alignment tracking.
 """
 
 import json
@@ -12,6 +12,8 @@ from typing import Dict, List, Any, Optional, Tuple
 # Import delusion detection and debugger agent modules
 from orchestrator.modules.delusion_detector import detect_plan_delusion, store_rejected_plan
 from agents.debugger_agent import debug_loop_failure
+from agents.historian_agent import analyze_loop_summary
+from memory.belief_reference import load_beliefs_from_file, get_recent_loops
 
 def evaluate_plan_with_delusion_detector(
     plan: Dict[str, Any],
@@ -165,6 +167,82 @@ def debug_failure_with_debugger_agent(
             "message": "Failed to generate debugger report"
         }
 
+def analyze_loop_with_historian_agent(
+    loop_id: str,
+    loop_summary: str,
+    memory: Dict[str, Any],
+    config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Analyzes a loop summary using the historian agent to track belief alignment.
+    
+    Args:
+        loop_id (str): The loop identifier
+        loop_summary (str): The summary text of the completed loop
+        memory (Dict[str, Any]): The memory dictionary
+        config (Optional[Dict[str, Any]]): Configuration options
+        
+    Returns:
+        Dict[str, Any]: Result of the analysis, including updated memory with historian alerts
+    """
+    # Use default config if none provided
+    if config is None:
+        config = {
+            "enabled": True,
+            "beliefs_file": "orchestrator_beliefs.json",
+            "recent_loops_count": 10
+        }
+    
+    # Skip analysis if disabled
+    if not config.get("enabled", True):
+        return {
+            "status": "skipped",
+            "memory": memory,
+            "message": "Historian agent is disabled"
+        }
+    
+    # Load beliefs from file
+    beliefs_file = config.get("beliefs_file", "orchestrator_beliefs.json")
+    beliefs = load_beliefs_from_file(beliefs_file)
+    
+    if not beliefs:
+        return {
+            "status": "error",
+            "memory": memory,
+            "message": f"Failed to load beliefs from {beliefs_file}"
+        }
+    
+    # Get recent loops
+    recent_loops_count = config.get("recent_loops_count", 10)
+    recent_loops = get_recent_loops(memory, recent_loops_count)
+    
+    # Analyze loop summary
+    updated_memory = analyze_loop_summary(loop_id, loop_summary, recent_loops, beliefs, memory)
+    
+    # Check if alerts were generated
+    has_alerts = False
+    if "historian_alerts" in updated_memory:
+        for alert in updated_memory["historian_alerts"]:
+            if alert["loop_id"] == loop_id:
+                has_alerts = True
+                alignment_score = alert["loop_belief_alignment_score"]
+                missing_beliefs = len(alert["missing_beliefs"])
+                break
+    
+    # Return result
+    if has_alerts:
+        return {
+            "status": "analyzed",
+            "memory": updated_memory,
+            "message": f"Loop analyzed: alignment score {alignment_score:.2f}, {missing_beliefs} missing beliefs"
+        }
+    else:
+        return {
+            "status": "error",
+            "memory": updated_memory,
+            "message": "Failed to generate historian alert"
+        }
+
 def handle_loop_execution(
     plan: Dict[str, Any],
     loop_id: str,
@@ -271,3 +349,43 @@ def handle_loop_failure(
     
     # Return result
     return debug_result
+
+def handle_loop_completion(
+    loop_id: str,
+    loop_summary: str,
+    memory: Dict[str, Any],
+    config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Handles loop completion with historian agent analysis.
+    
+    Args:
+        loop_id (str): The loop identifier
+        loop_summary (str): The summary text of the completed loop
+        memory (Dict[str, Any]): The memory dictionary
+        config (Optional[Dict[str, Any]]): Configuration options
+        
+    Returns:
+        Dict[str, Any]: Result of the completion handling
+    """
+    # Use default config if none provided
+    if config is None:
+        config = {
+            "historian_agent": {
+                "enabled": True,
+                "beliefs_file": "orchestrator_beliefs.json",
+                "recent_loops_count": 10
+            }
+        }
+    
+    # Analyze loop with historian agent
+    historian_config = config.get("historian_agent", {"enabled": True})
+    analysis_result = analyze_loop_with_historian_agent(
+        loop_id,
+        loop_summary,
+        memory,
+        historian_config
+    )
+    
+    # Return result
+    return analysis_result
