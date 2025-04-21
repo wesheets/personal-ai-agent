@@ -2,6 +2,7 @@
 Loop Controller Module
 
 This module provides functionality to control loop execution, including
+thought variant generation, persona mode switching, intent-impact analysis,
 delusion detection, failure debugging, belief alignment tracking, CEO insights,
 CTO health monitoring, system-level drift analysis, and weekly drift reporting.
 """
@@ -10,7 +11,10 @@ import json
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 
-# Import delusion detection and debugger agent modules
+# Import core modules
+from orchestrator.modules.variant_generator import process_plan_with_variant_generator
+from orchestrator.mode_dispatcher import process_loop_with_persona_loader
+from orchestrator.modules.intent_impact_analyzer import process_loop_with_intent_impact_analyzer
 from orchestrator.modules.delusion_detector import detect_plan_delusion, store_rejected_plan
 from orchestrator.modules.drift_summary_engine import process_loop_with_drift_engine
 from orchestrator.modules.weekly_drift_report import process_loop_with_weekly_drift_report
@@ -251,15 +255,17 @@ def analyze_loop_with_historian_agent(
 def handle_loop_execution(
     plan: Dict[str, Any],
     loop_id: str,
+    prompt: str,
     memory: Dict[str, Any],
     config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
-    Handles loop execution with delusion detection.
+    Handles loop execution with thought variant generation, persona mode loading, and delusion detection.
     
     Args:
         plan (Dict[str, Any]): The plan to execute
         loop_id (str): The loop identifier
+        prompt (str): The original user prompt
         memory (Dict[str, Any]): The memory dictionary
         config (Optional[Dict[str, Any]]): Configuration options
         
@@ -269,12 +275,44 @@ def handle_loop_execution(
     # Use default config if none provided
     if config is None:
         config = {
+            "variant_generator": {
+                "enabled": True,
+                "variants_count": 2
+            },
+            "persona_loader": {
+                "enabled": True,
+                "auto_selection": True
+            },
             "delusion_detection": {
                 "enabled": True,
                 "similarity_threshold": 0.85,
                 "block_execution": False
             }
         }
+    
+    # Generate plan variants
+    variant_config = config.get("variant_generator", {"enabled": True})
+    variant_result = process_plan_with_variant_generator(
+        plan,
+        loop_id,
+        memory,
+        variant_config
+    )
+    
+    # Update memory with variants
+    memory = variant_result["memory"]
+    
+    # Load persona for the loop
+    persona_config = config.get("persona_loader", {"enabled": True})
+    persona_result = process_loop_with_persona_loader(
+        loop_id,
+        prompt,
+        memory,
+        persona_config
+    )
+    
+    # Update memory with persona context
+    memory = persona_result["memory"]
     
     # Evaluate plan with delusion detector
     delusion_config = config.get("delusion_detection", {"enabled": True})
@@ -291,14 +329,18 @@ def handle_loop_execution(
         return {
             "status": "blocked",
             "memory": evaluation_result["memory"],
-            "message": "Loop execution blocked due to potential delusion"
+            "message": "Loop execution blocked due to potential delusion",
+            "variants_count": variant_result.get("variants_count", 0),
+            "persona": persona_result.get("persona", "ARCHITECT")
         }
     
     # Return result with updated memory
     return {
         "status": "proceed",
         "memory": evaluation_result["memory"],
-        "message": evaluation_result["message"]
+        "message": f"Proceeding with execution using {persona_result.get('persona', 'ARCHITECT')} persona",
+        "variants_count": variant_result.get("variants_count", 0),
+        "persona": persona_result.get("persona", "ARCHITECT")
     }
 
 def handle_loop_failure(
@@ -533,19 +575,21 @@ def handle_loop_completion(
     loop_summary: str,
     loop: Dict[str, Any],
     plan: Dict[str, Any],
+    prompt: str,
     agent_logs: List[Dict[str, Any]],
     memory: Dict[str, Any],
     config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
-    Handles loop completion with historian agent, CEO agent, CTO agent, drift summary analysis,
-    and weekly drift reporting.
+    Handles loop completion with intent-impact analysis, historian agent, CEO agent, 
+    CTO agent, drift summary analysis, and weekly drift reporting.
     
     Args:
         loop_id (str): The loop identifier
         loop_summary (str): The summary text of the completed loop
         loop (Dict[str, Any]): The loop data
         plan (Dict[str, Any]): The original plan
+        prompt (str): The original user prompt
         agent_logs (List[Dict[str, Any]]): List of agent execution logs
         memory (Dict[str, Any]): The memory dictionary
         config (Optional[Dict[str, Any]]): Configuration options
@@ -556,6 +600,11 @@ def handle_loop_completion(
     # Use default config if none provided
     if config is None:
         config = {
+            "intent_impact_analyzer": {
+                "enabled": True,
+                "confidence_delta_threshold": 0.15,
+                "tone_mismatch_threshold": 0.6
+            },
             "historian_agent": {
                 "enabled": True,
                 "beliefs_file": "orchestrator_beliefs.json",
@@ -600,6 +649,22 @@ def handle_loop_completion(
                 "critical_count_threshold": 2
             }
         }
+    
+    # Analyze intent-impact emotional feedback
+    intent_impact_config = config.get("intent_impact_analyzer", {"enabled": True})
+    intent_impact_result = process_loop_with_intent_impact_analyzer(
+        loop_id,
+        prompt,
+        loop_summary,
+        memory,
+        intent_impact_config
+    )
+    
+    # Update memory with intent-impact analysis
+    memory = intent_impact_result["memory"]
+    
+    # Track if there's an intent-impact mismatch
+    has_intent_impact_mismatch = intent_impact_result.get("has_mismatch", False)
     
     # Analyze loop with historian agent
     historian_config = config.get("historian_agent", {"enabled": True})
@@ -671,14 +736,15 @@ def handle_loop_completion(
                 break
     
     # Combine results
-    message = f"Historian: {historian_result['message']}; CEO: {ceo_result['message']}; CTO: {cto_result['message']}; Drift analysis completed"
+    message = f"Intent-Impact: {intent_impact_result['message']}; Historian: {historian_result['message']}; CEO: {ceo_result['message']}; CTO: {cto_result['message']}; Drift analysis completed"
     if weekly_report_generated:
         message += "; Weekly drift report generated"
     
     combined_result = {
         "status": "completed",
         "memory": memory,
-        "message": message
+        "message": message,
+        "has_intent_impact_mismatch": has_intent_impact_mismatch
     }
     
     # Return combined result
