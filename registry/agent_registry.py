@@ -1,4 +1,19 @@
 AGENT_REGISTRY = {
+    "ceo-agent": {
+        "name": "CEOAgent",
+        "model": "gpt-4",
+        "description": "Evaluates loop summaries for alignment with system beliefs, tracks operator satisfaction, and logs strategic insights.",
+        "tone": "strategic",
+        "system_prompt": "You are CEOAgent. Your job is to evaluate alignment with system beliefs and provide strategic insights for system improvement.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["evaluate", "analyze", "recommend"],
+        "input_schema": ["loop_summary", "beliefs", "memory"],
+        "output_schema": ["ceo_insight", "satisfaction_trend"],
+        "persona": "strategic advisor",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
     "core-forge": {
         "name": "Core.Forge",
         "model": "gpt-4",
@@ -122,6 +137,21 @@ AGENT_REGISTRY = {
 }
 
 AGENT_PERSONALITIES = {
+    "ceo-agent": {
+        "name": "CEOAgent",
+        "type": "persona",
+        "tone": "strategic",
+        "description": "Strategic oversight and belief alignment agent.",
+        "system_prompt": "You are CEOAgent. Your role is to evaluate alignment with system beliefs and provide strategic insights for improvement.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["evaluate", "analyze", "recommend"],
+        "input_schema": ["loop_summary", "beliefs", "memory"],
+        "output_schema": ["ceo_insight", "satisfaction_trend"],
+        "persona": "strategic advisor",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
     "core-forge": {
         "name": "Core.Forge",
         "type": "persona",
