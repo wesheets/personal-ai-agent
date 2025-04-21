@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Prompt Analysis Schema",
+  "description": "Schema for prompt analysis data in Orchestrator Thought Partner Mode",
+  "type": "object",
+  "required": [
+    "interpreted_intent",
+    "confidence_score",
+    "emotional_tone",
+    "ambiguous_phrases"
+  ],
+  "properties": {
+    "interpreted_intent": {
+      "type": "string",
+      "description": "The interpreted intent of the prompt"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "Confidence score for the interpretation (0.0 to 1.0)",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "emotional_tone": {
+      "type": "string",
+      "description": "Detected emotional tone of the prompt",
+      "enum": [
+        "neutral",
+        "excited",
+        "urgent",
+        "frustrated",
+        "curious",
+        "reflective",
+        "decisive"
+      ]
+    },
+    "ambiguous_phrases": {
+      "type": "array",
+      "description": "List of ambiguous phrases detected in the prompt",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reflection_questions": {
+      "type": "array",
+      "description": "Socratic-style questions generated based on the analysis",
+      "items": {
+        "type": "string"
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when the analysis was created",
+      "format": "date-time"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Identifier for the project"
+    },
+    "loop_id": {
+      "type": [
+        "integer",
+        "string"
+      ],
+      "description": "Identifier for the loop"
+    },
+    "prompt_quality_score": {
+      "type": "number",
+      "description": "Optional score indicating the quality of the prompt (1.0 = crystal clear)",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "prompt_variants": {
+      "type": "array",
+      "description": "Optional suggested variants of the prompt for clarity",
+      "items": {
+        "type": "string"
+      }
+    },
+    "domain_context": {
+      "type": "object",
+      "description": "Optional domain-specific context extracted from the prompt",
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "Identified domain (e.g., 'web-development', 'data-analysis')"
+        },
+        "key_terms": {
+          "type": "array",
+          "description": "Domain-specific key terms identified in the prompt",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "description": "Identified constraints or requirements",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
