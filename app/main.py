@@ -1,11 +1,8 @@
 """
 Main Application Module
 
-This module serves as the entry point for the application.
+This module serves as the entry point for the Promethios API.
 It initializes all required components and starts the server.
-
-MODIFIED: Added agent registry initialization
-MODIFIED: Added loop router registration
 """
 
 import os
@@ -14,6 +11,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.openapi.docs import get_swagger_ui_html
 
 # Configure logging
 logging.basicConfig(
@@ -23,7 +21,12 @@ logging.basicConfig(
 logger = logging.getLogger("app")
 
 # Create FastAPI app
-app = FastAPI(title="Personal AI Agent API")
+app = FastAPI(
+    title="Promethios API",
+    description="API for the Promethios cognitive system",
+    version="1.0.0",
+    docs_url=None,  # We'll create a custom docs endpoint
+)
 
 # Add CORS middleware
 app.add_middleware(
@@ -34,29 +37,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Import and initialize agent registry
-from app.modules.agent_registry import list_agents
-from app.modules.register_all_agents import register_all_agents
-
-# Register all agents
-register_all_agents()
-print("✅ Registered agents:", list_agents())
-
 # Import routers
-from routes.agent_routes import router as agent_router
-from routes.system_routes import router as system_router
-from routes.project_routes import router as project_router
-from routes.orchestrator_routes import router as orchestrator_router
-from routes.debug_routes import router as debug_router
-from routes.loop_routes import router as loop_router
+from app.routes.core_routes import router as core_router
+from app.routes.loop_routes import router as loop_router
+from app.routes.agent_routes import router as agent_router
+from app.routes.persona_routes import router as persona_router
 
-# Include routers
-app.include_router(agent_router, prefix="/api/agent", tags=["agent"])
-app.include_router(system_router, prefix="/api/system", tags=["system"])
-app.include_router(project_router, prefix="/api/project", tags=["project"])
-app.include_router(orchestrator_router, prefix="/api/orchestrator", tags=["orchestrator"])
-app.include_router(debug_router, prefix="/api/debug", tags=["debug"])
-app.include_router(loop_router, prefix="/api/loop", tags=["loop"])
+# Include routers with correct prefixes (no /api/ prefix)
+app.include_router(core_router)
+app.include_router(loop_router)
+app.include_router(agent_router)
+app.include_router(persona_router)
+
+# Custom docs endpoint
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url="/openapi.json",
+        title="Promethios API Documentation",
+        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
+        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
+    )
 
 @app.get("/")
 async def root():
@@ -64,25 +65,12 @@ async def root():
     Root endpoint that returns basic API information.
     """
     return {
-        "name": "Personal AI Agent API",
+        "name": "Promethios API",
         "version": "1.0.0",
         "status": "running",
-        "endpoints": [
-            "/api/agent",
-            "/api/system",
-            "/api/project",
-            "/api/orchestrator",
-            "/api/debug",
-            "/api/loop"
-        ]
+        "documentation": "/docs",
+        "health": "/health"
     }
-
-@app.get("/health")
-async def health():
-    """
-    Health check endpoint.
-    """
-    return {"status": "healthy"}
 
 # Add exception handler
 @app.exception_handler(Exception)
