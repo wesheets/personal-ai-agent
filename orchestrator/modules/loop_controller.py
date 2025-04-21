@@ -1,202 +1,273 @@
 """
 Loop Controller Module
 
-This module provides functionality to control the loop execution flow,
-including post-loop evaluation with the Pessimist Agent.
+This module provides functionality to control loop execution, including
+delusion detection and failure debugging.
 """
 
 import json
-import os
-import sys
 from datetime import datetime
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 
-# Add the parent directory to the path so we can import the modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+# Import delusion detection and debugger agent modules
+from orchestrator.modules.delusion_detector import detect_plan_delusion, store_rejected_plan
+from agents.debugger_agent import debug_loop_failure
 
-from agents.pessimist_agent import process_loop_summary
-
-def evaluate_loop_with_pessimist(
-    project_id: str,
-    loop_id: int,
+def evaluate_plan_with_delusion_detector(
+    plan: Dict[str, Any],
+    loop_id: str,
     memory: Dict[str, Any],
-    config: Dict[str, Any] = None
+    config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
-    Evaluates a loop summary using the Pessimist Agent.
+    Evaluates a plan using the delusion detector to check for similarity to failed plans.
     
     Args:
-        project_id (str): The project identifier
-        loop_id (int): The loop identifier
-        memory (Dict[str, Any]): The memory dictionary containing loop data
-        config (Dict[str, Any], optional): Configuration options
+        plan (Dict[str, Any]): The plan to evaluate
+        loop_id (str): The current loop identifier
+        memory (Dict[str, Any]): The memory dictionary
+        config (Optional[Dict[str, Any]]): Configuration options
         
     Returns:
-        Dict[str, Any]: Result of the evaluation with status and any alerts
+        Dict[str, Any]: Result of the evaluation, including updated memory if warnings were injected
     """
-    # Default configuration
-    default_config = {
-        "enabled": True,
-        "evaluation_threshold": 0.6,  # Only evaluate loops with confidence above this
-        "auto_inject_alerts": True
-    }
-    
-    # Merge with provided config
-    if config:
-        for key, value in config.items():
-            default_config[key] = value
-    
-    config = default_config
-    
-    # Skip if disabled
-    if not config["enabled"]:
-        return {
-            "status": "skipped",
-            "reason": "Pessimist Agent evaluation disabled in configuration",
-            "loop_id": loop_id
+    # Use default config if none provided
+    if config is None:
+        config = {
+            "enabled": True,
+            "similarity_threshold": 0.85
         }
     
-    # Get loop summary
-    loop_summary = ""
-    loop_summaries = memory.get("loop_summaries", {})
-    if str(loop_id) in loop_summaries:
-        loop_summary = loop_summaries[str(loop_id)].get("summary", "")
-    
-    # Get loop trace for feedback
-    loop_trace = memory.get("loop_trace", {}).get(str(loop_id), {})
-    
-    # Get operator feedback
-    operator_feedback = loop_trace.get("operator_feedback", [])
-    if not isinstance(operator_feedback, list):
-        operator_feedback = [operator_feedback] if operator_feedback else []
-    
-    # Get plan confidence score if available
-    plan_confidence_score = None
-    loop_plans = memory.get("loop_plans", [])
-    for plan in loop_plans:
-        if plan.get("loop_id") == loop_id:
-            plan_confidence_score = plan.get("confidence_score")
-            break
-    
-    # Skip if no summary
-    if not loop_summary:
+    # Skip evaluation if disabled
+    if not config.get("enabled", True):
         return {
             "status": "skipped",
-            "reason": "No loop summary found",
-            "loop_id": loop_id
+            "memory": memory,
+            "message": "Delusion detection is disabled"
         }
     
-    # Process the loop summary with the Pessimist Agent
-    updated_memory = process_loop_summary(
-        str(loop_id),
-        loop_summary,
-        operator_feedback,
-        memory.copy(),
-        plan_confidence_score
+    # Get similarity threshold from config
+    similarity_threshold = config.get("similarity_threshold", 0.85)
+    
+    # Detect delusions
+    updated_memory = detect_plan_delusion(
+        plan,
+        loop_id,
+        memory,
+        similarity_threshold
     )
     
-    # Check if any alerts were generated
-    pessimist_alerts = updated_memory.get("pessimist_alerts", [])
+    # Check if warnings were injected
+    has_warnings = False
+    if "delusion_alerts" in updated_memory:
+        for alert in updated_memory["delusion_alerts"]:
+            if alert["loop_id"] == loop_id:
+                has_warnings = True
+                break
     
-    # Find alerts for this loop
-    loop_alerts = [alert for alert in pessimist_alerts if alert.get("loop_id") == str(loop_id)]
-    
-    # If no alerts were generated, return success with no alerts
-    if not loop_alerts:
+    # Return result
+    if has_warnings:
         return {
-            "status": "success",
-            "message": "No bias detected in loop summary",
-            "loop_id": loop_id,
-            "alerts": []
+            "status": "warning",
+            "memory": updated_memory,
+            "message": "Potential delusion detected in plan"
         }
-    
-    # If auto-inject is enabled, update the original memory
-    if config["auto_inject_alerts"]:
-        # Initialize pessimist_alerts if it doesn't exist
-        if "pessimist_alerts" not in memory:
-            memory["pessimist_alerts"] = []
-        
-        # Add new alerts
-        for alert in loop_alerts:
-            memory["pessimist_alerts"].append(alert)
-        
-        # Update loop summary metadata if it exists
-        if "loop_summaries" in memory and str(loop_id) in memory["loop_summaries"]:
-            if "metadata" not in memory["loop_summaries"][str(loop_id)]:
-                memory["loop_summaries"][str(loop_id)]["metadata"] = {}
-            
-            if "bias_tags" not in memory["loop_summaries"][str(loop_id)]["metadata"]:
-                memory["loop_summaries"][str(loop_id)]["metadata"]["bias_tags"] = []
-            
-            # Add bias tags to metadata
-            for alert in loop_alerts:
-                memory["loop_summaries"][str(loop_id)]["metadata"]["bias_tags"].extend(alert.get("bias_tags", []))
-            
-            # Remove duplicates
-            memory["loop_summaries"][str(loop_id)]["metadata"]["bias_tags"] = list(
-                set(memory["loop_summaries"][str(loop_id)]["metadata"]["bias_tags"])
-            )
-    
-    # Log to chat
-    timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    
-    for alert in loop_alerts:
-        alert_type = alert.get("alert_type", "unknown")
-        bias_tags = alert.get("bias_tags", [])
-        suggestion = alert.get("suggestion", "")
-        
-        chat_message = {
-            "role": "pessimist",
-            "message": f"⚠️ Loop {loop_id} alert: {alert_type}. Detected: {', '.join(bias_tags)}. {suggestion}",
-            "timestamp": timestamp,
-            "loop_id": loop_id
+    else:
+        return {
+            "status": "ok",
+            "memory": updated_memory,
+            "message": "No delusions detected"
         }
-        
-        if "chat_messages" not in memory:
-            memory["chat_messages"] = []
-        
-        memory["chat_messages"].append(chat_message)
-    
-    return {
-        "status": "alert",
-        "message": f"Bias detected in loop {loop_id} summary",
-        "loop_id": loop_id,
-        "alerts": loop_alerts
-    }
 
-def post_loop_evaluation(project_id: str, loop_id: int, memory: Dict[str, Any], config: Dict[str, Any] = None) -> Dict[str, Any]:
+def register_failed_plan(
+    plan: Dict[str, Any],
+    loop_id: str,
+    failure_reason: str,
+    memory: Dict[str, Any]
+) -> Dict[str, Any]:
     """
-    Performs post-loop evaluation including Pessimist Agent analysis.
+    Registers a failed plan in memory for future delusion detection.
     
     Args:
-        project_id (str): The project identifier
-        loop_id (int): The loop identifier
-        memory (Dict[str, Any]): The memory dictionary containing loop data
-        config (Dict[str, Any], optional): Configuration options
+        plan (Dict[str, Any]): The failed plan
+        loop_id (str): The loop identifier
+        failure_reason (str): The reason the plan failed
+        memory (Dict[str, Any]): The memory dictionary
         
     Returns:
-        Dict[str, Any]: Result of the post-loop evaluation
+        Dict[str, Any]: Updated memory dictionary
     """
-    # Initialize results
-    results = {
-        "loop_id": loop_id,
-        "evaluations": []
+    return store_rejected_plan(plan, loop_id, failure_reason, memory)
+
+def debug_failure_with_debugger_agent(
+    loop_id: str,
+    failure_logs: str,
+    memory: Dict[str, Any],
+    loop_context: Optional[Dict[str, Any]] = None,
+    config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Debugs a loop failure using the debugger agent.
+    
+    Args:
+        loop_id (str): The loop identifier
+        failure_logs (str): The failure logs from the loop
+        memory (Dict[str, Any]): The memory dictionary
+        loop_context (Optional[Dict[str, Any]]): Context information about the loop
+        config (Optional[Dict[str, Any]]): Configuration options
+        
+    Returns:
+        Dict[str, Any]: Result of the debugging, including updated memory with debugger report
+    """
+    # Use default config if none provided
+    if config is None:
+        config = {
+            "enabled": True,
+            "auto_reroute": False
+        }
+    
+    # Skip debugging if disabled
+    if not config.get("enabled", True):
+        return {
+            "status": "skipped",
+            "memory": memory,
+            "message": "Debugger agent is disabled"
+        }
+    
+    # Use empty context if none provided
+    if loop_context is None:
+        loop_context = {}
+    
+    # Debug failure
+    updated_memory = debug_loop_failure(loop_id, failure_logs, memory, loop_context)
+    
+    # Get the latest debugger report
+    latest_report = None
+    if "debugger_reports" in updated_memory:
+        for report in updated_memory["debugger_reports"]:
+            if report["loop_id"] == loop_id:
+                if latest_report is None or report["timestamp"] > latest_report["timestamp"]:
+                    latest_report = report
+    
+    # Return result
+    if latest_report:
+        return {
+            "status": "debugged",
+            "memory": updated_memory,
+            "message": f"Failure debugged: {latest_report['failure_type']}",
+            "report": latest_report,
+            "auto_reroute": config.get("auto_reroute", False)
+        }
+    else:
+        return {
+            "status": "error",
+            "memory": updated_memory,
+            "message": "Failed to generate debugger report"
+        }
+
+def handle_loop_execution(
+    plan: Dict[str, Any],
+    loop_id: str,
+    memory: Dict[str, Any],
+    config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Handles loop execution with delusion detection.
+    
+    Args:
+        plan (Dict[str, Any]): The plan to execute
+        loop_id (str): The loop identifier
+        memory (Dict[str, Any]): The memory dictionary
+        config (Optional[Dict[str, Any]]): Configuration options
+        
+    Returns:
+        Dict[str, Any]: Result of the execution
+    """
+    # Use default config if none provided
+    if config is None:
+        config = {
+            "delusion_detection": {
+                "enabled": True,
+                "similarity_threshold": 0.85,
+                "block_execution": False
+            }
+        }
+    
+    # Evaluate plan with delusion detector
+    delusion_config = config.get("delusion_detection", {"enabled": True})
+    evaluation_result = evaluate_plan_with_delusion_detector(
+        plan,
+        loop_id,
+        memory,
+        delusion_config
+    )
+    
+    # Check if execution should be blocked due to delusion
+    if (evaluation_result["status"] == "warning" and 
+            delusion_config.get("block_execution", False)):
+        return {
+            "status": "blocked",
+            "memory": evaluation_result["memory"],
+            "message": "Loop execution blocked due to potential delusion"
+        }
+    
+    # Return result with updated memory
+    return {
+        "status": "proceed",
+        "memory": evaluation_result["memory"],
+        "message": evaluation_result["message"]
+    }
+
+def handle_loop_failure(
+    loop_id: str,
+    failure_logs: str,
+    plan: Dict[str, Any],
+    failure_reason: str,
+    memory: Dict[str, Any],
+    config: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Handles loop failure with debugging and plan registration.
+    
+    Args:
+        loop_id (str): The loop identifier
+        failure_logs (str): The failure logs from the loop
+        plan (Dict[str, Any]): The failed plan
+        failure_reason (str): The reason the plan failed
+        memory (Dict[str, Any]): The memory dictionary
+        config (Optional[Dict[str, Any]]): Configuration options
+        
+    Returns:
+        Dict[str, Any]: Result of the failure handling
+    """
+    # Use default config if none provided
+    if config is None:
+        config = {
+            "debugger_agent": {
+                "enabled": True,
+                "auto_reroute": False
+            },
+            "store_failed_plans": True
+        }
+    
+    # Store failed plan if enabled
+    if config.get("store_failed_plans", True):
+        memory = register_failed_plan(plan, loop_id, failure_reason, memory)
+    
+    # Debug failure with debugger agent
+    debugger_config = config.get("debugger_agent", {"enabled": True})
+    loop_context = {
+        "plan": plan,
+        "failure_reason": failure_reason
     }
     
-    # Run Pessimist Agent evaluation
-    pessimist_result = evaluate_loop_with_pessimist(project_id, loop_id, memory, config)
-    results["evaluations"].append({
-        "agent": "pessimist",
-        "result": pessimist_result
-    })
+    debug_result = debug_failure_with_debugger_agent(
+        loop_id,
+        failure_logs,
+        memory,
+        loop_context,
+        debugger_config
+    )
     
-    # Add timestamp
-    results["timestamp"] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    
-    # Store evaluation results in memory
-    if "loop_evaluations" not in memory:
-        memory["loop_evaluations"] = {}
-    
-    memory["loop_evaluations"][str(loop_id)] = results
-    
-    return results
+    # Return result
+    return debug_result
