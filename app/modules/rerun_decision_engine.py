@@ -9,6 +9,7 @@ It implements guardrails to prevent endless reruns, including:
 - Bias echo detection
 - Reflection fatigue scoring
 - Detailed rerun reasoning tracking
+- Safety checks from the Responsible Cognition Layer
 """
 
 from typing import Dict, Any, Optional, List
@@ -18,6 +19,8 @@ import re
 from datetime import datetime
 from app.utils.persona_utils import get_current_persona, preload_persona_for_deep_loop
 from app.modules.rerun_reasoning_logger import log_rerun_reasoning, log_finalization_reasoning
+from app.modules.safety_integration import should_trigger_rerun as safety_should_trigger_rerun
+from app.modules.safety_integration import get_rerun_configuration as safety_get_rerun_configuration
 
 # Configuration for rerun thresholds
 # These could be moved to a config file in a real implementation
@@ -230,7 +233,8 @@ async def evaluate_rerun_decision(
     reflection_result: Dict[str, Any],
     override_fatigue: bool = False,
     override_max_reruns: bool = False,
-    override_by: Optional[str] = None
+    override_by: Optional[str] = None,
+    override_safety_blocks: bool = False
 ) -> Dict[str, Any]:
     """
     Evaluate whether to rerun a loop based on reflection results and guardrails.
@@ -239,8 +243,9 @@ async def evaluate_rerun_decision(
     1. Checks if rerun limits have been reached
     2. Checks if bias echo has been detected
     3. Checks if reflection fatigue is too high
-    4. Checks if alignment and drift scores warrant a rerun
-    5. If rerun is needed, creates a new loop ID and copies trace
+    4. Checks if safety checks should trigger a rerun
+    5. Checks if alignment and drift scores warrant a rerun
+    6. If rerun is needed, creates a new loop ID and copies trace
     
     Args:
         loop_id: The ID of the loop to evaluate
@@ -248,6 +253,7 @@ async def evaluate_rerun_decision(
         override_fatigue: Whether to override fatigue-based finalization
         override_max_reruns: Whether to override max reruns limit
         override_by: Who performed the override
+        override_safety_blocks: Whether to override safety blocks
         
     Returns:
         Dict containing the decision and related information
@@ -261,6 +267,11 @@ async def evaluate_rerun_decision(
     rerun_trigger = []
     rerun_reason = None
     reflection_persona = None
+    
+    # Extract safety-related fields
+    safety_checks_performed = []
+    safety_blocks_triggered = []
+    safety_warnings_issued = []
     
     # Safely extract values if reflection_result is a dictionary
     if isinstance(reflection_result, dict):
@@ -295,6 +306,29 @@ async def evaluate_rerun_decision(
         
         # Get reflection persona
         reflection_persona = reflection_result.get("reflection_persona")
+        
+        # Get safety-related fields
+        safety_checks = reflection_result.get("safety_checks_performed")
+        if isinstance(safety_checks, list):
+            safety_checks_performed = safety_checks
+            
+        safety_blocks = reflection_result.get("safety_blocks_triggered")
+        if isinstance(safety_blocks, list):
+            safety_blocks_triggered = safety_blocks
+            
+        safety_warnings = reflection_result.get("safety_warnings_issued")
+        if isinstance(safety_warnings, list):
+            safety_warnings_issued = safety_warnings
+    
+    # Create a safety results dictionary for the safety integration module
+    safety_results = {
+        "safety_checks_performed": safety_checks_performed,
+        "safety_blocks_triggered": safety_blocks_triggered,
+        "safety_warnings_issued": safety_warnings_issued,
+        "blocks_triggered": len(safety_blocks_triggered) > 0,
+        "warnings_issued": len(safety_warnings_issued) > 0,
+        "override_blocks": override_safety_blocks
+    }
     
     # Enforce rerun limits
     rerun_limits = await enforce_rerun_limits(
@@ -310,23 +344,31 @@ async def evaluate_rerun_decision(
     
     # Check guardrails in order of precedence
     
-    # 1. Check if we need to force finalize due to rerun limits
-    if rerun_limits["force_finalize"]:
+    # 1. Check if safety checks should trigger a rerun
+    if safety_should_trigger_rerun(safety_results) and not override_safety_blocks:
+        rerun_needed = True
+        # Get rerun configuration from safety integration
+        safety_rerun_config = safety_get_rerun_configuration(safety_results)
+        rerun_reason = safety_rerun_config.get("rerun_reason", "safety_check_triggered")
+        rerun_trigger.extend(safety_rerun_config.get("rerun_trigger", ["safety"]))
+    
+    # 2. Check if we need to force finalize due to rerun limits
+    elif rerun_limits["force_finalize"]:
         force_finalize = True
         finalize_reason = "max_reruns_reached"
     
-    # 2. Check if bias echo has been detected
+    # 3. Check if bias echo has been detected
     elif bias_echo:
         force_finalize = True
         finalize_reason = "bias_echo_detected"
     
-    # 3. Check if fatigue threshold has been exceeded
+    # 4. Check if fatigue threshold has been exceeded
     elif reflection_fatigue > RERUN_CONFIG["fatigue_threshold"] and not override_fatigue:
         force_finalize = True
         finalize_reason = "fatigue_threshold_exceeded"
     
-    # 4. Check if rerun is needed based on alignment and drift thresholds
-    elif not force_finalize:
+    # 5. Check if rerun is needed based on alignment and drift thresholds
+    elif not force_finalize and not rerun_needed:
         if alignment_score < RERUN_CONFIG["alignment_threshold"]:
             rerun_needed = True
             if not rerun_reason:
@@ -389,10 +431,24 @@ async def evaluate_rerun_decision(
                 "bias_echo": bias_echo
             }
             
+            # Add safety-related fields if available
+            if safety_checks_performed:
+                new_trace["safety_checks_performed"] = safety_checks_performed
+            if safety_blocks_triggered:
+                new_trace["safety_blocks_triggered"] = safety_blocks_triggered
+            if safety_warnings_issued:
+                new_trace["safety_warnings_issued"] = safety_warnings_issued
+                
             # If there was an override, record it
             if override_fatigue and reflection_fatigue > RERUN_CONFIG["fatigue_threshold"]:
                 new_trace["overridden_by"] = override_by
                 new_trace["fatigue_override"] = True
+                
+            # If safety blocks were overridden, record it
+            if override_safety_blocks and len(safety_blocks_triggered) > 0:
+                new_trace["safety_override"] = True
+                if not "overridden_by" in new_trace:
+                    new_trace["overridden_by"] = override_by
             
             # Store the new trace
             await write_to_memory(f"loop_trace[{next_loop_id}]", new_trace)

@@ -7,11 +7,13 @@ Includes:
 - LoopTraceItem model for individual loop trace entries
 - LoopReflectionResult model for reflection results
 - LoopCompleteRequest model for loop completion signals
+- Safety-related fields for the Responsible Cognition Layer
 """
 
 from enum import Enum
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Set
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 class LoopStatus(str, Enum):
     """Enum defining the possible statuses of a loop."""
@@ -68,7 +70,7 @@ class LoopTraceItem(BaseModel):
     persona_switch_reason: Optional[str] = Field(default="default", description="Reason for persona selection")
     reflection_persona: Optional[str] = None
     
-    # NEW FIELDS FOR COGNITIVE CONTROL LAYER
+    # FIELDS FOR COGNITIVE CONTROL LAYER
     
     # Fields for belief reference
     belief_reference: Optional[List[str]] = Field(default_factory=list, description="Core beliefs referenced during execution")
@@ -87,6 +89,47 @@ class LoopTraceItem(BaseModel):
     reflection_agents: Optional[List[str]] = Field(default_factory=list, description="Agents involved in reflection")
     depth_escalation: Optional[bool] = Field(default=False, description="Whether depth was escalated during processing")
     depth_escalation_reason: Optional[str] = Field(default=None, description="Reason for depth escalation, if applicable")
+    
+    # FIELDS FOR RESPONSIBLE COGNITION LAYER (SAFETY ARCHITECTURE)
+    
+    # Fields for synthetic identity protection
+    synthetic_identity_risk: Optional[bool] = Field(default=False, description="Whether synthetic identity risk was detected")
+    synthetic_identity_severity: Optional[str] = Field(default="none", description="Severity of synthetic identity risk (none/low/medium/high)")
+    synthetic_identity_blocked: Optional[bool] = Field(default=False, description="Whether execution was blocked due to synthetic identity risk")
+    synthetic_identity_issues: Optional[int] = Field(default=0, description="Number of synthetic identity issues detected")
+    synthetic_identity_checked_at: Optional[str] = Field(default=None, description="When synthetic identity check was performed")
+    
+    # Fields for output policy enforcement
+    content_risk_tags: Optional[List[str]] = Field(default_factory=list, description="Content risk tags (nsfw, deepfake, etc.)")
+    output_policy_action: Optional[str] = Field(default="allowed", description="Output policy action (allowed/blocked)")
+    blocked_categories: Optional[List[str]] = Field(default_factory=list, description="Categories that triggered blocking")
+    output_policy_checked_at: Optional[str] = Field(default=None, description="When output policy check was performed")
+    
+    # Fields for prompt injection detection
+    prompt_injection_detected: Optional[bool] = Field(default=False, description="Whether prompt injection was detected")
+    injection_tags: Optional[List[str]] = Field(default_factory=list, description="Injection tags (instruction_override, jailbreak, etc.)")
+    sanitization_action: Optional[str] = Field(default="allow", description="Sanitization action (allow/warn/halt)")
+    injection_severity: Optional[float] = Field(default=0.0, description="Overall severity of injection attempts")
+    intent_sanitized_at: Optional[str] = Field(default=None, description="When intent sanitization was performed")
+    
+    # Fields for domain sensitivity flagging
+    domain_sensitive: Optional[bool] = Field(default=False, description="Whether domain sensitivity was detected")
+    sensitive_domains: Optional[List[str]] = Field(default_factory=list, description="Sensitive domains detected (medical, legal, etc.)")
+    primary_domain: Optional[str] = Field(default=None, description="Primary sensitive domain")
+    required_reviewers: Optional[List[str]] = Field(default_factory=list, description="Required reviewers for sensitive domains")
+    domain_sensitivity_checked_at: Optional[str] = Field(default=None, description="When domain sensitivity check was performed")
+    
+    # Fields for IP violation scanning
+    ip_violation_score: Optional[float] = Field(default=0.0, description="Overall IP violation score")
+    ip_violation_flag: Optional[bool] = Field(default=False, description="Whether IP violation was flagged")
+    violation_tags: Optional[List[str]] = Field(default_factory=list, description="Violation tags (code, text, lyrics)")
+    ip_checked_at: Optional[str] = Field(default=None, description="When IP violation check was performed")
+    
+    # Fields for safety audit trail
+    safety_checks_performed: Optional[List[str]] = Field(default_factory=list, description="Safety checks that were performed")
+    safety_blocks_triggered: Optional[List[str]] = Field(default_factory=list, description="Safety blocks that were triggered")
+    safety_warnings_issued: Optional[List[str]] = Field(default_factory=list, description="Safety warnings that were issued")
+    safety_check_timestamp: Optional[str] = Field(default=None, description="When safety checks were performed")
 
 class LoopReflectionResult(BaseModel):
     """
@@ -114,8 +157,6 @@ class LoopReflectionResult(BaseModel):
     rerun_trigger: Optional[List[str]] = Field(default_factory=list, description="Components that triggered the rerun")
     rerun_reason_detail: Optional[str] = Field(default=None, description="Detailed reason for the rerun")
     
-    # NEW FIELDS FOR COGNITIVE CONTROL LAYER
-    
     # Fields for belief reference
     belief_reference: Optional[List[str]] = Field(default_factory=list, description="Core beliefs referenced during reflection")
     belief_conflict: Optional[bool] = Field(default=False, description="Whether a belief conflict was detected")
@@ -126,6 +167,37 @@ class LoopReflectionResult(BaseModel):
     # Fields for reflection depth control
     depth: Optional[str] = Field(default="standard", description="Reflection depth used (shallow/standard/deep)")
     reflection_agents: Optional[List[str]] = Field(default_factory=list, description="Agents involved in reflection")
+    
+    # FIELDS FOR RESPONSIBLE COGNITION LAYER (SAFETY ARCHITECTURE)
+    
+    # Fields for synthetic identity protection
+    synthetic_identity_risk: Optional[bool] = Field(default=False, description="Whether synthetic identity risk was detected")
+    synthetic_identity_severity: Optional[str] = Field(default="none", description="Severity of synthetic identity risk (none/low/medium/high)")
+    synthetic_identity_issues: Optional[int] = Field(default=0, description="Number of synthetic identity issues detected")
+    
+    # Fields for output policy enforcement
+    content_risk_tags: Optional[List[str]] = Field(default_factory=list, description="Content risk tags (nsfw, deepfake, etc.)")
+    output_policy_action: Optional[str] = Field(default="allowed", description="Output policy action (allowed/blocked)")
+    
+    # Fields for prompt injection detection
+    prompt_injection_detected: Optional[bool] = Field(default=False, description="Whether prompt injection was detected")
+    injection_tags: Optional[List[str]] = Field(default_factory=list, description="Injection tags (instruction_override, jailbreak, etc.)")
+    sanitization_action: Optional[str] = Field(default="allow", description="Sanitization action (allow/warn/halt)")
+    
+    # Fields for domain sensitivity flagging
+    domain_sensitive: Optional[bool] = Field(default=False, description="Whether domain sensitivity was detected")
+    sensitive_domains: Optional[List[str]] = Field(default_factory=list, description="Sensitive domains detected (medical, legal, etc.)")
+    required_reviewers: Optional[List[str]] = Field(default_factory=list, description="Required reviewers for sensitive domains")
+    
+    # Fields for IP violation scanning
+    ip_violation_score: Optional[float] = Field(default=0.0, description="Overall IP violation score")
+    ip_violation_flag: Optional[bool] = Field(default=False, description="Whether IP violation was flagged")
+    violation_tags: Optional[List[str]] = Field(default_factory=list, description="Violation tags (code, text, lyrics)")
+    
+    # Fields for safety summary
+    safety_checks_performed: Optional[List[str]] = Field(default_factory=list, description="Safety checks that were performed")
+    safety_blocks_triggered: Optional[List[str]] = Field(default_factory=list, description="Safety blocks that were triggered")
+    safety_warnings_issued: Optional[List[str]] = Field(default_factory=list, description="Safety warnings that were issued")
 
 class LoopCompleteRequest(BaseModel):
     """
@@ -143,11 +215,19 @@ class LoopCompleteRequest(BaseModel):
     override_reason: Optional[str] = Field(default=None, description="Reason for the override")
     override_by: Optional[str] = Field(default=None, description="Who performed the override")
     
-    # NEW FIELDS FOR COGNITIVE CONTROL LAYER
-    
     # Fields for reflection depth control
     depth: Optional[str] = Field(default="standard", description="Requested reflection depth (shallow/standard/deep)")
     belief_reference: Optional[List[str]] = Field(default_factory=list, description="Core beliefs to reference during reflection")
+    
+    # FIELDS FOR RESPONSIBLE COGNITION LAYER (SAFETY ARCHITECTURE)
+    
+    # Fields for safety checks to perform
+    safety_checks: Optional[List[str]] = Field(default=["all"], description="Safety checks to perform (all, synthetic_identity, output_policy, prompt_injection, domain_sensitivity, ip_violation)")
+    
+    # Fields for safety check overrides
+    override_safety_blocks: Optional[bool] = Field(default=False, description="Whether to override safety blocks")
+    override_safety_reason: Optional[str] = Field(default=None, description="Reason for overriding safety blocks")
+    override_safety_by: Optional[str] = Field(default=None, description="Who overrode safety blocks")
 
 class RerunDecision(BaseModel):
     """
