@@ -3,7 +3,7 @@ Loop Controller Module
 
 This module provides functionality to control loop execution, including
 delusion detection, failure debugging, belief alignment tracking, CEO insights,
-CTO health monitoring, and system-level drift analysis.
+CTO health monitoring, system-level drift analysis, and weekly drift reporting.
 """
 
 import json
@@ -13,6 +13,7 @@ from typing import Dict, List, Any, Optional, Tuple
 # Import delusion detection and debugger agent modules
 from orchestrator.modules.delusion_detector import detect_plan_delusion, store_rejected_plan
 from orchestrator.modules.drift_summary_engine import process_loop_with_drift_engine
+from orchestrator.modules.weekly_drift_report import process_loop_with_weekly_drift_report
 from agents.debugger_agent import debug_loop_failure
 from agents.historian_agent import analyze_loop_summary
 from agents.ceo_agent import analyze_loop_with_ceo_agent
@@ -537,7 +538,8 @@ def handle_loop_completion(
     config: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
-    Handles loop completion with historian agent, CEO agent, CTO agent, and drift summary analysis.
+    Handles loop completion with historian agent, CEO agent, CTO agent, drift summary analysis,
+    and weekly drift reporting.
     
     Args:
         loop_id (str): The loop identifier
@@ -589,6 +591,13 @@ def handle_loop_completion(
                         "trust_decay": 0.1
                     }
                 }
+            },
+            "weekly_drift_report": {
+                "enabled": True,
+                "report_frequency": 7,
+                "min_loops_required": 3,
+                "critical_drift_threshold": 0.6,
+                "critical_count_threshold": 2
             }
         }
     
@@ -642,11 +651,34 @@ def handle_loop_completion(
     # Update memory with drift summary results
     memory = drift_result
     
+    # Process loop with weekly drift report generator
+    weekly_drift_config = config.get("weekly_drift_report", {"enabled": True})
+    weekly_drift_result = process_loop_with_weekly_drift_report(
+        loop_id,
+        memory,
+        weekly_drift_config
+    )
+    
+    # Update memory with weekly drift report results
+    memory = weekly_drift_result
+    
+    # Determine if a weekly report was generated
+    weekly_report_generated = False
+    if "weekly_drift_reports" in memory:
+        for report in memory["weekly_drift_reports"]:
+            if loop_id in report.get("loop_range", []):
+                weekly_report_generated = True
+                break
+    
     # Combine results
+    message = f"Historian: {historian_result['message']}; CEO: {ceo_result['message']}; CTO: {cto_result['message']}; Drift analysis completed"
+    if weekly_report_generated:
+        message += "; Weekly drift report generated"
+    
     combined_result = {
         "status": "completed",
         "memory": memory,
-        "message": f"Historian: {historian_result['message']}; CEO: {ceo_result['message']}; CTO: {cto_result['message']}; Drift analysis completed"
+        "message": message
     }
     
     # Return combined result
