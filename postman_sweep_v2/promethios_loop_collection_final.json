@@ -1,0 +1,495 @@
+{
+  "info": {
+    "name": "Promethios Loop Collection - Final",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health and System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Root Endpoint",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "System Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/system/status",
+              "host": ["{{base_url}}"],
+              "path": ["system", "status"]
+            }
+          }
+        },
+        {
+          "name": "OpenAPI Schema",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/openapi.json",
+              "host": ["{{base_url}}"],
+              "path": ["openapi.json"]
+            }
+          }
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/docs",
+              "host": ["{{base_url}}"],
+              "path": ["docs"]
+            }
+          }
+        },
+        {
+          "name": "Redoc Documentation",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/redoc",
+              "host": ["{{base_url}}"],
+              "path": ["redoc"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Memory Operations",
+      "item": [
+        {
+          "name": "Memory Read",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/memory/read?key=test_project",
+              "host": ["{{base_url}}"],
+              "path": ["memory", "read"],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "test_project"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Memory Write",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/memory/write",
+              "host": ["{{base_url}}"],
+              "path": ["memory", "write"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"test_project\",\n  \"value\": {\n    \"test\": \"data\",\n    \"timestamp\": \"2025-04-21T15:50:00Z\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Memory Delete",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/memory/delete",
+              "host": ["{{base_url}}"],
+              "path": ["memory", "delete"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"test_project_temp\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Loop Operations",
+      "item": [
+        {
+          "name": "Loop Trace (GET)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/loop/trace",
+              "host": ["{{base_url}}"],
+              "path": ["loop", "trace"]
+            }
+          }
+        },
+        {
+          "name": "Loop Trace (POST)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/loop/trace",
+              "host": ["{{base_url}}"],
+              "path": ["loop", "trace"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loop_id\": \"test_loop_001\",\n  \"status\": \"completed\",\n  \"timestamp\": \"2025-04-21T16:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Loop Reset",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/loop/reset",
+              "host": ["{{base_url}}"],
+              "path": ["loop", "reset"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Loop Persona Reflect",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/loop/persona-reflect",
+              "host": ["{{base_url}}"],
+              "path": ["loop", "persona-reflect"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"persona\": \"ceo\",\n  \"reflection\": \"This is a test reflection\",\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agent Operations",
+      "item": [
+        {
+          "name": "Analyze Prompt",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/analyze-prompt",
+              "host": ["{{base_url}}"],
+              "path": ["analyze-prompt"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Create a simple todo app using React\",\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Generate Variants",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/generate-variants",
+              "host": ["{{base_url}}"],
+              "path": ["generate-variants"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": {\n    \"steps\": [\n      {\"step_id\": 1, \"description\": \"Set up React project\"},\n      {\"step_id\": 2, \"description\": \"Create components\"}\n    ]\n  },\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Plan and Execute",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/plan-and-execute",
+              "host": ["{{base_url}}"],
+              "path": ["plan-and-execute"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Create a simple todo app using React\",\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Run Critic",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/run-critic",
+              "host": ["{{base_url}}"],
+              "path": ["run-critic"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"This is a test summary for critic review\",\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Specialized Agents",
+      "item": [
+        {
+          "name": "CEO Review",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ceo-review",
+              "host": ["{{base_url}}"],
+              "path": ["ceo-review"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"This is a test project for CEO review\",\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "CTO Review",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/cto-review",
+              "host": ["{{base_url}}"],
+              "path": ["cto-review"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"This is a test project for CTO review\",\n  \"loop_id\": \"test_loop_001\",\n  \"plan\": {\n    \"steps\": [\n      {\"step_id\": 1, \"description\": \"Research\"},\n      {\"step_id\": 2, \"description\": \"Implement\"}\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Historian Check",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/historian-check",
+              "host": ["{{base_url}}"],
+              "path": ["historian-check"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"This is a test project for historian check\",\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Pessimist Check",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/pessimist-check",
+              "host": ["{{base_url}}"],
+              "path": ["pessimist-check"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"This is a test project for pessimist check\",\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Drift Summary",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/drift-summary",
+              "host": ["{{base_url}}"],
+              "path": ["drift-summary"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Generate Weekly Drift Report",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/generate-weekly-drift-report",
+              "host": ["{{base_url}}"],
+              "path": ["generate-weekly-drift-report"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Persona",
+      "item": [
+        {
+          "name": "Current Persona",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/persona/current",
+              "host": ["{{base_url}}"],
+              "path": ["persona", "current"]
+            }
+          }
+        },
+        {
+          "name": "Switch Persona",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/persona/switch",
+              "host": ["{{base_url}}"],
+              "path": ["persona", "switch"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"persona\": \"ceo\",\n  \"loop_id\": \"test_loop_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Mode Trace",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/mode/trace",
+              "host": ["{{base_url}}"],
+              "path": ["mode", "trace"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Debug",
+      "item": [
+        {
+          "name": "Schema Injection Test",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/schema-injection-test",
+              "host": ["{{base_url}}"],
+              "path": ["schema-injection-test"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

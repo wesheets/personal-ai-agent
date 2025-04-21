@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-04-21T13:04:29.335162",
+  "base_url": "https://web-production-2639.up.railway.app",
+  "total_errors": 1,
+  "errors_by_type": {
+    "Bad Request - The request was malformed or missing required parameters": 1
+  },
+  "detailed_errors": {
+    "Switch Persona": {
+      "status_code": 400,
+      "error_type": "Bad Request - The request was malformed or missing required parameters",
+      "request_method": "POST",
+      "request_url": "https://web-production-2639.up.railway.app/persona/switch",
+      "request_body": "{\n  \"persona\": \"ceo\",\n  \"loop_id\": \"test_loop_001\"\n}",
+      "response_body": "{\n  \"detail\": \"Invalid persona. Must be one of: SAGE, ARCHITECT, RESEARCHER, RITUALIST, INVENTOR\"\n}",
+      "validation_errors": "Invalid persona. Must be one of: SAGE, ARCHITECT, RESEARCHER, RITUALIST, INVENTOR",
+      "suggested_fix": "Check the request body format and ensure all required fields are provided with correct types."
+    }
+  }
+}

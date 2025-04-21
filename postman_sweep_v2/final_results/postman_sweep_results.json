@@ -1,0 +1,1587 @@
+{
+  "timestamp": "2025-04-21T13:04:29.335162",
+  "base_url": "https://web-production-2639.up.railway.app",
+  "total_routes": 27,
+  "successful_routes": 26,
+  "failed_routes": 1,
+  "categories": {
+    "Health and System": {
+      "total": 6,
+      "successful": 6,
+      "failed": 0
+    },
+    "Memory Operations": {
+      "total": 3,
+      "successful": 3,
+      "failed": 0
+    },
+    "Loop Operations": {
+      "total": 4,
+      "successful": 4,
+      "failed": 0
+    },
+    "Agent Operations": {
+      "total": 4,
+      "successful": 4,
+      "failed": 0
+    },
+    "Specialized Agents": {
+      "total": 4,
+      "successful": 4,
+      "failed": 0
+    },
+    "Reports": {
+      "total": 2,
+      "successful": 2,
+      "failed": 0
+    },
+    "Persona": {
+      "total": 3,
+      "successful": 2,
+      "failed": 1
+    },
+    "Debug": {
+      "total": 1,
+      "successful": 1,
+      "failed": 0
+    }
+  },
+  "route_details": [
+    {
+      "name": "Health Check",
+      "category": "Health and System",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/health",
+      "status_code": 200,
+      "duration_seconds": 0.195981,
+      "success": true,
+      "response": {
+        "status": "ok"
+      }
+    },
+    {
+      "name": "Root Endpoint",
+      "category": "Health and System",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/",
+      "status_code": 200,
+      "duration_seconds": 0.228857,
+      "success": true,
+      "response": {
+        "name": "Promethios API",
+        "version": "1.0.0",
+        "status": "running",
+        "documentation": "/docs",
+        "health": "/health",
+        "diagnostics": "/diagnostics/router-check"
+      }
+    },
+    {
+      "name": "System Status",
+      "category": "Health and System",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/system/status",
+      "status_code": 200,
+      "duration_seconds": 0.251108,
+      "success": true,
+      "response": {
+        "status": "operational",
+        "environment": "production",
+        "modules": {
+          "core": "loaded",
+          "memory": "loaded",
+          "agents": "loaded",
+          "loop": "loaded",
+          "persona": "loaded"
+        },
+        "version": "1.0.0"
+      }
+    },
+    {
+      "name": "OpenAPI Schema",
+      "category": "Health and System",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/openapi.json",
+      "status_code": 200,
+      "duration_seconds": 0.245542,
+      "success": true,
+      "response": {
+        "openapi": "3.1.0",
+        "info": {
+          "title": "Promethios API",
+          "description": "API for the Promethios cognitive system",
+          "version": "1.0.0"
+        },
+        "paths": {
+          "/diagnostics/router-check": {
+            "get": {
+              "summary": "Router Diagnostics",
+              "description": "Diagnostic endpoint to check router registration status.",
+              "operationId": "router_diagnostics_diagnostics_router_check_get",
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/health": {
+            "get": {
+              "summary": "Health Check",
+              "description": "Health check endpoint that returns the API status.",
+              "operationId": "health_check_health_get",
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/system/status": {
+            "get": {
+              "tags": [
+                "core"
+              ],
+              "summary": "System Status",
+              "description": "Get system status including environment and module load state.",
+              "operationId": "system_status_system_status_get",
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/memory/read": {
+            "post": {
+              "tags": [
+                "core"
+              ],
+              "summary": "Read Memory",
+              "description": "Retrieve memory by key.",
+              "operationId": "read_memory_memory_read_post",
+              "parameters": [
+                {
+                  "name": "key",
+                  "in": "query",
+                  "required": true,
+                  "schema": {
+                    "type": "string",
+                    "title": "Key"
+                  }
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/memory/write": {
+            "post": {
+              "tags": [
+                "core"
+              ],
+              "summary": "Write Memory",
+              "description": "Direct memory injection.",
+              "operationId": "write_memory_memory_write_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/memory/delete": {
+            "post": {
+              "tags": [
+                "core"
+              ],
+              "summary": "Delete Memory",
+              "description": "Clear keys from memory.",
+              "operationId": "delete_memory_memory_delete_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/loop/trace": {
+            "get": {
+              "tags": [
+                "loop"
+              ],
+              "summary": "Get Loop Trace",
+              "description": "Get loop memory trace log.",
+              "operationId": "get_loop_trace_loop_trace_get",
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                }
+              }
+            },
+            "post": {
+              "tags": [
+                "loop"
+              ],
+              "summary": "Add Loop Trace",
+              "description": "Inject synthetic loop trace.",
+              "operationId": "add_loop_trace_loop_trace_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/loop/reset": {
+            "post": {
+              "tags": [
+                "loop"
+              ],
+              "summary": "Reset Loop",
+              "description": "Memory reset for clean test runs.",
+              "operationId": "reset_loop_loop_reset_post",
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/loop/persona-reflect": {
+            "post": {
+              "tags": [
+                "loop"
+              ],
+              "summary": "Persona Reflect",
+              "description": "Inject mode-aligned reflection trace.",
+              "operationId": "persona_reflect_loop_persona_reflect_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/analyze-prompt": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Analyze Prompt",
+              "description": "Thought Partner prompt analysis.",
+              "operationId": "analyze_prompt_analyze_prompt_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/generate-variants": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Generate Variants",
+              "description": "Thought Variant Generator.",
+              "operationId": "generate_variants_generate_variants_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/plan-and-execute": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Plan And Execute",
+              "description": "HAL, ASH, NOVA execution.",
+              "operationId": "plan_and_execute_plan_and_execute_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/run-critic": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Run Critic",
+              "description": "Loop summary review.",
+              "operationId": "run_critic_run_critic_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/pessimist-check": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Pessimist Check",
+              "description": "Tone realism scoring.",
+              "operationId": "pessimist_check_pessimist_check_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/ceo-review": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Ceo Review",
+              "description": "Alignment + Operator satisfaction.",
+              "operationId": "ceo_review_ceo_review_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/cto-review": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Cto Review",
+              "description": "Trust decay + loop health.",
+              "operationId": "cto_review_cto_review_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/historian-check": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Historian Check",
+              "description": "Forgotten belief analysis.",
+              "operationId": "historian_check_historian_check_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/drift-summary": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Drift Summary",
+              "description": "Aggregated loop-level drift.",
+              "operationId": "drift_summary_drift_summary_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/generate-weekly-drift-report": {
+            "post": {
+              "tags": [
+                "agent"
+              ],
+              "summary": "Generate Weekly Drift Report",
+              "description": "Weekly system meta-summary.",
+              "operationId": "generate_weekly_drift_report_generate_weekly_drift_report_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/persona/switch": {
+            "post": {
+              "tags": [
+                "persona"
+              ],
+              "summary": "Switch Persona",
+              "description": "Change active mode.",
+              "operationId": "switch_persona_persona_switch_post",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "additionalProperties": true,
+                      "type": "object",
+                      "title": "Data"
+                    }
+                  }
+                },
+                "required": true
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                },
+                "422": {
+                  "description": "Validation Error",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/HTTPValidationError"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/persona/current": {
+            "get": {
+              "tags": [
+                "persona"
+              ],
+              "summary": "Get Current Persona",
+              "description": "Return current orchestrator_persona.",
+              "operationId": "get_current_persona_persona_current_get",
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/mode/trace": {
+            "get": {
+              "tags": [
+                "persona"
+              ],
+              "summary": "Get Mode Trace",
+              "description": "Trace of persona usage over loops.",
+              "operationId": "get_mode_trace_mode_trace_get",
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/schema-injection-test": {
+            "get": {
+              "summary": "Schema Injection Test",
+              "description": "Test endpoint to validate if memory schemas are reachable.",
+              "operationId": "schema_injection_test_schema_injection_test_get",
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/": {
+            "get": {
+              "summary": "Root",
+              "description": "Root endpoint that returns basic API information.",
+              "operationId": "root__get",
+              "responses": {
+                "200": {
+                  "description": "Successful Response",
+                  "content": {
+                    "application/json": {
+                      "schema": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "components": {
+          "schemas": {
+            "HTTPValidationError": {
+              "properties": {
+                "detail": {
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  },
+                  "type": "array",
+                  "title": "Detail"
+                }
+              },
+              "type": "object",
+              "title": "HTTPValidationError"
+            },
+            "ValidationError": {
+              "properties": {
+                "loc": {
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "array",
+                  "title": "Location"
+                },
+                "msg": {
+                  "type": "string",
+                  "title": "Message"
+                },
+                "type": {
+                  "type": "string",
+                  "title": "Error Type"
+                }
+              },
+              "type": "object",
+              "required": [
+                "loc",
+                "msg",
+                "type"
+              ],
+              "title": "ValidationError"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "API Documentation",
+      "category": "Health and System",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/docs",
+      "status_code": 200,
+      "duration_seconds": 0.108808,
+      "success": true,
+      "response": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <link type=\"text/css\" rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css\">\n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/favicon.png\">\n    <title>Promethios API Documentation</title>\n    </head>\n    <body>\n    <div id=\"swagger-ui\">\n    </div>\n    <script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js\"></script>\n    <!-- `SwaggerUIBundle` is now available on the page -->\n    <script>\n    const ui = SwaggerUIBundle({\n        url: '/openapi.json',\n    \"dom_id\": \"#swagger-ui\",\n\"layout\": \"BaseLayout\",\n\"deepLinking\": true,\n\"showExtensions\": true,\n\"showCommonExtensions\": true,\n\n    presets: [\n        SwaggerUIBundle.presets.apis,\n        SwaggerUIBundle.SwaggerUIStandalonePreset\n        ],\n    })\n    </script>\n    </body>\n    </html>\n    "
+    },
+    {
+      "name": "Redoc Documentation",
+      "category": "Health and System",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/redoc",
+      "status_code": 200,
+      "duration_seconds": 0.09909,
+      "success": true,
+      "response": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <title>Promethios API - ReDoc</title>\n    <!-- needed for adaptive design -->\n    <meta charset=\"utf-8\"/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    \n    <link href=\"https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700\" rel=\"stylesheet\">\n    \n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/favicon.png\">\n    <!--\n    ReDoc doesn't change outer page styles\n    -->\n    <style>\n      body {\n        margin: 0;\n        padding: 0;\n      }\n    </style>\n    </head>\n    <body>\n    <noscript>\n        ReDoc requires Javascript to function. Please enable it to browse the documentation.\n    </noscript>\n    <redoc spec-url=\"/openapi.json\"></redoc>\n    <script src=\"https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js\"> </script>\n    </body>\n    </html>\n    "
+    },
+    {
+      "name": "Memory Read",
+      "category": "Memory Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/memory/read?key=test_project",
+      "status_code": 200,
+      "duration_seconds": 0.240905,
+      "success": true,
+      "response": {
+        "key": "test_project",
+        "value": "Value for test_project",
+        "timestamp": "2025-04-21T12:28:00Z"
+      }
+    },
+    {
+      "name": "Memory Write",
+      "category": "Memory Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/memory/write",
+      "status_code": 200,
+      "duration_seconds": 0.120556,
+      "success": true,
+      "response": {
+        "status": "success",
+        "key": "test_project",
+        "memory": {
+          "key": "test_project",
+          "value": {
+            "test": "data",
+            "timestamp": "2025-04-21T15:50:00Z"
+          },
+          "timestamp": "2025-04-21T12:28:00Z"
+        }
+      },
+      "request_body": {
+        "key": "test_project",
+        "value": {
+          "test": "data",
+          "timestamp": "2025-04-21T15:50:00Z"
+        }
+      }
+    },
+    {
+      "name": "Memory Delete",
+      "category": "Memory Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/memory/delete",
+      "status_code": 200,
+      "duration_seconds": 0.097517,
+      "success": true,
+      "response": {
+        "status": "success",
+        "key": "test_project_temp",
+        "message": "Key test_project_temp deleted from memory"
+      },
+      "request_body": {
+        "key": "test_project_temp"
+      }
+    },
+    {
+      "name": "Loop Trace (GET)",
+      "category": "Loop Operations",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/loop/trace",
+      "status_code": 200,
+      "duration_seconds": 0.226887,
+      "success": true,
+      "response": {
+        "traces": [
+          {
+            "loop_id": "loop_001",
+            "status": "completed",
+            "timestamp": "2025-04-21T12:00:00Z",
+            "summary": "Analyzed quantum computing concepts"
+          },
+          {
+            "loop_id": "loop_002",
+            "status": "completed",
+            "timestamp": "2025-04-21T12:10:00Z",
+            "summary": "Researched machine learning algorithms"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Loop Trace (POST)",
+      "category": "Loop Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/loop/trace",
+      "status_code": 200,
+      "duration_seconds": 0.155798,
+      "success": true,
+      "response": {
+        "status": "success",
+        "loop_id": "test_loop_001",
+        "message": "Loop trace for test_loop_001 added successfully"
+      },
+      "request_body": {
+        "loop_id": "test_loop_001",
+        "status": "completed",
+        "timestamp": "2025-04-21T16:00:00Z"
+      }
+    },
+    {
+      "name": "Loop Reset",
+      "category": "Loop Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/loop/reset",
+      "status_code": 200,
+      "duration_seconds": 0.099472,
+      "success": true,
+      "response": {
+        "status": "success",
+        "message": "Loop memory reset successfully",
+        "timestamp": "2025-04-21T12:28:00Z"
+      }
+    },
+    {
+      "name": "Loop Persona Reflect",
+      "category": "Loop Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/loop/persona-reflect",
+      "status_code": 200,
+      "duration_seconds": 0.111419,
+      "success": true,
+      "response": {
+        "status": "success",
+        "persona": "ceo",
+        "loop_id": "test_loop_001",
+        "message": "Reflection for test_loop_001 with persona ceo added successfully"
+      },
+      "request_body": {
+        "persona": "ceo",
+        "reflection": "This is a test reflection",
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "Analyze Prompt",
+      "category": "Agent Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/analyze-prompt",
+      "status_code": 200,
+      "duration_seconds": 0.229232,
+      "success": true,
+      "response": {
+        "analysis": {
+          "intent": "information_seeking",
+          "complexity": "medium",
+          "domain": "general",
+          "emotional_tone": "neutral",
+          "required_agents": [
+            "researcher",
+            "planner",
+            "critic"
+          ]
+        },
+        "loop_id": "test_loop_001",
+        "status": "success"
+      },
+      "request_body": {
+        "prompt": "Create a simple todo app using React",
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "Generate Variants",
+      "category": "Agent Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/generate-variants",
+      "status_code": 200,
+      "duration_seconds": 0.112138,
+      "success": true,
+      "response": {
+        "variants": [
+          {
+            "id": "variant_1",
+            "tone": "optimistic",
+            "risk_level": "low",
+            "alignment": "high",
+            "steps": [
+              {
+                "step_id": 1,
+                "description": "Set up React project"
+              },
+              {
+                "step_id": 2,
+                "description": "Create components"
+              }
+            ]
+          },
+          {
+            "id": "variant_2",
+            "tone": "cautious",
+            "risk_level": "medium",
+            "alignment": "medium",
+            "steps": [
+              {
+                "step_id": 1,
+                "description": "Set up React project"
+              },
+              {
+                "step_id": 2,
+                "description": "Create components"
+              }
+            ]
+          }
+        ],
+        "loop_id": "test_loop_001",
+        "status": "success"
+      },
+      "request_body": {
+        "plan": {
+          "steps": [
+            {
+              "step_id": 1,
+              "description": "Set up React project"
+            },
+            {
+              "step_id": 2,
+              "description": "Create components"
+            }
+          ]
+        },
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "Plan and Execute",
+      "category": "Agent Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/plan-and-execute",
+      "status_code": 200,
+      "duration_seconds": 0.105378,
+      "success": true,
+      "response": {
+        "plan": {
+          "steps": [
+            {
+              "step_id": 1,
+              "description": "Research the topic",
+              "status": "completed"
+            },
+            {
+              "step_id": 2,
+              "description": "Analyze findings",
+              "status": "completed"
+            },
+            {
+              "step_id": 3,
+              "description": "Generate response",
+              "status": "completed"
+            }
+          ]
+        },
+        "execution": {
+          "status": "completed",
+          "summary": "Successfully executed all steps",
+          "agents_used": [
+            "HAL",
+            "ASH",
+            "NOVA"
+          ]
+        },
+        "loop_id": "test_loop_001",
+        "status": "success"
+      },
+      "request_body": {
+        "prompt": "Create a simple todo app using React",
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "Run Critic",
+      "category": "Agent Operations",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/run-critic",
+      "status_code": 200,
+      "duration_seconds": 0.112201,
+      "success": true,
+      "response": {
+        "review": {
+          "accuracy": 0.85,
+          "completeness": 0.9,
+          "coherence": 0.95,
+          "issues": [],
+          "suggestions": []
+        },
+        "loop_id": "test_loop_001",
+        "status": "success"
+      },
+      "request_body": {
+        "summary": "This is a test summary for critic review",
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "CEO Review",
+      "category": "Specialized Agents",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/ceo-review",
+      "status_code": 200,
+      "duration_seconds": 0.112258,
+      "success": true,
+      "response": {
+        "review": {
+          "alignment_score": 0.88,
+          "satisfaction_trend": "increasing",
+          "strategic_insights": [
+            "Good response quality",
+            "Efficient execution"
+          ],
+          "recommendations": []
+        },
+        "loop_id": "test_loop_001",
+        "status": "success"
+      },
+      "request_body": {
+        "summary": "This is a test project for CEO review",
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "CTO Review",
+      "category": "Specialized Agents",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/cto-review",
+      "status_code": 200,
+      "duration_seconds": 0.100336,
+      "success": true,
+      "response": {
+        "review": {
+          "health_score": 0.92,
+          "trust_decay": 0.02,
+          "plan_summary_divergence": 0.05,
+          "warnings": [],
+          "recommendations": []
+        },
+        "loop_id": "test_loop_001",
+        "status": "success"
+      },
+      "request_body": {
+        "summary": "This is a test project for CTO review",
+        "loop_id": "test_loop_001",
+        "plan": {
+          "steps": [
+            {
+              "step_id": 1,
+              "description": "Research"
+            },
+            {
+              "step_id": 2,
+              "description": "Implement"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Historian Check",
+      "category": "Specialized Agents",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/historian-check",
+      "status_code": 200,
+      "duration_seconds": 0.100235,
+      "success": true,
+      "response": {
+        "analysis": {
+          "belief_alignment": 0.85,
+          "forgotten_beliefs": [],
+          "memory_drift": "minimal",
+          "warnings": []
+        },
+        "loop_id": "test_loop_001",
+        "status": "success"
+      },
+      "request_body": {
+        "summary": "This is a test project for historian check",
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "Pessimist Check",
+      "category": "Specialized Agents",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/pessimist-check",
+      "status_code": 200,
+      "duration_seconds": 0.100383,
+      "success": true,
+      "response": {
+        "assessment": {
+          "realism_score": 0.75,
+          "tone_balance": "slightly_optimistic",
+          "blind_spots": [],
+          "warnings": []
+        },
+        "loop_id": "test_loop_001",
+        "status": "success"
+      },
+      "request_body": {
+        "summary": "This is a test project for pessimist check",
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "Drift Summary",
+      "category": "Reports",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/drift-summary",
+      "status_code": 200,
+      "duration_seconds": 0.09965,
+      "success": true,
+      "response": {
+        "summary": {
+          "severity": "low",
+          "belief_drift": 0.03,
+          "trust_decay": 0.02,
+          "plan_execution_variance": 0.04,
+          "recommendations": []
+        },
+        "loop_id": "test_loop_001",
+        "status": "success"
+      },
+      "request_body": {
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "Generate Weekly Drift Report",
+      "category": "Reports",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/generate-weekly-drift-report",
+      "status_code": 200,
+      "duration_seconds": 0.097567,
+      "success": true,
+      "response": {
+        "report": {
+          "period": "2025-04-14 to 2025-04-21",
+          "loops_analyzed": 42,
+          "overall_health": "good",
+          "belief_alignment_trend": "stable",
+          "trust_score_trend": "improving",
+          "mode_usage_balance": "optimal",
+          "agent_performance": {
+            "HAL": 0.95,
+            "ASH": 0.92,
+            "NOVA": 0.88,
+            "CRITIC": 0.94
+          },
+          "recommendations": []
+        },
+        "status": "success"
+      },
+      "request_body": {
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "Current Persona",
+      "category": "Persona",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/persona/current",
+      "status_code": 200,
+      "duration_seconds": 0.228506,
+      "success": true,
+      "response": {
+        "persona": "SAGE",
+        "active_since": "2025-04-21T10:00:00Z",
+        "description": "The SAGE persona focuses on wisdom, balance, and holistic thinking.",
+        "status": "active"
+      }
+    },
+    {
+      "name": "Switch Persona",
+      "category": "Persona",
+      "method": "POST",
+      "url": "https://web-production-2639.up.railway.app/persona/switch",
+      "status_code": 400,
+      "duration_seconds": 0.097519,
+      "success": false,
+      "response": {
+        "detail": "Invalid persona. Must be one of: SAGE, ARCHITECT, RESEARCHER, RITUALIST, INVENTOR"
+      },
+      "request_body": {
+        "persona": "ceo",
+        "loop_id": "test_loop_001"
+      }
+    },
+    {
+      "name": "Mode Trace",
+      "category": "Persona",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/mode/trace",
+      "status_code": 200,
+      "duration_seconds": 0.107737,
+      "success": true,
+      "response": {
+        "traces": [
+          {
+            "loop_id": "loop_001",
+            "persona": "SAGE",
+            "timestamp": "2025-04-21T10:00:00Z",
+            "reason": "Initial mode"
+          },
+          {
+            "loop_id": "loop_002",
+            "persona": "RESEARCHER",
+            "timestamp": "2025-04-21T10:30:00Z",
+            "reason": "Complex research task detected"
+          },
+          {
+            "loop_id": "loop_003",
+            "persona": "SAGE",
+            "timestamp": "2025-04-21T11:00:00Z",
+            "reason": "Returning to balanced approach"
+          }
+        ],
+        "current_persona": "SAGE",
+        "status": "success"
+      }
+    },
+    {
+      "name": "Schema Injection Test",
+      "category": "Debug",
+      "method": "GET",
+      "url": "https://web-production-2639.up.railway.app/schema-injection-test",
+      "status_code": 200,
+      "duration_seconds": 0.098302,
+      "success": true,
+      "response": {
+        "test_route_status": "running",
+        "registered_routers": {
+          "core_router": "registered",
+          "loop_router": "registered",
+          "agent_router": "registered",
+          "persona_router": "registered",
+          "debug_routes": "import_error: cannot import name 'PROJECT_MEMORY' from 'app.memory' (/app/app/memory/__init__.py)",
+          "test_router": "registered"
+        },
+        "schemas_status": {
+          "project_memory": "accessible",
+          "model_registration": "working"
+        }
+      }
+    }
+  ],
+  "error_analysis": {
+    "Switch Persona": {
+      "status_code": 400,
+      "error_type": "Bad Request - The request was malformed or missing required parameters",
+      "request_method": "POST",
+      "request_url": "https://web-production-2639.up.railway.app/persona/switch",
+      "request_body": "{\n  \"persona\": \"ceo\",\n  \"loop_id\": \"test_loop_001\"\n}",
+      "response_body": "{\n  \"detail\": \"Invalid persona. Must be one of: SAGE, ARCHITECT, RESEARCHER, RITUALIST, INVENTOR\"\n}",
+      "validation_errors": "Invalid persona. Must be one of: SAGE, ARCHITECT, RESEARCHER, RITUALIST, INVENTOR",
+      "suggested_fix": "Check the request body format and ensure all required fields are provided with correct types."
+    }
+  },
+  "success_rate": "96.30%"
+}
