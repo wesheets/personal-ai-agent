@@ -1,0 +1,572 @@
+{
+  "loop_id": "stability-check-20250422033800",
+  "project_id": "promethios-core",
+  "timestamp": "2025-04-22T03:38:00Z",
+  "status": "completed",
+  "orchestrator_mode": "BALANCED",
+  "agents": [
+    {
+      "agent_id": "REBUILDER",
+      "timestamp": "2025-04-22T03:38:05Z",
+      "status": "completed",
+      "execution_time": 2.45,
+      "memory_usage": 128.5,
+      "belief_references": [
+        "system_stability",
+        "rebuild_criteria",
+        "module_dependencies"
+      ],
+      "result": {
+        "stability_score": 0.89,
+        "needs_rebuild": true,
+        "rebuild_events": [
+          {
+            "type": "module_failure",
+            "timestamp": "2025-04-22T03:37:35Z",
+            "stability_score": 0.78,
+            "threshold": 0.8,
+            "orchestrator_mode": "BALANCED",
+            "message": "Module 'loop' failed CI tests with score 0.78",
+            "severity": "high",
+            "details": {
+              "module_name": "loop",
+              "failure_reason": "Timeout in nested loop recovery tests",
+              "failed_tests": 11,
+              "total_tests": 50
+            }
+          },
+          {
+            "type": "module_failure",
+            "timestamp": "2025-04-22T03:37:50Z",
+            "stability_score": 0.65,
+            "threshold": 0.8,
+            "orchestrator_mode": "BALANCED",
+            "message": "Module 'reconciler_agent' failed CI tests with score 0.65",
+            "severity": "medium",
+            "details": {
+              "module_name": "reconciler_agent",
+              "failure_reason": "Contradiction detection failing on complex cases",
+              "failed_tests": 7,
+              "total_tests": 20
+            }
+          },
+          {
+            "type": "belief_version_mismatch",
+            "timestamp": "2025-04-22T03:38:25Z",
+            "stability_score": 0.85,
+            "threshold": 0.9,
+            "orchestrator_mode": "BALANCED",
+            "message": "Belief version mismatch detected for 'contradiction_resolution'",
+            "severity": "medium",
+            "details": {
+              "belief_name": "contradiction_resolution",
+              "current_version": "1.0.0",
+              "expected_version": "1.1.0",
+              "affected_modules": ["reconciler_agent"]
+            }
+          },
+          {
+            "type": "system_stability",
+            "timestamp": "2025-04-22T03:38:30Z",
+            "stability_score": 0.89,
+            "threshold": 0.9,
+            "orchestrator_mode": "BALANCED",
+            "message": "Overall system stability below threshold (0.89 < 0.9)",
+            "severity": "medium",
+            "details": {
+              "modules_needing_rebuild": ["loop", "reconciler_agent"],
+              "beliefs_needing_update": ["contradiction_resolution", "loop_execution"]
+            }
+          }
+        ],
+        "recommendations": [
+          {
+            "type": "rebuild",
+            "priority": "high",
+            "target": "module",
+            "target_name": "loop",
+            "description": "Rebuild loop module to fix nested loop recovery timeout issues",
+            "expected_impact": "high",
+            "estimated_effort": "medium"
+          },
+          {
+            "type": "rebuild",
+            "priority": "medium",
+            "target": "module",
+            "target_name": "reconciler_agent",
+            "description": "Enhance contradiction detection for complex and temporal cases",
+            "expected_impact": "medium",
+            "estimated_effort": "medium"
+          },
+          {
+            "type": "update",
+            "priority": "medium",
+            "target": "belief",
+            "target_name": "contradiction_resolution",
+            "description": "Update belief to version 1.1.0 with improved temporal contradiction handling",
+            "expected_impact": "medium",
+            "estimated_effort": "low"
+          },
+          {
+            "type": "fix",
+            "priority": "low",
+            "target": "module",
+            "target_name": "auditor_agent",
+            "description": "Fix correlation strength calculation for edge cases",
+            "expected_impact": "low",
+            "estimated_effort": "low"
+          },
+          {
+            "type": "fix",
+            "priority": "low",
+            "target": "module",
+            "target_name": "belief_versioning",
+            "description": "Improve conflict resolution for circular dependencies and complex branches",
+            "expected_impact": "medium",
+            "estimated_effort": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "agent_id": "AUDITOR",
+      "timestamp": "2025-04-22T03:38:15Z",
+      "status": "completed",
+      "execution_time": 1.85,
+      "memory_usage": 112.3,
+      "belief_references": [
+        "audit_principles",
+        "anomaly_detection",
+        "security_standards"
+      ],
+      "result": {
+        "belief_consistency_score": 0.92,
+        "memory_integrity_score": 0.95,
+        "execution_anomaly_score": 0.88,
+        "security_concern_score": 0.97,
+        "issues": [
+          {
+            "type": "execution_anomaly",
+            "severity": "medium",
+            "message": "Execution time for loop module is 2.5x higher than average",
+            "impact": 0.7,
+            "likelihood": 0.8,
+            "risk_level": "medium",
+            "recommendation": "Investigate nested loop recovery performance",
+            "priority": "medium"
+          },
+          {
+            "type": "belief_inconsistency",
+            "severity": "medium",
+            "message": "Contradiction detected between 'contradiction_resolution' belief and implementation",
+            "impact": 0.6,
+            "likelihood": 0.9,
+            "risk_level": "medium",
+            "recommendation": "Update belief or implementation to ensure consistency",
+            "priority": "medium"
+          },
+          {
+            "type": "memory_integrity",
+            "severity": "low",
+            "message": "Potential memory leak in loop module during nested execution",
+            "impact": 0.5,
+            "likelihood": 0.7,
+            "risk_level": "low",
+            "recommendation": "Review memory management in nested loop execution",
+            "priority": "low"
+          }
+        ],
+        "correlations": [
+          {
+            "issue_types": ["execution_anomaly", "memory_integrity"],
+            "correlation_strength": 0.85,
+            "description": "Execution time anomalies strongly correlated with memory integrity issues"
+          },
+          {
+            "issue_types": ["belief_inconsistency", "execution_anomaly"],
+            "correlation_strength": 0.72,
+            "description": "Belief inconsistencies moderately correlated with execution anomalies"
+          }
+        ]
+      }
+    },
+    {
+      "agent_id": "SKEPTIC",
+      "timestamp": "2025-04-22T03:38:25Z",
+      "status": "completed",
+      "execution_time": 1.25,
+      "memory_usage": 95.8,
+      "belief_references": [
+        "critical_thinking",
+        "belief_clarity"
+      ],
+      "result": {
+        "belief_clarity_score": 0.85,
+        "alignment_score": 0.82,
+        "flagged_beliefs": [
+          {
+            "belief_name": "contradiction_resolution",
+            "clarity_score": 0.75,
+            "alignment_score": 0.68,
+            "issues": [
+              "Ambiguous definition of temporal contradictions",
+              "Unclear resolution strategy for complex cases"
+            ],
+            "recommendations": [
+              "Clarify definition of temporal contradictions",
+              "Provide explicit examples of resolution strategies"
+            ]
+          },
+          {
+            "belief_name": "loop_execution",
+            "clarity_score": 0.82,
+            "alignment_score": 0.79,
+            "issues": [
+              "Incomplete specification for nested loop error recovery"
+            ],
+            "recommendations": [
+              "Expand error recovery guidelines for nested loops"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "beliefs": {
+    "system_stability": {
+      "content": "System stability is measured by CI test results, module health, and belief consistency.",
+      "version": "1.0.0",
+      "confidence": 0.95,
+      "last_updated": "2025-04-15T10:30:45Z",
+      "references": [
+        "stability_metrics_documentation",
+        "system_health_guidelines"
+      ]
+    },
+    "rebuild_criteria": {
+      "content": "Modules should be rebuilt when CI score falls below 0.8 or when critical issues are detected.",
+      "version": "1.0.0",
+      "confidence": 0.92,
+      "last_updated": "2025-04-15T10:35:22Z",
+      "references": [
+        "rebuild_policy_documentation",
+        "ci_score_guidelines"
+      ]
+    },
+    "module_dependencies": {
+      "content": "Modules depend on each other through shared beliefs and direct function calls.",
+      "version": "1.0.0",
+      "confidence": 0.88,
+      "last_updated": "2025-04-15T10:40:15Z",
+      "references": [
+        "architecture_documentation",
+        "dependency_mapping"
+      ]
+    },
+    "contradiction_resolution": {
+      "content": "Contradictions between beliefs should be resolved by evaluating evidence and confidence.",
+      "version": "1.0.0",
+      "confidence": 0.85,
+      "last_updated": "2025-03-24T14:22:10Z",
+      "references": [
+        "contradiction_handling_guidelines",
+        "belief_management_documentation"
+      ]
+    },
+    "loop_execution": {
+      "content": "Loops execute in sequence with proper error handling and recovery mechanisms.",
+      "version": "2.1.0",
+      "confidence": 0.90,
+      "last_updated": "2025-04-15T13:20:05Z",
+      "references": [
+        "loop_execution_documentation",
+        "error_recovery_guidelines"
+      ]
+    }
+  },
+  "summary": {
+    "content": "Stability check detected issues with the loop and reconciler_agent modules, with CI scores of 0.78 and 0.65 respectively. The overall system stability score is 0.89, which is below the threshold of 0.9 for BALANCED mode. The main issues are nested loop recovery timeouts and contradiction detection failures in complex cases. The REBUILDER agent recommends rebuilding these modules and updating the contradiction_resolution belief. The AUDITOR agent found correlations between execution anomalies and memory integrity issues. The SKEPTIC agent flagged ambiguities in the contradiction_resolution and loop_execution beliefs.",
+    "realism_score": 0.95,
+    "factual_accuracy": 0.97,
+    "logical_consistency": 0.94,
+    "emotional_congruence": 0.92,
+    "temporal_coherence": 0.96,
+    "confidence": 0.95
+  },
+  "execution_metrics": {
+    "total_execution_time": 5.55,
+    "peak_memory_usage": 156.2,
+    "agent_count": 3,
+    "belief_reference_count": 10,
+    "belief_update_count": 0
+  },
+  "audit_results": {
+    "belief_consistency_score": 0.92,
+    "memory_integrity_score": 0.95,
+    "execution_anomaly_score": 0.88,
+    "security_concern_score": 0.97,
+    "issues": [
+      {
+        "type": "execution_anomaly",
+        "severity": "medium",
+        "message": "Execution time for loop module is 2.5x higher than average",
+        "impact": 0.7,
+        "likelihood": 0.8,
+        "risk_level": "medium",
+        "recommendation": "Investigate nested loop recovery performance",
+        "priority": "medium"
+      },
+      {
+        "type": "belief_inconsistency",
+        "severity": "medium",
+        "message": "Contradiction detected between 'contradiction_resolution' belief and implementation",
+        "impact": 0.6,
+        "likelihood": 0.9,
+        "risk_level": "medium",
+        "recommendation": "Update belief or implementation to ensure consistency",
+        "priority": "medium"
+      },
+      {
+        "type": "memory_integrity",
+        "severity": "low",
+        "message": "Potential memory leak in loop module during nested execution",
+        "impact": 0.5,
+        "likelihood": 0.7,
+        "risk_level": "low",
+        "recommendation": "Review memory management in nested loop execution",
+        "priority": "low"
+      }
+    ],
+    "correlations": [
+      {
+        "issue_types": ["execution_anomaly", "memory_integrity"],
+        "correlation_strength": 0.85,
+        "description": "Execution time anomalies strongly correlated with memory integrity issues"
+      },
+      {
+        "issue_types": ["belief_inconsistency", "execution_anomaly"],
+        "correlation_strength": 0.72,
+        "description": "Belief inconsistencies moderately correlated with execution anomalies"
+      }
+    ]
+  },
+  "belief_versions": {
+    "contradiction_resolution": {
+      "current_version": "1.0.0",
+      "previous_version": null,
+      "version_history": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2025-03-24T14:22:10Z",
+          "change_type": "major",
+          "change_description": "Initial version",
+          "loop_id": "initial-setup-20250324142210"
+        }
+      ],
+      "dependencies": [
+        "belief_management"
+      ],
+      "dependents": [
+        "reconciler_agent"
+      ],
+      "change_impact": {
+        "impact_level": "medium",
+        "affected_beliefs": [],
+        "affected_modules": [
+          "reconciler_agent"
+        ]
+      },
+      "branch_info": {
+        "current_branch": "main",
+        "branches": [
+          {
+            "name": "main",
+            "created_at": "2025-03-24T14:22:10Z",
+            "last_updated": "2025-03-24T14:22:10Z",
+            "status": "active"
+          },
+          {
+            "name": "temporal-enhancement",
+            "created_at": "2025-04-20T09:45:30Z",
+            "last_updated": "2025-04-21T15:22:45Z",
+            "status": "active"
+          }
+        ]
+      }
+    },
+    "loop_execution": {
+      "current_version": "2.1.0",
+      "previous_version": "2.0.0",
+      "version_history": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2025-03-10T08:30:15Z",
+          "change_type": "major",
+          "change_description": "Initial version",
+          "loop_id": "initial-setup-20250310083015"
+        },
+        {
+          "version": "2.0.0",
+          "timestamp": "2025-03-25T11:42:18Z",
+          "change_type": "major",
+          "change_description": "Added support for nested loops",
+          "loop_id": "feature-nested-loops-20250325114218"
+        },
+        {
+          "version": "2.1.0",
+          "timestamp": "2025-04-15T13:20:05Z",
+          "change_type": "minor",
+          "change_description": "Enhanced error recovery",
+          "loop_id": "enhancement-error-recovery-20250415132005"
+        }
+      ],
+      "dependencies": [
+        "error_handling",
+        "memory_management"
+      ],
+      "dependents": [
+        "loop"
+      ],
+      "change_impact": {
+        "impact_level": "high",
+        "affected_beliefs": [
+          "error_handling"
+        ],
+        "affected_modules": [
+          "loop"
+        ]
+      },
+      "branch_info": {
+        "current_branch": "main",
+        "branches": [
+          {
+            "name": "main",
+            "created_at": "2025-03-10T08:30:15Z",
+            "last_updated": "2025-04-15T13:20:05Z",
+            "status": "active"
+          }
+        ]
+      }
+    }
+  },
+  "rebuild_events": [
+    {
+      "type": "module_failure",
+      "timestamp": "2025-04-22T03:37:35Z",
+      "stability_score": 0.78,
+      "threshold": 0.8,
+      "orchestrator_mode": "BALANCED",
+      "message": "Module 'loop' failed CI tests with score 0.78",
+      "severity": "high",
+      "details": {
+        "module_name": "loop",
+        "failure_reason": "Timeout in nested loop recovery tests",
+        "failed_tests": 11,
+        "total_tests": 50
+      }
+    },
+    {
+      "type": "module_failure",
+      "timestamp": "2025-04-22T03:37:50Z",
+      "stability_score": 0.65,
+      "threshold": 0.8,
+      "orchestrator_mode": "BALANCED",
+      "message": "Module 'reconciler_agent' failed CI tests with score 0.65",
+      "severity": "medium",
+      "details": {
+        "module_name": "reconciler_agent",
+        "failure_reason": "Contradiction detection failing on complex cases",
+        "failed_tests": 7,
+        "total_tests": 20
+      }
+    },
+    {
+      "type": "belief_version_mismatch",
+      "timestamp": "2025-04-22T03:38:25Z",
+      "stability_score": 0.85,
+      "threshold": 0.9,
+      "orchestrator_mode": "BALANCED",
+      "message": "Belief version mismatch detected for 'contradiction_resolution'",
+      "severity": "medium",
+      "details": {
+        "belief_name": "contradiction_resolution",
+        "current_version": "1.0.0",
+        "expected_version": "1.1.0",
+        "affected_modules": ["reconciler_agent"]
+      }
+    },
+    {
+      "type": "system_stability",
+      "timestamp": "2025-04-22T03:38:30Z",
+      "stability_score": 0.89,
+      "threshold": 0.9,
+      "orchestrator_mode": "BALANCED",
+      "message": "Overall system stability below threshold (0.89 < 0.9)",
+      "severity": "medium",
+      "details": {
+        "modules_needing_rebuild": ["loop", "reconciler_agent"],
+        "beliefs_needing_update": ["contradiction_resolution", "loop_execution"]
+      }
+    }
+  ],
+  "ci_results": {
+    "status": "failed",
+    "ci_score": 0.89,
+    "timestamp": "2025-04-22T03:37:00Z",
+    "total_modules": 12,
+    "passed_modules": 10,
+    "failed_modules": 2,
+    "module_results": [
+      {
+        "module_name": "loop",
+        "status": "failed",
+        "ci_score": 0.78,
+        "total_tests": 50,
+        "passed_tests": 39,
+        "failed_tests": 11,
+        "failure_reason": "Timeout in nested loop recovery tests"
+      },
+      {
+        "module_name": "reconciler_agent",
+        "status": "failed",
+        "ci_score": 0.65,
+        "total_tests": 20,
+        "passed_tests": 13,
+        "failed_tests": 7,
+        "failure_reason": "Contradiction detection failing on complex cases"
+      }
+    ]
+  },
+  "project_manifest_summary": {
+    "total_modules": 12,
+    "module_counts": {
+      "core": 5,
+      "agent": 4,
+      "utility": 3
+    },
+    "belief_versions": [
+      "orchestration_principles:1.2.0",
+      "agent_coordination:2.0.1",
+      "error_handling:1.1.3",
+      "depth_control:1.0.0",
+      "resource_management:1.1.0",
+      "loop_execution:2.1.0",
+      "memory_management:1.0.2",
+      "critical_thinking:1.0.0",
+      "belief_clarity:1.1.0",
+      "belief_management:1.0.0",
+      "core_principles:1.2.1",
+      "contradiction_resolution:1.0.0",
+      "audit_principles:1.0.0",
+      "anomaly_detection:1.0.0",
+      "performance_monitoring:1.0.0",
+      "version_control:1.0.0",
+      "realism_assessment:1.0.0",
+      "nlp_techniques:1.0.0"
+    ],
+    "modules_needing_rebuild": ["loop", "reconciler_agent"],
+    "modules_with_failed_ci": ["loop", "reconciler_agent"],
+    "last_stability_score": 0.89,
+    "last_updated": "2025-04-22T03:38:00Z"
+  }
+}
