@@ -1,0 +1,393 @@
+{
+  "project_id": "promethios-core",
+  "ci_run_id": "ci-20250422-033700",
+  "timestamp": "2025-04-22T03:37:00Z",
+  "status": "completed",
+  "ci_score": 0.89,
+  "total_modules": 12,
+  "passed_modules": 10,
+  "failed_modules": 2,
+  "module_results": [
+    {
+      "module_name": "orchestrator_logic",
+      "status": "passed",
+      "ci_score": 0.95,
+      "timestamp": "2025-04-22T03:37:10Z",
+      "total_tests": 42,
+      "passed_tests": 40,
+      "failed_tests": 2,
+      "test_results": [
+        {
+          "module_name": "orchestrator_logic",
+          "test_name": "TestOrchestratorLogic.test_mode_switching",
+          "status": "passed",
+          "execution_time": 0.45,
+          "timestamp": "2025-04-22T03:37:05Z"
+        },
+        {
+          "module_name": "orchestrator_logic",
+          "test_name": "TestOrchestratorLogic.test_error_handling",
+          "status": "passed",
+          "execution_time": 0.38,
+          "timestamp": "2025-04-22T03:37:06Z"
+        },
+        {
+          "module_name": "orchestrator_logic",
+          "test_name": "TestOrchestratorLogic.test_research_mode",
+          "status": "failed",
+          "execution_time": 1.25,
+          "timestamp": "2025-04-22T03:37:07Z",
+          "error_message": "Timeout waiting for research mode completion"
+        },
+        {
+          "module_name": "orchestrator_logic",
+          "test_name": "TestOrchestratorLogic.test_agent_coordination",
+          "status": "failed",
+          "execution_time": 0.95,
+          "timestamp": "2025-04-22T03:37:09Z",
+          "error_message": "Expected agent coordination score > 0.9, got 0.87"
+        }
+      ]
+    },
+    {
+      "module_name": "tiered_orchestrator",
+      "status": "passed",
+      "ci_score": 1.0,
+      "timestamp": "2025-04-22T03:37:20Z",
+      "total_tests": 35,
+      "passed_tests": 35,
+      "failed_tests": 0,
+      "test_results": [
+        {
+          "module_name": "tiered_orchestrator",
+          "test_name": "TestTieredOrchestrator.test_fast_mode",
+          "status": "passed",
+          "execution_time": 0.32,
+          "timestamp": "2025-04-22T03:37:15Z"
+        },
+        {
+          "module_name": "tiered_orchestrator",
+          "test_name": "TestTieredOrchestrator.test_balanced_mode",
+          "status": "passed",
+          "execution_time": 0.45,
+          "timestamp": "2025-04-22T03:37:16Z"
+        },
+        {
+          "module_name": "tiered_orchestrator",
+          "test_name": "TestTieredOrchestrator.test_thorough_mode",
+          "status": "passed",
+          "execution_time": 0.68,
+          "timestamp": "2025-04-22T03:37:17Z"
+        },
+        {
+          "module_name": "tiered_orchestrator",
+          "test_name": "TestTieredOrchestrator.test_research_mode",
+          "status": "passed",
+          "execution_time": 0.92,
+          "timestamp": "2025-04-22T03:37:19Z"
+        }
+      ]
+    },
+    {
+      "module_name": "loop",
+      "status": "failed",
+      "ci_score": 0.78,
+      "timestamp": "2025-04-22T03:37:35Z",
+      "total_tests": 50,
+      "passed_tests": 39,
+      "failed_tests": 11,
+      "failure_reason": "Timeout in nested loop recovery tests",
+      "test_results": [
+        {
+          "module_name": "loop",
+          "test_name": "TestLoop.test_basic_execution",
+          "status": "passed",
+          "execution_time": 0.28,
+          "timestamp": "2025-04-22T03:37:25Z"
+        },
+        {
+          "module_name": "loop",
+          "test_name": "TestLoop.test_nested_loops",
+          "status": "passed",
+          "execution_time": 0.65,
+          "timestamp": "2025-04-22T03:37:26Z"
+        },
+        {
+          "module_name": "loop",
+          "test_name": "TestLoop.test_error_recovery_simple",
+          "status": "passed",
+          "execution_time": 0.42,
+          "timestamp": "2025-04-22T03:37:27Z"
+        },
+        {
+          "module_name": "loop",
+          "test_name": "TestLoop.test_error_recovery_nested",
+          "status": "failed",
+          "execution_time": 3.25,
+          "timestamp": "2025-04-22T03:37:30Z",
+          "error_message": "Timeout waiting for nested loop recovery"
+        },
+        {
+          "module_name": "loop",
+          "test_name": "TestLoop.test_memory_management",
+          "status": "failed",
+          "execution_time": 0.85,
+          "timestamp": "2025-04-22T03:37:32Z",
+          "error_message": "Memory leak detected in nested loop execution"
+        }
+      ]
+    },
+    {
+      "module_name": "reconciler_agent",
+      "status": "failed",
+      "ci_score": 0.65,
+      "timestamp": "2025-04-22T03:37:50Z",
+      "total_tests": 20,
+      "passed_tests": 13,
+      "failed_tests": 7,
+      "failure_reason": "Contradiction detection failing on complex cases",
+      "test_results": [
+        {
+          "module_name": "reconciler_agent",
+          "test_name": "TestReconcilerAgent.test_simple_contradiction",
+          "status": "passed",
+          "execution_time": 0.35,
+          "timestamp": "2025-04-22T03:37:40Z"
+        },
+        {
+          "module_name": "reconciler_agent",
+          "test_name": "TestReconcilerAgent.test_medium_contradiction",
+          "status": "passed",
+          "execution_time": 0.48,
+          "timestamp": "2025-04-22T03:37:42Z"
+        },
+        {
+          "module_name": "reconciler_agent",
+          "test_name": "TestReconcilerAgent.test_complex_contradiction",
+          "status": "failed",
+          "execution_time": 1.15,
+          "timestamp": "2025-04-22T03:37:44Z",
+          "error_message": "Failed to detect contradiction in complex case #3"
+        },
+        {
+          "module_name": "reconciler_agent",
+          "test_name": "TestReconcilerAgent.test_temporal_contradiction",
+          "status": "failed",
+          "execution_time": 0.92,
+          "timestamp": "2025-04-22T03:37:46Z",
+          "error_message": "Failed to detect temporal contradiction"
+        },
+        {
+          "module_name": "reconciler_agent",
+          "test_name": "TestReconcilerAgent.test_belief_reconciliation",
+          "status": "failed",
+          "execution_time": 1.05,
+          "timestamp": "2025-04-22T03:37:48Z",
+          "error_message": "Reconciliation produced invalid belief state"
+        }
+      ]
+    },
+    {
+      "module_name": "auditor_agent",
+      "status": "passed",
+      "ci_score": 0.98,
+      "timestamp": "2025-04-22T03:38:05Z",
+      "total_tests": 45,
+      "passed_tests": 44,
+      "failed_tests": 1,
+      "test_results": [
+        {
+          "module_name": "auditor_agent",
+          "test_name": "TestAuditorAgent.test_belief_consistency",
+          "status": "passed",
+          "execution_time": 0.42,
+          "timestamp": "2025-04-22T03:37:55Z"
+        },
+        {
+          "module_name": "auditor_agent",
+          "test_name": "TestAuditorAgent.test_memory_integrity",
+          "status": "passed",
+          "execution_time": 0.38,
+          "timestamp": "2025-04-22T03:37:56Z"
+        },
+        {
+          "module_name": "auditor_agent",
+          "test_name": "TestAuditorAgent.test_execution_anomalies",
+          "status": "passed",
+          "execution_time": 0.55,
+          "timestamp": "2025-04-22T03:37:58Z"
+        },
+        {
+          "module_name": "auditor_agent",
+          "test_name": "TestAuditorAgent.test_security_concerns",
+          "status": "passed",
+          "execution_time": 0.62,
+          "timestamp": "2025-04-22T03:38:00Z"
+        },
+        {
+          "module_name": "auditor_agent",
+          "test_name": "TestAuditorAgent.test_correlation_analysis",
+          "status": "failed",
+          "execution_time": 0.85,
+          "timestamp": "2025-04-22T03:38:02Z",
+          "error_message": "Correlation strength calculation incorrect for edge case"
+        }
+      ]
+    },
+    {
+      "module_name": "belief_versioning",
+      "status": "passed",
+      "ci_score": 0.95,
+      "timestamp": "2025-04-22T03:38:20Z",
+      "total_tests": 40,
+      "passed_tests": 38,
+      "failed_tests": 2,
+      "test_results": [
+        {
+          "module_name": "belief_versioning",
+          "test_name": "TestBeliefVersioning.test_version_tracking",
+          "status": "passed",
+          "execution_time": 0.32,
+          "timestamp": "2025-04-22T03:38:10Z"
+        },
+        {
+          "module_name": "belief_versioning",
+          "test_name": "TestBeliefVersioning.test_semantic_versioning",
+          "status": "passed",
+          "execution_time": 0.28,
+          "timestamp": "2025-04-22T03:38:11Z"
+        },
+        {
+          "module_name": "belief_versioning",
+          "test_name": "TestBeliefVersioning.test_dependency_tracking",
+          "status": "passed",
+          "execution_time": 0.45,
+          "timestamp": "2025-04-22T03:38:13Z"
+        },
+        {
+          "module_name": "belief_versioning",
+          "test_name": "TestBeliefVersioning.test_conflict_resolution",
+          "status": "failed",
+          "execution_time": 0.75,
+          "timestamp": "2025-04-22T03:38:15Z",
+          "error_message": "Failed to resolve circular dependency conflict"
+        },
+        {
+          "module_name": "belief_versioning",
+          "test_name": "TestBeliefVersioning.test_branching_merging",
+          "status": "failed",
+          "execution_time": 0.82,
+          "timestamp": "2025-04-22T03:38:17Z",
+          "error_message": "Merge conflict resolution failed for complex branch"
+        }
+      ]
+    }
+  ],
+  "rebuild_events": [
+    {
+      "type": "module_failure",
+      "timestamp": "2025-04-22T03:37:35Z",
+      "stability_score": 0.78,
+      "threshold": 0.8,
+      "orchestrator_mode": "BALANCED",
+      "message": "Module 'loop' failed CI tests with score 0.78",
+      "severity": "high",
+      "details": {
+        "module_name": "loop",
+        "failure_reason": "Timeout in nested loop recovery tests",
+        "failed_tests": 11,
+        "total_tests": 50
+      }
+    },
+    {
+      "type": "module_failure",
+      "timestamp": "2025-04-22T03:37:50Z",
+      "stability_score": 0.65,
+      "threshold": 0.8,
+      "orchestrator_mode": "BALANCED",
+      "message": "Module 'reconciler_agent' failed CI tests with score 0.65",
+      "severity": "medium",
+      "details": {
+        "module_name": "reconciler_agent",
+        "failure_reason": "Contradiction detection failing on complex cases",
+        "failed_tests": 7,
+        "total_tests": 20
+      }
+    },
+    {
+      "type": "belief_version_mismatch",
+      "timestamp": "2025-04-22T03:38:25Z",
+      "stability_score": 0.85,
+      "threshold": 0.9,
+      "orchestrator_mode": "BALANCED",
+      "message": "Belief version mismatch detected for 'contradiction_resolution'",
+      "severity": "medium",
+      "details": {
+        "belief_name": "contradiction_resolution",
+        "current_version": "1.0.0",
+        "expected_version": "1.1.0",
+        "affected_modules": ["reconciler_agent"]
+      }
+    },
+    {
+      "type": "system_stability",
+      "timestamp": "2025-04-22T03:38:30Z",
+      "stability_score": 0.89,
+      "threshold": 0.9,
+      "orchestrator_mode": "BALANCED",
+      "message": "Overall system stability below threshold (0.89 < 0.9)",
+      "severity": "medium",
+      "details": {
+        "modules_needing_rebuild": ["loop", "reconciler_agent"],
+        "beliefs_needing_update": ["contradiction_resolution", "loop_execution"]
+      }
+    }
+  ],
+  "recommendations": [
+    {
+      "type": "rebuild",
+      "priority": "high",
+      "target": "module",
+      "target_name": "loop",
+      "description": "Rebuild loop module to fix nested loop recovery timeout issues",
+      "expected_impact": "high",
+      "estimated_effort": "medium"
+    },
+    {
+      "type": "rebuild",
+      "priority": "medium",
+      "target": "module",
+      "target_name": "reconciler_agent",
+      "description": "Enhance contradiction detection for complex and temporal cases",
+      "expected_impact": "medium",
+      "estimated_effort": "medium"
+    },
+    {
+      "type": "update",
+      "priority": "medium",
+      "target": "belief",
+      "target_name": "contradiction_resolution",
+      "description": "Update belief to version 1.1.0 with improved temporal contradiction handling",
+      "expected_impact": "medium",
+      "estimated_effort": "low"
+    },
+    {
+      "type": "fix",
+      "priority": "low",
+      "target": "module",
+      "target_name": "auditor_agent",
+      "description": "Fix correlation strength calculation for edge cases",
+      "expected_impact": "low",
+      "estimated_effort": "low"
+    },
+    {
+      "type": "fix",
+      "priority": "low",
+      "target": "module",
+      "target_name": "belief_versioning",
+      "description": "Improve conflict resolution for circular dependencies and complex branches",
+      "expected_impact": "medium",
+      "estimated_effort": "medium"
+    }
+  ]
+}
