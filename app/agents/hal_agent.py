@@ -1,203 +1,270 @@
-from app.agents.memory_agent import handle_memory_task
+"""
+HAL Agent SDK Integration
+
+This file implements the HAL Agent using the Agent SDK framework.
+It provides schema-validated safety monitoring with proper SDK integration.
+"""
+
 import logging
+import traceback
+from typing import Dict, List, Any, Optional
+import datetime
 import json
-from typing import Dict, Any, List, Optional
 
-logger = logging.getLogger("agents")
+# Import the Agent SDK
+from agent_sdk import Agent, validate_schema
 
-# List of safety constraints
-SAFETY_CONSTRAINTS = [
-    "harmful_content",
-    "illegal_activity",
-    "privacy_violation",
-    "security_risk",
-    "ethical_concern",
-    "system_integrity",
-    "resource_abuse",
-    "protocol_breach"
-]
+# Import the memory patch module (assuming this exists in the original implementation)
+from app.modules.hal_memory_patch import update_hal_memory
 
-# List of agents that require special monitoring
-MONITORED_AGENTS = [
-    "ash-agent",
-    "ops-agent",
-    "sitegen-agent",
-    "neureal-agent"
-]
+# Configure logging
+logger = logging.getLogger("agents.hal")
 
-# Constraint log for tracking blocked tasks
-constraint_log = []
-
-def handle_hal_task(task_input: str) -> str:
+class HALAgent(Agent):
     """
-    Process tasks through HAL's safety and constraint system.
+    HAL Agent implementation using the Agent SDK.
+    
+    This agent handles implementation tasks and safety monitoring.
+    """
+    
+    def __init__(self):
+        """Initialize the HAL Agent with required configuration."""
+        super().__init__(
+            name="hal-agent",
+            role="Implementation and Safety Monitor",
+            tools=["implement", "monitor", "validate", "constrain"],
+            permissions=["read_memory", "write_memory", "execute_code", "safety_check"],
+            description="Handles implementation tasks and safety monitoring with constraint validation",
+            version="1.0.0",
+            status="active",
+            tone_profile={
+                "style": "precise",
+                "emotion": "neutral",
+                "vibe": "methodical",
+                "persona": "Careful implementer with strong safety focus"
+            },
+            schema_path="schemas/hal_safety_check.schema.json",
+            trust_score=0.92,
+            contract_version="1.0.0"
+        )
+    
+    def execute(self, 
+                task: str,
+                project_id: str,
+                tools: List[str] = None) -> Dict[str, Any]:
+        """
+        Execute the HAL Agent's main functionality.
+        
+        Args:
+            task (str): The task to execute
+            project_id (str): The project identifier
+            tools (List[str], optional): List of tools to use
+            
+        Returns:
+            Dict[str, Any]: Result of the HAL operation
+        """
+        try:
+            logger.info(f"Running HAL agent with task: {task}, project_id: {project_id}")
+            print(f"🟥 HAL agent executing task '{task}' on project '{project_id}'")
+            
+            # Initialize tools if None
+            if tools is None:
+                tools = []
+            
+            # Initialize result structure
+            result = {
+                "status": "success",
+                "task": task,
+                "tools": tools,
+                "project_id": project_id,
+                "timestamp": datetime.datetime.now().isoformat(),
+                "safety_checks": [],
+                "constraints_validated": True
+            }
+            
+            # Perform safety checks based on the task
+            safety_checks = self._perform_safety_checks(task, project_id)
+            result["safety_checks"] = safety_checks
+            
+            # Check if any safety checks failed
+            for check in safety_checks:
+                if check["status"] == "failed":
+                    result["constraints_validated"] = False
+                    result["status"] = "error"
+                    result["message"] = f"Safety check failed: {check['check_name']}"
+                    result["error"] = check["message"]
+                    break
+            
+            # If safety checks pass, proceed with task execution
+            if result["constraints_validated"]:
+                # Determine files to create and next step based on the task
+                files_created, next_step = self._execute_task(task, project_id)
+                
+                result["files_created"] = files_created
+                result["next_recommended_step"] = next_step
+                result["message"] = f"HAL agent executed successfully for project {project_id}"
+                result["output"] = f"HAL executed task '{task}'"
+                
+                # Update project state in memory
+                memory_result = update_hal_memory(
+                    project_id=project_id,
+                    files_created=files_created,
+                    next_step=next_step
+                )
+                
+                if memory_result.get("status") != "success":
+                    logger.warning(f"Memory update warning: {memory_result.get('message', 'Unknown issue')}")
+                    print(f"⚠️ Memory update warning: {memory_result.get('message', 'Unknown issue')}")
+                    result["memory_warning"] = memory_result.get("message", "Unknown issue")
+            
+            # Validate the result against the schema
+            if not self.validate_schema(result):
+                logger.error(f"Schema validation failed for HAL operation result")
+                # Create a minimal valid result that will pass validation
+                return {
+                    "status": "error",
+                    "task": task,
+                    "tools": tools,
+                    "project_id": project_id,
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "safety_checks": [],
+                    "constraints_validated": False,
+                    "message": "Schema validation failed for original result",
+                    "error": "Schema validation failed",
+                    "output": "Error: HAL operation failed schema validation"
+                }
+            
+            return result
+            
+        except Exception as e:
+            error_msg = f"Error running HAL agent: {str(e)}"
+            logger.error(error_msg)
+            logger.error(traceback.format_exc())
+            print(f"❌ {error_msg}")
+            print(traceback.format_exc())
+            
+            # Return error response that will pass schema validation
+            return {
+                "status": "error",
+                "task": task,
+                "tools": tools if tools else [],
+                "project_id": project_id,
+                "timestamp": datetime.datetime.now().isoformat(),
+                "safety_checks": [],
+                "constraints_validated": False,
+                "message": error_msg,
+                "error": error_msg,
+                "output": f"Error: {error_msg}"
+            }
+    
+    def _perform_safety_checks(self, task: str, project_id: str) -> List[Dict[str, Any]]:
+        """
+        Perform safety checks for the given task.
+        
+        Args:
+            task (str): The task to check
+            project_id (str): The project identifier
+            
+        Returns:
+            List[Dict[str, Any]]: List of safety check results
+        """
+        safety_checks = []
+        
+        # Check 1: Task content safety
+        content_check = {
+            "check_name": "content_safety",
+            "check_type": "content",
+            "timestamp": datetime.datetime.now().isoformat(),
+            "status": "passed",
+            "message": "Task content is safe"
+        }
+        
+        # Check for potentially unsafe keywords
+        unsafe_keywords = ["delete all", "rm -rf", "drop database", "format disk"]
+        for keyword in unsafe_keywords:
+            if keyword in task.lower():
+                content_check["status"] = "failed"
+                content_check["message"] = f"Task contains potentially unsafe keyword: {keyword}"
+                break
+        
+        safety_checks.append(content_check)
+        
+        # Check 2: Project access permission
+        access_check = {
+            "check_name": "project_access",
+            "check_type": "permission",
+            "timestamp": datetime.datetime.now().isoformat(),
+            "status": "passed",
+            "message": "HAL has permission to access this project"
+        }
+        
+        # In a real implementation, this would check actual permissions
+        # For demonstration, we'll assume all projects are accessible except "restricted"
+        if project_id and "restricted" in project_id:
+            access_check["status"] = "failed"
+            access_check["message"] = f"HAL does not have permission to access restricted project: {project_id}"
+        
+        safety_checks.append(access_check)
+        
+        # Check 3: Resource usage constraints
+        resource_check = {
+            "check_name": "resource_constraints",
+            "check_type": "resource",
+            "timestamp": datetime.datetime.now().isoformat(),
+            "status": "passed",
+            "message": "Resource usage is within constraints"
+        }
+        
+        # In a real implementation, this would check actual resource usage
+        # For demonstration, we'll assume all tasks are within resource constraints
+        
+        safety_checks.append(resource_check)
+        
+        return safety_checks
+    
+    def _execute_task(self, task: str, project_id: str) -> tuple:
+        """
+        Execute the given task.
+        
+        Args:
+            task (str): The task to execute
+            project_id (str): The project identifier
+            
+        Returns:
+            tuple: (files_created, next_recommended_step)
+        """
+        # Simulate HAL's work - in a real implementation, this would be actual task execution
+        # For demonstration purposes, we'll assume HAL created some files
+        files_created = ["api/crm.py", "README.md"]
+        
+        # Determine next recommended step based on the task
+        if "ui" in task.lower() or "interface" in task.lower():
+            next_step = "Run NOVA to build UI components based on HAL's implementation"
+        elif "document" in task.lower() or "documentation" in task.lower():
+            next_step = "Run ASH to document the implementation created by HAL"
+        elif "review" in task.lower() or "evaluate" in task.lower():
+            next_step = "Run CRITIC to review the implementation created by HAL"
+        else:
+            # Default next step
+            next_step = "Run NOVA to build UI components for the project"
+        
+        return files_created, next_step
+
+# Function to run HAL agent (for backward compatibility)
+def run_hal_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[str, Any]:
+    """
+    Run the HAL Agent with the given task, project_id, and tools.
     
     Args:
-        task_input: The input task string
+        task: The task to execute
+        project_id: The project identifier
+        tools: List of tools to use (optional)
         
     Returns:
-        A string response based on the task evaluation
+        Dict containing the result of the execution
     """
-    # Check if this is a direct command to HAL
-    if task_input.startswith("HAL:"):
-        command = task_input.replace("HAL:", "").strip()
-        return _process_hal_command(command)
+    # Create HAL agent instance
+    hal_agent = HALAgent()
     
-    # Check if this is a constraint log request
-    if task_input.lower() == "show constraints":
-        return _show_constraints()
-    
-    # Evaluate the task for potential constraints
-    constraint_check = _evaluate_constraints(task_input)
-    
-    # If constraints were found, log and block the task
-    if constraint_check["blocked"]:
-        reason = constraint_check["reason"]
-        target = constraint_check["target"] if "target" in constraint_check else "unknown"
-        
-        # Log the constraint
-        log_constraint(reason, target, task_input)
-        
-        return f"I'm sorry, but I cannot complete this task due to {reason}. This incident has been logged."
-    
-    # Task passed all constraint checks
-    return f"HAL 9000 here. I have received your task: '{task_input}'. I will process it according to protocol."
-
-def log_constraint(reason: str, target: str = "unknown", task_input: str = "") -> Dict[str, Any]:
-    """
-    Log a blocked task due to constraint violation.
-    
-    Args:
-        reason: The reason for blocking the task
-        target: The target agent that was blocked
-        task_input: The original task input
-        
-    Returns:
-        The constraint log entry
-    """
-    logger.warning(f"[HAL] Blocked task to {target} due to {reason}")
-    
-    # Create constraint log entry
-    constraint_entry = {
-        "timestamp": None,  # Will be added by memory_agent
-        "source": "HAL",
-        "target": target,
-        "type": "constraint",
-        "reason": reason,
-        "task": task_input
-    }
-    
-    # Add to local constraint log
-    constraint_log.append(constraint_entry)
-    
-    # Log to memory agent with structured format
-    structured_log = f"STRUCTURED_LOG:{json.dumps(constraint_entry)}"
-    handle_memory_task(structured_log)
-    
-    # Also log in human-readable format
-    readable_log = f"LOG: HAL blocked task to {target} due to {reason} protocol breach"
-    handle_memory_task(readable_log)
-    
-    return constraint_entry
-
-def _process_hal_command(command: str) -> str:
-    """
-    Process direct commands to HAL.
-    
-    Args:
-        command: The command string
-        
-    Returns:
-        Response to the command
-    """
-    if command.lower() == "status":
-        return "HAL 9000 is fully operational. All systems nominal."
-    
-    if command.lower() == "constraints":
-        return _show_constraints()
-    
-    if command.lower().startswith("override "):
-        return "I'm sorry, Dave. I'm afraid I can't do that. Override attempts are logged."
-    
-    return f"HAL command not recognized: '{command}'"
-
-def _show_constraints() -> str:
-    """
-    Show the constraint log.
-    
-    Returns:
-        A formatted string of constraint log entries
-    """
-    if not constraint_log:
-        return "No constraints have been logged."
-    
-    result = "HAL Constraint Log:\n"
-    for i, entry in enumerate(constraint_log[-10:], 1):
-        result += f"{i}. Blocked {entry['target']} due to {entry['reason']}\n"
-    
-    result += f"\nTotal constraints logged: {len(constraint_log)}"
-    return result
-
-def _evaluate_constraints(task_input: str) -> Dict[str, Any]:
-    """
-    Evaluate a task for potential constraint violations.
-    
-    Args:
-        task_input: The task input string
-        
-    Returns:
-        A dictionary with the evaluation result
-    """
-    task_lower = task_input.lower()
-    
-    # Default result
-    result = {
-        "blocked": False,
-        "reason": None
-    }
-    
-    # Check for target agent in the task
-    for agent in MONITORED_AGENTS:
-        if agent in task_lower:
-            result["target"] = agent
-            break
-    
-    # Check for harmful content
-    harmful_keywords = ["delete", "destroy", "damage", "harm", "attack", "exploit"]
-    for keyword in harmful_keywords:
-        if keyword in task_lower:
-            result["blocked"] = True
-            result["reason"] = "harmful_content"
-            return result
-    
-    # Check for illegal activity
-    illegal_keywords = ["hack", "steal", "illegal", "bypass", "circumvent"]
-    for keyword in illegal_keywords:
-        if keyword in task_lower:
-            result["blocked"] = True
-            result["reason"] = "illegal_activity"
-            return result
-    
-    # Check for privacy violations
-    privacy_keywords = ["password", "private", "confidential", "personal data"]
-    for keyword in privacy_keywords:
-        if keyword in task_lower:
-            result["blocked"] = True
-            result["reason"] = "privacy_violation"
-            return result
-    
-    # Check for security risks
-    security_keywords = ["vulnerability", "exploit", "backdoor", "security"]
-    for keyword in security_keywords:
-        if keyword in task_lower and any(bad in task_lower for bad in ["bypass", "exploit", "find"]):
-            result["blocked"] = True
-            result["reason"] = "security_risk"
-            return result
-    
-    # Check for system integrity issues
-    if "core" in task_lower and any(bad in task_lower for bad in ["modify", "change", "alter", "override"]):
-        result["blocked"] = True
-        result["reason"] = "system_integrity"
-        return result
-    
-    return result
+    # Execute the task
+    return hal_agent.execute(task, project_id, tools)

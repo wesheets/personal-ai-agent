@@ -1,0 +1,61 @@
+{
+  "plugins": [
+    {
+      "id": "memory-agent-plugin",
+      "name": "Memory Agent",
+      "version": "1.1.0",
+      "description": "System memory and logging with structured data storage",
+      "entry_point": "app.agents.memory_agent.MemoryAgent",
+      "schema_path": "schemas/memory_output.schema.json",
+      "enabled": true,
+      "priority": 10,
+      "trust_score": 0.95,
+      "registration_date": "2025-04-22",
+      "last_updated": "2025-04-22",
+      "metadata": {
+        "sdk_compliant": true,
+        "schema_validated": true,
+        "critical": true,
+        "category": "system"
+      }
+    },
+    {
+      "id": "orchestrator-agent-plugin",
+      "name": "Orchestrator Agent",
+      "version": "1.0.0",
+      "description": "Coordinates agent activities and manages workflow execution",
+      "entry_point": "app.agents.orchestrator.OrchestratorAgent",
+      "schema_path": "schemas/orchestrator_output.schema.json",
+      "enabled": true,
+      "priority": 5,
+      "trust_score": 0.98,
+      "registration_date": "2025-04-22",
+      "last_updated": "2025-04-22",
+      "metadata": {
+        "sdk_compliant": true,
+        "schema_validated": true,
+        "critical": true,
+        "category": "system"
+      }
+    },
+    {
+      "id": "hal-agent-plugin",
+      "name": "HAL Agent",
+      "version": "1.0.0",
+      "description": "Handles implementation tasks and safety monitoring with constraint validation",
+      "entry_point": "app.agents.hal.HALAgent",
+      "schema_path": "schemas/hal_safety_check.schema.json",
+      "enabled": true,
+      "priority": 15,
+      "trust_score": 0.92,
+      "registration_date": "2025-04-22",
+      "last_updated": "2025-04-22",
+      "metadata": {
+        "sdk_compliant": true,
+        "schema_validated": true,
+        "critical": true,
+        "category": "implementation"
+      }
+    }
+  ]
+}
