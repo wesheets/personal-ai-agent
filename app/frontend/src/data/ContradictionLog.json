@@ -1,0 +1,87 @@
+{
+  "contradictions": [
+    {
+      "contradiction_id": "contradiction_1650389421000_1234",
+      "loop_id": "loop_789",
+      "agent": "SAGE",
+      "belief_1": "The system should prioritize user privacy over data collection.",
+      "belief_2": "Comprehensive data collection is necessary for optimal system performance.",
+      "detected_at": "2025-04-22T14:30:21.000Z",
+      "resolution": "unresolved",
+      "type": "divergent_values",
+      "score": 0.87,
+      "item1_type": "belief",
+      "item2_type": "reflection",
+      "item1_id": "belief_privacy_001",
+      "item2_id": "reflection_789_001"
+    },
+    {
+      "contradiction_id": "contradiction_1650389722000_5678",
+      "loop_id": "loop_456",
+      "agent": "HAL",
+      "belief_1": "The user interface should be simplified for better accessibility.",
+      "belief_2": "Advanced features should be prominently displayed in the interface.",
+      "detected_at": "2025-04-22T14:35:22.000Z",
+      "resolution": "flagged",
+      "type": "conflicting_intent",
+      "score": 0.82,
+      "item1_type": "reflection",
+      "item2_type": "reflection",
+      "item1_id": "reflection_456_002",
+      "item2_id": "reflection_456_005"
+    },
+    {
+      "contradiction_id": "contradiction_1650390023000_9012",
+      "loop_id": "loop_123",
+      "agent": "NOVA",
+      "belief_1": "The system will never make autonomous decisions affecting user data.",
+      "belief_2": "In certain high-confidence scenarios, the system should act autonomously to protect user data.",
+      "detected_at": "2025-04-22T14:40:23.000Z",
+      "resolution": "revised",
+      "type": "logical_opposite",
+      "score": 0.91,
+      "item1_type": "belief",
+      "item2_type": "summary",
+      "item1_id": "belief_autonomy_003",
+      "item2_id": "summary_123_001"
+    },
+    {
+      "contradiction_id": "contradiction_1650390324000_3456",
+      "loop_id": "loop_567",
+      "agent": "CRITIC",
+      "belief_1": "The implementation timeline should be extended to ensure quality.",
+      "belief_2": "The implementation must be completed by the original deadline.",
+      "detected_at": "2025-04-22T14:45:24.000Z",
+      "resolution": "unresolved",
+      "type": "semantic_conflict",
+      "score": 0.79,
+      "item1_type": "reflection",
+      "item2_type": "belief",
+      "item1_id": "reflection_567_003",
+      "item2_id": "belief_timeline_002"
+    },
+    {
+      "contradiction_id": "contradiction_1650390625000_7890",
+      "loop_id": "loop_890",
+      "agent": "SAGE",
+      "belief_1": "The feature will be implemented in the next release.",
+      "belief_2": "The feature has been postponed indefinitely.",
+      "detected_at": "2025-04-22T14:50:25.000Z",
+      "resolution": "unresolved",
+      "type": "temporal_inconsistency",
+      "score": 0.88,
+      "item1_type": "summary",
+      "item2_type": "summary",
+      "item1_id": "summary_890_001",
+      "item2_id": "summary_890_002"
+    }
+  ],
+  "meta": {
+    "last_updated": "2025-04-22T14:50:25.000Z",
+    "version": "1.0",
+    "total_count": 5,
+    "unresolved_count": 3,
+    "flagged_count": 1,
+    "revised_count": 1
+  }
+}
