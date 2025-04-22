@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Visualization Settings Schema",
+  "description": "Schema for mode-specific visualization settings",
+  "type": "object",
+  "required": ["detail_level", "node_types_to_show", "edge_types_to_show", "update_frequency"],
+  "properties": {
+    "detail_level": {
+      "type": "string",
+      "description": "Level of detail to include in the visualization",
+      "enum": ["minimal", "standard", "detailed", "comprehensive"]
+    },
+    "node_types_to_show": {
+      "type": "array",
+      "description": "Types of nodes to include in the visualization",
+      "items": {
+        "type": "string",
+        "enum": [
+          "agent", 
+          "memory", 
+          "decision", 
+          "reflection", 
+          "loop_start", 
+          "loop_end", 
+          "rerun", 
+          "operator", 
+          "mode_change", 
+          "depth_change"
+        ]
+      },
+      "minItems": 1
+    },
+    "edge_types_to_show": {
+      "type": "array",
+      "description": "Types of edges to include in the visualization",
+      "items": {
+        "type": "string",
+        "enum": [
+          "execution", 
+          "memory_access", 
+          "decision", 
+          "reflection", 
+          "rerun", 
+          "operator", 
+          "mode_transition", 
+          "depth_transition"
+        ]
+      },
+      "minItems": 1
+    },
+    "include_timestamps": {
+      "type": "boolean",
+      "description": "Whether to include timestamps in the visualization"
+    },
+    "include_memory_details": {
+      "type": "boolean",
+      "description": "Whether to include detailed memory information"
+    },
+    "include_agent_details": {
+      "type": "boolean",
+      "description": "Whether to include detailed agent information"
+    },
+    "include_decision_details": {
+      "type": "boolean",
+      "description": "Whether to include detailed decision information"
+    },
+    "include_uncertainty": {
+      "type": "boolean",
+      "description": "Whether to include uncertainty information (research mode only)"
+    },
+    "track_alternatives": {
+      "type": "boolean",
+      "description": "Whether to track alternative paths (research mode only)"
+    },
+    "update_frequency": {
+      "type": "string",
+      "description": "How frequently to update the visualization",
+      "enum": ["end_only", "agent_completion", "real_time"]
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "detail_level": "standard",
+      "node_types_to_show": [
+        "agent", 
+        "memory", 
+        "decision", 
+        "reflection", 
+        "loop_start", 
+        "loop_end", 
+        "rerun",
+        "mode_change",
+        "depth_change"
+      ],
+      "edge_types_to_show": [
+        "execution", 
+        "memory_access", 
+        "decision", 
+        "reflection", 
+        "rerun",
+        "mode_transition",
+        "depth_transition"
+      ],
+      "include_timestamps": true,
+      "include_memory_details": true,
+      "include_agent_details": true,
+      "include_decision_details": true,
+      "update_frequency": "agent_completion"
+    }
+  ]
+}
