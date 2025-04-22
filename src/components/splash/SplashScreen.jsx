@@ -7,13 +7,20 @@ import LoginGate from './LoginGate';
 
 const SplashScreen = () => {
   return (
-    <div className="relative flex flex-col justify-center items-center h-screen text-white bg-black overflow-hidden">
+    <div className="relative h-screen w-full overflow-hidden bg-black text-white">
       <VideoBackground />
-      <img src="/assets/promethioslogo.png" alt="Promethios Logo" className="w-64 mb-8 z-10" />
-      <SloganReveal />
-      <GlitchCountdown />
-      <WaitlistForm />
-      <LoginGate />
+
+      <div className="relative z-10 flex flex-col justify-center items-center h-full">
+        <img
+          src="/assets/promethioslogo.png"
+          alt="Promethios Logo"
+          className="w-64 mb-8"
+        />
+        <SloganReveal />
+        <GlitchCountdown />
+        <WaitlistForm />
+        <LoginGate />
+      </div>
     </div>
   );
 };
