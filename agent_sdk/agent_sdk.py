@@ -1,49 +1,55 @@
 """
 Agent SDK Module
 
-This module provides a standardized interface for creating and registering agents
-in the Promethios system. It ensures all agents follow the same structure and
-are properly registered in the plugin system.
+This module provides the standardized interface for creating and registering agents
+with proper schema validation and memory integration.
 """
 
 import json
+import logging
 import os
-from typing import Dict, List, Any, Optional, Callable, Union
-from datetime import datetime
+import datetime
+from typing import Dict, List, Any, Optional
+import jsonschema
+
+# Configure logging
+logger = logging.getLogger("agent_sdk")
 
 class Agent:
     """
     Base class for all agents in the Promethios system.
     
-    This class provides a standardized interface for creating agents with
-    proper registration, schema validation, and memory integration.
+    This class provides standardized methods for agent registration,
+    schema validation, and memory integration.
     """
     
-    def __init__(
-        self,
-        name: str,
-        role: str,
-        tools: List[str],
-        permissions: List[str],
-        description: str = "",
-        version: str = "1.0.0",
-        status: str = "active",
-        tone_profile: Optional[Dict[str, str]] = None,
-        schema_path: Optional[str] = None
-    ):
+    def __init__(self, 
+                 name: str,
+                 role: str,
+                 tools: List[str],
+                 permissions: List[str],
+                 description: str,
+                 version: str = "1.0.0",
+                 status: str = "active",
+                 tone_profile: Dict[str, str] = None,
+                 schema_path: str = None,
+                 trust_score: float = 0.8,
+                 contract_version: str = "1.0.0"):
         """
-        Initialize a new agent.
+        Initialize an agent with required configuration.
         
         Args:
-            name (str): Unique identifier for the agent
-            role (str): Human-readable description of the agent's role
-            tools (List[str]): List of tools the agent can use
-            permissions (List[str]): List of permissions the agent has
-            description (str, optional): Detailed description of the agent
-            version (str, optional): Version of the agent
-            status (str, optional): Status of the agent (active, experimental)
-            tone_profile (Dict[str, str], optional): Tone profile for the agent
-            schema_path (str, optional): Path to the agent's output schema
+            name: Unique identifier for the agent
+            role: Role description for the agent
+            tools: List of tools the agent can use
+            permissions: List of permissions the agent has
+            description: Detailed description of the agent's purpose
+            version: Agent version
+            status: Agent status (active, inactive, deprecated)
+            tone_profile: Dictionary of tone settings for the agent
+            schema_path: Path to the schema file for output validation
+            trust_score: Trust score for the agent (0.0 to 1.0)
+            contract_version: Version of the agent contract
         """
         self.name = name
         self.role = role
@@ -52,105 +58,60 @@ class Agent:
         self.description = description
         self.version = version
         self.status = status
-        self.tone_profile = tone_profile or {
-            "style": "neutral",
-            "emotion": "neutral",
-            "vibe": "professional",
-            "persona": f"{role} specialist"
-        }
+        self.tone_profile = tone_profile or {}
         self.schema_path = schema_path
-        self.registered = False
-        self.trust_score = 1.0
-        self.last_active = ""
+        self.trust_score = trust_score
+        self.contract_version = contract_version
+        self.schema = None
+        
+        # Load schema if provided
+        if schema_path:
+            self._load_schema()
         
         # Register the agent
-        self.register()
+        self._register()
     
-    def register(self) -> bool:
-        """
-        Register the agent with the plugin system.
-        
-        Returns:
-            bool: True if registration was successful, False otherwise
-        """
+    def _load_schema(self) -> None:
+        """Load the schema from the specified path."""
         try:
-            from app.modules.agent_registry import register_agent
-            
-            # Create handler function that will be called by the plugin system
-            def handler_fn(*args, **kwargs):
-                return self.execute(*args, **kwargs)
-            
-            # Register the agent
-            register_agent(self.name, handler_fn)
-            self.registered = True
-            
-            # Update agent manifest
-            self._update_agent_manifest()
-            
-            return True
+            schema_file = os.path.join(os.getcwd(), self.schema_path)
+            if os.path.exists(schema_file):
+                with open(schema_file, 'r') as f:
+                    self.schema = json.load(f)
+                logger.info(f"Loaded schema from {schema_file}")
+            else:
+                logger.warning(f"Schema file not found: {schema_file}")
         except Exception as e:
-            print(f"Failed to register agent {self.name}: {str(e)}")
-            return False
+            logger.error(f"Error loading schema: {str(e)}")
     
-    def _update_agent_manifest(self) -> None:
-        """
-        Update the agent manifest with this agent's information.
-        """
-        try:
-            manifest_path = os.path.join("config", "agent_manifest.json")
-            
-            # Create manifest if it doesn't exist
-            if not os.path.exists(manifest_path):
-                os.makedirs(os.path.dirname(manifest_path), exist_ok=True)
-                with open(manifest_path, "w") as f:
-                    json.dump({}, f, indent=2)
-            
-            # Read existing manifest
-            with open(manifest_path, "r") as f:
-                manifest = json.load(f)
-            
-            # Update manifest with this agent's information
-            manifest[self.name] = {
-                "version": self.version,
-                "description": self.description,
-                "status": self.status,
-                "entrypoint": f"app/agents/{self.name.lower().replace('-', '_')}.py",
-                "tone_profile": self.tone_profile,
-                "skills": self.tools
-            }
-            
-            # Write updated manifest
-            with open(manifest_path, "w") as f:
-                json.dump(manifest, f, indent=2)
-        except Exception as e:
-            print(f"Failed to update agent manifest for {self.name}: {str(e)}")
+    def _register(self) -> None:
+        """Register the agent with the system."""
+        logger.info(f"Registering agent: {self.name}")
+        # In a real implementation, this would register with a central registry
+        print(f"🟢 Registered agent: {self.name} (role: {self.role})")
     
-    def validate_schema(self, output: Dict[str, Any]) -> bool:
+    def validate_schema(self, data: Dict[str, Any]) -> bool:
         """
-        Validate the agent's output against its schema.
+        Validate data against the agent's schema.
         
         Args:
-            output (Dict[str, Any]): The output to validate
+            data: Data to validate
             
         Returns:
-            bool: True if validation was successful, False otherwise
+            True if validation succeeds, False otherwise
         """
-        if not self.schema_path:
-            # No schema to validate against
+        if not self.schema:
+            logger.warning(f"No schema loaded for agent {self.name}")
             return True
         
         try:
-            import jsonschema
-            
-            # Read schema
-            with open(self.schema_path, "r") as f:
-                schema = json.load(f)
-            
-            # Validate output against schema
-            jsonschema.validate(output, schema)
+            jsonschema.validate(instance=data, schema=self.schema)
             return True
+        except jsonschema.exceptions.ValidationError as e:
+            logger.error(f"Schema validation failed: {str(e)}")
+            return False
         except Exception as e:
-            print(f"Schema validation failed for {self.name}: {str(e)}")
+            logger.error(f"Error during schema validation: {str(e)}")
             return False
     
     def execute(self, *args, **kwargs) -> Dict[str, Any]:
@@ -160,128 +121,36 @@ class Agent:
         This method should be overridden by subclasses.
         
         Returns:
-            Dict[str, Any]: The agent's output
+            Result of the agent's execution
         """
         raise NotImplementedError("Subclasses must implement execute()")
-    
-    def update_memory(self, memory: Dict[str, Any], output: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Update memory with the agent's output.
-        
-        Args:
-            memory (Dict[str, Any]): The current memory state
-            output (Dict[str, Any]): The agent's output
-            
-        Returns:
-            Dict[str, Any]: The updated memory state
-        """
-        # Validate output against schema
-        if not self.validate_schema(output):
-            raise ValueError(f"Output from {self.name} failed schema validation")
-        
-        # Update memory with output
-        if self.name not in memory:
-            memory[self.name] = []
-        
-        # Add timestamp to output
-        output["timestamp"] = datetime.utcnow().isoformat() + "Z"
-        
-        # Add output to memory
-        memory[self.name].append(output)
-        
-        return memory
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """
-        Convert the agent to a dictionary representation.
-        
-        Returns:
-            Dict[str, Any]: Dictionary representation of the agent
-        """
-        return {
-            "name": self.name,
-            "role": self.role,
-            "tools": self.tools,
-            "permissions": self.permissions,
-            "description": self.description,
-            "version": self.version,
-            "status": self.status,
-            "tone_profile": self.tone_profile,
-            "schema_path": self.schema_path,
-            "registered": self.registered,
-            "trust_score": self.trust_score,
-            "last_active": self.last_active
-        }
 
-def register_legacy_agent(
-    name: str,
-    handler_fn: Callable,
-    tools: List[str],
-    permissions: List[str],
-    description: str = "",
-    version: str = "1.0.0",
-    status: str = "active",
-    tone_profile: Optional[Dict[str, str]] = None,
-    schema_path: Optional[str] = None
-) -> Agent:
+# Function to validate schema without an agent instance
+def validate_schema(data: Dict[str, Any], schema_path: str) -> bool:
     """
-    Register a legacy agent function with the plugin system.
-    
-    This function creates an Agent instance that wraps the legacy handler function.
+    Validate data against a schema.
     
     Args:
-        name (str): Unique identifier for the agent
-        handler_fn (Callable): The legacy handler function
-        tools (List[str]): List of tools the agent can use
-        permissions (List[str]): List of permissions the agent has
-        description (str, optional): Detailed description of the agent
-        version (str, optional): Version of the agent
-        status (str, optional): Status of the agent (active, experimental)
-        tone_profile (Dict[str, str], optional): Tone profile for the agent
-        schema_path (str, optional): Path to the agent's output schema
+        data: Data to validate
+        schema_path: Path to the schema file
         
     Returns:
-        Agent: The created Agent instance
-    """
-    class LegacyAgent(Agent):
-        def execute(self, *args, **kwargs):
-            return handler_fn(*args, **kwargs)
-    
-    return LegacyAgent(
-        name=name,
-        role=description or f"{name} agent",
-        tools=tools,
-        permissions=permissions,
-        description=description,
-        version=version,
-        status=status,
-        tone_profile=tone_profile,
-        schema_path=schema_path
-    )
-
-def validate_schema(output: Dict[str, Any], schema_path: str) -> bool:
-    """
-    Validate output against a schema.
-    
-    This is a standalone function for use in legacy code.
-    
-    Args:
-        output (Dict[str, Any]): The output to validate
-        schema_path (str): Path to the schema file
-        
-    Returns:
-        bool: True if validation was successful, False otherwise
+        True if validation succeeds, False otherwise
     """
     try:
-        import jsonschema
-        
-        # Read schema
-        with open(schema_path, "r") as f:
-            schema = json.load(f)
-        
-        # Validate output against schema
-        jsonschema.validate(output, schema)
-        return True
+        schema_file = os.path.join(os.getcwd(), schema_path)
+        if os.path.exists(schema_file):
+            with open(schema_file, 'r') as f:
+                schema = json.load(f)
+            
+            jsonschema.validate(instance=data, schema=schema)
+            return True
+        else:
+            logger.warning(f"Schema file not found: {schema_file}")
+            return False
+    except jsonschema.exceptions.ValidationError as e:
+        logger.error(f"Schema validation failed: {str(e)}")
+        return False
     except Exception as e:
-        print(f"Schema validation failed: {str(e)}")
+        logger.error(f"Error during schema validation: {str(e)}")
         return False

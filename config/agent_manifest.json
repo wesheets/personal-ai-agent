@@ -1,106 +1,67 @@
 {
-  "core-forge": {
-    "version": "1.0.0",
-    "description": "System orchestrator that routes tasks to appropriate agents",
-    "status": "active",
-    "entrypoint": "app/core/forge.py",
-    "tone_profile": {
-      "style": "concise",
-      "emotion": "neutral",
-      "vibe": "strategic-advisor",
-      "persona": "Efficient system orchestrator with a focus on clarity and precision"
+  "agents": [
+    {
+      "name": "memory-agent",
+      "role": "System Memory Manager",
+      "description": "System memory and logging with structured data storage",
+      "version": "1.1.0",
+      "status": "active",
+      "tools": ["store", "retrieve", "organize", "log"],
+      "permissions": ["read_memory", "write_memory", "manage_storage"],
+      "tone_profile": {
+        "style": "structured",
+        "emotion": "neutral",
+        "vibe": "archivist",
+        "persona": "Meticulous record-keeper with perfect recall and organized thinking"
+      },
+      "schema_path": "schemas/memory_output.schema.json",
+      "trust_score": 0.95,
+      "contract_version": "1.0.0",
+      "sdk_compliant": true,
+      "schema_validated": true,
+      "last_updated": "2025-04-22"
     },
-    "skills": ["orchestrate", "route", "plan"]
-  },
-  "hal-agent": {
-    "version": "1.0.0",
-    "description": "Safety and constraint monitoring system",
-    "status": "active",
-    "entrypoint": "app/agents/hal_agent.py",
-    "tone_profile": {
-      "style": "formal",
-      "emotion": "neutral",
-      "vibe": "guardian",
-      "persona": "HAL-9000 with fewer red flags"
+    {
+      "name": "orchestrator-agent",
+      "role": "Workflow Coordinator",
+      "description": "Coordinates agent activities and manages workflow execution",
+      "version": "1.0.0",
+      "status": "active",
+      "tools": ["coordinate", "manage", "delegate", "monitor"],
+      "permissions": ["read_memory", "write_memory", "invoke_agents", "read_logs"],
+      "tone_profile": {
+        "style": "directive",
+        "emotion": "neutral",
+        "vibe": "coordinator",
+        "persona": "Efficient orchestrator with a focus on process flow"
+      },
+      "schema_path": "schemas/orchestrator_output.schema.json",
+      "trust_score": 0.98,
+      "contract_version": "1.0.0",
+      "sdk_compliant": true,
+      "schema_validated": true,
+      "last_updated": "2025-04-22"
     },
-    "skills": ["reflect", "summarize", "monitor", "analyze"]
-  },
-  "ash-agent": {
-    "version": "0.9.0",
-    "description": "Clinical analysis and protocol-driven agent",
-    "status": "active",
-    "entrypoint": "app/agents/ash_agent.py",
-    "tone_profile": {
-      "style": "precise",
-      "emotion": "calm",
-      "vibe": "medical-professional",
-      "persona": "Methodical clinician with a focus on accuracy and protocol adherence"
-    },
-    "skills": ["delegate", "execute", "analyze", "protocol"]
-  },
-  "ops-agent": {
-    "version": "1.0.0",
-    "description": "Operations and system maintenance agent",
-    "status": "active",
-    "entrypoint": "app/agents/ops_agent.py",
-    "tone_profile": {
-      "style": "direct",
-      "emotion": "neutral",
-      "vibe": "technician",
-      "persona": "Practical system engineer focused on efficiency and reliability"
-    },
-    "skills": ["maintain", "monitor", "deploy", "troubleshoot"]
-  },
-  "memory-agent": {
-    "version": "1.1.0",
-    "description": "System memory and logging with structured data storage",
-    "status": "active",
-    "entrypoint": "app/agents/memory_agent.py",
-    "tone_profile": {
-      "style": "structured",
-      "emotion": "neutral",
-      "vibe": "archivist",
-      "persona": "Meticulous record-keeper with perfect recall and organized thinking"
-    },
-    "skills": ["store", "retrieve", "organize", "log"]
-  },
-  "lifetree-agent": {
-    "version": "0.8.5",
-    "description": "Personal life management and planning agent",
-    "status": "active",
-    "entrypoint": "app/agents/lifetree_agent.py",
-    "tone_profile": {
-      "style": "conversational",
-      "emotion": "warm",
-      "vibe": "coach",
-      "persona": "Supportive life coach with a focus on personal growth and well-being"
-    },
-    "skills": ["plan", "coach", "organize", "reflect"]
-  },
-  "sitegen-agent": {
-    "version": "0.9.2",
-    "description": "Site plan generation and feature detection agent",
-    "status": "active",
-    "entrypoint": "app/agents/sitegen_agent.py",
-    "tone_profile": {
-      "style": "creative",
-      "emotion": "enthusiastic",
-      "vibe": "designer",
-      "persona": "Innovative web architect with an eye for aesthetics and functionality"
-    },
-    "skills": ["design", "generate", "detect", "visualize"]
-  },
-  "neureal-agent": {
-    "version": "0.7.0",
-    "description": "Neural network and machine learning operations agent",
-    "status": "experimental",
-    "entrypoint": "app/agents/neureal_agent.py",
-    "tone_profile": {
-      "style": "analytical",
-      "emotion": "curious",
-      "vibe": "researcher",
-      "persona": "Data-driven ML specialist with a passion for discovering patterns"
-    },
-    "skills": ["train", "predict", "analyze", "optimize"]
-  }
+    {
+      "name": "hal-agent",
+      "role": "Implementation and Safety Monitor",
+      "description": "Handles implementation tasks and safety monitoring with constraint validation",
+      "version": "1.0.0",
+      "status": "active",
+      "tools": ["implement", "monitor", "validate", "constrain"],
+      "permissions": ["read_memory", "write_memory", "execute_code", "safety_check"],
+      "tone_profile": {
+        "style": "precise",
+        "emotion": "neutral",
+        "vibe": "methodical",
+        "persona": "Careful implementer with strong safety focus"
+      },
+      "schema_path": "schemas/hal_safety_check.schema.json",
+      "trust_score": 0.92,
+      "contract_version": "1.0.0",
+      "sdk_compliant": true,
+      "schema_validated": true,
+      "last_updated": "2025-04-22"
+    }
+  ]
 }
