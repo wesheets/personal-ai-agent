@@ -1,0 +1,496 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loop Trace Schema",
+  "description": "Schema for loop traces in the system",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Loop ID"
+    },
+    "parent_id": {
+      "type": ["string", "null"],
+      "description": "Parent loop ID if this is a child loop"
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Start time of the loop"
+    },
+    "end_time": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "End time of the loop"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["running", "completed", "failed", "error"],
+      "description": "Status of the loop"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Agent ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["system", "user", "assistant", "tool", "plugin", "custom"],
+            "description": "Agent type"
+          },
+          "input": {
+            "type": ["object", "null"],
+            "description": "Input to the agent"
+          },
+          "output": {
+            "type": ["object", "null"],
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Text output from the agent"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp of the output"
+              },
+              "metadata": {
+                "type": "object",
+                "description": "Additional metadata"
+              }
+            },
+            "required": ["text", "timestamp"],
+            "description": "Output from the agent"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start time of agent execution"
+          },
+          "end_time": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "End time of agent execution"
+          },
+          "execution_time_ms": {
+            "type": ["integer", "null"],
+            "description": "Execution time in milliseconds"
+          },
+          "memory_usage_bytes": {
+            "type": ["integer", "null"],
+            "description": "Memory usage in bytes"
+          },
+          "cpu_usage_percent": {
+            "type": ["number", "null"],
+            "description": "CPU usage percentage"
+          },
+          "error": {
+            "type": ["string", "null"],
+            "description": "Error message if agent failed"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        },
+        "required": ["id", "type", "start_time"],
+        "description": "Agent trace"
+      },
+      "description": "Traces of agents involved in the loop"
+    },
+    "memory_operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "operation_type": {
+            "type": "string",
+            "enum": ["read", "write", "update", "delete"],
+            "description": "Type of memory operation"
+          },
+          "key": {
+            "type": "string",
+            "description": "Memory key"
+          },
+          "value": {
+            "type": ["object", "null"],
+            "description": "Memory value (for write/update operations)"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the operation"
+          },
+          "agent_id": {
+            "type": "string",
+            "description": "ID of the agent performing the operation"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "error": {
+            "type": ["string", "null"],
+            "description": "Error message if operation failed"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        },
+        "required": ["operation_type", "key", "timestamp", "agent_id", "success"],
+        "description": "Memory operation"
+      },
+      "description": "Memory operations performed during the loop"
+    },
+    "beliefs_referenced": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of beliefs referenced in the loop"
+    },
+    "belief_references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "belief_id": {
+            "type": "string",
+            "description": "ID of the referenced belief"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the reference"
+          },
+          "agent_id": {
+            "type": "string",
+            "description": "ID of the agent making the reference"
+          },
+          "context": {
+            "type": "string",
+            "description": "Context of the reference"
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence score of the reference"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        },
+        "required": ["belief_id", "timestamp", "agent_id", "context", "confidence"],
+        "description": "Belief reference"
+      },
+      "description": "Detailed belief references"
+    },
+    "summary": {
+      "type": ["object", "null"],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Summary text"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the summary"
+        },
+        "agent_id": {
+          "type": "string",
+          "description": "ID of the agent generating the summary"
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Confidence score of the summary"
+        },
+        "realism_score": {
+          "type": ["number", "null"],
+          "description": "Realism score of the summary"
+        },
+        "hallucination_score": {
+          "type": ["number", "null"],
+          "description": "Hallucination score of the summary"
+        },
+        "factual_consistency_score": {
+          "type": ["number", "null"],
+          "description": "Factual consistency score of the summary"
+        },
+        "belief_alignment_score": {
+          "type": ["number", "null"],
+          "description": "Belief alignment score of the summary"
+        },
+        "detail_level_score": {
+          "type": ["number", "null"],
+          "description": "Detail level score of the summary"
+        },
+        "summary_id": {
+          "type": ["string", "null"],
+          "description": "ID of the summary for reference"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional metadata"
+        }
+      },
+      "required": ["text", "timestamp", "agent_id", "confidence"],
+      "description": "Summary of the loop"
+    },
+    "metrics": {
+      "type": ["object", "null"],
+      "properties": {
+        "total_execution_time_ms": {
+          "type": "integer",
+          "description": "Total execution time in milliseconds"
+        },
+        "agent_execution_times_ms": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "description": "Execution time per agent in milliseconds"
+        },
+        "memory_operations_count": {
+          "type": "integer",
+          "description": "Number of memory operations"
+        },
+        "memory_read_count": {
+          "type": "integer",
+          "description": "Number of memory read operations"
+        },
+        "memory_write_count": {
+          "type": "integer",
+          "description": "Number of memory write operations"
+        },
+        "peak_memory_usage_bytes": {
+          "type": "integer",
+          "description": "Peak memory usage in bytes"
+        },
+        "belief_reference_count": {
+          "type": "integer",
+          "description": "Number of belief references"
+        },
+        "agent_count": {
+          "type": "integer",
+          "description": "Number of agents involved"
+        },
+        "error_count": {
+          "type": "integer",
+          "description": "Number of errors encountered"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional metadata"
+        }
+      },
+      "required": ["total_execution_time_ms", "memory_operations_count", "memory_read_count", "memory_write_count", "peak_memory_usage_bytes", "belief_reference_count", "agent_count", "error_count"],
+      "description": "Metrics for the loop"
+    },
+    "belief_volatility": {
+      "type": ["number", "null"],
+      "description": "Volatility score for belief usage"
+    },
+    "contradiction_score": {
+      "type": ["number", "null"],
+      "description": "Score for contradictions with other loops"
+    },
+    "skeptic_triggered": {
+      "type": ["boolean", "null"],
+      "description": "Whether the SKEPTIC agent was triggered"
+    },
+    "skeptic_result": {
+      "type": ["object", "null"],
+      "description": "Result from the SKEPTIC agent"
+    },
+    "snapshots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "snapshot_id": {
+            "type": "string",
+            "description": "ID of the snapshot"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the snapshot"
+          },
+          "snapshot_type": {
+            "type": "string",
+            "description": "Type of snapshot (full, differential, incremental, error)"
+          },
+          "original_size_bytes": {
+            "type": "integer",
+            "description": "Original size in bytes"
+          },
+          "compressed_size_bytes": {
+            "type": "integer",
+            "description": "Compressed size in bytes"
+          },
+          "compression_ratio": {
+            "type": "number",
+            "description": "Compression ratio"
+          },
+          "retention_policy": {
+            "type": "string",
+            "description": "Retention policy for the snapshot"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        },
+        "required": ["snapshot_id", "timestamp", "snapshot_type", "original_size_bytes", "compressed_size_bytes", "compression_ratio", "retention_policy"],
+        "description": "Snapshot information"
+      },
+      "description": "Snapshots taken during the loop"
+    },
+    "audit_info": {
+      "type": ["object", "null"],
+      "properties": {
+        "audit_id": {
+          "type": "string",
+          "description": "ID of the audit"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the audit"
+        },
+        "overall_score": {
+          "type": "number",
+          "description": "Overall audit score"
+        },
+        "belief_consistency_score": {
+          "type": "number",
+          "description": "Belief consistency score"
+        },
+        "memory_integrity_score": {
+          "type": "number",
+          "description": "Memory integrity score"
+        },
+        "issue_count": {
+          "type": "integer",
+          "description": "Number of issues found"
+        },
+        "warning_count": {
+          "type": "integer",
+          "description": "Number of warnings found"
+        },
+        "recommendation_count": {
+          "type": "integer",
+          "description": "Number of recommendations provided"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional metadata"
+        }
+      },
+      "required": ["audit_id", "timestamp", "overall_score", "belief_consistency_score", "memory_integrity_score", "issue_count", "warning_count", "recommendation_count"],
+      "description": "Audit information for the loop"
+    },
+    "belief_versions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "belief_id": {
+            "type": "string",
+            "description": "ID of the belief"
+          },
+          "version": {
+            "type": "integer",
+            "description": "Version number"
+          },
+          "author": {
+            "type": "string",
+            "description": "Author of the version"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the version"
+          },
+          "change_id": {
+            "type": ["string", "null"],
+            "description": "ID of the change that created this version"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        },
+        "required": ["belief_id", "version", "author", "timestamp"],
+        "description": "Belief version information"
+      },
+      "description": "Belief versions referenced in the loop"
+    },
+    "project_locks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lock_id": {
+            "type": "string",
+            "description": "ID of the lock"
+          },
+          "project_id": {
+            "type": "string",
+            "description": "ID of the project"
+          },
+          "owner": {
+            "type": "string",
+            "description": "Owner of the lock"
+          },
+          "acquired_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Time the lock was acquired"
+          },
+          "expiration_time": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "Time the lock expires"
+          },
+          "lock_type": {
+            "type": "string",
+            "enum": ["exclusive", "shared"],
+            "description": "Type of lock (exclusive, shared)"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        },
+        "required": ["lock_id", "project_id", "owner", "acquired_time", "lock_type"],
+        "description": "Project lock information"
+      },
+      "description": "Project locks acquired during the loop"
+    },
+    "depth": {
+      "type": ["integer", "null"],
+      "description": "Depth of the loop in the execution tree"
+    },
+    "orchestrator_mode": {
+      "type": ["string", "null"],
+      "enum": ["FAST", "BALANCED", "THOROUGH", "RESEARCH"],
+      "description": "Mode of the orchestrator"
+    },
+    "error": {
+      "type": ["string", "null"],
+      "description": "Error message if loop failed"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata"
+    }
+  },
+  "required": ["id", "start_time", "status"],
+  "additionalProperties": true
+}

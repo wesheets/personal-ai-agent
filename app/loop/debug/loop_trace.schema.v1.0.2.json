@@ -1,0 +1,853 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loop Trace Schema",
+  "description": "Schema for loop traces in the system",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Loop ID"
+    },
+    "parent_id": {
+      "type": ["string", "null"],
+      "description": "Parent loop ID if this is a child loop"
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Start time of the loop"
+    },
+    "end_time": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "End time of the loop"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["running", "completed", "failed", "error"],
+      "description": "Status of the loop"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Agent ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["system", "user", "assistant", "tool", "plugin", "custom"],
+            "description": "Agent type"
+          },
+          "input": {
+            "type": ["object", "null"],
+            "description": "Input to the agent"
+          },
+          "output": {
+            "type": ["object", "null"],
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "Text output from the agent"
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp of the output"
+              },
+              "metadata": {
+                "type": "object",
+                "description": "Additional metadata"
+              }
+            },
+            "required": ["text", "timestamp"],
+            "description": "Output from the agent"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start time of agent execution"
+          },
+          "end_time": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "End time of agent execution"
+          },
+          "execution_time_ms": {
+            "type": ["integer", "null"],
+            "description": "Execution time in milliseconds"
+          },
+          "memory_usage_bytes": {
+            "type": ["integer", "null"],
+            "description": "Memory usage in bytes"
+          },
+          "cpu_usage_percent": {
+            "type": ["number", "null"],
+            "description": "CPU usage percentage"
+          },
+          "error": {
+            "type": ["string", "null"],
+            "description": "Error message if agent failed"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        },
+        "required": ["id", "type", "start_time"],
+        "description": "Agent trace"
+      },
+      "description": "Traces of agents involved in the loop"
+    },
+    "memory_operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "operation_type": {
+            "type": "string",
+            "enum": ["read", "write", "update", "delete"],
+            "description": "Type of memory operation"
+          },
+          "key": {
+            "type": "string",
+            "description": "Memory key"
+          },
+          "value": {
+            "type": ["object", "null"],
+            "description": "Memory value (for write/update operations)"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the operation"
+          },
+          "agent_id": {
+            "type": "string",
+            "description": "ID of the agent performing the operation"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          },
+          "error": {
+            "type": ["string", "null"],
+            "description": "Error message if operation failed"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        },
+        "required": ["operation_type", "key", "timestamp", "agent_id", "success"],
+        "description": "Memory operation"
+      },
+      "description": "Memory operations performed during the loop"
+    },
+    "beliefs_referenced": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of beliefs referenced in the loop"
+    },
+    "belief_references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "belief_id": {
+            "type": "string",
+            "description": "ID of the referenced belief"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the reference"
+          },
+          "agent_id": {
+            "type": "string",
+            "description": "ID of the agent making the reference"
+          },
+          "context": {
+            "type": "string",
+            "description": "Context of the reference"
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence score of the reference"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        },
+        "required": ["belief_id", "timestamp", "agent_id", "context", "confidence"],
+        "description": "Belief reference"
+      },
+      "description": "Detailed belief references"
+    },
+    "belief_dependencies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "Dependencies between beliefs (schema_patch_core: 1.0.2)"
+    },
+    "summary": {
+      "type": ["object", "null"],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Summary text"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the summary"
+        },
+        "agent_id": {
+          "type": "string",
+          "description": "ID of the agent generating the summary"
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Confidence score of the summary"
+        },
+        "realism_score": {
+          "type": ["number", "null"],
+          "description": "Realism score of the summary"
+        },
+        "hallucination_score": {
+          "type": ["number", "null"],
+          "description": "Hallucination score of the summary"
+        },
+        "factual_consistency_score": {
+          "type": ["number", "null"],
+          "description": "Factual consistency score of the summary"
+        },
+        "belief_alignment_score": {
+          "type": ["number", "null"],
+          "description": "Belief alignment score of the summary"
+        },
+        "detail_level_score": {
+          "type": ["number", "null"],
+          "description": "Detail level score of the summary"
+        },
+        "summary_id": {
+          "type": ["string", "null"],
+          "description": "ID of the summary for reference"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "schema_patch_core": {
+              "type": "string",
+              "description": "Schema patch version for core fields"
+            },
+            "emotional_congruence": {
+              "type": "number",
+              "description": "Emotional congruence score (schema_patch_core: 1.0.2)"
+            },
+            "confidence_explanation": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Explanation of confidence factors (schema_patch_core: 1.0.2)"
+            },
+            "adaptive_thresholds": {
+              "type": "object",
+              "description": "Adaptive thresholds used for scoring (schema_patch_core: 1.0.2)"
+            },
+            "levels": {
+              "type": "object",
+              "description": "Classification levels for different dimensions (schema_patch_core: 1.0.2)"
+            }
+          },
+          "description": "Additional metadata"
+        }
+      },
+      "required": ["text", "timestamp", "agent_id", "confidence"],
+      "description": "Summary of the loop"
+    },
+    "metrics": {
+      "type": ["object", "null"],
+      "properties": {
+        "total_execution_time_ms": {
+          "type": "integer",
+          "description": "Total execution time in milliseconds"
+        },
+        "agent_execution_times_ms": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "description": "Execution time per agent in milliseconds"
+        },
+        "memory_operations_count": {
+          "type": "integer",
+          "description": "Number of memory operations"
+        },
+        "memory_read_count": {
+          "type": "integer",
+          "description": "Number of memory read operations"
+        },
+        "memory_write_count": {
+          "type": "integer",
+          "description": "Number of memory write operations"
+        },
+        "peak_memory_usage_bytes": {
+          "type": "integer",
+          "description": "Peak memory usage in bytes"
+        },
+        "belief_reference_count": {
+          "type": "integer",
+          "description": "Number of belief references"
+        },
+        "agent_count": {
+          "type": "integer",
+          "description": "Number of agents involved"
+        },
+        "error_count": {
+          "type": "integer",
+          "description": "Number of errors encountered"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional metadata"
+        },
+        "schema_patch_core": {
+          "type": "string",
+          "description": "Schema patch version for core fields"
+        },
+        "sequence_efficiency": {
+          "type": "object",
+          "properties": {
+            "average_transition_time_ms": {
+              "type": "number",
+              "description": "Average transition time between agents in milliseconds"
+            },
+            "max_transition_time_ms": {
+              "type": "number",
+              "description": "Maximum transition time between agents in milliseconds"
+            },
+            "efficiency_score": {
+              "type": "number",
+              "description": "Efficiency score for agent transitions"
+            }
+          },
+          "description": "Sequence efficiency metrics (schema_patch_core: 1.0.2)"
+        },
+        "resource_efficiency": {
+          "type": "object",
+          "properties": {
+            "memory_time_ratio": {
+              "type": "number",
+              "description": "Memory usage (MB) to execution time (s) ratio"
+            },
+            "operations_per_second": {
+              "type": "number",
+              "description": "Memory operations per second"
+            },
+            "memory_per_operation": {
+              "type": "number",
+              "description": "Memory usage (MB) per operation"
+            }
+          },
+          "description": "Resource efficiency metrics (schema_patch_core: 1.0.2)"
+        },
+        "belief_reference_analysis": {
+          "type": "object",
+          "properties": {
+            "reference_density": {
+              "type": "number",
+              "description": "Belief references per agent"
+            },
+            "reference_efficiency": {
+              "type": "number",
+              "description": "Belief references per second"
+            }
+          },
+          "description": "Belief reference analysis (schema_patch_core: 1.0.2)"
+        },
+        "error_analysis": {
+          "type": "object",
+          "properties": {
+            "error_type": {
+              "type": "string",
+              "description": "Type of error"
+            },
+            "error_message": {
+              "type": "string",
+              "description": "Error message"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Timestamp of the error"
+            },
+            "recovery_attempted": {
+              "type": "boolean",
+              "description": "Whether recovery was attempted"
+            }
+          },
+          "description": "Error analysis information (schema_patch_core: 1.0.2)"
+        },
+        "performance_trends": {
+          "type": "object",
+          "properties": {
+            "execution_time_trend": {
+              "type": "string",
+              "enum": ["improving", "stable", "degrading"],
+              "description": "Trend in execution time"
+            },
+            "memory_usage_trend": {
+              "type": "string",
+              "enum": ["improving", "stable", "degrading"],
+              "description": "Trend in memory usage"
+            },
+            "historical_data_points": {
+              "type": "integer",
+              "description": "Number of historical data points used"
+            },
+            "trend_confidence": {
+              "type": "number",
+              "description": "Confidence in trend analysis"
+            }
+          },
+          "description": "Performance trend analysis (schema_patch_core: 1.0.2)"
+        }
+      },
+      "required": ["total_execution_time_ms", "memory_operations_count", "memory_read_count", "memory_write_count", "peak_memory_usage_bytes", "belief_reference_count", "agent_count", "error_count"],
+      "description": "Metrics for the loop"
+    },
+    "belief_volatility": {
+      "type": ["number", "null"],
+      "description": "Volatility score for belief usage"
+    },
+    "contradiction_score": {
+      "type": ["number", "null"],
+      "description": "Score for contradictions with other loops"
+    },
+    "skeptic_triggered": {
+      "type": ["boolean", "null"],
+      "description": "Whether the SKEPTIC agent was triggered"
+    },
+    "skeptic_result": {
+      "type": ["object", "null"],
+      "description": "Result from the SKEPTIC agent"
+    },
+    "snapshots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "snapshot_id": {
+            "type": "string",
+            "description": "ID of the snapshot"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the snapshot"
+          },
+          "snapshot_type": {
+            "type": "string",
+            "description": "Type of snapshot (full, differential, incremental, error)"
+          },
+          "original_size_bytes": {
+            "type": "integer",
+            "description": "Original size in bytes"
+          },
+          "compressed_size_bytes": {
+            "type": "integer",
+            "description": "Compressed size in bytes"
+          },
+          "compression_ratio": {
+            "type": "number",
+            "description": "Compression ratio"
+          },
+          "retention_policy": {
+            "type": "string",
+            "description": "Retention policy for the snapshot"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          },
+          "schema_patch_core": {
+            "type": "string",
+            "description": "Schema patch version for core fields"
+          },
+          "size_analysis": {
+            "type": "object",
+            "properties": {
+              "relative_size": {
+                "type": "number",
+                "description": "Size relative to average snapshot size"
+              },
+              "is_outlier": {
+                "type": "boolean",
+                "description": "Whether this snapshot is a size outlier"
+              }
+            },
+            "description": "Size analysis for the snapshot (schema_patch_core: 1.0.2)"
+          },
+          "type_distribution": {
+            "type": "object",
+            "properties": {
+              "count_by_type": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "description": "Count of snapshots by type"
+              },
+              "percentage_of_type": {
+                "type": "number",
+                "description": "Percentage of snapshots of this type"
+              }
+            },
+            "description": "Type distribution analysis (schema_patch_core: 1.0.2)"
+          }
+        },
+        "required": ["snapshot_id", "timestamp", "snapshot_type", "original_size_bytes", "compressed_size_bytes", "compression_ratio", "retention_policy"],
+        "description": "Snapshot information"
+      },
+      "description": "Snapshots taken during the loop"
+    },
+    "audit_info": {
+      "type": ["object", "null"],
+      "properties": {
+        "audit_id": {
+          "type": "string",
+          "description": "ID of the audit"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the audit"
+        },
+        "overall_score": {
+          "type": "number",
+          "description": "Overall audit score"
+        },
+        "belief_consistency_score": {
+          "type": "number",
+          "description": "Belief consistency score"
+        },
+        "memory_integrity_score": {
+          "type": "number",
+          "description": "Memory integrity score"
+        },
+        "issue_count": {
+          "type": "integer",
+          "description": "Number of issues found"
+        },
+        "warning_count": {
+          "type": "integer",
+          "description": "Number of warnings found"
+        },
+        "recommendation_count": {
+          "type": "integer",
+          "description": "Number of recommendations provided"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional metadata"
+        },
+        "schema_patch_core": {
+          "type": "string",
+          "description": "Schema patch version for core fields"
+        },
+        "risk_assessment": {
+          "type": "object",
+          "properties": {
+            "risk_level": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "critical"],
+              "description": "Overall risk level"
+            },
+            "impact": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "critical"],
+              "description": "Potential impact of issues"
+            },
+            "likelihood": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "critical"],
+              "description": "Likelihood of issues occurring"
+            },
+            "priority_issues": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of priority issues to address"
+            }
+          },
+          "description": "Risk assessment information (schema_patch_core: 1.0.2)"
+        },
+        "correlation_analysis": {
+          "type": "object",
+          "properties": {
+            "correlated_issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "issue_pair": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "description": "Pair of correlated issues"
+                  },
+                  "correlation_strength": {
+                    "type": "number",
+                    "description": "Strength of correlation between issues"
+                  },
+                  "systemic": {
+                    "type": "boolean",
+                    "description": "Whether this is a systemic problem"
+                  }
+                },
+                "description": "Correlated issue information"
+              },
+              "description": "List of correlated issues"
+            },
+            "root_causes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "cause": {
+                    "type": "string",
+                    "description": "Root cause description"
+                  },
+                  "affected_issues": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Issues affected by this root cause"
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "description": "Confidence in this root cause"
+                  }
+                },
+                "description": "Root cause information"
+              },
+              "description": "List of identified root causes"
+            }
+          },
+          "description": "Correlation analysis information (schema_patch_core: 1.0.2)"
+        }
+      },
+      "required": ["audit_id", "timestamp", "overall_score", "belief_consistency_score", "memory_integrity_score", "issue_count", "warning_count", "recommendation_count"],
+      "description": "Audit information for the loop"
+    },
+    "belief_versions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "belief_id": {
+            "type": "string",
+            "description": "ID of the belief"
+          },
+          "version": {
+            "type": "integer",
+            "description": "Version number"
+          },
+          "semantic_version": {
+            "type": "object",
+            "properties": {
+              "major": {
+                "type": "integer",
+                "description": "Major version number"
+              },
+              "minor": {
+                "type": "integer",
+                "description": "Minor version number"
+              },
+              "patch": {
+                "type": "integer",
+                "description": "Patch version number"
+              }
+            },
+            "required": ["major", "minor", "patch"],
+            "description": "Semantic version information (schema_patch_core: 1.0.2)"
+          },
+          "author": {
+            "type": "string",
+            "description": "Author of the version"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the version"
+          },
+          "change_id": {
+            "type": ["string", "null"],
+            "description": "ID of the change that created this version"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          },
+          "schema_patch_core": {
+            "type": "string",
+            "description": "Schema patch version for core fields"
+          },
+          "change_type": {
+            "type": "string",
+            "enum": ["creation", "major", "minor", "patch"],
+            "description": "Type of change for this version (schema_patch_core: 1.0.2)"
+          },
+          "change_summary": {
+            "type": "string",
+            "description": "Summary of changes in this version (schema_patch_core: 1.0.2)"
+          },
+          "branch": {
+            "type": "string",
+            "description": "Branch name for this version (schema_patch_core: 1.0.2)"
+          }
+        },
+        "required": ["belief_id", "version", "author", "timestamp"],
+        "description": "Belief version information"
+      },
+      "description": "Belief versions referenced in the loop"
+    },
+    "project_locks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "lock_id": {
+            "type": "string",
+            "description": "ID of the lock"
+          },
+          "project_id": {
+            "type": "string",
+            "description": "ID of the project"
+          },
+          "owner": {
+            "type": "string",
+            "description": "Owner of the lock"
+          },
+          "acquired_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Time the lock was acquired"
+          },
+          "expiration_time": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "Time the lock expires"
+          },
+          "lock_type": {
+            "type": "string",
+            "enum": ["exclusive", "shared"],
+            "description": "Type of lock (exclusive, shared)"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          },
+          "schema_patch_core": {
+            "type": "string",
+            "description": "Schema patch version for core fields"
+          },
+          "semantic_lock_info": {
+            "type": "object",
+            "properties": {
+              "is_exclusive": {
+                "type": "boolean",
+                "description": "Whether this is an exclusive lock"
+              },
+              "allows_shared": {
+                "type": "boolean",
+                "description": "Whether this lock allows shared locks"
+              },
+              "is_expired": {
+                "type": "boolean",
+                "description": "Whether this lock is expired"
+              }
+            },
+            "description": "Semantic lock information (schema_patch_core: 1.0.2)"
+          }
+        },
+        "required": ["lock_id", "project_id", "owner", "acquired_time", "lock_type"],
+        "description": "Project lock information"
+      },
+      "description": "Project locks acquired during the loop"
+    },
+    "depth": {
+      "type": ["integer", "null"],
+      "description": "Depth of the loop in the execution tree"
+    },
+    "orchestrator_mode": {
+      "type": ["string", "null"],
+      "enum": ["FAST", "BALANCED", "THOROUGH", "RESEARCH"],
+      "description": "Mode of the orchestrator"
+    },
+    "error": {
+      "type": ["string", "null"],
+      "description": "Error message if loop failed"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "schema_patch_core": {
+          "type": "string",
+          "description": "Schema patch version for core fields"
+        },
+        "schema_patch_ui": {
+          "type": "string",
+          "description": "Schema patch version for UI fields"
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "very_high"],
+          "description": "Risk level based on orchestrator mode (schema_patch_ui: 1.0.1)"
+        },
+        "error_analysis": {
+          "type": "object",
+          "properties": {
+            "error_type": {
+              "type": "string",
+              "description": "Type of error"
+            },
+            "error_message": {
+              "type": "string",
+              "description": "Error message"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Timestamp of the error"
+            },
+            "recovery_attempted": {
+              "type": "boolean",
+              "description": "Whether recovery was attempted"
+            }
+          },
+          "description": "Error analysis information (schema_patch_core: 1.0.2)"
+        }
+      },
+      "description": "Additional metadata"
+    }
+  },
+  "required": ["id", "start_time", "status"],
+  "additionalProperties": true
+}
