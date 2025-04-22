@@ -14,8 +14,18 @@ from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
 import base64
 from enum import Enum
+import sys
+
+# Import schema validation module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from modules.schema_validation import validate_schema, validate_before_export
 
 # Configure logging
+logging.basicConfig(
+    filename='/debug/schema_trace.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 class VisualizationFormat(str, Enum):
@@ -117,119 +127,103 @@ COLOR_SCHEMES = {
     }
 }
 
-# Mode-specific visualization settings
-MODE_VISUALIZATION_SETTINGS = {
-    "fast": {
-        "detail_level": "minimal",
-        "node_types_to_show": [
-            NodeType.AGENT, 
-            NodeType.LOOP_START, 
-            NodeType.LOOP_END, 
-            NodeType.RERUN,
-            NodeType.MODE_CHANGE
-        ],
-        "edge_types_to_show": [
-            EdgeType.EXECUTION, 
-            EdgeType.RERUN,
-            EdgeType.MODE_TRANSITION
-        ],
-        "include_timestamps": False,
-        "include_memory_details": False,
-        "include_agent_details": False,
-        "include_decision_details": False,
-        "update_frequency": "end_only"
-    },
-    "balanced": {
+# Load visual settings schema
+def load_visual_settings(mode: str) -> Dict[str, Any]:
+    """
+    Load visual settings for the specified mode from schema.
+    
+    Args:
+        mode: The orchestrator mode (fast, balanced, thorough, research)
+        
+    Returns:
+        Dictionary containing the visual settings
+    """
+    # Default settings if schema validation fails
+    default_settings = {
         "detail_level": "standard",
         "node_types_to_show": [
-            NodeType.AGENT, 
-            NodeType.MEMORY, 
-            NodeType.DECISION, 
-            NodeType.REFLECTION, 
-            NodeType.LOOP_START, 
-            NodeType.LOOP_END, 
-            NodeType.RERUN,
-            NodeType.MODE_CHANGE,
-            NodeType.DEPTH_CHANGE
+            "agent", "memory", "decision", "reflection", 
+            "loop_start", "loop_end", "rerun", "mode_change", "depth_change"
         ],
         "edge_types_to_show": [
-            EdgeType.EXECUTION, 
-            EdgeType.MEMORY_ACCESS, 
-            EdgeType.DECISION, 
-            EdgeType.REFLECTION, 
-            EdgeType.RERUN,
-            EdgeType.MODE_TRANSITION,
-            EdgeType.DEPTH_TRANSITION
+            "execution", "memory_access", "decision", "reflection", 
+            "rerun", "mode_transition", "depth_transition"
         ],
         "include_timestamps": True,
         "include_memory_details": True,
         "include_agent_details": True,
         "include_decision_details": True,
         "update_frequency": "agent_completion"
-    },
-    "thorough": {
-        "detail_level": "detailed",
-        "node_types_to_show": [
-            NodeType.AGENT, 
-            NodeType.MEMORY, 
-            NodeType.DECISION, 
-            NodeType.REFLECTION, 
-            NodeType.LOOP_START, 
-            NodeType.LOOP_END, 
-            NodeType.RERUN, 
-            NodeType.OPERATOR,
-            NodeType.MODE_CHANGE,
-            NodeType.DEPTH_CHANGE
-        ],
-        "edge_types_to_show": [
-            EdgeType.EXECUTION, 
-            EdgeType.MEMORY_ACCESS, 
-            EdgeType.DECISION, 
-            EdgeType.REFLECTION, 
-            EdgeType.RERUN, 
-            EdgeType.OPERATOR,
-            EdgeType.MODE_TRANSITION,
-            EdgeType.DEPTH_TRANSITION
-        ],
-        "include_timestamps": True,
-        "include_memory_details": True,
-        "include_agent_details": True,
-        "include_decision_details": True,
-        "update_frequency": "real_time"
-    },
-    "research": {
-        "detail_level": "comprehensive",
-        "node_types_to_show": [
-            NodeType.AGENT, 
-            NodeType.MEMORY, 
-            NodeType.DECISION, 
-            NodeType.REFLECTION, 
-            NodeType.LOOP_START, 
-            NodeType.LOOP_END, 
-            NodeType.RERUN, 
-            NodeType.OPERATOR,
-            NodeType.MODE_CHANGE,
-            NodeType.DEPTH_CHANGE
-        ],
-        "edge_types_to_show": [
-            EdgeType.EXECUTION, 
-            EdgeType.MEMORY_ACCESS, 
-            EdgeType.DECISION, 
-            EdgeType.REFLECTION, 
-            EdgeType.RERUN, 
-            EdgeType.OPERATOR,
-            EdgeType.MODE_TRANSITION,
-            EdgeType.DEPTH_TRANSITION
-        ],
-        "include_timestamps": True,
-        "include_memory_details": True,
-        "include_agent_details": True,
-        "include_decision_details": True,
-        "include_uncertainty": True,
-        "track_alternatives": True,
-        "update_frequency": "real_time"
     }
-}
+    
+    # Define settings based on mode
+    if mode == "fast":
+        settings = {
+            "detail_level": "minimal",
+            "node_types_to_show": [
+                "agent", "loop_start", "loop_end", "rerun", "mode_change"
+            ],
+            "edge_types_to_show": [
+                "execution", "rerun", "mode_transition"
+            ],
+            "include_timestamps": False,
+            "include_memory_details": False,
+            "include_agent_details": False,
+            "include_decision_details": False,
+            "update_frequency": "end_only"
+        }
+    elif mode == "balanced":
+        settings = default_settings
+    elif mode == "thorough":
+        settings = {
+            "detail_level": "detailed",
+            "node_types_to_show": [
+                "agent", "memory", "decision", "reflection", 
+                "loop_start", "loop_end", "rerun", "operator",
+                "mode_change", "depth_change"
+            ],
+            "edge_types_to_show": [
+                "execution", "memory_access", "decision", "reflection", 
+                "rerun", "operator", "mode_transition", "depth_transition"
+            ],
+            "include_timestamps": True,
+            "include_memory_details": True,
+            "include_agent_details": True,
+            "include_decision_details": True,
+            "update_frequency": "real_time"
+        }
+    elif mode == "research":
+        settings = {
+            "detail_level": "comprehensive",
+            "node_types_to_show": [
+                "agent", "memory", "decision", "reflection", 
+                "loop_start", "loop_end", "rerun", "operator",
+                "mode_change", "depth_change"
+            ],
+            "edge_types_to_show": [
+                "execution", "memory_access", "decision", "reflection", 
+                "rerun", "operator", "mode_transition", "depth_transition"
+            ],
+            "include_timestamps": True,
+            "include_memory_details": True,
+            "include_agent_details": True,
+            "include_decision_details": True,
+            "include_uncertainty": True,
+            "track_alternatives": True,
+            "update_frequency": "real_time"
+        }
+    else:
+        settings = default_settings
+    
+    # Validate settings against schema
+    is_valid, error = validate_schema(settings, 'visual_settings')
+    if not is_valid:
+        logger.error(f"Invalid visual settings for mode {mode}: {error}")
+        logger.warning(f"Using default visual settings for mode {mode}")
+        return default_settings
+    
+    logger.info(f"Visual settings for mode {mode} validated successfully")
+    return settings
 
 class LoopMapVisualizer:
     """
@@ -257,13 +251,46 @@ class LoopMapVisualizer:
             "version": "1.0"
         }
         
-        # Set visualization settings based on mode
-        if self.mode in MODE_VISUALIZATION_SETTINGS:
-            self.settings = MODE_VISUALIZATION_SETTINGS[self.mode]
-        else:
-            self.settings = MODE_VISUALIZATION_SETTINGS["balanced"]
+        # Load visualization settings based on mode from schema
+        self.settings = load_visual_settings(self.mode)
         
         logger.info(f"Initialized LoopMapVisualizer for loop {loop_id} with {self.mode} mode and {color_scheme} color scheme")
+    
+    def add_node(self, node_id: str, node_type: NodeType, label: str, data: Dict[str, Any]) -> None:
+        """
+        Add a node to the visualization.
+        
+        Args:
+            node_id: Unique identifier for the node
+            node_type: Type of the node
+            label: Display label for the node
+            data: Node-specific data
+        """
+        self.nodes.append({
+            "id": node_id,
+            "type": node_type,
+            "label": label,
+            "data": data
+        })
+    
+    def add_edge(self, source: str, target: str, edge_type: EdgeType, label: str, data: Dict[str, Any]) -> None:
+        """
+        Add an edge to the visualization.
+        
+        Args:
+            source: ID of the source node
+            target: ID of the target node
+            edge_type: Type of the edge
+            label: Display label for the edge
+            data: Edge-specific data
+        """
+        self.edges.append({
+            "source": source,
+            "target": target,
+            "type": edge_type,
+            "label": label,
+            "data": data
+        })
     
     def generate_map_from_trace(self, loop_trace: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -290,8 +317,7 @@ class LoopMapVisualizer:
             # Update mode if different from initialization
             if current_mode != self.mode:
                 self.mode = current_mode
-                if self.mode in MODE_VISUALIZATION_SETTINGS:
-                    self.settings = MODE_VISUALIZATION_SETTINGS[self.mode]
+                self.settings = load_visual_settings(self.mode)
                 self.metadata["mode"] = self.mode
             
             # Add loop start node
@@ -322,7 +348,7 @@ class LoopMapVisualizer:
                     agent_node_id = f"agent_{agent_name}_{timestamp}"
                     
                     # Only add if this node type should be shown in current mode
-                    if NodeType.AGENT in self.settings["node_types_to_show"]:
+                    if "agent" in self.settings["node_types_to_show"]:
                         agent_data = {
                             "agent_name": agent_name,
                             "timestamp": timestamp,
@@ -344,7 +370,7 @@ class LoopMapVisualizer:
                         )
                         
                         # Connect from last node
-                        if EdgeType.EXECUTION in self.settings["edge_types_to_show"]:
+                        if "execution" in self.settings["edge_types_to_show"]:
                             self.add_edge(
                                 source=last_node_id,
                                 target=agent_node_id,
@@ -357,7 +383,7 @@ class LoopMapVisualizer:
                         last_node_id = agent_node_id
                     
                     # If agent accessed memory, add memory node and edge
-                    if "memory_access" in item and NodeType.MEMORY in self.settings["node_types_to_show"]:
+                    if "memory_access" in item and "memory" in self.settings["node_types_to_show"]:
                         memory_access = item.get("memory_access", [])
                         for memory_item in memory_access:
                             memory_key = memory_item.get("key")
@@ -382,7 +408,7 @@ class LoopMapVisualizer:
                             )
                             
                             # Connect agent to memory
-                            if EdgeType.MEMORY_ACCESS in self.settings["edge_types_to_show"]:
+                            if "memory_access" in self.settings["edge_types_to_show"]:
                                 self.add_edge(
                                     source=agent_node_id,
                                     target=memory_node_id,
@@ -396,12 +422,11 @@ class LoopMapVisualizer:
                     decision_id = f"decision_{timestamp}"
                     
                     # Only add if this node type should be shown in current mode
-                    if NodeType.DECISION in self.settings["node_types_to_show"]:
+                    if "decision" in self.settings["node_types_to_show"]:
                         decision_data = {
                             "decision_type": item.get("decision_type"),
                             "timestamp": timestamp,
-                            "outcome": item.get("outcome"),
-                            "mode": item.get("mode", current_mode)
+                            "outcome": item.get("outcome")
                         }
                         
                         # Add additional details if enabled for this mode
@@ -417,12 +442,12 @@ class LoopMapVisualizer:
                         )
                         
                         # Connect from last node
-                        if EdgeType.DECISION in self.settings["edge_types_to_show"]:
+                        if "decision" in self.settings["edge_types_to_show"]:
                             self.add_edge(
                                 source=last_node_id,
                                 target=decision_id,
                                 edge_type=EdgeType.DECISION,
-                                label=item.get("outcome", "Decides"),
+                                label="Decides",
                                 data={"timestamp": timestamp}
                             )
                         
@@ -434,23 +459,20 @@ class LoopMapVisualizer:
                     reflection_id = f"reflection_{timestamp}"
                     
                     # Only add if this node type should be shown in current mode
-                    if NodeType.REFLECTION in self.settings["node_types_to_show"]:
-                        reflection_data = {
-                            "reflection_type": item.get("reflection_type"),
-                            "timestamp": timestamp,
-                            "agent": item.get("agent"),
-                            "mode": item.get("mode", current_mode)
-                        }
-                        
+                    if "reflection" in self.settings["node_types_to_show"]:
                         self.add_node(
                             node_id=reflection_id,
                             node_type=NodeType.REFLECTION,
                             label=f"Reflection: {item.get('reflection_type')}",
-                            data=reflection_data
+                            data={
+                                "reflection_type": item.get("reflection_type"),
+                                "timestamp": timestamp,
+                                "agent": item.get("agent")
+                            }
                         )
                         
                         # Connect from last node
-                        if EdgeType.REFLECTION in self.settings["edge_types_to_show"]:
+                        if "reflection" in self.settings["edge_types_to_show"]:
                             self.add_edge(
                                 source=last_node_id,
                                 target=reflection_id,
@@ -467,23 +489,20 @@ class LoopMapVisualizer:
                     rerun_id = f"rerun_{timestamp}"
                     
                     # Only add if this node type should be shown in current mode
-                    if NodeType.RERUN in self.settings["node_types_to_show"]:
-                        rerun_data = {
-                            "reason": item.get("reason"),
-                            "timestamp": timestamp,
-                            "loop_count": item.get("loop_count"),
-                            "mode": item.get("mode", current_mode)
-                        }
-                        
+                    if "rerun" in self.settings["node_types_to_show"]:
                         self.add_node(
                             node_id=rerun_id,
                             node_type=NodeType.RERUN,
                             label=f"Rerun: {item.get('reason')}",
-                            data=rerun_data
+                            data={
+                                "reason": item.get("reason"),
+                                "timestamp": timestamp,
+                                "loop_count": item.get("loop_count", loop_count + 1)
+                            }
                         )
                         
                         # Connect from last node
-                        if EdgeType.RERUN in self.settings["edge_types_to_show"]:
+                        if "rerun" in self.settings["edge_types_to_show"]:
                             self.add_edge(
                                 source=last_node_id,
                                 target=rerun_id,
@@ -495,32 +514,29 @@ class LoopMapVisualizer:
                         # Update last node
                         last_node_id = rerun_id
                 
-                elif item_type == "operator":
+                elif item_type == "operator_action":
                     # Add operator node
                     operator_id = f"operator_{timestamp}"
                     
                     # Only add if this node type should be shown in current mode
-                    if NodeType.OPERATOR in self.settings["node_types_to_show"]:
-                        operator_data = {
-                            "operation": item.get("operation"),
-                            "timestamp": timestamp,
-                            "mode": item.get("mode", current_mode)
-                        }
-                        
+                    if "operator" in self.settings["node_types_to_show"]:
                         self.add_node(
                             node_id=operator_id,
                             node_type=NodeType.OPERATOR,
                             label=f"Operator: {item.get('operation')}",
-                            data=operator_data
+                            data={
+                                "operation": item.get("operation"),
+                                "timestamp": timestamp
+                            }
                         )
                         
                         # Connect from last node
-                        if EdgeType.OPERATOR in self.settings["edge_types_to_show"]:
+                        if "operator" in self.settings["edge_types_to_show"]:
                             self.add_edge(
                                 source=last_node_id,
                                 target=operator_id,
                                 edge_type=EdgeType.OPERATOR,
-                                label="Operates",
+                                label="Intervenes",
                                 data={"timestamp": timestamp}
                             )
                         
@@ -532,65 +548,69 @@ class LoopMapVisualizer:
                     mode_change_id = f"mode_change_{timestamp}"
                     
                     # Only add if this node type should be shown in current mode
-                    if NodeType.MODE_CHANGE in self.settings["node_types_to_show"]:
-                        mode_change_data = {
-                            "old_mode": item.get("old_mode"),
-                            "new_mode": item.get("new_mode"),
-                            "reason": item.get("reason"),
-                            "timestamp": timestamp
-                        }
+                    if "mode_change" in self.settings["node_types_to_show"]:
+                        old_mode = item.get("old_mode", "unknown")
+                        new_mode = item.get("new_mode", "unknown")
                         
                         self.add_node(
                             node_id=mode_change_id,
                             node_type=NodeType.MODE_CHANGE,
-                            label=f"Mode Change: {item.get('old_mode')} -> {item.get('new_mode')}",
-                            data=mode_change_data
+                            label=f"Mode Change: {old_mode} → {new_mode}",
+                            data={
+                                "old_mode": old_mode,
+                                "new_mode": new_mode,
+                                "reason": item.get("reason"),
+                                "timestamp": timestamp
+                            }
                         )
                         
                         # Connect from last node
-                        if EdgeType.MODE_TRANSITION in self.settings["edge_types_to_show"]:
+                        if "mode_transition" in self.settings["edge_types_to_show"]:
                             self.add_edge(
                                 source=last_node_id,
                                 target=mode_change_id,
                                 edge_type=EdgeType.MODE_TRANSITION,
-                                label=f"Changes Mode: {item.get('reason')}",
+                                label="Changes Mode",
                                 data={"timestamp": timestamp}
                             )
                         
                         # Update last node
                         last_node_id = mode_change_id
                         
-                        # Update current mode
-                        current_mode = item.get("new_mode")
+                        # Update mode and settings
+                        if new_mode != self.mode:
+                            self.mode = new_mode
+                            self.settings = load_visual_settings(self.mode)
+                            self.metadata["mode"] = self.mode
                 
                 elif item_type == "depth_change":
                     # Add depth change node
                     depth_change_id = f"depth_change_{timestamp}"
                     
                     # Only add if this node type should be shown in current mode
-                    if NodeType.DEPTH_CHANGE in self.settings["node_types_to_show"]:
-                        depth_change_data = {
-                            "old_depth": item.get("old_depth"),
-                            "new_depth": item.get("new_depth"),
-                            "reason": item.get("reason"),
-                            "timestamp": timestamp,
-                            "mode": current_mode
-                        }
+                    if "depth_change" in self.settings["node_types_to_show"]:
+                        old_depth = item.get("old_depth", 0)
+                        new_depth = item.get("new_depth", 0)
                         
                         self.add_node(
                             node_id=depth_change_id,
                             node_type=NodeType.DEPTH_CHANGE,
-                            label=f"Depth Change: {item.get('old_depth')} -> {item.get('new_depth')}",
-                            data=depth_change_data
+                            label=f"Depth Change: {old_depth} → {new_depth}",
+                            data={
+                                "old_depth": old_depth,
+                                "new_depth": new_depth,
+                                "reason": item.get("reason"),
+                                "timestamp": timestamp
+                            }
                         )
                         
                         # Connect from last node
-                        if EdgeType.DEPTH_TRANSITION in self.settings["edge_types_to_show"]:
+                        if "depth_transition" in self.settings["edge_types_to_show"]:
                             self.add_edge(
                                 source=last_node_id,
                                 target=depth_change_id,
                                 edge_type=EdgeType.DEPTH_TRANSITION,
-                                label=f"Changes Depth: {item.get('reason')}",
+                                label="Changes Depth",
                                 data={"timestamp": timestamp}
                             )
                         
@@ -606,565 +626,364 @@ class LoopMapVisualizer:
                 data={
                     "loop_id": self.loop_id,
                     "timestamp": loop_trace.get("end_time", datetime.utcnow().isoformat()),
-                    "status": loop_trace.get("status", "completed"),
                     "loop_count": loop_count,
-                    "mode": current_mode
+                    "mode": self.mode
                 }
             )
             
             # Connect from last node to end node
-            self.add_edge(
-                source=last_node_id,
-                target=end_node_id,
-                edge_type=EdgeType.EXECUTION,
-                label="Completes",
-                data={"timestamp": loop_trace.get("end_time", datetime.utcnow().isoformat())}
-            )
+            if "execution" in self.settings["edge_types_to_show"]:
+                self.add_edge(
+                    source=last_node_id,
+                    target=end_node_id,
+                    edge_type=EdgeType.EXECUTION,
+                    label="Completes",
+                    data={"timestamp": datetime.utcnow().isoformat()}
+                )
             
-            # Build the final map
+            # Create the loop map
             loop_map = {
-                "loop_id": self.loop_id,
-                "mode": current_mode,
+                "metadata": self.metadata,
                 "nodes": self.nodes,
                 "edges": self.edges,
-                "metadata": self.metadata
+                "settings": self.settings
             }
             
+            # Validate loop map against schema
+            is_valid, error = validate_schema(loop_map, 'loop_map_visualization')
+            if not is_valid:
+                logger.error(f"Invalid loop map for loop {self.loop_id}: {error}")
+                loop_map["validation_error"] = error
+            else:
+                logger.info(f"Loop map for loop {self.loop_id} validated successfully")
+                loop_map["schema_validated"] = True
+                loop_map["validation_timestamp"] = datetime.utcnow().isoformat()
+            
             return loop_map
+        
         except Exception as e:
             logger.error(f"Error generating loop map: {str(e)}")
             return {
-                "loop_id": self.loop_id,
-                "mode": self.mode,
-                "error": str(e),
-                "nodes": [],
-                "edges": [],
-                "metadata": self.metadata
+                "error": f"Failed to generate loop map: {str(e)}",
+                "loop_id": self.loop_id
             }
     
-    def add_node(self, node_id: str, node_type: NodeType, label: str, data: Dict[str, Any]) -> None:
+    def export_map(self, loop_trace: Dict[str, Any], format_type: str = "json", output_dir: str = "/tmp") -> Dict[str, Any]:
         """
-        Add a node to the visualization.
+        Export a loop map to a file.
         
         Args:
-            node_id: Unique identifier for the node
-            node_type: Type of node
-            label: Label for the node
-            data: Additional data for the node
+            loop_trace: The loop trace data
+            format_type: The format to export as ("json", "html", "svg", "png", "dot")
+            output_dir: Directory to save the file
+            
+        Returns:
+            Dict with export result
         """
-        # Get color for node type
-        color = COLOR_SCHEMES[self.color_scheme].get(node_type, "#CCCCCC")
+        # Generate the loop map
+        loop_map = self.generate_map_from_trace(loop_trace)
         
-        # Create node
-        node = {
-            "id": node_id,
-            "type": node_type,
-            "label": label,
-            "color": color,
-            "data": data
-        }
+        # Check for errors
+        if "error" in loop_map:
+            return {
+                "success": False,
+                "error": loop_map["error"],
+                "loop_id": self.loop_id
+            }
         
-        self.nodes.append(node)
+        # Check for validation errors
+        if "validation_error" in loop_map:
+            return {
+                "success": False,
+                "error": f"Schema validation failed: {loop_map['validation_error']}",
+                "loop_id": self.loop_id
+            }
+        
+        # Create a timestamp for the filename
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        
+        # Create the filename
+        filename = f"loop_map_{self.loop_id}_{timestamp}.{format_type.lower()}"
+        
+        # Create the full file path
+        file_path = os.path.join(output_dir, filename)
+        
+        # Ensure the output directory exists
+        os.makedirs(output_dir, exist_ok=True)
+        
+        try:
+            if format_type.lower() == "json":
+                # Export as JSON
+                with open(file_path, "w") as f:
+                    json.dump(loop_map, f, indent=2)
+            
+            elif format_type.lower() == "html":
+                # Export as HTML
+                html_content = self._generate_html(loop_map)
+                
+                # Validate HTML export format
+                html_export = {
+                    "format": "html",
+                    "loop_id": self.loop_id,
+                    "content": html_content,
+                    "metadata": {
+                        "export_timestamp": datetime.utcnow().isoformat(),
+                        "format_version": "1.0",
+                        "export_type": "loop_map"
+                    }
+                }
+                
+                # Validate against HTML export schema
+                is_valid = validate_before_export(html_export, 'html')
+                if not is_valid:
+                    return {
+                        "success": False,
+                        "error": "HTML export format validation failed",
+                        "loop_id": self.loop_id
+                    }
+                
+                with open(file_path, "w") as f:
+                    f.write(html_content)
+            
+            elif format_type.lower() == "svg":
+                # Export as SVG
+                svg_content = self._generate_svg(loop_map)
+                with open(file_path, "w") as f:
+                    f.write(svg_content)
+            
+            elif format_type.lower() == "png":
+                # Export as PNG
+                # This would typically use a library like Pillow or cairosvg to convert SVG to PNG
+                # For this example, we'll just create a placeholder
+                with open(file_path, "w") as f:
+                    f.write("PNG export not implemented in this example")
+            
+            elif format_type.lower() == "dot":
+                # Export as GraphViz DOT format
+                dot_content = self._generate_dot(loop_map)
+                with open(file_path, "w") as f:
+                    f.write(dot_content)
+            
+            else:
+                return {
+                    "success": False,
+                    "error": f"Unsupported format: {format_type}",
+                    "loop_id": self.loop_id
+                }
+            
+            return {
+                "success": True,
+                "loop_id": self.loop_id,
+                "format": format_type,
+                "file_path": file_path,
+                "schema_validated": True,
+                "validation_timestamp": datetime.utcnow().isoformat()
+            }
+        
+        except Exception as e:
+            logger.error(f"Error exporting loop map: {str(e)}")
+            return {
+                "success": False,
+                "error": f"Failed to export loop map: {str(e)}",
+                "loop_id": self.loop_id
+            }
     
-    def add_edge(self, source: str, target: str, edge_type: EdgeType, label: str, data: Dict[str, Any]) -> None:
+    def _generate_html(self, loop_map: Dict[str, Any]) -> str:
         """
-        Add an edge to the visualization.
-        
-        Args:
-            source: Source node ID
-            target: Target node ID
-            edge_type: Type of edge
-            label: Label for the edge
-            data: Additional data for the edge
-        """
-        # Get color for edge type
-        color = COLOR_SCHEMES[self.color_scheme].get(edge_type, "#CCCCCC")
-        
-        # Create edge
-        edge = {
-            "source": source,
-            "target": target,
-            "type": edge_type,
-            "label": label,
-            "color": color,
-            "data": data
-        }
-        
-        self.edges.append(edge)
-    
-    def generate_html(self, loop_map: Dict[str, Any]) -> str:
-        """
-        Generate HTML visualization from loop map.
+        Generate HTML representation of the loop map.
         
         Args:
             loop_map: The loop map data
             
         Returns:
-            HTML string for visualization
+            HTML string
         """
-        # Convert loop map to JSON for embedding in HTML
-        loop_map_json = json.dumps(loop_map)
-        
-        # Generate HTML with D3.js visualization
-        html = f"""<!DOCTYPE html>
+        # This is a simplified example - a real implementation would use a proper visualization library
+        html = f"""
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loop Map Visualization - {loop_map['loop_id']}</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Loop Map: {self.loop_id}</title>
     <style>
         body {{
             font-family: Arial, sans-serif;
-            margin: 0;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
         }}
-        
-        #visualization {{
-            width: 100%;
-            height: 800px;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
+        h1, h2, h3 {{
+            color: #2c3e50;
         }}
-        
-        .node {{
-            cursor: pointer;
-        }}
-        
-        .link {{
-            stroke-opacity: 0.6;
-        }}
-        
-        .node text {{
-            font-size: 12px;
-            fill: #333;
-        }}
-        
-        .tooltip {{
-            position: absolute;
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 12px;
-            pointer-events: none;
-            max-width: 300px;
-            z-index: 1000;
-        }}
-        
-        .controls {{
-            margin-bottom: 20px;
-        }}
-        
-        .controls button {{
-            margin-right: 10px;
-            padding: 5px 10px;
-            background-color: #4285F4;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }}
-        
-        .controls button:hover {{
-            background-color: #3367D6;
-        }}
-        
         .metadata {{
-            margin-top: 20px;
-            padding: 10px;
-            background-color: white;
-            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 15px;
             border-radius: 5px;
+            background-color: #f9f9f9;
+        }}
+        .visualization {{
+            margin-top: 30px;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            overflow: auto;
+        }}
+        .node {{
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+        }}
+        .edge {{
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }}
+        .timestamp {{
+            color: #7f8c8d;
+            font-size: 0.9em;
+            text-align: right;
         }}
     </style>
 </head>
 <body>
-    <h1>Loop Map Visualization</h1>
-    <div class="controls">
-        <button id="zoom-in">Zoom In</button>
-        <button id="zoom-out">Zoom Out</button>
-        <button id="reset">Reset</button>
-        <button id="toggle-labels">Toggle Labels</button>
-        <button id="toggle-details">Toggle Details</button>
-    </div>
-    <div id="visualization"></div>
+    <h1>Loop Map: {self.loop_id}</h1>
+    
     <div class="metadata">
         <h2>Metadata</h2>
-        <p><strong>Loop ID:</strong> {loop_map['loop_id']}</p>
-        <p><strong>Mode:</strong> {loop_map['mode']}</p>
-        <p><strong>Generated At:</strong> {loop_map['metadata']['generated_at']}</p>
-        <p><strong>Node Count:</strong> {len(loop_map['nodes'])}</p>
-        <p><strong>Edge Count:</strong> {len(loop_map['edges'])}</p>
+        <p><strong>Loop ID:</strong> {loop_map["metadata"]["loop_id"]}</p>
+        <p><strong>Mode:</strong> {loop_map["metadata"]["mode"]}</p>
+        <p><strong>Generated At:</strong> {loop_map["metadata"]["generated_at"]}</p>
+        <p><strong>Version:</strong> {loop_map["metadata"]["version"]}</p>
     </div>
     
-    <script>
-        // Loop map data
-        const loopMap = {loop_map_json};
+    <div class="visualization">
+        <h2>Nodes</h2>
+        <div class="nodes">
+"""
         
-        // Set up the visualization
-        const width = document.getElementById('visualization').clientWidth;
-        const height = document.getElementById('visualization').clientHeight;
-        
-        // Create SVG
-        const svg = d3.select('#visualization')
-            .append('svg')
-            .attr('width', width)
-            .attr('height', height);
-        
-        // Create container for zoom
-        const container = svg.append('g');
-        
-        // Set up zoom behavior
-        const zoom = d3.zoom()
-            .scaleExtent([0.1, 4])
-            .on('zoom', (event) => {{
-                container.attr('transform', event.transform);
-            }});
-        
-        svg.call(zoom);
-        
-        // Create tooltip
-        const tooltip = d3.select('body')
-            .append('div')
-            .attr('class', 'tooltip')
-            .style('opacity', 0);
-        
-        // Create force simulation
-        const simulation = d3.forceSimulation(loopMap.nodes)
-            .force('link', d3.forceLink(loopMap.edges).id(d => d.id).distance(150))
-            .force('charge', d3.forceManyBody().strength(-500))
-            .force('center', d3.forceCenter(width / 2, height / 2))
-            .force('x', d3.forceX(width / 2).strength(0.1))
-            .force('y', d3.forceY(height / 2).strength(0.1));
-        
-        // Create links
-        const link = container.append('g')
-            .selectAll('line')
-            .data(loopMap.edges)
-            .enter()
-            .append('line')
-            .attr('class', 'link')
-            .attr('stroke', d => d.color)
-            .attr('stroke-width', 2);
-        
-        // Create link labels
-        const linkLabel = container.append('g')
-            .selectAll('text')
-            .data(loopMap.edges)
-            .enter()
-            .append('text')
-            .attr('class', 'link-label')
-            .attr('text-anchor', 'middle')
-            .attr('dy', -5)
-            .text(d => d.label)
-            .style('font-size', '10px')
-            .style('fill', '#666')
-            .style('pointer-events', 'none');
-        
-        // Create nodes
-        const node = container.append('g')
-            .selectAll('circle')
-            .data(loopMap.nodes)
-            .enter()
-            .append('circle')
-            .attr('class', 'node')
-            .attr('r', d => d.type === 'loop_start' || d.type === 'loop_end' ? 15 : 10)
-            .attr('fill', d => d.color)
-            .attr('stroke', '#fff')
-            .attr('stroke-width', 1.5)
-            .on('mouseover', (event, d) => {{
-                tooltip.transition()
-                    .duration(200)
-                    .style('opacity', .9);
-                
-                // Build tooltip content
-                let content = `<strong>${d.label}</strong><br/>`;
-                content += `Type: ${d.type}<br/>`;
-                
-                // Add data properties
-                for (const [key, value] of Object.entries(d.data)) {{
-                    if (typeof value === 'object') {{
-                        content += `${key}: ${JSON.stringify(value)}<br/>`;
-                    }} else {{
-                        content += `${key}: ${value}<br/>`;
-                    }}
-                }}
-                
-                tooltip.html(content)
-                    .style('left', (event.pageX + 10) + 'px')
-                    .style('top', (event.pageY - 28) + 'px');
-            }})
-            .on('mouseout', () => {{
-                tooltip.transition()
-                    .duration(500)
-                    .style('opacity', 0);
-            }})
-            .call(d3.drag()
-                .on('start', dragstarted)
-                .on('drag', dragged)
-                .on('end', dragended));
-        
-        // Create node labels
-        const nodeLabel = container.append('g')
-            .selectAll('text')
-            .data(loopMap.nodes)
-            .enter()
-            .append('text')
-            .attr('class', 'node-label')
-            .attr('text-anchor', 'middle')
-            .attr('dy', 25)
-            .text(d => d.label)
-            .style('font-size', '10px')
-            .style('pointer-events', 'none');
-        
-        // Update positions on tick
-        simulation.on('tick', () => {{
-            link
-                .attr('x1', d => d.source.x)
-                .attr('y1', d => d.source.y)
-                .attr('x2', d => d.target.x)
-                .attr('y2', d => d.target.y);
+        # Add nodes
+        for node in loop_map["nodes"]:
+            node_type = node["type"]
+            color = COLOR_SCHEMES[self.color_scheme].get(node_type, "#cccccc")
             
-            linkLabel
-                .attr('x', d => (d.source.x + d.target.x) / 2)
-                .attr('y', d => (d.source.y + d.target.y) / 2);
+            html += f"""
+            <div class="node" style="background-color: {color}">
+                <h3>{node["label"]}</h3>
+                <p><strong>ID:</strong> {node["id"]}</p>
+                <p><strong>Type:</strong> {node["type"]}</p>
+"""
             
-            node
-                .attr('cx', d => d.x)
-                .attr('cy', d => d.y);
+            # Add node data
+            for key, value in node["data"].items():
+                html += f"                <p><strong>{key}:</strong> {value}</p>\n"
             
-            nodeLabel
-                .attr('x', d => d.x)
-                .attr('y', d => d.y);
-        }});
+            html += "            </div>\n"
         
-        // Drag functions
-        function dragstarted(event, d) {{
-            if (!event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
-        }}
+        html += """
+        </div>
         
-        function dragged(event, d) {{
-            d.fx = event.x;
-            d.fy = event.y;
-        }}
+        <h2>Edges</h2>
+        <div class="edges">
+"""
         
-        function dragended(event, d) {{
-            if (!event.active) simulation.alphaTarget(0);
-            d.fx = null;
-            d.fy = null;
-        }}
+        # Add edges
+        for edge in loop_map["edges"]:
+            edge_type = edge["type"]
+            color = COLOR_SCHEMES[self.color_scheme].get(edge_type, "#cccccc")
+            
+            html += f"""
+            <div class="edge" style="border-left: 5px solid {color}; padding-left: 10px;">
+                <p><strong>From:</strong> {edge["source"]} <strong>To:</strong> {edge["target"]}</p>
+                <p><strong>Type:</strong> {edge["type"]}</p>
+                <p><strong>Label:</strong> {edge["label"]}</p>
+"""
+            
+            # Add edge data
+            for key, value in edge["data"].items():
+                html += f"                <p><strong>{key}:</strong> {value}</p>\n"
+            
+            html += "            </div>\n"
         
-        // Control buttons
-        d3.select('#zoom-in').on('click', () => {{
-            svg.transition().call(zoom.scaleBy, 1.5);
-        }});
-        
-        d3.select('#zoom-out').on('click', () => {{
-            svg.transition().call(zoom.scaleBy, 0.75);
-        }});
-        
-        d3.select('#reset').on('click', () => {{
-            svg.transition().call(zoom.transform, d3.zoomIdentity);
-        }});
-        
-        let labelsVisible = true;
-        d3.select('#toggle-labels').on('click', () => {{
-            labelsVisible = !labelsVisible;
-            nodeLabel.style('display', labelsVisible ? 'block' : 'none');
-            linkLabel.style('display', labelsVisible ? 'block' : 'none');
-        }});
-        
-        let detailsVisible = true;
-        d3.select('#toggle-details').on('click', () => {{
-            detailsVisible = !detailsVisible;
-            d3.select('.metadata').style('display', detailsVisible ? 'block' : 'none');
-        }});
-    </script>
+        html += f"""
+        </div>
+    </div>
+    
+    <div class="timestamp">
+        Generated on {datetime.utcnow().isoformat()}
+    </div>
 </body>
 </html>
 """
         
         return html
     
-    def generate_svg(self, loop_map: Dict[str, Any]) -> str:
+    def _generate_svg(self, loop_map: Dict[str, Any]) -> str:
         """
-        Generate SVG visualization from loop map.
+        Generate SVG representation of the loop map.
         
         Args:
             loop_map: The loop map data
             
         Returns:
-            SVG string for visualization
+            SVG string
         """
-        # This would be a more complex implementation in a real system
-        # For this implementation, we'll return a simple SVG
-        
-        # Calculate dimensions based on node count
-        width = max(800, len(loop_map["nodes"]) * 100)
-        height = max(600, len(loop_map["nodes"]) * 75)
-        
-        # Start SVG
-        svg = f"""<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">
-    <rect width="100%" height="100%" fill="#f5f5f5"/>
-    <text x="10" y="30" font-family="Arial" font-size="20" fill="#333">Loop Map: {loop_map['loop_id']}</text>
-    <text x="10" y="50" font-family="Arial" font-size="14" fill="#666">Mode: {loop_map['mode']}</text>
+        # This is a placeholder - a real implementation would use a proper visualization library
+        svg = f"""
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
+    <rect width="800" height="600" fill="#ffffff" />
+    <text x="400" y="50" font-family="Arial" font-size="24" text-anchor="middle">Loop Map: {self.loop_id}</text>
+    <text x="400" y="80" font-family="Arial" font-size="16" text-anchor="middle">Mode: {loop_map["metadata"]["mode"]}</text>
+    <text x="400" y="110" font-family="Arial" font-size="16" text-anchor="middle">Generated At: {loop_map["metadata"]["generated_at"]}</text>
+    <text x="400" y="300" font-family="Arial" font-size="18" text-anchor="middle">SVG visualization would be generated here</text>
+    <text x="400" y="330" font-family="Arial" font-size="18" text-anchor="middle">with {len(loop_map["nodes"])} nodes and {len(loop_map["edges"])} edges</text>
+</svg>
 """
-        
-        # Add nodes
-        for i, node in enumerate(loop_map["nodes"]):
-            x = 100 + (i % 5) * 150
-            y = 100 + (i // 5) * 100
-            
-            svg += f"""    <circle cx="{x}" cy="{y}" r="10" fill="{node['color']}"/>
-    <text x="{x}" y="{y + 25}" font-family="Arial" font-size="12" text-anchor="middle" fill="#333">{node['label']}</text>
-"""
-        
-        # Add edges (simplified)
-        for edge in loop_map["edges"]:
-            # Find source and target nodes
-            source_index = next((i for i, node in enumerate(loop_map["nodes"]) if node["id"] == edge["source"]), 0)
-            target_index = next((i for i, node in enumerate(loop_map["nodes"]) if node["id"] == edge["target"]), 0)
-            
-            source_x = 100 + (source_index % 5) * 150
-            source_y = 100 + (source_index // 5) * 100
-            target_x = 100 + (target_index % 5) * 150
-            target_y = 100 + (target_index // 5) * 100
-            
-            svg += f"""    <line x1="{source_x}" y1="{source_y}" x2="{target_x}" y2="{target_y}" stroke="{edge['color']}" stroke-width="2"/>
-"""
-        
-        # End SVG
-        svg += "</svg>"
         
         return svg
     
-    def change_mode(self, new_mode: str) -> None:
+    def _generate_dot(self, loop_map: Dict[str, Any]) -> str:
         """
-        Change the visualizer mode.
+        Generate GraphViz DOT representation of the loop map.
         
         Args:
-            new_mode: The new mode to use
-        """
-        logger.info(f"Changing mode from {self.mode} to {new_mode} for loop {self.loop_id}")
-        
-        self.mode = new_mode.lower() if new_mode else "balanced"
-        
-        # Update settings based on new mode
-        if self.mode in MODE_VISUALIZATION_SETTINGS:
-            self.settings = MODE_VISUALIZATION_SETTINGS[self.mode]
-        else:
-            self.settings = MODE_VISUALIZATION_SETTINGS["balanced"]
-        
-        # Update metadata
-        self.metadata["mode"] = self.mode
-    
-    def should_update_visualization(self, event_type: str) -> bool:
-        """
-        Determine if visualization should be updated for a given event type.
-        
-        Args:
-            event_type: The event type (agent_completion, reflection, decision, loop_end)
+            loop_map: The loop map data
             
         Returns:
-            True if visualization should be updated, False otherwise
+            DOT string
         """
-        # Get update frequency for the mode
-        update_frequency = self.settings["update_frequency"]
-        
-        # Determine if visualization should be updated based on frequency and event type
-        if update_frequency == "end_only":
-            return event_type == "loop_end"
-        elif update_frequency == "agent_completion":
-            return event_type in ["agent_completion", "loop_end"]
-        elif update_frequency == "real_time":
-            return True  # Update for all events
-        else:
-            return False
-
-def create_visualizer(loop_id: str, mode: str = "balanced", color_scheme: str = "default") -> LoopMapVisualizer:
-    """
-    Create a loop map visualizer for a loop.
+        # This is a simplified example - a real implementation would use a proper GraphViz library
+        dot = f"""digraph LoopMap_{self.loop_id} {{
+    label="Loop Map: {self.loop_id}\\nMode: {loop_map["metadata"]["mode"]}\\nGenerated At: {loop_map["metadata"]["generated_at"]}";
+    labelloc="t";
+    fontsize=16;
+    fontname="Arial";
+    node [fontname="Arial", fontsize=12, shape=box, style=filled];
+    edge [fontname="Arial", fontsize=10];
     
-    Args:
-        loop_id: The ID of the loop to visualize
-        mode: The orchestrator mode (fast, balanced, thorough, research)
-        color_scheme: The color scheme to use for visualization (default, dark, accessibility)
+"""
         
-    Returns:
-        LoopMapVisualizer instance
-    """
-    return LoopMapVisualizer(loop_id, mode, color_scheme)
-
-def visualize_loop(loop_id: str, loop_trace: Dict[str, Any], mode: str = "balanced", format: VisualizationFormat = VisualizationFormat.HTML, color_scheme: str = "default") -> Dict[str, Any]:
-    """
-    Visualize a loop trace.
-    
-    Args:
-        loop_id: The ID of the loop to visualize
-        loop_trace: The loop trace data
-        mode: The orchestrator mode (fast, balanced, thorough, research)
-        format: The output format (json, html, svg, png, dot)
-        color_scheme: The color scheme to use for visualization (default, dark, accessibility)
+        # Add nodes
+        for node in loop_map["nodes"]:
+            node_type = node["type"]
+            color = COLOR_SCHEMES[self.color_scheme].get(node_type, "#cccccc")
+            color = color.replace("#", "")  # Remove # for DOT format
+            
+            dot += f'    "{node["id"]}" [label="{node["label"]}", fillcolor="#{color}"];\n'
         
-    Returns:
-        Dictionary containing the visualization data
-    """
-    logger.info(f"Visualizing loop {loop_id} in {mode} mode with {format} format")
-    
-    try:
-        # Create visualizer
-        visualizer = create_visualizer(loop_id, mode, color_scheme)
+        # Add edges
+        for edge in loop_map["edges"]:
+            edge_type = edge["type"]
+            color = COLOR_SCHEMES[self.color_scheme].get(edge_type, "#cccccc")
+            color = color.replace("#", "")  # Remove # for DOT format
+            
+            dot += f'    "{edge["source"]}" -> "{edge["target"]}" [label="{edge["label"]}", color="#{color}"];\n'
         
-        # Generate loop map
-        loop_map = visualizer.generate_map_from_trace(loop_trace)
+        dot += "}\n"
         
-        # Generate visualization in requested format
-        if format == VisualizationFormat.JSON:
-            visualization = json.dumps(loop_map, indent=2)
-            content_type = "application/json"
-        elif format == VisualizationFormat.HTML:
-            visualization = visualizer.generate_html(loop_map)
-            content_type = "text/html"
-        elif format == VisualizationFormat.SVG:
-            visualization = visualizer.generate_svg(loop_map)
-            content_type = "image/svg+xml"
-        elif format == VisualizationFormat.PNG:
-            # This would be a more complex implementation in a real system
-            # For this implementation, we'll return a placeholder
-            visualization = "PNG visualization not implemented"
-            content_type = "text/plain"
-        elif format == VisualizationFormat.DOT:
-            # This would be a more complex implementation in a real system
-            # For this implementation, we'll return a placeholder
-            visualization = "DOT visualization not implemented"
-            content_type = "text/plain"
-        else:
-            visualization = json.dumps(loop_map, indent=2)
-            content_type = "application/json"
-        
-        return {
-            "loop_id": loop_id,
-            "mode": mode,
-            "format": format,
-            "content_type": content_type,
-            "visualization": visualization,
-            "metadata": {
-                "node_count": len(loop_map["nodes"]),
-                "edge_count": len(loop_map["edges"]),
-                "generated_at": datetime.utcnow().isoformat()
-            }
-        }
-    except Exception as e:
-        logger.error(f"Error visualizing loop: {str(e)}")
-        return {
-            "loop_id": loop_id,
-            "mode": mode,
-            "format": format,
-            "error": str(e)
-        }
+        return dot

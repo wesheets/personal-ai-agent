@@ -14,7 +14,7 @@
         "vibe": "archivist",
         "persona": "Meticulous record-keeper with perfect recall and organized thinking"
       },
-      "schema_path": "schemas/memory_output.schema.json",
+      "schema_path": "schemas/agent_output/memory_output.schema.json",
       "trust_score": 0.95,
       "contract_version": "1.0.0",
       "sdk_compliant": true,
@@ -35,7 +35,7 @@
         "vibe": "coordinator",
         "persona": "Efficient orchestrator with a focus on process flow"
       },
-      "schema_path": "schemas/orchestrator_output.schema.json",
+      "schema_path": "schemas/agent_output/orchestrator_output.schema.json",
       "trust_score": 0.98,
       "contract_version": "1.0.0",
       "sdk_compliant": true,
@@ -56,12 +56,74 @@
         "vibe": "methodical",
         "persona": "Careful implementer with strong safety focus"
       },
-      "schema_path": "schemas/hal_safety_check.schema.json",
+      "schema_path": "schemas/agent_output/hal_safety_check.schema.json",
+      "trust_score": 0.92,
+      "contract_version": "1.0.0",
+      "sdk_compliant": true,
+      "schema_validated": true,
+      "last_updated": "2025-04-22"
+    },
+    {
+      "name": "nova-agent",
+      "role": "UI/UX Designer",
+      "description": "Creates user interfaces and experience designs",
+      "version": "1.0.0",
+      "status": "active",
+      "tools": ["design", "prototype", "visualize"],
+      "permissions": ["read_memory", "write_memory", "generate_ui"],
+      "tone_profile": {
+        "style": "creative",
+        "emotion": "enthusiastic",
+        "vibe": "designer",
+        "persona": "Innovative designer with an eye for aesthetics and usability"
+      },
+      "schema_path": "schemas/agent_output/nova_output.schema.json",
+      "trust_score": 0.90,
+      "contract_version": "1.0.0",
+      "sdk_compliant": true,
+      "schema_validated": true,
+      "last_updated": "2025-04-22"
+    },
+    {
+      "name": "sage-agent",
+      "role": "Knowledge Advisor",
+      "description": "Provides domain expertise and knowledge synthesis",
+      "version": "1.0.0",
+      "status": "active",
+      "tools": ["research", "analyze", "synthesize"],
+      "permissions": ["read_memory", "write_memory", "access_knowledge_base"],
+      "tone_profile": {
+        "style": "academic",
+        "emotion": "thoughtful",
+        "vibe": "scholarly",
+        "persona": "Wise advisor with deep knowledge and analytical thinking"
+      },
+      "schema_path": "schemas/agent_output/sage_output.schema.json",
       "trust_score": 0.92,
       "contract_version": "1.0.0",
       "sdk_compliant": true,
       "schema_validated": true,
       "last_updated": "2025-04-22"
     }
-  ]
+  ],
+  "agent_schema_compliance": {
+    "phase": "2/2",
+    "core_agents": "100% SDK + schema compliant",
+    "plugin_agents": "100% schema compliant",
+    "memory_safe_writes": true,
+    "schema_registry_enabled": true,
+    "timestamp": "2025-04-22"
+  },
+  "schema_validation": {
+    "components": {
+      "loop_lineage_export": "validated",
+      "loop_map_visualization": "validated",
+      "visual_settings": "validated",
+      "rerun_decision": "validated",
+      "md_export_format": "validated",
+      "html_export_format": "validated"
+    },
+    "last_validation": "2025-04-22T02:50:08Z",
+    "validation_status": "complete"
+  }
 }

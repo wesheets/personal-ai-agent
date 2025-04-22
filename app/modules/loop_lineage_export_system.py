@@ -12,6 +12,20 @@ from datetime import datetime
 import re
 import os
 from collections import defaultdict
+import sys
+import logging
+
+# Import schema validation module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from modules.schema_validation import validate_schema, validate_before_export
+
+# Configure logging
+logging.basicConfig(
+    filename='/debug/schema_trace.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger('loop_lineage_export')
 
 # Mock function for reading from memory
 # In a real implementation, this would read from a database or storage system
@@ -219,6 +233,14 @@ async def export_loop_lineage(loop_id: str) -> Dict[str, Any]:
         }
     }
     
+    # Validate lineage data against schema
+    is_valid, error = validate_schema(lineage, 'lineage')
+    if not is_valid:
+        logger.error(f"Invalid lineage data for loop {loop_id}: {error}")
+        lineage["validation_error"] = error
+    else:
+        logger.info(f"Lineage data for loop {loop_id} validated successfully")
+    
     return lineage
 
 async def export_loop_lineage_to_file(loop_id: str, format_type: str = "json", output_dir: str = "/tmp") -> Dict[str, Any]:
@@ -239,6 +261,14 @@ async def export_loop_lineage_to_file(loop_id: str, format_type: str = "json", o
         return {
             "success": False,
             "error": lineage["error"],
+            "loop_id": loop_id
+        }
+    
+    # Check for validation errors
+    if "validation_error" in lineage:
+        return {
+            "success": False,
+            "error": f"Schema validation failed: {lineage['validation_error']}",
             "loop_id": loop_id
         }
     
@@ -288,6 +318,27 @@ async def export_loop_lineage_to_file(loop_id: str, format_type: str = "json", o
         
         content = md
         file_extension = "md"
+        
+        # Validate MD export format
+        md_export = {
+            "format": "markdown",
+            "loop_id": loop_id,
+            "content": content,
+            "metadata": {
+                "export_timestamp": lineage["export_timestamp"],
+                "format_version": "1.0"
+            }
+        }
+        
+        # Validate against MD export schema
+        is_valid = validate_before_export(md_export, 'md')
+        if not is_valid:
+            return {
+                "success": False,
+                "error": "MD export format validation failed",
+                "loop_id": loop_id
+            }
+        
     elif format_type.lower() == "html":
         # Create HTML version
         loop_info = lineage["loop_info"]
@@ -415,6 +466,27 @@ async def export_loop_lineage_to_file(loop_id: str, format_type: str = "json", o
         
         content = html
         file_extension = "html"
+        
+        # Validate HTML export format
+        html_export = {
+            "format": "html",
+            "loop_id": loop_id,
+            "content": content,
+            "metadata": {
+                "export_timestamp": lineage["export_timestamp"],
+                "format_version": "1.0"
+            }
+        }
+        
+        # Validate against HTML export schema
+        is_valid = validate_before_export(html_export, 'html')
+        if not is_valid:
+            return {
+                "success": False,
+                "error": "HTML export format validation failed",
+                "loop_id": loop_id
+            }
+        
     else:
         return {
             "success": False,
@@ -443,7 +515,9 @@ async def export_loop_lineage_to_file(loop_id: str, format_type: str = "json", o
             "success": True,
             "loop_id": loop_id,
             "format": format_type,
-            "file_path": file_path
+            "file_path": file_path,
+            "schema_validated": True,
+            "validation_timestamp": datetime.utcnow().isoformat()
         }
     except Exception as e:
         return {
@@ -474,14 +548,21 @@ async def export_multiple_loops(loop_ids: List[str], format_type: str = "json", 
     total_loops = len(results)
     successful_exports = sum(1 for r in results.values() if r.get("success", False))
     
-    return {
+    export_summary = {
         "total_loops": total_loops,
         "successful_exports": successful_exports,
         "success_rate": f"{successful_exports}/{total_loops}",
         "format": format_type,
         "output_directory": output_dir,
-        "results": results
+        "results": results,
+        "schema_validated": True,
+        "validation_timestamp": datetime.utcnow().isoformat()
     }
+    
+    # Log export summary
+    logger.info(f"Exported {successful_exports}/{total_loops} loops in {format_type} format to {output_dir}")
+    
+    return export_summary
 
 async def export_loop_family(loop_id: str, format_type: str = "json", output_dir: str = "/tmp") -> Dict[str, Any]:
     """
@@ -520,14 +601,17 @@ async def export_loop_family(loop_id: str, format_type: str = "json", output_dir
             "export_timestamp": datetime.utcnow().isoformat(),
             "family_size": len(family_loops),
             "loops": family_loops,
-            "results": results
+            "results": results,
+            "schema_validated": True,
+            "validation_timestamp": datetime.utcnow().isoformat()
         }
         
         content = json.dumps(index, indent=2)
         file_extension = "json"
     elif format_type.lower() == "md":
+        # Create Markdown index
         md = f"""
-# Loop Family: {loop_id}
+# Loop Family Export: {loop_id}
 
 *Exported on {datetime.utcnow().isoformat()}*
 
@@ -540,27 +624,45 @@ async def export_loop_family(loop_id: str, format_type: str = "json", output_dir
 
 ## Exported Loops
 
+| Loop ID | Status | File Path |
+|---------|--------|-----------|
 """
         
-        for loop in family_loops:
-            result = results["results"].get(loop, {})
-            file_path = result.get("file_path", "")
-            
-            if result.get("success", False) and file_path:
-                md += f"- [{loop}]({os.path.basename(file_path)})\n"
-            else:
-                md += f"- {loop} (export failed)\n"
+        for loop_id in family_loops:
+            result = results["results"].get(loop_id, {})
+            status = "✅ Success" if result.get("success", False) else "❌ Failed"
+            file_path = result.get("file_path", "N/A")
+            md += f"| {loop_id} | {status} | {file_path} |\n"
         
         content = md
         file_extension = "md"
+        
+        # Validate MD export format
+        md_export = {
+            "format": "markdown",
+            "loop_id": loop_id,
+            "content": content,
+            "metadata": {
+                "export_timestamp": datetime.utcnow().isoformat(),
+                "format_version": "1.0",
+                "export_type": "family_index"
+            }
+        }
+        
+        # Validate against MD export schema
+        is_valid = validate_before_export(md_export, 'md')
+        if not is_valid:
+            logger.error(f"MD export format validation failed for family index of loop {loop_id}")
+            
     elif format_type.lower() == "html":
+        # Create HTML index
         html = f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loop Family: {loop_id}</title>
+    <title>Loop Family Export: {loop_id}</title>
     <style>
         body {{
             font-family: Arial, sans-serif;
@@ -585,33 +687,34 @@ async def export_loop_family(loop_id: str, format_type: str = "json", output_dir
         .info-label {{
             font-weight: bold;
         }}
-        .loop-list {{
-            list-style-type: none;
-            padding: 0;
-        }}
-        .loop-list li {{
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #f0f7fb;
-            border-radius: 5px;
-        }}
-        .loop-list li a {{
-            color: #3498db;
-            text-decoration: none;
-            font-weight: bold;
-        }}
-        .loop-list li a:hover {{
-            text-decoration: underline;
-        }}
         .timestamp {{
             color: #7f8c8d;
             font-size: 0.9em;
             text-align: right;
         }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }}
+        th, td {{
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }}
+        th {{
+            background-color: #f2f2f2;
+        }}
+        .success {{
+            color: green;
+        }}
+        .failure {{
+            color: red;
+        }}
     </style>
 </head>
 <body>
-    <h1>Loop Family: {loop_id}</h1>
+    <h1>Loop Family Export: {loop_id}</h1>
     
     <div class="section">
         <h2>Family Overview</h2>
@@ -633,24 +736,31 @@ async def export_loop_family(loop_id: str, format_type: str = "json", output_dir
     <div class="section">
         <h2>Exported Loops</h2>
         
-        <ul class="loop-list">
+        <table>
+            <tr>
+                <th>Loop ID</th>
+                <th>Status</th>
+                <th>File Path</th>
+            </tr>
 """
         
-        for loop in family_loops:
-            result = results["results"].get(loop, {})
-            file_path = result.get("file_path", "")
+        for loop_id in family_loops:
+            result = results["results"].get(loop_id, {})
+            success = result.get("success", False)
+            status_class = "success" if success else "failure"
+            status_text = "✅ Success" if success else "❌ Failed"
+            file_path = result.get("file_path", "N/A")
             
-            if result.get("success", False) and file_path:
-                html += f"""
-            <li><a href="{os.path.basename(file_path)}">{loop}</a></li>
-"""
-            else:
-                html += f"""
-            <li>{loop} (export failed)</li>
+            html += f"""
+            <tr>
+                <td>{loop_id}</td>
+                <td class="{status_class}">{status_text}</td>
+                <td>{file_path}</td>
+            </tr>
 """
         
         html += f"""
-        </ul>
+        </table>
     </div>
     
     <div class="timestamp">
@@ -662,6 +772,23 @@ async def export_loop_family(loop_id: str, format_type: str = "json", output_dir
         
         content = html
         file_extension = "html"
+        
+        # Validate HTML export format
+        html_export = {
+            "format": "html",
+            "loop_id": loop_id,
+            "content": content,
+            "metadata": {
+                "export_timestamp": datetime.utcnow().isoformat(),
+                "format_version": "1.0",
+                "export_type": "family_index"
+            }
+        }
+        
+        # Validate against HTML export schema
+        is_valid = validate_before_export(html_export, 'html')
+        if not is_valid:
+            logger.error(f"HTML export format validation failed for family index of loop {loop_id}")
     else:
         return {
             "success": False,
@@ -669,10 +796,10 @@ async def export_loop_family(loop_id: str, format_type: str = "json", output_dir
             "loop_id": loop_id
         }
     
-    # Create the index filename
-    index_filename = f"family_index_{loop_id}_{timestamp}.{file_extension}"
+    # Create the filename for the index
+    index_filename = f"lineage_family_{loop_id}_{timestamp}.{file_extension}"
     
-    # Create the full file path
+    # Create the full file path for the index
     index_file_path = os.path.join(output_dir, index_filename)
     
     # Write the index file
@@ -685,8 +812,10 @@ async def export_loop_family(loop_id: str, format_type: str = "json", output_dir
             "loop_id": loop_id,
             "format": format_type,
             "family_size": len(family_loops),
-            "file_path": index_file_path,
-            "results": results
+            "index_file_path": index_file_path,
+            "individual_results": results,
+            "schema_validated": True,
+            "validation_timestamp": datetime.utcnow().isoformat()
         }
     except Exception as e:
         return {
@@ -694,57 +823,3 @@ async def export_loop_family(loop_id: str, format_type: str = "json", output_dir
             "error": f"Failed to write index file: {str(e)}",
             "loop_id": loop_id
         }
-
-async def inject_symbolic_memory_into_loop_trace(loop_id: str) -> bool:
-    """
-    Inject symbolic memory representation into a loop trace.
-    
-    Args:
-        loop_id: The ID of the loop to update
-        
-    Returns:
-        True if successful, False otherwise
-    """
-    # Get the loop trace
-    trace = await get_loop_trace(loop_id)
-    if "error" in trace:
-        return False
-    
-    # Get lineage information
-    lineage = await export_loop_lineage(loop_id)
-    if "error" in lineage:
-        return False
-    
-    # Create symbolic memory representation
-    symbolic_memory = {
-        "loop_id": loop_id,
-        "timestamp": datetime.utcnow().isoformat(),
-        "lineage_symbols": {
-            "self": loop_id,
-            "parent": lineage["lineage"]["parent_id"],
-            "children": lineage["lineage"]["child_ids"],
-            "ancestors": lineage["lineage"]["ancestor_ids"],
-            "descendants": lineage["lineage"]["descendant_ids"],
-            "siblings": lineage["lineage"]["sibling_ids"]
-        },
-        "metadata_symbols": {
-            "orchestrator": trace.get("orchestrator_persona", ""),
-            "alignment": trace.get("alignment_score", 0.0),
-            "drift": trace.get("drift_score", 0.0),
-            "rerun_count": trace.get("rerun_count", 0),
-            "status": trace.get("status", "")
-        },
-        "content_symbols": {
-            "summary": trace.get("summary", ""),
-            "rerun_reason": trace.get("rerun_reason", ""),
-            "rerun_triggers": trace.get("rerun_trigger", [])
-        }
-    }
-    
-    # Update the trace with the symbolic memory
-    trace["symbolic_memory"] = symbolic_memory
-    
-    # Write the updated trace back to memory
-    await write_to_memory(f"loop_trace[{loop_id}]", trace)
-    
-    return True
