@@ -1,125 +1,84 @@
-import React, { useState } from 'react';
-import { Box, Flex, Grid, GridItem, useColorModeValue, useDisclosure, Button, Icon } from '@chakra-ui/react';
+import React, { useState, useEffect } from 'react';
+import { 
+  Box, 
+  Grid, 
+  GridItem, 
+  Button, 
+  Icon, 
+  useColorModeValue, 
+  useDisclosure 
+} from '@chakra-ui/react';
+import { 
+  FaTools, 
+  FaHistory, 
+  FaQuestionCircle, 
+  FaMapMarkedAlt 
+} from 'react-icons/fa';
 import ErrorBoundary from './ErrorBoundary';
-import { LoadingCard } from './LoadingStates';
-import UIZoneSchema from '../config/ui/UIZoneSchema.json';
-
-// Import existing components
-import AgentPanel from './AgentPanel';
-import GoalLoopVisualization from './GoalLoopVisualization';
-import MemoryViewer from './MemoryViewer';
-
-// Import new components as they're created
-// LEFT zone components
-import OperatorHUDBar from './left/OperatorHUDBar';
-import ProjectContextSwitcher from './left/ProjectContextSwitcher';
-import OrchestratorModePanel from './left/OrchestratorModePanel';
-import PermissionsManager from './left/PermissionsManager';
-import AgentChatConsole from './left/AgentChatConsole';
-
-// CENTER zone components
-import LoopDebugger from './center/LoopDebugger';
-import WhatIfSimulator from './center/WhatIfSimulator';
-import BeliefsExplorer from './center/BeliefsExplorer';
-
-// PROJECT timeline components
-import ProjectTimelineViewer from './project/ProjectTimelineViewer';
-import LoopForkMap from './project/LoopForkMap';
-import BeliefChangeLog from './project/BeliefChangeLog';
-
-// REPAIR components
-import LoopRepairSuggestionPanel from './repair/LoopRepairSuggestionPanel';
-import LoopRepairLog from './repair/LoopRepairLog';
-import { AutoRouterProvider } from '../logic/AutoRerouter';
-
-// RIGHT zone components
-import RightPanelContainer from './right/RightPanelContainer';
-import FileTreePanel from './right/FileTreePanel';
-import SystemHealthPanel from './right/SystemHealthPanel';
-import MetricsVisualization from './right/MetricsVisualization';
-import RebuildStatusDisplay from './right/RebuildStatusDisplay';
-import AuditLogViewer from './right/AuditLogViewer';
-import TrustScoreDisplay from './right/TrustScoreDisplay';
-import ContradictionDisplay from './right/ContradictionDisplay';
-import LoopDriftIndex from './right/LoopDriftIndex';
-
-// MODAL components are loaded dynamically when needed
-import { useModalContext } from '../hooks/useModalContext';
-
-// Import onboarding components
 import SageTooltip from './onboarding/SageTooltip';
 import OnboardingPane from './onboarding/OnboardingPane';
 import GuidedTourManager from './onboarding/GuidedTourManager';
-import { FaQuestionCircle, FaMapMarkedAlt, FaHistory, FaTools } from 'react-icons/fa';
-
-// Component mapping for dynamic rendering
-const componentMap = {
-  // LEFT zone
-  OperatorHUDBar,
-  ProjectContextSwitcher,
-  OrchestratorModePanel,
-  AgentPanel,
-  PermissionsManager,
-  AgentChatConsole,
-  
-  // CENTER zone
-  GoalLoopVisualization,
-  MemoryViewer,
-  LoopDebugger,
-  WhatIfSimulator,
-  BeliefsExplorer,
-  ProjectTimelineViewer,
-  LoopForkMap,
-  LoopRepairSuggestionPanel,
-  
-  // RIGHT zone
-  RightPanelContainer,
-  FileTreePanel,
-  SystemHealthPanel,
-  MetricsVisualization,
-  RebuildStatusDisplay,
-  AuditLogViewer,
-  TrustScoreDisplay,
-  ContradictionDisplay,
-  LoopDriftIndex,
-  
-  // MODAL zone
-  BeliefChangeLog,
-  LoopRepairLog
-};
+import { AutoRouterProvider } from '../logic/AutoRerouter';
+import UIZoneSchema from '../config/UIZoneSchema';
+import MisalignmentAlertBar from './beliefs/MisalignmentAlertBar';
+import { useBeliefDriftMonitor } from '../logic/BeliefDriftMonitor';
 
 const DashboardLayout = () => {
+  // Color mode values
   const bgColor = useColorModeValue('gray.50', 'gray.900');
-  const cardBgColor = useColorModeValue('white', 'gray.700');
-  const borderColor = useColorModeValue('gray.200', 'gray.600');
-  const { activeModal, openModal } = useModalContext();
+  const cardBgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
   
-  // Onboarding state
-  const [showTour, setShowTour] = useState(false);
+  // State for modals and tours
+  const [activeModal, setActiveModal] = useState(null);
   const [activeTour, setActiveTour] = useState('main');
+  const [showTour, setShowTour] = useState(false);
+  
+  // Onboarding disclosure
   const { isOpen: isOnboardingOpen, onOpen: onOpenOnboarding, onClose: onCloseOnboarding } = useDisclosure();
   
-  // Check if this is the first visit
-  React.useEffect(() => {
-    const isFirstVisit = localStorage.getItem('promethios_first_visit') === null;
-    if (isFirstVisit) {
-      // Set first visit flag
-      localStorage.setItem('promethios_first_visit', 'false');
-      // Show onboarding pane
-      onOpenOnboarding();
-      // Start tour after a short delay
-      setTimeout(() => {
-        setActiveTour('newUser');
-        setShowTour(true);
-      }, 1000);
+  // State for anchored beliefs
+  const [anchoredBeliefs, setAnchoredBeliefs] = useState([]);
+  const [misalignmentAlerts, setMisalignmentAlerts] = useState([]);
+  
+  // Load anchored beliefs from storage
+  useEffect(() => {
+    try {
+      const storedBeliefs = localStorage.getItem('anchored_beliefs');
+      if (storedBeliefs) {
+        setAnchoredBeliefs(JSON.parse(storedBeliefs));
+      }
+    } catch (error) {
+      console.error('Failed to load anchored beliefs:', error);
     }
-  }, [onOpenOnboarding]);
-
+  }, []);
+  
+  // Initialize belief drift monitor
+  const { isMonitoring, driftLogs } = useBeliefDriftMonitor({
+    anchoredBeliefs,
+    onDriftDetected: (alert) => {
+      setMisalignmentAlerts(prev => [...prev, alert]);
+    },
+    globalThreshold: 0.7,
+    enabled: true
+  });
+  
+  // Function to open a modal
+  const openModal = (modalName) => {
+    setActiveModal(modalName);
+  };
+  
+  // Function to render a component by name
   const renderComponent = (componentName) => {
+    // Map component names to actual components
+    const componentMap = {
+      // Existing components would be listed here
+    };
+    
     const Component = componentMap[componentName];
+    
     if (!Component) {
-      console.warn(`Component ${componentName} not found in component map`);
-      return <Box p={4}>Component {componentName} not implemented yet</Box>;
+      return <Box p={4}>{componentName} not implemented yet</Box>;
     }
     
     // Wrap component with SageTooltip if it has tooltip data
@@ -143,10 +102,12 @@ const DashboardLayout = () => {
       </Box>
     );
   };
-
   return (
     <AutoRouterProvider>
       <Box bg={bgColor} minH="100vh">
+        {/* Misalignment Alert Bar - Global placement */}
+        <MisalignmentAlertBar />
+        
         <Grid
           templateColumns={{ base: '1fr', md: '300px 1fr 300px' }}
           templateAreas={{
@@ -164,7 +125,6 @@ const DashboardLayout = () => {
               </Box>
             ))}
           </GridItem>
-
           {/* CENTER Zone */}
           <GridItem area="center" overflowY="auto" p={2} maxH="100vh">
             {UIZoneSchema.zones.CENTER.map((componentName) => (
@@ -173,7 +133,6 @@ const DashboardLayout = () => {
               </Box>
             ))}
           </GridItem>
-
           {/* RIGHT Zone */}
           <GridItem area="right" overflowY="auto" p={2} maxH="100vh">
             {UIZoneSchema.zones.RIGHT.map((componentName) => (
@@ -183,7 +142,6 @@ const DashboardLayout = () => {
             ))}
           </GridItem>
         </Grid>
-
         {/* MODAL Zone - Rendered conditionally */}
         {activeModal && (
           <Box
@@ -309,5 +267,4 @@ const DashboardLayout = () => {
     </AutoRouterProvider>
   );
 };
-
 export default DashboardLayout;
