@@ -26,6 +26,7 @@ from app.modules.orchestrator_integration import (
 )
 from app.modules.loop_validator import validate_loop
 from app.modules.core_beliefs_integration import inject_belief_references
+from app.modules.loop_execution_guard import loop_execution_guard
 
 # Import tiered orchestrator components
 from app.modules.tiered_orchestrator import (
@@ -222,6 +223,18 @@ async def validate_loop_endpoint(request: LoopValidateRequest):
                 request.user_preference
             )
             logger.info(f"Determined optimal mode {mode} for loop {request.loop_id}")
+        
+        # Execute the loop execution guard to check safety constraints
+        guard_result = loop_execution_guard(request.loop_data)
+        if guard_result["status"] != "ok":
+            logger.warning(f"Loop execution guard rejected loop {request.loop_id}: {guard_result['reason']}")
+            return {
+                "status": "rejected",
+                "loop_id": request.loop_id,
+                "guard_result": guard_result,
+                "processed_by": "loop_execution_guard",
+                "processed_at": datetime.utcnow().isoformat()
+            }
         
         # Apply cognitive controls to the loop with specified or determined mode
         prepared_loop = integrate_with_orchestrator(request.loop_id, request.loop_data, mode)
