@@ -155,6 +155,17 @@ def create_visualizer(*args, **kwargs):
     logger.info("create_visualizer stub function called")
     return {"status": "Visualizer not implemented. Stub function active."}
 
+def visualize_loop(*args, **kwargs):
+    """
+    Stub function for visualizing a loop trace.
+    This function is required for backend boot but is not fully implemented.
+    
+    Returns:
+        Dictionary with status message indicating stub implementation
+    """
+    logger.info("visualize_loop stub function called")
+    return {"status": "Loop visualization not implemented. Stub function active."}
+
 # Load visual settings schema
 def load_visual_settings(mode: str) -> Dict[str, Any]:
     """
