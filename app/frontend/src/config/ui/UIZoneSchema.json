@@ -10,6 +10,7 @@
     ],
     "CENTER": [
       "GoalLoopVisualization",
+      "LoopRepairSuggestionPanel",
       "MemoryViewer",
       "LoopDebugger",
       "WhatIfSimulator",
@@ -21,6 +22,7 @@
       "RightPanelContainer"
     ],
     "MODAL": [
+      "LoopRepairLog",
       "MemoryQueryConsole",
       "SnapshotManager",
       "ManifestExplorer",

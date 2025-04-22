@@ -27,6 +27,11 @@ import ProjectTimelineViewer from './project/ProjectTimelineViewer';
 import LoopForkMap from './project/LoopForkMap';
 import BeliefChangeLog from './project/BeliefChangeLog';
 
+// REPAIR components
+import LoopRepairSuggestionPanel from './repair/LoopRepairSuggestionPanel';
+import LoopRepairLog from './repair/LoopRepairLog';
+import { AutoRouterProvider } from '../logic/AutoRerouter';
+
 // RIGHT zone components
 import RightPanelContainer from './right/RightPanelContainer';
 import FileTreePanel from './right/FileTreePanel';
@@ -45,7 +50,7 @@ import { useModalContext } from '../hooks/useModalContext';
 import SageTooltip from './onboarding/SageTooltip';
 import OnboardingPane from './onboarding/OnboardingPane';
 import GuidedTourManager from './onboarding/GuidedTourManager';
-import { FaQuestionCircle, FaMapMarkedAlt, FaHistory } from 'react-icons/fa';
+import { FaQuestionCircle, FaMapMarkedAlt, FaHistory, FaTools } from 'react-icons/fa';
 
 // Component mapping for dynamic rendering
 const componentMap = {
@@ -65,6 +70,7 @@ const componentMap = {
   BeliefsExplorer,
   ProjectTimelineViewer,
   LoopForkMap,
+  LoopRepairSuggestionPanel,
   
   // RIGHT zone
   RightPanelContainer,
@@ -78,7 +84,8 @@ const componentMap = {
   LoopDriftIndex,
   
   // MODAL zone
-  BeliefChangeLog
+  BeliefChangeLog,
+  LoopRepairLog
 };
 
 const DashboardLayout = () => {
@@ -138,148 +145,168 @@ const DashboardLayout = () => {
   };
 
   return (
-    <Box bg={bgColor} minH="100vh">
-      <Grid
-        templateColumns={{ base: '1fr', md: '300px 1fr 300px' }}
-        templateAreas={{
-          base: `"left" "center" "right"`,
-          md: `"left center right"`
-        }}
-        gap={2}
-        height="100vh"
-      >
-        {/* LEFT Zone */}
-        <GridItem area="left" overflowY="auto" p={2} maxH="100vh">
-          {UIZoneSchema.zones.LEFT.map((componentName) => (
-            <Box key={componentName} mb={4}>
-              {renderComponent(componentName)}
-            </Box>
-          ))}
-        </GridItem>
+    <AutoRouterProvider>
+      <Box bg={bgColor} minH="100vh">
+        <Grid
+          templateColumns={{ base: '1fr', md: '300px 1fr 300px' }}
+          templateAreas={{
+            base: `"left" "center" "right"`,
+            md: `"left center right"`
+          }}
+          gap={2}
+          height="100vh"
+        >
+          {/* LEFT Zone */}
+          <GridItem area="left" overflowY="auto" p={2} maxH="100vh">
+            {UIZoneSchema.zones.LEFT.map((componentName) => (
+              <Box key={componentName} mb={4}>
+                {renderComponent(componentName)}
+              </Box>
+            ))}
+          </GridItem>
 
-        {/* CENTER Zone */}
-        <GridItem area="center" overflowY="auto" p={2} maxH="100vh">
-          {UIZoneSchema.zones.CENTER.map((componentName) => (
-            <Box key={componentName} mb={4}>
-              {renderComponent(componentName)}
-            </Box>
-          ))}
-        </GridItem>
+          {/* CENTER Zone */}
+          <GridItem area="center" overflowY="auto" p={2} maxH="100vh">
+            {UIZoneSchema.zones.CENTER.map((componentName) => (
+              <Box key={componentName} mb={4}>
+                {renderComponent(componentName)}
+              </Box>
+            ))}
+          </GridItem>
 
-        {/* RIGHT Zone */}
-        <GridItem area="right" overflowY="auto" p={2} maxH="100vh">
-          {UIZoneSchema.zones.RIGHT.map((componentName) => (
-            <Box key={componentName} mb={4}>
-              {renderComponent(componentName)}
-            </Box>
-          ))}
-        </GridItem>
-      </Grid>
+          {/* RIGHT Zone */}
+          <GridItem area="right" overflowY="auto" p={2} maxH="100vh">
+            {UIZoneSchema.zones.RIGHT.map((componentName) => (
+              <Box key={componentName} mb={4}>
+                {renderComponent(componentName)}
+              </Box>
+            ))}
+          </GridItem>
+        </Grid>
 
-      {/* MODAL Zone - Rendered conditionally */}
-      {activeModal && (
+        {/* MODAL Zone - Rendered conditionally */}
+        {activeModal && (
+          <Box
+            position="fixed"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            bg="rgba(0, 0, 0, 0.7)"
+            zIndex={1000}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Box
+              width="80%"
+              maxWidth="1200px"
+              maxHeight="80vh"
+              overflowY="auto"
+              bg={cardBgColor}
+              borderRadius="lg"
+              p={6}
+            >
+              <ErrorBoundary>
+                {/* Modal content will be rendered here */}
+              </ErrorBoundary>
+            </Box>
+          </Box>
+        )}
+        
+        {/* Onboarding Pane */}
+        <OnboardingPane 
+          isOpen={isOnboardingOpen} 
+          onClose={onCloseOnboarding} 
+        />
+        
+        {/* Loop Repair Log Button */}
         <Box
           position="fixed"
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          bg="rgba(0, 0, 0, 0.7)"
-          zIndex={1000}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
+          bottom="200px"
+          right="20px"
+          zIndex="900"
         >
-          <Box
-            width="80%"
-            maxWidth="1200px"
-            maxHeight="80vh"
-            overflowY="auto"
-            bg={cardBgColor}
-            borderRadius="lg"
-            p={6}
+          <Button
+            leftIcon={<Icon as={FaTools} />}
+            colorScheme="red"
+            onClick={() => openModal('LoopRepairLog')}
+            size="md"
+            boxShadow="md"
           >
-            <ErrorBoundary>
-              {/* Modal content will be rendered here */}
-            </ErrorBoundary>
-          </Box>
+            Repair Log
+          </Button>
         </Box>
-      )}
-      
-      {/* Onboarding Pane */}
-      <OnboardingPane 
-        isOpen={isOnboardingOpen} 
-        onClose={onCloseOnboarding} 
-      />
-      
-      {/* Belief Change Log Button */}
-      <Box
-        position="fixed"
-        bottom="140px"
-        right="20px"
-        zIndex="900"
-      >
-        <Button
-          leftIcon={<Icon as={FaHistory} />}
-          colorScheme="purple"
-          onClick={() => openModal('BeliefChangeLog')}
-          size="md"
-          boxShadow="md"
+        
+        {/* Belief Change Log Button */}
+        <Box
+          position="fixed"
+          bottom="140px"
+          right="20px"
+          zIndex="900"
         >
-          Belief Changes
-        </Button>
-      </Box>
-      
-      {/* Help Button */}
-      <Box
-        position="fixed"
-        bottom="80px"
-        right="20px"
-        zIndex="900"
-      >
-        <Button
-          leftIcon={<Icon as={FaQuestionCircle} />}
-          colorScheme="blue"
-          onClick={onOpenOnboarding}
-          size="md"
-          boxShadow="md"
+          <Button
+            leftIcon={<Icon as={FaHistory} />}
+            colorScheme="purple"
+            onClick={() => openModal('BeliefChangeLog')}
+            size="md"
+            boxShadow="md"
+          >
+            Belief Changes
+          </Button>
+        </Box>
+        
+        {/* Help Button */}
+        <Box
+          position="fixed"
+          bottom="80px"
+          right="20px"
+          zIndex="900"
         >
-          Help
-        </Button>
-      </Box>
-      
-      {/* Tour Button */}
-      <Box
-        position="fixed"
-        bottom="20px"
-        right="20px"
-        zIndex="900"
-      >
-        <Button
-          leftIcon={<Icon as={FaMapMarkedAlt} />}
-          colorScheme="teal"
-          onClick={() => {
-            setActiveTour('main');
-            setShowTour(true);
-          }}
-          size="md"
-          boxShadow="md"
+          <Button
+            leftIcon={<Icon as={FaQuestionCircle} />}
+            colorScheme="blue"
+            onClick={onOpenOnboarding}
+            size="md"
+            boxShadow="md"
+          >
+            Help
+          </Button>
+        </Box>
+        
+        {/* Tour Button */}
+        <Box
+          position="fixed"
+          bottom="20px"
+          right="20px"
+          zIndex="900"
         >
-          Take Tour
-        </Button>
+          <Button
+            leftIcon={<Icon as={FaMapMarkedAlt} />}
+            colorScheme="teal"
+            onClick={() => {
+              setActiveTour('main');
+              setShowTour(true);
+            }}
+            size="md"
+            boxShadow="md"
+          >
+            Take Tour
+          </Button>
+        </Box>
+        
+        {/* Guided Tour Manager */}
+        {showTour && (
+          <GuidedTourManager
+            tourId={activeTour}
+            autoStart={true}
+            onComplete={() => setShowTour(false)}
+            onSkip={() => setShowTour(false)}
+            showControls={true}
+          />
+        )}
       </Box>
-      
-      {/* Guided Tour Manager */}
-      {showTour && (
-        <GuidedTourManager
-          tourId={activeTour}
-          autoStart={true}
-          onComplete={() => setShowTour(false)}
-          onSkip={() => setShowTour(false)}
-          showControls={true}
-        />
-      )}
-    </Box>
+    </AutoRouterProvider>
   );
 };
 
