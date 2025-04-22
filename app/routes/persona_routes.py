@@ -8,7 +8,6 @@ from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional, List
 from pydantic import BaseModel
 from datetime import datetime
-from app.memory.project_memory import update_project_memory, get_project_memory
 
 # Define valid personas
 VALID_PERSONAS = ["SAGE", "ARCHITECT", "RESEARCHER", "RITUALIST", "INVENTOR"]
@@ -28,8 +27,7 @@ async def switch_persona(request: PersonaSwitchRequest):
     
     This endpoint:
     1. Validates the persona against the allowed list
-    2. Writes the persona state to memory
-    3. Returns the previous and new persona information
+    2. Returns the previous and new persona information
     """
     # Validate persona against allowed list
     if request.persona not in VALID_PERSONAS:
@@ -43,37 +41,6 @@ async def switch_persona(request: PersonaSwitchRequest):
     
     # Get previous persona (if any)
     previous_persona = "SAGE"  # Default if not found
-    try:
-        # Try to get the current persona from memory
-        loop_trace = get_project_memory(request.loop_id)
-        if "orchestrator_persona" in loop_trace:
-            previous_persona = loop_trace["orchestrator_persona"]
-    except KeyError:
-        # If loop doesn't exist in memory, use default
-        pass
-    
-    # Write to memory
-    persona_state = {
-        "loop_id": request.loop_id,
-        "orchestrator_persona": request.persona,
-        "switched_by": "operator",
-        "operator_id": request.operator_id,
-        "timestamp": timestamp,
-        "persona_switch_reason": "manual"
-    }
-    
-    # Update memory with persona state
-    try:
-        update_project_memory(request.loop_id, "orchestrator_persona", request.persona)
-        update_project_memory(request.loop_id, "persona_switch_timestamp", timestamp)
-        update_project_memory(request.loop_id, "persona_switch_reason", "manual")
-        update_project_memory(request.loop_id, "operator_id", request.operator_id)
-    except KeyError:
-        # If loop doesn't exist in memory, create it with persona state
-        update_project_memory(request.loop_id, "orchestrator_persona", request.persona)
-        update_project_memory(request.loop_id, "persona_switch_timestamp", timestamp)
-        update_project_memory(request.loop_id, "persona_switch_reason", "manual")
-        update_project_memory(request.loop_id, "operator_id", request.operator_id)
     
     # Return success response
     return {
@@ -96,18 +63,6 @@ async def get_current_persona(loop_id: Optional[str] = None):
     """
     current_persona = "SAGE"  # Default persona
     active_since = datetime.utcnow().isoformat()
-    
-    if loop_id:
-        try:
-            # Try to get the current persona from memory for the specified loop
-            loop_trace = get_project_memory(loop_id)
-            if "orchestrator_persona" in loop_trace:
-                current_persona = loop_trace["orchestrator_persona"]
-            if "persona_switch_timestamp" in loop_trace:
-                active_since = loop_trace["persona_switch_timestamp"]
-        except KeyError:
-            # If loop doesn't exist in memory, use default
-            pass
     
     # Get persona description
     persona_descriptions = {

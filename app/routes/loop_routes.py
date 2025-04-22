@@ -6,11 +6,66 @@ This module defines the loop-related routes for the Promethios API.
 
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional, List
+from pydantic import BaseModel
 
 router = APIRouter(tags=["loop"])
 
+class LoopPlanRequest(BaseModel):
+    prompt: str
+    loop_id: str
+    orchestrator_persona: Optional[str] = None
+
+class LoopValidateRequest(BaseModel):
+    loop_id: str
+    loop_data: Dict[str, Any]
+    mode: Optional[str] = None
+    complexity: Optional[float] = None
+    sensitivity: Optional[float] = None
+    time_constraint: Optional[float] = None
+    user_preference: Optional[str] = None
+
+@router.post("/loop/plan")
+async def plan_loop(request: LoopPlanRequest):
+    """
+    Create execution plan for a loop.
+    """
+    # This would normally create a plan based on the prompt
+    # For now, return a mock response
+    return {
+        "plan": {
+            "steps": [
+                {"step_id": 1, "description": "Research the topic", "status": "pending"},
+                {"step_id": 2, "description": "Analyze findings", "status": "pending"},
+                {"step_id": 3, "description": "Generate response", "status": "pending"}
+            ]
+        },
+        "loop_id": request.loop_id,
+        "orchestrator_persona": request.orchestrator_persona or "SAGE",
+        "status": "success"
+    }
+
+@router.post("/loop/validate")
+async def validate_loop(request: LoopValidateRequest):
+    """
+    Validate a loop against core requirements and enrich with cognitive controls.
+    """
+    # This would normally validate the loop data
+    # For now, return a mock response
+    return {
+        "status": "success",
+        "loop_id": request.loop_id,
+        "mode": request.mode or "balanced",
+        "validation_result": {
+            "valid": True,
+            "warnings": [],
+            "enriched": True
+        },
+        "prepared_loop": request.loop_data,
+        "processed_by": "cognitive_control_layer"
+    }
+
 @router.get("/loop/trace")
-async def get_loop_trace():
+async def get_loop_trace(project_id: Optional[str] = None):
     """
     Get loop memory trace log.
     """
