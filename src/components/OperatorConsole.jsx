@@ -11,16 +11,19 @@ function OperatorConsole() {
   const [executionStarted, setExecutionStarted] = useState(false);
   const [orchestratorData, setOrchestratorData] = useState(null);
   
+  // Function to handle tab changes from Sidebar
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
   };
   
+  // Function to handle plan confirmation
   const handlePlanConfirm = (loopId) => {
     setExecutionStarted(true);
     setPendingConfirmation(false);
     console.log('Plan confirmed for loop:', loopId);
   };
   
+  // Function to handle plan modification
   const handlePlanModify = (modifiedPlan) => {
     setOrchestratorData(prevData => ({
       ...prevData,
@@ -29,12 +32,14 @@ function OperatorConsole() {
     console.log('Plan modified:', modifiedPlan);
   };
   
+  // Function to handle plan rejection
   const handlePlanReject = (loopId) => {
     setPendingConfirmation(false);
     setOrchestratorData(null);
     console.log('Plan rejected for loop:', loopId);
   };
   
+  // Determine which right panel to show based on active tab
   const renderRightPanel = () => {
     if (activeTab === 'health') {
       return <SystemIntegrityPanel />;
@@ -44,7 +49,7 @@ function OperatorConsole() {
   };
   
   return (
-    <div className="flex min-h-screen w-full bg-[#0a0a0a] text-white overflow-hidden">
+    <div className="flex h-screen w-full bg-gray-900 text-white">
       {/* Sidebar - 20% */}
       <div className="w-1/5 h-full">
         <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
@@ -59,11 +64,13 @@ function OperatorConsole() {
         />
       </div>
       
-      {/* Right Panel - 20% */}
+      {/* Right Panel - 20% (FileTree or SystemIntegrity) */}
       <div className="w-1/5 h-full flex flex-col">
         <div className="flex-grow">
           {renderRightPanel()}
         </div>
+        
+        {/* Orchestrator Sandbox - pinned to bottom right */}
         <div className="mb-4 mx-4">
           <OrchestratorSandbox 
             orchestratorData={orchestratorData}
