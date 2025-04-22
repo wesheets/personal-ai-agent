@@ -22,6 +22,11 @@ import LoopDebugger from './center/LoopDebugger';
 import WhatIfSimulator from './center/WhatIfSimulator';
 import BeliefsExplorer from './center/BeliefsExplorer';
 
+// PROJECT timeline components
+import ProjectTimelineViewer from './project/ProjectTimelineViewer';
+import LoopForkMap from './project/LoopForkMap';
+import BeliefChangeLog from './project/BeliefChangeLog';
+
 // RIGHT zone components
 import RightPanelContainer from './right/RightPanelContainer';
 import FileTreePanel from './right/FileTreePanel';
@@ -40,7 +45,7 @@ import { useModalContext } from '../hooks/useModalContext';
 import SageTooltip from './onboarding/SageTooltip';
 import OnboardingPane from './onboarding/OnboardingPane';
 import GuidedTourManager from './onboarding/GuidedTourManager';
-import { FaQuestionCircle, FaMapMarkedAlt } from 'react-icons/fa';
+import { FaQuestionCircle, FaMapMarkedAlt, FaHistory } from 'react-icons/fa';
 
 // Component mapping for dynamic rendering
 const componentMap = {
@@ -58,6 +63,8 @@ const componentMap = {
   LoopDebugger,
   WhatIfSimulator,
   BeliefsExplorer,
+  ProjectTimelineViewer,
+  LoopForkMap,
   
   // RIGHT zone
   RightPanelContainer,
@@ -68,7 +75,10 @@ const componentMap = {
   AuditLogViewer,
   TrustScoreDisplay,
   ContradictionDisplay,
-  LoopDriftIndex
+  LoopDriftIndex,
+  
+  // MODAL zone
+  BeliefChangeLog
 };
 
 const DashboardLayout = () => {
@@ -128,7 +138,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <Box bg={bgColor} minH="100vh"}>
+    <Box bg={bgColor} minH="100vh">
       <Grid
         templateColumns={{ base: '1fr', md: '300px 1fr 300px' }}
         templateAreas={{
@@ -201,6 +211,24 @@ const DashboardLayout = () => {
         isOpen={isOnboardingOpen} 
         onClose={onCloseOnboarding} 
       />
+      
+      {/* Belief Change Log Button */}
+      <Box
+        position="fixed"
+        bottom="140px"
+        right="20px"
+        zIndex="900"
+      >
+        <Button
+          leftIcon={<Icon as={FaHistory} />}
+          colorScheme="purple"
+          onClick={() => openModal('BeliefChangeLog')}
+          size="md"
+          boxShadow="md"
+        >
+          Belief Changes
+        </Button>
+      </Box>
       
       {/* Help Button */}
       <Box
