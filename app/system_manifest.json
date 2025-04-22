@@ -1,0 +1,433 @@
+{
+  "status": "Stabilization Phase - Preservation Mode",
+  "routes": [
+    {
+      "path": "/analyze-prompt",
+      "handler": "agent_routes.py",
+      "module": "agent_runner.py"
+    },
+    {
+      "path": "/generate-variants",
+      "handler": "agent_routes.py",
+      "module": "agent_runner.py"
+    },
+    {
+      "path": "/plan-and-execute",
+      "handler": "agent_routes.py",
+      "module": "agent_runner.py"
+    },
+    {
+      "path": "/run-critic",
+      "handler": "agent_routes.py",
+      "module": "critic_agent.py"
+    },
+    {
+      "path": "/pessimist-check",
+      "handler": "agent_routes.py",
+      "module": "pessimist_agent.py"
+    },
+    {
+      "path": "/ceo-review",
+      "handler": "agent_routes.py",
+      "module": "agent_runner.py"
+    },
+    {
+      "path": "/cto-review",
+      "handler": "agent_routes.py",
+      "module": "agent_runner.py"
+    },
+    {
+      "path": "/historian-check",
+      "handler": "agent_routes.py",
+      "module": "agent_runner.py"
+    },
+    {
+      "path": "/drift-summary",
+      "handler": "agent_routes.py",
+      "module": "historian_drift_report.py"
+    },
+    {
+      "path": "/generate-weekly-drift-report",
+      "handler": "agent_routes.py",
+      "module": "historian_drift_report.py"
+    },
+    {
+      "path": "/loop/trace",
+      "handler": "loop_routes.py",
+      "module": "loop.py"
+    },
+    {
+      "path": "/loop/reset",
+      "handler": "loop_routes.py",
+      "module": "loop.py"
+    },
+    {
+      "path": "/loop/persona-reflect",
+      "handler": "loop_routes.py",
+      "module": "reflect.py"
+    },
+    {
+      "path": "/orchestrator/loop-complete",
+      "handler": "orchestrator_routes.py",
+      "module": "post_loop_summary_handler.py"
+    },
+    {
+      "path": "/orchestrator/validate-loop",
+      "handler": "orchestrator_routes.py",
+      "module": "loop_validator.py"
+    },
+    {
+      "path": "/orchestrator/determine-mode",
+      "handler": "orchestrator_routes.py",
+      "module": "tiered_orchestrator.py"
+    },
+    {
+      "path": "/orchestrator/available-modes",
+      "handler": "orchestrator_routes.py",
+      "module": "tiered_orchestrator.py"
+    },
+    {
+      "path": "/orchestrator/visualize-loop",
+      "handler": "orchestrator_routes.py",
+      "module": "loop_map_visualizer.py"
+    },
+    {
+      "path": "/orchestrator/inspect-memory",
+      "handler": "orchestrator_routes.py",
+      "module": "live_memory_inspection.py"
+    },
+    {
+      "path": "/orchestrator/memory-snapshot",
+      "handler": "orchestrator_routes.py",
+      "module": "live_memory_inspection.py"
+    },
+    {
+      "path": "/orchestrator/memory-diff",
+      "handler": "orchestrator_routes.py",
+      "module": "live_memory_inspection.py"
+    },
+    {
+      "path": "/orchestrator/export-memory",
+      "handler": "orchestrator_routes.py",
+      "module": "live_memory_inspection.py"
+    },
+    {
+      "path": "/health",
+      "handler": "core_routes.py",
+      "module": "health.py"
+    },
+    {
+      "path": "/system/status",
+      "handler": "core_routes.py",
+      "module": "health.py"
+    },
+    {
+      "path": "/memory/read",
+      "handler": "core_routes.py",
+      "module": "memory.py"
+    },
+    {
+      "path": "/memory/write",
+      "handler": "core_routes.py",
+      "module": "memory.py"
+    },
+    {
+      "path": "/memory/delete",
+      "handler": "core_routes.py",
+      "module": "memory.py"
+    },
+    {
+      "path": "/reflection/{project_id}",
+      "handler": "debug_routes.py",
+      "module": "reflect.py"
+    },
+    {
+      "path": "/reflections/{project_id}",
+      "handler": "debug_routes.py",
+      "module": "reflect.py"
+    },
+    {
+      "path": "/flags/{project_id}",
+      "handler": "debug_routes.py",
+      "module": "system_flag_manager.py"
+    },
+    {
+      "path": "/persona/switch",
+      "handler": "persona_routes.py",
+      "module": "persona_utils.py"
+    },
+    {
+      "path": "/persona/current",
+      "handler": "persona_routes.py",
+      "module": "persona_utils.py"
+    },
+    {
+      "path": "/mode/trace",
+      "handler": "persona_routes.py",
+      "module": "persona_utils.py"
+    }
+  ],
+  "agents": {
+    "HAL": "active",
+    "ASH": "active",
+    "SAGE": "active",
+    "ORCHESTRATOR": "active",
+    "CRITIC": "active",
+    "NOVA": "active",
+    "REALITY_CHECKER": "unreferenced"
+  },
+  "modules": [
+    {
+      "name": "agent_loop_trigger.py",
+      "status": "imported",
+      "references": ["SAGE", "ORCHESTRATOR"]
+    },
+    {
+      "name": "agent_permission_validator.py",
+      "status": "imported",
+      "references": ["CRITIC"]
+    },
+    {
+      "name": "agent_runner.py",
+      "status": "imported",
+      "references": ["CRITIC"]
+    },
+    {
+      "name": "agent_runner_retry_integration.py",
+      "status": "imported",
+      "references": ["NOVA", "CRITIC"]
+    },
+    {
+      "name": "agent_trust_delta_monitoring.py",
+      "status": "imported",
+      "references": ["NOVA", "CRITIC"]
+    },
+    {
+      "name": "ash_agent.py",
+      "status": "imported",
+      "references": ["ASH"]
+    },
+    {
+      "name": "belief_versioning.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "cognitive_continuity_integration.py",
+      "status": "imported",
+      "references": ["NOVA"]
+    },
+    {
+      "name": "core_beliefs_integration.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "critic_agent.py",
+      "status": "imported",
+      "references": ["CRITIC"]
+    },
+    {
+      "name": "depth_controller.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "historian_drift_report.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "live_memory_inspection.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "loop.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "loop_map_visualizer.py",
+      "status": "patched",
+      "references": []
+    },
+    {
+      "name": "loop_monitor.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "loop_resume_engine.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "loop_validator.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "memory_block_writer.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "memory_summarizer.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "memory_thread.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "memory_writer.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "nova_agent.py",
+      "status": "imported",
+      "references": ["NOVA"]
+    },
+    {
+      "name": "orchestrator_integration.py",
+      "status": "imported",
+      "references": ["ORCHESTRATOR"]
+    },
+    {
+      "name": "orchestrator_logic.py",
+      "status": "imported",
+      "references": ["ORCHESTRATOR"]
+    },
+    {
+      "name": "pessimist_agent.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "post_loop_summary_handler.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "reflect.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "reflection_fatigue_scoring.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "reflection_grader.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "reflection_guardrails.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "rerun_decision_engine.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "safety_integration.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "summary_realism_scorer.py",
+      "status": "imported",
+      "references": []
+    },
+    {
+      "name": "tiered_orchestrator.py",
+      "status": "imported",
+      "references": ["ORCHESTRATOR"]
+    }
+  ],
+  "schemas": [
+    {
+      "name": "loop_trace.py",
+      "location": "app/schemas/",
+      "used_by": ["loop.py", "loop_map_visualizer.py"]
+    },
+    {
+      "name": "memory.py",
+      "location": "app/schemas/",
+      "used_by": ["memory_block_writer.py", "memory_writer.py"]
+    },
+    {
+      "name": "rerun_decision.py",
+      "location": "app/schemas/",
+      "used_by": ["rerun_decision_engine.py"]
+    },
+    {
+      "name": "BeliefSchema.js",
+      "location": "app/frontend/src/schemas/",
+      "used_by": ["belief_versioning.py", "core_beliefs_integration.py"]
+    },
+    {
+      "name": "ContradictionSchema.js",
+      "location": "app/frontend/src/schemas/",
+      "used_by": []
+    },
+    {
+      "name": "FreezeStatusSchema.js",
+      "location": "app/frontend/src/schemas/",
+      "used_by": []
+    },
+    {
+      "name": "ReflectionSchema.js",
+      "location": "app/frontend/src/schemas/",
+      "used_by": ["reflect.py", "reflection_grader.py"]
+    },
+    {
+      "name": "RevisionSchema.js",
+      "location": "app/frontend/src/schemas/",
+      "used_by": []
+    },
+    {
+      "name": "TrustSchema.js",
+      "location": "app/frontend/src/schemas/",
+      "used_by": ["agent_trust_delta_monitoring.py"]
+    }
+  ],
+  "memory_logs": [
+    {
+      "name": "task_state_log.json",
+      "location": "app/core/",
+      "active": true
+    },
+    {
+      "name": "control_violations.json",
+      "location": "app/logs/",
+      "active": true
+    },
+    {
+      "name": "loop_trace.schema.json",
+      "location": "app/loop/debug/",
+      "active": true
+    },
+    {
+      "name": "memory_store.json",
+      "location": "app/modules/",
+      "active": true
+    },
+    {
+      "name": "training_logs.json",
+      "location": "app/",
+      "active": false
+    }
+  ],
+  "freeze_system": true,
+  "recursive_reflection": true,
+  "trust_feedback_loop": true
+}
