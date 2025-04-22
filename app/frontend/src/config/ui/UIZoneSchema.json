@@ -13,7 +13,8 @@
       "MemoryViewer",
       "LoopDebugger",
       "WhatIfSimulator",
-      "BeliefsExplorer"
+      "BeliefsExplorer",
+      "LoopTraceViewer"
     ],
     "RIGHT": [
       "RightPanelContainer"
@@ -24,7 +25,8 @@
       "ManifestExplorer",
       "CITestResultsViewer",
       "ReflectionRetractionPanel",
-      "OnboardingPane"
+      "OnboardingPane",
+      "ReflectionHistoryPanel"
     ]
   }
 }

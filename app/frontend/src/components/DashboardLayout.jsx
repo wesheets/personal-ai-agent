@@ -22,6 +22,11 @@ import LoopDebugger from './center/LoopDebugger';
 import WhatIfSimulator from './center/WhatIfSimulator';
 import BeliefsExplorer from './center/BeliefsExplorer';
 
+// Import Memory Query and Reflection Trace components
+import MemoryQueryConsole from './memory/MemoryQueryConsole';
+import LoopTraceViewer from './memory/LoopTraceViewer';
+import ReflectionHistoryPanel from './memory/ReflectionHistoryPanel';
+
 // RIGHT zone components
 import RightPanelContainer from './right/RightPanelContainer';
 import FileTreePanel from './right/FileTreePanel';
@@ -58,6 +63,7 @@ const componentMap = {
   LoopDebugger,
   WhatIfSimulator,
   BeliefsExplorer,
+  LoopTraceViewer, // Added new component
   
   // RIGHT zone
   RightPanelContainer,
@@ -68,7 +74,12 @@ const componentMap = {
   AuditLogViewer,
   TrustScoreDisplay,
   ContradictionDisplay,
-  LoopDriftIndex
+  LoopDriftIndex,
+  
+  // MODAL zone
+  MemoryQueryConsole, // Added new component
+  ReflectionHistoryPanel, // Added new component
+  OnboardingPane
 };
 
 const DashboardLayout = () => {
@@ -128,7 +139,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <Box bg={bgColor} minH="100vh"}>
+    <Box bg={bgColor} minH="100vh">
       <Grid
         templateColumns={{ base: '1fr', md: '300px 1fr 300px' }}
         templateAreas={{
@@ -191,6 +202,7 @@ const DashboardLayout = () => {
           >
             <ErrorBoundary>
               {/* Modal content will be rendered here */}
+              {renderComponent(activeModal)}
             </ErrorBoundary>
           </Box>
         </Box>
@@ -238,6 +250,23 @@ const DashboardLayout = () => {
           boxShadow="md"
         >
           Take Tour
+        </Button>
+      </Box>
+      
+      {/* Memory Query Button */}
+      <Box
+        position="fixed"
+        bottom="20px"
+        left="20px"
+        zIndex="900"
+      >
+        <Button
+          colorScheme="purple"
+          onClick={() => openModal('MemoryQueryConsole')}
+          size="md"
+          boxShadow="md"
+        >
+          Memory Query
         </Button>
       </Box>
       
