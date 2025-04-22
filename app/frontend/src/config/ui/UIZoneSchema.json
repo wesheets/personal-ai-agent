@@ -23,7 +23,8 @@
       "SnapshotManager",
       "ManifestExplorer",
       "CITestResultsViewer",
-      "ReflectionRetractionPanel"
+      "ReflectionRetractionPanel",
+      "OnboardingPane"
     ]
   }
 }

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Flex, Grid, GridItem, useColorModeValue } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, Flex, Grid, GridItem, useColorModeValue, useDisclosure, Button, Icon } from '@chakra-ui/react';
 import ErrorBoundary from './ErrorBoundary';
 import { LoadingCard } from './LoadingStates';
 import UIZoneSchema from '../config/ui/UIZoneSchema.json';
@@ -36,6 +36,12 @@ import LoopDriftIndex from './right/LoopDriftIndex';
 // MODAL components are loaded dynamically when needed
 import { useModalContext } from '../hooks/useModalContext';
 
+// Import onboarding components
+import SageTooltip from './onboarding/SageTooltip';
+import OnboardingPane from './onboarding/OnboardingPane';
+import GuidedTourManager from './onboarding/GuidedTourManager';
+import { FaQuestionCircle, FaMapMarkedAlt } from 'react-icons/fa';
+
 // Component mapping for dynamic rendering
 const componentMap = {
   // LEFT zone
@@ -70,6 +76,27 @@ const DashboardLayout = () => {
   const cardBgColor = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.200', 'gray.600');
   const { activeModal, openModal } = useModalContext();
+  
+  // Onboarding state
+  const [showTour, setShowTour] = useState(false);
+  const [activeTour, setActiveTour] = useState('main');
+  const { isOpen: isOnboardingOpen, onOpen: onOpenOnboarding, onClose: onCloseOnboarding } = useDisclosure();
+  
+  // Check if this is the first visit
+  React.useEffect(() => {
+    const isFirstVisit = localStorage.getItem('promethios_first_visit') === null;
+    if (isFirstVisit) {
+      // Set first visit flag
+      localStorage.setItem('promethios_first_visit', 'false');
+      // Show onboarding pane
+      onOpenOnboarding();
+      // Start tour after a short delay
+      setTimeout(() => {
+        setActiveTour('newUser');
+        setShowTour(true);
+      }, 1000);
+    }
+  }, [onOpenOnboarding]);
 
   const renderComponent = (componentName) => {
     const Component = componentMap[componentName];
@@ -78,6 +105,7 @@ const DashboardLayout = () => {
       return <Box p={4}>Component {componentName} not implemented yet</Box>;
     }
     
+    // Wrap component with SageTooltip if it has tooltip data
     return (
       <Box
         p={4}
@@ -88,9 +116,12 @@ const DashboardLayout = () => {
         shadow="sm"
         mb={4}
         height="100%"
+        id={componentName}
       >
         <ErrorBoundary>
-          <Component />
+          <SageTooltip componentId={componentName} showIcon={false} usePopover={true}>
+            <Component />
+          </SageTooltip>
         </ErrorBoundary>
       </Box>
     );
@@ -163,6 +194,62 @@ const DashboardLayout = () => {
             </ErrorBoundary>
           </Box>
         </Box>
+      )}
+      
+      {/* Onboarding Pane */}
+      <OnboardingPane 
+        isOpen={isOnboardingOpen} 
+        onClose={onCloseOnboarding} 
+      />
+      
+      {/* Help Button */}
+      <Box
+        position="fixed"
+        bottom="80px"
+        right="20px"
+        zIndex="900"
+      >
+        <Button
+          leftIcon={<Icon as={FaQuestionCircle} />}
+          colorScheme="blue"
+          onClick={onOpenOnboarding}
+          size="md"
+          boxShadow="md"
+        >
+          Help
+        </Button>
+      </Box>
+      
+      {/* Tour Button */}
+      <Box
+        position="fixed"
+        bottom="20px"
+        right="20px"
+        zIndex="900"
+      >
+        <Button
+          leftIcon={<Icon as={FaMapMarkedAlt} />}
+          colorScheme="teal"
+          onClick={() => {
+            setActiveTour('main');
+            setShowTour(true);
+          }}
+          size="md"
+          boxShadow="md"
+        >
+          Take Tour
+        </Button>
+      </Box>
+      
+      {/* Guided Tour Manager */}
+      {showTour && (
+        <GuidedTourManager
+          tourId={activeTour}
+          autoStart={true}
+          onComplete={() => setShowTour(false)}
+          onSkip={() => setShowTour(false)}
+          showControls={true}
+        />
       )}
     </Box>
   );
