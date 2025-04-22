@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "Tracks reflection depth for each loop to prevent infinite recursion",
+    "last_updated": "2025-04-22T20:56:21.000Z",
+    "max_depth": 3
+  },
+  "loops": [
+    {
+      "loop_id": "loop_289",
+      "project_id": "life_tree",
+      "reflections": [
+        {
+          "depth": 1,
+          "agent": "SAGE",
+          "confidence": 0.52,
+          "timestamp": "2025-04-22T14:30:21.000Z",
+          "reason": "low_confidence",
+          "status": "completed"
+        },
+        {
+          "depth": 2,
+          "agent": "CRITIC",
+          "confidence": 0.71,
+          "timestamp": "2025-04-22T14:31:45.000Z",
+          "reason": "unresolved_contradiction",
+          "status": "completed"
+        }
+      ],
+      "current_depth": 2,
+      "max_depth_reached": false,
+      "last_reflection": "2025-04-22T14:31:45.000Z"
+    },
+    {
+      "loop_id": "loop_290",
+      "project_id": "critical_systems",
+      "reflections": [
+        {
+          "depth": 1,
+          "agent": "SAGE",
+          "confidence": 0.48,
+          "timestamp": "2025-04-22T15:10:33.000Z",
+          "reason": "low_confidence",
+          "status": "completed"
+        },
+        {
+          "depth": 2,
+          "agent": "NOVA",
+          "confidence": 0.62,
+          "timestamp": "2025-04-22T15:12:05.000Z",
+          "reason": "trust_decay",
+          "status": "completed"
+        },
+        {
+          "depth": 3,
+          "agent": "CRITIC",
+          "confidence": 0.85,
+          "timestamp": "2025-04-22T15:14:22.000Z",
+          "reason": "high_drift",
+          "status": "completed"
+        }
+      ],
+      "current_depth": 3,
+      "max_depth_reached": true,
+      "last_reflection": "2025-04-22T15:14:22.000Z"
+    }
+  ]
+}
