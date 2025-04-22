@@ -19,40 +19,17 @@ import {
   FormLabel,
   Textarea,
   useDisclosure,
-  useColorModeValue
+  useColorModeValue,
+  Alert,
+  AlertIcon,
+  Heading,
+  Tooltip,
+  HStack,
+  CircularProgress,
+  CircularProgressLabel
 } from '@chakra-ui/react';
 import { controlService } from '../services/api';
 import isEqual from 'lodash/isEqual';
-
-// This ensures it happens before any component rendering
-(function initializeGlobalOrchestrator() {
-  try {
-    if (typeof window !== 'undefined') {
-      if (!window.or) {
-        console.warn("⚠️ window.or not found, creating empty object");
-        window.or = {};
-      }
-
-      if (typeof window.or.getTaskState !== "function") {
-        if (process.env.NODE_ENV === "development") {
-          console.warn("⚠️ Injecting mock getTaskState into window.or at module level");
-        }
-        window.or.getTaskState = async () => {
-          if (process.env.NODE_ENV === "development") {
-            console.warn("🛑 Mock getTaskState invoked – returning empty array");
-          }
-          return { tasks: [] };
-        };
-      } else if (process.env.NODE_ENV === "development") {
-        console.log("✅ getTaskState exists and is safe to use at module level");
-      }
-    }
-  } catch (err) {
-    if (process.env.NODE_ENV === "development") {
-      console.error("🔥 Error initializing global orchestrator:", err);
-    }
-  }
-})();
 
 const InterruptControl = () => {
   const [systemState, setSystemState] = useState({
@@ -67,6 +44,7 @@ const InterruptControl = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [taskPrompt, setTaskPrompt] = useState('');
   const [activeTasks, setActiveTasks] = useState([]);
+  const [systemHeartbeat, setSystemHeartbeat] = useState({ status: 'unknown', lastBeat: null });
   const { isOpen, onOpen, onClose } = useDisclosure();
   
   const bgColor = useColorModeValue('white', 'gray.700');
@@ -83,35 +61,48 @@ const InterruptControl = () => {
     }
   });
 
-  // Double-check window.or.getTaskState on component mount as a safety measure
+  // Fetch system status from API
   useEffect(() => {
-    try {
-      if (!window.or) {
-        if (process.env.NODE_ENV === "development") {
-          console.warn("⚠️ window.or still not found after module init, creating empty object");
+    const fetchSystemStatus = async () => {
+      try {
+        const response = await fetch('/api/system/status');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch system status: ${response.status}`);
         }
-        window.or = {};
+        
+        const data = await response.json();
+        
+        setSystemHeartbeat({
+          status: data.status || 'unknown',
+          lastBeat: data.lastHeartbeat ? new Date(data.lastHeartbeat) : new Date(),
+          activeTasks: data.activeTasks || 0,
+          cpuUsage: data.cpuUsage || 0,
+          memoryUsage: data.memoryUsage || 0
+        });
+        
+        setInterruptSystemOffline(data.status === 'offline');
+      } catch (err) {
+        console.error('Error fetching system status:', err);
+        // Don't set interrupt system offline here, as we'll check that separately
+        
+        // Set fallback heartbeat data
+        setSystemHeartbeat(prev => ({
+          ...prev,
+          status: 'unknown',
+          lastBeat: new Date()
+        }));
       }
-
-      if (typeof window.or.getTaskState !== "function") {
-        if (process.env.NODE_ENV === "development") {
-          console.warn("⚠️ Re-injecting mock getTaskState into window.or");
-        }
-        window.or.getTaskState = async () => {
-          if (process.env.NODE_ENV === "development") {
-            console.warn("🛑 Mock getTaskState invoked – returning empty array");
-          }
-          return { tasks: [] };
-        };
-      } else if (process.env.NODE_ENV === "development") {
-        console.log("✅ getTaskState exists and is safe to use in component");
-      }
-    } catch (err) {
-      if (process.env.NODE_ENV === "development") {
-        console.error("🔥 Error in component getTaskState check:", err);
-      }
-      setInterruptSystemOffline(true);
-    }
+    };
+    
+    // Initial fetch
+    fetchSystemStatus();
+    
+    // Set up polling for heartbeat updates
+    const intervalId = setInterval(fetchSystemStatus, 10000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -122,72 +113,125 @@ const InterruptControl = () => {
           setLoading(true);
         }
         
-        const res = await controlService.getControlMode();
-        
-        // Compare data before updating state to avoid unnecessary re-renders
-        const modeChanged = !isEqual(prevControlModeRef.current, res.data);
-        if (modeChanged) {
-          prevControlModeRef.current = res.data;
-          setControlMode(res.data);
-        }
-        
-        // Strict guard for or.getTaskState fallback logic with retry
-        let taskState = { tasks: [] };
-
+        // Try to fetch from the new API endpoint first
         try {
-          // Extra defensive check before calling
-          if (typeof window.or?.getTaskState !== "function") {
-            if (process.env.NODE_ENV === "development") {
-              console.warn("⚠️ getTaskState still not a function before fetch attempt");
-            }
-            throw new Error("getTaskState is not available");
+          const response = await fetch('/api/system/status');
+          
+          if (!response.ok) {
+            throw new Error(`Failed to fetch system status: ${response.status}`);
           }
           
-          const res = await window.or.getTaskState();
+          const data = await response.json();
           
-          // Deep compare task state before updating to prevent unnecessary re-renders
-          if (!isEqual(prevTaskStateRef.current, res)) {
-            prevTaskStateRef.current = res;
-            taskState = res;
-            if (process.env.NODE_ENV === "development") {
-              console.log("✅ Successfully fetched task state:", taskState);
+          // Update control mode if available in the response
+          if (data.executionMode) {
+            const newControlMode = { mode: data.executionMode };
+            
+            // Compare data before updating state to avoid unnecessary re-renders
+            const modeChanged = !isEqual(prevControlModeRef.current, newControlMode);
+            if (modeChanged) {
+              prevControlModeRef.current = newControlMode;
+              setControlMode(newControlMode);
             }
           }
-          setInterruptSystemOffline(false);
+          
+          // Update tasks if available in the response
+          if (Array.isArray(data.tasks)) {
+            // Deep compare task state before updating to prevent unnecessary re-renders
+            if (!isEqual(prevTaskStateRef.current, data.tasks)) {
+              prevTaskStateRef.current = data.tasks;
+              
+              // Filter active tasks
+              const active = data.tasks.filter(task => 
+                task && task.status && 
+                ['pending', 'in_progress', 'running'].includes(task.status.toLowerCase())
+              );
+              
+              if (!isEqual(activeTasks, active)) {
+                setActiveTasks(active);
+              }
+              
+              setSystemState(prev => ({
+                ...prev,
+                tasks: data.tasks
+              }));
+            }
+            
+            setInterruptSystemOffline(false);
+            setError(null);
+          }
         } catch (err) {
-          console.warn("Error while calling window.or.getTaskState:", err);
-          setInterruptSystemOffline(true);
+          // If new API fails, fall back to original implementation
+          console.warn('Falling back to original implementation:', err);
           
-          // Implement retry logic with exponential backoff
-          if (retryCount < 3) {
-            const timeout = Math.pow(2, retryCount) * 1000;
-            if (process.env.NODE_ENV === "development") {
-              console.log(`⏱️ Retrying in ${timeout/1000} seconds...`);
-            }
-            setTimeout(() => {
-              setRetryCount(prev => prev + 1);
-            }, timeout);
+          // Original implementation
+          const res = await controlService.getControlMode();
+          
+          // Compare data before updating state to avoid unnecessary re-renders
+          const modeChanged = !isEqual(prevControlModeRef.current, res.data);
+          if (modeChanged) {
+            prevControlModeRef.current = res.data;
+            setControlMode(res.data);
           }
-        }
+          
+          // Strict guard for or.getTaskState fallback logic with retry
+          let taskState = { tasks: [] };
 
-        // Compare data before updating state to avoid unnecessary re-renders
-        const executionModeChanged = controlMode.mode !== systemState.executionMode;
-        const tasksChanged = !isEqual(systemState.tasks, taskState.tasks);
-        
-        if (executionModeChanged || tasksChanged) {
-          setSystemState({
-            executionMode: controlMode.mode,
-            tasks: taskState.tasks || []
-          });
+          try {
+            // Extra defensive check before calling
+            if (typeof window.or?.getTaskState !== "function") {
+              if (process.env.NODE_ENV === "development") {
+                console.warn("⚠️ getTaskState still not a function before fetch attempt");
+              }
+              throw new Error("getTaskState is not available");
+            }
+            
+            const res = await window.or.getTaskState();
+            
+            // Deep compare task state before updating to prevent unnecessary re-renders
+            if (!isEqual(prevTaskStateRef.current, res)) {
+              prevTaskStateRef.current = res;
+              taskState = res;
+              if (process.env.NODE_ENV === "development") {
+                console.log("✅ Successfully fetched task state:", taskState);
+              }
+            }
+            setInterruptSystemOffline(false);
+          } catch (err) {
+            console.warn("Error while calling window.or.getTaskState:", err);
+            setInterruptSystemOffline(true);
+            
+            // Implement retry logic with exponential backoff
+            if (retryCount < 3) {
+              const timeout = Math.pow(2, retryCount) * 1000;
+              if (process.env.NODE_ENV === "development") {
+                console.log(`⏱️ Retrying in ${timeout/1000} seconds...`);
+              }
+              setTimeout(() => {
+                setRetryCount(prev => prev + 1);
+              }, timeout);
+            }
+          }
+
+          // Compare data before updating state to avoid unnecessary re-renders
+          const executionModeChanged = controlMode.mode !== systemState.executionMode;
+          const tasksChanged = !isEqual(systemState.tasks, taskState.tasks);
           
-          // Filter active tasks
-          const active = (taskState.tasks || []).filter(task => 
-            task && task.status && 
-            ['pending', 'in_progress', 'running'].includes(task.status.toLowerCase())
-          );
-          
-          if (!isEqual(activeTasks, active)) {
-            setActiveTasks(active);
+          if (executionModeChanged || tasksChanged) {
+            setSystemState({
+              executionMode: controlMode.mode,
+              tasks: taskState.tasks || []
+            });
+            
+            // Filter active tasks
+            const active = (taskState.tasks || []).filter(task => 
+              task && task.status && 
+              ['pending', 'in_progress', 'running'].includes(task.status.toLowerCase())
+            );
+            
+            if (!isEqual(activeTasks, active)) {
+              setActiveTasks(active);
+            }
           }
         }
         
@@ -213,6 +257,31 @@ const InterruptControl = () => {
 
   const handleModeChange = async (mode) => {
     try {
+      // Try new API endpoint first
+      try {
+        const response = await fetch('/api/system/mode', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ mode }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to set mode: ${response.status}`);
+        }
+        
+        setSystemState(prevState => ({
+          ...prevState,
+          executionMode: mode
+        }));
+        
+        return;
+      } catch (err) {
+        console.warn('Falling back to original implementation for mode change:', err);
+      }
+      
+      // Fall back to original implementation
       await controlService.setControlMode(mode);
       setSystemState(prevState => ({
         ...prevState,
@@ -227,6 +296,28 @@ const InterruptControl = () => {
 
   const handleTaskAction = async (taskId, action) => {
     try {
+      // Try new API endpoint first
+      try {
+        const endpoint = action === 'kill' ? '/api/system/task/kill' : '/api/system/task/restart';
+        
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ taskId }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to ${action} task: ${response.status}`);
+        }
+        
+        return;
+      } catch (err) {
+        console.warn(`Falling back to original implementation for ${action}:`, err);
+      }
+      
+      // Fall back to original implementation
       if (action === 'kill') {
         await controlService.killTask(taskId);
       } else if (action === 'restart') {
@@ -242,6 +333,26 @@ const InterruptControl = () => {
   const handleTaskRedirect = async (taskId, targetAgent) => {
     if (!targetAgent) return;
     try {
+      // Try new API endpoint first
+      try {
+        const response = await fetch('/api/system/task/delegate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ taskId, agent: targetAgent }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to delegate task: ${response.status}`);
+        }
+        
+        return;
+      } catch (err) {
+        console.warn('Falling back to original implementation for delegation:', err);
+      }
+      
+      // Fall back to original implementation
       await controlService.delegateTask(taskId, targetAgent);
     } catch (err) {
       if (process.env.NODE_ENV === "development") {
@@ -258,6 +369,32 @@ const InterruptControl = () => {
 
   const handlePromptEdit = async () => {
     try {
+      // Try new API endpoint first
+      try {
+        const response = await fetch('/api/system/task/edit-prompt', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            taskId: selectedTask.task_id, 
+            prompt: taskPrompt 
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to edit prompt: ${response.status}`);
+        }
+        
+        onClose();
+        setSelectedTask(null);
+        setTaskPrompt('');
+        return;
+      } catch (err) {
+        console.warn('Falling back to original implementation for prompt edit:', err);
+      }
+      
+      // Fall back to original implementation
       await controlService.editTaskPrompt(selectedTask.task_id, taskPrompt);
       onClose();
       setSelectedTask(null);
@@ -267,6 +404,42 @@ const InterruptControl = () => {
         console.error(`Error editing prompt for task ${selectedTask.task_id}:`, err);
       }
     }
+  };
+
+  // Get status color
+  const getStatusColor = (status) => {
+    if (!status || typeof status !== 'string') {
+      return 'gray';
+    }
+    
+    switch (status.toLowerCase()) {
+      case 'online':
+      case 'active':
+        return 'green';
+      case 'idle':
+        return 'blue';
+      case 'offline':
+      case 'error':
+        return 'red';
+      case 'busy':
+        return 'orange';
+      case 'warning':
+        return 'yellow';
+      default:
+        return 'gray';
+    }
+  };
+
+  // Format time since last heartbeat
+  const formatTimeSince = (date) => {
+    if (!date) return 'unknown';
+    
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
   };
 
   // Memoize the tasks list to prevent unnecessary re-renders
@@ -283,16 +456,81 @@ const InterruptControl = () => {
     );
   }
 
-  if (error) {
-    return (
-      <Box minH="inherit" display="flex" alignItems="center" justifyContent="center">
-        <Text fontSize="lg" color="red.500">{error}</Text>
-      </Box>
-    );
-  }
-
   return (
     <Box minH="inherit">
+      <Flex mb={4} justifyContent="space-between" alignItems="center">
+        <Heading size="md">System Control</Heading>
+        
+        <HStack spacing={2}>
+          <Text fontWeight="bold">Status:</Text>
+          <Badge colorScheme={getStatusColor(systemHeartbeat.status)}>
+            {systemHeartbeat.status || 'Unknown'}
+          </Badge>
+          
+          <Tooltip label={systemHeartbeat.lastBeat ? systemHeartbeat.lastBeat.toLocaleString() : 'Unknown'}>
+            <Text fontSize="sm" color="gray.500">
+              {systemHeartbeat.lastBeat ? formatTimeSince(systemHeartbeat.lastBeat) : 'unknown'}
+            </Text>
+          </Tooltip>
+        </HStack>
+      </Flex>
+      
+      {/* System metrics */}
+      <Flex mb={4} justifyContent="space-between" gap={4}>
+        <Box 
+          p={3} 
+          borderWidth="1px" 
+          borderRadius="md" 
+          flex="1"
+          bg={bgColor}
+        >
+          <Flex alignItems="center" justifyContent="space-between">
+            <Text fontSize="sm" fontWeight="medium">Active Tasks</Text>
+            <Badge colorScheme="blue" fontSize="md">
+              {systemHeartbeat.activeTasks || memoizedTasks.length || 0}
+            </Badge>
+          </Flex>
+        </Box>
+        
+        <Box 
+          p={3} 
+          borderWidth="1px" 
+          borderRadius="md" 
+          flex="1"
+          bg={bgColor}
+        >
+          <Flex alignItems="center" justifyContent="space-between">
+            <Text fontSize="sm" fontWeight="medium">CPU Usage</Text>
+            <CircularProgress 
+              value={systemHeartbeat.cpuUsage || 0} 
+              color="green.400" 
+              size="40px"
+            >
+              <CircularProgressLabel>{systemHeartbeat.cpuUsage || 0}%</CircularProgressLabel>
+            </CircularProgress>
+          </Flex>
+        </Box>
+        
+        <Box 
+          p={3} 
+          borderWidth="1px" 
+          borderRadius="md" 
+          flex="1"
+          bg={bgColor}
+        >
+          <Flex alignItems="center" justifyContent="space-between">
+            <Text fontSize="sm" fontWeight="medium">Memory</Text>
+            <CircularProgress 
+              value={systemHeartbeat.memoryUsage || 0} 
+              color="purple.400" 
+              size="40px"
+            >
+              <CircularProgressLabel>{systemHeartbeat.memoryUsage || 0}%</CircularProgressLabel>
+            </CircularProgress>
+          </Flex>
+        </Box>
+      </Flex>
+      
       <Flex mb={4} justifyContent="space-between" alignItems="center">
         <Text fontWeight="bold">Execution Mode:</Text>
         <Select 
@@ -306,6 +544,13 @@ const InterruptControl = () => {
           <option value="paused">Paused</option>
         </Select>
       </Flex>
+      
+      {error && (
+        <Alert status="error" mb={4} borderRadius="md">
+          <AlertIcon />
+          {error}
+        </Alert>
+      )}
       
       {interruptSystemOffline && (
         <Box 
@@ -322,6 +567,8 @@ const InterruptControl = () => {
           </Text>
         </Box>
       )}
+      
+      <Heading size="sm" mb={3}>Active Tasks</Heading>
       
       {memoizedTasks.length > 0 ? (
         <VStack spacing={4} align="stretch">
@@ -401,6 +648,7 @@ const InterruptControl = () => {
           borderRadius="md" 
           borderStyle="dashed"
           borderColor={borderColor}
+          py={8}
         >
           <Text color="gray.500">No active tasks</Text>
         </Box>

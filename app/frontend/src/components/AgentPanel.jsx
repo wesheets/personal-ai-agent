@@ -1,13 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Button, Textarea, VStack, Heading, Text, useToast, Flex, Badge } from '@chakra-ui/react';
+import { Box, Button, Textarea, VStack, Heading, Text, useToast, Flex, Grid, GridItem } from '@chakra-ui/react';
 import { controlService } from '../services/api';
+import AgentCard from './AgentCard';
 
 const AgentPanel = () => {
   const [taskInput, setTaskInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState('builder');
+  const [agentList, setAgentList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const toast = useToast();
   const submitTimeoutRef = useRef(null);
+
+  // Fetch agents from API
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        setLoading(true);
+        // Replace with actual API call when endpoint is available
+        const response = await fetch('/api/agent/list');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch agents: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setAgentList(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching agents:', err);
+        setError('Failed to load agents');
+        
+        // Fallback to hardcoded agents if API fails
+        setAgentList(agents);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAgents();
+  }, []);
 
   // Cleanup function to ensure we always reset state
   useEffect(() => {
@@ -106,6 +139,26 @@ const AgentPanel = () => {
     }
   };
 
+  // Render loading state
+  if (loading) {
+    return (
+      <Box 
+        borderWidth="1px" 
+        borderRadius="lg" 
+        p={4} 
+        shadow="md" 
+        bg="white" 
+        _dark={{ bg: 'gray.700' }}
+        minH="240px"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Text>Loading agents...</Text>
+      </Box>
+    );
+  }
+
   return (
     <Box 
       borderWidth="1px" 
@@ -124,27 +177,29 @@ const AgentPanel = () => {
         
         <Text fontSize="sm">Select an agent and describe your task</Text>
         
-        <Flex wrap="wrap" gap={2}>
-          {agents.map((agent) => (
-            <Badge
-              key={agent.id}
-              px={3}
-              py={1}
-              borderRadius="full"
-              colorScheme={agent.color}
-              cursor="pointer"
-              onClick={() => setSelectedAgent(agent.id)}
-              bg={selectedAgent === agent.id ? `${agent.color}.500` : `${agent.color}.100`}
-              color={selectedAgent === agent.id ? 'white' : `${agent.color}.800`}
-              _dark={{
-                bg: selectedAgent === agent.id ? `${agent.color}.500` : `${agent.color}.900`,
-                color: selectedAgent === agent.id ? 'white' : `${agent.color}.200`
-              }}
-            >
-              {agent.name}
-            </Badge>
+        {/* Agent cards grid */}
+        <Grid 
+          templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} 
+          gap={4}
+        >
+          {agentList.map((agent) => (
+            <GridItem key={agent.id}>
+              <Box 
+                onClick={() => setSelectedAgent(agent.id)}
+                cursor="pointer"
+                transition="all 0.2s"
+              >
+                <AgentCard
+                  name={agent.name}
+                  status={agent.status || 'idle'}
+                  description={agent.description}
+                  active={selectedAgent === agent.id}
+                  color={agent.color}
+                />
+              </Box>
+            </GridItem>
           ))}
-        </Flex>
+        </Grid>
         
         <Textarea
           value={taskInput}
@@ -170,12 +225,36 @@ const AgentPanel = () => {
   );
 };
 
-// Agent definitions
+// Fallback agent definitions if API fails
 const agents = [
-  { id: 'builder', name: 'Builder Agent', color: 'blue' },
-  { id: 'research', name: 'Research Agent', color: 'green' },
-  { id: 'memory', name: 'Memory Agent', color: 'purple' },
-  { id: 'ops', name: 'Ops Agent', color: 'orange' }
+  { 
+    id: 'builder', 
+    name: 'Builder Agent', 
+    color: 'blue',
+    status: 'idle',
+    description: 'Creates and modifies code, files, and configurations'
+  },
+  { 
+    id: 'research', 
+    name: 'Research Agent', 
+    color: 'green',
+    status: 'idle',
+    description: 'Gathers information and performs analysis on topics'
+  },
+  { 
+    id: 'memory', 
+    name: 'Memory Agent', 
+    color: 'purple',
+    status: 'active',
+    description: 'Manages and retrieves information from system memory'
+  },
+  { 
+    id: 'ops', 
+    name: 'Ops Agent', 
+    color: 'orange',
+    status: 'idle',
+    description: 'Handles system operations and maintenance tasks'
+  }
 ];
 
 export default AgentPanel;
