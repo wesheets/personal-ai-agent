@@ -1,0 +1,29 @@
+{
+  "zones": {
+    "LEFT": [
+      "OperatorHUDBar",
+      "ProjectContextSwitcher",
+      "OrchestratorModePanel",
+      "AgentPanel",
+      "PermissionsManager",
+      "AgentChatConsole"
+    ],
+    "CENTER": [
+      "GoalLoopVisualization",
+      "MemoryViewer",
+      "LoopDebugger",
+      "WhatIfSimulator",
+      "BeliefsExplorer"
+    ],
+    "RIGHT": [
+      "RightPanelContainer"
+    ],
+    "MODAL": [
+      "MemoryQueryConsole",
+      "SnapshotManager",
+      "ManifestExplorer",
+      "CITestResultsViewer",
+      "ReflectionRetractionPanel"
+    ]
+  }
+}
