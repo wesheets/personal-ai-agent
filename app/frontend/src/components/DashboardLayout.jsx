@@ -1,35 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Grid, 
-  GridItem, 
-  Button, 
-  Icon, 
-  useColorModeValue, 
-  useDisclosure 
+import React, { useState, useEffect, useContext } from 'react';
+import {
+  Box,
+  Grid,
+  GridItem,
+  Button,
+  Icon,
+  useColorModeValue,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { 
-  FaTools, 
-  FaHistory, 
-  FaQuestionCircle, 
-  FaMapMarkedAlt 
-} from 'react-icons/fa';
+import { FaTools, FaHistory, FaQuestionCircle, FaMapMarkedAlt, FaExclamationTriangle } from 'react-icons/fa';
+import { AutoRouterProvider } from '../context/AutoRouterContext';
+import { UIZoneSchema } from '../schemas/UIZoneSchema';
 import ErrorBoundary from './ErrorBoundary';
-import SageTooltip from './onboarding/SageTooltip';
-import OnboardingPane from './onboarding/OnboardingPane';
-import GuidedTourManager from './onboarding/GuidedTourManager';
-import { AutoRouterProvider } from '../logic/AutoRerouter';
-import UIZoneSchema from '../config/UIZoneSchema';
+import SageTooltip from './SageTooltip';
+import OnboardingPane from './OnboardingPane';
+import GuidedTourManager from './GuidedTourManager';
 import MisalignmentAlertBar from './beliefs/MisalignmentAlertBar';
-import { useBeliefDriftMonitor } from '../logic/BeliefDriftMonitor';
+import ContradictionIntegration from './ContradictionIntegration';
 
+/**
+ * DashboardLayout Component
+ * 
+ * Main layout component for the Promethios dashboard.
+ * Organizes UI components into zones based on UIZoneSchema.
+ */
 const DashboardLayout = () => {
   // Color mode values
   const bgColor = useColorModeValue('gray.50', 'gray.900');
   const cardBgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.700');
   
-  // State for modals and tours
+  // State for modal and tour
   const [activeModal, setActiveModal] = useState(null);
   const [activeTour, setActiveTour] = useState('main');
   const [showTour, setShowTour] = useState(false);
@@ -37,51 +38,29 @@ const DashboardLayout = () => {
   // Onboarding disclosure
   const { isOpen: isOnboardingOpen, onOpen: onOpenOnboarding, onClose: onCloseOnboarding } = useDisclosure();
   
-  // State for anchored beliefs
-  const [anchoredBeliefs, setAnchoredBeliefs] = useState([]);
-  const [misalignmentAlerts, setMisalignmentAlerts] = useState([]);
-  
-  // Load anchored beliefs from storage
-  useEffect(() => {
-    try {
-      const storedBeliefs = localStorage.getItem('anchored_beliefs');
-      if (storedBeliefs) {
-        setAnchoredBeliefs(JSON.parse(storedBeliefs));
-      }
-    } catch (error) {
-      console.error('Failed to load anchored beliefs:', error);
-    }
-  }, []);
-  
-  // Initialize belief drift monitor
-  const { isMonitoring, driftLogs } = useBeliefDriftMonitor({
-    anchoredBeliefs,
-    onDriftDetected: (alert) => {
-      setMisalignmentAlerts(prev => [...prev, alert]);
-    },
-    globalThreshold: 0.7,
-    enabled: true
-  });
-  
-  // Function to open a modal
-  const openModal = (modalName) => {
-    setActiveModal(modalName);
+  // Open modal
+  const openModal = (componentName) => {
+    setActiveModal(componentName);
   };
   
-  // Function to render a component by name
+  // Close modal
+  const closeModal = () => {
+    setActiveModal(null);
+  };
+  
+  // Render component based on name
   const renderComponent = (componentName) => {
     // Map component names to actual components
     const componentMap = {
-      // Existing components would be listed here
+      // Add your component mappings here
+      ContradictionDisplay: ContradictionIntegration,
+      // Other components...
     };
     
-    const Component = componentMap[componentName];
+    // Get component from map or use a placeholder
+    const Component = componentMap[componentName] || (() => <div>Component: {componentName}</div>);
     
-    if (!Component) {
-      return <Box p={4}>{componentName} not implemented yet</Box>;
-    }
-    
-    // Wrap component with SageTooltip if it has tooltip data
+    // Render component with error boundary and tooltip
     return (
       <Box
         p={4}
@@ -135,6 +114,10 @@ const DashboardLayout = () => {
           </GridItem>
           {/* RIGHT Zone */}
           <GridItem area="right" overflowY="auto" p={2} maxH="100vh">
+            {/* Add ContradictionDisplay to the RIGHT zone */}
+            <Box mb={4}>
+              {renderComponent('ContradictionDisplay')}
+            </Box>
             {UIZoneSchema.zones.RIGHT.map((componentName) => (
               <Box key={componentName} mb={4}>
                 {renderComponent(componentName)}
@@ -214,11 +197,29 @@ const DashboardLayout = () => {
           </Button>
         </Box>
         
-        {/* Help Button */}
+        {/* Contradiction Log Button */}
         <Box
           position="fixed"
           bottom="80px"
           right="20px"
+          zIndex="900"
+        >
+          <Button
+            leftIcon={<Icon as={FaExclamationTriangle} />}
+            colorScheme="orange"
+            onClick={() => openModal('ContradictionDisplay')}
+            size="md"
+            boxShadow="md"
+          >
+            Contradictions
+          </Button>
+        </Box>
+        
+        {/* Help Button */}
+        <Box
+          position="fixed"
+          bottom="80px"
+          right="180px"
           zIndex="900"
         >
           <Button
