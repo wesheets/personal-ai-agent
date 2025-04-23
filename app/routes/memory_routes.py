@@ -16,7 +16,7 @@ logger = logging.getLogger("app.routes.memory_routes")
 
 router = APIRouter(tags=["memory"])
 
-@router.get("/memory/ping")
+@router.get("/api/memory/ping")
 def memory_ping():
     """
     Ping endpoint to verify memory routes are accessible.
@@ -24,7 +24,7 @@ def memory_ping():
     logger.info("🔍 DEBUG: memory_ping endpoint called")
     return {"status": "Memory router operational", "timestamp": str(datetime.datetime.now())}
 
-@router.post("/memory/write")
+@router.post("/api/memory/write")
 async def memory_write_endpoint(request_data: dict):
     """
     Write content to memory.
@@ -68,7 +68,7 @@ async def memory_write_endpoint(request_data: dict):
         logger.error(f"Error in memory_write_endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to write memory: {str(e)}")
 
-@router.get("/memory/read")
+@router.get("/api/memory/read")
 async def memory_read_endpoint(project_id: str = Query(..., description="Project identifier")):
     """
     Read content from memory.
