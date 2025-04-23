@@ -5,6 +5,25 @@ This module defines the loop-related routes for the Promethios API.
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional, List
 from pydantic import BaseModel
+from datetime import datetime
+import logging
+import traceback
+
+# Import schemas
+from app.schemas.loop_schema import LoopResponseRequest
+
+# Import memory operations
+from app.modules.memory_writer import write_memory
+from app.api.modules.memory import read_memory
+
+# Import agent modules
+from app.agents.hal import run_hal_agent
+from app.agents.ash import run_ash_agent
+from app.agents.critic import run_critic_agent
+
+# Configure logging
+logger = logging.getLogger("app.routes.loop_routes")
+
 router = APIRouter(tags=["loop"])
 
 class LoopPlanRequest(BaseModel):
@@ -101,6 +120,134 @@ async def loop_complete_endpoint(request: LoopCompletionRequest):
     except Exception as e:
         # Log the error and return an error response
         raise HTTPException(status_code=500, detail=f"Failed to activate loop: {str(e)}")
+
+@router.post("/loop/respond")
+async def loop_respond_endpoint(request: LoopResponseRequest):
+    """
+    Handle agent responses to memory within a loop.
+    
+    This endpoint allows agents (like HAL, ASH, CRITIC) to respond to a memory key
+    within a loop and write their structured output to memory, completing the
+    loop planning-to-response lifecycle.
+    """
+    # Validate required fields
+    if not request.loop_id or not request.project_id or not request.agent or not request.input_key:
+        raise HTTPException(status_code=400, detail="loop_id, project_id, agent, and input_key are required")
+    
+    # Validate target_file is provided if response_type is code
+    if request.response_type == "code" and not request.target_file:
+        raise HTTPException(status_code=400, detail="target_file is required when response_type is 'code'")
+    
+    try:
+        # Retrieve prior memory using memory.read
+        try:
+            prior_memory = await read_memory(
+                project_id=request.project_id,
+                loop_id=request.loop_id,
+                key=request.input_key
+            )
+            
+            if not prior_memory:
+                raise HTTPException(
+                    status_code=404, 
+                    detail=f"Memory not found for key: {request.input_key} in loop: {request.loop_id}"
+                )
+                
+        except Exception as e:
+            logger.error(f"Error reading memory: {str(e)}")
+            raise HTTPException(
+                status_code=404,
+                detail=f"Failed to retrieve memory for key: {request.input_key} - {str(e)}"
+            )
+        
+        # Call corresponding agent module based on agent and response_type
+        agent_response = None
+        if request.agent.lower() == "hal":
+            if request.response_type == "code":
+                # Call HAL for code generation
+                agent_result = run_hal_agent(
+                    task=f"Generate code for {prior_memory.get('content', '')}",
+                    project_id=request.project_id,
+                    tools=["code_generation"]
+                )
+                agent_response = {
+                    "code": agent_result.get("files_created", []),
+                    "target_file": request.target_file,
+                    "description": f"Code generated for {request.target_file}"
+                }
+            else:
+                # Call HAL for other response types
+                agent_result = run_hal_agent(
+                    task=f"Generate {request.response_type} for {prior_memory.get('content', '')}",
+                    project_id=request.project_id
+                )
+                agent_response = {
+                    "content": agent_result.get("result", ""),
+                    "type": request.response_type
+                }
+        elif request.agent.lower() == "ash":
+            # Call ASH agent
+            agent_result = run_ash_agent(
+                task=f"Generate {request.response_type} for {prior_memory.get('content', '')}",
+                project_id=request.project_id
+            )
+            agent_response = {
+                "content": agent_result.get("result", ""),
+                "type": request.response_type
+            }
+        elif request.agent.lower() == "critic":
+            # Call CRITIC agent
+            agent_result = run_critic_agent(
+                task=f"Generate {request.response_type} for {prior_memory.get('content', '')}",
+                project_id=request.project_id
+            )
+            agent_response = {
+                "content": agent_result.get("result", ""),
+                "type": request.response_type,
+                "judgment": agent_result.get("judgment", "neutral")
+            }
+        else:
+            raise HTTPException(status_code=400, detail=f"Unsupported agent: {request.agent}")
+        
+        # Generate output key in the format: {agent}_{input_key}_response
+        output_key = f"{request.agent.lower()}_{request.input_key}_response"
+        
+        # Write agent response to memory
+        timestamp = datetime.now().isoformat()
+        memory_data = {
+            "agent": request.agent.lower(),
+            "project_id": request.project_id,
+            "loop_id": request.loop_id,
+            "action": f"Generated {request.response_type} response",
+            "tool_used": f"{request.agent.lower()}_response_generator",
+            "input_key": request.input_key,
+            "output_key": output_key,
+            "response_type": request.response_type,
+            "content": agent_response,
+            "timestamp": timestamp
+        }
+        
+        # Write to memory
+        memory_result = write_memory(memory_data)
+        
+        # Return success response
+        return {
+            "status": "success",
+            "agent": request.agent,
+            "input_key": request.input_key,
+            "output_key": output_key,
+            "response_type": request.response_type,
+            "timestamp": timestamp,
+            "message": f"Response generated successfully by {request.agent}"
+        }
+    except HTTPException as he:
+        # Re-raise HTTP exceptions
+        raise he
+    except Exception as e:
+        # Log the error and return an error response
+        logger.error(f"Error in loop_respond_endpoint: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Failed to generate response: {str(e)}")
 
 @router.post("/loop/validate")
 async def validate_loop(request: LoopValidateRequest):
