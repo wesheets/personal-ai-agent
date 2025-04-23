@@ -17,7 +17,9 @@ from app.routes.loop_routes import router as loop_router
 from app.routes.agent_routes import router as agent_router
 from app.routes.persona_routes import router as persona_router
 from app.routes.debug_routes import router as debug_router
-from app.routes.orchestrator_routes import router as orchestrator_router  # Add the new orchestrator router
+from app.routes.orchestrator_routes import router as orchestrator_router
+from app.routes.reflection_routes import router as reflection_router
+from app.routes.trust_routes import router as trust_router
 
 # Import memory module
 from app.memory.project_memory import PROJECT_MEMORY
@@ -53,7 +55,9 @@ app.include_router(loop_router)
 app.include_router(agent_router)
 app.include_router(persona_router)
 app.include_router(debug_router)
-app.include_router(orchestrator_router)  # Include the new orchestrator router
+app.include_router(orchestrator_router)
+app.include_router(reflection_router)
+app.include_router(trust_router)
 
 # Root endpoint
 @app.get("/")
@@ -80,7 +84,9 @@ async def schema_injection_test():
             "agent_routes",
             "persona_routes",
             "debug_routes",
-            "orchestrator_routes"  # Add the new orchestrator routes
+            "orchestrator_routes",
+            "reflection_routes",
+            "trust_routes"
         ]
     }
 
@@ -97,7 +103,9 @@ async def router_diagnostics():
             {"name": "agent_router", "status": "registered"},
             {"name": "persona_router", "status": "registered"},
             {"name": "debug_router", "status": "registered"},
-            {"name": "orchestrator_router", "status": "registered"}  # Add the new orchestrator router
+            {"name": "orchestrator_router", "status": "registered"},
+            {"name": "reflection_router", "status": "registered"},
+            {"name": "trust_router", "status": "registered"}
         ],
         "status": "ok"
     }
