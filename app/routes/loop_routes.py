@@ -141,10 +141,12 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
     try:
         # Retrieve prior memory using memory.read
         try:
+            # Modified to use agent_id instead of project_id and loop_id
+            # Using the loop_id as the agent_id for compatibility
             prior_memory = await read_memory(
-                project_id=request.project_id,
-                loop_id=request.loop_id,
-                key=request.input_key
+                agent_id=request.loop_id,
+                memory_type="loop",
+                tag=request.input_key
             )
             
             if not prior_memory:
