@@ -4,10 +4,21 @@ Core Routes Module
 This module defines the core infrastructure routes for the Promethios API.
 """
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Dict, Any, Optional
+from pydantic import BaseModel
 
 router = APIRouter(tags=["core"])
+
+class MemoryReadRequest(BaseModel):
+    key: str
+
+class MemoryWriteRequest(BaseModel):
+    key: str
+    value: Any
+
+class MemoryDeleteRequest(BaseModel):
+    key: str
 
 @router.get("/health")
 async def health_check():
@@ -34,8 +45,8 @@ async def system_status():
         "version": "1.0.0"
     }
 
-@router.post("/memory/read")
-async def read_memory(key: str):
+@router.get("/memory/read")
+async def read_memory(key: str = Query(..., description="Memory key to retrieve")):
     """
     Retrieve memory by key.
     """
@@ -47,43 +58,45 @@ async def read_memory(key: str):
         "timestamp": "2025-04-21T12:28:00Z"
     }
 
+@router.post("/memory/read")
+async def read_memory_post(request: MemoryReadRequest):
+    """
+    Retrieve memory by key (POST method).
+    """
+    # This would normally interact with a memory store
+    # For now, return a mock response
+    return {
+        "key": request.key,
+        "value": f"Value for {request.key}",
+        "timestamp": "2025-04-21T12:28:00Z"
+    }
+
 @router.post("/memory/write")
-async def write_memory(data: Dict[str, Any]):
+async def write_memory(request: MemoryWriteRequest):
     """
     Direct memory injection.
     """
-    key = data.get("key")
-    value = data.get("value")
-    
-    if not key or not value:
-        raise HTTPException(status_code=400, detail="Both key and value are required")
-    
     # This would normally write to a memory store
     # For now, return a success response
     return {
         "status": "success",
-        "key": key,
+        "key": request.key,
         "memory": {
-            "key": key,
-            "value": value,
+            "key": request.key,
+            "value": request.value,
             "timestamp": "2025-04-21T12:28:00Z"
         }
     }
 
 @router.post("/memory/delete")
-async def delete_memory(data: Dict[str, str]):
+async def delete_memory(request: MemoryDeleteRequest):
     """
     Clear keys from memory.
     """
-    key = data.get("key")
-    
-    if not key:
-        raise HTTPException(status_code=400, detail="Key is required")
-    
     # This would normally delete from a memory store
     # For now, return a success response
     return {
         "status": "success",
-        "key": key,
-        "message": f"Key {key} deleted from memory"
+        "key": request.key,
+        "message": f"Key {request.key} deleted from memory"
     }

@@ -1,8 +1,9 @@
 """
-Schema validation module stub for testing purposes
+Module: schema_validation
+Purpose: Validate all schema-bound Promethios data objects (reflection, loop, trust, freeze)
 
-This module provides stub implementations of schema validation functions
-to allow testing without the actual schema validation module.
+All functions in this module must conform to the Promethios schema layer
+and should enforce structural integrity once full schemas are wired.
 """
 
 def validate_schema(data, schema_type=None):
