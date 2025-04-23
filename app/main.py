@@ -40,6 +40,24 @@ except ImportError:
     loop_routes_loaded = False
     print("⚠️ Could not load loop_routes directly")
 
+# Import HAL routes directly from routes directory
+try:
+    from routes import hal_routes
+    hal_routes_loaded = True
+    print("✅ Directly loaded hal_routes with fixed imports")
+except ImportError:
+    hal_routes_loaded = False
+    print("⚠️ Could not load hal_routes directly")
+
+# Import routes from routes directory
+try:
+    from routes import memory_routes as routes_memory_routes
+    routes_memory_loaded = True
+    print("✅ Directly loaded routes/memory_routes")
+except ImportError:
+    routes_memory_loaded = False
+    print("⚠️ Could not load routes/memory_routes directly")
+
 # Create FastAPI app
 app = FastAPI(
     title="Promethios API",
@@ -65,6 +83,11 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
+# Include HAL routes with priority (first)
+if hal_routes_loaded:
+    app.include_router(hal_routes.router, prefix="/api")
+    print("✅ Included hal_router with /api prefix (PRIORITY)")
+
 # Include routes with explicit paths without prefix
 if memory_routes_loaded:
     app.include_router(memory_router)  # No prefix as routes already include /api/
@@ -73,6 +96,11 @@ if memory_routes_loaded:
 if loop_routes_loaded:
     app.include_router(loop_router)  # No prefix as routes already include /api/
     print("✅ Included loop_router without prefix")
+
+# Include routes/memory_routes.py with /api prefix
+if routes_memory_loaded:
+    app.include_router(routes_memory_routes.router, prefix="/api")
+    print("✅ Included routes/memory_routes with /api prefix")
 
 # Comprehensive list of all routes based on file system scan
 routes_to_try = [
@@ -93,7 +121,7 @@ routes_to_try = [
     "system_integrity",
     "system_log_routes",
     "system_summary_routes",
-    "hal_routes",
+    # "hal_routes", # Removed as it's handled separately above
     
     # Modules routes
     "modules/agent/list",
@@ -126,12 +154,18 @@ if "memory_routes" in routes_to_try:
     routes_to_try.remove("memory_routes")
 if "loop_routes" in routes_to_try:
     routes_to_try.remove("loop_routes")
+if "hal_routes" in routes_to_try:
+    routes_to_try.remove("hal_routes")
 
 loaded_routes = []
 if memory_routes_loaded:
     loaded_routes.append("memory_routes")
 if loop_routes_loaded:
     loaded_routes.append("loop_routes")
+if hal_routes_loaded:
+    loaded_routes.append("hal_routes")
+if routes_memory_loaded:
+    loaded_routes.append("routes_memory_routes")
 
 # Create stub router for missing routes
 def create_stub_router(route_name):
@@ -268,8 +302,19 @@ async def router_diagnostics():
     """
     Diagnostics endpoint to check router registration.
     """
+    router_list = []
+    
+    # Add priority routers first
+    if hal_routes_loaded:
+        router_list.append({"name": "hal_router", "status": "registered", "priority": "high"})
+    
+    # Add other routers
+    for route in loaded_routes:
+        if route != "hal_routes":  # Skip hal_routes as it's already added above
+            router_list.append({"name": route, "status": "registered"})
+    
     return {
-        "routers": [{"name": route, "status": "registered"} for route in loaded_routes],
+        "routers": router_list,
         "status": "ok",
         "total_routes_loaded": len(loaded_routes)
     }
