@@ -228,13 +228,8 @@ async def validate_loop_endpoint(request: LoopValidateRequest):
         guard_result = loop_execution_guard(request.loop_data)
         if guard_result["status"] != "ok":
             logger.warning(f"Loop execution guard rejected loop {request.loop_id}: {guard_result['reason']}")
-            return {
-                "status": "rejected",
-                "loop_id": request.loop_id,
-                "guard_result": guard_result,
-                "processed_by": "loop_execution_guard",
-                "processed_at": datetime.utcnow().isoformat()
-            }
+            print(f"[GUARD] Triggered: {guard_result}")  # Debug log
+            return guard_result  # 🛑 Short-circuit if freeze/reflection triggered
         
         # Apply cognitive controls to the loop with specified or determined mode
         prepared_loop = integrate_with_orchestrator(request.loop_id, request.loop_data, mode)
