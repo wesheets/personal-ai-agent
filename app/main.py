@@ -7,17 +7,16 @@ This module initializes the FastAPI application and includes all routes.
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import importlib
 import time
 import os
 import json
 
-# Import routers
-from routes import core_routes, loop_routes, agent_routes, persona_routes, debug_routes
-from routes import orchestrator_routes, reflection_routes, trust_routes, memory_routes
-from app.routes.self_routes import router as self_router
-
 # Import memory module
 from app.memory.project_memory import PROJECT_MEMORY
+
+# Import self_routes directly as it's in a different location
+from app.routes.self_routes import router as self_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -44,17 +43,34 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
-# Include routers
-app.include_router(core_routes.router, prefix="/api")
-app.include_router(loop_routes.router, prefix="/api")
-app.include_router(agent_routes.router, prefix="/api")
-app.include_router(persona_routes.router, prefix="/api")
-app.include_router(debug_routes.router, prefix="/api")
-app.include_router(orchestrator_routes.router, prefix="/api")
-app.include_router(reflection_routes.router, prefix="/api")
-app.include_router(trust_routes.router, prefix="/api")
+# Dynamic route loader
+routes_to_try = [
+    "loop_routes",
+    "agent_routes",
+    "memory_routes",
+    "core_routes",
+    "persona_routes",
+    "system_routes",
+    "plan_routes",
+    "orchestrator_routes",
+    "debug_routes",
+    "reflection_routes",
+    "trust_routes"
+]
+
+for route in routes_to_try:
+    try:
+        module = importlib.import_module(f"routes.{route}")
+        app.include_router(module.router, prefix="/api")
+        print(f"✅ Loaded route: {route}")
+    except ImportError as e:
+        print(f"⚠️ Skipped missing route: {route} — {e}")
+    except AttributeError as e:
+        print(f"⚠️ Route file found but missing 'router' object: {route} — {e}")
+
+# Include self_router separately as it's from a different location
 app.include_router(self_router, prefix="/self")
-app.include_router(memory_routes.router, prefix="/api")
+print(f"✅ Loaded route: self_routes")
 
 # Root endpoint
 @app.get("/")
@@ -75,16 +91,7 @@ async def schema_injection_test():
     return {
         "schema_loaded": True,
         "memory_initialized": PROJECT_MEMORY is not None,
-        "routes_registered": [
-            "core_routes",
-            "loop_routes",
-            "agent_routes",
-            "persona_routes",
-            "debug_routes",
-            "orchestrator_routes",
-            "reflection_routes",
-            "trust_routes"
-        ]
+        "routes_registered": routes_to_try
     }
 
 # Diagnostics router check endpoint
@@ -94,15 +101,6 @@ async def router_diagnostics():
     Diagnostics endpoint to check router registration.
     """
     return {
-        "routers": [
-            {"name": "core_router", "status": "registered"},
-            {"name": "loop_router", "status": "registered"},
-            {"name": "agent_router", "status": "registered"},
-            {"name": "persona_router", "status": "registered"},
-            {"name": "debug_router", "status": "registered"},
-            {"name": "orchestrator_router", "status": "registered"},
-            {"name": "reflection_router", "status": "registered"},
-            {"name": "trust_router", "status": "registered"}
-        ],
+        "routers": [{"name": route, "status": "registered"} for route in routes_to_try],
         "status": "ok"
     }
