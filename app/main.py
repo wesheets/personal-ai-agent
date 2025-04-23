@@ -23,6 +23,23 @@ from app.memory.project_memory import PROJECT_MEMORY
 # Import self_routes directly as it's in a different location
 from app.routes.self_routes import router as self_router
 
+# Import routes with explicit API paths directly
+try:
+    from app.routes.memory_routes import router as memory_router
+    memory_routes_loaded = True
+    print("✅ Directly loaded memory_routes with explicit paths")
+except ImportError:
+    memory_routes_loaded = False
+    print("⚠️ Could not load memory_routes directly")
+
+try:
+    from app.routes.loop_routes import router as loop_router
+    loop_routes_loaded = True
+    print("✅ Directly loaded loop_routes with explicit paths")
+except ImportError:
+    loop_routes_loaded = False
+    print("⚠️ Could not load loop_routes directly")
+
 # Create FastAPI app
 app = FastAPI(
     title="Promethios API",
@@ -48,12 +65,19 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
+# Include routes with explicit paths without prefix
+if memory_routes_loaded:
+    app.include_router(memory_router)  # No prefix as routes already include /api/
+    print("✅ Included memory_router without prefix")
+
+if loop_routes_loaded:
+    app.include_router(loop_router)  # No prefix as routes already include /api/
+    print("✅ Included loop_router without prefix")
+
 # Comprehensive list of all routes based on file system scan
 routes_to_try = [
     # Core routes
-    "loop_routes",
     "agent_routes",
-    "memory_routes",
     "core_routes",
     "persona_routes",
     "system_routes",
@@ -97,7 +121,17 @@ routes_to_try = [
     "modules/system/groups",
 ]
 
+# Remove memory_routes and loop_routes from routes_to_try as they're handled separately
+if "memory_routes" in routes_to_try:
+    routes_to_try.remove("memory_routes")
+if "loop_routes" in routes_to_try:
+    routes_to_try.remove("loop_routes")
+
 loaded_routes = []
+if memory_routes_loaded:
+    loaded_routes.append("memory_routes")
+if loop_routes_loaded:
+    loaded_routes.append("loop_routes")
 
 # Create stub router for missing routes
 def create_stub_router(route_name):

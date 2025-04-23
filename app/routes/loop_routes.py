@@ -49,7 +49,7 @@ class LoopValidateRequest(BaseModel):
     time_constraint: Optional[float] = None
     user_preference: Optional[str] = None
 
-@router.post("/loop/plan")
+@router.post("/api/loop/plan")
 async def plan_loop(request: LoopPlanRequest):
     """
     Create execution plan for a loop.
@@ -69,7 +69,7 @@ async def plan_loop(request: LoopPlanRequest):
         "status": "success"
     }
 
-@router.post("/loop/complete")
+@router.post("/api/loop/complete")
 async def loop_complete_endpoint(request: LoopCompletionRequest):
     """
     Handle loop completion and initiate loop execution.
@@ -124,7 +124,7 @@ async def loop_complete_endpoint(request: LoopCompletionRequest):
         # Log the error and return an error response
         raise HTTPException(status_code=500, detail=f"Failed to activate loop: {str(e)}")
 
-@router.post("/loop/respond")
+@router.post("/api/loop/respond")
 async def loop_respond_endpoint(request: LoopResponseRequest):
     """
     Handle agent responses to memory within a loop.
@@ -280,7 +280,7 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Failed to generate response: {str(e)}")
 
-@router.post("/loop/validate")
+@router.post("/api/loop/validate")
 async def validate_loop(request: LoopValidateRequest):
     """
     Validate a loop against core requirements and enrich with cognitive controls.
@@ -300,7 +300,7 @@ async def validate_loop(request: LoopValidateRequest):
         "processed_by": "cognitive_control_layer"
     }
 
-@router.get("/loop/trace")
+@router.get("/api/loop/trace")
 async def get_loop_trace(project_id: Optional[str] = None):
     """
     Get loop memory trace log.
@@ -324,7 +324,7 @@ async def get_loop_trace(project_id: Optional[str] = None):
         ]
     }
 
-@router.post("/loop/trace")
+@router.post("/api/loop/trace")
 async def add_loop_trace(data: Dict[str, Any]):
     """
     Inject synthetic loop trace.
@@ -344,7 +344,7 @@ async def add_loop_trace(data: Dict[str, Any]):
         "message": f"Loop trace for {loop_id} added successfully"
     }
 
-@router.post("/loop/reset")
+@router.post("/api/loop/reset")
 async def reset_loop():
     """
     Memory reset for clean test runs.
@@ -357,7 +357,7 @@ async def reset_loop():
         "timestamp": datetime.now().isoformat()
     }
 
-@router.post("/loop/persona-reflect")
+@router.post("/api/loop/persona-reflect")
 async def persona_reflect(data: Dict[str, Any]):
     """
     Inject mode-aligned reflection trace.
