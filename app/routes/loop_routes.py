@@ -1,6 +1,5 @@
 """
-Loop Routes Module
-This module defines the loop-related routes for the Promethios API.
+Updated loop_routes.py to integrate with HAL code generation functionality
 """
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional, List
@@ -20,6 +19,9 @@ from app.api.modules.memory import read_memory
 from app.agents.hal import run_hal_agent
 from app.agents.ash import run_ash_agent
 from app.agents.critic import run_critic_agent
+
+# Import code generation module
+from app.modules.code_generation.hal_code_generator import process_build_task
 
 # Configure logging
 logger = logging.getLogger("app.routes.loop_routes")
@@ -167,16 +169,31 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
         if request.agent.lower() == "hal":
             if request.response_type == "code":
                 # Call HAL for code generation
-                agent_result = run_hal_agent(
-                    task=f"Generate code for {prior_memory.get('content', '')}",
-                    project_id=request.project_id,
-                    tools=["code_generation"]
-                )
-                agent_response = {
-                    "code": agent_result.get("files_created", []),
-                    "target_file": request.target_file,
-                    "description": f"Code generated for {request.target_file}"
-                }
+                try:
+                    # Process the build task and generate code
+                    code_result = await process_build_task(
+                        loop_id=request.loop_id,
+                        input_key=request.input_key,
+                        target_file=request.target_file
+                    )
+                    
+                    if code_result.get("status") != "success":
+                        raise Exception(f"Failed to process build task: {code_result.get('message', 'Unknown error')}")
+                    
+                    # Set agent_response based on the code generation result
+                    agent_response = {
+                        "code": code_result.get("code", ""),
+                        "target_file": request.target_file,
+                        "timestamp": code_result.get("timestamp", datetime.now().isoformat()),
+                        "description": f"Code generated for {request.target_file}"
+                    }
+                except Exception as code_error:
+                    logger.error(f"Error in code generation: {str(code_error)}")
+                    logger.error(traceback.format_exc())
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Failed to generate code: {str(code_error)}"
+                    )
             else:
                 # Call HAL for other response types
                 agent_result = run_hal_agent(
