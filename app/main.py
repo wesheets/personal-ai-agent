@@ -12,16 +12,9 @@ import os
 import json
 
 # Import routers
-from app.routes.core_routes import router as core_router
-from app.routes.loop_routes import router as loop_router
-from app.routes.agent_routes import router as agent_router
-from app.routes.persona_routes import router as persona_router
-from app.routes.debug_routes import router as debug_router
-from app.routes.orchestrator_routes import router as orchestrator_router
-from app.routes.reflection_routes import router as reflection_router
-from app.routes.trust_routes import router as trust_router
+from routes import core_routes, loop_routes, agent_routes, persona_routes, debug_routes
+from routes import orchestrator_routes, reflection_routes, trust_routes, memory_routes
 from app.routes.self_routes import router as self_router
-from routes import memory_routes
 
 # Import memory module
 from app.memory.project_memory import PROJECT_MEMORY
@@ -52,14 +45,14 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 # Include routers
-app.include_router(core_router)
-app.include_router(loop_router, prefix="/api")
-app.include_router(agent_router)
-app.include_router(persona_router)
-app.include_router(debug_router)
-app.include_router(orchestrator_router)
-app.include_router(reflection_router)
-app.include_router(trust_router)
+app.include_router(core_routes.router, prefix="/api")
+app.include_router(loop_routes.router, prefix="/api")
+app.include_router(agent_routes.router, prefix="/api")
+app.include_router(persona_routes.router, prefix="/api")
+app.include_router(debug_routes.router, prefix="/api")
+app.include_router(orchestrator_routes.router, prefix="/api")
+app.include_router(reflection_routes.router, prefix="/api")
+app.include_router(trust_routes.router, prefix="/api")
 app.include_router(self_router, prefix="/self")
 app.include_router(memory_routes.router, prefix="/api")
 
