@@ -38,7 +38,7 @@ class AgentTaskRequest(BaseModel):
     task: Optional[Dict[str, Any]] = None
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "agent_id": "builder-1",
                 "task": {
