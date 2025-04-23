@@ -1,19 +1,39 @@
 """
 Memory Writer Module
-
 This module provides functionality for writing memory entries.
 It is primarily used by agents to log their actions and thoughts.
 """
-
 import logging
 import json
 import os
 import uuid
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 # Configure logging
 logger = logging.getLogger("app.modules.memory_writer")
+
+# Initialize memory_store as a list to store memory entries
+# This is exported and used by various modules
+memory_store: List[Dict[str, Any]] = []
+
+def generate_reflection(agent_id: str, content: str) -> Dict[str, Any]:
+    """
+    Generate a reflection entry for an agent.
+    
+    Args:
+        agent_id: The agent identifier
+        content: The reflection content
+        
+    Returns:
+        Dict containing the reflection entry
+    """
+    return {
+        "agent_id": agent_id,
+        "type": "reflection",
+        "content": content,
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
 def write_memory(memory_data: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -44,6 +64,9 @@ def write_memory(memory_data: Dict[str, Any]) -> Dict[str, Any]:
         # Log the memory entry
         logger.info(f"Memory entry created: {memory_id}")
         print(f"✅ Memory entry created: {memory_id}")
+        
+        # Add to memory_store
+        memory_store.append(memory_entry)
         
         # In a real implementation, this would store to a database
         # For now, we'll write to a JSON file for demonstration
