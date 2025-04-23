@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.schemas.self_reflection_schema import SelfInquiryRequest
 from app.schemas.self_revision_schema import BeliefRevisionRequest
+from app.schemas.self_reinforcement_schema import BeliefReinforcementRequest
 import json
 from datetime import datetime
 
@@ -54,6 +55,9 @@ async def reflect_on_self(request: SelfInquiryRequest):
             }
             break
     
+    # Get reinforced beliefs information
+    reinforced_beliefs = beliefs.get("reinforced_beliefs", {})
+    
     return {
         "status": "self-reflection",
         "beliefs": beliefs,
@@ -66,13 +70,21 @@ async def reflect_on_self(request: SelfInquiryRequest):
         "belief_stability": belief_stability,
         "volatility_flags": volatility_flags,
         "changed_often_recently": changed_often_recently,
-        "identity_risk": identity_risk
+        "identity_risk": identity_risk,
+        "reinforced_beliefs": reinforced_beliefs
     }
 
 @router.post("/revise")
 async def revise_belief(request: BeliefRevisionRequest):
     with open("app/memory/core_beliefs.json", "r+") as f:
         beliefs = json.load(f)
+        
+        # Check if the belief is locked (reinforced)
+        if beliefs.get("reinforced_beliefs", {}).get(request.field_updated, {}).get("locked", False):
+            return {
+                "status": "rejected",
+                "reason": "Field is currently reinforced and locked from revision."
+            }
 
         # Add to revision log
         beliefs["revision_log"].append({
@@ -113,4 +125,39 @@ async def revise_belief(request: BeliefRevisionRequest):
         "new_value": request.new_value,
         "loop_id": request.loop_id,
         "stability": beliefs.get("belief_stability", {}).get(request.field_updated, 1.0)
+    }
+
+@router.post("/reinforce")
+async def reinforce_belief(request: BeliefReinforcementRequest):
+    with open("app/memory/core_beliefs.json", "r+") as f:
+        beliefs = json.load(f)
+        
+        # Initialize reinforced_beliefs if not present
+        if "reinforced_beliefs" not in beliefs:
+            beliefs["reinforced_beliefs"] = {}
+            
+        # Initialize this belief's reinforcement data if not present
+        if request.field not in beliefs["reinforced_beliefs"]:
+            beliefs["reinforced_beliefs"][request.field] = {
+                "last_reinforced_at": None,
+                "reinforcement_reason": None,
+                "locked": False
+            }
+        
+        # Update reinforcement data
+        beliefs["reinforced_beliefs"][request.field] = {
+            "last_reinforced_at": datetime.utcnow().isoformat(),
+            "reinforcement_reason": request.reinforcement_reason,
+            "locked": True
+        }
+
+        f.seek(0)
+        json.dump(beliefs, f, indent=2)
+        f.truncate()
+
+    return {
+        "status": "reinforced",
+        "field": request.field,
+        "locked": True,
+        "reason": request.reinforcement_reason
     }
