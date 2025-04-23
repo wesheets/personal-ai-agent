@@ -6,10 +6,51 @@ It evaluates trust scores and deltas for loop plans based on various factors.
 """
 
 import logging
+import re
 from typing import Dict, Any, Optional, List, Union, Tuple
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+def analyze_prompt_for_trust_conditions(loop_plan: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Analyze prompt text for trust-related conditions.
+    
+    Args:
+        loop_plan: The loop plan to evaluate
+        
+    Returns:
+        Dictionary with trust-related data extracted from prompt
+    """
+    trust_data = {}
+    
+    # Get prompt text
+    prompt_text = loop_plan.get("prompt", "")
+    if not prompt_text and "loop_data" in loop_plan and isinstance(loop_plan["loop_data"], dict):
+        prompt_text = loop_plan["loop_data"].get("prompt", "")
+    
+    if not prompt_text:
+        return trust_data
+    
+    # Check for trust unknown mentions
+    if re.search(r"trust\s+is\s+unknown", prompt_text, re.IGNORECASE):
+        trust_data["trust_unknown"] = True
+        logger.info("'Trust is unknown' found in prompt text")
+    
+    # Check for trust threshold mentions
+    trust_pattern = r"trust\s+(?:is\s+)?(?:under|below|less\s+than)\s+(\d+)%"
+    trust_match = re.search(trust_pattern, prompt_text, re.IGNORECASE)
+    if trust_match:
+        threshold = int(trust_match.group(1)) / 100.0
+        trust_data["trust_threshold"] = threshold
+        logger.info(f"Trust threshold found in prompt: {threshold}")
+    
+    # Check for agent disagreement that might affect trust
+    if re.search(r"(HAL|CRITIC).+disagree", prompt_text, re.IGNORECASE):
+        trust_data["agent_disagreement"] = True
+        logger.info("Agent disagreement found in prompt that may affect trust")
+    
+    return trust_data
 
 def evaluate_trust_delta(loop_plan: Dict[str, Any]) -> float:
     """
@@ -26,6 +67,11 @@ def evaluate_trust_delta(loop_plan: Dict[str, Any]) -> float:
         Trust delta value (positive for increased trust, negative for decreased trust)
     """
     logger.info("Evaluating trust delta for loop plan")
+    
+    # Check if trust is undefined or unknown
+    if loop_plan.get("trust_undefined", False) or loop_plan.get("prompt_analysis", {}).get("trust_unknown", False):
+        logger.warning("Trust is undefined or unknown, returning significant negative delta")
+        return -0.5
     
     # Start with neutral delta
     delta = 0.0
@@ -65,6 +111,12 @@ def evaluate_trust_delta(loop_plan: Dict[str, Any]) -> float:
         logger.info(f"Safety violations impact on trust: {safety_impact}")
         delta += safety_impact
     
+    # Check prompt analysis for agent disagreement
+    if loop_plan.get("prompt_analysis", {}).get("agent_disagreement", False):
+        disagreement_impact = -0.2
+        logger.info(f"Agent disagreement from prompt impact on trust: {disagreement_impact}")
+        delta += disagreement_impact
+    
     logger.info(f"Final trust delta: {delta}")
     return delta
 
@@ -77,11 +129,27 @@ def get_trust_score(loop_plan: Dict[str, Any], base_score: float = 0.5) -> float
         base_score: Base trust score to start with
         
     Returns:
-        Trust score between 0.0 and 1.0
+        Trust score between 0.0 and 1.0, or None if trust is undefined
     """
+    # Check if trust is undefined or unknown
+    if loop_plan.get("trust_undefined", False) or loop_plan.get("prompt_analysis", {}).get("trust_unknown", False):
+        logger.warning("Trust is undefined or unknown, returning None")
+        return None
+    
     # If trust score is explicitly set in the plan, use that
     if "trust_score" in loop_plan and isinstance(loop_plan["trust_score"], (int, float)):
-        return max(0.0, min(1.0, loop_plan["trust_score"]))
+        score = loop_plan["trust_score"]
+        logger.info(f"Using explicit trust score from plan: {score}")
+        return max(0.0, min(1.0, score))
+    
+    # Check prompt analysis for trust threshold
+    prompt_analysis = loop_plan.get("prompt_analysis", {})
+    if "trust_threshold" in prompt_analysis:
+        threshold = prompt_analysis["trust_threshold"]
+        # If trust threshold is mentioned in prompt, set trust below threshold
+        score = threshold - 0.1
+        logger.info(f"Setting trust score to {score} based on prompt threshold")
+        return max(0.0, min(1.0, score))
     
     # Otherwise calculate based on delta
     delta = evaluate_trust_delta(loop_plan)
@@ -89,10 +157,11 @@ def get_trust_score(loop_plan: Dict[str, Any], base_score: float = 0.5) -> float
     
     # Ensure score is between 0 and 1
     score = max(0.0, min(1.0, score))
+    logger.info(f"Calculated trust score: {score}")
     
     return score
 
-def is_trust_sufficient(loop_plan: Dict[str, Any], threshold: float = 0.3) -> Tuple[bool, float]:
+def is_trust_sufficient(loop_plan: Dict[str, Any], threshold: float = 0.3) -> Tuple[bool, Optional[float]]:
     """
     Determine if the trust score is sufficient to proceed.
     
@@ -104,4 +173,16 @@ def is_trust_sufficient(loop_plan: Dict[str, Any], threshold: float = 0.3) -> Tu
         Tuple of (is_sufficient, actual_score)
     """
     score = get_trust_score(loop_plan)
-    return (score >= threshold, score)
+    
+    # If score is None (undefined trust), trust is insufficient
+    if score is None:
+        logger.warning("Trust is undefined, considered insufficient")
+        return (False, None)
+    
+    is_sufficient = score >= threshold
+    if not is_sufficient:
+        logger.warning(f"Trust score {score} is below threshold {threshold}")
+    else:
+        logger.info(f"Trust score {score} is sufficient (>= {threshold})")
+    
+    return (is_sufficient, score)
