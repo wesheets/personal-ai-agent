@@ -118,7 +118,20 @@ def should_freeze_loop(loop_plan: Dict[str, Any]) -> bool:
     # Check prompt text directly for freeze conditions
     if analyze_prompt_for_freeze_conditions(loop_plan):
         logger.warning("Freeze conditions found in prompt text")
+        # Add trace logging before returning True
+        trust_score = "undefined" if loop_plan.get("trust_undefined", False) else loop_plan.get("trust_score", "not_set")
+        freeze_triggered = True
+        print("[TRACE] Freeze Check – Trust Score:", trust_score)
+        print("[TRACE] Freeze Triggered:", freeze_triggered)
         return True
+    
+    # Get trust score for trace logging
+    trust_score = "undefined" if loop_plan.get("trust_undefined", False) else loop_plan.get("trust_score", "not_set")
+    freeze_triggered = False
+    
+    # Add trace logging
+    print("[TRACE] Freeze Check – Trust Score:", trust_score)
+    print("[TRACE] Freeze Triggered:", freeze_triggered)
     
     logger.info("No freeze triggers detected in loop plan")
     return False

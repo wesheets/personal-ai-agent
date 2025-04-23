@@ -103,12 +103,30 @@ def should_reflect(loop_plan: Dict[str, Any]) -> bool:
     confidence = loop_plan.get("confidence", 1.0)
     if isinstance(confidence, (int, float)) and confidence < 0.5:
         logger.warning(f"Low confidence score detected: {confidence}, triggering reflection")
+        # Add trace logging before returning True
+        confidence_score = confidence
+        reflection_triggered = True
+        print("[TRACE] Reflection Check – Confidence:", confidence_score)
+        print("[TRACE] Recursive Reflection Triggered:", reflection_triggered)
         return True
     
     # Check prompt text directly for reflection conditions
     if analyze_prompt_for_reflection_conditions(loop_plan):
         logger.warning("Reflection conditions found in prompt text")
+        # Add trace logging before returning True
+        confidence_score = loop_plan.get("confidence", "undefined")
+        reflection_triggered = True
+        print("[TRACE] Reflection Check – Confidence:", confidence_score)
+        print("[TRACE] Recursive Reflection Triggered:", reflection_triggered)
         return True
+    
+    # Extract confidence score for trace logging
+    confidence_score = loop_plan.get("confidence", "undefined")
+    reflection_triggered = False
+    
+    # Add trace logging
+    print("[TRACE] Reflection Check – Confidence:", confidence_score)
+    print("[TRACE] Recursive Reflection Triggered:", reflection_triggered)
     
     logger.info("No reflection triggers detected in loop plan")
     return False
