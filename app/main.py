@@ -52,7 +52,7 @@ async def add_process_time_header(request: Request, call_next):
 
 # Include routers
 app.include_router(core_router)
-app.include_router(loop_router)
+app.include_router(loop_router, prefix="/api")
 app.include_router(agent_router)
 app.include_router(persona_router)
 app.include_router(debug_router)
