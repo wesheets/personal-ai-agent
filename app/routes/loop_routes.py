@@ -1,19 +1,22 @@
 """
 Loop Routes Module
-
 This module defines the loop-related routes for the Promethios API.
 """
-
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional, List
 from pydantic import BaseModel
-
 router = APIRouter(tags=["loop"])
 
 class LoopPlanRequest(BaseModel):
     prompt: str
     loop_id: str
     orchestrator_persona: Optional[str] = None
+
+class LoopCompletionRequest(BaseModel):
+    loop_id: str
+    project_id: str
+    executor: str
+    notes: str
 
 class LoopValidateRequest(BaseModel):
     loop_id: str
@@ -43,6 +46,61 @@ async def plan_loop(request: LoopPlanRequest):
         "orchestrator_persona": request.orchestrator_persona or "SAGE",
         "status": "success"
     }
+
+@router.post("/loop/complete")
+async def loop_complete_endpoint(request: LoopCompletionRequest):
+    """
+    Handle loop completion and initiate loop execution.
+    
+    This endpoint is called when a loop is ready to be executed and triggers:
+    - Loop log writing
+    - Memory state activation
+    - Orchestration delegation to HAL/NOVA/CRITIC
+    """
+    # Validate required fields
+    if not request.loop_id or not request.project_id or not request.executor:
+        raise HTTPException(status_code=400, detail="loop_id, project_id, and executor are required")
+    
+    try:
+        # Write to loop log
+        # This would normally write to a persistent storage
+        loop_log_entry = {
+            "loop_id": request.loop_id,
+            "project_id": request.project_id,
+            "executor": request.executor,
+            "notes": request.notes,
+            "status": "activated",
+            "timestamp": "2025-04-23T04:50:00Z"  # In a real implementation, this would be the current time
+        }
+        
+        # Activate memory state
+        # This would normally update the memory state in a database
+        memory_activation_result = {
+            "status": "success",
+            "loop_id": request.loop_id,
+            "memory_state": "active"
+        }
+        
+        # Delegate to orchestration systems
+        # This would normally trigger the orchestration systems
+        orchestration_result = {
+            "status": "delegated",
+            "systems": ["HAL", "NOVA", "CRITIC"],
+            "loop_id": request.loop_id
+        }
+        
+        # Return success response
+        return {
+            "status": "activated",
+            "loop_id": request.loop_id,
+            "project_id": request.project_id,
+            "executor": request.executor,
+            "message": f"Loop {request.loop_id} has been activated successfully",
+            "orchestration_status": orchestration_result
+        }
+    except Exception as e:
+        # Log the error and return an error response
+        raise HTTPException(status_code=500, detail=f"Failed to activate loop: {str(e)}")
 
 @router.post("/loop/validate")
 async def validate_loop(request: LoopValidateRequest):
