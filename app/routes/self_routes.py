@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.schemas.self_reflection_schema import SelfInquiryRequest
 from app.schemas.self_revision_schema import BeliefRevisionRequest
 from app.schemas.self_reinforcement_schema import BeliefReinforcementRequest
+from app.schemas.self_challenge_schema import BeliefChallengeRequest
 import json
 from datetime import datetime
 
@@ -58,6 +59,27 @@ async def reflect_on_self(request: SelfInquiryRequest):
     # Get reinforced beliefs information
     reinforced_beliefs = beliefs.get("reinforced_beliefs", {})
     
+    # Get recent challenges
+    recent_challenges = []
+    under_review = {}
+    
+    # Process challenge log
+    challenge_log = beliefs.get("challenge_log", {})
+    for field, challenges in challenge_log.items():
+        # Add field to under_review if it has 3 or more challenges and is locked
+        if len(challenges) >= 3 and beliefs.get("reinforced_beliefs", {}).get(field, {}).get("locked", False):
+            under_review[field] = True
+        
+        # Add recent challenges to the list
+        if challenges:
+            for challenge in challenges[-3:]:  # Get up to 3 most recent challenges
+                recent_challenges.append({
+                    "field": field,
+                    "loop_id": challenge.get("loop_id"),
+                    "challenger": challenge.get("challenger"),
+                    "reason": challenge.get("reason")
+                })
+    
     return {
         "status": "self-reflection",
         "beliefs": beliefs,
@@ -71,7 +93,9 @@ async def reflect_on_self(request: SelfInquiryRequest):
         "volatility_flags": volatility_flags,
         "changed_often_recently": changed_often_recently,
         "identity_risk": identity_risk,
-        "reinforced_beliefs": reinforced_beliefs
+        "reinforced_beliefs": reinforced_beliefs,
+        "recent_challenges": recent_challenges,
+        "under_review": under_review
     }
 
 @router.post("/revise")
@@ -160,4 +184,47 @@ async def reinforce_belief(request: BeliefReinforcementRequest):
         "field": request.field,
         "locked": True,
         "reason": request.reinforcement_reason
+    }
+
+@router.post("/challenge")
+async def challenge_belief(request: BeliefChallengeRequest):
+    with open("app/memory/core_beliefs.json", "r+") as f:
+        beliefs = json.load(f)
+
+        if "challenge_log" not in beliefs:
+            beliefs["challenge_log"] = {}
+
+        field = request.field
+        log = beliefs["challenge_log"].get(field, [])
+
+        log.append({
+            "loop_id": request.loop_id,
+            "challenger": request.challenger,
+            "reason": request.challenge_reason,
+            "challenged_at": datetime.utcnow().isoformat()
+        })
+
+        beliefs["challenge_log"][field] = log
+
+        # Optional: trigger under_review state if challenged too often
+        if len(log) >= 3 and beliefs.get("reinforced_beliefs", {}).get(field, {}).get("locked", False):
+            if "reinforced_beliefs" not in beliefs:
+                beliefs["reinforced_beliefs"] = {}
+            if field not in beliefs["reinforced_beliefs"]:
+                beliefs["reinforced_beliefs"][field] = {
+                    "last_reinforced_at": None,
+                    "reinforcement_reason": None,
+                    "locked": False
+                }
+            beliefs["reinforced_beliefs"][field]["under_review"] = True
+
+        f.seek(0)
+        json.dump(beliefs, f, indent=2)
+        f.truncate()
+
+    return {
+        "status": "challenged",
+        "field": field,
+        "challenge_count": len(log),
+        "under_review": beliefs.get("reinforced_beliefs", {}).get(field, {}).get("under_review", False)
     }
