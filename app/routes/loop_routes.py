@@ -17,6 +17,7 @@ from app.api.modules.memory import read_memory
 
 # Import agent modules
 from app.agents.hal import run_hal_agent
+from app.agents.hal_agent import run_hal_agent as run_hal_agent_v2
 from app.agents.ash import run_ash_agent
 from app.agents.critic import run_critic_agent
 
@@ -91,7 +92,7 @@ async def loop_complete_endpoint(request: LoopCompletionRequest):
             "executor": request.executor,
             "notes": request.notes,
             "status": "activated",
-            "timestamp": "2025-04-23T04:50:00Z"  # In a real implementation, this would be the current time
+            "timestamp": datetime.now().isoformat()
         }
         
         # Activate memory state
@@ -196,14 +197,25 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
                     )
             else:
                 # Call HAL for other response types
-                agent_result = run_hal_agent(
-                    task=f"Generate {request.response_type} for {prior_memory.get('content', '')}",
-                    project_id=request.project_id
-                )
-                agent_response = {
-                    "content": agent_result.get("result", ""),
-                    "type": request.response_type
-                }
+                try:
+                    agent_result = run_hal_agent_v2(
+                        task=f"Generate {request.response_type} for {prior_memory.get('content', '')}",
+                        project_id=request.project_id
+                    )
+                    agent_response = {
+                        "content": agent_result.get("result", ""),
+                        "type": request.response_type
+                    }
+                except Exception as e:
+                    # Try the alternative HAL agent implementation
+                    agent_result = run_hal_agent(
+                        task=f"Generate {request.response_type} for {prior_memory.get('content', '')}",
+                        project_id=request.project_id
+                    )
+                    agent_response = {
+                        "content": agent_result.get("result", ""),
+                        "type": request.response_type
+                    }
         elif request.agent.lower() == "ash":
             # Call ASH agent
             agent_result = run_ash_agent(
@@ -342,7 +354,7 @@ async def reset_loop():
     return {
         "status": "success",
         "message": "Loop memory reset successfully",
-        "timestamp": "2025-04-21T12:28:00Z"
+        "timestamp": datetime.now().isoformat()
     }
 
 @router.post("/loop/persona-reflect")
