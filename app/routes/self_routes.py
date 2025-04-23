@@ -3,6 +3,7 @@ from app.schemas.self_reflection_schema import SelfInquiryRequest
 from app.schemas.self_revision_schema import BeliefRevisionRequest
 from app.schemas.self_reinforcement_schema import BeliefReinforcementRequest
 from app.schemas.self_challenge_schema import BeliefChallengeRequest
+from app.modules.reflection_styler import summarize_reflection
 import json
 from datetime import datetime
 
@@ -80,7 +81,8 @@ async def reflect_on_self(request: SelfInquiryRequest):
                     "reason": challenge.get("reason")
                 })
     
-    return {
+    # Create response object
+    response = {
         "status": "self-reflection",
         "beliefs": beliefs,
         "origin_prompt": request.prompt,
@@ -97,6 +99,11 @@ async def reflect_on_self(request: SelfInquiryRequest):
         "recent_challenges": recent_challenges,
         "under_review": under_review
     }
+    
+    # Generate natural language summary
+    response["natural_language_summary"] = summarize_reflection(response)
+    
+    return response
 
 @router.post("/revise")
 async def revise_belief(request: BeliefRevisionRequest):
