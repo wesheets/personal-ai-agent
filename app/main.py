@@ -22,6 +22,9 @@ from app.routes.reflection_routes import router as reflection_router
 from app.routes.trust_routes import router as trust_router
 from app.routes.self_routes import router as self_router
 
+# Import routes with explicit paths directly
+from routes import memory_routes, hal_routes
+
 # Import memory module
 from app.memory.project_memory import PROJECT_MEMORY
 
@@ -50,7 +53,11 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
-# Include routers
+# Include routes with explicit paths first (priority override)
+app.include_router(memory_routes.router, prefix="/api")
+app.include_router(hal_routes.router, prefix="/api")
+
+# Include other routers
 app.include_router(core_router)
 app.include_router(loop_router)
 app.include_router(agent_router)
@@ -71,6 +78,16 @@ async def root():
 async def health_check():
     return {"status": "ok"}
 
+# System health endpoint at /api/system/health for compatibility
+@app.get("/api/system/health")
+async def api_system_health():
+    return {"status": "ok", "message": "System is healthy"}
+
+# API ping endpoint
+@app.get("/api/ping")
+async def api_ping():
+    return {"status": "ok", "message": "API is responding"}
+
 # Schema injection test endpoint
 @app.get("/schema-injection-test")
 async def schema_injection_test():
@@ -81,6 +98,8 @@ async def schema_injection_test():
         "schema_loaded": True,
         "memory_initialized": PROJECT_MEMORY is not None,
         "routes_registered": [
+            "memory_routes",
+            "hal_routes",
             "core_routes",
             "loop_routes",
             "agent_routes",
@@ -100,6 +119,8 @@ async def router_diagnostics():
     """
     return {
         "routers": [
+            {"name": "memory_router", "status": "registered", "priority": "high"},
+            {"name": "hal_router", "status": "registered", "priority": "high"},
             {"name": "core_router", "status": "registered"},
             {"name": "loop_router", "status": "registered"},
             {"name": "agent_router", "status": "registered"},
