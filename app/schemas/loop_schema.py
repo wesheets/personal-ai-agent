@@ -18,7 +18,7 @@ class LoopResponseRequest(BaseModel):
     target_file: Optional[str] = Field(None, description="Target file for code responses, required if response_type is 'code'")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "loop_id": "loop_123456",
                 "project_id": "project_789012",

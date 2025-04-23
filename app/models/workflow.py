@@ -46,7 +46,7 @@ class WorkflowResponse(BaseModel):
     total_steps: int = 0
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "steps": [
                     {
