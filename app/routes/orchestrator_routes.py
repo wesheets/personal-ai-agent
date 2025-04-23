@@ -247,15 +247,14 @@ async def validate_loop_endpoint(request: LoopValidateRequest):
         
         # Execute the loop execution guard to check safety constraints
         guard_result = loop_execution_guard(request.loop_data)
+
+        print("[DEBUG] Guard Result:", guard_result)
+        print("[DEBUG] Incoming Prompt:", request.loop_data.get("prompt", "N/A"))
+
         if guard_result["status"] != "ok":
+            print("[DEBUG] Guard triggered — returning early.")
             logger.warning(f"Loop execution guard rejected loop {request.loop_id}: {guard_result['reason']}")
-            return {
-                "status": "rejected",
-                "loop_id": request.loop_id,
-                "guard_result": guard_result,
-                "processed_by": "loop_execution_guard",
-                "processed_at": datetime.utcnow().isoformat()
-            }
+            return guard_result  # ✅ This must halt further execution
         
         # Apply cognitive controls to the loop with specified or determined mode
         prepared_loop = integrate_with_orchestrator(request.loop_id, request.loop_data, mode)
