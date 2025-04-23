@@ -21,6 +21,7 @@ from app.routes.orchestrator_routes import router as orchestrator_router
 from app.routes.reflection_routes import router as reflection_router
 from app.routes.trust_routes import router as trust_router
 from app.routes.self_routes import router as self_router
+from app.routes import memory_routes
 
 # Import memory module
 from app.memory.project_memory import PROJECT_MEMORY
@@ -60,6 +61,7 @@ app.include_router(orchestrator_router)
 app.include_router(reflection_router)
 app.include_router(trust_router)
 app.include_router(self_router, prefix="/self")
+app.include_router(memory_routes.router, prefix="/api")
 
 # Root endpoint
 @app.get("/")
