@@ -6,7 +6,6 @@ All functions in this module must conform to the Promethios schema layer
 and should enforce structural integrity once full schemas are wired.
 """
 
-# Placeholder for future schema-bound enforcement
 def validate_schema(data, schema_type=None):
     """
     Validate incoming data structure before allowing reflection, memory, or agent use.
