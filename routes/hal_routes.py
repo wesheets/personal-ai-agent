@@ -106,3 +106,6 @@ async def list_constraints():
         "count": len(SAFETY_CONSTRAINTS),
         "status": "success"
     }
+
+from fastapi import APIRouter
+router = APIRouter()

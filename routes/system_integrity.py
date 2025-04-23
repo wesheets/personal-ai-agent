@@ -180,3 +180,6 @@ def check_file_integrity(file_path: str) -> Dict[str, Any]:
         logger.error(f"Error checking integrity of {file_path}: {str(e)}")
     
     return result
+
+from fastapi import APIRouter
+router = APIRouter()

@@ -1249,3 +1249,6 @@ def get_loop_snapshot_history_route(project_id: str):
             "message": error_msg,
             "project_id": project_id
         }
+
+from fastapi import APIRouter
+router = APIRouter()

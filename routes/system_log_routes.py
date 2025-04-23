@@ -69,3 +69,6 @@ async def clear_system_delegation_log() -> Dict[str, Any]:
             raise HTTPException(status_code=500, detail="Failed to clear system log")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error clearing system log: {str(e)}")
+
+from fastapi import APIRouter
+router = APIRouter()
