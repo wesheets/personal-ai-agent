@@ -26,13 +26,13 @@ logger = logging.getLogger("memory_routes")
 router = APIRouter()
 
 
-@router.get("/ping")
+@router.get("/memory/ping")
 def memory_ping():
     print("🔍 DEBUG: memory_ping endpoint called")
     return {"status": "Memory router recovered", "timestamp": str(datetime.datetime.now())}
 
 
-@router.post("/write")
+@router.post("/memory/write")
 async def memory_write(request_data: dict):
     """
     Write content to memory.
@@ -60,7 +60,7 @@ async def memory_write(request_data: dict):
     }
 
 
-@router.get("/read")
+@router.get("/memory/read")
 async def memory_read(project_id: str = Query(..., description="Project identifier")):
     """
     Read content from memory.
@@ -96,7 +96,7 @@ async def memory_read(project_id: str = Query(..., description="Project identifi
         }
 
 
-@router.post("/summarize")
+@router.post("/memory/summarize")
 async def memory_summarize(request_data: dict):
     """
     Summarize a memory thread.
@@ -122,7 +122,7 @@ async def memory_summarize(request_data: dict):
     }
 
 
-@router.post("/thread")
+@router.post("/memory/thread")
 async def memory_thread_post(request_data: dict):
     """
     Get a memory thread via POST method.
@@ -143,7 +143,7 @@ async def memory_thread_post(request_data: dict):
     }
 
 
-@router.get("/thread")
+@router.get("/memory/thread")
 async def memory_thread_get(
     project_id: str = Query(..., description="Project identifier")
 ):

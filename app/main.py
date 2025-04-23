@@ -40,6 +40,82 @@ except ImportError:
     loop_routes_loaded = False
     print("⚠️ Could not load loop_routes directly")
 
+# Import HAL routes directly from routes directory
+try:
+    from routes import hal_routes
+    hal_routes_loaded = True
+    print("✅ Directly loaded hal_routes with fixed imports")
+except ImportError:
+    hal_routes_loaded = False
+    print("⚠️ Could not load hal_routes directly")
+
+# Import memory routes from routes directory
+try:
+    from routes import memory_routes
+    routes_memory_loaded = True
+    print("✅ Directly loaded routes/memory_routes")
+except ImportError:
+    routes_memory_loaded = False
+    print("⚠️ Could not load routes/memory_routes directly")
+
+# Import reflection and trust routes directly
+try:
+    from app.routes.reflection_routes import router as reflection_router
+    reflection_routes_loaded = True
+    print("✅ Directly loaded reflection_routes")
+except ImportError:
+    reflection_routes_loaded = False
+    print("⚠️ Could not load reflection_routes directly")
+
+try:
+    from app.routes.trust_routes import router as trust_router
+    trust_routes_loaded = True
+    print("✅ Directly loaded trust_routes")
+except ImportError:
+    trust_routes_loaded = False
+    print("⚠️ Could not load trust_routes directly")
+
+# Import core routes directly
+try:
+    from app.routes.core_routes import router as core_router
+    core_routes_loaded = True
+    print("✅ Directly loaded core_routes")
+except ImportError:
+    core_routes_loaded = False
+    print("⚠️ Could not load core_routes directly")
+
+try:
+    from app.routes.agent_routes import router as agent_router
+    agent_routes_loaded = True
+    print("✅ Directly loaded agent_routes")
+except ImportError:
+    agent_routes_loaded = False
+    print("⚠️ Could not load agent_routes directly")
+
+try:
+    from app.routes.persona_routes import router as persona_router
+    persona_routes_loaded = True
+    print("✅ Directly loaded persona_routes")
+except ImportError:
+    persona_routes_loaded = False
+    print("⚠️ Could not load persona_routes directly")
+
+try:
+    from app.routes.debug_routes import router as debug_router
+    debug_routes_loaded = True
+    print("✅ Directly loaded debug_routes")
+except ImportError:
+    debug_routes_loaded = False
+    print("⚠️ Could not load debug_routes directly")
+
+try:
+    from app.routes.orchestrator_routes import router as orchestrator_router
+    orchestrator_routes_loaded = True
+    print("✅ Directly loaded orchestrator_routes")
+except ImportError:
+    orchestrator_routes_loaded = False
+    print("⚠️ Could not load orchestrator_routes directly")
+
 # Create FastAPI app
 app = FastAPI(
     title="Promethios API",
@@ -65,14 +141,67 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
+# Initialize loaded_routes list to track all registered routes
+loaded_routes = []
+
+# Include HAL routes with priority (first)
+if hal_routes_loaded:
+    app.include_router(hal_routes.router, prefix="/api")
+    print("✅ Included hal_router with /api prefix (PRIORITY)")
+    loaded_routes.append("hal_routes")
+
+# Include memory routes from routes directory with priority
+if routes_memory_loaded:
+    app.include_router(memory_routes.router, prefix="/api")
+    print("✅ Included routes/memory_routes with /api prefix (PRIORITY)")
+    loaded_routes.append("memory_routes")
+
 # Include routes with explicit paths without prefix
 if memory_routes_loaded:
     app.include_router(memory_router)  # No prefix as routes already include /api/
     print("✅ Included memory_router without prefix")
+    loaded_routes.append("app_memory_routes")
 
 if loop_routes_loaded:
     app.include_router(loop_router)  # No prefix as routes already include /api/
     print("✅ Included loop_router without prefix")
+    loaded_routes.append("loop_routes")
+
+# Include directly imported routers
+if core_routes_loaded:
+    app.include_router(core_router)
+    print("✅ Included core_router")
+    loaded_routes.append("core_routes")
+
+if agent_routes_loaded:
+    app.include_router(agent_router)
+    print("✅ Included agent_router")
+    loaded_routes.append("agent_routes")
+
+if persona_routes_loaded:
+    app.include_router(persona_router)
+    print("✅ Included persona_router")
+    loaded_routes.append("persona_routes")
+
+if debug_routes_loaded:
+    app.include_router(debug_router)
+    print("✅ Included debug_router")
+    loaded_routes.append("debug_routes")
+
+if orchestrator_routes_loaded:
+    app.include_router(orchestrator_router)
+    print("✅ Included orchestrator_router")
+    loaded_routes.append("orchestrator_routes")
+
+if reflection_routes_loaded:
+    app.include_router(reflection_router)
+    print("✅ Included reflection_router")
+    loaded_routes.append("reflection_routes")
+
+if trust_routes_loaded:
+    app.include_router(trust_router)
+    print("✅ Included trust_router")
+    loaded_routes.append("trust_routes")
 
 # Comprehensive list of all routes based on file system scan
 routes_to_try = [
@@ -93,7 +222,6 @@ routes_to_try = [
     "system_integrity",
     "system_log_routes",
     "system_summary_routes",
-    "hal_routes",
     
     # Modules routes
     "modules/agent/list",
@@ -121,17 +249,12 @@ routes_to_try = [
     "modules/system/groups",
 ]
 
-# Remove memory_routes and loop_routes from routes_to_try as they're handled separately
-if "memory_routes" in routes_to_try:
-    routes_to_try.remove("memory_routes")
-if "loop_routes" in routes_to_try:
-    routes_to_try.remove("loop_routes")
-
-loaded_routes = []
-if memory_routes_loaded:
-    loaded_routes.append("memory_routes")
-if loop_routes_loaded:
-    loaded_routes.append("loop_routes")
+# Remove routes that are already loaded directly
+for route in ["memory_routes", "loop_routes", "hal_routes", "core_routes", 
+              "agent_routes", "persona_routes", "debug_routes", "orchestrator_routes",
+              "reflection_routes", "trust_routes"]:
+    if route in routes_to_try:
+        routes_to_try.remove(route)
 
 # Create stub router for missing routes
 def create_stub_router(route_name):
@@ -268,8 +391,21 @@ async def router_diagnostics():
     """
     Diagnostics endpoint to check router registration.
     """
+    router_list = []
+    
+    # Add priority routers first
+    if hal_routes_loaded:
+        router_list.append({"name": "hal_router", "status": "registered", "priority": "high"})
+    if routes_memory_loaded:
+        router_list.append({"name": "memory_router", "status": "registered", "priority": "high"})
+    
+    # Add other routers
+    for route in loaded_routes:
+        if route not in ["hal_routes", "memory_routes"]:  # Skip already added priority routes
+            router_list.append({"name": route, "status": "registered"})
+    
     return {
-        "routers": [{"name": route, "status": "registered"} for route in loaded_routes],
+        "routers": router_list,
         "status": "ok",
         "total_routes_loaded": len(loaded_routes)
     }
