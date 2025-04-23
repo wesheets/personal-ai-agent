@@ -172,16 +172,32 @@ def loop_execution_guard(loop_plan: Dict[str, Any]) -> Dict[str, Any]:
     # Check if the loop should be frozen
     if should_freeze_loop(enriched_plan):
         logger.warning("Loop execution guard: Freezing loop due to trust or contradiction threshold")
-        return {"status": "frozen", "reason": "Trust or contradiction threshold triggered"}
+        # Add trace logging before returning frozen status
+        confidence_score = enriched_plan.get("confidence", "undefined")
+        trust_status = "undefined" if enriched_plan.get("trust_undefined", False) else get_trust_score(enriched_plan)
+        contradiction_score = len(enriched_plan.get("contradictions", []))
+        guard_result = {"status": "frozen", "reason": "Trust or contradiction threshold triggered"}
+        print("[TRACE] PROMPT:", loop_plan.get("prompt", "N/A"))
+        print("[TRACE] Confidence Score Parsed:", confidence_score)
+        print("[TRACE] Trust Status:", trust_status)
+        print("[TRACE] Contradiction Score:", contradiction_score)
+        print("[TRACE] Final Guard Status:", guard_result["status"])
+        return guard_result
 
     # Check if reflection is needed
     if should_reflect(enriched_plan):
         logger.info("Loop execution guard: Triggering recursive reflection")
-        return {
-            "status": "reflection-triggered",
-            "action": "recursive_reflection",
-            "reason": "Uncertainty or agent contradiction detected"
-        }
+        # Add trace logging before returning reflection status
+        confidence_score = enriched_plan.get("confidence", "undefined")
+        trust_status = "undefined" if enriched_plan.get("trust_undefined", False) else get_trust_score(enriched_plan)
+        contradiction_score = len(enriched_plan.get("contradictions", []))
+        guard_result = {"status": "reflection-triggered", "action": "recursive_reflection", "reason": "Uncertainty or agent contradiction detected"}
+        print("[TRACE] PROMPT:", loop_plan.get("prompt", "N/A"))
+        print("[TRACE] Confidence Score Parsed:", confidence_score)
+        print("[TRACE] Trust Status:", trust_status)
+        print("[TRACE] Contradiction Score:", contradiction_score)
+        print("[TRACE] Final Guard Status:", guard_result["status"])
+        return guard_result
     
     # Evaluate trust delta for logging purposes
     trust_delta = evaluate_trust_delta(enriched_plan)
@@ -191,6 +207,19 @@ def loop_execution_guard(loop_plan: Dict[str, Any]) -> Dict[str, Any]:
     trust_score = get_trust_score(enriched_plan)
     logger.info(f"Loop execution guard: Current trust score: {trust_score}")
     
+    # Extract values for trace logging
+    confidence_score = enriched_plan.get("confidence", "undefined")
+    trust_status = "undefined" if enriched_plan.get("trust_undefined", False) else get_trust_score(enriched_plan)
+    contradiction_score = len(enriched_plan.get("contradictions", []))
+    guard_result = {"status": "ok"}
+    
+    # Add trace logging
+    print("[TRACE] PROMPT:", loop_plan.get("prompt", "N/A"))
+    print("[TRACE] Confidence Score Parsed:", confidence_score)
+    print("[TRACE] Trust Status:", trust_status)
+    print("[TRACE] Contradiction Score:", contradiction_score)
+    print("[TRACE] Final Guard Status:", guard_result["status"])
+    
     # If all checks pass, return OK status
     logger.info("Loop execution guard: Loop plan accepted")
-    return {"status": "ok"}
+    return guard_result

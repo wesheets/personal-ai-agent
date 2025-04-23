@@ -68,6 +68,18 @@ def evaluate_trust_delta(loop_plan: Dict[str, Any]) -> float:
     """
     logger.info("Evaluating trust delta for loop plan")
     
+    # Get prompt text for trace logging
+    prompt = loop_plan.get("prompt", "N/A")
+    if not prompt and "loop_data" in loop_plan and isinstance(loop_plan["loop_data"], dict):
+        prompt = loop_plan["loop_data"].get("prompt", "N/A")
+    
+    # Determine trust state for trace logging
+    trust_result = "undefined" if loop_plan.get("trust_undefined", False) else loop_plan.get("trust_score", "not_set")
+    
+    # Add trace logging
+    print("[TRACE] Evaluating Trust – Raw Prompt:", prompt)
+    print("[TRACE] Parsed Agent Trust State:", trust_result)
+    
     # Check if trust is undefined or unknown
     if loop_plan.get("trust_undefined", False) or loop_plan.get("prompt_analysis", {}).get("trust_unknown", False):
         logger.warning("Trust is undefined or unknown, returning significant negative delta")
