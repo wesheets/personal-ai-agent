@@ -43,7 +43,7 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
-# Dynamic route loader
+# Dynamic route loader with fallback to app.routes
 routes_to_try = [
     "loop_routes",
     "agent_routes",
@@ -58,19 +58,36 @@ routes_to_try = [
     "trust_routes"
 ]
 
+loaded_routes = []
+
 for route in routes_to_try:
+    # First try importing from routes directory
     try:
         module = importlib.import_module(f"routes.{route}")
         app.include_router(module.router, prefix="/api")
-        print(f"✅ Loaded route: {route}")
+        print(f"✅ Loaded route from routes/: {route}")
+        loaded_routes.append(route)
+        continue
     except ImportError as e:
-        print(f"⚠️ Skipped missing route: {route} — {e}")
+        print(f"⚠️ Not found in routes/: {route} — {e}")
     except AttributeError as e:
-        print(f"⚠️ Route file found but missing 'router' object: {route} — {e}")
+        print(f"⚠️ Found in routes/ but missing 'router' object: {route} — {e}")
+    
+    # If that fails, try importing from app.routes directory
+    try:
+        module = importlib.import_module(f"app.routes.{route}")
+        app.include_router(module.router, prefix="/api")
+        print(f"✅ Loaded route from app/routes/: {route}")
+        loaded_routes.append(route)
+    except ImportError as e:
+        print(f"⚠️ Not found in app/routes/: {route} — {e}")
+    except AttributeError as e:
+        print(f"⚠️ Found in app/routes/ but missing 'router' object: {route} — {e}")
 
-# Include self_router separately as it's from a different location
+# Include self_router separately as it's already imported
 app.include_router(self_router, prefix="/self")
 print(f"✅ Loaded route: self_routes")
+loaded_routes.append("self_routes")
 
 # Root endpoint
 @app.get("/")
@@ -82,6 +99,16 @@ async def root():
 async def health_check():
     return {"status": "ok"}
 
+# System health endpoint at /api/system/health for compatibility
+@app.get("/api/system/health")
+async def api_system_health():
+    return {"status": "ok", "message": "System is healthy"}
+
+# API ping endpoint
+@app.get("/api/ping")
+async def api_ping():
+    return {"status": "ok", "message": "API is responding"}
+
 # Schema injection test endpoint
 @app.get("/schema-injection-test")
 async def schema_injection_test():
@@ -91,7 +118,7 @@ async def schema_injection_test():
     return {
         "schema_loaded": True,
         "memory_initialized": PROJECT_MEMORY is not None,
-        "routes_registered": routes_to_try
+        "routes_registered": loaded_routes
     }
 
 # Diagnostics router check endpoint
@@ -101,6 +128,7 @@ async def router_diagnostics():
     Diagnostics endpoint to check router registration.
     """
     return {
-        "routers": [{"name": route, "status": "registered"} for route in routes_to_try],
-        "status": "ok"
+        "routers": [{"name": route, "status": "registered"} for route in loaded_routes],
+        "status": "ok",
+        "total_routes_loaded": len(loaded_routes)
     }
