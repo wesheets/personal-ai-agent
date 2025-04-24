@@ -9,17 +9,120 @@ to reflect, route tasks, and respond to operator input.
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
-from app.core.orchestrator import get_orchestrator
-from app.modules.project_state import write_project_state, get_project_state
-from app.modules.loop import run_agent_from_loop  # ✅ Loop trigger import
-from app.modules.orchestrator_memory import (
-    log_loop_event, 
-    get_loop_log, 
-    store_belief, 
-    get_beliefs,
-    get_latest_loop_events,
-    get_agent_activity_summary
-)
+
+# Import orchestrator modules with fallback discovery
+try:
+    from app.core.orchestrator import get_orchestrator
+    print("✅ Successfully imported orchestrator core")
+except ImportError as e:
+    print(f"⚠️ Failed to import orchestrator core: {e}. Initiating fallback discovery.")
+    try:
+        # Import schema discovery utility
+        from app.utils.schema_discovery import discover_and_import_schema, get_structured_error, log_schema_error_to_memory
+        
+        # Try to discover and import get_orchestrator
+        get_orchestrator, import_statement = discover_and_import_schema("get_orchestrator")
+        if get_orchestrator:
+            print(f"✅ Successfully discovered and imported get_orchestrator: {import_statement}")
+        else:
+            print(f"❌ Failed to discover get_orchestrator")
+            raise ImportError(f"Could not locate get_orchestrator in any known paths")
+    except ImportError as e:
+        print(f"❌ Schema discovery failed for orchestrator core: {e}")
+        raise HTTPException(
+            status_code=422,
+            detail=get_structured_error("get_orchestrator", str(e))
+        )
+
+try:
+    from app.modules.project_state import write_project_state, get_project_state
+    print("✅ Successfully imported project_state module")
+except ImportError as e:
+    print(f"⚠️ Failed to import project_state module: {e}. Initiating fallback discovery.")
+    try:
+        # Import schema discovery utility
+        from app.utils.schema_discovery import discover_and_import_schema, get_structured_error, log_schema_error_to_memory
+        
+        # Try to discover and import write_project_state
+        write_project_state, import_statement1 = discover_and_import_schema("write_project_state")
+        if write_project_state:
+            print(f"✅ Successfully discovered and imported write_project_state: {import_statement1}")
+        else:
+            print(f"❌ Failed to discover write_project_state")
+            raise ImportError(f"Could not locate write_project_state in any known paths")
+            
+        # Try to discover and import get_project_state
+        get_project_state, import_statement2 = discover_and_import_schema("get_project_state")
+        if get_project_state:
+            print(f"✅ Successfully discovered and imported get_project_state: {import_statement2}")
+        else:
+            print(f"❌ Failed to discover get_project_state")
+            raise ImportError(f"Could not locate get_project_state in any known paths")
+    except ImportError as e:
+        print(f"❌ Schema discovery failed for project_state module: {e}")
+        raise HTTPException(
+            status_code=422,
+            detail=get_structured_error("project_state functions", str(e))
+        )
+
+try:
+    from app.modules.loop import run_agent_from_loop  # ✅ Loop trigger import
+    print("✅ Successfully imported loop module")
+except ImportError as e:
+    print(f"⚠️ Failed to import loop module: {e}. Initiating fallback discovery.")
+    try:
+        # Import schema discovery utility
+        from app.utils.schema_discovery import discover_and_import_schema, get_structured_error, log_schema_error_to_memory
+        
+        # Try to discover and import run_agent_from_loop
+        run_agent_from_loop, import_statement = discover_and_import_schema("run_agent_from_loop")
+        if run_agent_from_loop:
+            print(f"✅ Successfully discovered and imported run_agent_from_loop: {import_statement}")
+        else:
+            print(f"❌ Failed to discover run_agent_from_loop")
+            raise ImportError(f"Could not locate run_agent_from_loop in any known paths")
+    except ImportError as e:
+        print(f"❌ Schema discovery failed for loop module: {e}")
+        raise HTTPException(
+            status_code=422,
+            detail=get_structured_error("run_agent_from_loop", str(e))
+        )
+
+try:
+    from app.modules.orchestrator_memory import (
+        log_loop_event, 
+        get_loop_log, 
+        store_belief, 
+        get_beliefs,
+        get_latest_loop_events,
+        get_agent_activity_summary
+    )
+    print("✅ Successfully imported orchestrator_memory module")
+except ImportError as e:
+    print(f"⚠️ Failed to import orchestrator_memory module: {e}. Initiating fallback discovery.")
+    try:
+        # Import schema discovery utility
+        from app.utils.schema_discovery import discover_and_import_schema, get_structured_error, log_schema_error_to_memory
+        
+        # Try to discover and import each function
+        memory_functions = ["log_loop_event", "get_loop_log", "store_belief", "get_beliefs", 
+                           "get_latest_loop_events", "get_agent_activity_summary"]
+        
+        for func_name in memory_functions:
+            func, import_statement = discover_and_import_schema(func_name)
+            if func:
+                print(f"✅ Successfully discovered and imported {func_name}: {import_statement}")
+                # Assign the function to the current module's namespace
+                locals()[func_name] = func
+            else:
+                print(f"❌ Failed to discover {func_name}")
+                raise ImportError(f"Could not locate {func_name} in any known paths")
+    except ImportError as e:
+        print(f"❌ Schema discovery failed for orchestrator_memory module: {e}")
+        raise HTTPException(
+            status_code=422,
+            detail=get_structured_error("orchestrator_memory functions", str(e))
+        )
 import uuid
 import datetime
 import json
@@ -31,26 +134,83 @@ logger = logging.getLogger("api")
 # Create router
 router = APIRouter()
 
-# Define request and response models
-class OrchestratorConsultRequest(BaseModel):
-    """Request model for the orchestrator/consult endpoint"""
-    agent_id: str = Field(..., description="Agent identifier")
-    project_id: str = Field(..., description="Project context")
-    task: str = Field(..., description="Primary task to evaluate")
-    objective: Optional[str] = Field(None, description="Optional objective")
-    context: Optional[str] = Field(None, description="Optional context")
-
-class OrchestratorInterpretRequest(BaseModel):
-    """Request model for the orchestrator/interpret endpoint"""
-    input: str = Field(..., description="User input to interpret")
-
-class OrchestratorPlanRequest(BaseModel):
-    """Request model for the orchestrator/plan endpoint"""
-    project_id: str = Field(..., description="Project identifier")
-    current_agent: Optional[str] = Field(None, description="Current agent in the loop")
-    task_status: Optional[str] = Field("completed", description="Status of the current task")
-    task_result: Optional[str] = Field(None, description="Result of the current task")
-    context: Optional[Dict[str, Any]] = Field(None, description="Additional context")
+# Define request and response models with fallback discovery
+try:
+    # Try to import from app.schemas
+    from app.schemas.orchestrator_schema import (
+        OrchestratorConsultRequest,
+        OrchestratorInterpretRequest,
+        OrchestratorPlanRequest
+    )
+    print("✅ Successfully imported orchestrator schema classes")
+except ImportError as e:
+    print(f"⚠️ Failed to import orchestrator schema classes: {e}. Using local definitions.")
+    try:
+        # Import schema discovery utility
+        from app.utils.schema_discovery import discover_and_import_schema, get_structured_error, log_schema_error_to_memory
+        
+        # Try to discover each schema class
+        schema_classes = ["OrchestratorConsultRequest", "OrchestratorInterpretRequest", "OrchestratorPlanRequest"]
+        schema_found = False
+        
+        for class_name in schema_classes:
+            schema_class, import_statement = discover_and_import_schema(class_name)
+            if schema_class:
+                print(f"✅ Successfully discovered and imported {class_name}: {import_statement}")
+                # Assign the class to the current module's namespace
+                locals()[class_name] = schema_class
+                schema_found = True
+        
+        # If no schemas were found, define them locally
+        if not schema_found:
+            print("⚠️ No schema classes found. Using local definitions.")
+            
+            class OrchestratorConsultRequest(BaseModel):
+                """Request model for the orchestrator/consult endpoint"""
+                agent_id: str = Field(..., description="Agent identifier")
+                project_id: str = Field(..., description="Project context")
+                task: str = Field(..., description="Primary task to evaluate")
+                objective: Optional[str] = Field(None, description="Optional objective")
+                context: Optional[str] = Field(None, description="Optional context")
+            
+            class OrchestratorInterpretRequest(BaseModel):
+                """Request model for the orchestrator/interpret endpoint"""
+                input: str = Field(..., description="User input to interpret")
+            
+            class OrchestratorPlanRequest(BaseModel):
+                """Request model for the orchestrator/plan endpoint"""
+                project_id: str = Field(..., description="Project identifier")
+                current_agent: Optional[str] = Field(None, description="Current agent in the loop")
+                task_status: Optional[str] = Field("completed", description="Status of the current task")
+                task_result: Optional[str] = Field(None, description="Result of the current task")
+                context: Optional[Dict[str, Any]] = Field(None, description="Additional context")
+            
+            print("✅ Created local schema definitions as fallback")
+    except Exception as e:
+        print(f"❌ Schema discovery failed: {e}")
+        
+        # Define locally as last resort
+        class OrchestratorConsultRequest(BaseModel):
+            """Request model for the orchestrator/consult endpoint"""
+            agent_id: str = Field(..., description="Agent identifier")
+            project_id: str = Field(..., description="Project context")
+            task: str = Field(..., description="Primary task to evaluate")
+            objective: Optional[str] = Field(None, description="Optional objective")
+            context: Optional[str] = Field(None, description="Optional context")
+        
+        class OrchestratorInterpretRequest(BaseModel):
+            """Request model for the orchestrator/interpret endpoint"""
+            input: str = Field(..., description="User input to interpret")
+        
+        class OrchestratorPlanRequest(BaseModel):
+            """Request model for the orchestrator/plan endpoint"""
+            project_id: str = Field(..., description="Project identifier")
+            current_agent: Optional[str] = Field(None, description="Current agent in the loop")
+            task_status: Optional[str] = Field("completed", description="Status of the current task")
+            task_result: Optional[str] = Field(None, description="Result of the current task")
+            context: Optional[Dict[str, Any]] = Field(None, description="Additional context")
+        
+        print("⚠️ Using emergency local schema definitions due to discovery failure")
 
 @router.post("/orchestrator/consult")
 async def orchestrator_consult(request: OrchestratorConsultRequest, background_tasks: BackgroundTasks = None):
