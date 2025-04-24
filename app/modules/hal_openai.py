@@ -5,12 +5,27 @@ This module provides functions to generate React/JSX code using OpenAI's API,
 specifically designed for use with the HAL agent's code generation capabilities.
 """
 
-import openai
+import os
 import logging
 from typing import Dict, Any, Optional
 
 # Configure logging
 logger = logging.getLogger("hal_openai")
+
+# Safely import OpenAI
+try:
+    import openai
+    # Set API key from environment variable
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    if not openai.api_key:
+        logger.warning("⚠️ OPENAI_API_KEY environment variable not set")
+    else:
+        logger.info("✅ OpenAI client initialized successfully with API key from environment")
+    openai_available = True
+except Exception as e:
+    logger.error(f"❌ OpenAI failed to initialize: {e}")
+    openai_available = False
+    openai = None
 
 def generate_react_component(task: str) -> str:
     """
@@ -23,6 +38,14 @@ def generate_react_component(task: str) -> str:
     - The generated React component code as a string
     """
     try:
+        # Check if OpenAI is available
+        if not openai_available:
+            raise Exception("OpenAI client is not available")
+            
+        # Check if API key is set
+        if not openai.api_key:
+            raise Exception("OpenAI API key is not set")
+            
         # Configure OpenAI API
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -44,7 +67,7 @@ def generate_react_component(task: str) -> str:
         return f"""
 // Error generating component: {str(e)}
 // Fallback component based on task: {task}
-import React, { useState } from 'react';
+import React, {{ useState }} from 'react';
 
 export default function FallbackComponent() {{
   const [error, setError] = useState("Failed to generate component");
