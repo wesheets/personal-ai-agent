@@ -169,7 +169,7 @@ class PessimistCheckRequest(BaseModel):
                 "context": {
                     "priority": "high",
                     "user_id": "user_789",
-                    "previous_loop_success": true
+                    "previous_loop_success": True
                 }
             }
         }
