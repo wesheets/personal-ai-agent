@@ -79,6 +79,78 @@ ENDPOINTS = {
     "GET /diagnostics/router-check": {"method": "GET", "path": "/diagnostics/router-check", "expected": 200},
     "GET /schema-injection-test": {"method": "GET", "path": "/schema-injection-test", "expected": 200},
     
+    # Historian endpoints
+    "POST /api/historian/log": {
+        "method": "POST", 
+        "path": "/api/historian/log", 
+        "expected": 200,
+        "json": {
+            "loop_id": "test_loop_123",
+            "loop_summary": "This is a test loop summary that mentions system beliefs about reliability and performance.",
+            "recent_loops": [
+                {"summary": "Previous loop summary about system architecture."},
+                {"summary": "Another loop summary discussing user experience."}
+            ],
+            "beliefs": [
+                "System reliability is a top priority",
+                "Performance optimization is essential",
+                "User experience should be intuitive"
+            ],
+            "memory": {}
+        }
+    },
+    
+    # Debugger endpoints
+    "POST /api/debugger/trace": {
+        "method": "POST", 
+        "path": "/api/debugger/trace", 
+        "expected": 200,
+        "json": {
+            "loop_id": "test_loop_123",
+            "failure_logs": "Traceback (most recent call last):\n  File \"app.py\", line 42, in process_request\n    result = api.call()\n  File \"api.py\", line 105, in call\n    response = requests.get(url, timeout=5)\nrequests.exceptions.Timeout: HTTPConnectionPool(host='api.example.com', port=80): Request timed out. (timeout=5)",
+            "memory": {},
+            "loop_context": {"operation": "data_fetch", "target": "external_api"}
+        }
+    },
+    
+    # CRITIC endpoints
+    "POST /api/critic/review": {
+        "method": "POST", 
+        "path": "/api/critic/review", 
+        "expected": 200,
+        "json": {
+            "loop_id": "test_loop_123",
+            "agent_outputs": {
+                "code": "function calculateTotal(items) {\n  return items.reduce((sum, item) => sum + item.price, 0);\n}",
+                "explanation": "This function calculates the total price of all items in the array by using the reduce method."
+            },
+            "project_id": "test_project"
+        }
+    },
+    
+    # ORCHESTRATOR endpoints
+    "POST /api/orchestrator/delegate": {
+        "method": "POST", 
+        "path": "/api/orchestrator/delegate", 
+        "expected": 200,
+        "json": {
+            "task": "Create a simple React component that displays a list of items",
+            "project_id": "test_project"
+        }
+    },
+    
+    # SAGE endpoints
+    "POST /api/sage/analyze": {
+        "method": "POST", 
+        "path": "/api/sage/analyze", 
+        "expected": 200,
+        "json": {
+            "loop_id": "test_loop_123",
+            "summary_text": "The system should prioritize user experience while maintaining high performance standards. Security measures must be implemented without compromising usability.",
+            "project_id": "test_project"
+        }
+    },
+    
     # Additional endpoints to test
     "GET /api/modules/orchestrator/status": {"method": "GET", "path": "/api/modules/orchestrator/status", "expected": 200},
     "GET /api/modules/debug/routes": {"method": "GET", "path": "/api/modules/debug/routes", "expected": 200},
@@ -242,16 +314,34 @@ def print_results(results, verbose=False):
 def main():
     """Main function to parse arguments and run tests."""
     parser = argparse.ArgumentParser(description="Test API endpoints")
-    parser.add_argument("--base-url", default="https://web-production-2639.up.railway.app",
+    parser.add_argument("--base-url", default="http://localhost:8000",
                         help="Base URL of the API")
     parser.add_argument("--verbose", action="store_true",
                         help="Show detailed information for each endpoint")
     parser.add_argument("--output", help="Write results to a file in JSON format")
+    parser.add_argument("--endpoints", nargs="+", help="Specific endpoints to test (e.g. 'historian' 'debugger')")
     args = parser.parse_args()
     
     print(f"Testing API endpoints at {args.base_url}")
     print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Testing {len(ENDPOINTS)} endpoints...")
+    
+    # Filter endpoints if specific ones are requested
+    test_endpoints = ENDPOINTS
+    if args.endpoints:
+        filtered_endpoints = {}
+        for name, config in ENDPOINTS.items():
+            for endpoint_filter in args.endpoints:
+                if endpoint_filter.lower() in name.lower():
+                    filtered_endpoints[name] = config
+                    break
+        if filtered_endpoints:
+            test_endpoints = filtered_endpoints
+            print(f"Testing {len(test_endpoints)} filtered endpoints matching: {', '.join(args.endpoints)}")
+        else:
+            print(f"No endpoints found matching filters: {', '.join(args.endpoints)}")
+            print(f"Testing all {len(ENDPOINTS)} endpoints instead...")
+    else:
+        print(f"Testing all {len(ENDPOINTS)} endpoints...")
     
     start_time = time.time()
     results = run_tests(args.base_url, args.verbose)
@@ -267,7 +357,7 @@ def main():
             output_data = {
                 "timestamp": datetime.now().isoformat(),
                 "base_url": args.base_url,
-                "total_endpoints": len(ENDPOINTS),
+                "total_endpoints": len(test_endpoints),
                 "execution_time": total_time,
                 "results": results
             }

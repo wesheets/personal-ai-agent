@@ -5,6 +5,8 @@ Update to main.py to register SAGE routes, Dashboard routes, and FORGE routes
 import os
 import logging
 import json
+import importlib
+import sys
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -12,12 +14,217 @@ from fastapi.staticfiles import StaticFiles
 import time
 import datetime
 
+# Add current directory to Python path to ensure imports work
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger("api")
+
+# Import memory module
+try:
+    from app.memory.project_memory import PROJECT_MEMORY
+    print("✅ Imported PROJECT_MEMORY")
+except ImportError as e:
+    print(f"⚠️ Failed to import PROJECT_MEMORY: {e}")
+
+# Import self_routes directly as it's in a different location
+try:
+    from app.routes.self_routes import router as self_router
+    self_routes_loaded = True
+    print("✅ Directly loaded self_routes")
+except ImportError as e:
+    self_routes_loaded = False
+    print(f"⚠️ Could not load self_routes directly: {e}")
+
+# Import routes with explicit API paths directly
+try:
+    from app.routes.memory_routes import router as memory_router
+    memory_routes_loaded = True
+    print("✅ Directly loaded memory_routes with explicit paths")
+except ImportError:
+    memory_routes_loaded = False
+    print("⚠️ Could not load memory_routes directly")
+
+try:
+    from app.routes.loop_routes import router as loop_router
+    loop_routes_loaded = True
+    print("✅ Directly loaded loop_routes with explicit paths")
+except ImportError:
+    loop_routes_loaded = False
+    print("⚠️ Could not load loop_routes directly")
+
+# Import HAL routes directly from routes directory
+try:
+    from routes import hal_routes
+    hal_routes_loaded = True
+    print("✅ Directly loaded hal_routes with fixed imports")
+except ImportError:
+    hal_routes_loaded = False
+    print("⚠️ Could not load hal_routes directly")
+
+# Import orchestrator routes directly from routes directory
+try:
+    from routes import orchestrator_routes
+    routes_orchestrator_loaded = True
+    print("✅ Directly loaded routes/orchestrator_routes")
+except ImportError:
+    routes_orchestrator_loaded = False
+    print("⚠️ Could not load routes/orchestrator_routes directly")
+
+# Import memory routes from routes directory
+try:
+    from routes import memory_routes
+    routes_memory_loaded = True
+    print("✅ Directly loaded routes/memory_routes")
+except ImportError:
+    routes_memory_loaded = False
+    print("⚠️ Could not load routes/memory_routes directly")
+
+# Import reflection and trust routes directly
+try:
+    from app.routes.reflection_routes import router as reflection_router
+    reflection_routes_loaded = True
+    print("✅ Directly loaded reflection_routes")
+except ImportError:
+    reflection_routes_loaded = False
+    print("⚠️ Could not load reflection_routes directly")
+
+try:
+    from app.routes.trust_routes import router as trust_router
+    trust_routes_loaded = True
+    print("✅ Directly loaded trust_routes")
+except ImportError:
+    trust_routes_loaded = False
+    print("⚠️ Could not load trust_routes directly")
+
+# Import core routes directly
+try:
+    from app.routes.core_routes import router as core_router
+    core_routes_loaded = True
+    print("✅ Directly loaded core_routes")
+except ImportError:
+    core_routes_loaded = False
+    print("⚠️ Could not load core_routes directly")
+
+try:
+    from app.routes.agent_routes import router as agent_router
+    agent_routes_loaded = True
+    print("✅ Directly loaded agent_routes")
+except ImportError:
+    agent_routes_loaded = False
+    print("⚠️ Could not load agent_routes directly")
+
+try:
+    from app.routes.persona_routes import router as persona_router
+    persona_routes_loaded = True
+    print("✅ Directly loaded persona_routes")
+except ImportError:
+    persona_routes_loaded = False
+    print("⚠️ Could not load persona_routes directly")
+
+try:
+    from app.routes.debug_routes import router as debug_router
+    debug_routes_loaded = True
+    print("✅ Directly loaded debug_routes")
+except ImportError:
+    debug_routes_loaded = False
+    print("⚠️ Could not load debug_routes directly")
+
+try:
+    from app.routes.orchestrator_routes import router as orchestrator_router
+    orchestrator_routes_loaded = True
+    print("✅ Directly loaded orchestrator_routes")
+except ImportError:
+    orchestrator_routes_loaded = False
+    print("⚠️ Could not load orchestrator_routes directly")
+
+# Import historian and debugger routes directly
+try:
+    from app.routes.historian_routes import router as historian_router
+    historian_routes_loaded = True
+    print("✅ Directly loaded historian_routes")
+except ImportError:
+    historian_routes_loaded = False
+    print("⚠️ Could not load historian_routes directly")
+
+try:
+    from app.routes.debugger_routes import router as debugger_router
+    debugger_routes_loaded = True
+    print("✅ Directly loaded debugger_routes")
+except ImportError:
+    debugger_routes_loaded = False
+    print("⚠️ Could not load debugger_routes directly")
+
+# Import CRITIC, ORCHESTRATOR, and SAGE routes directly
+try:
+    from app.routes.critic_routes import router as critic_router
+    critic_routes_loaded = True
+    print("✅ Directly loaded critic_routes")
+except ImportError:
+    critic_routes_loaded = False
+    print("⚠️ Could not load critic_routes directly")
+
+try:
+    from app.routes.sage_routes import router as sage_router
+    sage_routes_loaded = True
+    print("✅ Directly loaded sage_routes")
+except ImportError:
+    sage_routes_loaded = False
+    print("⚠️ Could not load sage_routes directly")
+
+# Import Phase 3 agent routes directly
+try:
+    from app.routes.guardian_routes import router as guardian_router
+    guardian_routes_loaded = True
+    print("✅ Directly loaded guardian_routes")
+except ImportError:
+    guardian_routes_loaded = False
+    print("⚠️ Could not load guardian_routes directly")
+
+# Import Phase 2 agent routes directly
+try:
+    from app.routes.pessimist_routes import router as pessimist_router
+    pessimist_routes_loaded = True
+    print("✅ Directly loaded pessimist_routes")
+except ImportError:
+    pessimist_routes_loaded = False
+    print("⚠️ Could not load pessimist_routes directly")
+
+try:
+    from app.routes.nova_routes import router as nova_router
+    nova_routes_loaded = True
+    print("✅ Directly loaded nova_routes")
+except ImportError:
+    nova_routes_loaded = False
+    print("⚠️ Could not load nova_routes directly")
+
+try:
+    from app.routes.cto_routes import router as cto_router
+    cto_routes_loaded = True
+    print("✅ Directly loaded cto_routes")
+except ImportError:
+    cto_routes_loaded = False
+    print("⚠️ Could not load cto_routes directly")
+
+try:
+    from app.routes.observer_routes import router as observer_router
+    observer_routes_loaded = True
+    print("✅ Directly loaded observer_routes")
+except ImportError:
+    observer_routes_loaded = False
+    print("⚠️ Could not load observer_routes directly")
+
+try:
+    from app.routes.sitegen_routes import router as sitegen_router
+    sitegen_routes_loaded = True
+    print("✅ Directly loaded sitegen_routes")
+except ImportError:
+    sitegen_routes_loaded = False
+    print("⚠️ Could not load sitegen_routes directly")
 
 # Create FastAPI app
 app = FastAPI(
@@ -34,6 +241,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add request timing middleware
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
 # Initialize system manifest
 try:
@@ -66,36 +282,128 @@ try:
 except Exception as e:
     print(f"⚠️ Failed to mount static files directory: {e}")
 
-# Track loaded routes
+# Initialize loaded_routes list to track all registered routes
 loaded_routes = []
 
-# Import and include routes
-# HAL routes
-try:
-    from app.routes.hal_routes import router as hal_router
-    app.include_router(hal_router)
-    loaded_routes.append("hal")
-    print("✅ HAL routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load HAL routes: {e}")
+# Include HAL routes with priority (first)
+if hal_routes_loaded:
+    app.include_router(hal_routes.router, prefix="/api")
+    print("✅ Included hal_router with /api prefix (PRIORITY)")
+    loaded_routes.append("hal_routes")
 
-# Orchestrator routes
-try:
-    from app.routes.orchestrator_routes import router as orchestrator_router
+# Include memory routes from routes directory with priority
+if routes_memory_loaded:
+    app.include_router(memory_routes.router, prefix="/api")
+    print("✅ Included routes/memory_routes with /api prefix (PRIORITY)")
+    loaded_routes.append("memory_routes")
+
+# Include routes with explicit paths without prefix
+if memory_routes_loaded:
+    app.include_router(memory_router)  # No prefix as routes already include /api/
+    print("✅ Included memory_router without prefix")
+    loaded_routes.append("app_memory_routes")
+
+if loop_routes_loaded:
+    app.include_router(loop_router)  # No prefix as routes already include /api/
+    print("✅ Included loop_router without prefix")
+    loaded_routes.append("loop_routes")
+
+# Include orchestrator routes from routes directory with HIGHEST priority - MUST BE FIRST
+if routes_orchestrator_loaded:
+    app.include_router(orchestrator_routes.router, prefix="/api")
+    print("✅ Included routes/orchestrator_routes with /api prefix (HIGHEST PRIORITY)")
+    loaded_routes.append("routes_orchestrator_routes")
+
+# Include directly imported routers
+if core_routes_loaded:
+    app.include_router(core_router)
+    print("✅ Included core_router")
+    loaded_routes.append("core_routes")
+
+if agent_routes_loaded:
+    app.include_router(agent_router)
+    print("✅ Included agent_router")
+    loaded_routes.append("agent_routes")
+
+if persona_routes_loaded:
+    app.include_router(persona_router)
+    print("✅ Included persona_router")
+    loaded_routes.append("persona_routes")
+
+if debug_routes_loaded:
+    app.include_router(debug_router)
+    print("✅ Included debug_router")
+    loaded_routes.append("debug_routes")
+
+# Include historian and debugger routers
+if historian_routes_loaded:
+    app.include_router(historian_router)
+    print("✅ Included historian_router")
+    loaded_routes.append("historian_routes")
+
+if debugger_routes_loaded:
+    app.include_router(debugger_router)
+    print("✅ Included debugger_router")
+    loaded_routes.append("debugger_routes")
+
+# Include app/routes/orchestrator_routes.py AFTER routes/orchestrator_routes.py to prevent overriding
+if orchestrator_routes_loaded:
     app.include_router(orchestrator_router)
-    loaded_routes.append("orchestrator")
-    print("✅ Orchestrator routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load Orchestrator routes: {e}")
+    print("✅ Included orchestrator_router (LOWER PRIORITY)")
+    loaded_routes.append("orchestrator_routes")
 
-# SAGE routes - Hard-wired registration
-try:
-    from app.routes.sage_routes import router as sage_router
+# Include CRITIC, ORCHESTRATOR, and SAGE routers
+if critic_routes_loaded:
+    app.include_router(critic_router)
+    print("✅ Included critic_router")
+    loaded_routes.append("critic_routes")
+
+if sage_routes_loaded:
     app.include_router(sage_router)
-    loaded_routes.append("sage")
-    print("✅ SAGE routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load SAGE routes: {e}")
+    print("✅ Included sage_router")
+    loaded_routes.append("sage_routes")
+
+# Include Phase 3 agent routers
+if guardian_routes_loaded:
+    app.include_router(guardian_router)
+    print("✅ Included guardian_router")
+    loaded_routes.append("guardian_routes")
+
+# Include Phase 2 agent routers
+if pessimist_routes_loaded:
+    app.include_router(pessimist_router)
+    print("✅ Included pessimist_router")
+    loaded_routes.append("pessimist_routes")
+
+if nova_routes_loaded:
+    app.include_router(nova_router)
+    print("✅ Included nova_router")
+    loaded_routes.append("nova_routes")
+
+if cto_routes_loaded:
+    app.include_router(cto_router)
+    print("✅ Included cto_router")
+    loaded_routes.append("cto_routes")
+
+if observer_routes_loaded:
+    app.include_router(observer_router)
+    print("✅ Included observer_router")
+    loaded_routes.append("observer_routes")
+
+if sitegen_routes_loaded:
+    app.include_router(sitegen_router)
+    print("✅ Included sitegen_router")
+    loaded_routes.append("sitegen_routes")
+
+if reflection_routes_loaded:
+    app.include_router(reflection_router)
+    print("✅ Included reflection_router")
+    loaded_routes.append("reflection_routes")
+
+if trust_routes_loaded:
+    app.include_router(trust_router)
+    print("✅ Included trust_router")
+    loaded_routes.append("trust_routes")
 
 # Dashboard routes - Hard-wired registration
 try:
@@ -115,24 +423,6 @@ try:
 except ImportError as e:
     print(f"⚠️ Failed to load FORGE routes: {e}")
 
-# Loop routes
-try:
-    from app.routes.loop_routes import router as loop_router
-    app.include_router(loop_router)
-    loaded_routes.append("loop")
-    print("✅ Loop routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load Loop routes: {e}")
-
-# Critic routes
-try:
-    from app.routes.critic_routes import router as critic_router
-    app.include_router(critic_router)
-    loaded_routes.append("critic")
-    print("✅ Critic routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load Critic routes: {e}")
-
 # Drift routes
 try:
     from app.routes.drift_routes import router as drift_router
@@ -150,6 +440,50 @@ try:
     print("✅ Output Policy routes loaded")
 except ImportError as e:
     print(f"⚠️ Failed to load Output Policy routes: {e}")
+
+# Comprehensive list of all routes based on file system scan
+routes_to_try = [
+    # Core routes
+    "agent_routes",
+    "core_routes",
+    "persona_routes",
+    "system_routes",
+    "orchestrator_routes",
+    "debug_routes",
+    "reflection_routes",
+    "trust_routes",
+    "historian_routes",
+    "debugger_routes",
+    "critic_routes",
+    "sage_routes",
+    
+    # Additional routes found in file system
+    "project_routes",
+    "reset_routes",
+    "snapshot_routes",
+    "system_integrity",
+    "system_log_routes",
+    "system_summary_routes",
+    
+    # Modules routes
+    "modules/agent/list",
+    "modules/agent/run",
+    "modules/plan/generate",
+    "modules/orchestrator/status",
+    "modules/debug/routes",
+    "modules/system/routes",
+    "modules/system/version",
+    "modules/system/status",
+    "modules/system/config",
+    "modules/system/logs",
+    "modules/system/metrics",
+    "modules/system/health",
+    "modules/system/info",
+    "modules/system/ping",
+    "modules/system/time",
+    "modules/system/uptime",
+    "modules/system/memory",
+]
 
 # Register loaded routes in manifest
 if manifest_initialized:
@@ -175,12 +509,3 @@ async def dashboard_redirect():
     """Redirect to the dashboard frontend"""
     from fastapi.responses import RedirectResponse
     return RedirectResponse(url="/static/dashboard/index.html")
-
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    """Middleware to add processing time header to responses"""
-    start_time = time.time()
-    response = await call_next(request)
-    process_time = time.time() - start_time
-    response.headers["X-Process-Time"] = str(process_time)
-    return response
