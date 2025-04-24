@@ -310,6 +310,24 @@ async def orchestrator_plan(request: OrchestratorPlanRequest):
         # Raise HTTP exception
         raise HTTPException(status_code=500, detail=f"Planning failed: {str(e)}")
 
+# Add an additional route at /plan that redirects to /orchestrator/plan
+@router.post("/plan")
+async def plan_redirect(request: OrchestratorPlanRequest):
+    """
+    Redirect endpoint for /plan to /orchestrator/plan.
+    
+    This endpoint provides compatibility for clients expecting the plan endpoint
+    at /api/plan instead of /api/orchestrator/plan.
+    
+    Args:
+        request: The planning request containing project_id and context
+        
+    Returns:
+        JSON response with next agent recommendation and reasoning
+    """
+    # Simply call the orchestrator_plan function with the same request
+    return await orchestrator_plan(request)
+
 @router.get("/orchestrator/status")
 async def orchestrator_status(project_id: str):
     """
