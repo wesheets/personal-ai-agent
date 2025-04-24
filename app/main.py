@@ -267,6 +267,55 @@ except ImportError:
     ash_routes_loaded = False
     print("⚠️ Could not load ash_routes directly")
 
+# Import previously orphaned routes
+try:
+    from app.routes.dashboard_routes import router as dashboard_routes_router
+    dashboard_routes_loaded = True
+    print("✅ Directly loaded dashboard_routes_router")
+except ImportError:
+    dashboard_routes_loaded = False
+    print("⚠️ Could not load dashboard_routes_router directly")
+
+try:
+    from app.routes.drift_routes import router as drift_routes_router
+    drift_routes_loaded = True
+    print("✅ Directly loaded drift_routes_router")
+except ImportError:
+    drift_routes_loaded = False
+    print("⚠️ Could not load drift_routes_router directly")
+
+try:
+    from app.routes.forge_routes import router as forge_routes_router
+    forge_routes_loaded = True
+    print("✅ Directly loaded forge_routes_router")
+except ImportError:
+    forge_routes_loaded = False
+    print("⚠️ Could not load forge_routes_router directly")
+
+try:
+    from app.routes.loop_validation_routes import router as loop_validation_routes_router
+    loop_validation_routes_loaded = True
+    print("✅ Directly loaded loop_validation_routes_router")
+except ImportError:
+    loop_validation_routes_loaded = False
+    print("⚠️ Could not load loop_validation_routes_router directly")
+
+try:
+    from app.routes.output_policy_routes import router as output_policy_routes_router
+    output_policy_routes_loaded = True
+    print("✅ Directly loaded output_policy_routes_router")
+except ImportError:
+    output_policy_routes_loaded = False
+    print("⚠️ Could not load output_policy_routes_router directly")
+
+try:
+    from app.routes.pessimist_evaluation_routes import router as pessimist_evaluation_routes_router
+    pessimist_evaluation_routes_loaded = True
+    print("✅ Directly loaded pessimist_evaluation_routes_router")
+except ImportError:
+    pessimist_evaluation_routes_loaded = False
+    print("⚠️ Could not load pessimist_evaluation_routes_router directly")
+
 # Create FastAPI app
 app = FastAPI(
     title="Promethios API",
@@ -477,48 +526,89 @@ if ash_routes_loaded:
     print("✅ Included ash_router")
     loaded_routes.append("ash_routes")
 
-# Dashboard routes - Hard-wired registration
+# Include previously orphaned routes
+if dashboard_routes_loaded:
+    app.include_router(dashboard_routes_router)
+    print("✅ Included dashboard_routes_router")
+    loaded_routes.append("dashboard_routes")
+
+if drift_routes_loaded:
+    app.include_router(drift_routes_router)
+    print("✅ Included drift_routes_router")
+    loaded_routes.append("drift_routes")
+
+if forge_routes_loaded:
+    app.include_router(forge_routes_router)
+    print("✅ Included forge_routes_router")
+    loaded_routes.append("forge_routes")
+
+if loop_validation_routes_loaded:
+    app.include_router(loop_validation_routes_router)
+    print("✅ Included loop_validation_routes_router")
+    loaded_routes.append("loop_validation_routes")
+
+if output_policy_routes_loaded:
+    app.include_router(output_policy_routes_router)
+    print("✅ Included output_policy_routes_router")
+    loaded_routes.append("output_policy_routes")
+
+if pessimist_evaluation_routes_loaded:
+    app.include_router(pessimist_evaluation_routes_router)
+    print("✅ Included pessimist_evaluation_routes_router")
+    loaded_routes.append("pessimist_evaluation_routes")
+
+# Dashboard routes - Hard-wired registration (kept for backward compatibility)
 try:
     from app.routes.dashboard_routes import router as dashboard_router
-    app.include_router(dashboard_router)
-    loaded_routes.append("dashboard")
-    print("✅ Dashboard routes loaded")
+    # Only include if not already included above
+    if "dashboard_routes" not in loaded_routes:
+        app.include_router(dashboard_router)
+        loaded_routes.append("dashboard")
+        print("✅ Dashboard routes loaded (legacy)")
 except ImportError as e:
     print(f"⚠️ Failed to load Dashboard routes: {e}")
 
-# FORGE routes - Hard-wired registration
+# FORGE routes - Hard-wired registration (kept for backward compatibility)
 try:
     from app.routes.forge_routes import router as forge_router
-    app.include_router(forge_router)
-    loaded_routes.append("forge")
-    print("✅ FORGE routes loaded")
+    # Only include if not already included above
+    if "forge_routes" not in loaded_routes:
+        app.include_router(forge_router)
+        loaded_routes.append("forge")
+        print("✅ FORGE routes loaded (legacy)")
 except ImportError as e:
     print(f"⚠️ Failed to load FORGE routes: {e}")
 
 # Debug Analyzer routes - Hard-wired registration
 try:
     from app.routes.debug_routes import router as debug_analyzer_router
-    app.include_router(debug_analyzer_router)
-    loaded_routes.append("debug_analyzer")
-    print("✅ Debug Analyzer routes loaded")
+    # Only include if not already included above
+    if "debug_analyzer" not in loaded_routes:
+        app.include_router(debug_analyzer_router)
+        loaded_routes.append("debug_analyzer")
+        print("✅ Debug Analyzer routes loaded (legacy)")
 except ImportError as e:
     print(f"⚠️ Failed to load Debug Analyzer routes: {e}")
 
-# Drift routes
+# Drift routes - Hard-wired registration (kept for backward compatibility)
 try:
     from app.routes.drift_routes import router as drift_router
-    app.include_router(drift_router)
-    loaded_routes.append("drift")
-    print("✅ Drift routes loaded")
+    # Only include if not already included above
+    if "drift_routes" not in loaded_routes:
+        app.include_router(drift_router)
+        loaded_routes.append("drift")
+        print("✅ Drift routes loaded (legacy)")
 except ImportError as e:
     print(f"⚠️ Failed to load Drift routes: {e}")
 
-# Output Policy routes
+# Output Policy routes - Hard-wired registration (kept for backward compatibility)
 try:
     from app.routes.output_policy_routes import router as output_policy_router
-    app.include_router(output_policy_router)
-    loaded_routes.append("output_policy")
-    print("✅ Output Policy routes loaded")
+    # Only include if not already included above
+    if "output_policy_routes" not in loaded_routes:
+        app.include_router(output_policy_router)
+        loaded_routes.append("output_policy")
+        print("✅ Output Policy routes loaded (legacy)")
 except ImportError as e:
     print(f"⚠️ Failed to load Output Policy routes: {e}")
 
