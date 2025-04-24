@@ -52,6 +52,38 @@
         "sage_summary_*"
       ],
       "last_updated": "2025-04-24T17:08:57.026537"
+    },
+    "forge": {
+      "tools": [
+        "scaffold",
+        "wire",
+        "register",
+        "test",
+        "validate",
+        "patch",
+        "version_track",
+        "memory_read",
+        "memory_write"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "log_error",
+        "retry_with_simplified_input",
+        "create_recovery_snapshot"
+      ],
+      "checksum": "initial"
+    },
+    "debug_analyzer": {
+      "tools": [
+        "analyze_memory",
+        "diagnose_loop",
+        "recommend_fix"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "schema_fallback"
+      ],
+      "checksum": "initial"
     }
   },
   "schemas": {
@@ -148,6 +180,100 @@
       "routes": [
         "/sage/review"
       ]
+    },
+    "ForgeBuildRequest": {
+      "file": "app/schemas/forge_schema.py",
+      "bound_to_routes": [
+        "/forge/build"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "ForgeBuildResult": {
+      "file": "app/schemas/forge_schema.py",
+      "bound_to_routes": [
+        "/forge/build"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "ComponentBuildResult": {
+      "file": "app/schemas/forge_schema.py",
+      "bound_to_routes": [],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "ForgeRevisionRequest": {
+      "file": "app/schemas/forge_schema.py",
+      "bound_to_routes": [],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "ForgeRevisionResult": {
+      "file": "app/schemas/forge_schema.py",
+      "bound_to_routes": [],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "Demo_writer_001RequestSchema": {
+      "file": "app/schemas/demo_writer_001_schema.py",
+      "bound_to_routes": [
+        "/demo_writer_001/process"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "Demo_writer_001ResponseSchema": {
+      "file": "app/schemas/demo_writer_001_schema.py",
+      "bound_to_routes": [
+        "/demo_writer_001/process"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "LoopDebugRequest": {
+      "file": "app/schemas/debug_schema.py",
+      "bound_to_routes": [
+        "/debug/analyze-loop"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "LoopDebugResult": {
+      "file": "app/schemas/debug_schema.py",
+      "bound_to_routes": [
+        "/debug/analyze-loop"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "LoopIssue": {
+      "file": "app/schemas/debug_schema.py",
+      "bound_to_routes": [],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "RepairSuggestion": {
+      "file": "app/schemas/debug_schema.py",
+      "bound_to_routes": [],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "ValidateSchemaHashRequest": {
+      "file": "app/schemas/validate_schema_hash.py",
+      "bound_to_routes": [
+        "/critic/validate_schema"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "ValidateSchemaHashResult": {
+      "file": "app/schemas/validate_schema_hash.py",
+      "bound_to_routes": [
+        "/critic/validate_schema"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
     }
   },
   "routes": {
@@ -262,6 +388,24 @@
       "schema": "None",
       "status": "tested",
       "errors": []
+    },
+    "/forge/build": {
+      "method": "POST",
+      "schema": "ForgeBuildRequest",
+      "status": "registered",
+      "errors": []
+    },
+    "/demo_writer_001/process": {
+      "method": "POST",
+      "schema": "Demo_writer_001Request",
+      "status": "registered",
+      "errors": []
+    },
+    "/debug/analyze-loop": {
+      "method": "POST",
+      "schema": "LoopDebugRequest",
+      "status": "registered",
+      "errors": []
     }
   },
   "modules": {
@@ -319,13 +463,44 @@
       "file": "app/utils/dashboard_setup.py",
       "wrapped_with_schema": false,
       "last_updated": "2025-04-24T13:38:47.192380"
+    },
+    "forge_agent": {
+      "file": "app/agents/forge_agent.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24T18:58:00.000000"
+    },
+    "demo_writer_001_api": {
+      "file": "app/api/modules/demo_writer_001_api.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24T19:03:15.880378"
     }
   },
   "memory": {
     "schema_hashes": {
       "TestSchema": "updated_checksum"
     },
-    "fallback_logging_enabled": true
+    "fallback_logging_enabled": true,
+    "memory_tags": {
+      "forge_build_log": {
+        "format": "forge_build_log_{loop_id}_v{version}",
+        "description": "Build log for FORGE agent",
+        "retention_days": 30
+      }
+    },
+    "tags": {
+      "loop_diagnosis": {
+        "pattern": "loop_diagnosis_{loop_id}_v{n}",
+        "description": "Debug Analyzer diagnosis results for a loop execution",
+        "schema": "LoopDebugResult",
+        "retention_days": 30
+      },
+      "backend_patch_applied_20250424171200": {
+        "pattern": "backend_patch_applied_20250424171200",
+        "description": "Backend patch applied to fix missing schema and route imports",
+        "schema": "None",
+        "retention_days": 30
+      }
+    }
   },
   "hardening_layers": {
     "schema_checksum_tracking": true,
@@ -340,16 +515,31 @@
     "agent_contract_enforcement": true,
     "output_policy_enforcement": true,
     "sage_cascade_mode_enabled": true,
-    "sage_belief_dashboard_enabled": true
+    "sage_belief_dashboard_enabled": true,
+    "forge_integration_enabled": true,
+    "debug_tools_enabled": true,
+    "diagnostic_agents": [
+      "debug_analyzer"
+    ],
+    "schema_trace_tool_enabled": true
   },
   "manifest_meta": {
     "version": "1.0.0",
     "created_at": "2025-04-24T14:28:08.000Z",
-    "last_updated": "2025-04-24T17:38:47.195268",
-    "last_updated_by": "dashboard_manifest_update.py"
+    "last_updated": "2025-04-24T17:12:00.488418",
+    "last_updated_by": "backend_patch_manifest_update.py"
   },
   "testing": {
     "last_endpoint_sweep": "\u2705 PASSED",
     "timestamp": "2025-04-24T16:44:39.819205"
+  },
+  "tools": {
+    "schema_trace": {
+      "name": "Schema Trace Tool",
+      "description": "Diagnostic utility that scans the codebase for missing schema definitions and route import errors",
+      "version": "1.0.0",
+      "path": "tools/schema_trace.py",
+      "enabled": true
+    }
   }
 }

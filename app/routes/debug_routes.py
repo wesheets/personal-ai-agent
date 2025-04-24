@@ -1,57 +1,48 @@
-from fastapi import APIRouter, HTTPException
-from app.memory import PROJECT_MEMORY
+"""
+Debug Routes Module
 
-router = APIRouter(prefix="/api/debug/cto")
+This module defines the routes for the Debug Analyzer agent, which acts as a diagnostic tool
+for analyzing failed or incomplete loop executions within the Promethios architecture.
+"""
 
-@router.get("/reflection/{project_id}")
-def get_cto_reflection(project_id: str):
+from fastapi import APIRouter, HTTPException, Depends
+from typing import Dict, List, Any, Optional
+
+# Import schemas
+from app.schemas.debug_schema import LoopDebugRequest, LoopDebugResult
+
+# Import agent
+from app.agents.debug_analyzer_agent import DebugAnalyzerAgent
+
+# Create router
+router = APIRouter(tags=["debug"])
+
+# Initialize agent
+debug_analyzer = DebugAnalyzerAgent()
+
+@router.post("/debug/analyze-loop", response_model=LoopDebugResult)
+async def analyze_loop(request: LoopDebugRequest):
     """
-    Get the most recent CTO reflection for a project.
+    Analyze a failed or incomplete loop execution.
+    
+    This endpoint accepts a loop_id and project_id, scans system memory and logs,
+    and returns a structured diagnosis of what failed, why it failed, which agent
+    was responsible, what memory tags were involved, and what repair or rerun is
+    recommended.
     
     Args:
-        project_id (str): The ID of the project
+        request: The debug request containing loop_id, project_id, and optional filters
         
     Returns:
-        dict: The most recent CTO reflection
+        LoopDebugResult containing the diagnosis of the loop execution
     """
-    if project_id not in PROJECT_MEMORY:
-        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
-    
-    cto_reflections = PROJECT_MEMORY[project_id].get("cto_reflections", [])
-    
-    if not cto_reflections:
-        return {"message": "No CTO reflections found for this project"}
-    
-    return cto_reflections[-1]
-
-@router.get("/reflections/{project_id}")
-def get_all_cto_reflections(project_id: str):
-    """
-    Get all CTO reflections for a project.
-    
-    Args:
-        project_id (str): The ID of the project
-        
-    Returns:
-        list: All CTO reflections for the project
-    """
-    if project_id not in PROJECT_MEMORY:
-        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
-    
-    return PROJECT_MEMORY[project_id].get("cto_reflections", [])
-
-@router.get("/flags/{project_id}")
-def get_system_flags(project_id: str):
-    """
-    Get all system flags for a project.
-    
-    Args:
-        project_id (str): The ID of the project
-        
-    Returns:
-        list: All system flags for the project
-    """
-    if project_id not in PROJECT_MEMORY:
-        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
-    
-    return PROJECT_MEMORY[project_id].get("system_flags", [])
+    try:
+        # Call the Debug Analyzer agent
+        result = await debug_analyzer.analyze_loop(request)
+        return result
+    except Exception as e:
+        # Handle exceptions and return appropriate error response
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error analyzing loop: {str(e)}"
+        )
