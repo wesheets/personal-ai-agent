@@ -1,234 +1,132 @@
 {
-  "system_manifest": {
-    "version": "1.0.0",
-    "last_updated": "2025-04-24T19:16:19Z",
-    "system_name": "Promethios",
-    "agent_discovery_status": {
-      "timestamp": "2025-04-24T19:16:19Z",
-      "total_agents_discovered": 22,
-      "agents_with_implementation": 19,
-      "agents_in_registry": 19,
-      "agents_with_duplicates": 3,
-      "agents_needing_action": 3,
-      "action_summary": {
-        "none_needed": 19,
-        "register_only": 0,
-        "register_and_consolidate": 0,
-        "consolidate_only": 0,
-        "scaffold_only": 0,
-        "archive": 3
+  "system_name": "Promethios Cognitive System",
+  "version": "1.5.0",
+  "last_updated": "2025-04-24T19:51:13Z",
+  "modules": {
+    "core": {
+      "agent_registry": {
+        "enabled": true,
+        "version": "1.2.0",
+        "path": "/app/core/agent_registry.py"
       },
-      "newly_registered_agents": [
-        "historian (registered with schema and routes)",
-        "debugger (registered with schema and routes)",
-        "critic (registered with schema and routes)",
-        "orchestrator (registered with schema and routes)",
-        "sage (registered with schema and routes)",
-        "pessimist (registered with schema and routes)",
-        "nova (registered with schema and routes, consolidated)",
-        "cto (registered with schema and routes)",
-        "observer (registered with schema and routes)",
-        "sitegen (registered with schema and routes)",
-        "trainer (registered with schema only)",
-        "guardian (registered with schema and routes)",
-        "ash (consolidated with ash-xenomorph)"
-      ],
-      "previously_discovered_agents": [
-        "core-forge (implementation found)",
-        "debugger (now registered)",
-        "historian (now registered)",
-        "critic (now registered and consolidated)",
-        "orchestrator (now registered and consolidated)",
-        "sage (now registered)",
-        "pessimist (now registered)",
-        "nova (now registered and consolidated)",
-        "cto (now registered)",
-        "observer (now registered)",
-        "sitegen (now registered)",
-        "trainer (now registered schema only)",
-        "guardian (now registered)",
-        "ash (now consolidated with ash-xenomorph)",
-        "ceo (schema created, implementation archived)",
-        "lifetree (archived)",
-        "neureal (archived)"
-      ],
-      "discovery_report_path": "/app/core/agent_discovery_report.json",
-      "discovery_status": "completed",
-      "registration_status": {
-        "phase": "3",
-        "completed": [
-          "historian",
-          "debugger",
-          "critic",
-          "orchestrator",
-          "sage",
-          "pessimist",
-          "nova",
-          "cto",
-          "observer",
-          "sitegen",
-          "trainer",
-          "guardian",
-          "ash"
-        ],
-        "archived": [
-          "ceo",
-          "lifetree",
-          "neureal"
-        ],
-        "pending": [
-          "auditor"
-        ]
+      "memory_api_quota_guard": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/core/memory_api_quota_guard.py"
       },
-      "recommendations": "Complete agent registration with remaining agent (auditor)"
+      "confidence_retry": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/core/confidence_retry.py"
+      }
     },
-    "system_status": {
-      "status": "operational",
-      "agent_readiness": "excellent",
-      "next_steps": "Complete agent registration sprint with auditor agent"
-    },
-    "registered_agents": {
-      "historian": {
-        "registration_date": "2025-04-24T17:45:10Z",
-        "schema_path": "/app/schemas/historian_schema.py",
-        "route_path": "/app/routes/historian_routes.py",
-        "endpoint": "/api/historian/log",
-        "status": "active",
-        "tools": ["log_belief", "track_alignment", "score_drift"]
+    "safety": {
+      "loop_sanity_validator": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/modules/loop_validation.py",
+        "schema_path": "/app/schemas/loop_validation_schema.py",
+        "route_path": "/app/routes/loop_validation_routes.py",
+        "endpoint": "/api/loop/validate",
+        "description": "Validates loop configurations before execution to ensure structural integrity and prevent invalid loop plans"
       },
-      "debugger": {
-        "registration_date": "2025-04-24T17:45:10Z",
-        "schema_path": "/app/schemas/debugger_schema.py",
-        "route_path": "/app/routes/debugger_routes.py",
-        "endpoint": "/api/debugger/trace",
-        "status": "active",
-        "tools": ["trace", "log_error", "inject_debug"]
+      "pessimist_evaluation": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/modules/pessimist_evaluation.py",
+        "schema_path": "/app/schemas/pessimist_evaluation_schema.py",
+        "route_path": "/app/routes/pessimist_evaluation_routes.py",
+        "endpoint": "/api/pessimist/evaluate",
+        "confidence_threshold": 0.6,
+        "description": "Evaluates loop plans before execution, identifying potential risks and providing confidence scores"
+      },
+      "belief_drift_monitor": {
+        "enabled": true,
+        "version": "2.0.0",
+        "path": "/app/modules/drift_monitor.py",
+        "alignment_threshold": 0.7,
+        "belief_drift_enabled": true,
+        "description": "Compares recent loop SAGE summaries, CRITIC logs, and project goal beliefs to detect belief alignment drift"
+      }
+    },
+    "agents": {
+      "hal": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/agents/hal_agent.py"
+      },
+      "memory": {
+        "enabled": true,
+        "version": "1.1.0",
+        "path": "/app/agents/memory_agent.py"
       },
       "critic": {
-        "registration_date": "2025-04-24T18:15:00Z",
-        "schema_path": "/app/schemas/critic_schema.py",
-        "route_path": "/app/routes/critic_routes.py",
-        "endpoint": "/api/critic/review",
-        "status": "active",
-        "tools": ["review", "reject", "log_reason"],
-        "consolidation": "completed"
-      },
-      "orchestrator": {
-        "registration_date": "2025-04-24T18:15:00Z",
-        "schema_path": "/app/schemas/orchestrator_schema.py",
-        "route_path": "/app/routes/orchestrator_routes.py",
-        "endpoint": "/api/orchestrator/delegate",
-        "status": "active",
-        "tools": ["delegate", "plan", "resolve"],
-        "consolidation": "completed"
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/agents/critic.py"
       },
       "sage": {
-        "registration_date": "2025-04-24T18:15:00Z",
-        "schema_path": "/app/schemas/sage_schema.py",
-        "route_path": "/app/routes/sage_routes.py",
-        "endpoint": "/api/sage/analyze",
-        "status": "active",
-        "tools": ["reflect", "summarize", "score_belief"]
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/agents/sage.py"
+      },
+      "orchestrator": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/agents/orchestrator.py"
       },
       "pessimist": {
-        "registration_date": "2025-04-24T18:38:04Z",
-        "schema_path": "/app/schemas/pessimist_schema.py",
-        "route_path": "/app/routes/pessimist_routes.py",
-        "endpoint": "/api/pessimist/analyze",
-        "status": "active",
-        "tools": ["analyze_bias", "detect_echo", "track_bias"]
-      },
-      "nova": {
-        "registration_date": "2025-04-24T18:40:51Z",
-        "schema_path": "/app/schemas/nova_schema.py",
-        "route_path": "/app/routes/nova_routes.py",
-        "endpoint": "/api/nova/build",
-        "status": "active",
-        "tools": ["build_ui", "generate_component"],
-        "consolidation": "completed"
-      },
-      "cto": {
-        "registration_date": "2025-04-24T18:42:56Z",
-        "schema_path": "/app/schemas/cto_schema.py",
-        "route_path": "/app/routes/cto_routes.py",
-        "endpoint": "/api/cto/audit",
-        "status": "active",
-        "tools": ["audit_memory", "validate_schema", "check_reflection"]
-      },
-      "observer": {
-        "registration_date": "2025-04-24T18:45:46Z",
-        "schema_path": "/app/schemas/observer_schema.py",
-        "route_path": "/app/routes/observer_routes.py",
-        "endpoint": "/api/observer/journal",
-        "status": "active",
-        "tools": ["journal", "observe", "reflect"]
-      },
-      "sitegen": {
-        "registration_date": "2025-04-24T18:48:55Z",
-        "schema_path": "/app/schemas/sitegen_schema.py",
-        "route_path": "/app/routes/sitegen_routes.py",
-        "endpoint": "/api/sitegen/plan",
-        "status": "active",
-        "tools": ["analyze_zoning", "create_layout", "evaluate_market_fit"]
-      },
-      "trainer": {
-        "registration_date": "2025-04-24T18:51:53Z",
-        "schema_path": "/app/schemas/trainer_schema.py",
-        "route_path": null,
-        "endpoint": null,
-        "status": "schema_only",
-        "tools": ["train", "evaluate", "fine_tune"]
-      },
-      "guardian": {
-        "registration_date": "2025-04-24T19:07:02Z",
-        "schema_path": "/app/schemas/guardian_schema.py",
-        "route_path": "/app/routes/guardian_routes.py",
-        "endpoint": "/api/guardian/override",
-        "status": "active",
-        "tools": ["halt", "alert_operator", "rollback_loop", "raise_flag"]
-      },
-      "ash": {
-        "registration_date": "2025-04-24T19:13:04Z",
-        "schema_path": "/app/schemas/ash_schema.py",
-        "route_path": "/app/routes/ash_routes.py",
-        "endpoint": "/api/ash/analyze",
-        "status": "active",
-        "tools": ["analyze", "detect", "test", "execute", "resolve"],
-        "consolidation": "completed",
-        "consolidated_with": "ash-xenomorph"
-      },
-      "ceo": {
-        "registration_date": "2025-04-24T19:10:26Z",
-        "schema_path": "/app/schemas/ceo_schema.py",
-        "route_path": null,
-        "endpoint": null,
-        "status": "archived",
-        "archive_path": "/app/archive/philosophy_agents/ceo_agent.py",
-        "tools": ["review_plans", "reallocate_agents", "trigger_reorg"]
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/agents/pessimist_agent.py"
       }
     },
-    "archived_agents": {
-      "ceo": {
-        "archive_date": "2025-04-24T19:10:50Z",
-        "schema_path": "/app/schemas/ceo_schema.py",
-        "archive_path": "/app/archive/philosophy_agents/ceo_agent.py",
-        "status": "archived",
-        "reason": "Conceptual agent, functionality covered by ORCHESTRATOR"
+    "api": {
+      "agent": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/api/agent.py"
       },
-      "lifetree": {
-        "archive_date": "2025-04-24T19:14:43Z",
-        "schema_path": null,
-        "archive_path": "/app/archive/philosophy_agents/lifetree_agent.py",
-        "status": "archived",
-        "reason": "Conceptual agent outside current system scope"
+      "memory": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/api/modules/memory.py"
       },
-      "neureal": {
-        "archive_date": "2025-04-24T19:15:16Z",
-        "schema_path": null,
-        "archive_path": "/app/archive/philosophy_agents/neureal_agent.py",
-        "status": "archived",
-        "reason": "Conceptual agent, functionality covered by TRAINER"
+      "orchestrator_status": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/api/orchestrator/status.py"
+      }
+    },
+    "routes": {
+      "loop_routes": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/routes/loop_routes.py"
+      },
+      "loop_validation_routes": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/routes/loop_validation_routes.py"
+      },
+      "pessimist_evaluation_routes": {
+        "enabled": true,
+        "version": "1.0.0",
+        "path": "/app/routes/pessimist_evaluation_routes.py"
       }
     }
+  },
+  "hardening_features": {
+    "schema_enforcement": true,
+    "schema_fallback_support": true,
+    "loop_sanity_validation": true,
+    "pessimist_pre_run_evaluation": true,
+    "belief_drift_monitoring": true
+  },
+  "cognitive_safety_layer": {
+    "version": "1.0.0",
+    "modules_enabled": 3,
+    "modules_total": 5,
+    "last_updated": "2025-04-24T19:51:13Z"
   }
 }

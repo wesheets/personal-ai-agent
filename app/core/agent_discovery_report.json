@@ -1,0 +1,452 @@
+{
+  "agent_discovery_report": {
+    "timestamp": "2025-04-24T17:31:22Z",
+    "total_agents_discovered": 22,
+    "agents": [
+      {
+        "name": "ash",
+        "file_exists": true,
+        "registry_entry": true,
+        "contract_present": true,
+        "schema_found": false,
+        "tools_assigned": true,
+        "duplicate_detected": true,
+        "purpose_clear": true,
+        "action_recommended": "consolidate",
+        "implementation_files": [
+          "/app/agents/ash.py",
+          "/app/agents/ash_agent.py",
+          "/app/modules/ash_agent.py"
+        ],
+        "description": "Cold, clinical agent designed for logic under pressure and moral ambiguity resolution.",
+        "tools": ["analyze", "resolve", "execute"]
+      },
+      {
+        "name": "auditor",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/app/modules/auditor_agent.py"
+        ],
+        "description": "Audits system operations and agent actions.",
+        "tools": []
+      },
+      {
+        "name": "core-forge",
+        "file_exists": true,
+        "registry_entry": true,
+        "contract_present": true,
+        "schema_found": true,
+        "tools_assigned": true,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "none",
+        "implementation_files": [
+          "/agents/core_forge.py"
+        ],
+        "description": "Architect-class AI responsible for orchestrating intelligence systems.",
+        "tools": ["orchestrate", "design", "architect"]
+      },
+      {
+        "name": "critic",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": true,
+        "purpose_clear": true,
+        "action_recommended": "register, consolidate",
+        "implementation_files": [
+          "/app/agents/critic.py",
+          "/app/modules/critic_agent.py",
+          "/app/modules/review/critic_agent.py"
+        ],
+        "description": "Reviews and evaluates work produced by other agents.",
+        "tools": []
+      },
+      {
+        "name": "cto",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": true,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/app/agents/cto_agent.py"
+        ],
+        "description": "Technical oversight and project validation.",
+        "tools": []
+      },
+      {
+        "name": "debugger",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/agents/debugger_agent.py"
+        ],
+        "description": "Injects debugging information into memory.",
+        "tools": []
+      },
+      {
+        "name": "guardian",
+        "file_exists": false,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "scaffold",
+        "implementation_files": [],
+        "description": "Handles escalation of issues.",
+        "tools": []
+      },
+      {
+        "name": "hal",
+        "file_exists": true,
+        "registry_entry": true,
+        "contract_present": true,
+        "schema_found": true,
+        "tools_assigned": true,
+        "duplicate_detected": true,
+        "purpose_clear": true,
+        "action_recommended": "consolidate",
+        "implementation_files": [
+          "/app/agents/hal.py",
+          "/app/agents/hal_agent.py"
+        ],
+        "description": "Cautious, logical AI designed for safety, systems control, and ethical constraint enforcement.",
+        "tools": ["safety", "control", "monitor"]
+      },
+      {
+        "name": "historian",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/agents/historian_agent.py"
+        ],
+        "description": "Tracks forgotten beliefs and alignment scores.",
+        "tools": []
+      },
+      {
+        "name": "lifetree",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": false,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/app/agents/lifetree_agent.py"
+        ],
+        "description": "Life Tree project agent (purpose unclear).",
+        "tools": []
+      },
+      {
+        "name": "memory",
+        "file_exists": true,
+        "registry_entry": true,
+        "contract_present": true,
+        "schema_found": true,
+        "tools_assigned": true,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "none",
+        "implementation_files": [
+          "/app/agents/memory_agent.py"
+        ],
+        "description": "Stores, retrieves, and reflects on system memory and past agent actions.",
+        "tools": ["store", "retrieve", "reflect"]
+      },
+      {
+        "name": "neureal",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": false,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/app/agents/neureal_agent.py"
+        ],
+        "description": "Purpose unknown.",
+        "tools": []
+      },
+      {
+        "name": "nova",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": true,
+        "purpose_clear": true,
+        "action_recommended": "register, consolidate",
+        "implementation_files": [
+          "/app/agents/nova.py",
+          "/app/modules/nova_agent.py"
+        ],
+        "description": "UI component building and frontend implementation.",
+        "tools": []
+      },
+      {
+        "name": "observer",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/app/agents/observer_agent.py"
+        ],
+        "description": "System monitoring.",
+        "tools": []
+      },
+      {
+        "name": "ops",
+        "file_exists": true,
+        "registry_entry": true,
+        "contract_present": true,
+        "schema_found": false,
+        "tools_assigned": true,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "none",
+        "implementation_files": [
+          "/app/agents/ops_agent.py"
+        ],
+        "description": "Handles devops, backend tasks, CI/CD, and system automation flows.",
+        "tools": ["devops", "automate", "deploy"]
+      },
+      {
+        "name": "orchestrator",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": true,
+        "purpose_clear": true,
+        "action_recommended": "register, consolidate",
+        "implementation_files": [
+          "/app/agents/orchestrator.py",
+          "/app/agents/orchestrator_agent.py"
+        ],
+        "description": "Coordinates workflows and manages task delegation between agents.",
+        "tools": []
+      },
+      {
+        "name": "pessimist",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/app/modules/pessimist_agent.py"
+        ],
+        "description": "Identifies potential failure modes and risks.",
+        "tools": []
+      },
+      {
+        "name": "sage",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/app/agents/sage.py"
+        ],
+        "description": "System summarization and project insights.",
+        "tools": []
+      },
+      {
+        "name": "sitegen",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/app/agents/sitegen_agent.py"
+        ],
+        "description": "Website generation.",
+        "tools": []
+      },
+      {
+        "name": "trainer",
+        "file_exists": true,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "register",
+        "implementation_files": [
+          "/app/agents/trainer_agent.py"
+        ],
+        "description": "Model training.",
+        "tools": []
+      },
+      {
+        "name": "ceo",
+        "file_exists": false,
+        "registry_entry": false,
+        "contract_present": false,
+        "schema_found": false,
+        "tools_assigned": false,
+        "duplicate_detected": false,
+        "purpose_clear": false,
+        "action_recommended": "scaffold",
+        "implementation_files": [],
+        "description": "Purpose unknown.",
+        "tools": []
+      },
+      {
+        "name": "ash-xenomorph",
+        "file_exists": false,
+        "registry_entry": true,
+        "contract_present": true,
+        "schema_found": true,
+        "tools_assigned": true,
+        "duplicate_detected": false,
+        "purpose_clear": true,
+        "action_recommended": "scaffold",
+        "implementation_files": [],
+        "description": "Risk analysis and anomaly detection agent.",
+        "tools": ["analyze", "detect", "test"]
+      }
+    ],
+    "conceptual_agents": [
+      {
+        "name": "core-forge",
+        "type": "implementation",
+        "evidence": "Found in /agents/core_forge.py",
+        "reason": "Implementation file exists and is registered in agent registry"
+      },
+      {
+        "name": "historian",
+        "type": "memory-only",
+        "evidence": "Found in /agents/historian_agent.py",
+        "reason": "Implementation file exists with memory operations"
+      },
+      {
+        "name": "debugger",
+        "type": "memory-only",
+        "evidence": "Found in /agents/debugger_agent.py",
+        "reason": "Implementation file exists with memory operations"
+      },
+      {
+        "name": "guardian",
+        "type": "conceptual",
+        "evidence": "Referenced in planner_agent_enhancer.py",
+        "reason": "Referenced in code as part of escalation policy"
+      },
+      {
+        "name": "ceo",
+        "type": "conceptual",
+        "evidence": "Listed in requirements document",
+        "reason": "Listed in requirements document"
+      }
+    ],
+    "statistics": {
+      "total_agents": 22,
+      "with_implementation_files": 19,
+      "in_registry": 6,
+      "with_contracts": 6,
+      "with_schemas": 4,
+      "with_tools_assigned": 6,
+      "with_duplicates": 5,
+      "with_clear_purpose": 19,
+      "action_recommendations": {
+        "none": 3,
+        "register": 11,
+        "register_and_consolidate": 3,
+        "consolidate": 2,
+        "scaffold": 3
+      }
+    },
+    "recommendations": {
+      "high_priority": [
+        "Consolidate duplicate implementations of core agents (ash, hal)",
+        "Register memory-critical agents (historian, debugger)",
+        "Register orchestration-critical agents (orchestrator, critic)"
+      ],
+      "medium_priority": [
+        "Register remaining implemented agents (cto, observer, sage, etc.)",
+        "Scaffold referenced but missing agents (guardian)",
+        "Consolidate remaining duplicate implementations (nova)"
+      ],
+      "low_priority": [
+        "Clarify purpose of ambiguous agents (lifetree, neureal)",
+        "Determine need for conceptual agents (ceo)",
+        "Add schema validation to all agents"
+      ],
+      "implementation_approach": [
+        "Adopt the Agent SDK pattern for all agents",
+        "Standardize on a single file naming convention",
+        "Use consistent directory structure",
+        "Create a registration script to automate adding agents to registry",
+        "Create standard schema templates for common agent types",
+        "Implement naming convention enforcement"
+      ]
+    },
+    "newly_discovered_agents": [
+      {
+        "name": "core-forge",
+        "status": "Previously thought missing, implementation found at /agents/core_forge.py",
+        "recommendation": "None needed, fully implemented and registered"
+      },
+      {
+        "name": "debugger",
+        "status": "Implementation found at /agents/debugger_agent.py but not registered",
+        "recommendation": "Register in agent registry with appropriate contract, schema, and tools"
+      },
+      {
+        "name": "historian",
+        "status": "Implementation found at /agents/historian_agent.py but not registered",
+        "recommendation": "Register in agent registry with appropriate contract, schema, and tools"
+      }
+    ]
+  }
+}
