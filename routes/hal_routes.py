@@ -16,19 +16,44 @@ import datetime
 import os
 from typing import Dict, Any, List
 
-# Import schemas - check correct path
+# Import schemas - check correct path with fallback discovery
 print("🧠 HAL ROUTES: Importing schemas...")
 try:
     from app.schemas.loop_schema import LoopResponseRequest, LoopResponseResult
     print("✅ Successfully imported schemas from app.schemas.loop_schema")
 except ImportError as e:
-    print(f"❌ Failed to import schemas from app.schemas.loop_schema: {e}")
+    print(f"⚠️ Failed to import schemas from app.schemas.loop_schema: {e}. Initiating fallback discovery.")
     try:
         from schemas.loop_schema import LoopResponseRequest, LoopResponseResult
         print("✅ Successfully imported schemas from schemas.loop_schema")
     except ImportError as e:
-        print(f"❌ Failed to import schemas from schemas.loop_schema: {e}")
-        raise
+        print(f"⚠️ Failed to import schemas from schemas.loop_schema: {e}. Initiating fallback discovery.")
+        try:
+            # Import schema discovery utility
+            from app.utils.schema_discovery import discover_and_import_schema, get_structured_error, log_schema_error_to_memory
+            
+            # Try to discover and import LoopResponseRequest
+            LoopResponseRequest, import_statement_req = discover_and_import_schema("LoopResponseRequest")
+            if LoopResponseRequest:
+                print(f"✅ Successfully discovered and imported LoopResponseRequest: {import_statement_req}")
+            else:
+                print(f"❌ Failed to discover LoopResponseRequest")
+                raise ImportError(f"Could not locate LoopResponseRequest schema in any known paths")
+            
+            # Try to discover and import LoopResponseResult
+            LoopResponseResult, import_statement_res = discover_and_import_schema("LoopResponseResult")
+            if LoopResponseResult:
+                print(f"✅ Successfully discovered and imported LoopResponseResult: {import_statement_res}")
+            else:
+                print(f"❌ Failed to discover LoopResponseResult")
+                raise ImportError(f"Could not locate LoopResponseResult schema in any known paths")
+                
+        except ImportError as e:
+            print(f"❌ Schema discovery failed: {e}")
+            raise HTTPException(
+                status_code=422,
+                detail=get_structured_error("LoopResponseRequest/LoopResponseResult", str(e))
+            )
 
 # Import HAL modules
 print("🧠 HAL ROUTES: Importing HAL modules...")
