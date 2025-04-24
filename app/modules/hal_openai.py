@@ -63,17 +63,51 @@ def generate_react_component(task: str) -> str:
             model_used = "gpt-4o"
             logger.info("✅ Using gpt-4o model")
         except Exception as model_error:
+            error_str = str(model_error).lower()
+            
             # If gpt-4o is not available, fallback to gpt-4.1
-            if "model_not_found" in str(model_error).lower() or "not found" in str(model_error).lower():
+            if "model_not_found" in error_str or "not found" in error_str:
                 logger.warning(f"⚠️ gpt-4o model not found, falling back to gpt-4.1: {str(model_error)}")
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-4.1",
+                        messages=[
+                            {"role": "user", "content": task}
+                        ]
+                    )
+                    model_used = "gpt-4.1"
+                    logger.info("✅ Using gpt-4.1 model (fallback)")
+                except Exception as fallback_error:
+                    # If gpt-4.1 also fails, check if it's a quota issue
+                    fallback_error_str = str(fallback_error).lower()
+                    if "insufficient_quota" in fallback_error_str or "exceeded your current quota" in fallback_error_str:
+                        logger.warning(f"⚠️ Quota exceeded for gpt-4.1, falling back to gpt-3.5-turbo: {str(fallback_error)}")
+                        response = client.chat.completions.create(
+                            model="gpt-3.5-turbo",
+                            messages=[
+                                {"role": "user", "content": task}
+                            ]
+                        )
+                        model_used = "gpt-3.5-turbo"
+                        logger.info("✅ Using gpt-3.5-turbo model (quota fallback)")
+                        # Log quota issue for monitoring
+                        print("⚠️ QUOTA_ALERT: OpenAI quota exceeded, using gpt-3.5-turbo fallback")
+                    else:
+                        # If it's another error, re-raise it
+                        raise fallback_error
+            # If it's a quota issue with gpt-4o, try gpt-3.5-turbo directly
+            elif "insufficient_quota" in error_str or "exceeded your current quota" in error_str:
+                logger.warning(f"⚠️ Quota exceeded for gpt-4o, falling back to gpt-3.5-turbo: {str(model_error)}")
                 response = client.chat.completions.create(
-                    model="gpt-4.1",
+                    model="gpt-3.5-turbo",
                     messages=[
                         {"role": "user", "content": task}
                     ]
                 )
-                model_used = "gpt-4.1"
-                logger.info("✅ Using gpt-4.1 model (fallback)")
+                model_used = "gpt-3.5-turbo"
+                logger.info("✅ Using gpt-3.5-turbo model (quota fallback)")
+                # Log quota issue for monitoring
+                print("⚠️ QUOTA_ALERT: OpenAI quota exceeded, using gpt-3.5-turbo fallback")
             else:
                 # If it's another error, re-raise it
                 raise model_error
