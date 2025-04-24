@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGE Belief Map Dashboard</title>
+    <link rel="stylesheet" href="/static/dashboard/styles.css">
+    <script src="/static/dashboard/belief_map.js" defer></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1 class="dashboard-title">SAGE Belief Map Dashboard</h1>
+            <div class="dashboard-controls">
+                <button id="refresh-button" class="btn btn-primary">Refresh Data</button>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="filter-container">
+                <input type="text" id="belief-filter" placeholder="Filter beliefs...">
+                <span class="filter-icon">🔍</span>
+            </div>
+
+            <div class="dashboard-layout">
+                <!-- Loop List Section -->
+                <div class="loop-list">
+                    <h2 class="loop-list-header">Available Loops</h2>
+                    <div id="loop-list-container">
+                        <div class="loading">Loading loops...</div>
+                    </div>
+                </div>
+
+                <!-- Belief Map Section -->
+                <div id="belief-map-container">
+                    <div class="loading">Select a loop to view belief map</div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="dashboard-footer">
+            <p>Promethios SAGE Belief Map Dashboard v1.0.0</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize dashboard when document is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDashboard();
+        });
+
+        /**
+         * Initialize the dashboard
+         */
+        async function initializeDashboard() {
+            // Load loop list
+            await loadLoopList();
+            
+            // Set up refresh button
+            const refreshButton = document.getElementById('refresh-button');
+            if (refreshButton) {
+                refreshButton.addEventListener('click', () => {
+                    loadLoopList();
+                });
+            }
+        }
+
+        /**
+         * Load the list of available loops
+         */
+        async function loadLoopList() {
+            const container = document.getElementById('loop-list-container');
+            if (!container) {
+                console.error('Loop list container not found');
+                return;
+            }
+
+            // Show loading indicator
+            container.innerHTML = '<div class="loading">Loading loops...</div>';
+
+            try {
+                // Fetch loop summaries from API
+                const response = await fetch('/dashboard/loops');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch loop summaries: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                // Check if we have loop summaries
+                if (!data.loop_summaries || data.loop_summaries.length === 0) {
+                    container.innerHTML = '<div class="no-data">No loops available. Run the system to generate loops.</div>';
+                    return;
+                }
+
+                // Clear loading indicator
+                container.innerHTML = '';
+
+                // Create loop list items
+                data.loop_summaries.forEach(loop => {
+                    const loopItem = document.createElement('div');
+                    loopItem.className = 'loop-list-item';
+                    loopItem.dataset.loopId = loop.loop_id;
+                    loopItem.textContent = `Loop: ${loop.loop_id}`;
+                    
+                    // Add click event to load belief map for this loop
+                    loopItem.addEventListener('click', () => {
+                        // Update active state
+                        document.querySelectorAll('.loop-list-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        loopItem.classList.add('active');
+                        
+                        // Load belief map for this loop
+                        loadBeliefDataForLoop(loop.loop_id);
+                    });
+                    
+                    container.appendChild(loopItem);
+                });
+
+                // Load the first loop by default
+                if (data.loop_summaries.length > 0) {
+                    const firstLoop = data.loop_summaries[0];
+                    const firstLoopItem = container.querySelector(`.loop-list-item[data-loop-id="${firstLoop.loop_id}"]`);
+                    if (firstLoopItem) {
+                        firstLoopItem.classList.add('active');
+                        loadBeliefDataForLoop(firstLoop.loop_id);
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error loading loop list:', error);
+                container.innerHTML = `<div class="error">Error loading loops: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

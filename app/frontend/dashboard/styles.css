@@ -1,0 +1,246 @@
+/* 
+ * Loop Summary Dashboard Styles
+ * 
+ * CSS styles for the SAGE belief map visualization dashboard
+ */
+
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2c3e50;
+  --success-color: #2ecc71;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #34495e;
+  --neutral-color: #95a5a6;
+  --border-radius: 6px;
+  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  color: var(--dark-color);
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--light-color);
+}
+
+.dashboard-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--secondary-color);
+  margin: 0;
+}
+
+.dashboard-controls {
+  display: flex;
+  gap: 15px;
+}
+
+/* Filter Input */
+.filter-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+#belief-filter {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid var(--light-color);
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+#belief-filter:focus {
+  border-color: var(--primary-color);
+}
+
+.filter-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--neutral-color);
+}
+
+/* Loop Section */
+.loop-section {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+.loop-header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 15px 20px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.timestamp {
+  padding: 10px 20px;
+  font-size: 14px;
+  color: var(--neutral-color);
+  border-bottom: 1px solid var(--light-color);
+}
+
+.reflection {
+  padding: 15px 20px;
+  background-color: rgba(52, 152, 219, 0.1);
+  border-bottom: 1px solid var(--light-color);
+}
+
+.reflection h3 {
+  margin-top: 0;
+  font-size: 18px;
+  color: var(--primary-color);
+}
+
+.reflection p {
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+/* Belief Map */
+.belief-map {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Belief Card */
+.belief-card {
+  position: relative;
+  padding: 15px;
+  border-radius: var(--border-radius);
+  border-left: 5px solid;
+  box-shadow: var(--box-shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.belief-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.belief-card.selected {
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.belief-text {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.confidence-indicator {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  font-size: 14px;
+  margin-right: 10px;
+  margin-bottom: 5px;
+}
+
+.emotional-indicator {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Status Messages */
+.loading, .error, .no-data, .no-beliefs {
+  padding: 20px;
+  text-align: center;
+  border-radius: var(--border-radius);
+  margin: 20px 0;
+}
+
+.loading {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: var(--primary-color);
+}
+
+.error {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: var(--danger-color);
+}
+
+.no-data, .no-beliefs {
+  background-color: rgba(149, 165, 166, 0.1);
+  color: var(--neutral-color);
+}
+
+/* Loop List */
+.loop-list {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 30px;
+}
+
+.loop-list-header {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 15px 20px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.loop-list-item {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--light-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.loop-list-item:last-child {
+  border-bottom: none;
+}
+
+.loop-list-item:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.loop-list-item.active {
+  background-color: rgba(52, 152, 219, 0.2);
+  border-left: 4px solid var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .belief-map {
+    grid-template-columns: 1fr;
+  }
+}
