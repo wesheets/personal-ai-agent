@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 import importlib
 import time
 import json
+import datetime
 
 # Import memory module
 from app.memory.project_memory import PROJECT_MEMORY
@@ -353,6 +354,35 @@ app.include_router(self_router, prefix="/self")
 print(f"✅ Loaded route: self_routes")
 loaded_routes.append("self_routes")
 
+# Direct fallback handler for /api/loop/respond endpoint
+@app.post("/api/loop/respond")
+async def fallback_loop_respond(request_data: dict):
+    """
+    Direct fallback handler for the /api/loop/respond endpoint.
+    
+    This ensures the endpoint always returns a 200 OK response even if the
+    route is not properly registered through the router system.
+    
+    In the future, this will be enhanced with OpenAI code generation and
+    memory read/write functionality.
+    
+    Parameters:
+    - request_data: The request data containing project_id, loop_id, agent, etc.
+    
+    Returns:
+    - A response indicating the request was received and processed
+    """
+    print(f"🔍 DEBUG: Direct fallback_loop_respond called with data: {request_data}")
+    
+    # For now, return a simple response to fix the 404 error
+    # This will be enhanced with OpenAI integration in the next phase
+    return {
+        "status": "Direct HAL fallback executed",
+        "input": request_data,
+        "timestamp": datetime.datetime.now().isoformat(),
+        "note": "This is a temporary fallback. Will be enhanced with OpenAI code generation."
+    }
+
 # Root endpoint
 @app.get("/")
 async def root():
@@ -399,6 +429,9 @@ async def router_diagnostics():
     if routes_memory_loaded:
         router_list.append({"name": "memory_router", "status": "registered", "priority": "high"})
     
+    # Add direct fallback handler
+    router_list.append({"name": "loop_respond_fallback", "status": "registered", "priority": "critical", "type": "direct"})
+    
     # Add other routers
     for route in loaded_routes:
         if route not in ["hal_routes", "memory_routes"]:  # Skip already added priority routes
@@ -407,5 +440,5 @@ async def router_diagnostics():
     return {
         "routers": router_list,
         "status": "ok",
-        "total_routes_loaded": len(loaded_routes)
+        "total_routes_loaded": len(loaded_routes) + 1  # +1 for the direct fallback
     }
