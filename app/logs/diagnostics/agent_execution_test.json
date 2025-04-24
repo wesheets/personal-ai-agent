@@ -5,10 +5,10 @@
   "agent_details": [
     {
       "name": "builder",
-      "config_loaded": true,
-      "tool_called": true,
-      "memory_stored": true,
-      "execution_logged": true,
+      "config_loaded": True,
+      "tool_called": True,
+      "memory_stored": True,
+      "execution_logged": True,
       "errors": [],
       "config_summary": {
         "name": "Builder Agent",
@@ -41,10 +41,10 @@
     },
     {
       "name": "research",
-      "config_loaded": true,
-      "tool_called": true,
-      "memory_stored": true,
-      "execution_logged": true,
+      "config_loaded": True,
+      "tool_called": True,
+      "memory_stored": True,
+      "execution_logged": True,
       "errors": [],
       "config_summary": {
         "name": "Research Agent",
@@ -77,10 +77,10 @@
     },
     {
       "name": "memory",
-      "config_loaded": true,
-      "tool_called": true,
-      "memory_stored": true,
-      "execution_logged": true,
+      "config_loaded": True,
+      "tool_called": True,
+      "memory_stored": True,
+      "execution_logged": True,
       "errors": [],
       "config_summary": {
         "name": "Memory Agent",
@@ -113,20 +113,20 @@
     },
     {
       "name": "planner",
-      "config_loaded": false,
-      "tool_called": false,
-      "memory_stored": false,
-      "execution_logged": false,
+      "config_loaded": False,
+      "tool_called": False,
+      "memory_stored": False,
+      "execution_logged": False,
       "errors": [
         "Config file not found: /home/ubuntu/personal-ai-agent/app/prompts/planner.json"
       ]
     },
     {
       "name": "ops",
-      "config_loaded": true,
-      "tool_called": true,
-      "memory_stored": true,
-      "execution_logged": true,
+      "config_loaded": True,
+      "tool_called": True,
+      "memory_stored": True,
+      "execution_logged": True,
       "errors": [],
       "config_summary": {
         "name": "Ops Agent",

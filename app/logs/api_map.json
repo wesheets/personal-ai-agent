@@ -1,0 +1,643 @@
+{
+  "timestamp": "2025-04-24T17:42:35.375886",
+  "total_routes_found": 61,
+  "active_routes": {
+    "agent_config_routes": {
+      "router_var": "agent_config_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/agent_config_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "agent_context_routes": {
+      "router_var": "agent_context_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/agent_context_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": True
+    },
+    "memory_recall_routes": {
+      "router_var": "memory_recall_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/memory_recall_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "memory_embed_routes": {
+      "router_var": "memory_embed_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/memory_embed_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "plan_generate_routes": {
+      "router_var": "plan_generate_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/plan_generate_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": True
+    },
+    "train_routes": {
+      "router_var": "train_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/train_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "training",
+      "test_coverage": True
+    },
+    "export_routes": {
+      "router_var": "export_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/export_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "export",
+      "test_coverage": False
+    },
+    "fix_routes": {
+      "router_var": "fix_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/fix_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": True
+    },
+    "delegate_stream_routes": {
+      "router_var": "delegate_stream_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/delegate_stream_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": False
+    },
+    "hal_routes": {
+      "router_var": "hal_routes",
+      "prefix": "/api",
+      "status": "active",
+      "source_file": "app/routes/hal_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": True
+    },
+    "memory_routes": {
+      "router_var": "memory_routes",
+      "prefix": "/api",
+      "status": "active",
+      "source_file": "app/routes/memory_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": True
+    },
+    "memory_router": {
+      "router_var": "memory_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/memory_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "loop_router": {
+      "router_var": "loop_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/loop_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "orchestrator_routes": {
+      "router_var": "orchestrator_routes",
+      "prefix": "/api",
+      "status": "active",
+      "source_file": "app/routes/orchestrator_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": True
+    },
+    "core_router": {
+      "router_var": "core_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/core_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": False
+    },
+    "agent_router": {
+      "router_var": "agent_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/agent_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": True
+    },
+    "persona_router": {
+      "router_var": "persona_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/persona_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": False
+    },
+    "debug_router": {
+      "router_var": "debug_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/debug_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "debug",
+      "test_coverage": False
+    },
+    "historian_router": {
+      "router_var": "historian_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/historian_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": False
+    },
+    "debugger_router": {
+      "router_var": "debugger_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/debugger_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "debug",
+      "test_coverage": False
+    },
+    "orchestrator_router": {
+      "router_var": "orchestrator_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/orchestrator_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "critic_router": {
+      "router_var": "critic_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/critic_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "reflection",
+      "test_coverage": False
+    },
+    "sage_router": {
+      "router_var": "sage_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/sage_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "guardian_router": {
+      "router_var": "guardian_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/guardian_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "safety",
+      "test_coverage": False
+    },
+    "pessimist_router": {
+      "router_var": "pessimist_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/pessimist_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "safety",
+      "test_coverage": False
+    },
+    "nova_router": {
+      "router_var": "nova_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/nova_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "cto_router": {
+      "router_var": "cto_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/cto_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": False
+    },
+    "observer_router": {
+      "router_var": "observer_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/observer_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "reflection",
+      "test_coverage": False
+    },
+    "sitegen_router": {
+      "router_var": "sitegen_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/sitegen_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": False
+    },
+    "reflection_router": {
+      "router_var": "reflection_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/reflection_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "reflection",
+      "test_coverage": False
+    },
+    "trust_router": {
+      "router_var": "trust_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/trust_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "safety",
+      "test_coverage": False
+    },
+    "snapshot_routes": {
+      "router_var": "snapshot_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/snapshot_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "export",
+      "test_coverage": False
+    },
+    "orchestrator_plan_routes": {
+      "router_var": "orchestrator_plan_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/orchestrator_plan_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "health_monitor_routes": {
+      "router_var": "health_monitor_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/health_monitor_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": False
+    },
+    "self_router": {
+      "router_var": "self_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/self_router.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "reflection",
+      "test_coverage": False
+    },
+    "orchestrator_contract_routes": {
+      "router_var": "orchestrator_contract_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/orchestrator_contract_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "cognitive",
+      "test_coverage": False
+    },
+    "ash_routes": {
+      "router_var": "ash_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/ash_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": True
+    },
+    "dashboard_routes": {
+      "router_var": "dashboard_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/dashboard_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": False
+    },
+    "forge_routes": {
+      "router_var": "forge_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/forge_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": False
+    },
+    "debug_routes": {
+      "router_var": "debug_analyzer_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/debug_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "debug",
+      "test_coverage": True
+    },
+    "drift_routes": {
+      "router_var": "drift_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/drift_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "system_building",
+      "test_coverage": True
+    },
+    "output_policy_routes": {
+      "router_var": "output_policy_router",
+      "prefix": "",
+      "status": "active",
+      "source_file": "app/routes/output_policy_routes.py",
+      "schema": "",
+      "agent": "",
+      "memory_tag": "",
+      "category": "safety",
+      "test_coverage": False
+    }
+  },
+  "orphaned_routes": {
+    "agent_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.agent_routes import router as agent_routes_router",
+      "file_path": "routes/agent_routes.py"
+    },
+    "core_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.core_routes import router as core_routes_router",
+      "file_path": "routes/core_routes.py"
+    },
+    "critic_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.critic_routes import router as critic_routes_router",
+      "file_path": "routes/critic_routes.py"
+    },
+    "cto_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.cto_routes import router as cto_routes_router",
+      "file_path": "routes/cto_routes.py"
+    },
+    "debugger_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.debugger_routes import router as debugger_routes_router",
+      "file_path": "routes/debugger_routes.py"
+    },
+    "guardian_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.guardian_routes import router as guardian_routes_router",
+      "file_path": "routes/guardian_routes.py"
+    },
+    "historian_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.historian_routes import router as historian_routes_router",
+      "file_path": "routes/historian_routes.py"
+    },
+    "loop_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.loop_routes import router as loop_routes_router",
+      "file_path": "routes/loop_routes.py"
+    },
+    "loop_validation_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.loop_validation_routes import router as loop_validation_routes_router",
+      "file_path": "routes/loop_validation_routes.py"
+    },
+    "nova_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.nova_routes import router as nova_routes_router",
+      "file_path": "routes/nova_routes.py"
+    },
+    "observer_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.observer_routes import router as observer_routes_router",
+      "file_path": "routes/observer_routes.py"
+    },
+    "persona_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.persona_routes import router as persona_routes_router",
+      "file_path": "routes/persona_routes.py"
+    },
+    "pessimist_evaluation_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.pessimist_evaluation_routes import router as pessimist_evaluation_routes_router",
+      "file_path": "routes/pessimist_evaluation_routes.py"
+    },
+    "pessimist_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.pessimist_routes import router as pessimist_routes_router",
+      "file_path": "routes/pessimist_routes.py"
+    },
+    "reflection_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.reflection_routes import router as reflection_routes_router",
+      "file_path": "routes/reflection_routes.py"
+    },
+    "sage_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.sage_routes import router as sage_routes_router",
+      "file_path": "routes/sage_routes.py"
+    },
+    "self_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.self_routes import router as self_routes_router",
+      "file_path": "routes/self_routes.py"
+    },
+    "sitegen_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.sitegen_routes import router as sitegen_routes_router",
+      "file_path": "routes/sitegen_routes.py"
+    },
+    "trust_routes": {
+      "status": "inactive",
+      "reason": "Route file exists but is not included in main.py",
+      "suggested_import": "from app.routes.trust_routes import router as trust_routes_router",
+      "file_path": "routes/trust_routes.py"
+    }
+  },
+  "route_to_schema_map": {},
+  "categories": {
+    "cognitive": [
+      "agent_config_routes",
+      "agent_context_routes",
+      "memory_recall_routes",
+      "memory_embed_routes",
+      "plan_generate_routes",
+      "hal_routes",
+      "memory_routes",
+      "memory_router",
+      "loop_router",
+      "orchestrator_routes",
+      "agent_router",
+      "orchestrator_router",
+      "sage_router",
+      "nova_router",
+      "orchestrator_plan_routes",
+      "orchestrator_contract_routes"
+    ],
+    "debug": [
+      "debug_router",
+      "debugger_router",
+      "debug_routes"
+    ],
+    "reflection": [
+      "critic_router",
+      "observer_router",
+      "reflection_router",
+      "self_router"
+    ],
+    "safety": [
+      "guardian_router",
+      "pessimist_router",
+      "trust_router",
+      "output_policy_routes"
+    ],
+    "training": [
+      "train_routes"
+    ],
+    "system_building": [
+      "fix_routes",
+      "delegate_stream_routes",
+      "core_router",
+      "persona_router",
+      "historian_router",
+      "cto_router",
+      "sitegen_router",
+      "health_monitor_routes",
+      "ash_routes",
+      "dashboard_routes",
+      "forge_routes",
+      "drift_routes"
+    ],
+    "export": [
+      "export_routes",
+      "snapshot_routes"
+    ]
+  }
+}

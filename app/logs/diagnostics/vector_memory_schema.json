@@ -159,7 +159,7 @@
       "tags"
     ],
     "fields_missing": [],
-    "schema_valid": true
+    "schema_valid": True
   },
   "status": "success",
   "errors": [],

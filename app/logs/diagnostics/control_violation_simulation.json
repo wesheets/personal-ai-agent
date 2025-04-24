@@ -3,9 +3,9 @@
   "simulation_details": {
     "restricted_tool": "github_commit",
     "unauthorized_agent": "research",
-    "action_blocked": true,
-    "violation_logged": true,
-    "override_suggested": true
+    "action_blocked": True,
+    "violation_logged": True,
+    "override_suggested": True
   },
   "status": "success",
   "errors": []

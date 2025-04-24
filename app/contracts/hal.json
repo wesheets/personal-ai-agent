@@ -4,7 +4,7 @@
   "expected_output_schema": "LoopResponseResult",
   "allowed_tools": ["openai_generate_code", "memory_read", "memory_write"],
   "fallback_behaviors": ["generate_fallback_jsx", "log_error"],
-  "output_must_be_wrapped": true,
-  "can_initiate_recovery": false,
+  "output_must_be_wrapped": True,
+  "can_initiate_recovery": False,
   "version": "1.0.0"
 }

@@ -66,22 +66,22 @@
   },
   "logging_validation": {
     "execution_logs": {
-      "exists": false,
+      "exists": False,
       "entries_found": 0,
       "status": "failure"
     },
     "control_violations": {
-      "exists": true,
+      "exists": True,
       "entries_found": 1,
       "status": "success"
     },
     "task_state_log": {
-      "exists": true,
+      "exists": True,
       "entries_found": 1,
       "status": "success"
     },
     "diagnostics": {
-      "exists": true,
+      "exists": True,
       "entries_found": 5,
       "status": "success"
     }

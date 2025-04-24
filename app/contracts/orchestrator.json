@@ -4,7 +4,7 @@
   "expected_output_schema": "LoopOrchestrationResult",
   "allowed_tools": ["delegate", "memory_read", "memory_write", "plan_execution"],
   "fallback_behaviors": ["log_error", "trigger_recovery"],
-  "output_must_be_wrapped": true,
-  "can_initiate_recovery": true,
+  "output_must_be_wrapped": True,
+  "can_initiate_recovery": True,
   "version": "1.0.0"
 }

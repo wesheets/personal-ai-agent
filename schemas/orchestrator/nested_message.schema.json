@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http:
   "title": "Nested Message Schema",
   "description": "Schema for validating nested message threads in Promethios",
   "type": "object",
@@ -74,7 +74,7 @@
     "actionable": {
       "type": "boolean",
       "description": "Whether the thread contains actionable insights for plan revision",
-      "default": false
+      "default": False
     },
     "tags": {
       "type": "array",
@@ -142,5 +142,5 @@
       }
     }
   },
-  "additionalProperties": false
+  "additionalProperties": False
 }

@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http:
   "title": "Delusion Alert Schema",
   "description": "Schema for alerts generated when a plan is similar to previously rejected plans",
   "type": "object",
@@ -71,5 +71,5 @@
       ]
     }
   },
-  "additionalProperties": false
+  "additionalProperties": False
 }

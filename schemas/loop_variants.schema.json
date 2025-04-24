@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http:
   "title": "Loop Variants Schema",
   "description": "Schema for plan variants generated before execution",
   "type": "object",
@@ -49,5 +49,5 @@
       "format": "date-time"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": False
 }

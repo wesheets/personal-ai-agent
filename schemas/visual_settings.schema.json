@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http:
   "title": "Visualization Settings Schema",
   "description": "Schema for mode-specific visualization settings",
   "type": "object",
@@ -78,7 +78,7 @@
       "enum": ["end_only", "agent_completion", "real_time"]
     }
   },
-  "additionalProperties": false,
+  "additionalProperties": False,
   "examples": [
     {
       "detail_level": "standard",
@@ -102,10 +102,10 @@
         "mode_transition",
         "depth_transition"
       ],
-      "include_timestamps": true,
-      "include_memory_details": true,
-      "include_agent_details": true,
-      "include_decision_details": true,
+      "include_timestamps": True,
+      "include_memory_details": True,
+      "include_agent_details": True,
+      "include_decision_details": True,
       "update_frequency": "agent_completion"
     }
   ]

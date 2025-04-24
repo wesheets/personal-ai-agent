@@ -1,83 +1,23 @@
 {
   "agents": {
     "hal": {
-      "tools": "LoopResponseRequest",
-      "schema_wrapped": "LoopResponseResult",
-      "fallbacks": [
+      "tools": [
         "openai_generate_code",
         "memory_read",
         "memory_write"
       ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "openai_fallback",
+        "schema_fallback"
+      ],
       "checksum": "initial"
     },
     "orchestrator": {
-      "tools": "LoopOrchestrationRequest",
-      "schema_wrapped": "LoopOrchestrationResult",
-      "fallbacks": [
-        "delegate",
+      "tools": [
         "memory_read",
         "memory_write",
-        "plan_execution"
-      ],
-      "checksum": "initial"
-    },
-    "test_agent": {
-      "tools": [
-        "test_tool"
-      ],
-      "schema_wrapped": true,
-      "fallbacks": [],
-      "checksum": "initial"
-    },
-    "critic": {
-      "tools": "LoopSummaryReviewRequest",
-      "schema_wrapped": "LoopReflectionRejection",
-      "fallbacks": [
-        "log_rejection",
-        "write_memory"
-      ],
-      "checksum": "initial"
-    },
-    "sage": {
-      "name": "SAGE",
-      "description": "Summarizes loop beliefs and logs structured belief maps",
-      "capabilities": [
-        "belief_extraction",
-        "confidence_scoring",
-        "emotional_weight_analysis"
-      ],
-      "cascade_mode": true,
-      "post_critic": true,
-      "memory_tags": [
-        "sage_summary_*"
-      ],
-      "last_updated": "2025-04-24T17:08:57.026537"
-    },
-    "forge": {
-      "tools": [
-        "scaffold",
-        "wire",
-        "register",
-        "test",
-        "validate",
-        "patch",
-        "version_track",
-        "memory_read",
-        "memory_write"
-      ],
-      "schema_wrapped": true,
-      "fallbacks": [
-        "log_error",
-        "retry_with_simplified_input",
-        "create_recovery_snapshot"
-      ],
-      "checksum": "initial"
-    },
-    "debug_analyzer": {
-      "tools": [
-        "analyze_memory",
-        "diagnose_loop",
-        "recommend_fix"
+        "plan_next_agent"
       ],
       "schema_wrapped": true,
       "fallbacks": [
@@ -102,457 +42,61 @@
       ],
       "version": "v1.0.0",
       "checksum": "initial"
-    },
-    "OrchestratorPlanRequest": {
-      "file": "app/schemas/orchestrator_schema.py",
-      "bound_to_routes": [
-        "/orchestrator/plan"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "OrchestratorStatusResponse": {
-      "file": "app/schemas/orchestrator_schema.py",
-      "bound_to_routes": [
-        "/orchestrator/status"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "TestSchema": {
-      "file": "app/schemas/test_schema.py",
-      "bound_to_routes": [
-        "/test"
-      ],
-      "version": "v1.0.0",
-      "checksum": "updated_checksum"
-    },
-    "OutputPolicyRequest": {
-      "file": "/app/schemas/output_policy_schema.py",
-      "class": "OutputPolicyRequest",
-      "checksum": "output_policy_schema_checksum",
-      "routes": [
-        "/policy/enforce"
-      ]
-    },
-    "OutputPolicyResult": {
-      "file": "/app/schemas/output_policy_schema.py",
-      "class": "OutputPolicyResult",
-      "checksum": "output_policy_schema_checksum",
-      "routes": [
-        "/policy/enforce"
-      ]
-    },
-    "PolicyLogRequest": {
-      "file": "/app/schemas/output_policy_schema.py",
-      "class": "PolicyLogRequest",
-      "checksum": "output_policy_schema_checksum",
-      "routes": [
-        "/policy/logs"
-      ]
-    },
-    "PolicyLogResponse": {
-      "file": "/app/schemas/output_policy_schema.py",
-      "class": "PolicyLogResponse",
-      "checksum": "output_policy_schema_checksum",
-      "routes": [
-        "/policy/logs"
-      ]
-    },
-    "SageReviewRequest": {
-      "file": "/app/schemas/sage_schema.py",
-      "class": "SageReviewRequest",
-      "checksum": "sage_schema_checksum",
-      "routes": [
-        "/sage/review"
-      ]
-    },
-    "BeliefScore": {
-      "file": "/app/schemas/sage_schema.py",
-      "class": "BeliefScore",
-      "checksum": "sage_schema_checksum",
-      "routes": []
-    },
-    "SageReviewResult": {
-      "file": "/app/schemas/sage_schema.py",
-      "class": "SageReviewResult",
-      "checksum": "sage_schema_checksum",
-      "routes": [
-        "/sage/review"
-      ]
-    },
-    "ForgeBuildRequest": {
-      "file": "app/schemas/forge_schema.py",
-      "bound_to_routes": [
-        "/forge/build"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "ForgeBuildResult": {
-      "file": "app/schemas/forge_schema.py",
-      "bound_to_routes": [
-        "/forge/build"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "ComponentBuildResult": {
-      "file": "app/schemas/forge_schema.py",
-      "bound_to_routes": [],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "ForgeRevisionRequest": {
-      "file": "app/schemas/forge_schema.py",
-      "bound_to_routes": [],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "ForgeRevisionResult": {
-      "file": "app/schemas/forge_schema.py",
-      "bound_to_routes": [],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "Demo_writer_001RequestSchema": {
-      "file": "app/schemas/demo_writer_001_schema.py",
-      "bound_to_routes": [
-        "/demo_writer_001/process"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "Demo_writer_001ResponseSchema": {
-      "file": "app/schemas/demo_writer_001_schema.py",
-      "bound_to_routes": [
-        "/demo_writer_001/process"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopDebugRequest": {
-      "file": "app/schemas/debug_schema.py",
-      "bound_to_routes": [
-        "/debug/analyze-loop"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopDebugResult": {
-      "file": "app/schemas/debug_schema.py",
-      "bound_to_routes": [
-        "/debug/analyze-loop"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopIssue": {
-      "file": "app/schemas/debug_schema.py",
-      "bound_to_routes": [],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "RepairSuggestion": {
-      "file": "app/schemas/debug_schema.py",
-      "bound_to_routes": [],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "ValidateSchemaHashRequest": {
-      "file": "app/schemas/validate_schema_hash.py",
-      "bound_to_routes": [
-        "/critic/validate_schema"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "ValidateSchemaHashResult": {
-      "file": "app/schemas/validate_schema_hash.py",
-      "bound_to_routes": [
-        "/critic/validate_schema"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopPlanRequest": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/plan"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopPlanResponse": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/plan"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopCompletionRequest": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/complete"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopCompletionResponse": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/complete"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopValidateRequest": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/validate"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopValidateResponse": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/validate"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopTraceResponse": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/trace"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopTraceRequest": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/trace"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopResetResponse": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/reset"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "PersonaReflectRequest": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/persona-reflect"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "PersonaReflectResponse": {
-      "file": "app/schemas/loop_schema.py",
-      "bound_to_routes": [
-        "/api/loop/persona-reflect"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopValidationRequest": {
-      "file": "app/schemas/loop_validation_schema.py",
-      "bound_to_routes": [
-        "/api/loop/validate"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopValidationResult": {
-      "file": "app/schemas/loop_validation_schema.py",
-      "bound_to_routes": [
-        "/api/loop/validate"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
-    },
-    "LoopValidationError": {
-      "file": "app/schemas/loop_validation_schema.py",
-      "bound_to_routes": [
-        "/api/loop/validate"
-      ],
-      "version": "v1.0.0",
-      "checksum": "initial"
     }
   },
   "routes": {
-    "/orchestrator/plan": {
-      "method": "POST",
-      "schema": "OrchestratorPlanRequest",
-      "status": "registered",
-      "errors": []
-    },
-    "/orchestrator/status": {
-      "method": "GET",
-      "schema": "OrchestratorStatusResponse",
-      "status": "registered",
-      "errors": []
-    },
-    "/test/route": {
-      "method": "GET",
-      "schema": "TestSchema",
-      "status": "registered",
-      "errors": []
-    },
-    "/loop/snapshot/save": {
-      "method": "POST",
-      "schema": "LoopSnapshot",
-      "status": "tested",
-      "errors": []
-    },
-    "/loop/snapshot/restore": {
-      "method": "POST",
-      "schema": "LoopSnapshot",
-      "status": "tested",
-      "errors": []
-    },
-    "/critic/review": {
-      "method": "POST",
-      "schema": "LoopSummaryReviewRequest",
-      "status": "tested",
-      "errors": []
-    },
-    "/drift/monitor": {
-      "method": "POST",
-      "schema": "DriftMonitorRequest",
-      "status": "tested",
-      "errors": []
-    },
-    "/drift/history": {
-      "method": "GET",
-      "schema": "None",
-      "status": "tested",
-      "errors": []
-    },
-    "/orchestrator/validate_contract": {
-      "method": "POST",
-      "schema": "ContractValidationRequest",
-      "status": "tested",
-      "errors": []
-    },
-    "/orchestrator/validate_delegation": {
-      "method": "POST",
-      "schema": "DelegationValidationRequest",
-      "status": "tested",
-      "errors": []
-    },
-    "/orchestrator/handle_violation": {
-      "method": "POST",
-      "schema": "None",
-      "status": "tested",
-      "errors": []
-    },
-    "/orchestrator/check_recovery_authorization": {
-      "method": "POST",
-      "schema": "None",
-      "status": "tested",
-      "errors": []
-    },
-    "/policy/enforce": {
-      "method": "POST",
-      "schema": "OutputPolicyRequest",
-      "status": "tested"
-    },
-    "/policy/logs": {
-      "method": "POST",
-      "schema": "PolicyLogRequest",
-      "status": "tested"
-    },
-    "/sage/review": {
-      "method": "POST",
-      "schema": "SageReviewRequest",
-      "status": "tested",
-      "errors": []
-    },
-    "/dashboard/sage/beliefs": {
-      "method": "GET",
-      "schema": "None",
-      "status": "tested",
-      "errors": []
-    },
-    "/dashboard/loops": {
-      "method": "GET",
-      "schema": "None",
-      "status": "tested",
-      "errors": []
-    },
-    "/dashboard": {
-      "method": "GET",
-      "schema": "None",
-      "status": "tested",
-      "errors": []
-    },
-    "/forge/build": {
-      "method": "POST",
-      "schema": "ForgeBuildRequest",
-      "status": "registered",
-      "errors": []
-    },
-    "/demo_writer_001/process": {
-      "method": "POST",
-      "schema": "Demo_writer_001Request",
-      "status": "registered",
-      "errors": []
-    },
-    "/debug/analyze-loop": {
-      "method": "POST",
-      "schema": "LoopDebugRequest",
-      "status": "registered",
-      "errors": []
-    },
-    "/api/loop/plan": {
-      "method": "POST",
-      "schema": "LoopPlanRequest",
-      "status": "registered",
-      "errors": []
-    },
-    "/api/loop/complete": {
-      "method": "POST",
-      "schema": "LoopCompletionRequest",
-      "status": "registered",
-      "errors": []
-    },
-    "/api/loop/respond": {
+    "/loop/respond": {
       "method": "POST",
       "schema": "LoopResponseRequest",
       "status": "registered",
       "errors": []
     },
-    "/api/loop/validate": {
+    "/loop/snapshot/save": {
       "method": "POST",
-      "schema": "LoopValidateRequest",
-      "status": "registered",
+      "schema": "SnapshotSaveRequest",
+      "status": "active",
       "errors": []
     },
-    "/api/loop/trace": {
+    "/loop/snapshot/restore": {
       "method": "POST",
-      "schema": "LoopTraceRequest",
-      "status": "registered",
+      "schema": "SnapshotRestoreRequest",
+      "status": "active",
       "errors": []
     },
-    "/api/loop/reset": {
-      "method": "POST",
-      "schema": "LoopResetResponse",
-      "status": "registered",
+    "/loop/snapshot/list": {
+      "method": "GET",
+      "schema": "None",
+      "status": "active",
       "errors": []
     },
-    "/api/loop/persona-reflect": {
+    "/orchestrator/plan": {
       "method": "POST",
-      "schema": "PersonaReflectRequest",
-      "status": "registered",
+      "schema": "OrchestratorPlanRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/orchestrator/validate_contract": {
+      "method": "POST",
+      "schema": "ContractValidationRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/orchestrator/validate_delegation": {
+      "method": "POST",
+      "schema": "DelegationValidationRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/policy/enforce": {
+      "method": "POST",
+      "schema": "OutputPolicyRequest",
+      "status": "tested",
+      "errors": []
+    },
+    "/policy/logs": {
+      "method": "POST",
+      "schema": "PolicyLogRequest",
+      "status": "tested",
       "errors": []
     }
   },
@@ -560,140 +104,73 @@
     "hal_openai": {
       "file": "app/modules/hal_openai.py",
       "wrapped_with_schema": true,
-      "last_updated": "2025-04-24"
-    },
-    "hal_memory": {
-      "file": "app/modules/hal_memory.py",
-      "wrapped_with_schema": true,
-      "last_updated": "2025-04-24"
-    },
-    "orchestrator_memory": {
-      "file": "app/modules/orchestrator_memory.py",
-      "wrapped_with_schema": true,
-      "last_updated": "2025-04-24"
-    },
-    "project_state": {
-      "file": "app/modules/project_state.py",
-      "wrapped_with_schema": true,
-      "last_updated": "2025-04-24"
-    },
-    "retry_handler": {
-      "file": "app/utils/retry_handler.py",
-      "wrapped_with_schema": false,
-      "last_updated": "2025-04-24T15:28:37.176434"
-    },
-    "error_classification": {
-      "file": "app/utils/error_classification.py",
-      "wrapped_with_schema": false,
-      "last_updated": "2025-04-24T15:28:37.177172"
-    },
-    "sage": {
-      "file": "app/agents/sage.py",
-      "wrapped_with_schema": true,
-      "last_updated": "2025-04-24T17:08:57.026634"
-    },
-    "sage_cascade_integration": {
-      "file": "app/integrations/sage_cascade_integration.py",
-      "wrapped_with_schema": true,
-      "last_updated": "2025-04-24T17:08:57.026637"
-    },
-    "orchestrator_sage_integration": {
-      "file": "app/integrations/orchestrator_sage_integration.py",
-      "wrapped_with_schema": true,
-      "last_updated": "2025-04-24T17:08:57.026639"
-    },
-    "dashboard_routes": {
-      "file": "app/routes/dashboard_routes.py",
-      "wrapped_with_schema": false,
-      "last_updated": "2025-04-24T13:38:47.191429"
-    },
-    "dashboard_setup": {
-      "file": "app/utils/dashboard_setup.py",
-      "wrapped_with_schema": false,
-      "last_updated": "2025-04-24T13:38:47.192380"
-    },
-    "forge_agent": {
-      "file": "app/agents/forge_agent.py",
-      "wrapped_with_schema": true,
-      "last_updated": "2025-04-24T18:58:00.000000"
-    },
-    "demo_writer_001_api": {
-      "file": "app/api/modules/demo_writer_001_api.py",
-      "wrapped_with_schema": true,
-      "last_updated": "2025-04-24T19:03:15.880378"
+      "last_updated": "2025-04-24T23:47:07.446977"
     }
   },
   "memory": {
-    "schema_hashes": {
-      "TestSchema": "updated_checksum"
-    },
-    "fallback_logging_enabled": true,
-    "memory_tags": {
-      "forge_build_log": {
-        "format": "forge_build_log_{loop_id}_v{version}",
-        "description": "Build log for FORGE agent",
-        "retention_days": 30
-      }
-    },
-    "tags": {
-      "loop_diagnosis": {
-        "pattern": "loop_diagnosis_{loop_id}_v{n}",
-        "description": "Debug Analyzer diagnosis results for a loop execution",
-        "schema": "LoopDebugResult",
-        "retention_days": 30
-      },
-      "backend_patch_applied_20250424171200": {
-        "pattern": "backend_patch_applied_20250424171200",
-        "description": "Backend patch applied to fix missing schema and route imports",
-        "schema": "None",
-        "retention_days": 30
-      },
-      "backend_refactor_schema_binding_20250424180533": {
-        "pattern": "backend_refactor_schema_binding_20250424180533",
-        "description": "Backend refactor to implement schema binding, test coverage, and route cleanup",
-        "schema": "None",
-        "retention_days": 30
-      }
-    }
+    "schema_hashes": {},
+    "fallback_logging_enabled": true
   },
   "hardening_layers": {
     "schema_checksum_tracking": true,
     "schema_discovery_fallback": true,
     "test_route_integrity": false,
-    "retry_handler_enabled": true,
-    "error_classification_enabled": true,
-    "loop_snapshot_enabled": true,
-    "loop_rewind_enabled": true,
-    "loop_rejection_enabled": true,
-    "drift_monitor_enabled": true,
-    "agent_contract_enforcement": true,
-    "output_policy_enforcement": true,
-    "sage_cascade_mode_enabled": true,
-    "sage_belief_dashboard_enabled": true,
-    "forge_integration_enabled": true,
-    "debug_tools_enabled": true,
-    "diagnostic_agents": [
-      "debug_analyzer"
-    ],
-    "schema_trace_tool_enabled": true
+    "agent_contract_enforcement": true
   },
   "manifest_meta": {
     "version": "1.0.0",
-    "created_at": "2025-04-24T14:28:08.000Z",
-    "last_updated": "2025-04-24T22:05:33.918698",
-    "last_updated_by": "backend_refactor_schema_binding.py"
-  },
-  "testing": {
-    "last_endpoint_sweep": "\u2705 PASSED",
-    "timestamp": "2025-04-24T16:44:39.819205"
-  },
-  "tools": {
-    "schema_trace": {
-      "name": "Schema Trace Tool",
-      "description": "Diagnostic utility that scans the codebase for missing schema definitions and route import errors",
-      "version": "1.0.0",
-      "path": "tools/schema_trace.py",
-      "enabled": true
-    }
+    "created_at": "2025-04-24T23:47:07.446977",
+    "last_updated": "2025-04-24T23:47:07.960943",
+    "boot_events": [
+      {
+        "timestamp": "2025-04-24T23:47:07.816573",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-24T23:47:07.897987",
+        "version": "1.0.0"
+      }
+    ],
+    "loaded_routes": [
+      "agent_config_routes",
+      "agent_context_routes",
+      "memory_recall_routes",
+      "memory_embed_routes",
+      "plan_generate_routes",
+      "train_routes",
+      "export_routes",
+      "fix_routes",
+      "delegate_stream_routes",
+      "app_memory_routes",
+      "loop_routes",
+      "routes_orchestrator_routes",
+      "core_routes",
+      "agent_routes",
+      "persona_routes",
+      "debug_routes",
+      "historian_routes",
+      "debugger_routes",
+      "critic_routes",
+      "sage_routes",
+      "guardian_routes",
+      "pessimist_routes",
+      "nova_routes",
+      "cto_routes",
+      "observer_routes",
+      "sitegen_routes",
+      "reflection_routes",
+      "trust_routes",
+      "snapshot_routes",
+      "orchestrator_plan_routes",
+      "health_monitor_routes",
+      "self_routes",
+      "orchestrator_contract_routes",
+      "ash_routes",
+      "dashboard_routes",
+      "forge_routes",
+      "loop_validation_routes",
+      "output_policy_routes",
+      "pessimist_evaluation_routes"
+    ]
   }
 }
