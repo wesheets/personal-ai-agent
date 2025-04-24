@@ -170,7 +170,7 @@ class HealthMonitor:
             }
         }
 
-    @retry_with_backoff(max_retries=3, base_delay=1, backoff_factor=2)
+    @retry_with_backoff(retries=3, backoff=2)
     async def check_health(self, request: HealthCheckRequest) -> HealthCheckResponse:
         """
         Perform a health check on the specified component or the entire system.
@@ -949,7 +949,7 @@ class HealthMonitor:
         except Exception as e:
             logger.error(f"Error saving health check history: {str(e)}")
 
-    @retry_with_backoff(max_retries=3, base_delay=1, backoff_factor=2)
+    @retry_with_backoff(retries=3, backoff=2)
     async def predict_maintenance(
         self, request: PredictiveMaintenanceRequest
     ) -> PredictiveMaintenanceResponse:
@@ -1374,7 +1374,7 @@ class HealthMonitor:
         except Exception as e:
             logger.error(f"Error saving predictions: {str(e)}")
 
-    @retry_with_backoff(max_retries=3, base_delay=1, backoff_factor=2)
+    @retry_with_backoff(retries=3, backoff=2)
     async def perform_self_healing(self, request: SelfHealingRequest) -> SelfHealingResponse:
         """
         Perform self-healing actions on a component.
@@ -1636,7 +1636,7 @@ class HealthMonitor:
         except Exception as e:
             logger.error(f"Error saving healing actions: {str(e)}")
 
-    @retry_with_backoff(max_retries=3, base_delay=1, backoff_factor=2)
+    @retry_with_backoff(retries=3, backoff=2)
     async def update_config(self, request: HealthMonitorConfigRequest) -> HealthMonitorConfigResponse:
         """
         Update health monitor configuration.
