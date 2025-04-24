@@ -1,5 +1,5 @@
 """
-Update to main.py to register SAGE routes, Dashboard routes, and FORGE routes
+Update to main.py to register SAGE routes, Dashboard routes, FORGE routes, and Debug Analyzer routes
 """
 
 import os
@@ -422,6 +422,15 @@ try:
     print("✅ FORGE routes loaded")
 except ImportError as e:
     print(f"⚠️ Failed to load FORGE routes: {e}")
+
+# Debug Analyzer routes - Hard-wired registration
+try:
+    from app.routes.debug_routes import router as debug_analyzer_router
+    app.include_router(debug_analyzer_router)
+    loaded_routes.append("debug_analyzer")
+    print("✅ Debug Analyzer routes loaded")
+except ImportError as e:
+    print(f"⚠️ Failed to load Debug Analyzer routes: {e}")
 
 # Drift routes
 try:
