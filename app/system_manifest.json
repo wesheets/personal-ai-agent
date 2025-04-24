@@ -1,0 +1,355 @@
+{
+  "agents": {
+    "hal": {
+      "tools": "LoopResponseRequest",
+      "schema_wrapped": "LoopResponseResult",
+      "fallbacks": [
+        "openai_generate_code",
+        "memory_read",
+        "memory_write"
+      ],
+      "checksum": "initial"
+    },
+    "orchestrator": {
+      "tools": "LoopOrchestrationRequest",
+      "schema_wrapped": "LoopOrchestrationResult",
+      "fallbacks": [
+        "delegate",
+        "memory_read",
+        "memory_write",
+        "plan_execution"
+      ],
+      "checksum": "initial"
+    },
+    "test_agent": {
+      "tools": [
+        "test_tool"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [],
+      "checksum": "initial"
+    },
+    "critic": {
+      "tools": "LoopSummaryReviewRequest",
+      "schema_wrapped": "LoopReflectionRejection",
+      "fallbacks": [
+        "log_rejection",
+        "write_memory"
+      ],
+      "checksum": "initial"
+    },
+    "sage": {
+      "name": "SAGE",
+      "description": "Summarizes loop beliefs and logs structured belief maps",
+      "capabilities": [
+        "belief_extraction",
+        "confidence_scoring",
+        "emotional_weight_analysis"
+      ],
+      "cascade_mode": true,
+      "post_critic": true,
+      "memory_tags": [
+        "sage_summary_*"
+      ],
+      "last_updated": "2025-04-24T17:08:57.026537"
+    }
+  },
+  "schemas": {
+    "LoopResponseRequest": {
+      "file": "app/schemas/loop_schema.py",
+      "bound_to_routes": [
+        "/loop/respond"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "LoopResponseResult": {
+      "file": "app/schemas/loop_schema.py",
+      "bound_to_routes": [
+        "/loop/respond"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "OrchestratorPlanRequest": {
+      "file": "app/schemas/orchestrator_schema.py",
+      "bound_to_routes": [
+        "/orchestrator/plan"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "OrchestratorStatusResponse": {
+      "file": "app/schemas/orchestrator_schema.py",
+      "bound_to_routes": [
+        "/orchestrator/status"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "TestSchema": {
+      "file": "app/schemas/test_schema.py",
+      "bound_to_routes": [
+        "/test"
+      ],
+      "version": "v1.0.0",
+      "checksum": "updated_checksum"
+    },
+    "OutputPolicyRequest": {
+      "file": "/app/schemas/output_policy_schema.py",
+      "class": "OutputPolicyRequest",
+      "checksum": "output_policy_schema_checksum",
+      "routes": [
+        "/policy/enforce"
+      ]
+    },
+    "OutputPolicyResult": {
+      "file": "/app/schemas/output_policy_schema.py",
+      "class": "OutputPolicyResult",
+      "checksum": "output_policy_schema_checksum",
+      "routes": [
+        "/policy/enforce"
+      ]
+    },
+    "PolicyLogRequest": {
+      "file": "/app/schemas/output_policy_schema.py",
+      "class": "PolicyLogRequest",
+      "checksum": "output_policy_schema_checksum",
+      "routes": [
+        "/policy/logs"
+      ]
+    },
+    "PolicyLogResponse": {
+      "file": "/app/schemas/output_policy_schema.py",
+      "class": "PolicyLogResponse",
+      "checksum": "output_policy_schema_checksum",
+      "routes": [
+        "/policy/logs"
+      ]
+    },
+    "SageReviewRequest": {
+      "file": "/app/schemas/sage_schema.py",
+      "class": "SageReviewRequest",
+      "checksum": "sage_schema_checksum",
+      "routes": [
+        "/sage/review"
+      ]
+    },
+    "BeliefScore": {
+      "file": "/app/schemas/sage_schema.py",
+      "class": "BeliefScore",
+      "checksum": "sage_schema_checksum",
+      "routes": []
+    },
+    "SageReviewResult": {
+      "file": "/app/schemas/sage_schema.py",
+      "class": "SageReviewResult",
+      "checksum": "sage_schema_checksum",
+      "routes": [
+        "/sage/review"
+      ]
+    }
+  },
+  "routes": {
+    "/loop/respond": {
+      "method": "POST",
+      "schema": "LoopResponseRequest",
+      "status": "registered",
+      "errors": []
+    },
+    "/orchestrator/plan": {
+      "method": "POST",
+      "schema": "OrchestratorPlanRequest",
+      "status": "registered",
+      "errors": []
+    },
+    "/orchestrator/status": {
+      "method": "GET",
+      "schema": "OrchestratorStatusResponse",
+      "status": "registered",
+      "errors": []
+    },
+    "/test/route": {
+      "method": "GET",
+      "schema": "TestSchema",
+      "status": "registered",
+      "errors": []
+    },
+    "/loop/snapshot/save": {
+      "method": "POST",
+      "schema": "LoopSnapshot",
+      "status": "tested",
+      "errors": []
+    },
+    "/loop/snapshot/restore": {
+      "method": "POST",
+      "schema": "LoopSnapshot",
+      "status": "tested",
+      "errors": []
+    },
+    "/critic/review": {
+      "method": "POST",
+      "schema": "LoopSummaryReviewRequest",
+      "status": "tested",
+      "errors": []
+    },
+    "/drift/monitor": {
+      "method": "POST",
+      "schema": "DriftMonitorRequest",
+      "status": "tested",
+      "errors": []
+    },
+    "/drift/history": {
+      "method": "GET",
+      "schema": "None",
+      "status": "tested",
+      "errors": []
+    },
+    "/orchestrator/validate_contract": {
+      "method": "POST",
+      "schema": "ContractValidationRequest",
+      "status": "tested",
+      "errors": []
+    },
+    "/orchestrator/validate_delegation": {
+      "method": "POST",
+      "schema": "DelegationValidationRequest",
+      "status": "tested",
+      "errors": []
+    },
+    "/orchestrator/handle_violation": {
+      "method": "POST",
+      "schema": "None",
+      "status": "tested",
+      "errors": []
+    },
+    "/orchestrator/check_recovery_authorization": {
+      "method": "POST",
+      "schema": "None",
+      "status": "tested",
+      "errors": []
+    },
+    "/policy/enforce": {
+      "method": "POST",
+      "schema": "OutputPolicyRequest",
+      "status": "tested"
+    },
+    "/policy/logs": {
+      "method": "POST",
+      "schema": "PolicyLogRequest",
+      "status": "tested"
+    },
+    "/sage/review": {
+      "method": "POST",
+      "schema": "SageReviewRequest",
+      "status": "tested",
+      "errors": []
+    },
+    "/dashboard/sage/beliefs": {
+      "method": "GET",
+      "schema": "None",
+      "status": "tested",
+      "errors": []
+    },
+    "/dashboard/loops": {
+      "method": "GET",
+      "schema": "None",
+      "status": "tested",
+      "errors": []
+    },
+    "/dashboard": {
+      "method": "GET",
+      "schema": "None",
+      "status": "tested",
+      "errors": []
+    }
+  },
+  "modules": {
+    "hal_openai": {
+      "file": "app/modules/hal_openai.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24"
+    },
+    "hal_memory": {
+      "file": "app/modules/hal_memory.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24"
+    },
+    "orchestrator_memory": {
+      "file": "app/modules/orchestrator_memory.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24"
+    },
+    "project_state": {
+      "file": "app/modules/project_state.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24"
+    },
+    "retry_handler": {
+      "file": "app/utils/retry_handler.py",
+      "wrapped_with_schema": false,
+      "last_updated": "2025-04-24T15:28:37.176434"
+    },
+    "error_classification": {
+      "file": "app/utils/error_classification.py",
+      "wrapped_with_schema": false,
+      "last_updated": "2025-04-24T15:28:37.177172"
+    },
+    "sage": {
+      "file": "app/agents/sage.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24T17:08:57.026634"
+    },
+    "sage_cascade_integration": {
+      "file": "app/integrations/sage_cascade_integration.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24T17:08:57.026637"
+    },
+    "orchestrator_sage_integration": {
+      "file": "app/integrations/orchestrator_sage_integration.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24T17:08:57.026639"
+    },
+    "dashboard_routes": {
+      "file": "app/routes/dashboard_routes.py",
+      "wrapped_with_schema": false,
+      "last_updated": "2025-04-24T13:38:47.191429"
+    },
+    "dashboard_setup": {
+      "file": "app/utils/dashboard_setup.py",
+      "wrapped_with_schema": false,
+      "last_updated": "2025-04-24T13:38:47.192380"
+    }
+  },
+  "memory": {
+    "schema_hashes": {
+      "TestSchema": "updated_checksum"
+    },
+    "fallback_logging_enabled": true
+  },
+  "hardening_layers": {
+    "schema_checksum_tracking": true,
+    "schema_discovery_fallback": true,
+    "test_route_integrity": false,
+    "retry_handler_enabled": true,
+    "error_classification_enabled": true,
+    "loop_snapshot_enabled": true,
+    "loop_rewind_enabled": true,
+    "loop_rejection_enabled": true,
+    "drift_monitor_enabled": true,
+    "agent_contract_enforcement": true,
+    "output_policy_enforcement": true,
+    "sage_cascade_mode_enabled": true,
+    "sage_belief_dashboard_enabled": true
+  },
+  "manifest_meta": {
+    "version": "1.0.0",
+    "created_at": "2025-04-24T14:28:08.000Z",
+    "last_updated": "2025-04-24T17:38:47.195268",
+    "last_updated_by": "dashboard_manifest_update.py"
+  },
+  "testing": {
+    "last_endpoint_sweep": "\u2705 PASSED",
+    "timestamp": "2025-04-24T16:44:39.819205"
+  }
+}

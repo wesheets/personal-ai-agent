@@ -1,0 +1,10 @@
+{
+  "agent_id": "critic",
+  "accepted_input_schema": "LoopSummaryReviewRequest",
+  "expected_output_schema": "LoopReflectionRejection",
+  "allowed_tools": ["log_rejection", "write_memory"],
+  "fallback_behaviors": ["log_schema_violation"],
+  "output_must_be_wrapped": true,
+  "can_initiate_recovery": true,
+  "version": "1.0.0"
+}

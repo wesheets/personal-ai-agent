@@ -1,28 +1,44 @@
-import sys
+"""
+Update to main.py to register SAGE routes and Dashboard routes
+"""
+
 import os
+import logging
+import json
+import importlib
+import sys
+from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+import time
+import datetime
 
 # Add current directory to Python path to ensure imports work
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-"""
-Main application module for the Promethios API.
-
-This module initializes the FastAPI application and includes all routes.
-"""
-
-from fastapi import FastAPI, Request, Response
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import importlib
-import time
-import json
-import datetime
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger("api")
 
 # Import memory module
-from app.memory.project_memory import PROJECT_MEMORY
+try:
+    from app.memory.project_memory import PROJECT_MEMORY
+    print("✅ Imported PROJECT_MEMORY")
+except ImportError as e:
+    print(f"⚠️ Failed to import PROJECT_MEMORY: {e}")
 
 # Import self_routes directly as it's in a different location
-from app.routes.self_routes import router as self_router
+try:
+    from app.routes.self_routes import router as self_router
+    self_routes_loaded = True
+    print("✅ Directly loaded self_routes")
+except ImportError as e:
+    self_routes_loaded = False
+    print(f"⚠️ Could not load self_routes directly: {e}")
 
 # Import routes with explicit API paths directly
 try:
@@ -146,8 +162,8 @@ except ImportError:
 # Create FastAPI app
 app = FastAPI(
     title="Promethios API",
-    description="API for the Promethios cognitive system",
-    version="1.0.0",
+    description="API for the Promethios AI Agent System",
+    version="0.1.0",
 )
 
 # Add CORS middleware
@@ -167,6 +183,37 @@ async def add_process_time_header(request: Request, call_next):
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
     return response
+
+# Initialize system manifest
+try:
+    from app.utils.manifest_manager import initialize_manifest, register_system_boot, register_loaded_routes
+    
+    # Initialize manifest at boot
+    initialize_manifest()
+    
+    # Register system boot in manifest
+    register_system_boot()
+    
+    print("✅ System manifest initialized")
+    manifest_initialized = True
+except ImportError as e:
+    print(f"⚠️ Failed to initialize system manifest: {e}")
+    manifest_initialized = False
+
+# Setup dashboard static files
+try:
+    from app.utils.dashboard_setup import setup_dashboard_static_files
+    setup_result = setup_dashboard_static_files()
+    print(f"✅ Dashboard static files setup: {setup_result['message']}")
+except ImportError as e:
+    print(f"⚠️ Failed to setup dashboard static files: {e}")
+
+# Mount static files directory
+try:
+    app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    print("✅ Static files directory mounted")
+except Exception as e:
+    print(f"⚠️ Failed to mount static files directory: {e}")
 
 # Initialize loaded_routes list to track all registered routes
 loaded_routes = []
@@ -248,6 +295,51 @@ if trust_routes_loaded:
     print("✅ Included trust_router")
     loaded_routes.append("trust_routes")
 
+# SAGE routes - Hard-wired registration
+try:
+    from app.routes.sage_routes import router as sage_router
+    app.include_router(sage_router)
+    loaded_routes.append("sage")
+    print("✅ SAGE routes loaded")
+except ImportError as e:
+    print(f"⚠️ Failed to load SAGE routes: {e}")
+
+# Dashboard routes - Hard-wired registration
+try:
+    from app.routes.dashboard_routes import router as dashboard_router
+    app.include_router(dashboard_router)
+    loaded_routes.append("dashboard")
+    print("✅ Dashboard routes loaded")
+except ImportError as e:
+    print(f"⚠️ Failed to load Dashboard routes: {e}")
+
+# Critic routes
+try:
+    from app.routes.critic_routes import router as critic_router
+    app.include_router(critic_router)
+    loaded_routes.append("critic")
+    print("✅ Critic routes loaded")
+except ImportError as e:
+    print(f"⚠️ Failed to load Critic routes: {e}")
+
+# Drift routes
+try:
+    from app.routes.drift_routes import router as drift_router
+    app.include_router(drift_router)
+    loaded_routes.append("drift")
+    print("✅ Drift routes loaded")
+except ImportError as e:
+    print(f"⚠️ Failed to load Drift routes: {e}")
+
+# Output Policy routes
+try:
+    from app.routes.output_policy_routes import router as output_policy_router
+    app.include_router(output_policy_router)
+    loaded_routes.append("output_policy")
+    print("✅ Output Policy routes loaded")
+except ImportError as e:
+    print(f"⚠️ Failed to load Output Policy routes: {e}")
+
 # Comprehensive list of all routes based on file system scan
 routes_to_try = [
     # Core routes
@@ -299,7 +391,8 @@ routes_to_try = [
 # Remove routes that are already loaded directly
 for route in ["memory_routes", "loop_routes", "hal_routes", "core_routes", 
               "agent_routes", "persona_routes", "debug_routes", "orchestrator_routes",
-              "reflection_routes", "trust_routes", "historian_routes", "debugger_routes"]:
+              "reflection_routes", "trust_routes", "historian_routes", "debugger_routes",
+              "sage", "dashboard", "critic", "drift", "output_policy"]:
     if route in routes_to_try:
         routes_to_try.remove(route)
 
@@ -396,9 +489,18 @@ for route in routes_to_try:
         loaded_routes.append(route)
 
 # Include self_router separately as it's already imported
-app.include_router(self_router, prefix="/self")
-print(f"✅ Loaded route: self_routes")
-loaded_routes.append("self_routes")
+if self_routes_loaded:
+    app.include_router(self_router, prefix="/self")
+    print(f"✅ Loaded route: self_routes")
+    loaded_routes.append("self_routes")
+
+# Register loaded routes in manifest
+if manifest_initialized:
+    try:
+        register_loaded_routes(loaded_routes)
+        print(f"✅ Registered {len(loaded_routes)} routes in manifest")
+    except Exception as e:
+        print(f"⚠️ Failed to register routes in manifest: {e}")
 
 # Direct fallback handler for /api/loop/respond endpoint
 # This ensures the endpoint always works even if route registration fails
@@ -472,7 +574,14 @@ async def fallback_loop_respond(request_data: dict):
 # Root endpoint
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the Promethios API"}
+    """Root endpoint that returns basic API information"""
+    return {
+        "name": "Promethios API",
+        "version": "0.1.0",
+        "status": "operational",
+        "loaded_routes": loaded_routes,
+        "timestamp": datetime.datetime.now().isoformat()
+    }
 
 # Health check endpoint
 @app.get("/health")
@@ -493,6 +602,13 @@ async def api_ping():
 @app.get("/schema-injection-test")
 async def schema_injection_test():
     return {"status": "ok", "message": "Schema injection test endpoint"}
+
+# Dashboard redirect
+@app.get("/dashboard")
+async def dashboard_redirect():
+    """Redirect to the dashboard frontend"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/static/dashboard/index.html")
 
 # Log all registered routes
 print(f"\n🔍 Registered {len(loaded_routes)} routes: {', '.join(loaded_routes)}")

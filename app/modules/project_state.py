@@ -4,6 +4,7 @@ This module provides functionality for tracking and persisting the evolving stat
 It maintains a centralized record of project status, files created, agents involved, and other metadata.
 
 MODIFIED: Added auto-expiration of orphaned projects after 24h of inactivity
+MODIFIED: Added get_project_state alias for read_project_state to maintain compatibility
 """
 import logging
 import json
@@ -101,6 +102,20 @@ def read_project_state(project_id: str) -> Dict[str, Any]:
             "last_completed_agent": None,
             "completed_steps": []
         }
+
+# Add alias for read_project_state to maintain compatibility
+def get_project_state(project_id: str) -> Dict[str, Any]:
+    """
+    Alias for read_project_state to maintain compatibility with existing code.
+    
+    Args:
+        project_id: The project identifier (e.g., "demo_writer_001")
+            
+    Returns:
+        Dict containing the current project state
+    """
+    logger.info(f"Using get_project_state alias for project {project_id}")
+    return read_project_state(project_id)
 
 def write_project_state(project_id: str, state_dict: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -326,6 +341,21 @@ def should_continue_loop(project_id: str) -> bool:
         
         # Default to stopping the loop in case of error
         return False
+
+# Add alias for read_project_state to maintain compatibility
+def get_project_state(project_id: str) -> Dict[str, Any]:
+    """
+    Alias for read_project_state to maintain compatibility with existing code.
+    
+    Args:
+        project_id: The project identifier (e.g., "demo_writer_001")
+            
+    Returns:
+        Dict containing the project state
+    """
+    logger.info(f"Using get_project_state alias for project {project_id}")
+    print(f"✅ Using get_project_state alias for project {project_id}")
+    return read_project_state(project_id)
 
 def cleanup_orphaned_projects() -> Dict[str, Any]:
     """

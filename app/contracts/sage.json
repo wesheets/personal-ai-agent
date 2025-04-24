@@ -1,0 +1,10 @@
+{
+  "agent_id": "sage",
+  "accepted_input_schema": "LoopAnalysisRequest",
+  "expected_output_schema": "LoopAnalysisResult",
+  "allowed_tools": ["analyze_memory", "memory_read", "generate_insights"],
+  "fallback_behaviors": ["log_error", "provide_partial_analysis"],
+  "output_must_be_wrapped": true,
+  "can_initiate_recovery": false,
+  "version": "1.0.0"
+}

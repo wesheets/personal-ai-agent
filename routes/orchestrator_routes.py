@@ -333,6 +333,46 @@ async def orchestrator_plan(request: OrchestratorPlanRequest):
         JSON response with next agent recommendation and reasoning
     """
     try:
+        # Log schema checksums for orchestrator-related schemas
+        try:
+            from app.utils.schema_integrity import get_schema_checksum
+            
+            # Import schemas to check
+            try:
+                from app.schemas.loop_schema import LoopResponseRequest, LoopResponseResult
+                from app.schemas.orchestrator_schema import OrchestratorPlanRequest, OrchestratorStatusResponse
+                
+                # Generate and log schema checksums
+                schema_hashes = {
+                    "LoopResponseRequest": get_schema_checksum(LoopResponseRequest),
+                    "LoopResponseResult": get_schema_checksum(LoopResponseResult),
+                    "OrchestratorPlanRequest": get_schema_checksum(OrchestratorPlanRequest)
+                }
+                
+                # Try to get orchestrator status schema if available
+                try:
+                    schema_hashes["OrchestratorStatusResponse"] = get_schema_checksum(OrchestratorStatusResponse)
+                except Exception:
+                    # Not critical if this isn't available
+                    pass
+                
+                # Log schema checksums to memory
+                await log_loop_event(
+                    loop_id=request.project_id,
+                    project_id=request.project_id,
+                    agent="orchestrator",
+                    task="schema_checksum_tracking",
+                    status="success",
+                    additional_data={"schema_hashes": schema_hashes}
+                )
+                
+                logger.info(f"✅ Logged schema checksums for orchestrator schemas")
+                print(f"✅ Orchestrator schema checksums logged: {len(schema_hashes)} schemas")
+            except Exception as schema_import_e:
+                logger.warning(f"⚠️ Could not import schemas for checksum: {schema_import_e}")
+        except Exception as schema_e:
+            logger.warning(f"⚠️ Could not log schema checksums: {schema_e}")
+            
         # Get project state
         project_state = await get_project_state(request.project_id)
         
