@@ -1,0 +1,143 @@
+{
+  "agents": {
+    "hal": {
+      "tools": [
+        "openai_generate_code",
+        "memory_read",
+        "memory_write"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "openai_fallback",
+        "schema_fallback"
+      ],
+      "checksum": "initial"
+    },
+    "orchestrator": {
+      "tools": [
+        "memory_read",
+        "memory_write",
+        "plan_next_agent"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "schema_fallback"
+      ],
+      "checksum": "initial"
+    },
+    "test_agent": {
+      "tools": [
+        "test_tool"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [],
+      "checksum": "initial"
+    }
+  },
+  "schemas": {
+    "LoopResponseRequest": {
+      "file": "app/schemas/loop_schema.py",
+      "bound_to_routes": [
+        "/loop/respond"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "LoopResponseResult": {
+      "file": "app/schemas/loop_schema.py",
+      "bound_to_routes": [
+        "/loop/respond"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "OrchestratorPlanRequest": {
+      "file": "app/schemas/orchestrator_schema.py",
+      "bound_to_routes": [
+        "/orchestrator/plan"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "OrchestratorStatusResponse": {
+      "file": "app/schemas/orchestrator_schema.py",
+      "bound_to_routes": [
+        "/orchestrator/status"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "TestSchema": {
+      "file": "app/schemas/test_schema.py",
+      "bound_to_routes": [
+        "/test"
+      ],
+      "version": "v1.0.0",
+      "checksum": "updated_checksum"
+    }
+  },
+  "routes": {
+    "/loop/respond": {
+      "method": "POST",
+      "schema": "LoopResponseRequest",
+      "status": "registered",
+      "errors": []
+    },
+    "/orchestrator/plan": {
+      "method": "POST",
+      "schema": "OrchestratorPlanRequest",
+      "status": "registered",
+      "errors": []
+    },
+    "/orchestrator/status": {
+      "method": "GET",
+      "schema": "OrchestratorStatusResponse",
+      "status": "registered",
+      "errors": []
+    },
+    "/test/route": {
+      "method": "GET",
+      "schema": "TestSchema",
+      "status": "registered",
+      "errors": []
+    }
+  },
+  "modules": {
+    "hal_openai": {
+      "file": "app/modules/hal_openai.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24"
+    },
+    "hal_memory": {
+      "file": "app/modules/hal_memory.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24"
+    },
+    "orchestrator_memory": {
+      "file": "app/modules/orchestrator_memory.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24"
+    },
+    "project_state": {
+      "file": "app/modules/project_state.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24"
+    }
+  },
+  "memory": {
+    "schema_hashes": {
+      "TestSchema": "updated_checksum"
+    },
+    "fallback_logging_enabled": true
+  },
+  "hardening_layers": {
+    "schema_checksum_tracking": true,
+    "schema_discovery_fallback": true,
+    "test_route_integrity": false
+  },
+  "manifest_meta": {
+    "version": "1.0.0",
+    "created_at": "2025-04-24T14:28:08.000Z",
+    "last_updated": "2025-04-24T14:37:36.792396"
+  }
+}
