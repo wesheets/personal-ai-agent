@@ -81,6 +81,54 @@ async def save_snapshot(loop_id: str, memory_state: Dict[str, Any], agents: List
         logger.error(f"❌ Error saving snapshot: {str(e)}")
         return False
 
+async def create_recovery_snapshot(loop_id: str, notes: str = "Auto-created recovery point") -> Dict[str, Any]:
+    """
+    Create a recovery snapshot before a potentially risky operation.
+    
+    Args:
+        loop_id: Unique identifier for the loop
+        notes: Notes about the snapshot context
+        
+    Returns:
+        Dictionary containing the result of the snapshot operation
+    """
+    try:
+        # Get current memory state
+        memory_state = await get_memory_state(loop_id)
+        
+        # Get agent sequence (simplified for now)
+        agent_sequence = memory_state.get("agent_sequence", ["hal", "critic", "orchestrator", "forge"])
+        
+        # Save the snapshot
+        success = await save_snapshot(
+            loop_id=loop_id,
+            memory_state=memory_state,
+            agents=agent_sequence,
+            notes=notes
+        )
+        
+        if success:
+            logger.info(f"✅ Created recovery snapshot for loop {loop_id}")
+            return {
+                "status": "success",
+                "message": "Recovery snapshot created successfully",
+                "loop_id": loop_id
+            }
+        else:
+            return {
+                "status": "error",
+                "message": "Failed to create recovery snapshot",
+                "loop_id": loop_id
+            }
+    
+    except Exception as e:
+        logger.error(f"❌ Error creating recovery snapshot: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Error creating recovery snapshot: {str(e)}",
+            "loop_id": loop_id
+        }
+
 async def load_snapshot(loop_id: str) -> Optional[LoopSnapshot]:
     """
     Load the most recent snapshot for a loop.

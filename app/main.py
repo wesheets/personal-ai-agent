@@ -1,5 +1,5 @@
 """
-Update to main.py to register SAGE routes and Dashboard routes
+Update to main.py to register SAGE routes, Dashboard routes, and FORGE routes
 """
 
 import os
@@ -105,6 +105,15 @@ try:
     print("✅ Dashboard routes loaded")
 except ImportError as e:
     print(f"⚠️ Failed to load Dashboard routes: {e}")
+
+# FORGE routes - Hard-wired registration
+try:
+    from app.routes.forge_routes import router as forge_router
+    app.include_router(forge_router)
+    loaded_routes.append("forge")
+    print("✅ FORGE routes loaded")
+except ImportError as e:
+    print(f"⚠️ Failed to load FORGE routes: {e}")
 
 # Loop routes
 try:
