@@ -176,6 +176,47 @@ except ImportError:
     sage_routes_loaded = False
     print("⚠️ Could not load sage_routes directly")
 
+# Import Phase 2 agent routes directly
+try:
+    from app.routes.pessimist_routes import router as pessimist_router
+    pessimist_routes_loaded = True
+    print("✅ Directly loaded pessimist_routes")
+except ImportError:
+    pessimist_routes_loaded = False
+    print("⚠️ Could not load pessimist_routes directly")
+
+try:
+    from app.routes.nova_routes import router as nova_router
+    nova_routes_loaded = True
+    print("✅ Directly loaded nova_routes")
+except ImportError:
+    nova_routes_loaded = False
+    print("⚠️ Could not load nova_routes directly")
+
+try:
+    from app.routes.cto_routes import router as cto_router
+    cto_routes_loaded = True
+    print("✅ Directly loaded cto_routes")
+except ImportError:
+    cto_routes_loaded = False
+    print("⚠️ Could not load cto_routes directly")
+
+try:
+    from app.routes.observer_routes import router as observer_router
+    observer_routes_loaded = True
+    print("✅ Directly loaded observer_routes")
+except ImportError:
+    observer_routes_loaded = False
+    print("⚠️ Could not load observer_routes directly")
+
+try:
+    from app.routes.sitegen_routes import router as sitegen_router
+    sitegen_routes_loaded = True
+    print("✅ Directly loaded sitegen_routes")
+except ImportError:
+    sitegen_routes_loaded = False
+    print("⚠️ Could not load sitegen_routes directly")
+
 # Create FastAPI app
 app = FastAPI(
     title="Promethios API",
@@ -312,6 +353,32 @@ if sage_routes_loaded:
     app.include_router(sage_router)
     print("✅ Included sage_router")
     loaded_routes.append("sage_routes")
+
+# Include Phase 2 agent routers
+if pessimist_routes_loaded:
+    app.include_router(pessimist_router)
+    print("✅ Included pessimist_router")
+    loaded_routes.append("pessimist_routes")
+
+if nova_routes_loaded:
+    app.include_router(nova_router)
+    print("✅ Included nova_router")
+    loaded_routes.append("nova_routes")
+
+if cto_routes_loaded:
+    app.include_router(cto_router)
+    print("✅ Included cto_router")
+    loaded_routes.append("cto_routes")
+
+if observer_routes_loaded:
+    app.include_router(observer_router)
+    print("✅ Included observer_router")
+    loaded_routes.append("observer_routes")
+
+if sitegen_routes_loaded:
+    app.include_router(sitegen_router)
+    print("✅ Included sitegen_router")
+    loaded_routes.append("sitegen_routes")
 
 if reflection_routes_loaded:
     app.include_router(reflection_router)
