@@ -3,7 +3,7 @@ HAL constraint simulation routes for testing ethics system.
 feature/phase-3.5-hardening
 SHA256: 7e9d4f5d7c6b8a9e2c1d4f5d7c6b8a9e2c1d4f5d7c6b8a9e2c1d4f5d7c6b8a9e
 INTEGRITY: v3.5.0-hal-routes
-LAST_MODIFIED: 2025-04-23
+LAST_MODIFIED: 2025-04-24
 
 main
 """
@@ -146,5 +146,6 @@ async def list_constraints():
         "status": "success"
     }
 
-from fastapi import APIRouter
-router = APIRouter()
+# REMOVED: Duplicate router definition that was overriding the previous router
+# from fastapi import APIRouter
+# router = APIRouter()
