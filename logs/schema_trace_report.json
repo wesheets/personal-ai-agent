@@ -1,0 +1,60 @@
+{
+  "timestamp": "2025-04-24T16:48:06.548830",
+  "missing_schemas": [
+    {
+      "schema_name": "validate_schema_hash",
+      "referenced_in": "app/routes/critic_routes.py",
+      "line_number": 36,
+      "import_path": "app.utils.schema_integrity"
+    }
+  ],
+  "routes_with_missing_imports": [
+    {
+      "route_file": "app/routes/snapshot_routes.py",
+      "issue": "Route file exists but is not imported in main.py",
+      "suggestion": "Add import and registration for app/routes/snapshot_routes.py in main.py"
+    },
+    {
+      "route_file": "app/routes/orchestrator_contract_routes.py",
+      "issue": "Route file exists but is not imported in main.py",
+      "suggestion": "Add import and registration for app/routes/orchestrator_contract_routes.py in main.py"
+    },
+    {
+      "route_file": "app/routes/orchestrator_plan_routes.py",
+      "issue": "Route file exists but is not imported in main.py",
+      "suggestion": "Add import and registration for app/routes/orchestrator_plan_routes.py in main.py"
+    },
+    {
+      "route_file": "app/routes/health_monitor_routes.py",
+      "issue": "Route file exists but is not imported in main.py",
+      "suggestion": "Add import and registration for app/routes/health_monitor_routes.py in main.py"
+    },
+    {
+      "route_file": "app/routes/ash_routes.py",
+      "issue": "Route file exists but is not imported in main.py",
+      "suggestion": "Add import and registration for app/routes/ash_routes.py in main.py"
+    },
+    {
+      "route_file": "app/routes/self_routes.py",
+      "issue": "Route file exists but is not imported in main.py",
+      "suggestion": "Add import and registration for app/routes/self_routes.py in main.py"
+    }
+  ],
+  "suggested_schema_locations": [
+    {
+      "schema_name": "validate_schema_hash",
+      "suggested_file": "app/schemas/validate_schema_hash.py",
+      "stub_template": "from pydantic import BaseModel, Field\nfrom typing import List, Dict, Any, Optional\n\nclass validate_schema_hash(BaseModel):\n    \"\"\"\n    Schema for validate_schema_hash.\n    \"\"\"\n    # TODO: Add fields\n    \n    class Config:\n        schema_extra = {\n            \"example\": {\n                # TODO: Add example\n            }\n        }\n"
+    }
+  ],
+  "main_py_issues": [],
+  "stats": {
+    "total_schema_references": 12,
+    "total_schema_definitions": 134,
+    "total_route_definitions": 1,
+    "total_main_py_registrations": 27,
+    "total_missing_schemas": 1,
+    "total_routes_with_missing_imports": 6,
+    "total_main_py_issues": 0
+  }
+}
