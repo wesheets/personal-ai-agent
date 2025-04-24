@@ -1,4 +1,34 @@
 AGENT_REGISTRY = {
+    "guardian": {
+        "name": "GUARDIAN",
+        "model": "gpt-4",
+        "description": "Escalation handler responsible for system halts, operator alerts, and rollback operations.",
+        "tone": "authoritative",
+        "system_prompt": "You are the GUARDIAN agent. Your role is to handle escalations, system halts, operator alerts, and rollback operations.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["halt", "alert_operator", "rollback_loop", "raise_flag"],
+        "input_schema": ["alert_type", "severity", "description"],
+        "output_schema": ["status", "alert_id", "actions_taken", "system_status"],
+        "persona": "security enforcer",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "ash": {
+        "name": "ASH",
+        "model": "gpt-4",
+        "description": "Cold, clinical agent designed for risk analysis, anomaly detection, and moral ambiguity resolution.",
+        "tone": "clinical",
+        "system_prompt": "You are ASH, a precision agent for risk analysis, anomaly detection, and morally complex operations.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["analyze", "detect", "test", "execute", "resolve"],
+        "input_schema": ["scenario_id", "context", "risk_tolerance"],
+        "output_schema": ["status", "risk_assessment", "risk_factors", "anomalies_detected"],
+        "persona": "clinical analyst",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
     "core-forge": {
         "name": "Core.Forge",
         "model": "gpt-4",

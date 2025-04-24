@@ -176,6 +176,15 @@ except ImportError:
     sage_routes_loaded = False
     print("⚠️ Could not load sage_routes directly")
 
+# Import Phase 3 agent routes directly
+try:
+    from app.routes.guardian_routes import router as guardian_router
+    guardian_routes_loaded = True
+    print("✅ Directly loaded guardian_routes")
+except ImportError:
+    guardian_routes_loaded = False
+    print("⚠️ Could not load guardian_routes directly")
+
 # Import Phase 2 agent routes directly
 try:
     from app.routes.pessimist_routes import router as pessimist_router
@@ -353,6 +362,12 @@ if sage_routes_loaded:
     app.include_router(sage_router)
     print("✅ Included sage_router")
     loaded_routes.append("sage_routes")
+
+# Include Phase 3 agent routers
+if guardian_routes_loaded:
+    app.include_router(guardian_router)
+    print("✅ Included guardian_router")
+    loaded_routes.append("guardian_routes")
 
 # Include Phase 2 agent routers
 if pessimist_routes_loaded:
