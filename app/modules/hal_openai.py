@@ -14,10 +14,9 @@ logger = logging.getLogger("hal_openai")
 
 # Safely import OpenAI
 try:
-    # Use the new OpenAI client (v1.0.0+)
     from openai import OpenAI
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    logger.info("✅ Using new OpenAI client (v1.0.0+)")
+    logger.info("✅ Using OpenAI client v1.0.0+")
     
     if not os.getenv("OPENAI_API_KEY"):
         logger.warning("⚠️ OPENAI_API_KEY environment variable not set")
@@ -52,23 +51,24 @@ def generate_react_component(task: str) -> str:
             logger.error("❌ OpenAI API key is not set")
             raise Exception("OpenAI API key is not set")
         
-        # Use the new OpenAI client (v1.0.0+)
+        # Use the OpenAI client v1.0.0+
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a helpful React developer using Tailwind CSS."},
                 {"role": "user", "content": task}
             ]
         )
         
         # Extract the generated code
-        jsx_code = response.choices[0].message.content
+        code = response.choices[0].message.content
         
         # Log the parsed response
-        logger.info(f"✅ Successfully generated React component ({len(jsx_code)} chars)")
-        print(f"📝 Parsed OpenAI response: {jsx_code[:100]}...")
+        logger.info(f"✅ Successfully generated React component ({len(code)} chars)")
+        print("✅ HAL GPT-4 Output:", response.choices[0].message.content)
+        print(f"📝 Parsed OpenAI response: {code[:100]}...")
+        print("✅ HAL generated code:\n", code)
         
-        return jsx_code
+        return code
     except Exception as e:
         logger.error(f"❌ Error generating React component: {str(e)}")
         print(f"❌ Fallback reason: OpenAI is unavailable - {str(e)}")
