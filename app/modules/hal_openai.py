@@ -51,20 +51,40 @@ def generate_react_component(task: str) -> str:
             logger.error("❌ OpenAI API key is not set")
             raise Exception("OpenAI API key is not set")
         
-        # Use the OpenAI client v1.0.0+
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "user", "content": task}
-            ]
-        )
+        # Try to use gpt-4o model first
+        try:
+            # Use the OpenAI client v1.0.0+
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "user", "content": task}
+                ]
+            )
+            model_used = "gpt-4o"
+            logger.info("✅ Using gpt-4o model")
+        except Exception as model_error:
+            # If gpt-4o is not available, fallback to gpt-4.1
+            if "model_not_found" in str(model_error).lower() or "not found" in str(model_error).lower():
+                logger.warning(f"⚠️ gpt-4o model not found, falling back to gpt-4.1: {str(model_error)}")
+                response = client.chat.completions.create(
+                    model="gpt-4.1",
+                    messages=[
+                        {"role": "user", "content": task}
+                    ]
+                )
+                model_used = "gpt-4.1"
+                logger.info("✅ Using gpt-4.1 model (fallback)")
+            else:
+                # If it's another error, re-raise it
+                raise model_error
         
         # Extract the generated code
         code = response.choices[0].message.content
         
         # Log the parsed response
         logger.info(f"✅ Successfully generated React component ({len(code)} chars)")
-        print("✅ HAL GPT-4 Output:", response.choices[0].message.content)
+        print(f"✅ HAL model used: {model_used}")
+        print("✅ Raw OpenAI response:", response.choices[0].message.content[:120])
         print(f"📝 Parsed OpenAI response: {code[:100]}...")
         print("✅ HAL generated code:\n", code)
         
@@ -74,7 +94,7 @@ def generate_react_component(task: str) -> str:
         print(f"❌ Fallback reason: OpenAI is unavailable - {str(e)}")
         
         # Return a fallback component if generation fails
-        return f"""
+        fallback_code = f"""
 // Error generating component: {str(e)}
 // Fallback component based on task: {task}
 import React, {{ useState }} from 'react';
@@ -94,3 +114,6 @@ export default function FallbackComponent() {{
   );
 }}
 """
+        # Log memory write failure
+        print("❌ Memory write will contain fallback HTML due to OpenAI error")
+        return fallback_code

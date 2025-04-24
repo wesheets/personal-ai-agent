@@ -109,7 +109,7 @@ async def loop_respond(request: LoopResponseRequest) -> LoopResponseResult:
         jsx_code = generate_react_component(task_prompt)
         
         # Step 3: Write JSX back to memory
-        await write_memory(
+        memory_write_result = await write_memory(
             agent_id=request.loop_id,
             memory_type="loop",
             tag="hal_build_task_response",
@@ -117,6 +117,7 @@ async def loop_respond(request: LoopResponseRequest) -> LoopResponseResult:
         )
         
         logger.info(f"✅ Successfully wrote JSX code to memory ({len(jsx_code)} chars)")
+        print(f"✅ Memory write success log: {memory_write_result}")
         
         # Step 4: Return response as LoopResponseResult
         return LoopResponseResult(
