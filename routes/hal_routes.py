@@ -133,6 +133,27 @@ async def loop_respond(request: LoopResponseRequest) -> LoopResponseResult:
         # Step 2: Generate JSX via OpenAI
         jsx_code = generate_react_component(task_prompt)
         
+        # Log schema checksum for LoopResponseRequest
+        try:
+            from app.utils.schema_integrity import get_schema_checksum
+            
+            # Generate schema checksum
+            checksum = get_schema_checksum(LoopResponseRequest)
+            
+            # Log schema checksum to memory
+            await write_memory(
+                agent_id=request.project_id,
+                memory_type="loop",
+                tag="schema_hashes",
+                value={"LoopResponseRequest": checksum}
+            )
+            
+            logger.info(f"✅ Logged schema checksum for LoopResponseRequest: {checksum[:8]}...")
+            print(f"✅ HAL schema checksum: {checksum[:8]}...")
+        except Exception as schema_e:
+            logger.warning(f"⚠️ Could not log schema checksum: {schema_e}")
+            print(f"⚠️ Could not log schema checksum: {schema_e}")
+        
         # Step 3: Write JSX back to memory
         memory_write_result = await write_memory(
             agent_id=request.loop_id,
