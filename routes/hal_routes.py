@@ -119,6 +119,20 @@ export default function FallbackComponent() {{
 }}
 """
 
+@router.post("/loop/test", response_model=LoopResponseResult)
+async def loop_test(request: LoopResponseRequest):
+    """
+    Test endpoint to verify that LoopResponseRequest and LoopResponseResult schemas are working correctly.
+    This helps isolate whether issues are with the schema/imports or with HAL's main handler.
+    """
+    print("🧪 TEST LOOP INPUT:", request.dict())
+    return LoopResponseResult(
+        status="ok",
+        output_tag="test_output",
+        timestamp=str(datetime.datetime.utcnow()),
+        code="<div>Test Component JSX</div>"
+    )
+
 @router.post("/loop/respond")
 async def loop_respond(request: LoopResponseRequest) -> LoopResponseResult:
     """
