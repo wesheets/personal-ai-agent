@@ -126,6 +126,23 @@ except ImportError:
     orchestrator_routes_loaded = False
     print("⚠️ Could not load orchestrator_routes directly")
 
+# Import historian and debugger routes directly
+try:
+    from app.routes.historian_routes import router as historian_router
+    historian_routes_loaded = True
+    print("✅ Directly loaded historian_routes")
+except ImportError:
+    historian_routes_loaded = False
+    print("⚠️ Could not load historian_routes directly")
+
+try:
+    from app.routes.debugger_routes import router as debugger_router
+    debugger_routes_loaded = True
+    print("✅ Directly loaded debugger_routes")
+except ImportError:
+    debugger_routes_loaded = False
+    print("⚠️ Could not load debugger_routes directly")
+
 # Create FastAPI app
 app = FastAPI(
     title="Promethios API",
@@ -204,6 +221,17 @@ if debug_routes_loaded:
     print("✅ Included debug_router")
     loaded_routes.append("debug_routes")
 
+# Include historian and debugger routers
+if historian_routes_loaded:
+    app.include_router(historian_router)
+    print("✅ Included historian_router")
+    loaded_routes.append("historian_routes")
+
+if debugger_routes_loaded:
+    app.include_router(debugger_router)
+    print("✅ Included debugger_router")
+    loaded_routes.append("debugger_routes")
+
 # Include app/routes/orchestrator_routes.py AFTER routes/orchestrator_routes.py to prevent overriding
 if orchestrator_routes_loaded:
     app.include_router(orchestrator_router)
@@ -231,6 +259,8 @@ routes_to_try = [
     "debug_routes",
     "reflection_routes",
     "trust_routes",
+    "historian_routes",
+    "debugger_routes",
     
     # Additional routes found in file system
     "project_routes",
@@ -269,7 +299,7 @@ routes_to_try = [
 # Remove routes that are already loaded directly
 for route in ["memory_routes", "loop_routes", "hal_routes", "core_routes", 
               "agent_routes", "persona_routes", "debug_routes", "orchestrator_routes",
-              "reflection_routes", "trust_routes"]:
+              "reflection_routes", "trust_routes", "historian_routes", "debugger_routes"]:
     if route in routes_to_try:
         routes_to_try.remove(route)
 
@@ -462,36 +492,7 @@ async def api_ping():
 # Schema injection test endpoint
 @app.get("/schema-injection-test")
 async def schema_injection_test():
-    """
-    Test endpoint for schema injection.
-    """
-    return {
-        "schema_loaded": True,
-        "memory_initialized": PROJECT_MEMORY is not None,
-        "routes_registered": loaded_routes
-    }
+    return {"status": "ok", "message": "Schema injection test endpoint"}
 
-# Diagnostics router check endpoint
-@app.get("/diagnostics/router-check")
-async def router_diagnostics():
-    """
-    Diagnostics endpoint to check router registration.
-    """
-    router_list = []
-    
-    # Add priority routers first
-    if hal_routes_loaded:
-        router_list.append({"name": "hal_router", "status": "registered", "priority": "high"})
-    if routes_memory_loaded:
-        router_list.append({"name": "memory_router", "status": "registered", "priority": "high"})
-    
-    # Add other routers
-    for route in loaded_routes:
-        if route not in ["hal_routes", "memory_routes"]:  # Skip already added priority routes
-            router_list.append({"name": route, "status": "registered"})
-    
-    return {
-        "routers": router_list,
-        "status": "ok",
-        "total_routes_loaded": len(loaded_routes)
-    }
+# Log all registered routes
+print(f"\n🔍 Registered {len(loaded_routes)} routes: {', '.join(loaded_routes)}")

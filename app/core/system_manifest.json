@@ -1,0 +1,71 @@
+{
+  "system_manifest": {
+    "version": "1.0.0",
+    "last_updated": "2025-04-24T17:45:10Z",
+    "system_name": "Promethios",
+    "agent_discovery_status": {
+      "timestamp": "2025-04-24T17:45:10Z",
+      "total_agents_discovered": 22,
+      "agents_with_implementation": 19,
+      "agents_in_registry": 8,
+      "agents_with_duplicates": 5,
+      "agents_needing_action": 17,
+      "action_summary": {
+        "none_needed": 5,
+        "register_only": 9,
+        "register_and_consolidate": 3,
+        "consolidate_only": 2,
+        "scaffold_only": 3
+      },
+      "newly_registered_agents": [
+        "historian (registered with schema and routes)",
+        "debugger (registered with schema and routes)"
+      ],
+      "previously_discovered_agents": [
+        "core-forge (implementation found)",
+        "debugger (now registered)",
+        "historian (now registered)"
+      ],
+      "discovery_report_path": "/app/core/agent_discovery_report.json",
+      "discovery_status": "in_progress",
+      "registration_status": {
+        "phase": "1a",
+        "completed": [
+          "historian",
+          "debugger"
+        ],
+        "pending": [
+          "auditor",
+          "cto",
+          "guardian",
+          "ceo",
+          "ash-xenomorph"
+        ]
+      },
+      "recommendations": "Continue agent registration sprint with remaining agents"
+    },
+    "system_status": {
+      "status": "operational",
+      "agent_readiness": "improving",
+      "next_steps": "Continue agent registration sprint phase 1b"
+    },
+    "registered_agents": {
+      "historian": {
+        "registration_date": "2025-04-24T17:45:10Z",
+        "schema_path": "/app/schemas/historian_schema.py",
+        "route_path": "/app/routes/historian_routes.py",
+        "endpoint": "/api/historian/log",
+        "status": "active",
+        "tools": ["log_belief", "track_alignment", "score_drift"]
+      },
+      "debugger": {
+        "registration_date": "2025-04-24T17:45:10Z",
+        "schema_path": "/app/schemas/debugger_schema.py",
+        "route_path": "/app/routes/debugger_routes.py",
+        "endpoint": "/api/debugger/trace",
+        "status": "active",
+        "tools": ["trace", "log_error", "inject_debug"]
+      }
+    }
+  }
+}
