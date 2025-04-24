@@ -226,6 +226,47 @@ except ImportError:
     sitegen_routes_loaded = False
     print("⚠️ Could not load sitegen_routes directly")
 
+# Import missing routes identified in diagnostic report
+try:
+    from app.routes.snapshot_routes import router as snapshot_router
+    snapshot_routes_loaded = True
+    print("✅ Directly loaded snapshot_routes")
+except ImportError:
+    snapshot_routes_loaded = False
+    print("⚠️ Could not load snapshot_routes directly")
+
+try:
+    from app.routes.orchestrator_plan_routes import router as orchestrator_plan_router
+    orchestrator_plan_routes_loaded = True
+    print("✅ Directly loaded orchestrator_plan_routes")
+except ImportError:
+    orchestrator_plan_routes_loaded = False
+    print("⚠️ Could not load orchestrator_plan_routes directly")
+
+try:
+    from app.routes.health_monitor_routes import router as health_monitor_router
+    health_monitor_routes_loaded = True
+    print("✅ Directly loaded health_monitor_routes")
+except ImportError:
+    health_monitor_routes_loaded = False
+    print("⚠️ Could not load health_monitor_routes directly")
+
+try:
+    from app.routes.orchestrator_contract_routes import router as orchestrator_contract_router
+    orchestrator_contract_routes_loaded = True
+    print("✅ Directly loaded orchestrator_contract_routes")
+except ImportError:
+    orchestrator_contract_routes_loaded = False
+    print("⚠️ Could not load orchestrator_contract_routes directly")
+
+try:
+    from app.routes.ash_routes import router as ash_router
+    ash_routes_loaded = True
+    print("✅ Directly loaded ash_routes")
+except ImportError:
+    ash_routes_loaded = False
+    print("⚠️ Could not load ash_routes directly")
+
 # Create FastAPI app
 app = FastAPI(
     title="Promethios API",
@@ -404,6 +445,37 @@ if trust_routes_loaded:
     app.include_router(trust_router)
     print("✅ Included trust_router")
     loaded_routes.append("trust_routes")
+
+# Include missing routes identified in diagnostic report
+if snapshot_routes_loaded:
+    app.include_router(snapshot_router)
+    print("✅ Included snapshot_router")
+    loaded_routes.append("snapshot_routes")
+
+if orchestrator_plan_routes_loaded:
+    app.include_router(orchestrator_plan_router)
+    print("✅ Included orchestrator_plan_router")
+    loaded_routes.append("orchestrator_plan_routes")
+
+if health_monitor_routes_loaded:
+    app.include_router(health_monitor_router)
+    print("✅ Included health_monitor_router")
+    loaded_routes.append("health_monitor_routes")
+
+if self_routes_loaded:
+    app.include_router(self_router)
+    print("✅ Included self_router")
+    loaded_routes.append("self_routes")
+
+if orchestrator_contract_routes_loaded:
+    app.include_router(orchestrator_contract_router)
+    print("✅ Included orchestrator_contract_router")
+    loaded_routes.append("orchestrator_contract_routes")
+
+if ash_routes_loaded:
+    app.include_router(ash_router)
+    print("✅ Included ash_router")
+    loaded_routes.append("ash_routes")
 
 # Dashboard routes - Hard-wired registration
 try:
