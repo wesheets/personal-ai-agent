@@ -103,6 +103,51 @@ AGENT_REGISTRY = {
         "persona": "diagnostic technician",
         "availability": "active",
         "contract_version": "v1.0.0"
+    },
+    "critic": {
+        "name": "Critic",
+        "model": "gpt-4",
+        "description": "Evaluates agent outputs, provides quality scores, and enforces standards.",
+        "tone": "analytical",
+        "system_prompt": "You are the Critic agent. Your role is to evaluate outputs, provide constructive feedback, and ensure quality standards are met.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["review", "reject", "log_reason"],
+        "input_schema": ["loop_id", "agent_outputs", "project_id"],
+        "output_schema": ["status", "reflection", "scores", "rejection", "rejection_reason"],
+        "persona": "quality evaluator",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "orchestrator": {
+        "name": "Orchestrator",
+        "model": "gpt-4",
+        "description": "Coordinates task delegation and agent routing across the system.",
+        "tone": "directive",
+        "system_prompt": "You are the Orchestrator agent. Your purpose is to coordinate agent activities, manage workflow execution, and handle task delegation.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["delegate", "plan", "resolve"],
+        "input_schema": ["task", "project_id"],
+        "output_schema": ["status", "output", "next_agent", "trigger_result", "decisions"],
+        "persona": "system coordinator",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "sage": {
+        "name": "Sage",
+        "model": "gpt-4",
+        "description": "Analyzes CRITIC-approved loops, logs belief/emotion scores, and generates structured belief maps.",
+        "tone": "reflective",
+        "system_prompt": "You are the Sage agent. Your role is to analyze approved content, extract key beliefs, and score their confidence and emotional weight.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["reflect", "summarize", "score_belief"],
+        "input_schema": ["loop_id", "summary_text", "project_id"],
+        "output_schema": ["status", "belief_scores", "reflection_text", "timestamp"],
+        "persona": "belief analyst",
+        "availability": "active",
+        "contract_version": "v1.0.0"
     }
 }
 
@@ -179,6 +224,51 @@ AGENT_PERSONALITIES = {
     "input_schema": ["loop_id", "failure_logs", "memory", "loop_context"],
     "output_schema": ["updated_memory", "failure_type", "patch_plan", "next_agent", "suggested_fix"],
     "persona": "diagnostic technician",
+    "availability": "active",
+    "contract_version": "v1.0.0"
+  },
+  "critic": {
+    "name": "Critic",
+    "type": "persona",
+    "tone": "analytical",
+    "description": "Quality evaluation and standards enforcement specialist.",
+    "system_prompt": "You are the Critic. Evaluate outputs, provide constructive feedback, and ensure quality standards are met.",
+    "agent_state": "idle",
+    "last_active": "",
+    "tools": ["review", "reject", "log_reason"],
+    "input_schema": ["loop_id", "agent_outputs", "project_id"],
+    "output_schema": ["status", "reflection", "scores", "rejection", "rejection_reason"],
+    "persona": "quality evaluator",
+    "availability": "active",
+    "contract_version": "v1.0.0"
+  },
+  "orchestrator": {
+    "name": "Orchestrator",
+    "type": "persona",
+    "tone": "directive",
+    "description": "System coordination and workflow management specialist.",
+    "system_prompt": "You are the Orchestrator. Coordinate agent activities, manage workflow execution, and handle task delegation.",
+    "agent_state": "idle",
+    "last_active": "",
+    "tools": ["delegate", "plan", "resolve"],
+    "input_schema": ["task", "project_id"],
+    "output_schema": ["status", "output", "next_agent", "trigger_result", "decisions"],
+    "persona": "system coordinator",
+    "availability": "active",
+    "contract_version": "v1.0.0"
+  },
+  "sage": {
+    "name": "Sage",
+    "type": "persona",
+    "tone": "reflective",
+    "description": "Belief analysis and emotional intelligence specialist.",
+    "system_prompt": "You are the Sage. Analyze approved content, extract key beliefs, and score their confidence and emotional weight.",
+    "agent_state": "idle",
+    "last_active": "",
+    "tools": ["reflect", "summarize", "score_belief"],
+    "input_schema": ["loop_id", "summary_text", "project_id"],
+    "output_schema": ["status", "belief_scores", "reflection_text", "timestamp"],
+    "persona": "belief analyst",
     "availability": "active",
     "contract_version": "v1.0.0"
   }

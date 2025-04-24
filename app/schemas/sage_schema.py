@@ -1,112 +1,130 @@
 """
-SAGE Agent Schema Module
+SAGE Agent Schema Definitions
 
-This module defines the schemas for the SAGE agent's review functionality
-in cascade mode, allowing it to summarize loop beliefs and log structured belief maps.
+This module defines the schemas for SAGE agent requests and responses.
 """
 
-from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field, validator
-import datetime
+from typing import Dict, Any, List, Optional, Union
+from pydantic import BaseModel, Field
+
 
 class BeliefScore(BaseModel):
     """
-    Represents a belief with its confidence score and optional emotional weight.
-    
-    Attributes:
-        belief: The belief statement
-        confidence: Confidence score (0.0 to 1.0)
-        emotional_weight: Optional emotional weight or significance (-1.0 to 1.0)
+    Schema for a belief score entry.
     """
     belief: str = Field(..., description="The belief statement")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score (0.0 to 1.0)")
-    emotional_weight: Optional[float] = Field(None, ge=-1.0, le=1.0, 
-                                             description="Emotional weight or significance (-1.0 to 1.0)")
-    
-    @validator('belief')
-    def belief_must_not_be_empty(cls, v):
-        if not v or not v.strip():
-            raise ValueError('Belief statement cannot be empty')
-        return v.strip()
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "belief": "The user needs a more efficient workflow for data processing",
-                "confidence": 0.85,
-                "emotional_weight": 0.3
-            }
-        }
+    confidence: float = Field(
+        ..., 
+        description="Confidence score for the belief (0.0-1.0)",
+        ge=0.0,
+        le=1.0
+    )
+    emotional_weight: Optional[float] = Field(
+        None, 
+        description="Emotional weight of the belief (-1.0 to 1.0)",
+        ge=-1.0,
+        le=1.0
+    )
+
 
 class SageReviewRequest(BaseModel):
     """
-    Request schema for SAGE agent review in cascade mode.
-    
-    Attributes:
-        loop_id: Unique identifier for the loop
-        summary_text: Summary text to analyze for beliefs
+    Schema for SAGE agent review request.
     """
     loop_id: str = Field(..., description="Unique identifier for the loop")
     summary_text: str = Field(..., description="Summary text to analyze for beliefs")
-    
-    @validator('summary_text')
-    def summary_must_not_be_empty(cls, v):
-        if not v or not v.strip():
-            raise ValueError('Summary text cannot be empty')
-        return v
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "loop_id": "loop_12345",
-                "summary_text": "The user is trying to optimize their data processing pipeline. They've mentioned issues with the current ETL process being too slow and error-prone. They're looking for automated solutions that can handle large datasets efficiently."
-            }
-        }
+    project_id: str = Field(..., description="Project identifier")
+    tools: Optional[List[str]] = Field(
+        default=["reflect", "summarize", "score_belief"],
+        description="List of tools to use for the analysis"
+    )
+
 
 class SageReviewResult(BaseModel):
     """
-    Response schema for SAGE agent review in cascade mode.
-    
-    Attributes:
-        belief_scores: List of beliefs with confidence scores
-        reflection_text: Optional reflection on the beliefs and their implications
-        timestamp: When the review was performed
-        loop_id: The loop identifier that was reviewed
+    Schema for SAGE agent review result.
     """
-    belief_scores: List[BeliefScore] = Field(..., description="List of beliefs with confidence scores")
-    reflection_text: Optional[str] = Field(None, description="Reflection on the beliefs and their implications")
-    timestamp: str = Field(default_factory=lambda: datetime.datetime.utcnow().isoformat(),
-                          description="When the review was performed")
-    loop_id: str = Field(..., description="The loop identifier that was reviewed")
-    
-    @validator('belief_scores')
-    def must_have_beliefs(cls, v):
-        if not v:
-            raise ValueError('Must include at least one belief score')
-        return v
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "belief_scores": [
-                    {
-                        "belief": "The user needs a more efficient workflow for data processing",
-                        "confidence": 0.85,
-                        "emotional_weight": 0.3
-                    },
-                    {
-                        "belief": "Current ETL process is causing frustration",
-                        "confidence": 0.75,
-                        "emotional_weight": -0.6
-                    },
-                    {
-                        "belief": "Automation is a high priority for the user",
-                        "confidence": 0.9,
-                        "emotional_weight": 0.5
-                    }
-                ],
-                "reflection_text": "The user appears to be experiencing significant frustration with their current data processing workflow. There's a strong desire for automation and efficiency improvements, suggesting that solutions focusing on these aspects would be well-received.",
-                "timestamp": "2025-04-24T17:02:30.123456",
-                "loop_id": "loop_12345"
-            }
-        }
+    status: str = Field(..., description="Status of the review (success or error)")
+    loop_id: str = Field(..., description="Unique identifier for the reviewed loop")
+    belief_scores: Optional[List[BeliefScore]] = Field(
+        None, 
+        description="List of extracted beliefs with confidence and emotional weight"
+    )
+    reflection_text: Optional[str] = Field(
+        None, 
+        description="Generated reflection based on the beliefs"
+    )
+    timestamp: Optional[str] = Field(None, description="ISO format timestamp of the review")
+    message: Optional[str] = Field(None, description="Error message if status is error")
+
+
+class SageSummarizeRequest(BaseModel):
+    """
+    Schema for SAGE agent summarize request.
+    """
+    loop_id: str = Field(..., description="Unique identifier for the loop")
+    content: str = Field(..., description="Content to summarize")
+    project_id: str = Field(..., description="Project identifier")
+    tools: Optional[List[str]] = Field(
+        default=["reflect", "summarize", "score_belief"],
+        description="List of tools to use for summarization"
+    )
+
+
+class SageSummarizeResult(BaseModel):
+    """
+    Schema for SAGE agent summarize result.
+    """
+    status: str = Field(..., description="Status of the summarization (success or error)")
+    loop_id: str = Field(..., description="Unique identifier for the loop")
+    summary: Optional[str] = Field(None, description="Generated summary")
+    original_word_count: Optional[int] = Field(None, description="Word count of original content")
+    summary_word_count: Optional[int] = Field(None, description="Word count of summary")
+    compression_ratio: Optional[float] = Field(None, description="Ratio of summary to original length")
+    timestamp: Optional[str] = Field(None, description="ISO format timestamp of the summarization")
+    message: Optional[str] = Field(None, description="Error message if status is error")
+
+
+class SageScoreBeliefRequest(BaseModel):
+    """
+    Schema for SAGE agent score belief request.
+    """
+    loop_id: str = Field(..., description="Unique identifier for the loop")
+    belief: str = Field(..., description="Belief statement to score")
+    project_id: str = Field(..., description="Project identifier")
+    tools: Optional[List[str]] = Field(
+        default=["reflect", "summarize", "score_belief"],
+        description="List of tools to use for belief scoring"
+    )
+
+
+class SageScoreBeliefResult(BaseModel):
+    """
+    Schema for SAGE agent score belief result.
+    """
+    status: str = Field(..., description="Status of the scoring (success or error)")
+    loop_id: str = Field(..., description="Unique identifier for the loop")
+    belief: Optional[str] = Field(None, description="The belief statement")
+    confidence: Optional[float] = Field(
+        None, 
+        description="Confidence score for the belief (0.0-1.0)"
+    )
+    emotional_weight: Optional[float] = Field(
+        None, 
+        description="Emotional weight of the belief (-1.0 to 1.0)"
+    )
+    timestamp: Optional[str] = Field(None, description="ISO format timestamp of the scoring")
+    message: Optional[str] = Field(None, description="Error message if status is error")
+
+
+# Fallback schema for handling errors
+class SageErrorResult(BaseModel):
+    """
+    Schema for SAGE agent error result.
+    """
+    status: str = Field("error", description="Status of the operation")
+    message: str = Field(..., description="Error message")
+    task: Optional[str] = Field(None, description="Original task")
+    tools: Optional[List[str]] = Field(None, description="Tools used")
+    project_id: Optional[str] = Field(None, description="Project identifier")
+    loop_id: Optional[str] = Field(None, description="Loop identifier if applicable")
