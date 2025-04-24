@@ -9,7 +9,10 @@ import logging
 import traceback
 
 # Import schemas
-from app.schemas.loop_schema import LoopResponseRequest
+from app.schemas.loop_schema import (
+    LoopResponseRequest,
+    LoopResponseResult
+)
 
 # Import memory operations
 from app.modules.memory_writer import write_memory
@@ -34,11 +37,25 @@ class LoopPlanRequest(BaseModel):
     loop_id: str
     orchestrator_persona: Optional[str] = None
 
+class LoopPlanResponse(BaseModel):
+    plan: Dict[str, Any]
+    loop_id: str
+    orchestrator_persona: str
+    status: str
+
 class LoopCompletionRequest(BaseModel):
     loop_id: str
     project_id: str
     executor: str
     notes: str
+
+class LoopCompletionResponse(BaseModel):
+    status: str
+    loop_id: str
+    project_id: str
+    executor: str
+    message: str
+    orchestration_status: Dict[str, Any]
 
 class LoopValidateRequest(BaseModel):
     loop_id: str
@@ -49,7 +66,40 @@ class LoopValidateRequest(BaseModel):
     time_constraint: Optional[float] = None
     user_preference: Optional[str] = None
 
-@router.post("/api/loop/plan")
+class LoopValidateResponse(BaseModel):
+    status: str
+    loop_id: str
+    mode: str
+    validation_result: Dict[str, Any]
+    prepared_loop: Dict[str, Any]
+    processed_by: str
+
+class LoopTraceResponse(BaseModel):
+    traces: List[Dict[str, Any]]
+
+class LoopTraceRequest(BaseModel):
+    loop_id: str
+    status: str
+    timestamp: Optional[str] = None
+    summary: Optional[str] = None
+
+class LoopResetResponse(BaseModel):
+    status: str
+    message: str
+    timestamp: str
+
+class PersonaReflectRequest(BaseModel):
+    persona: str
+    reflection: str
+    loop_id: str
+
+class PersonaReflectResponse(BaseModel):
+    status: str
+    persona: str
+    loop_id: str
+    message: str
+
+@router.post("/api/loop/plan", response_model=LoopPlanResponse)
 async def plan_loop(request: LoopPlanRequest):
     """
     Create execution plan for a loop.
@@ -69,7 +119,7 @@ async def plan_loop(request: LoopPlanRequest):
         "status": "success"
     }
 
-@router.post("/api/loop/complete")
+@router.post("/api/loop/complete", response_model=LoopCompletionResponse)
 async def loop_complete_endpoint(request: LoopCompletionRequest):
     """
     Handle loop completion and initiate loop execution.
@@ -124,7 +174,7 @@ async def loop_complete_endpoint(request: LoopCompletionRequest):
         # Log the error and return an error response
         raise HTTPException(status_code=500, detail=f"Failed to activate loop: {str(e)}")
 
-@router.post("/api/loop/respond")
+@router.post("/api/loop/respond", response_model=LoopResponseResult)
 async def loop_respond_endpoint(request: LoopResponseRequest):
     """
     Handle agent responses to memory within a loop.
@@ -266,8 +316,7 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
             "status": "success",
             "agent": request.agent,
             "input_key": request.input_key,
-            "output_key": output_key,
-            "response_type": request.response_type,
+            "output_tag": output_key,
             "timestamp": timestamp,
             "message": f"Response generated successfully by {request.agent}"
         }
@@ -280,7 +329,7 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Failed to generate response: {str(e)}")
 
-@router.post("/api/loop/validate")
+@router.post("/api/loop/validate", response_model=LoopValidateResponse)
 async def validate_loop(request: LoopValidateRequest):
     """
     Validate a loop against core requirements and enrich with cognitive controls.
@@ -300,7 +349,7 @@ async def validate_loop(request: LoopValidateRequest):
         "processed_by": "cognitive_control_layer"
     }
 
-@router.get("/api/loop/trace")
+@router.get("/api/loop/trace", response_model=LoopTraceResponse)
 async def get_loop_trace(project_id: Optional[str] = None):
     """
     Get loop memory trace log.
@@ -325,26 +374,19 @@ async def get_loop_trace(project_id: Optional[str] = None):
     }
 
 @router.post("/api/loop/trace")
-async def add_loop_trace(data: Dict[str, Any]):
+async def add_loop_trace(data: LoopTraceRequest):
     """
     Inject synthetic loop trace.
     """
-    loop_id = data.get("loop_id")
-    status = data.get("status")
-    timestamp = data.get("timestamp")
-    
-    if not loop_id or not status:
-        raise HTTPException(status_code=400, detail="loop_id and status are required")
-    
     # This would normally store the loop trace
     # For now, return a success response
     return {
         "status": "success",
-        "loop_id": loop_id,
-        "message": f"Loop trace for {loop_id} added successfully"
+        "loop_id": data.loop_id,
+        "message": f"Loop trace for {data.loop_id} added successfully"
     }
 
-@router.post("/api/loop/reset")
+@router.post("/api/loop/reset", response_model=LoopResetResponse)
 async def reset_loop():
     """
     Memory reset for clean test runs.
@@ -357,23 +399,16 @@ async def reset_loop():
         "timestamp": datetime.now().isoformat()
     }
 
-@router.post("/api/loop/persona-reflect")
-async def persona_reflect(data: Dict[str, Any]):
+@router.post("/api/loop/persona-reflect", response_model=PersonaReflectResponse)
+async def persona_reflect(data: PersonaReflectRequest):
     """
     Inject mode-aligned reflection trace.
     """
-    persona = data.get("persona")
-    reflection = data.get("reflection")
-    loop_id = data.get("loop_id")
-    
-    if not persona or not reflection or not loop_id:
-        raise HTTPException(status_code=400, detail="persona, reflection, and loop_id are required")
-    
     # This would normally store the reflection
     # For now, return a success response
     return {
         "status": "success",
-        "persona": persona,
-        "loop_id": loop_id,
-        "message": f"Reflection for {loop_id} with persona {persona} added successfully"
+        "persona": data.persona,
+        "loop_id": data.loop_id,
+        "message": f"Reflection for {data.loop_id} with persona {data.persona} added successfully"
     }

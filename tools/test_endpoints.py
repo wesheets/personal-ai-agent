@@ -91,6 +91,176 @@ def test_agent_config_module():
         print(f"Default permissions: {len(response.get('permissions', [])) == 0}")
         print(f"Default memory access level: {response.get('memory_access_level') == 'standard'}")
 
+def test_loop_module():
+    """Test the loop module endpoints."""
+    print("\n=== Testing Loop Module ===")
+    
+    # Test case 1: Create loop plan
+    endpoint = f"{BASE_URL}/loop/plan"
+    
+    plan_request = {
+        "prompt": "Analyze quantum computing concepts",
+        "loop_id": "loop_test_001",
+        "orchestrator_persona": "SAGE"
+    }
+    
+    print("Test case 1: Create loop plan")
+    response = make_request("POST", endpoint, plan_request)
+    if response:
+        print(f"Status: {'✅ PASS' if response.get('loop_id') == 'loop_test_001' else '❌ FAIL'}")
+        print(f"Loop ID: {response.get('loop_id')}")
+        print(f"Orchestrator Persona: {response.get('orchestrator_persona')}")
+        print(f"Plan Steps: {len(response.get('plan', {}).get('steps', []))}")
+    
+    # Test case 2: Complete loop
+    endpoint = f"{BASE_URL}/loop/complete"
+    
+    complete_request = {
+        "loop_id": "loop_test_001",
+        "project_id": "project_test_001",
+        "executor": "HAL",
+        "notes": "Test loop completion"
+    }
+    
+    print("\nTest case 2: Complete loop")
+    response = make_request("POST", endpoint, complete_request)
+    if response:
+        print(f"Status: {'✅ PASS' if response.get('status') == 'activated' else '❌ FAIL'}")
+        print(f"Loop ID: {response.get('loop_id')}")
+        print(f"Project ID: {response.get('project_id')}")
+        print(f"Executor: {response.get('executor')}")
+        print(f"Message: {response.get('message')}")
+    
+    # Test case 3: Generate loop response
+    endpoint = f"{BASE_URL}/loop/respond"
+    
+    respond_request = {
+        "loop_id": "loop_test_001",
+        "project_id": "project_test_001",
+        "agent": "HAL",
+        "input_key": "quantum_analysis",
+        "response_type": "text",
+        "target_file": None
+    }
+    
+    print("\nTest case 3: Generate loop response")
+    response = make_request("POST", endpoint, respond_request)
+    if response:
+        print(f"Status: {'✅ PASS' if response.get('status') == 'success' else '❌ FAIL'}")
+        print(f"Agent: {response.get('agent')}")
+        print(f"Input Key: {response.get('input_key')}")
+        print(f"Output Tag: {response.get('output_tag')}")
+        print(f"Timestamp: {response.get('timestamp')}")
+    
+    # Test case 4: Validate loop
+    endpoint = f"{BASE_URL}/loop/validate"
+    
+    validate_request = {
+        "loop_id": "loop_test_001",
+        "loop_data": {
+            "steps": [
+                {"step_id": 1, "description": "Research quantum computing", "status": "pending"},
+                {"step_id": 2, "description": "Analyze findings", "status": "pending"},
+                {"step_id": 3, "description": "Generate response", "status": "pending"}
+            ]
+        },
+        "mode": "balanced"
+    }
+    
+    print("\nTest case 4: Validate loop")
+    response = make_request("POST", endpoint, validate_request)
+    if response:
+        print(f"Status: {'✅ PASS' if response.get('status') == 'success' else '❌ FAIL'}")
+        print(f"Loop ID: {response.get('loop_id')}")
+        print(f"Mode: {response.get('mode')}")
+        print(f"Validation Result: {response.get('validation_result', {}).get('valid')}")
+    
+    # Test case 5: Get loop trace
+    endpoint = f"{BASE_URL}/loop/trace?project_id=project_test_001"
+    
+    print("\nTest case 5: Get loop trace")
+    response = make_request("GET", endpoint)
+    if response:
+        print(f"Status: {'✅ PASS' if 'traces' in response else '❌ FAIL'}")
+        print(f"Traces Count: {len(response.get('traces', []))}")
+        if response.get('traces'):
+            print(f"First Trace Loop ID: {response.get('traces', [{}])[0].get('loop_id')}")
+    
+    # Test case 6: Add loop trace
+    endpoint = f"{BASE_URL}/loop/trace"
+    
+    trace_request = {
+        "loop_id": "loop_test_001",
+        "status": "completed",
+        "timestamp": "2025-04-24T22:00:00Z",
+        "summary": "Analyzed quantum computing concepts"
+    }
+    
+    print("\nTest case 6: Add loop trace")
+    response = make_request("POST", endpoint, trace_request)
+    if response:
+        print(f"Status: {'✅ PASS' if response.get('status') == 'success' else '❌ FAIL'}")
+        print(f"Loop ID: {response.get('loop_id')}")
+        print(f"Message: {response.get('message')}")
+    
+    # Test case 7: Reset loop
+    endpoint = f"{BASE_URL}/loop/reset"
+    
+    print("\nTest case 7: Reset loop")
+    response = make_request("POST", endpoint)
+    if response:
+        print(f"Status: {'✅ PASS' if response.get('status') == 'success' else '❌ FAIL'}")
+        print(f"Message: {response.get('message')}")
+        print(f"Timestamp: {response.get('timestamp')}")
+    
+    # Test case 8: Add persona reflection
+    endpoint = f"{BASE_URL}/loop/persona-reflect"
+    
+    reflect_request = {
+        "persona": "SAGE",
+        "reflection": "The quantum computing analysis was thorough and accurate.",
+        "loop_id": "loop_test_001"
+    }
+    
+    print("\nTest case 8: Add persona reflection")
+    response = make_request("POST", endpoint, reflect_request)
+    if response:
+        print(f"Status: {'✅ PASS' if response.get('status') == 'success' else '❌ FAIL'}")
+        print(f"Persona: {response.get('persona')}")
+        print(f"Loop ID: {response.get('loop_id')}")
+        print(f"Message: {response.get('message')}")
+
+def test_loop_validation_module():
+    """Test the loop validation module endpoints."""
+    print("\n=== Testing Loop Validation Module ===")
+    
+    # Test case 1: Validate loop configuration
+    endpoint = f"{BASE_URL}/loop/validate"
+    
+    validation_request = {
+        "project_id": "project_test_001",
+        "loop_id": "loop_test_001",
+        "loop_config": {
+            "steps": [
+                {"step_id": 1, "description": "Research quantum computing", "status": "pending"},
+                {"step_id": 2, "description": "Analyze findings", "status": "pending"},
+                {"step_id": 3, "description": "Generate response", "status": "pending"}
+            ],
+            "orchestrator": "SAGE",
+            "timeout_seconds": 300
+        }
+    }
+    
+    print("Test case 1: Validate loop configuration")
+    response = make_request("POST", endpoint, validation_request)
+    if response:
+        print(f"Status: {'✅ PASS' if not isinstance(response, dict) or not response.get('message', '').startswith('Error') else '❌ FAIL'}")
+        if isinstance(response, dict) and 'message' in response and response['message'].startswith('Error'):
+            print(f"Error Message: {response.get('message')}")
+        else:
+            print(f"Project ID: {response.get('project_id')}")
+            print(f"Loop ID: {response.get('loop_id')}")
+            print(f"Validation Result: {response.get('message')}")
 def make_request(method: str, url: str, data: Dict[str, Any] = None) -> Dict[str, Any]:
     """
     Make an HTTP request to the specified endpoint.
@@ -800,4 +970,10 @@ def main():
     print("\n=== Test Suite Complete ===")
 
 if __name__ == "__main__":
-    main()
+    
+    # Test loop module
+    test_loop_module()
+    
+    # Test loop validation module
+    test_loop_validation_module()
+main()

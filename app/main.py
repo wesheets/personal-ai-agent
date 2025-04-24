@@ -1,5 +1,7 @@
 """
-Update to main.py to register SAGE routes, Dashboard routes, FORGE routes, and Debug Analyzer routes
+Main application entry point for the Promethios API.
+
+This module initializes the FastAPI application and registers all routes.
 """
 
 from fastapi import FastAPI
@@ -17,6 +19,8 @@ from app.routes.train_routes import router as train_router
 from app.routes.export_routes import router as export_router
 from app.routes.fix_routes import router as fix_router
 from app.routes.delegate_stream_routes import router as delegate_stream_router
+from app.routes.loop_routes import router as loop_routes_router
+from app.routes.loop_validation_routes import router as loop_validation_router
 
 # Import missing routes identified in diagnostic report
 try:
@@ -322,6 +326,16 @@ app.include_router(delegate_stream_router)
 loaded_routes.append("delegate_stream_routes")
 print("✅ Included delegate_stream_router")
 
+# Include loop routes
+app.include_router(loop_routes_router)
+loaded_routes.append("loop_routes")
+print("✅ Included loop_routes_router")
+
+# Include loop validation routes
+app.include_router(loop_validation_router)
+loaded_routes.append("loop_validation_routes")
+print("✅ Included loop_validation_router")
+
 # Include HAL routes with priority (first)
 if hal_routes_loaded:
     app.include_router(hal_routes, prefix="/api")
@@ -343,7 +357,7 @@ if memory_routes_loaded:
 if loop_routes_loaded:
     app.include_router(loop_router)  # No prefix as routes already include /api/
     print("✅ Included loop_router without prefix")
-    loaded_routes.append("loop_routes")
+    loaded_routes.append("loop_router")
 
 # Include orchestrator routes from routes directory with HIGHEST priority - MUST BE FIRST
 if routes_orchestrator_loaded:
@@ -400,13 +414,12 @@ if sage_routes_loaded:
     print("✅ Included sage_router")
     loaded_routes.append("sage_routes")
 
-# Include Phase 3 agent routers
+# Include GUARDIAN, PESSIMIST, and NOVA routers
 if guardian_routes_loaded:
     app.include_router(guardian_router)
     print("✅ Included guardian_router")
     loaded_routes.append("guardian_routes")
 
-# Include Phase 2 agent routers
 if pessimist_routes_loaded:
     app.include_router(pessimist_router)
     print("✅ Included pessimist_router")
@@ -417,6 +430,7 @@ if nova_routes_loaded:
     print("✅ Included nova_router")
     loaded_routes.append("nova_routes")
 
+# Include CTO, OBSERVER, SITEGEN, REFLECTION, TRUST, and SELF routers
 if cto_routes_loaded:
     app.include_router(cto_router)
     print("✅ Included cto_router")
@@ -442,151 +456,83 @@ if trust_routes_loaded:
     print("✅ Included trust_router")
     loaded_routes.append("trust_routes")
 
-# Include missing routes identified in diagnostic report
-if snapshot_routes_loaded:
-    app.include_router(snapshot_router)
-    print("✅ Included snapshot_router")
-    loaded_routes.append("snapshot_routes")
-
-if orchestrator_plan_routes_loaded:
-    app.include_router(orchestrator_plan_router)
-    print("✅ Included orchestrator_plan_router")
-    loaded_routes.append("orchestrator_plan_routes")
-
-if health_monitor_routes_loaded:
-    app.include_router(health_monitor_router)
-    print("✅ Included health_monitor_router")
-    loaded_routes.append("health_monitor_routes")
-
 if self_routes_loaded:
     app.include_router(self_router)
     print("✅ Included self_router")
     loaded_routes.append("self_routes")
 
+# Include snapshot routes
+if snapshot_routes_loaded:
+    app.include_router(snapshot_router)
+    print("✅ Included snapshot_router")
+    loaded_routes.append("snapshot_routes")
+
+# Include orchestrator plan routes
+if orchestrator_plan_routes_loaded:
+    app.include_router(orchestrator_plan_router)
+    print("✅ Included orchestrator_plan_router")
+    loaded_routes.append("orchestrator_plan_routes")
+
+# Include health monitor routes
+if health_monitor_routes_loaded:
+    app.include_router(health_monitor_router)
+    print("✅ Included health_monitor_router")
+    loaded_routes.append("health_monitor_routes")
+
+# Include orchestrator contract routes
 if orchestrator_contract_routes_loaded:
     app.include_router(orchestrator_contract_router)
     print("✅ Included orchestrator_contract_router")
     loaded_routes.append("orchestrator_contract_routes")
 
+# Include ASH routes
 if ash_routes_loaded:
     app.include_router(ash_router)
     print("✅ Included ash_router")
     loaded_routes.append("ash_routes")
 
-# Dashboard routes - Hard-wired registration
-try:
-    from app.routes.dashboard_routes import router as dashboard_router
-    app.include_router(dashboard_router)
-    loaded_routes.append("dashboard")
-    print("✅ Dashboard routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load Dashboard routes: {e}")
-
-# FORGE routes - Hard-wired registration
-try:
-    from app.routes.forge_routes import router as forge_router
-    app.include_router(forge_router)
-    loaded_routes.append("forge")
-    print("✅ FORGE routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load FORGE routes: {e}")
-
-# Debug Analyzer routes - Hard-wired registration
-try:
-    from app.routes.debug_routes import router as debug_analyzer_router
-    app.include_router(debug_analyzer_router)
-    loaded_routes.append("debug_analyzer")
-    print("✅ Debug Analyzer routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load Debug Analyzer routes: {e}")
-
-# Drift routes
-try:
-    from app.routes.drift_routes import router as drift_router
-    app.include_router(drift_router)
-    loaded_routes.append("drift")
-    print("✅ Drift routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load Drift routes: {e}")
-
-# Output Policy routes
-try:
-    from app.routes.output_policy_routes import router as output_policy_router
-    app.include_router(output_policy_router)
-    loaded_routes.append("output_policy")
-    print("✅ Output Policy routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load Output Policy routes: {e}")
-
-# Comprehensive list of all routes based on file system scan
-routes_to_try = [
-    # Core routes
-    "agent_routes",
-    "core_routes",
-    "persona_routes",
-    "system_routes",
-    "orchestrator_routes",
-    "debug_routes",
-    "reflection_routes",
-    "trust_routes",
-    "historian_routes",
-    "debugger_routes",
-    "critic_routes",
-    "sage_routes",
-    
-    # Additional routes found in file system
-    "project_routes",
-    "reset_routes",
-    "snapshot_routes",
-    "system_integrity",
-    "system_log_routes",
-    "system_summary_routes",
-    
-    # Modules routes
-    "modules/agent/list",
-    "modules/agent/run",
-    "modules/plan/generate",
-    "modules/orchestrator/status",
-    "modules/debug/routes",
-    "modules/system/routes",
-    "modules/system/version",
-    "modules/system/status",
-    "modules/system/config",
-    "modules/system/logs",
-    "modules/system/metrics",
-    "modules/system/health",
-    "modules/system/info",
-    "modules/system/ping",
-    "modules/system/time",
-    "modules/system/uptime",
-    "modules/system/memory",
-]
-
 # Register loaded routes in manifest
 if manifest_initialized:
     try:
         register_loaded_routes(loaded_routes)
-        print(f"✅ Registered {len(loaded_routes)} routes in manifest")
+        print(f"✅ Registered {len(loaded_routes)} routes in system manifest")
     except Exception as e:
-        print(f"⚠️ Failed to register routes in manifest: {e}")
+        print(f"⚠️ Failed to register loaded routes in system manifest: {e}")
 
+# Root endpoint
 @app.get("/")
 async def root():
-    """Root endpoint that returns basic API information"""
+    """
+    Root endpoint for the Promethios API.
+    
+    Returns:
+        dict: Basic information about the API
+    """
     return {
         "name": "Promethios API",
         "version": "1.0.0",
-        "status": "operational",
-        "loaded_routes": loaded_routes,
-        "documentation": "/docs",
-        "timestamp": datetime.datetime.now().isoformat()
+        "status": "online",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "routes_loaded": len(loaded_routes),
+        "documentation": "/docs"
     }
 
-@app.get("/dashboard")
-async def dashboard_redirect():
-    """Redirect to the dashboard frontend"""
-    from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/static/dashboard/index.html")
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    """
+    Health check endpoint for the Promethios API.
+    
+    Returns:
+        dict: Health status information
+    """
+    return {
+        "status": "healthy",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "routes_loaded": len(loaded_routes),
+        "uptime": "unknown"  # Would be calculated from boot time in production
+    }
 
+# Run the application if executed directly
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
