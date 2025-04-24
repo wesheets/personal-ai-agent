@@ -14,18 +14,10 @@ logger = logging.getLogger("hal_openai")
 
 # Safely import OpenAI
 try:
-    import openai
-    # Check if we're using the new OpenAI client (v1.0.0+) or legacy client
-    is_new_client = hasattr(openai, "__version__") and openai.__version__.startswith(("1.", "2."))
-    
-    if is_new_client:
-        logger.info("✅ Using new OpenAI client (v1.0.0+)")
-        from openai import OpenAI
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    else:
-        logger.info("✅ Using legacy OpenAI client")
-        # Set API key from environment variable
-        openai.api_key = os.getenv("OPENAI_API_KEY")
+    # Use the new OpenAI client (v1.0.0+)
+    from openai import OpenAI
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    logger.info("✅ Using new OpenAI client (v1.0.0+)")
     
     if not os.getenv("OPENAI_API_KEY"):
         logger.warning("⚠️ OPENAI_API_KEY environment variable not set")
@@ -37,8 +29,6 @@ try:
 except Exception as e:
     logger.error(f"❌ OpenAI failed to initialize: {e}")
     openai_available = False
-    openai = None
-    is_new_client = False
     client = None
 
 def generate_react_component(task: str) -> str:
@@ -62,35 +52,23 @@ def generate_react_component(task: str) -> str:
             logger.error("❌ OpenAI API key is not set")
             raise Exception("OpenAI API key is not set")
         
-        # Configure OpenAI API based on client version
-        if is_new_client:
-            # New OpenAI client (v1.0.0+)
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "You are an expert React developer. Use Tailwind CSS for styling. Return only the code without explanations."},
-                    {"role": "user", "content": task}
-                ]
-            )
-            # Extract the generated code
-            generated_code = response.choices[0].message.content
-        else:
-            # Legacy OpenAI client
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "You are an expert React developer. Use Tailwind CSS for styling. Return only the code without explanations."},
-                    {"role": "user", "content": task}
-                ]
-            )
-            # Extract the generated code
-            generated_code = response.choices[0].message["content"]
+        # Use the new OpenAI client (v1.0.0+)
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful React developer using Tailwind CSS."},
+                {"role": "user", "content": task}
+            ]
+        )
+        
+        # Extract the generated code
+        jsx_code = response.choices[0].message.content
         
         # Log the parsed response
-        logger.info(f"✅ Successfully generated React component ({len(generated_code)} chars)")
-        print(f"📝 Parsed OpenAI response: {generated_code[:100]}...")
+        logger.info(f"✅ Successfully generated React component ({len(jsx_code)} chars)")
+        print(f"📝 Parsed OpenAI response: {jsx_code[:100]}...")
         
-        return generated_code
+        return jsx_code
     except Exception as e:
         logger.error(f"❌ Error generating React component: {str(e)}")
         print(f"❌ Fallback reason: OpenAI is unavailable - {str(e)}")
