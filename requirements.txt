@@ -1,3 +1,4 @@
+# Force redeploy: Updated deps for HAL
 fastapi>=0.68.0
 uvicorn>=0.15.0
 pytest>=6.2.5
