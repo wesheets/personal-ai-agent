@@ -354,10 +354,74 @@ app.include_router(self_router, prefix="/self")
 print(f"✅ Loaded route: self_routes")
 loaded_routes.append("self_routes")
 
-# REMOVED: Direct fallback handler for /api/loop/respond endpoint
-# This was preventing the HAL OpenAI implementation from being used
-# Now requests will be properly routed to the hal_routes implementation
-# which includes the OpenAI code generation functionality
+# Direct fallback handler for /api/loop/respond endpoint
+# This ensures the endpoint always works even if route registration fails
+@app.post("/api/loop/respond")
+async def fallback_loop_respond(request_data: dict):
+    """
+    Direct fallback handler for the /api/loop/respond endpoint.
+    
+    This ensures the endpoint always returns a 200 OK response even if the
+    route is not properly registered through the router system.
+    
+    This implementation integrates with the OpenAI code generation functionality.
+    """
+    import datetime
+    import logging
+    from app.modules.hal_memory import read_memory, write_memory
+    from app.modules.hal_openai import generate_react_component
+    from app.schemas.loop_schema import LoopResponseResult
+    
+    logger = logging.getLogger("api")
+    logger.info(f"🔍 DEBUG: Direct fallback_loop_respond called with data: {request_data}")
+    
+    try:
+        # Extract request parameters
+        project_id = request_data.get("project_id", "")
+        loop_id = request_data.get("loop_id", "")
+        agent = request_data.get("agent", "")
+        response_type = request_data.get("response_type", "")
+        target_file = request_data.get("target_file", "")
+        input_key = request_data.get("input_key", "")
+        
+        # Step 1: Read task from memory
+        task_prompt = await read_memory(
+            agent_id=loop_id,
+            memory_type="loop",
+            tag=input_key
+        )
+        
+        if not task_prompt:
+            logger.warning(f"⚠️ No task found in memory for key: {input_key}")
+            task_prompt = f"Build a React component called {target_file} with basic functionality."
+        
+        # Step 2: Generate JSX via OpenAI
+        jsx_code = generate_react_component(task_prompt)
+        
+        # Step 3: Write JSX back to memory
+        await write_memory(
+            agent_id=loop_id,
+            memory_type="loop",
+            tag="hal_build_task_response",
+            value=jsx_code
+        )
+        
+        # Step 4: Return response as LoopResponseResult
+        return LoopResponseResult(
+            status="HAL build complete",
+            output_tag="hal_build_task_response",
+            timestamp=str(datetime.datetime.utcnow()),
+            code=jsx_code  # Include the code in the response (optional)
+        )
+    
+    except Exception as e:
+        logger.error(f"❌ Error in HAL fallback_loop_respond: {str(e)}")
+        return LoopResponseResult(
+            status="error",
+            output_tag="hal_build_task_response",
+            timestamp=str(datetime.datetime.utcnow()),
+            code=f"// Error: {str(e)}"
+        )
 
 # Root endpoint
 @app.get("/")
