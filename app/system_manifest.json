@@ -72,6 +72,18 @@
         "create_recovery_snapshot"
       ],
       "checksum": "initial"
+    },
+    "debug_analyzer": {
+      "tools": [
+        "analyze_memory",
+        "diagnose_loop",
+        "recommend_fix"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "schema_fallback"
+      ],
+      "checksum": "initial"
     }
   },
   "schemas": {
@@ -218,6 +230,34 @@
       ],
       "version": "v1.0.0",
       "checksum": "initial"
+    },
+    "LoopDebugRequest": {
+      "file": "app/schemas/debug_schema.py",
+      "bound_to_routes": [
+        "/debug/analyze-loop"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "LoopDebugResult": {
+      "file": "app/schemas/debug_schema.py",
+      "bound_to_routes": [
+        "/debug/analyze-loop"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "LoopIssue": {
+      "file": "app/schemas/debug_schema.py",
+      "bound_to_routes": [],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "RepairSuggestion": {
+      "file": "app/schemas/debug_schema.py",
+      "bound_to_routes": [],
+      "version": "v1.0.0",
+      "checksum": "initial"
     }
   },
   "routes": {
@@ -344,6 +384,12 @@
       "schema": "Demo_writer_001Request",
       "status": "registered",
       "errors": []
+    },
+    "/debug/analyze-loop": {
+      "method": "POST",
+      "schema": "LoopDebugRequest",
+      "status": "registered",
+      "errors": []
     }
   },
   "modules": {
@@ -424,6 +470,14 @@
         "description": "Build log for FORGE agent",
         "retention_days": 30
       }
+    },
+    "tags": {
+      "loop_diagnosis": {
+        "pattern": "loop_diagnosis_{loop_id}_v{n}",
+        "description": "Debug Analyzer diagnosis results for a loop execution",
+        "schema": "LoopDebugResult",
+        "retention_days": 30
+      }
     }
   },
   "hardening_layers": {
@@ -440,12 +494,16 @@
     "output_policy_enforcement": true,
     "sage_cascade_mode_enabled": true,
     "sage_belief_dashboard_enabled": true,
-    "forge_integration_enabled": true
+    "forge_integration_enabled": true,
+    "debug_tools_enabled": true,
+    "diagnostic_agents": [
+      "debug_analyzer"
+    ]
   },
   "manifest_meta": {
     "version": "1.0.0",
     "created_at": "2025-04-24T14:28:08.000Z",
-    "last_updated": "2025-04-24T19:03:15.884757",
+    "last_updated": "2025-04-24T20:04:01.731000",
     "last_updated_by": "dashboard_manifest_update.py"
   },
   "testing": {
