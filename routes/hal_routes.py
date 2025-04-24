@@ -26,7 +26,7 @@ logger = logging.getLogger("api")
 # Create router
 router = APIRouter(tags=["HAL"])
 
-@router.post("/api/loop/respond")  # Changed to include /api prefix explicitly
+@router.post("/loop/respond")  # Changed back to use prefix from main.py
 async def loop_respond(request_data: dict):
     """
     Process a loop/respond request for HAL agent.
