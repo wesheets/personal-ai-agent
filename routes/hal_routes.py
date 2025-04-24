@@ -27,7 +27,7 @@ logger = logging.getLogger("api")
 router = APIRouter(tags=["HAL"])
 
 @router.post("/loop/respond")  # Changed back to use prefix from main.py
-async def loop_respond(request_data: dict):
+async def loop_respond(request: LoopResponseRequest) -> LoopResponseResult:
     """
     Process a loop/respond request for HAL agent.
     
@@ -35,21 +35,21 @@ async def loop_respond(request_data: dict):
     writes the result back to memory, and returns a success response.
     
     Parameters:
-    - request_data: The request data containing project_id, loop_id, agent, etc.
+    - request: The LoopResponseRequest containing project_id, loop_id, agent, etc.
     
     Returns:
     - A LoopResponseResult indicating the status and output location
     """
-    logger.info(f"🔍 HAL loop_respond called with data: {request_data}")
+    logger.info(f"🔍 HAL loop_respond called with data: {request.dict()}")
     
     try:
-        # Extract request parameters
-        project_id = request_data.get("project_id", "")
-        loop_id = request_data.get("loop_id", "")
-        agent = request_data.get("agent", "")
-        response_type = request_data.get("response_type", "")
-        target_file = request_data.get("target_file", "")
-        input_key = request_data.get("input_key", "")
+        # Extract request parameters from schema
+        project_id = request.project_id
+        loop_id = request.loop_id
+        agent = request.agent
+        response_type = request.response_type
+        target_file = request.target_file
+        input_key = request.input_key
         
         # Step 1: Read task from memory
         task_prompt = await read_memory(
@@ -73,22 +73,22 @@ async def loop_respond(request_data: dict):
             value=jsx_code
         )
         
-        # Step 4: Return response
-        return {
-            "status": "HAL build complete",
-            "output_tag": "hal_build_task_response",
-            "timestamp": str(datetime.datetime.utcnow()),
-            "code": jsx_code  # Include the code in the response (optional)
-        }
+        # Step 4: Return response as LoopResponseResult
+        return LoopResponseResult(
+            status="HAL build complete",
+            output_tag="hal_build_task_response",
+            timestamp=str(datetime.datetime.utcnow()),
+            code=jsx_code  # Include the code in the response (optional)
+        )
     
     except Exception as e:
         logger.error(f"❌ Error in HAL loop_respond: {str(e)}")
-        return {
-            "status": "error",
-            "output_tag": "hal_build_task_response",
-            "timestamp": str(datetime.datetime.utcnow()),
-            "code": f"// Error: {str(e)}"
-        }
+        return LoopResponseResult(
+            status="error",
+            output_tag="hal_build_task_response",
+            timestamp=str(datetime.datetime.utcnow()),
+            code=f"// Error: {str(e)}"
+        )
 
 @router.get("/simulate-block")
 async def simulate_hal_constraint(
