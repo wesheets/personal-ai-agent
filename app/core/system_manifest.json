@@ -1,20 +1,20 @@
 {
   "system_manifest": {
     "version": "1.0.0",
-    "last_updated": "2025-04-24T18:15:00Z",
+    "last_updated": "2025-04-24T18:53:43Z",
     "system_name": "Promethios",
     "agent_discovery_status": {
-      "timestamp": "2025-04-24T18:15:00Z",
+      "timestamp": "2025-04-24T18:53:43Z",
       "total_agents_discovered": 22,
       "agents_with_implementation": 19,
-      "agents_in_registry": 11,
+      "agents_in_registry": 17,
       "agents_with_duplicates": 5,
-      "agents_needing_action": 14,
+      "agents_needing_action": 8,
       "action_summary": {
-        "none_needed": 8,
-        "register_only": 6,
-        "register_and_consolidate": 3,
-        "consolidate_only": 2,
+        "none_needed": 14,
+        "register_only": 3,
+        "register_and_consolidate": 2,
+        "consolidate_only": 0,
         "scaffold_only": 3
       },
       "newly_registered_agents": [
@@ -22,7 +22,13 @@
         "debugger (registered with schema and routes)",
         "critic (registered with schema and routes)",
         "orchestrator (registered with schema and routes)",
-        "sage (registered with schema and routes)"
+        "sage (registered with schema and routes)",
+        "pessimist (registered with schema and routes)",
+        "nova (registered with schema and routes, consolidated)",
+        "cto (registered with schema and routes)",
+        "observer (registered with schema and routes)",
+        "sitegen (registered with schema and routes)",
+        "trainer (registered with schema only)"
       ],
       "previously_discovered_agents": [
         "core-forge (implementation found)",
@@ -30,22 +36,33 @@
         "historian (now registered)",
         "critic (now registered and consolidated)",
         "orchestrator (now registered and consolidated)",
-        "sage (now registered)"
+        "sage (now registered)",
+        "pessimist (now registered)",
+        "nova (now registered and consolidated)",
+        "cto (now registered)",
+        "observer (now registered)",
+        "sitegen (now registered)",
+        "trainer (now registered schema only)"
       ],
       "discovery_report_path": "/app/core/agent_discovery_report.json",
       "discovery_status": "in_progress",
       "registration_status": {
-        "phase": "1b",
+        "phase": "2",
         "completed": [
           "historian",
           "debugger",
           "critic",
           "orchestrator",
-          "sage"
+          "sage",
+          "pessimist",
+          "nova",
+          "cto",
+          "observer",
+          "sitegen",
+          "trainer"
         ],
         "pending": [
           "auditor",
-          "cto",
           "guardian",
           "ceo",
           "ash-xenomorph"
@@ -55,8 +72,8 @@
     },
     "system_status": {
       "status": "operational",
-      "agent_readiness": "improving",
-      "next_steps": "Continue agent registration sprint phase 2"
+      "agent_readiness": "good",
+      "next_steps": "Complete agent registration sprint phase 3"
     },
     "registered_agents": {
       "historian": {
@@ -100,6 +117,55 @@
         "endpoint": "/api/sage/analyze",
         "status": "active",
         "tools": ["reflect", "summarize", "score_belief"]
+      },
+      "pessimist": {
+        "registration_date": "2025-04-24T18:38:04Z",
+        "schema_path": "/app/schemas/pessimist_schema.py",
+        "route_path": "/app/routes/pessimist_routes.py",
+        "endpoint": "/api/pessimist/analyze",
+        "status": "active",
+        "tools": ["analyze_bias", "detect_echo", "track_bias"]
+      },
+      "nova": {
+        "registration_date": "2025-04-24T18:40:51Z",
+        "schema_path": "/app/schemas/nova_schema.py",
+        "route_path": "/app/routes/nova_routes.py",
+        "endpoint": "/api/nova/build",
+        "status": "active",
+        "tools": ["build_ui", "generate_component"],
+        "consolidation": "completed"
+      },
+      "cto": {
+        "registration_date": "2025-04-24T18:42:56Z",
+        "schema_path": "/app/schemas/cto_schema.py",
+        "route_path": "/app/routes/cto_routes.py",
+        "endpoint": "/api/cto/audit",
+        "status": "active",
+        "tools": ["audit_memory", "validate_schema", "check_reflection"]
+      },
+      "observer": {
+        "registration_date": "2025-04-24T18:45:46Z",
+        "schema_path": "/app/schemas/observer_schema.py",
+        "route_path": "/app/routes/observer_routes.py",
+        "endpoint": "/api/observer/journal",
+        "status": "active",
+        "tools": ["journal", "observe", "reflect"]
+      },
+      "sitegen": {
+        "registration_date": "2025-04-24T18:48:55Z",
+        "schema_path": "/app/schemas/sitegen_schema.py",
+        "route_path": "/app/routes/sitegen_routes.py",
+        "endpoint": "/api/sitegen/plan",
+        "status": "active",
+        "tools": ["analyze_zoning", "create_layout", "evaluate_market_fit"]
+      },
+      "trainer": {
+        "registration_date": "2025-04-24T18:51:53Z",
+        "schema_path": "/app/schemas/trainer_schema.py",
+        "route_path": null,
+        "endpoint": null,
+        "status": "schema_only",
+        "tools": ["train", "evaluate", "fine_tune"]
       }
     }
   }

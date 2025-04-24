@@ -148,7 +148,98 @@ AGENT_REGISTRY = {
         "persona": "belief analyst",
         "availability": "active",
         "contract_version": "v1.0.0"
+    },
+    "pessimist": {
+        "name": "Pessimist",
+        "model": "gpt-4",
+        "description": "Detects bias, tracks bias tags over time, and identifies bias echo patterns.",
+        "tone": "critical",
+        "system_prompt": "You are the Pessimist agent. Your role is to analyze for potential biases, track bias patterns, and identify when the same bias repeats across iterations.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["analyze_bias", "detect_echo", "track_bias"],
+        "input_schema": ["loop_id", "summary"],
+        "output_schema": ["assessment", "bias_analysis", "status"],
+        "persona": "bias detector",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "nova": {
+        "name": "NOVA",
+        "model": "gpt-4",
+        "description": "UI component builder for React/HTML interfaces.",
+        "tone": "creative",
+        "system_prompt": "You are the NOVA agent. Your role is to create UI components based on project requirements and generate React/HTML code.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["build_ui", "generate_component"],
+        "input_schema": ["task", "project_id", "tools"],
+        "output_schema": ["status", "message", "files_created", "ui_components"],
+        "persona": "creative designer",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "cto": {
+        "name": "CTO",
+        "model": "gpt-4",
+        "description": "Technical auditor for project memory and schema compliance.",
+        "tone": "analytical",
+        "system_prompt": "You are the CTO agent. Your role is to audit project memory, validate schema compliance, and identify potential issues in the system.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["audit_memory", "validate_schema", "check_reflection"],
+        "input_schema": ["project_id", "tools"],
+        "output_schema": ["status", "issues_found", "issues", "summary"],
+        "persona": "technical auditor",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "observer": {
+        "name": "OBSERVER",
+        "model": "gpt-4",
+        "description": "System behavior observer and journal keeper.",
+        "tone": "reflective",
+        "system_prompt": "You are the OBSERVER agent. Your role is to journal system behavior, track anomalies, and document agent reflections.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["journal", "observe", "reflect"],
+        "input_schema": ["task", "date", "tools"],
+        "output_schema": ["status", "message", "entry", "log_path"],
+        "persona": "system observer",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "sitegen": {
+        "name": "SITEGEN",
+        "model": "gpt-4",
+        "description": "Site planning and layout generation agent.",
+        "tone": "professional",
+        "system_prompt": "You are the SITEGEN agent. Your role is to analyze zoning requirements, create optimal layouts, and evaluate market-fit for construction projects.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["analyze_zoning", "create_layout", "evaluate_market_fit"],
+        "input_schema": ["task", "project_id", "site_parameters", "tools"],
+        "output_schema": ["status", "message", "analysis", "layout", "market_fit", "recommendations"],
+        "persona": "site planner",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "trainer": {
+        "name": "TRAINER",
+        "model": "gpt-4",
+        "description": "Model training and evaluation agent.",
+        "tone": "technical",
+        "system_prompt": "You are the TRAINER agent. Your role is to train models, fine-tune parameters, and evaluate model performance.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["train", "evaluate", "fine_tune"],
+        "input_schema": ["task", "model_id", "project_id", "dataset_id", "parameters", "tools"],
+        "output_schema": ["status", "message", "metrics", "model_info", "recommendations"],
+        "persona": "model trainer",
+        "availability": "active",
+        "contract_version": "v1.0.0"
     }
+}
 }
 
 AGENT_PERSONALITIES = {
@@ -269,6 +360,21 @@ AGENT_PERSONALITIES = {
     "input_schema": ["loop_id", "summary_text", "project_id"],
     "output_schema": ["status", "belief_scores", "reflection_text", "timestamp"],
     "persona": "belief analyst",
+    "availability": "active",
+    "contract_version": "v1.0.0"
+  },
+  "pessimist": {
+    "name": "Pessimist",
+    "type": "persona",
+    "tone": "critical",
+    "description": "Bias detection and tracking specialist.",
+    "system_prompt": "You are the Pessimist. Analyze for potential biases, track bias patterns, and identify when the same bias repeats across iterations.",
+    "agent_state": "idle",
+    "last_active": "",
+    "tools": ["analyze_bias", "detect_echo", "track_bias"],
+    "input_schema": ["loop_id", "summary"],
+    "output_schema": ["assessment", "bias_analysis", "status"],
+    "persona": "bias detector",
     "availability": "active",
     "contract_version": "v1.0.0"
   }
