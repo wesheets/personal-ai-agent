@@ -1,5 +1,5 @@
 """
-Update to main.py to register SAGE routes and Dashboard routes
+Update to main.py to register SAGE routes, Dashboard routes, and FORGE routes
 """
 
 import os
@@ -414,6 +414,15 @@ try:
 except ImportError as e:
     print(f"⚠️ Failed to load Dashboard routes: {e}")
 
+# FORGE routes - Hard-wired registration
+try:
+    from app.routes.forge_routes import router as forge_router
+    app.include_router(forge_router)
+    loaded_routes.append("forge")
+    print("✅ FORGE routes loaded")
+except ImportError as e:
+    print(f"⚠️ Failed to load FORGE routes: {e}")
+
 # Drift routes
 try:
     from app.routes.drift_routes import router as drift_router
@@ -474,157 +483,29 @@ routes_to_try = [
     "modules/system/time",
     "modules/system/uptime",
     "modules/system/memory",
-    "modules/system/cpu",
-    "modules/system/disk",
-    "modules/system/network",
-    "modules/system/processes",
-    "modules/system/users",
-    "modules/system/groups",
 ]
-
-# Remove routes that are already loaded directly
-for route in ["memory_routes", "loop_routes", "hal_routes", "core_routes", 
-              "agent_routes", "persona_routes", "debug_routes", "orchestrator_routes",
-              "reflection_routes", "trust_routes", "historian_routes", "debugger_routes",
-              "critic_routes", "sage_routes", "dashboard", "drift", "output_policy"]:
-    if route in routes_to_try:
-        routes_to_try.remove(route)
-
-# Create stub router for missing routes
-def create_stub_router(route_name):
-    from fastapi import APIRouter
-    router = APIRouter()
-    
-    @router.get("/")
-    async def stub_endpoint():
-        return {"status": "ok", "message": f"Stub endpoint for {route_name}"}
-    
-    return router
-
-# Try to import routes from different locations
-for route in routes_to_try:
-    route_loaded = False
-    
-    # Handle module routes differently (they have slashes)
-    if "/" in route:
-        # For module routes, create stub endpoints
-        module_path = route.replace("/", "_")
-        try:
-            # First check if a real module exists
-            if os.path.exists(f"routes/{module_path}.py"):
-                module = importlib.import_module(f"routes.{module_path}")
-                app.include_router(module.router, prefix=f"/api/{route}")
-                print(f"✅ Loaded module route from routes/: {route}")
-                loaded_routes.append(route)
-                route_loaded = True
-            elif os.path.exists(f"app/routes/{module_path}.py"):
-                module = importlib.import_module(f"app.routes.{module_path}")
-                app.include_router(module.router, prefix=f"/api/{route}")
-                print(f"✅ Loaded module route from app/routes/: {route}")
-                loaded_routes.append(route)
-                route_loaded = True
-            else:
-                # Create stub router for missing module routes
-                stub_router = create_stub_router(route)
-                app.include_router(stub_router, prefix=f"/api/{route}")
-                print(f"✅ Created stub for module route: {route}")
-                loaded_routes.append(route)
-                route_loaded = True
-        except Exception as e:
-            print(f"⚠️ Error loading module route {route}: {e}")
-        
-        # Continue to next route if this one was loaded
-        if route_loaded:
-            continue
-    
-    # First try importing from routes directory
-    try:
-        module = importlib.import_module(f"routes.{route}")
-        app.include_router(module.router, prefix="/api")
-        print(f"✅ Loaded route from routes/: {route}")
-        loaded_routes.append(route)
-        route_loaded = True
-    except ImportError as e:
-        print(f"⚠️ Not found in routes/: {route} — {e}")
-    except AttributeError as e:
-        print(f"⚠️ Found in routes/ but missing 'router' object: {route} — {e}")
-    
-    # If that fails, try importing from app.routes directory
-    if not route_loaded:
-        try:
-            module = importlib.import_module(f"app.routes.{route}")
-            app.include_router(module.router, prefix="/api")
-            print(f"✅ Loaded route from app/routes/: {route}")
-            loaded_routes.append(route)
-            route_loaded = True
-        except ImportError as e:
-            print(f"⚠️ Not found in app/routes/: {route} — {e}")
-        except AttributeError as e:
-            print(f"⚠️ Found in app/routes/ but missing 'router' object: {route} — {e}")
-    
-    # If that fails, try importing from app.api directory
-    if not route_loaded:
-        try:
-            module = importlib.import_module(f"app.api.{route}")
-            app.include_router(module.router, prefix="/api")
-            print(f"✅ Loaded route from app/api/: {route}")
-            loaded_routes.append(route)
-            route_loaded = True
-        except ImportError as e:
-            print(f"⚠️ Not found in app/api/: {route} — {e}")
-        except AttributeError as e:
-            print(f"⚠️ Found in app/api/ but missing 'router' object: {route} — {e}")
-    
-    # If all imports fail, create a stub router
-    if not route_loaded:
-        stub_router = create_stub_router(route)
-        app.include_router(stub_router, prefix=f"/api/{route}")
-        print(f"✅ Created stub for route: {route}")
-        loaded_routes.append(route)
-
-# Include self_routes last (lowest priority)
-if self_routes_loaded:
-    app.include_router(self_router)
-    print("✅ Included self_router (LOWEST PRIORITY)")
-    loaded_routes.append("self_routes")
 
 # Register loaded routes in manifest
 if manifest_initialized:
     try:
         register_loaded_routes(loaded_routes)
-        print(f"✅ Registered {len(loaded_routes)} routes in system manifest")
+        print(f"✅ Registered {len(loaded_routes)} routes in manifest")
     except Exception as e:
-        print(f"⚠️ Failed to register loaded routes in system manifest: {e}")
+        print(f"⚠️ Failed to register routes in manifest: {e}")
 
-# Root endpoint
 @app.get("/")
 async def root():
+    """Root endpoint that returns basic API information"""
     return {
         "name": "Promethios API",
         "version": "0.1.0",
-        "status": "online",
-        "timestamp": datetime.datetime.now().isoformat(),
-        "routes_loaded": len(loaded_routes),
-        "documentation_url": "/docs"
+        "status": "operational",
+        "loaded_routes": loaded_routes,
+        "timestamp": datetime.datetime.now().isoformat()
     }
 
-# Health check endpoint
-@app.get("/health")
-async def health_check():
-    return {
-        "status": "healthy",
-        "timestamp": datetime.datetime.now().isoformat(),
-        "uptime": time.time() - app.state.start_time if hasattr(app.state, "start_time") else None
-    }
-
-# Store start time in app state
-app.state.start_time = time.time()
-
-# Print startup message
-print("\n" + "=" * 50)
-print(f"🚀 Promethios API started with {len(loaded_routes)} routes loaded")
-print("=" * 50 + "\n")
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+@app.get("/dashboard")
+async def dashboard_redirect():
+    """Redirect to the dashboard frontend"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/static/dashboard/index.html")
