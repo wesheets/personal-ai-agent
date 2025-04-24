@@ -1,38 +1,47 @@
 {
   "system_manifest": {
     "version": "1.0.0",
-    "last_updated": "2025-04-24T17:45:10Z",
+    "last_updated": "2025-04-24T18:15:00Z",
     "system_name": "Promethios",
     "agent_discovery_status": {
-      "timestamp": "2025-04-24T17:45:10Z",
+      "timestamp": "2025-04-24T18:15:00Z",
       "total_agents_discovered": 22,
       "agents_with_implementation": 19,
-      "agents_in_registry": 8,
+      "agents_in_registry": 11,
       "agents_with_duplicates": 5,
-      "agents_needing_action": 17,
+      "agents_needing_action": 14,
       "action_summary": {
-        "none_needed": 5,
-        "register_only": 9,
+        "none_needed": 8,
+        "register_only": 6,
         "register_and_consolidate": 3,
         "consolidate_only": 2,
         "scaffold_only": 3
       },
       "newly_registered_agents": [
         "historian (registered with schema and routes)",
-        "debugger (registered with schema and routes)"
+        "debugger (registered with schema and routes)",
+        "critic (registered with schema and routes)",
+        "orchestrator (registered with schema and routes)",
+        "sage (registered with schema and routes)"
       ],
       "previously_discovered_agents": [
         "core-forge (implementation found)",
         "debugger (now registered)",
-        "historian (now registered)"
+        "historian (now registered)",
+        "critic (now registered and consolidated)",
+        "orchestrator (now registered and consolidated)",
+        "sage (now registered)"
       ],
       "discovery_report_path": "/app/core/agent_discovery_report.json",
       "discovery_status": "in_progress",
       "registration_status": {
-        "phase": "1a",
+        "phase": "1b",
         "completed": [
           "historian",
-          "debugger"
+          "debugger",
+          "critic",
+          "orchestrator",
+          "sage"
         ],
         "pending": [
           "auditor",
@@ -47,7 +56,7 @@
     "system_status": {
       "status": "operational",
       "agent_readiness": "improving",
-      "next_steps": "Continue agent registration sprint phase 1b"
+      "next_steps": "Continue agent registration sprint phase 2"
     },
     "registered_agents": {
       "historian": {
@@ -65,6 +74,32 @@
         "endpoint": "/api/debugger/trace",
         "status": "active",
         "tools": ["trace", "log_error", "inject_debug"]
+      },
+      "critic": {
+        "registration_date": "2025-04-24T18:15:00Z",
+        "schema_path": "/app/schemas/critic_schema.py",
+        "route_path": "/app/routes/critic_routes.py",
+        "endpoint": "/api/critic/review",
+        "status": "active",
+        "tools": ["review", "reject", "log_reason"],
+        "consolidation": "completed"
+      },
+      "orchestrator": {
+        "registration_date": "2025-04-24T18:15:00Z",
+        "schema_path": "/app/schemas/orchestrator_schema.py",
+        "route_path": "/app/routes/orchestrator_routes.py",
+        "endpoint": "/api/orchestrator/delegate",
+        "status": "active",
+        "tools": ["delegate", "plan", "resolve"],
+        "consolidation": "completed"
+      },
+      "sage": {
+        "registration_date": "2025-04-24T18:15:00Z",
+        "schema_path": "/app/schemas/sage_schema.py",
+        "route_path": "/app/routes/sage_routes.py",
+        "endpoint": "/api/sage/analyze",
+        "status": "active",
+        "tools": ["reflect", "summarize", "score_belief"]
       }
     }
   }

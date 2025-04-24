@@ -1,80 +1,146 @@
 """
-CRITIC Schema Module
+CRITIC Agent Schema Definitions
 
-This module defines the data models for CRITIC loop summary review and rejection,
-enabling validation and accountability in the loop execution process.
+This module defines the schemas for CRITIC agent requests and responses.
 """
 
+from typing import Dict, Any, List, Optional, Union
 from pydantic import BaseModel, Field
-from typing import Dict, List, Any, Optional
-from datetime import datetime
 
-class LoopSummaryReviewRequest(BaseModel):
-    """
-    Schema for loop summary review requests.
-    
-    This schema defines the structure of requests to the CRITIC agent
-    for reviewing loop summaries and validating their integrity.
-    """
-    loop_id: str = Field(..., description="Unique identifier for the loop")
-    agent: str = Field(..., description="Agent that produced the summary")
-    output_tag: str = Field(..., description="Memory tag where the output is stored")
-    schema_hash: Optional[str] = Field(None, description="Expected schema hash for validation")
-    snapshot_id: Optional[str] = Field(None, description="Reference snapshot ID if available")
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "loop_id": "loop_003",
-                "agent": "hal",
-                "output_tag": "hal_build_task_response",
-                "schema_hash": "a1b2c3d4e5f6",
-                "snapshot_id": None
-            }
-        }
 
-class LoopReflectionRejection(BaseModel):
+class CriticReviewRequest(BaseModel):
     """
-    Schema for loop reflection rejection responses.
-    
-    This schema defines the structure of rejection responses from the CRITIC agent
-    when a loop summary fails validation checks.
+    Schema for CRITIC agent review request.
     """
-    loop_id: str = Field(..., description="Unique identifier for the loop")
-    status: str = Field("rejected", description="Status of the review")
+    loop_id: str = Field(..., description="Unique identifier for the loop being reviewed")
+    agent_outputs: Dict[str, str] = Field(
+        ..., 
+        description="Dictionary mapping agent IDs to their outputs"
+    )
+    project_id: str = Field(..., description="Project identifier")
+    tools: Optional[List[str]] = Field(
+        default=["review", "reject", "log_reason"],
+        description="List of tools to use for the review"
+    )
+
+
+class CriticScores(BaseModel):
+    """
+    Schema for CRITIC agent evaluation scores.
+    """
+    technical_accuracy: int = Field(
+        ..., 
+        description="Score for technical accuracy (0-10)",
+        ge=0,
+        le=10
+    )
+    ux_clarity: int = Field(
+        ..., 
+        description="Score for UX clarity (0-10)",
+        ge=0,
+        le=10
+    )
+    visual_design: int = Field(
+        ..., 
+        description="Score for visual design (0-10)",
+        ge=0,
+        le=10
+    )
+    monetization_strategy: int = Field(
+        ..., 
+        description="Score for monetization strategy (0-10)",
+        ge=0,
+        le=10
+    )
+
+
+class CriticUsage(BaseModel):
+    """
+    Schema for API usage metrics.
+    """
+    prompt_tokens: int = Field(..., description="Number of prompt tokens used")
+    completion_tokens: int = Field(..., description="Number of completion tokens used")
+    total_tokens: int = Field(..., description="Total number of tokens used")
+
+
+class CriticReviewResult(BaseModel):
+    """
+    Schema for CRITIC agent review result.
+    """
+    status: str = Field(..., description="Status of the review (success or error)")
+    loop_id: str = Field(..., description="Unique identifier for the reviewed loop")
+    reflection: Optional[str] = Field(None, description="Overall analysis and suggestions for improvement")
+    scores: Optional[CriticScores] = Field(None, description="Evaluation scores for different criteria")
+    rejection: Optional[bool] = Field(False, description="Whether the output is rejected")
+    rejection_reason: Optional[str] = Field(None, description="Reason for rejection if rejected")
+    usage: Optional[CriticUsage] = Field(None, description="API usage metrics")
+    timestamp: Optional[float] = Field(None, description="Timestamp of the review")
+    message: Optional[str] = Field(None, description="Error message if status is error")
+    raw_response: Optional[str] = Field(None, description="Raw response if parsing failed")
+
+
+class CriticRejectRequest(BaseModel):
+    """
+    Schema for CRITIC agent rejection request.
+    """
+    loop_id: str = Field(..., description="Unique identifier for the loop being rejected")
     reason: str = Field(..., description="Reason for rejection")
-    recommendation: Optional[str] = Field(None, description="Recommended recovery action")
-    timestamp: datetime = Field(default_factory=datetime.utcnow, description="When the rejection occurred")
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "loop_id": "loop_003",
-                "status": "rejected",
-                "reason": "Output from HAL did not match schema checksum",
-                "recommendation": "Re-run HAL with fallback schema wrapping",
-                "timestamp": "2025-04-24T16:04:00.123456"
-            }
-        }
+    project_id: str = Field(..., description="Project identifier")
+    tools: Optional[List[str]] = Field(
+        default=["review", "reject", "log_reason"],
+        description="List of tools to use for the rejection"
+    )
 
-class LoopReflectionApproval(BaseModel):
+
+class CriticRejectResult(BaseModel):
     """
-    Schema for loop reflection approval responses.
-    
-    This schema defines the structure of approval responses from the CRITIC agent
-    when a loop summary passes validation checks.
+    Schema for CRITIC agent rejection result.
+    """
+    status: str = Field(..., description="Status of the rejection (success or error)")
+    loop_id: str = Field(..., description="Unique identifier for the rejected loop")
+    rejection: bool = Field(True, description="Whether the output is rejected")
+    rejection_reason: str = Field(..., description="Reason for rejection")
+    timestamp: Optional[float] = Field(None, description="Timestamp of the rejection")
+    message: Optional[str] = Field(None, description="Error message if status is error")
+
+
+class CriticLogReasonRequest(BaseModel):
+    """
+    Schema for CRITIC agent log reason request.
     """
     loop_id: str = Field(..., description="Unique identifier for the loop")
-    status: str = Field("approved", description="Status of the review")
-    message: str = Field(..., description="Approval message")
-    timestamp: datetime = Field(default_factory=datetime.utcnow, description="When the approval occurred")
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "loop_id": "loop_003",
-                "status": "approved",
-                "message": "HAL output validated successfully",
-                "timestamp": "2025-04-24T16:04:00.123456"
-            }
-        }
+    reason_type: str = Field(
+        ..., 
+        description="Type of reason (e.g., 'improvement', 'concern', 'praise')"
+    )
+    reason_text: str = Field(..., description="Detailed explanation")
+    project_id: str = Field(..., description="Project identifier")
+    tools: Optional[List[str]] = Field(
+        default=["review", "reject", "log_reason"],
+        description="List of tools to use for logging the reason"
+    )
+
+
+class CriticLogReasonResult(BaseModel):
+    """
+    Schema for CRITIC agent log reason result.
+    """
+    status: str = Field(..., description="Status of the log operation (success or error)")
+    loop_id: str = Field(..., description="Unique identifier for the loop")
+    reason_type: str = Field(..., description="Type of reason")
+    reason_text: str = Field(..., description="Detailed explanation")
+    timestamp: Optional[float] = Field(None, description="Timestamp of the log operation")
+    message: Optional[str] = Field(None, description="Error message if status is error")
+
+
+# Fallback schema for handling errors
+class CriticErrorResult(BaseModel):
+    """
+    Schema for CRITIC agent error result.
+    """
+    status: str = Field("error", description="Status of the operation")
+    message: str = Field(..., description="Error message")
+    task: Optional[str] = Field(None, description="Original task")
+    tools: Optional[List[str]] = Field(None, description="Tools used")
+    project_id: Optional[str] = Field(None, description="Project identifier")
+    loop_id: Optional[str] = Field(None, description="Loop identifier if applicable")

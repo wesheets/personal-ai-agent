@@ -159,6 +159,23 @@ except ImportError:
     debugger_routes_loaded = False
     print("⚠️ Could not load debugger_routes directly")
 
+# Import CRITIC, ORCHESTRATOR, and SAGE routes directly
+try:
+    from app.routes.critic_routes import router as critic_router
+    critic_routes_loaded = True
+    print("✅ Directly loaded critic_routes")
+except ImportError:
+    critic_routes_loaded = False
+    print("⚠️ Could not load critic_routes directly")
+
+try:
+    from app.routes.sage_routes import router as sage_router
+    sage_routes_loaded = True
+    print("✅ Directly loaded sage_routes")
+except ImportError:
+    sage_routes_loaded = False
+    print("⚠️ Could not load sage_routes directly")
+
 # Create FastAPI app
 app = FastAPI(
     title="Promethios API",
@@ -285,6 +302,17 @@ if orchestrator_routes_loaded:
     print("✅ Included orchestrator_router (LOWER PRIORITY)")
     loaded_routes.append("orchestrator_routes")
 
+# Include CRITIC, ORCHESTRATOR, and SAGE routers
+if critic_routes_loaded:
+    app.include_router(critic_router)
+    print("✅ Included critic_router")
+    loaded_routes.append("critic_routes")
+
+if sage_routes_loaded:
+    app.include_router(sage_router)
+    print("✅ Included sage_router")
+    loaded_routes.append("sage_routes")
+
 if reflection_routes_loaded:
     app.include_router(reflection_router)
     print("✅ Included reflection_router")
@@ -295,15 +323,6 @@ if trust_routes_loaded:
     print("✅ Included trust_router")
     loaded_routes.append("trust_routes")
 
-# SAGE routes - Hard-wired registration
-try:
-    from app.routes.sage_routes import router as sage_router
-    app.include_router(sage_router)
-    loaded_routes.append("sage")
-    print("✅ SAGE routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load SAGE routes: {e}")
-
 # Dashboard routes - Hard-wired registration
 try:
     from app.routes.dashboard_routes import router as dashboard_router
@@ -312,15 +331,6 @@ try:
     print("✅ Dashboard routes loaded")
 except ImportError as e:
     print(f"⚠️ Failed to load Dashboard routes: {e}")
-
-# Critic routes
-try:
-    from app.routes.critic_routes import router as critic_router
-    app.include_router(critic_router)
-    loaded_routes.append("critic")
-    print("✅ Critic routes loaded")
-except ImportError as e:
-    print(f"⚠️ Failed to load Critic routes: {e}")
 
 # Drift routes
 try:
@@ -353,6 +363,8 @@ routes_to_try = [
     "trust_routes",
     "historian_routes",
     "debugger_routes",
+    "critic_routes",
+    "sage_routes",
     
     # Additional routes found in file system
     "project_routes",
@@ -392,7 +404,7 @@ routes_to_try = [
 for route in ["memory_routes", "loop_routes", "hal_routes", "core_routes", 
               "agent_routes", "persona_routes", "debug_routes", "orchestrator_routes",
               "reflection_routes", "trust_routes", "historian_routes", "debugger_routes",
-              "sage", "dashboard", "critic", "drift", "output_policy"]:
+              "critic_routes", "sage_routes", "dashboard", "drift", "output_policy"]:
     if route in routes_to_try:
         routes_to_try.remove(route)
 
@@ -481,134 +493,56 @@ for route in routes_to_try:
         except AttributeError as e:
             print(f"⚠️ Found in app/api/ but missing 'router' object: {route} — {e}")
     
-    # If route still not loaded, create a stub router
+    # If all imports fail, create a stub router
     if not route_loaded:
         stub_router = create_stub_router(route)
-        app.include_router(stub_router, prefix="/api")
+        app.include_router(stub_router, prefix=f"/api/{route}")
         print(f"✅ Created stub for route: {route}")
         loaded_routes.append(route)
 
-# Include self_router separately as it's already imported
+# Include self_routes last (lowest priority)
 if self_routes_loaded:
-    app.include_router(self_router, prefix="/self")
-    print(f"✅ Loaded route: self_routes")
+    app.include_router(self_router)
+    print("✅ Included self_router (LOWEST PRIORITY)")
     loaded_routes.append("self_routes")
 
 # Register loaded routes in manifest
 if manifest_initialized:
     try:
         register_loaded_routes(loaded_routes)
-        print(f"✅ Registered {len(loaded_routes)} routes in manifest")
+        print(f"✅ Registered {len(loaded_routes)} routes in system manifest")
     except Exception as e:
-        print(f"⚠️ Failed to register routes in manifest: {e}")
-
-# Direct fallback handler for /api/loop/respond endpoint
-# This ensures the endpoint always works even if route registration fails
-@app.post("/api/loop/respond")
-async def fallback_loop_respond(request_data: dict):
-    """
-    Direct fallback handler for the /api/loop/respond endpoint.
-    
-    This ensures the endpoint always returns a 200 OK response even if the
-    route is not properly registered through the router system.
-    
-    This implementation integrates with the OpenAI code generation functionality.
-    """
-    import datetime
-    import logging
-    from app.modules.hal_memory import read_memory, write_memory
-    from app.modules.hal_openai import generate_react_component
-    from app.schemas.loop_schema import LoopResponseResult
-    
-    logger = logging.getLogger("api")
-    logger.info(f"🔍 DEBUG: Direct fallback_loop_respond called with data: {request_data}")
-    
-    try:
-        # Extract request parameters
-        project_id = request_data.get("project_id", "")
-        loop_id = request_data.get("loop_id", "")
-        agent = request_data.get("agent", "")
-        response_type = request_data.get("response_type", "")
-        target_file = request_data.get("target_file", "")
-        input_key = request_data.get("input_key", "")
-        
-        # Step 1: Read task from memory
-        task_prompt = await read_memory(
-            agent_id=loop_id,
-            memory_type="loop",
-            tag=input_key
-        )
-        
-        if not task_prompt:
-            logger.warning(f"⚠️ No task found in memory for key: {input_key}")
-            task_prompt = f"Build a React component called {target_file} with basic functionality."
-        
-        # Step 2: Generate JSX via OpenAI
-        jsx_code = generate_react_component(task_prompt)
-        
-        # Step 3: Write JSX back to memory
-        await write_memory(
-            agent_id=loop_id,
-            memory_type="loop",
-            tag="hal_build_task_response",
-            value=jsx_code
-        )
-        
-        # Step 4: Return response as LoopResponseResult
-        return LoopResponseResult(
-            status="HAL build complete",
-            output_tag="hal_build_task_response",
-            timestamp=str(datetime.datetime.utcnow()),
-            code=jsx_code  # Include the code in the response (optional)
-        )
-    
-    except Exception as e:
-        logger.error(f"❌ Error in HAL fallback_loop_respond: {str(e)}")
-        return LoopResponseResult(
-            status="error",
-            output_tag="hal_build_task_response",
-            timestamp=str(datetime.datetime.utcnow()),
-            code=f"// Error: {str(e)}"
-        )
+        print(f"⚠️ Failed to register loaded routes in system manifest: {e}")
 
 # Root endpoint
 @app.get("/")
 async def root():
-    """Root endpoint that returns basic API information"""
     return {
         "name": "Promethios API",
         "version": "0.1.0",
-        "status": "operational",
-        "loaded_routes": loaded_routes,
-        "timestamp": datetime.datetime.now().isoformat()
+        "status": "online",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "routes_loaded": len(loaded_routes),
+        "documentation_url": "/docs"
     }
 
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    return {"status": "ok"}
+    return {
+        "status": "healthy",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "uptime": time.time() - app.state.start_time if hasattr(app.state, "start_time") else None
+    }
 
-# System health endpoint at /api/system/health for compatibility
-@app.get("/api/system/health")
-async def api_system_health():
-    return {"status": "ok", "message": "System is healthy"}
+# Store start time in app state
+app.state.start_time = time.time()
 
-# API ping endpoint
-@app.get("/api/ping")
-async def api_ping():
-    return {"status": "ok", "message": "API is responding"}
+# Print startup message
+print("\n" + "=" * 50)
+print(f"🚀 Promethios API started with {len(loaded_routes)} routes loaded")
+print("=" * 50 + "\n")
 
-# Schema injection test endpoint
-@app.get("/schema-injection-test")
-async def schema_injection_test():
-    return {"status": "ok", "message": "Schema injection test endpoint"}
-
-# Dashboard redirect
-@app.get("/dashboard")
-async def dashboard_redirect():
-    """Redirect to the dashboard frontend"""
-    from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/static/dashboard/index.html")
-
-# Log all registered routes
-print(f"\n🔍 Registered {len(loaded_routes)} routes: {', '.join(loaded_routes)}")
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

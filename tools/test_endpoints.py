@@ -113,6 +113,44 @@ ENDPOINTS = {
         }
     },
     
+    # CRITIC endpoints
+    "POST /api/critic/review": {
+        "method": "POST", 
+        "path": "/api/critic/review", 
+        "expected": 200,
+        "json": {
+            "loop_id": "test_loop_123",
+            "agent_outputs": {
+                "code": "function calculateTotal(items) {\n  return items.reduce((sum, item) => sum + item.price, 0);\n}",
+                "explanation": "This function calculates the total price of all items in the array by using the reduce method."
+            },
+            "project_id": "test_project"
+        }
+    },
+    
+    # ORCHESTRATOR endpoints
+    "POST /api/orchestrator/delegate": {
+        "method": "POST", 
+        "path": "/api/orchestrator/delegate", 
+        "expected": 200,
+        "json": {
+            "task": "Create a simple React component that displays a list of items",
+            "project_id": "test_project"
+        }
+    },
+    
+    # SAGE endpoints
+    "POST /api/sage/analyze": {
+        "method": "POST", 
+        "path": "/api/sage/analyze", 
+        "expected": 200,
+        "json": {
+            "loop_id": "test_loop_123",
+            "summary_text": "The system should prioritize user experience while maintaining high performance standards. Security measures must be implemented without compromising usability.",
+            "project_id": "test_project"
+        }
+    },
+    
     # Additional endpoints to test
     "GET /api/modules/orchestrator/status": {"method": "GET", "path": "/api/modules/orchestrator/status", "expected": 200},
     "GET /api/modules/debug/routes": {"method": "GET", "path": "/api/modules/debug/routes", "expected": 200},
