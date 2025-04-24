@@ -342,6 +342,21 @@ def should_continue_loop(project_id: str) -> bool:
         # Default to stopping the loop in case of error
         return False
 
+# Add alias for read_project_state to maintain compatibility
+def get_project_state(project_id: str) -> Dict[str, Any]:
+    """
+    Alias for read_project_state to maintain compatibility with existing code.
+    
+    Args:
+        project_id: The project identifier (e.g., "demo_writer_001")
+            
+    Returns:
+        Dict containing the project state
+    """
+    logger.info(f"Using get_project_state alias for project {project_id}")
+    print(f"✅ Using get_project_state alias for project {project_id}")
+    return read_project_state(project_id)
+
 def cleanup_orphaned_projects() -> Dict[str, Any]:
     """
     Clean up orphaned projects that haven't been updated in 24 hours.
