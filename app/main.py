@@ -177,6 +177,12 @@ if loop_routes_loaded:
     print("✅ Included loop_router without prefix")
     loaded_routes.append("loop_routes")
 
+# Include orchestrator routes from routes directory with HIGHEST priority - MUST BE FIRST
+if routes_orchestrator_loaded:
+    app.include_router(orchestrator_routes.router, prefix="/api")
+    print("✅ Included routes/orchestrator_routes with /api prefix (HIGHEST PRIORITY)")
+    loaded_routes.append("routes_orchestrator_routes")
+
 # Include directly imported routers
 if core_routes_loaded:
     app.include_router(core_router)
@@ -198,16 +204,11 @@ if debug_routes_loaded:
     print("✅ Included debug_router")
     loaded_routes.append("debug_routes")
 
+# Include app/routes/orchestrator_routes.py AFTER routes/orchestrator_routes.py to prevent overriding
 if orchestrator_routes_loaded:
     app.include_router(orchestrator_router)
-    print("✅ Included orchestrator_router")
+    print("✅ Included orchestrator_router (LOWER PRIORITY)")
     loaded_routes.append("orchestrator_routes")
-
-# Include orchestrator routes from routes directory with priority
-if routes_orchestrator_loaded:
-    app.include_router(orchestrator_routes.router, prefix="/api")
-    print("✅ Included routes/orchestrator_routes with /api prefix (PRIORITY)")
-    loaded_routes.append("routes_orchestrator_routes")
 
 if reflection_routes_loaded:
     app.include_router(reflection_router)
