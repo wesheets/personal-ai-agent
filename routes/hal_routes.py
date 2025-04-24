@@ -7,7 +7,7 @@ LAST_MODIFIED: 2025-04-24
 
 main
 """
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, HTTPException
 import logging
 import json
 import datetime
@@ -26,8 +26,8 @@ logger = logging.getLogger("api")
 # Create router
 router = APIRouter(tags=["HAL"])
 
-@router.post("/loop/respond", response_model=LoopResponseResult)
-async def loop_respond(request: LoopResponseRequest):
+@router.post("/api/loop/respond")  # Changed to include /api prefix explicitly
+async def loop_respond(request_data: dict):
     """
     Process a loop/respond request for HAL agent.
     
@@ -35,52 +35,60 @@ async def loop_respond(request: LoopResponseRequest):
     writes the result back to memory, and returns a success response.
     
     Parameters:
-    - request: The LoopResponseRequest containing project_id, loop_id, agent, etc.
+    - request_data: The request data containing project_id, loop_id, agent, etc.
     
     Returns:
     - A LoopResponseResult indicating the status and output location
     """
-    logger.info(f"🔍 HAL loop_respond called with data: {request.dict()}")
+    logger.info(f"🔍 HAL loop_respond called with data: {request_data}")
     
     try:
+        # Extract request parameters
+        project_id = request_data.get("project_id", "")
+        loop_id = request_data.get("loop_id", "")
+        agent = request_data.get("agent", "")
+        response_type = request_data.get("response_type", "")
+        target_file = request_data.get("target_file", "")
+        input_key = request_data.get("input_key", "")
+        
         # Step 1: Read task from memory
         task_prompt = await read_memory(
-            agent_id=request.loop_id,
+            agent_id=loop_id,
             memory_type="loop",
-            tag=request.input_key
+            tag=input_key
         )
         
         if not task_prompt:
-            logger.warning(f"⚠️ No task found in memory for key: {request.input_key}")
-            task_prompt = f"Build a React component called {request.target_file} with basic functionality."
+            logger.warning(f"⚠️ No task found in memory for key: {input_key}")
+            task_prompt = f"Build a React component called {target_file} with basic functionality."
         
         # Step 2: Generate JSX via OpenAI
         jsx_code = generate_react_component(task_prompt)
         
         # Step 3: Write JSX back to memory
         await write_memory(
-            agent_id=request.loop_id,
+            agent_id=loop_id,
             memory_type="loop",
             tag="hal_build_task_response",
             value=jsx_code
         )
         
         # Step 4: Return response
-        return LoopResponseResult(
-            status="HAL build complete",
-            output_tag="hal_build_task_response",
-            timestamp=str(datetime.datetime.utcnow()),
-            code=jsx_code  # Include the code in the response (optional)
-        )
+        return {
+            "status": "HAL build complete",
+            "output_tag": "hal_build_task_response",
+            "timestamp": str(datetime.datetime.utcnow()),
+            "code": jsx_code  # Include the code in the response (optional)
+        }
     
     except Exception as e:
         logger.error(f"❌ Error in HAL loop_respond: {str(e)}")
-        return LoopResponseResult(
-            status="error",
-            output_tag="hal_build_task_response",
-            timestamp=str(datetime.datetime.utcnow()),
-            code=f"// Error: {str(e)}"
-        )
+        return {
+            "status": "error",
+            "output_tag": "hal_build_task_response",
+            "timestamp": str(datetime.datetime.utcnow()),
+            "code": f"// Error: {str(e)}"
+        }
 
 @router.get("/simulate-block")
 async def simulate_hal_constraint(
