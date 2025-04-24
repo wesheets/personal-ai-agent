@@ -244,6 +244,24 @@
       "schema": "SageReviewRequest",
       "status": "tested",
       "errors": []
+    },
+    "/dashboard/sage/beliefs": {
+      "method": "GET",
+      "schema": "None",
+      "status": "tested",
+      "errors": []
+    },
+    "/dashboard/loops": {
+      "method": "GET",
+      "schema": "None",
+      "status": "tested",
+      "errors": []
+    },
+    "/dashboard": {
+      "method": "GET",
+      "schema": "None",
+      "status": "tested",
+      "errors": []
     }
   },
   "modules": {
@@ -291,6 +309,16 @@
       "file": "app/integrations/orchestrator_sage_integration.py",
       "wrapped_with_schema": true,
       "last_updated": "2025-04-24T17:08:57.026639"
+    },
+    "dashboard_routes": {
+      "file": "app/routes/dashboard_routes.py",
+      "wrapped_with_schema": false,
+      "last_updated": "2025-04-24T13:38:47.191429"
+    },
+    "dashboard_setup": {
+      "file": "app/utils/dashboard_setup.py",
+      "wrapped_with_schema": false,
+      "last_updated": "2025-04-24T13:38:47.192380"
     }
   },
   "memory": {
@@ -311,13 +339,14 @@
     "drift_monitor_enabled": true,
     "agent_contract_enforcement": true,
     "output_policy_enforcement": true,
-    "sage_cascade_mode_enabled": true
+    "sage_cascade_mode_enabled": true,
+    "sage_belief_dashboard_enabled": true
   },
   "manifest_meta": {
     "version": "1.0.0",
     "created_at": "2025-04-24T14:28:08.000Z",
-    "last_updated": "2025-04-24T17:08:57.026641",
-    "last_updated_by": "sage_cascade_manifest_update.py"
+    "last_updated": "2025-04-24T17:38:47.195268",
+    "last_updated_by": "dashboard_manifest_update.py"
   },
   "testing": {
     "last_endpoint_sweep": "\u2705 PASSED",

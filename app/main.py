@@ -1,5 +1,5 @@
 """
-Update to main.py to register SAGE routes
+Update to main.py to register SAGE routes and Dashboard routes
 """
 
 import os
@@ -8,6 +8,7 @@ import json
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 import time
 import datetime
 
@@ -50,6 +51,21 @@ except ImportError as e:
     print(f"⚠️ Failed to initialize system manifest: {e}")
     manifest_initialized = False
 
+# Setup dashboard static files
+try:
+    from app.utils.dashboard_setup import setup_dashboard_static_files
+    setup_result = setup_dashboard_static_files()
+    print(f"✅ Dashboard static files setup: {setup_result['message']}")
+except ImportError as e:
+    print(f"⚠️ Failed to setup dashboard static files: {e}")
+
+# Mount static files directory
+try:
+    app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    print("✅ Static files directory mounted")
+except Exception as e:
+    print(f"⚠️ Failed to mount static files directory: {e}")
+
 # Track loaded routes
 loaded_routes = []
 
@@ -80,6 +96,15 @@ try:
     print("✅ SAGE routes loaded")
 except ImportError as e:
     print(f"⚠️ Failed to load SAGE routes: {e}")
+
+# Dashboard routes - Hard-wired registration
+try:
+    from app.routes.dashboard_routes import router as dashboard_router
+    app.include_router(dashboard_router)
+    loaded_routes.append("dashboard")
+    print("✅ Dashboard routes loaded")
+except ImportError as e:
+    print(f"⚠️ Failed to load Dashboard routes: {e}")
 
 # Loop routes
 try:
@@ -135,6 +160,12 @@ async def root():
         "loaded_routes": loaded_routes,
         "timestamp": datetime.datetime.now().isoformat()
     }
+
+@app.get("/dashboard")
+async def dashboard_redirect():
+    """Redirect to the dashboard frontend"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/static/dashboard/index.html")
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
