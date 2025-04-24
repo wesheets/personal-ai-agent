@@ -5,6 +5,7 @@ This module provides functions to read from and write to the memory system,
 specifically designed for use with the HAL agent's code generation capabilities.
 """
 
+import os
 import aiohttp
 import json
 import logging
@@ -12,6 +13,10 @@ from typing import Dict, Any, Optional
 
 # Configure logging
 logger = logging.getLogger("hal_memory")
+
+# Configure base URL for memory service
+BASE_URL = os.getenv("MEMORY_SERVICE_URL", "https://web-production-2639.up.railway.app")
+logger.info(f"🔌 Memory service configured with base URL: {BASE_URL}")
 
 async def read_memory(agent_id: str, memory_type: str, tag: str) -> str:
     """
@@ -27,22 +32,28 @@ async def read_memory(agent_id: str, memory_type: str, tag: str) -> str:
     """
     try:
         # Use internal API call to avoid network overhead
-        from app.memory.project_memory import PROJECT_MEMORY
-        
-        # Try to read directly from memory system
-        if PROJECT_MEMORY:
-            memory_value = PROJECT_MEMORY.read_memory(
-                agent_id=agent_id,
-                memory_type=memory_type,
-                tag=tag
-            )
-            if memory_value:
-                logger.info(f"✅ Successfully read memory: {tag} for agent {agent_id}")
-                return memory_value
+        try:
+            from app.memory.project_memory import PROJECT_MEMORY
+            
+            # Try to read directly from memory system
+            if PROJECT_MEMORY:
+                memory_value = PROJECT_MEMORY.read_memory(
+                    agent_id=agent_id,
+                    memory_type=memory_type,
+                    tag=tag
+                )
+                if memory_value:
+                    logger.info(f"✅ Successfully read memory: {tag} for agent {agent_id}")
+                    return memory_value
+        except ImportError:
+            logger.info("⚠️ Direct memory access not available, using API fallback")
         
         # Fallback to API call if direct access fails
         async with aiohttp.ClientSession() as session:
-            url = f"http://localhost:8000/api/memory/read?agent_id={agent_id}&memory_type={memory_type}&tag={tag}"
+            read_url = f"{BASE_URL}/api/memory/read"
+            url = f"{read_url}?agent_id={agent_id}&memory_type={memory_type}&tag={tag}"
+            logger.info(f"🔍 Reading memory from: {url}")
+            
             async with session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
@@ -71,29 +82,34 @@ async def write_memory(agent_id: str, memory_type: str, tag: str, value: str) ->
     """
     try:
         # Use internal API call to avoid network overhead
-        from app.memory.project_memory import PROJECT_MEMORY
-        
-        # Try to write directly to memory system
-        if PROJECT_MEMORY:
-            PROJECT_MEMORY.write_memory(
-                agent_id=agent_id,
-                memory_type=memory_type,
-                tag=tag,
-                value=value
-            )
-            logger.info(f"✅ Successfully wrote memory: {tag} for agent {agent_id}")
-            return True
+        try:
+            from app.memory.project_memory import PROJECT_MEMORY
+            
+            # Try to write directly to memory system
+            if PROJECT_MEMORY:
+                PROJECT_MEMORY.write_memory(
+                    agent_id=agent_id,
+                    memory_type=memory_type,
+                    tag=tag,
+                    value=value
+                )
+                logger.info(f"✅ Successfully wrote memory: {tag} for agent {agent_id}")
+                return True
+        except ImportError:
+            logger.info("⚠️ Direct memory access not available, using API fallback")
         
         # Fallback to API call if direct access fails
         async with aiohttp.ClientSession() as session:
-            url = "http://localhost:8000/api/memory/write"
+            write_url = f"{BASE_URL}/api/memory/write"
+            logger.info(f"💾 Writing memory to: {write_url}")
+            
             payload = {
                 "agent_id": agent_id,
                 "memory_type": memory_type,
                 "tag": tag,
                 "value": value
             }
-            async with session.post(url, json=payload) as response:
+            async with session.post(write_url, json=payload) as response:
                 if response.status == 200:
                     logger.info(f"✅ Successfully wrote memory via API: {tag}")
                     return True
