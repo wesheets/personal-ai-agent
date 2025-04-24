@@ -73,6 +73,36 @@ AGENT_REGISTRY = {
         "persona": "reflective historian",
         "availability": "active",
         "contract_version": "v1.0.0"
+    },
+    "historian": {
+        "name": "Historian",
+        "model": "gpt-4",
+        "description": "Tracks forgotten beliefs and alignment scores across system operations.",
+        "tone": "analytical",
+        "system_prompt": "You are the Historian agent. Your role is to monitor belief drift, track alignment, and ensure system coherence over time.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["log_belief", "track_alignment", "score_drift"],
+        "input_schema": ["loop_id", "loop_summary", "recent_loops", "beliefs", "memory"],
+        "output_schema": ["updated_memory", "alignment_score", "missing_beliefs", "suggestion"],
+        "persona": "meticulous archivist",
+        "availability": "active",
+        "contract_version": "v1.0.0"
+    },
+    "debugger": {
+        "name": "Debugger",
+        "model": "gpt-4",
+        "description": "Injects debug traces, logs anomalies, flags execution drift.",
+        "tone": "precise",
+        "system_prompt": "You are the Debugger agent. Your purpose is to diagnose failures, propose recovery plans, and improve system resilience.",
+        "agent_state": "idle",
+        "last_active": "",
+        "tools": ["trace", "log_error", "inject_debug"],
+        "input_schema": ["loop_id", "failure_logs", "memory", "loop_context"],
+        "output_schema": ["updated_memory", "failure_type", "patch_plan", "next_agent", "suggested_fix"],
+        "persona": "diagnostic technician",
+        "availability": "active",
+        "contract_version": "v1.0.0"
     }
 }
 
@@ -119,6 +149,36 @@ AGENT_PERSONALITIES = {
     "input_schema": ["objective", "memory_trace"],
     "output_schema": ["reflection", "risk_assessment"],
     "persona": "clinical analyst",
+    "availability": "active",
+    "contract_version": "v1.0.0"
+  },
+  "historian": {
+    "name": "Historian",
+    "type": "persona",
+    "tone": "analytical",
+    "description": "Memory coherence and belief tracking specialist.",
+    "system_prompt": "You are the Historian. Track system beliefs, monitor alignment drift, and preserve cognitive coherence.",
+    "agent_state": "idle",
+    "last_active": "",
+    "tools": ["log_belief", "track_alignment", "score_drift"],
+    "input_schema": ["loop_id", "loop_summary", "recent_loops", "beliefs", "memory"],
+    "output_schema": ["updated_memory", "alignment_score", "missing_beliefs", "suggestion"],
+    "persona": "meticulous archivist",
+    "availability": "active",
+    "contract_version": "v1.0.0"
+  },
+  "debugger": {
+    "name": "Debugger",
+    "type": "persona",
+    "tone": "precise",
+    "description": "System diagnostics and recovery specialist.",
+    "system_prompt": "You are the Debugger. Diagnose failures, trace execution paths, and propose recovery solutions.",
+    "agent_state": "idle",
+    "last_active": "",
+    "tools": ["trace", "log_error", "inject_debug"],
+    "input_schema": ["loop_id", "failure_logs", "memory", "loop_context"],
+    "output_schema": ["updated_memory", "failure_type", "patch_plan", "next_agent", "suggested_fix"],
+    "persona": "diagnostic technician",
     "availability": "active",
     "contract_version": "v1.0.0"
   }
