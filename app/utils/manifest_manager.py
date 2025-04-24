@@ -591,6 +591,46 @@ def update_hardening_layer(layer_name: str, enabled: bool) -> bool:
         logger.error(f"❌ Error updating hardening layer: {str(e)}")
         return False
 
+def log_endpoint_test_results(test_status: str, timestamp: Optional[str] = None) -> bool:
+    """
+    Log endpoint testing results in the manifest.
+    
+    Args:
+        test_status: The status of the endpoint tests (e.g., "✅ PASSED", "❌ FAILED")
+        timestamp: Optional timestamp for the test run (defaults to current time)
+        
+    Returns:
+        True if the results were logged successfully, False otherwise
+    """
+    try:
+        # Load current manifest
+        manifest_data = load_manifest()
+        
+        # Ensure testing section exists
+        if "testing" not in manifest_data:
+            manifest_data["testing"] = {}
+        
+        # Set timestamp if not provided
+        if not timestamp:
+            timestamp = datetime.datetime.utcnow().isoformat()
+        
+        # Update testing section
+        manifest_data["testing"]["last_endpoint_sweep"] = test_status
+        manifest_data["testing"]["timestamp"] = timestamp
+        
+        # Save updated manifest
+        result = save_manifest(manifest_data)
+        
+        if result:
+            logger.info(f"✅ Logged endpoint test results: {test_status}")
+            print(f"✅ Logged endpoint test results: {test_status}")
+        
+        return result
+    except Exception as e:
+        logger.error(f"❌ Error logging endpoint test results: {str(e)}")
+        print(f"❌ Error logging endpoint test results: {str(e)}")
+        return False
+
 def get_manifest_checksum() -> str:
     """
     Generate a checksum for the entire manifest.
