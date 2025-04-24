@@ -3,3 +3,4 @@ uvicorn>=0.15.0
 pytest>=6.2.5
 jsonschema>=4.0.0
 requests>=2.31.0
+openai>=1.0.0
