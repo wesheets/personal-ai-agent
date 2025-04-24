@@ -7,14 +7,18 @@ LAST_MODIFIED: 2025-04-24
 
 main
 """
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 import logging
 import json
 import datetime
 from typing import Dict, Any, List
 
-# Remove broken import
-# from agent_sdk import Agent  # This import was breaking the system
+# Import schemas
+from app.schemas.loop_schema import LoopResponseRequest, LoopResponseResult
+
+# Import HAL modules
+from app.modules.hal_memory import read_memory, write_memory
+from app.modules.hal_openai import generate_react_component
 
 # Configure logging
 logger = logging.getLogger("api")
@@ -22,29 +26,61 @@ logger = logging.getLogger("api")
 # Create router
 router = APIRouter(tags=["HAL"])
 
-@router.post("/loop/respond")
-async def loop_respond_stub(request_data: dict):
+@router.post("/loop/respond", response_model=LoopResponseResult)
+async def loop_respond(request: LoopResponseRequest):
     """
-    Stub handler for loop/respond endpoint.
+    Process a loop/respond request for HAL agent.
     
-    This endpoint provides a working fallback for the HAL agent's loop/respond functionality
-    until the full HAL implementation is fixed.
+    This endpoint reads a task from memory, generates React/JSX code using OpenAI,
+    writes the result back to memory, and returns a success response.
     
     Parameters:
-    - request_data: The request data containing project_id, loop_id, agent, etc.
+    - request: The LoopResponseRequest containing project_id, loop_id, agent, etc.
     
     Returns:
-    - A stub response indicating the request was received
+    - A LoopResponseResult indicating the status and output location
     """
-    logger.info(f"🔍 DEBUG: loop_respond_stub called with data: {request_data}")
-    print(f"🔍 DEBUG: loop_respond_stub called with project_id: {request_data.get('project_id', 'default')}")
+    logger.info(f"🔍 HAL loop_respond called with data: {request.dict()}")
     
-    return {
-        "status": "HAL stub executed",
-        "input": request_data,
-        "note": "Replace this stub with real code gen call when HAL is online.",
-        "timestamp": datetime.datetime.now().isoformat()
-    }
+    try:
+        # Step 1: Read task from memory
+        task_prompt = await read_memory(
+            agent_id=request.loop_id,
+            memory_type="loop",
+            tag=request.input_key
+        )
+        
+        if not task_prompt:
+            logger.warning(f"⚠️ No task found in memory for key: {request.input_key}")
+            task_prompt = f"Build a React component called {request.target_file} with basic functionality."
+        
+        # Step 2: Generate JSX via OpenAI
+        jsx_code = generate_react_component(task_prompt)
+        
+        # Step 3: Write JSX back to memory
+        await write_memory(
+            agent_id=request.loop_id,
+            memory_type="loop",
+            tag="hal_build_task_response",
+            value=jsx_code
+        )
+        
+        # Step 4: Return response
+        return LoopResponseResult(
+            status="HAL build complete",
+            output_tag="hal_build_task_response",
+            timestamp=str(datetime.datetime.utcnow()),
+            code=jsx_code  # Include the code in the response (optional)
+        )
+    
+    except Exception as e:
+        logger.error(f"❌ Error in HAL loop_respond: {str(e)}")
+        return LoopResponseResult(
+            status="error",
+            output_tag="hal_build_task_response",
+            timestamp=str(datetime.datetime.utcnow()),
+            code=f"// Error: {str(e)}"
+        )
 
 @router.get("/simulate-block")
 async def simulate_hal_constraint(
@@ -145,7 +181,3 @@ async def list_constraints():
         "count": len(SAFETY_CONSTRAINTS),
         "status": "success"
     }
-
-# REMOVED: Duplicate router definition that was overriding the previous router
-# from fastapi import APIRouter
-# router = APIRouter()
