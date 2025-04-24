@@ -379,7 +379,41 @@ async def orchestrator_status(project_id: str):
         else:
             emotional_state = "satisfied"
         
-        # Return comprehensive status
+        # Check if project memory exists
+        memory_status = True
+        try:
+            memory_result = await read_memory(
+                agent_id="orchestrator",
+                memory_type="state",
+                tag="project_state",
+                project_id=project_id
+            )
+            memory_status = memory_result is not None
+        except Exception:
+            memory_status = False
+            
+        # Get simplified loop log for agent completions
+        loop_log = []
+        if loop_history:
+            for entry in loop_history:
+                if entry.get("status") == "completed":
+                    loop_log.append({
+                        "agent": entry.get("agent"),
+                        "task": entry.get("task"),
+                        "timestamp": entry.get("timestamp")
+                    })
+        
+        # Map emotional state to required format
+        emotion = "stable"
+        if emotional_state in ["curious", "engaged"]:
+            emotion = "reflective"
+        elif emotional_state in ["focused", "determined"]:
+            emotion = "intense"
+            
+        # Determine if there's an active loop
+        active_loop = project_state.get("status") != "complete" and loop_count < max_loops
+        
+        # Return enhanced comprehensive status
         return {
             "status": "success",
             "project_id": project_id,
@@ -393,7 +427,14 @@ async def orchestrator_status(project_id: str):
             "loop_count": loop_count,
             "max_loops": max_loops,
             "progress_percentage": round(progress_ratio * 100, 1),
-            "timestamp": datetime.datetime.utcnow().isoformat()
+            "timestamp": datetime.datetime.utcnow().isoformat(),
+            
+            # Enhanced fields as required
+            "loop_log": loop_log,
+            "active_loop": active_loop,
+            "emotion": emotion,
+            "progress_pct": round(progress_ratio * 100, 1),
+            "memory_status": memory_status
         }
         
     except Exception as e:

@@ -45,79 +45,16 @@ logger = logging.getLogger("api")
 # Create router
 router = APIRouter(tags=["HAL"])
 
-# Safely import OpenAI
+# Import HAL OpenAI module for code generation
+print("🧠 HAL ROUTES: Importing HAL OpenAI module...")
 try:
-    import openai
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-    if not openai.api_key:
-        logger.warning("⚠️ OPENAI_API_KEY environment variable not set")
-        logger.info(f"🔑 OpenAI API key (masked): {'*' * 8 + (openai.api_key[-4:] if openai.api_key else '')}")
-    else:
-        logger.info("✅ OpenAI client initialized successfully with API key from environment")
-        logger.info(f"🔑 OpenAI API key (masked): {'*' * 8 + openai.api_key[-4:]}")
+    from app.modules.hal_openai import generate_react_component
+    print("✅ Successfully imported HAL OpenAI module")
     openai_available = True
-except Exception as e:
-    logger.error(f"❌ OpenAI failed to initialize: {e}")
+except ImportError as e:
+    print(f"❌ Failed to import HAL OpenAI module: {e}")
+    logger.error(f"❌ Failed to import HAL OpenAI module: {e}")
     openai_available = False
-    openai = None
-
-def generate_react_component(task: str) -> str:
-    """
-    Generate React component code using OpenAI's API.
-    
-    Parameters:
-    - task: The task description or requirements for the component
-    
-    Returns:
-    - The generated React component code as a string
-    """
-    try:
-        # Check if OpenAI is available
-        if not openai_available:
-            raise Exception("OpenAI client is not available")
-            
-        # Check if API key is set
-        if not openai.api_key:
-            raise Exception("OpenAI API key is not set")
-            
-        # Configure OpenAI API
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are an expert React developer. Use Tailwind CSS for styling. Return only the code without explanations."},
-                {"role": "user", "content": task}
-            ]
-        )
-        
-        # Extract the generated code
-        generated_code = response.choices[0].message["content"]
-        logger.info(f"✅ Successfully generated React component ({len(generated_code)} chars)")
-        
-        return generated_code
-    except Exception as e:
-        logger.error(f"❌ Error generating React component: {str(e)}")
-        
-        # Return a fallback component if generation fails
-        return f"""
-// Error generating component: {str(e)}
-// Fallback component based on task: {task}
-import React, {{ useState }} from 'react';
-
-export default function FallbackComponent() {{
-  const [error, setError] = useState("Failed to generate component");
-  
-  return (
-    <div className="p-4 border border-red-300 rounded bg-red-50">
-      <h2 className="text-lg font-semibold text-red-700">Component Generation Error</h2>
-      <p className="text-red-600">{{error}}</p>
-      <div className="mt-4 p-2 bg-white rounded border border-gray-200">
-        <p className="text-gray-700">Task description:</p>
-        <pre className="mt-2 p-2 bg-gray-50 rounded text-sm">{{task}}</pre>
-      </div>
-    </div>
-  );
-}}
-"""
 
 @router.post("/loop/test", response_model=LoopResponseResult)
 async def loop_test(request: LoopResponseRequest):

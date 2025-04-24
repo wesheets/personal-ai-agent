@@ -50,6 +50,15 @@ except ImportError:
     hal_routes_loaded = False
     print("⚠️ Could not load hal_routes directly")
 
+# Import orchestrator routes directly from routes directory
+try:
+    from routes import orchestrator_routes
+    routes_orchestrator_loaded = True
+    print("✅ Directly loaded routes/orchestrator_routes")
+except ImportError:
+    routes_orchestrator_loaded = False
+    print("⚠️ Could not load routes/orchestrator_routes directly")
+
 # Import memory routes from routes directory
 try:
     from routes import memory_routes
@@ -193,6 +202,12 @@ if orchestrator_routes_loaded:
     app.include_router(orchestrator_router)
     print("✅ Included orchestrator_router")
     loaded_routes.append("orchestrator_routes")
+
+# Include orchestrator routes from routes directory with priority
+if routes_orchestrator_loaded:
+    app.include_router(orchestrator_routes.router, prefix="/api")
+    print("✅ Included routes/orchestrator_routes with /api prefix (PRIORITY)")
+    loaded_routes.append("routes_orchestrator_routes")
 
 if reflection_routes_loaded:
     app.include_router(reflection_router)
