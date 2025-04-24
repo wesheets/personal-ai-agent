@@ -1,3 +1,5 @@
+print("🧠 HAL ROUTES: LOADING...")
+
 """
 HAL constraint simulation routes for testing ethics system.
 feature/phase-3.5-hardening
@@ -14,11 +16,28 @@ import datetime
 import os
 from typing import Dict, Any, List
 
-# Import schemas
-from app.schemas.loop_schema import LoopResponseRequest, LoopResponseResult
+# Import schemas - check correct path
+print("🧠 HAL ROUTES: Importing schemas...")
+try:
+    from app.schemas.loop_schema import LoopResponseRequest, LoopResponseResult
+    print("✅ Successfully imported schemas from app.schemas.loop_schema")
+except ImportError as e:
+    print(f"❌ Failed to import schemas from app.schemas.loop_schema: {e}")
+    try:
+        from schemas.loop_schema import LoopResponseRequest, LoopResponseResult
+        print("✅ Successfully imported schemas from schemas.loop_schema")
+    except ImportError as e:
+        print(f"❌ Failed to import schemas from schemas.loop_schema: {e}")
+        raise
 
 # Import HAL modules
-from app.modules.hal_memory import read_memory, write_memory
+print("🧠 HAL ROUTES: Importing HAL modules...")
+try:
+    from app.modules.hal_memory import read_memory, write_memory
+    print("✅ Successfully imported HAL memory modules")
+except ImportError as e:
+    print(f"❌ Failed to import HAL memory modules: {e}")
+    raise
 
 # Configure logging
 logger = logging.getLogger("api")
