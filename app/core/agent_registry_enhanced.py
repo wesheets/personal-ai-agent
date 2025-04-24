@@ -102,10 +102,10 @@ def register_agent_with_contract(agent_id: str, agent_data: Dict[str, Any]) -> b
     Returns:
         Boolean indicating whether registration was successful
     """
+    global AGENT_CONTRACTS  # Moved to top of function
     try:
         # Load agent contract if not already loaded
         if not AGENT_CONTRACTS:
-            global AGENT_CONTRACTS
             AGENT_CONTRACTS = load_agent_contracts()
         
         # Check if contract exists for this agent
@@ -184,10 +184,10 @@ async def validate_agent_operation(
     Returns:
         Dictionary containing validation results
     """
+    global AGENT_CONTRACTS  # Moved to top of function
     try:
         # Load agent contract if not already loaded
         if not AGENT_CONTRACTS:
-            global AGENT_CONTRACTS
             AGENT_CONTRACTS = load_agent_contracts()
         
         # Check if contract exists for this agent
@@ -330,10 +330,10 @@ def get_agent_contract(agent_id: str) -> Optional[Dict[str, Any]]:
     Returns:
         Agent contract if found, None otherwise
     """
+    global AGENT_CONTRACTS  # Moved to top of function
     try:
         # Load agent contract if not already loaded
         if not AGENT_CONTRACTS:
-            global AGENT_CONTRACTS
             AGENT_CONTRACTS = load_agent_contracts()
         
         # Check if contract exists for this agent
