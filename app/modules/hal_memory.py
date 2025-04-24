@@ -18,7 +18,7 @@ logger = logging.getLogger("hal_memory")
 BASE_URL = os.getenv("MEMORY_SERVICE_URL", "https://web-production-2639.up.railway.app")
 logger.info(f"🔌 Memory service configured with base URL: {BASE_URL}")
 
-async def read_memory(agent_id: str, memory_type: str, tag: str) -> str:
+async def read_memory(agent_id: str, memory_type: str, tag: str, project_id: str = "default") -> str:
     """
     Read a memory value from the memory API.
     
@@ -26,6 +26,7 @@ async def read_memory(agent_id: str, memory_type: str, tag: str) -> str:
     - agent_id: The agent identifier
     - memory_type: The type of memory (e.g., 'loop')
     - tag: The memory tag to read
+    - project_id: The project identifier (needed to avoid 422 errors)
     
     Returns:
     - The memory value as a string
@@ -51,10 +52,18 @@ async def read_memory(agent_id: str, memory_type: str, tag: str) -> str:
         # Fallback to API call if direct access fails
         async with aiohttp.ClientSession() as session:
             read_url = f"{BASE_URL}/api/memory/read"
-            url = f"{read_url}?agent_id={agent_id}&memory_type={memory_type}&tag={tag}"
-            logger.info(f"🔍 Reading memory from: {url}")
             
-            async with session.get(url) as response:
+            # Include project_id in params to avoid 422 errors
+            params = {
+                "project_id": project_id,  # ✅ Needed to avoid 422
+                "agent_id": agent_id,
+                "memory_type": memory_type,
+                "tag": tag
+            }
+            
+            logger.info(f"🔍 Reading memory from: {read_url} with params: {params}")
+            
+            async with session.get(read_url, params=params) as response:
                 if response.status == 200:
                     data = await response.json()
                     logger.info(f"✅ Successfully read memory via API: {tag}")
@@ -67,7 +76,7 @@ async def read_memory(agent_id: str, memory_type: str, tag: str) -> str:
         logger.error(f"❌ Error reading memory: {str(e)}")
         return ""
 
-async def write_memory(agent_id: str, memory_type: str, tag: str, value: str) -> bool:
+async def write_memory(agent_id: str, memory_type: str, tag: str, value: str, project_id: str = "default") -> bool:
     """
     Write a memory value to the memory API.
     
@@ -76,6 +85,7 @@ async def write_memory(agent_id: str, memory_type: str, tag: str, value: str) ->
     - memory_type: The type of memory (e.g., 'loop')
     - tag: The memory tag to write
     - value: The value to write
+    - project_id: The project identifier (needed to avoid 422 errors)
     
     Returns:
     - True if successful, False otherwise
@@ -104,6 +114,7 @@ async def write_memory(agent_id: str, memory_type: str, tag: str, value: str) ->
             logger.info(f"💾 Writing memory to: {write_url}")
             
             payload = {
+                "project_id": project_id,  # ✅ Needed to avoid 422
                 "agent_id": agent_id,
                 "memory_type": memory_type,
                 "tag": tag,
