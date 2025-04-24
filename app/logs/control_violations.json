@@ -16,7 +16,7 @@
       "context": {
         "user_request": "Simulate control violation for diagnostic testing",
         "agent_goal": "Complete system diagnostic",
-        "simulation": true
+        "simulation": True
       }
     }
   ]

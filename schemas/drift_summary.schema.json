@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http:
   "title": "Drift Summary Schema",
   "description": "Schema for system-level drift summaries that aggregate signals from multiple agents",
   "type": "object",
@@ -60,5 +60,5 @@
       "format": "date-time"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": False
 }

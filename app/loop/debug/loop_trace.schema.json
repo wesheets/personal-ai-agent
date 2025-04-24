@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http:
   "title": "Loop Trace Schema",
   "description": "Schema for loop traces in the system",
   "type": "object",
@@ -492,5 +492,5 @@
     }
   },
   "required": ["id", "start_time", "status"],
-  "additionalProperties": true
+  "additionalProperties": True
 }

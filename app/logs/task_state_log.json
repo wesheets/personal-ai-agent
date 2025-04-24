@@ -44,7 +44,7 @@
           "result": {
             "status": "error",
             "error": "API rate limit exceeded",
-            "retry_scheduled": true
+            "retry_scheduled": True
           }
         },
         {

@@ -4,7 +4,7 @@
   "last_updated": "2025-04-24T21:11:07Z",
   "modules": {
     "agent_config": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/agent_config_schema.py",
       "module_path": "app/modules/agent_config.py",
@@ -16,7 +16,7 @@
       "description": "Manages agent configuration including permissions, tools, and fallback behaviors"
     },
     "agent_context": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/agent_context_schema.py",
       "module_path": "app/modules/agent_context.py",
@@ -28,7 +28,7 @@
       "description": "Returns loop state, last agent, and memory usage information"
     },
     "memory_recall": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/memory_recall_schema.py",
       "module_path": "app/modules/memory_recall.py",
@@ -40,7 +40,7 @@
       "description": "Retrieves memories based on semantic search with confidence scoring"
     },
     "memory_embed": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/memory_embed_schema.py",
       "module_path": "app/modules/memory_embed.py",
@@ -51,7 +51,7 @@
       "description": "Stores new memories with proper embedding and metadata"
     },
     "plan_generate": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/plan_generate_schema.py",
       "module_path": "app/modules/plan_generate.py",
@@ -63,7 +63,7 @@
       "description": "Creates execution plans with step validation and dependency tracking"
     },
     "train": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/train_schema.py",
       "module_path": "app/modules/train.py",
@@ -75,7 +75,7 @@
       "description": "Handles fine-tuning requests with job tracking and model versioning"
     },
     "export": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/export_schema.py",
       "module_path": "app/modules/export.py",
@@ -87,7 +87,7 @@
       "description": "Exports system data in various formats with filtering options"
     },
     "fix": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/fix_schema.py",
       "module_path": "app/modules/fix.py",
@@ -99,7 +99,7 @@
       "description": "Provides self-healing capabilities for system issues and errors"
     },
     "delegate_stream": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/delegate_stream_schema.py",
       "module_path": "app/modules/delegate_stream.py",
@@ -114,7 +114,7 @@
       "description": "Manages real-time event streams with WebSocket support"
     },
     "loop_validation": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/loop_validation_schema.py",
       "module_path": "app/modules/loop_validation.py",
@@ -125,7 +125,7 @@
       "description": "Validates loop structure and prevents malformed loops"
     },
     "pessimist_evaluation": {
-      "enabled": true,
+      "enabled": True,
       "version": "1.0.0",
       "schema_path": "app/schemas/pessimist_evaluation_schema.py",
       "module_path": "app/modules/pessimist_evaluation.py",
@@ -136,7 +136,7 @@
       "description": "Evaluates potential risks and blocks low-confidence operations"
     },
     "drift_monitor": {
-      "enabled": true,
+      "enabled": True,
       "version": "2.0.0",
       "schema_path": null,
       "module_path": "app/modules/drift_monitor.py",
@@ -147,122 +147,122 @@
   },
   "agents": {
     "MEMORY": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/memory_schema.py",
       "agent_path": "app/agents/memory_agent.py",
       "routes_path": "app/routes/memory_routes.py"
     },
     "HAL": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/hal_schema.py",
       "agent_path": "app/agents/hal_agent.py",
       "routes_path": "app/routes/hal_routes.py"
     },
     "HISTORIAN": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/historian_schema.py",
       "agent_path": "app/agents/historian_agent.py",
       "routes_path": "app/routes/historian_routes.py"
     },
     "DEBUGGER": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/debugger_schema.py",
       "agent_path": "app/agents/debugger_agent.py",
       "routes_path": "app/routes/debugger_routes.py"
     },
     "CRITIC": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/critic_schema.py",
       "agent_path": "app/agents/critic.py",
       "routes_path": "app/routes/critic_routes.py"
     },
     "ORCHESTRATOR": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/orchestrator_schema.py",
       "agent_path": "app/agents/orchestrator_agent.py",
       "routes_path": "app/routes/orchestrator_routes.py"
     },
     "SAGE": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/sage_schema.py",
       "agent_path": "app/agents/sage.py",
       "routes_path": "app/routes/sage_routes.py"
     },
     "PESSIMIST": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/pessimist_schema.py",
       "agent_path": "app/modules/pessimist_agent.py",
       "routes_path": "app/routes/pessimist_routes.py"
     },
     "NOVA": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/nova_schema.py",
       "agent_path": "app/agents/nova.py",
       "routes_path": "app/routes/nova_routes.py"
     },
     "CTO": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/cto_schema.py",
       "agent_path": "app/agents/cto_agent.py",
       "routes_path": "app/routes/cto_routes.py"
     },
     "OBSERVER": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/observer_schema.py",
       "agent_path": "app/agents/observer_agent.py",
       "routes_path": "app/routes/observer_routes.py"
     },
     "SITEGEN": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/sitegen_schema.py",
       "agent_path": "app/agents/sitegen_agent.py",
       "routes_path": "app/routes/sitegen_routes.py"
     },
     "TRAINER": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/trainer_schema.py",
       "agent_path": null,
       "routes_path": null
     },
     "GUARDIAN": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/guardian_schema.py",
       "agent_path": "app/agents/guardian_agent.py",
       "routes_path": "app/routes/guardian_routes.py"
     },
     "ASH": {
-      "enabled": true,
+      "enabled": True,
       "schema_path": "app/schemas/ash_schema.py",
       "agent_path": "app/agents/ash_agent.py",
       "routes_path": "app/routes/ash_routes.py"
     },
     "CEO": {
-      "enabled": false,
+      "enabled": False,
       "schema_path": "app/schemas/ceo_schema.py",
       "agent_path": "app/archive/philosophy_agents/ceo_agent.py",
       "routes_path": null
     },
     "LIFETREE": {
-      "enabled": false,
+      "enabled": False,
       "schema_path": null,
       "agent_path": "app/archive/philosophy_agents/lifetree_agent.py",
       "routes_path": null
     },
     "NEUREAL": {
-      "enabled": false,
+      "enabled": False,
       "schema_path": null,
       "agent_path": "app/archive/philosophy_agents/neureal_agent.py",
       "routes_path": null
     }
   },
   "features": {
-    "schema_enforcement": true,
-    "schema_fallback_support": true,
-    "memory_logging": true,
-    "belief_drift_monitoring": true,
-    "loop_validation": true,
-    "pessimist_evaluation": true,
-    "agent_registration": true
+    "schema_enforcement": True,
+    "schema_fallback_support": True,
+    "memory_logging": True,
+    "belief_drift_monitoring": True,
+    "loop_validation": True,
+    "pessimist_evaluation": True,
+    "agent_registration": True
   },
   "settings": {
     "default_confidence_threshold": 0.6,

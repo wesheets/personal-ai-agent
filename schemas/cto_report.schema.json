@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http:
   "title": "CTO Report Schema",
   "description": "Schema for CTO Agent reports about loop health and system integrity",
   "type": "object",
@@ -53,5 +53,5 @@
       "format": "date-time"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": False
 }

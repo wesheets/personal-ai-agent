@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http:
   "title": "Loop Lineage Export Schema",
   "description": "Schema for loop lineage export data in various formats",
   "type": "object",
@@ -118,7 +118,7 @@
       }
     }
   },
-  "additionalProperties": false,
+  "additionalProperties": False,
   "examples": [
     {
       "loop_id": "loop_001",

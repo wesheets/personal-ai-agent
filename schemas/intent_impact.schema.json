@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http:
   "title": "Intent Impact Schema",
   "description": "Schema for intent-impact emotional feedback analysis",
   "type": "object",
@@ -38,5 +38,5 @@
       "format": "date-time"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": False
 }

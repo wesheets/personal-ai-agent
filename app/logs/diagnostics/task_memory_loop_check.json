@@ -2,12 +2,12 @@
   "timestamp": "2025-03-29T20:28:15.581561",
   "goal": "Create a product pitch deck from a text file",
   "simulation_details": {
-    "goal_decomposed": true,
-    "subtasks_assigned": true,
-    "subtasks_tracked": true,
-    "failed_subtasks_retried": true,
-    "status_stored": true,
-    "final_state_logged": true
+    "goal_decomposed": True,
+    "subtasks_assigned": True,
+    "subtasks_tracked": True,
+    "failed_subtasks_retried": True,
+    "status_stored": True,
+    "final_state_logged": True
   },
   "status": "success",
   "errors": [],
@@ -55,7 +55,7 @@
         "result": {
           "status": "error",
           "error": "API rate limit exceeded",
-          "retry_scheduled": true
+          "retry_scheduled": True
         }
       },
       {
