@@ -1,21 +1,22 @@
 {
   "system_manifest": {
     "version": "1.0.0",
-    "last_updated": "2025-04-24T18:53:43Z",
+    "last_updated": "2025-04-24T19:16:19Z",
     "system_name": "Promethios",
     "agent_discovery_status": {
-      "timestamp": "2025-04-24T18:53:43Z",
+      "timestamp": "2025-04-24T19:16:19Z",
       "total_agents_discovered": 22,
       "agents_with_implementation": 19,
-      "agents_in_registry": 17,
-      "agents_with_duplicates": 5,
-      "agents_needing_action": 8,
+      "agents_in_registry": 19,
+      "agents_with_duplicates": 3,
+      "agents_needing_action": 3,
       "action_summary": {
-        "none_needed": 14,
-        "register_only": 3,
-        "register_and_consolidate": 2,
+        "none_needed": 19,
+        "register_only": 0,
+        "register_and_consolidate": 0,
         "consolidate_only": 0,
-        "scaffold_only": 3
+        "scaffold_only": 0,
+        "archive": 3
       },
       "newly_registered_agents": [
         "historian (registered with schema and routes)",
@@ -28,7 +29,9 @@
         "cto (registered with schema and routes)",
         "observer (registered with schema and routes)",
         "sitegen (registered with schema and routes)",
-        "trainer (registered with schema only)"
+        "trainer (registered with schema only)",
+        "guardian (registered with schema and routes)",
+        "ash (consolidated with ash-xenomorph)"
       ],
       "previously_discovered_agents": [
         "core-forge (implementation found)",
@@ -42,12 +45,17 @@
         "cto (now registered)",
         "observer (now registered)",
         "sitegen (now registered)",
-        "trainer (now registered schema only)"
+        "trainer (now registered schema only)",
+        "guardian (now registered)",
+        "ash (now consolidated with ash-xenomorph)",
+        "ceo (schema created, implementation archived)",
+        "lifetree (archived)",
+        "neureal (archived)"
       ],
       "discovery_report_path": "/app/core/agent_discovery_report.json",
-      "discovery_status": "in_progress",
+      "discovery_status": "completed",
       "registration_status": {
-        "phase": "2",
+        "phase": "3",
         "completed": [
           "historian",
           "debugger",
@@ -59,21 +67,25 @@
           "cto",
           "observer",
           "sitegen",
-          "trainer"
+          "trainer",
+          "guardian",
+          "ash"
+        ],
+        "archived": [
+          "ceo",
+          "lifetree",
+          "neureal"
         ],
         "pending": [
-          "auditor",
-          "guardian",
-          "ceo",
-          "ash-xenomorph"
+          "auditor"
         ]
       },
-      "recommendations": "Continue agent registration sprint with remaining agents"
+      "recommendations": "Complete agent registration with remaining agent (auditor)"
     },
     "system_status": {
       "status": "operational",
-      "agent_readiness": "good",
-      "next_steps": "Complete agent registration sprint phase 3"
+      "agent_readiness": "excellent",
+      "next_steps": "Complete agent registration sprint with auditor agent"
     },
     "registered_agents": {
       "historian": {
@@ -166,6 +178,56 @@
         "endpoint": null,
         "status": "schema_only",
         "tools": ["train", "evaluate", "fine_tune"]
+      },
+      "guardian": {
+        "registration_date": "2025-04-24T19:07:02Z",
+        "schema_path": "/app/schemas/guardian_schema.py",
+        "route_path": "/app/routes/guardian_routes.py",
+        "endpoint": "/api/guardian/override",
+        "status": "active",
+        "tools": ["halt", "alert_operator", "rollback_loop", "raise_flag"]
+      },
+      "ash": {
+        "registration_date": "2025-04-24T19:13:04Z",
+        "schema_path": "/app/schemas/ash_schema.py",
+        "route_path": "/app/routes/ash_routes.py",
+        "endpoint": "/api/ash/analyze",
+        "status": "active",
+        "tools": ["analyze", "detect", "test", "execute", "resolve"],
+        "consolidation": "completed",
+        "consolidated_with": "ash-xenomorph"
+      },
+      "ceo": {
+        "registration_date": "2025-04-24T19:10:26Z",
+        "schema_path": "/app/schemas/ceo_schema.py",
+        "route_path": null,
+        "endpoint": null,
+        "status": "archived",
+        "archive_path": "/app/archive/philosophy_agents/ceo_agent.py",
+        "tools": ["review_plans", "reallocate_agents", "trigger_reorg"]
+      }
+    },
+    "archived_agents": {
+      "ceo": {
+        "archive_date": "2025-04-24T19:10:50Z",
+        "schema_path": "/app/schemas/ceo_schema.py",
+        "archive_path": "/app/archive/philosophy_agents/ceo_agent.py",
+        "status": "archived",
+        "reason": "Conceptual agent, functionality covered by ORCHESTRATOR"
+      },
+      "lifetree": {
+        "archive_date": "2025-04-24T19:14:43Z",
+        "schema_path": null,
+        "archive_path": "/app/archive/philosophy_agents/lifetree_agent.py",
+        "status": "archived",
+        "reason": "Conceptual agent outside current system scope"
+      },
+      "neureal": {
+        "archive_date": "2025-04-24T19:15:16Z",
+        "schema_path": null,
+        "archive_path": "/app/archive/philosophy_agents/neureal_agent.py",
+        "status": "archived",
+        "reason": "Conceptual agent, functionality covered by TRAINER"
       }
     }
   }
