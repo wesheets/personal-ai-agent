@@ -1,2 +1,18 @@
-# Allow the debug_status route to be included in the build
+# Ignore build junk
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+.env
+
+# Allow the full app directory
+!app/
+!app/main.py
+!app/routes/
 !app/routes/debug_status.py
+!app/routes/debug_hal_schema.py
+!app/modules/
+!app/schemas/
+!app/config/
