@@ -1,0 +1,2 @@
+# Allow the debug_status route to be included in the build
+!app/routes/debug_status.py
