@@ -9,24 +9,82 @@ import logging
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, List, Optional
 import json
+import importlib.util
+import sys
+import os
 
 # Configure logging
 logger = logging.getLogger("app.routes.dashboard_routes")
 
-# Import memory functions if available
-try:
-    from app.modules.orchestrator_memory import read_memory, list_memories
-    memory_available = True
-except ImportError:
-    memory_available = False
+# Import memory functions with flexible import paths
+memory_available = False
+
+# Try multiple import paths for orchestrator_memory
+import_paths = [
+    "app.modules.orchestrator_memory",
+    "modules.orchestrator_memory",
+    ".orchestrator_memory"
+]
+
+for import_path in import_paths:
+    try:
+        module = importlib.import_module(import_path)
+        if hasattr(module, 'read_memory') and hasattr(module, 'list_memories'):
+            read_memory = module.read_memory
+            list_memories = module.list_memories
+            memory_available = True
+            logger.info(f"✅ Successfully imported memory functions from {import_path}")
+            break
+    except ImportError:
+        logger.warning(f"⚠️ Could not import memory functions from {import_path}")
+        continue
+
+# If no import succeeded, check if we can load the module from file
+if not memory_available:
+    # List of possible file paths to check
+    file_paths = [
+        os.path.join("app", "modules", "orchestrator_memory.py"),
+        os.path.join("/app", "modules", "orchestrator_memory.py"),
+        os.path.join("/home", "ubuntu", "personal-ai-agent", "app", "modules", "orchestrator_memory.py")
+    ]
+    
+    for file_path in file_paths:
+        if os.path.exists(file_path):
+            try:
+                spec = importlib.util.spec_from_file_location("orchestrator_memory", file_path)
+                module = importlib.util.module_from_spec(spec)
+                sys.modules["orchestrator_memory"] = module
+                spec.loader.exec_module(module)
+                
+                if hasattr(module, 'read_memory') and hasattr(module, 'list_memories'):
+                    read_memory = module.read_memory
+                    list_memories = module.list_memories
+                    memory_available = True
+                    logger.info(f"✅ Successfully loaded memory functions from file: {file_path}")
+                    break
+            except Exception as e:
+                logger.warning(f"⚠️ Error loading memory functions from file {file_path}: {str(e)}")
+                continue
+
+# If still not available, try to use memory_writer directly
+if not memory_available:
+    try:
+        from app.modules.memory_writer import read_memory, list_memories
+        memory_available = True
+        logger.info("✅ Using memory_writer functions directly")
+    except ImportError:
+        logger.warning("⚠️ Could not import memory_writer")
+
+# If still not available, create mock implementation
+if not memory_available:
     logger.warning("⚠️ Memory module not available, dashboard will use mock data")
     
     # Mock implementation for testing
-    async def read_memory(agent_id, memory_type, tag):
+    async def read_memory(agent_id, memory_type, tag, project_id=None):
         logger.info(f"Mock memory read: {agent_id}, {memory_type}, {tag}")
         return {"status": "success", "value": "Mock memory value"}
     
-    async def list_memories(agent_id, memory_type, tag_prefix=None):
+    async def list_memories(agent_id, memory_type, tag_prefix=None, project_id=None):
         logger.info(f"Mock list memories: {agent_id}, {memory_type}, {tag_prefix}")
         return {"status": "success", "memories": []}
 
@@ -219,6 +277,7 @@ async def get_dashboard_index():
         "name": "Loop Summary Dashboard",
         "description": "Visualizes SAGE belief maps and loop summaries",
         "version": "1.0.0",
+        "memory_available": memory_available,
         "endpoints": [
             {
                 "path": "/dashboard/sage/beliefs",
