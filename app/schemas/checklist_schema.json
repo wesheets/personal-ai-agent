@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Promethios Internal Checklist Engine Schema",
+  "description": "Schema for validating the system consciousness checklist format",
+  "type": "object",
+  "required": [
+    "agents",
+    "routes",
+    "schemas",
+    "modules",
+    "tools",
+    "execution_checklist",
+    "last_updated"
+  ],
+  "properties": {
+    "agents": {
+      "type": "array",
+      "description": "List of agents, their roles, wiring status, and linked routes",
+      "items": {
+        "type": "object",
+        "required": ["name", "role", "wired", "routes"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the agent"
+          },
+          "role": {
+            "type": "string",
+            "description": "Role or purpose of the agent"
+          },
+          "wired": {
+            "type": "boolean",
+            "description": "Whether the agent is wired to any routes"
+          },
+          "routes": {
+            "type": "array",
+            "description": "List of routes linked to this agent",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "routes": {
+      "type": "array",
+      "description": "List of wired/unwired routes and their schemas",
+      "items": {
+        "type": "object",
+        "required": ["name", "file", "wired", "endpoints", "schemas"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the route"
+          },
+          "file": {
+            "type": "string",
+            "description": "Filename of the route module"
+          },
+          "wired": {
+            "type": "boolean",
+            "description": "Whether the route is wired in main.py"
+          },
+          "endpoints": {
+            "type": "array",
+            "description": "List of endpoints defined in this route",
+            "items": {
+              "type": "object",
+              "required": ["method", "path"],
+              "properties": {
+                "method": {
+                  "type": "string",
+                  "description": "HTTP method (get, post, put, delete, etc.)"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "URL path of the endpoint"
+                }
+              }
+            }
+          },
+          "schemas": {
+            "type": "array",
+            "description": "List of schemas used by this route",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if there was an issue scanning this route"
+          }
+        }
+      }
+    },
+    "schemas": {
+      "type": "array",
+      "description": "List of schemas, their validation status, and route linkage",
+      "items": {
+        "type": "object",
+        "required": ["name", "file", "models", "used_in_routes", "validation_status"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the schema"
+          },
+          "file": {
+            "type": "string",
+            "description": "Filename of the schema module"
+          },
+          "models": {
+            "type": "array",
+            "description": "List of model classes defined in this schema",
+            "items": {
+              "type": "string"
+            }
+          },
+          "used_in_routes": {
+            "type": "array",
+            "description": "List of routes that use this schema",
+            "items": {
+              "type": "string"
+            }
+          },
+          "validation_status": {
+            "type": "string",
+            "description": "Validation status of the schema",
+            "enum": ["Valid", "Invalid", "Empty", "Error"]
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if there was an issue with this schema"
+          }
+        }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "description": "List of modules and their wiring status",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "wiring_status"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the module"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type or category of the module"
+          },
+          "wiring_status": {
+            "type": "string",
+            "description": "Wiring status of the module",
+            "enum": ["Wired", "Unwired", "Partial"]
+          }
+        }
+      }
+    },
+    "tools": {
+      "type": "array",
+      "description": "List of tools and their operational status",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "operational_status"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the tool"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type or category of the tool"
+          },
+          "operational_status": {
+            "type": "string",
+            "description": "Operational status of the tool",
+            "enum": ["Operational", "Disabled", "Unwired", "Error"]
+          }
+        }
+      }
+    },
+    "execution_checklist": {
+      "type": "array",
+      "description": "Human-readable list of tasks to complete",
+      "items": {
+        "type": "string"
+      }
+    },
+    "last_updated": {
+      "type": "string",
+      "description": "UTC timestamp of when the checklist was last updated",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}
