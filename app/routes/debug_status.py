@@ -11,7 +11,8 @@ import sys
 import importlib.util
 import datetime
 import json
-from fastapi import APIRouter, HTTPException
+import requests
+from fastapi import APIRouter, HTTPException, Request
 from typing import Dict, Any, List, Optional
 
 # Configure logging
@@ -24,7 +25,7 @@ router = APIRouter(
 )
 
 @router.get("/status")
-async def get_deployment_status():
+async def get_deployment_status(request: Request):
     """
     Get comprehensive status of all critical components.
     
@@ -34,6 +35,7 @@ async def get_deployment_status():
     - Memory module availability
     - Orchestrator router status
     - Import paths for all critical modules
+    - All core system endpoints accessibility
     
     Returns:
         Dict containing detailed status information
@@ -49,6 +51,7 @@ async def get_deployment_status():
         },
         "import_paths": check_import_paths(),
         "file_paths": check_file_paths(),
+        "endpoints": check_all_endpoints(request),
         "overall_status": "unknown"  # Will be updated based on component statuses
     }
     
@@ -60,9 +63,15 @@ async def get_deployment_status():
         status_report["components"]["dashboard"]["status"]
     ]
     
-    if all(status == "operational" for status in component_statuses):
+    # Include endpoint status in overall status determination
+    endpoint_statuses = [
+        endpoint["status"] for endpoint in status_report["endpoints"].values()
+    ]
+    all_statuses = component_statuses + endpoint_statuses
+    
+    if all(status == "operational" for status in component_statuses) and all(status == "accessible" for status in endpoint_statuses):
         status_report["overall_status"] = "operational"
-    elif any(status == "failed" for status in component_statuses):
+    elif any(status == "failed" for status in component_statuses) or any(status == "inaccessible" for status in endpoint_statuses):
         status_report["overall_status"] = "degraded"
     else:
         status_report["overall_status"] = "partial"
@@ -530,6 +539,126 @@ def check_file_paths() -> Dict[str, Any]:
                 }
     
     return file_info
+
+def check_all_endpoints(request: Request) -> Dict[str, Any]:
+    """
+    Check all critical endpoints to verify they are accessible and responding correctly.
+    
+    Args:
+        request: The FastAPI request object to get base URL
+    
+    Returns:
+        Dict containing endpoint status information
+    """
+    # Get base URL from request
+    base_url = str(request.base_url).rstrip('/')
+    
+    # Define all critical endpoints to check
+    endpoints = {
+        # Debug endpoints
+        "debug_status": "/debug/status",
+        "debug_hal_schema": "/debug/hal-schema",
+        
+        # Core system endpoints
+        "memory": "/api/memory",
+        "agent": "/api/agent",
+        "orchestrator": "/api/orchestrator",
+        "plan": "/api/plan",
+        "fix": "/api/fix",
+        "delegate": "/api/delegate",
+        "critic": "/api/critic",
+        "sage": "/api/sage",
+        "nova": "/api/nova",
+        
+        # Additional core system endpoints
+        "hal": "/api/hal/status",
+        "dashboard": "/dashboard",
+        "health": "/health",
+        "diagnostics": "/diagnostics/routes"
+    }
+    
+    endpoint_status = {}
+    
+    # Check each endpoint
+    for name, path in endpoints.items():
+        # Skip the current endpoint to avoid infinite recursion
+        if path == "/debug/status":
+            endpoint_status[name] = {
+                "url": f"{base_url}{path}",
+                "status": "accessible",
+                "status_code": 200,
+                "response_time_ms": 0,
+                "source_file": "/home/ubuntu/personal-ai-agent/app/routes/debug_status.py",
+                "note": "Current endpoint, skipping actual request"
+            }
+            continue
+            
+        try:
+            # Make request to endpoint
+            start_time = datetime.datetime.now()
+            response = requests.get(f"{base_url}{path}", timeout=2)
+            end_time = datetime.datetime.now()
+            response_time = (end_time - start_time).total_seconds() * 1000
+            
+            # Determine source file for this endpoint
+            source_file = determine_endpoint_source_file(path)
+            
+            endpoint_status[name] = {
+                "url": f"{base_url}{path}",
+                "status": "accessible" if response.status_code == 200 else "degraded",
+                "status_code": response.status_code,
+                "response_time_ms": response_time,
+                "source_file": source_file
+            }
+        except Exception as e:
+            endpoint_status[name] = {
+                "url": f"{base_url}{path}",
+                "status": "inaccessible",
+                "error": str(e),
+                "source_file": determine_endpoint_source_file(path)
+            }
+    
+    return endpoint_status
+
+def determine_endpoint_source_file(path: str) -> str:
+    """
+    Determine the source file for a given endpoint path.
+    
+    Args:
+        path: The endpoint path
+    
+    Returns:
+        The source file path or "unknown"
+    """
+    # Map of endpoint prefixes to their likely source files
+    endpoint_file_map = {
+        "/debug/status": "/app/routes/debug_status.py",
+        "/debug/hal-schema": "/app/routes/debug_hal_schema.py",
+        "/api/memory": "/app/routes/memory_routes.py",
+        "/api/agent": "/app/routes/agent_routes.py",
+        "/api/orchestrator": "/app/routes/orchestrator_routes.py",
+        "/api/plan": "/app/routes/plan_generate_routes.py",
+        "/api/fix": "/app/routes/fix_routes.py",
+        "/api/delegate": "/app/routes/delegate_stream_routes.py",
+        "/api/critic": "/app/routes/critic_routes.py",
+        "/api/sage": "/app/routes/sage_routes.py",
+        "/api/nova": "/app/routes/nova_routes.py",
+        "/api/hal": "/app/routes/hal_routes.py",
+        "/dashboard": "/app/routes/dashboard_routes.py",
+        "/health": "/app/routes/health_monitor_routes.py",
+        "/diagnostics": "/app/routes/diagnostics_routes.py"
+    }
+    
+    # Check for exact match
+    if path in endpoint_file_map:
+        return endpoint_file_map[path]
+    
+    # Check for prefix match
+    for prefix, file_path in endpoint_file_map.items():
+        if path.startswith(prefix):
+            return file_path
+    
+    return "unknown"
 
 def log_status_report(status_report: Dict[str, Any]) -> None:
     """
