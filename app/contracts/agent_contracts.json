@@ -1,0 +1,79 @@
+{
+  "critic": {
+    "agent_id": "critic",
+    "accepted_input_schema": "LoopSummaryReviewRequest",
+    "expected_output_schema": "LoopReflectionRejection",
+    "allowed_tools": ["log_rejection", "write_memory"],
+    "fallback_behaviors": ["log_schema_violation"],
+    "output_must_be_wrapped": true,
+    "can_initiate_recovery": true,
+    "version": "1.0.0"
+  },
+  "forge": {
+    "agent_id": "forge",
+    "accepted_input_schema": "ForgeBuildRequest",
+    "expected_output_schema": "ForgeBuildResult",
+    "allowed_tools": [
+      "scaffold",
+      "wire",
+      "register",
+      "test",
+      "validate",
+      "patch",
+      "version_track",
+      "memory_read",
+      "memory_write"
+    ],
+    "fallback_behaviors": [
+      "log_error",
+      "retry_with_simplified_input",
+      "create_recovery_snapshot"
+    ],
+    "output_must_be_wrapped": true,
+    "can_initiate_recovery": true,
+    "version": "1.0.0",
+    "description": "Deep system builder agent responsible for creating endpoints, schemas, modules, and registering routes",
+    "capabilities": [
+      "Retrieve project memory and loop history",
+      "Create endpoints, schemas, modules",
+      "Register routes and agent contracts",
+      "Write build logs, revision logs, and snapshots",
+      "Interface with ORCHESTRATOR, HAL, CRITIC, PESSIMIST"
+    ],
+    "memory_tags": [
+      "forge_build_log_<loop_id>_v{version}",
+      "project_memory_<project_id>",
+      "hal_build_task_response_<loop_id>"
+    ]
+  },
+  "hal": {
+    "agent_id": "hal",
+    "accepted_input_schema": "LoopResponseRequest",
+    "expected_output_schema": "LoopResponseResult",
+    "allowed_tools": ["openai_generate_code", "memory_read", "memory_write"],
+    "fallback_behaviors": ["generate_fallback_jsx", "log_error"],
+    "output_must_be_wrapped": true,
+    "can_initiate_recovery": false,
+    "version": "1.0.0"
+  },
+  "orchestrator": {
+    "agent_id": "orchestrator",
+    "accepted_input_schema": "LoopOrchestrationRequest",
+    "expected_output_schema": "LoopOrchestrationResult",
+    "allowed_tools": ["delegate", "memory_read", "memory_write", "plan_execution"],
+    "fallback_behaviors": ["log_error", "trigger_recovery"],
+    "output_must_be_wrapped": true,
+    "can_initiate_recovery": true,
+    "version": "1.0.0"
+  },
+  "sage": {
+    "agent_id": "sage",
+    "accepted_input_schema": "LoopAnalysisRequest",
+    "expected_output_schema": "LoopAnalysisResult",
+    "allowed_tools": ["analyze_memory", "memory_read", "generate_insights"],
+    "fallback_behaviors": ["log_error", "provide_partial_analysis"],
+    "output_must_be_wrapped": true,
+    "can_initiate_recovery": false,
+    "version": "1.0.0"
+  }
+}
