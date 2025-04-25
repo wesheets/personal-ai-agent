@@ -1,0 +1,1685 @@
+{
+  "agents": [
+    {
+      "name": "hal",
+      "role": "Unknown",
+      "wired": false,
+      "routes": [
+        "hal"
+      ]
+    },
+    {
+      "name": "orchestrator",
+      "role": "Unknown",
+      "wired": true,
+      "routes": [
+        "orchestrator_contract",
+        "orchestrator_plan",
+        "orchestrator"
+      ]
+    },
+    {
+      "name": "ash",
+      "role": "Unknown",
+      "wired": true,
+      "routes": [
+        "ash"
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "name": "agent_config",
+      "file": "agent_config_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "agent_context",
+      "file": "agent_context_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "agent",
+      "file": "agent_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "ash",
+      "file": "ash_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "core",
+      "file": "core_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "critic",
+      "file": "critic_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "cto",
+      "file": "cto_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "dashboard",
+      "file": "dashboard_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "debug",
+      "file": "debug_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "debugger",
+      "file": "debugger_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "delegate_stream",
+      "file": "delegate_stream_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "diagnostics",
+      "file": "diagnostics_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "drift",
+      "file": "drift_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "export",
+      "file": "export_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "fix",
+      "file": "fix_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "forge",
+      "file": "forge_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "guardian",
+      "file": "guardian_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "hal",
+      "file": "hal_routes.py",
+      "wired": false,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "health_monitor",
+      "file": "health_monitor_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "historian",
+      "file": "historian_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "loop",
+      "file": "loop_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "loop_validation",
+      "file": "loop_validation_routes.py",
+      "wired": false,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "memory_embed",
+      "file": "memory_embed_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "memory_recall",
+      "file": "memory_recall_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "memory",
+      "file": "memory_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "nova",
+      "file": "nova_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "observer",
+      "file": "observer_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "orchestrator_contract",
+      "file": "orchestrator_contract_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "orchestrator_plan",
+      "file": "orchestrator_plan_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "orchestrator",
+      "file": "orchestrator_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "output_policy",
+      "file": "output_policy_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "persona",
+      "file": "persona_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "pessimist_evaluation",
+      "file": "pessimist_evaluation_routes.py",
+      "wired": false,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "pessimist",
+      "file": "pessimist_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "plan_generate",
+      "file": "plan_generate_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "reflection",
+      "file": "reflection_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "sage",
+      "file": "sage_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "self",
+      "file": "self_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "sitegen",
+      "file": "sitegen_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "snapshot",
+      "file": "snapshot_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "train",
+      "file": "train_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    },
+    {
+      "name": "trust",
+      "file": "trust_routes.py",
+      "wired": true,
+      "endpoints": [],
+      "schemas": []
+    }
+  ],
+  "schemas": [
+    {
+      "name": "agent_config_schema",
+      "file": "agent_config_schema.py",
+      "models": [
+        "ToolPermission",
+        "FallbackBehavior",
+        "AgentConfigRequest",
+        "AgentConfigResponse",
+        "AgentConfigError",
+        "AgentConfigGetRequest",
+        "AgentConfigGetResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "agent_context_schema",
+      "file": "agent_context_schema.py",
+      "models": [
+        "MemoryUsage",
+        "LoopState",
+        "LastAgentAction",
+        "AgentContextRequest",
+        "AgentContextResponse",
+        "AgentContextError"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "agent_contract_schema",
+      "file": "agent_contract_schema.py",
+      "models": [
+        "AgentContract",
+        "ContractViolation",
+        "ContractValidationRequest",
+        "ContractValidationResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "ash_schema",
+      "file": "ash_schema.py",
+      "models": [
+        "AshAnalysisRequest",
+        "RiskFactor",
+        "AshAnalysisResult",
+        "AshTestRequest",
+        "TestResult",
+        "AshTestResult",
+        "AshErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "ceo_schema",
+      "file": "ceo_schema.py",
+      "models": [
+        "CEOReviewRequest",
+        "AgentAllocation",
+        "CEOPlanResult",
+        "CEOErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "critic_schema",
+      "file": "critic_schema.py",
+      "models": [
+        "CriticReviewRequest",
+        "CriticScores",
+        "CriticUsage",
+        "CriticReviewResult",
+        "CriticRejectRequest",
+        "CriticRejectResult",
+        "CriticLogReasonRequest",
+        "CriticLogReasonResult",
+        "CriticErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "cto_schema",
+      "file": "cto_schema.py",
+      "models": [
+        "CTOAuditRequest",
+        "CTOIssue",
+        "CTOAuditResult",
+        "CTOErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "debug_schema",
+      "file": "debug_schema.py",
+      "models": [
+        "LoopDebugRequest",
+        "LoopIssue",
+        "RepairSuggestion",
+        "LoopDebugResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "debugger_schema",
+      "file": "debugger_schema.py",
+      "models": [
+        "PatchPlan",
+        "DebuggerReport",
+        "DebuggerTraceRequest",
+        "DebuggerTraceResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "delegate_stream_schema",
+      "file": "delegate_stream_schema.py",
+      "models": [
+        "StreamRequest",
+        "StreamResponse",
+        "StreamError",
+        "StreamStatusRequest",
+        "StreamStatusResponse",
+        "StreamCloseRequest",
+        "StreamCloseResponse",
+        "StreamEvent"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "drift_schema",
+      "file": "drift_schema.py",
+      "models": [
+        "DriftMonitorRequest",
+        "LoopDriftLog",
+        "DriftMonitorResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "export_schema",
+      "file": "export_schema.py",
+      "models": [
+        "ExportRequest",
+        "ExportResponse",
+        "ExportError",
+        "ExportStatusRequest",
+        "ExportStatusResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "fix_schema",
+      "file": "fix_schema.py",
+      "models": [
+        "FixRequest",
+        "FixResponse",
+        "FixError",
+        "FixStatusRequest",
+        "FixStatusResponse",
+        "FixRollbackRequest",
+        "FixRollbackResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "forge_schema",
+      "file": "forge_schema.py",
+      "models": [
+        "ForgeBuildRequest",
+        "ComponentBuildResult",
+        "ForgeBuildResult",
+        "ForgeRevisionRequest",
+        "ForgeRevisionResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "guardian_schema",
+      "file": "guardian_schema.py",
+      "models": [
+        "GuardianAlertRequest",
+        "GuardianResponse",
+        "GuardianRollbackRequest",
+        "GuardianRollbackResult",
+        "GuardianErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "health_monitor_schema",
+      "file": "health_monitor_schema.py",
+      "models": [
+        "HealthMetric",
+        "ComponentHealth",
+        "SystemHealthSummary",
+        "HealthCheckRequest",
+        "HealthCheckResponse",
+        "PredictiveMaintenanceRequest",
+        "MaintenancePrediction",
+        "PredictiveMaintenanceResponse",
+        "SelfHealingRequest",
+        "HealingActionResult",
+        "SelfHealingResponse",
+        "HealthMonitorConfigRequest",
+        "HealthMonitorConfigResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "historian_schema",
+      "file": "historian_schema.py",
+      "models": [
+        "BeliefAlignmentScore",
+        "HistorianAlert",
+        "HistorianDriftRequest",
+        "HistorianDriftResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "loop_schema",
+      "file": "loop_schema.py",
+      "models": [
+        "LoopResponseRequest",
+        "LoopResponseResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "loop_snapshot_schema",
+      "file": "loop_snapshot_schema.py",
+      "models": [
+        "LoopSnapshot",
+        "SnapshotSaveRequest",
+        "SnapshotRestoreRequest",
+        "SnapshotResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "loop_trace",
+      "file": "loop_trace.py",
+      "models": [
+        "LoopTraceItem",
+        "LoopReflectionResult",
+        "LoopCompleteRequest",
+        "RerunDecision",
+        "BiasTag",
+        "AgentPermissionViolation"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "loop_validation_schema",
+      "file": "loop_validation_schema.py",
+      "models": [
+        "LoopValidationRequest",
+        "ValidationIssue",
+        "ValidationRecommendation",
+        "LoopValidationResult",
+        "LoopValidationError"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "memory",
+      "file": "memory.py",
+      "models": [
+        "MemoryItem",
+        "ThreadRequest",
+        "SummarizationRequest"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "memory_embed_schema",
+      "file": "memory_embed_schema.py",
+      "models": [
+        "MemoryEmbedRequest",
+        "MemoryEmbedResponse",
+        "MemoryEmbedError",
+        "MemoryEmbedBatchRequest",
+        "MemoryEmbedBatchResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "memory_recall_schema",
+      "file": "memory_recall_schema.py",
+      "models": [
+        "MemoryRecallRequest",
+        "MemoryEntry",
+        "MemoryRecallResponse",
+        "MemoryRecallError"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "nova_schema",
+      "file": "nova_schema.py",
+      "models": [
+        "UIComponent",
+        "NovaUIRequest",
+        "NovaUIResult",
+        "NovaUIRequestFallback",
+        "NovaUIResultFallback"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "observer_schema",
+      "file": "observer_schema.py",
+      "models": [
+        "ObserverTaskRequest",
+        "ObservationEntry",
+        "ObserverTaskResult",
+        "ObserverErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "orchestrator_schema",
+      "file": "orchestrator_schema.py",
+      "models": [
+        "OrchestratorConsultRequest",
+        "OrchestratorInterpretRequest",
+        "OrchestratorPlanRequest",
+        "TriggerResult",
+        "OrchestratorDecision",
+        "PlanStep",
+        "OrchestratorPlan",
+        "DelegationResult",
+        "ResolutionResult",
+        "OrchestratorPlanResult",
+        "OrchestratorErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "output_policy_schema",
+      "file": "output_policy_schema.py",
+      "models": [
+        "OutputPolicyRequest",
+        "OutputPolicyResult",
+        "PolicyLogEntry",
+        "PolicyLogRequest",
+        "PolicyLogResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "pessimist_evaluation_schema",
+      "file": "pessimist_evaluation_schema.py",
+      "models": [
+        "AgentMapping",
+        "LoopComponent",
+        "PessimistCheckRequest",
+        "Risk",
+        "RecommendedChange",
+        "PessimistCheckResult",
+        "PessimistCheckError"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "pessimist_schema",
+      "file": "pessimist_schema.py",
+      "models": [
+        "BiasTagDetail",
+        "PessimistCheckRequest",
+        "PessimistAssessment",
+        "BiasAnalysis",
+        "PessimistCheckResult",
+        "PessimistErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "plan_generate_schema",
+      "file": "plan_generate_schema.py",
+      "models": [
+        "PlanGenerateRequest",
+        "PlanStep",
+        "PlanGenerateResponse",
+        "PlanGenerateError"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "rerun_decision",
+      "file": "rerun_decision.py",
+      "models": [
+        "RerunDecision"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "sage_schema",
+      "file": "sage_schema.py",
+      "models": [
+        "BeliefScore",
+        "SageReviewRequest",
+        "SageReviewResult",
+        "SageSummarizeRequest",
+        "SageSummarizeResult",
+        "SageScoreBeliefRequest",
+        "SageScoreBeliefResult",
+        "SageErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "self_challenge_schema",
+      "file": "self_challenge_schema.py",
+      "models": [
+        "BeliefChallengeRequest"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "self_reflection_schema",
+      "file": "self_reflection_schema.py",
+      "models": [
+        "SelfInquiryRequest"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "self_reinforcement_schema",
+      "file": "self_reinforcement_schema.py",
+      "models": [
+        "BeliefReinforcementRequest"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "self_revision_schema",
+      "file": "self_revision_schema.py",
+      "models": [
+        "BeliefRevisionRequest"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "sitegen_schema",
+      "file": "sitegen_schema.py",
+      "models": [
+        "SiteGenTaskRequest",
+        "SiteLayout",
+        "SiteGenTaskResult",
+        "SiteGenErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "train_schema",
+      "file": "train_schema.py",
+      "models": [
+        "TrainRequest",
+        "TrainingMetrics",
+        "TrainResponse",
+        "TrainError",
+        "TrainStatusRequest",
+        "TrainStatusResponse"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "trainer_schema",
+      "file": "trainer_schema.py",
+      "models": [
+        "TrainerTaskRequest",
+        "TrainingMetrics",
+        "ModelInfo",
+        "TrainerTaskResult",
+        "TrainerErrorResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    },
+    {
+      "name": "validate_schema_hash",
+      "file": "validate_schema_hash.py",
+      "models": [
+        "ValidateSchemaHashRequest",
+        "ValidateSchemaHashResult"
+      ],
+      "used_in_routes": [],
+      "validation_status": "Valid"
+    }
+  ],
+  "modules": [
+    {
+      "name": "hal_openai",
+      "type": "Unknown",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "drift_monitor",
+      "type": "Unknown",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "memory_writer",
+      "type": "Unknown",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "memory_engine",
+      "type": "Unknown",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "hal_routes_fallback",
+      "type": "Unknown",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "debug_hal_schema",
+      "type": "Unknown",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "__init__",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_config",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_context",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_create",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_dispatch",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_fallback",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_loop_trigger",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_permission_validator",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_present",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_reflect",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_reflection",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_registry",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_retry",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_runner",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_runner_retry_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_tool_runner",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_trust_delta_monitoring",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "agent_verify",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "ash_agent",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "auditor_agent",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "belief_versioning",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "cognitive_continuity_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "core_beliefs_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "critic_agent",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "delegate",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "delegate_stream",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "depth_controller",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "domain_sensitivity_flagging",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "export",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "fix",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "freeze_controller",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "hal_memory",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "hal_memory_patch",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "hal_openai_enhanced",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "health_monitor",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "historian_drift_report",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "instruction_validator",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "ip_violation_scanner",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "live_memory_inspection",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "llm_infer",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "logic_loader",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "logic_registry_validator",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_ci_test_runner",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_execution_guard",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_hardening_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_intent_sanitizer",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_lineage_export_system",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_map_visualizer",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_monitor",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_resume_engine",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_summary_validator",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_validation",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "loop_validator",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "memory_block_writer",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "memory_embed",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "memory_recall",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "memory_summarize",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "memory_summarizer",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "memory_summarizer_project",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "memory_thread",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "nova_agent",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "operator_alignment_profile_tracking",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_build",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_contract_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_critic_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_drift_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_logic",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_memory",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_memory_enhanced",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_present",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_rewind",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "orchestrator_scope",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "output_policy_enforcer",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "passive_reflection",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "pessimist_agent",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "pessimist_bias_tracking",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "pessimist_evaluation",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "plan_generate",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "planning_logic_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "post_loop_summary_handler",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "project_manifest",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "project_state",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "project_state_watch",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "public_use_transparency_layer",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "recursive_reflection_engine",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "reflect",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "reflection_fatigue_scoring",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "reflection_grader",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "reflection_guardrails",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "reflection_styler",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "register_all_agents",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "rerun_decision_engine",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "rerun_reasoning_logger",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "reset_flags",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "safety_integration",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "safety_loop_summary",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "schema_validation",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "summary_realism_scorer",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "symbolic_memory_encoder",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "synthetic_identity_checker",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "task_result",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "task_supervisor",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "test_llm_infer",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "test_memory_summarize",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "test_memory_thread",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "tiered_orchestrator",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "train",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    },
+    {
+      "name": "trust_score_evaluator",
+      "type": "Module",
+      "wiring_status": "Unwired"
+    }
+  ],
+  "tools": [
+    {
+      "name": "__init__",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "agent_builder",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "api_request",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "architecture_validator",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "audio_input_handler",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "audio_transcriber",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "autonomous_research_chain",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "belief_calibrator",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "calendar_scheduler",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "code_executor",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "code_explainer",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "dns_tools",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "email_drafter",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "event_tracker",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "file_reader",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "file_writer",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "git_utils",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "github_commit",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "image_caption",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "lint_utils",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "multi_agent_debater",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "multi_file_editor",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "news_fetcher",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "notion_writer",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "package_installer",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "pdf_ingest",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "pitch_optimizer",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "refactor_suggester",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "repo_loader",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "repo_tools",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "resume_parser",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "screenshot_reader",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "search_google",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "slack_messenger",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "snapshot",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "spreadsheet_analyzer",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "status_tracker",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "stock_checker",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "test_runner",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "tone_converter",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "unit_test_writer",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "url_summarizer",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "vercel_deploy",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "video_summarizer",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "weather_checker",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "web_search",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    },
+    {
+      "name": "update_checklist",
+      "type": "Tool",
+      "operational_status": "Unwired"
+    }
+  ],
+  "execution_checklist": [
+    "Wire the following routes in main.py: hal, loop_validation, pessimist_evaluation",
+    "Bind the following schemas to routes: agent_config_schema, agent_context_schema, agent_contract_schema, ash_schema, ceo_schema, critic_schema, cto_schema, debug_schema, debugger_schema, delegate_stream_schema, drift_schema, export_schema, fix_schema, forge_schema, guardian_schema, health_monitor_schema, historian_schema, loop_schema, loop_snapshot_schema, loop_trace, loop_validation_schema, memory, memory_embed_schema, memory_recall_schema, nova_schema, observer_schema, orchestrator_schema, output_policy_schema, pessimist_evaluation_schema, pessimist_schema, plan_generate_schema, rerun_decision, sage_schema, self_challenge_schema, self_reflection_schema, self_reinforcement_schema, self_revision_schema, sitegen_schema, train_schema, trainer_schema, validate_schema_hash",
+    "Wire the following modules: hal_openai, drift_monitor, memory_writer, memory_engine, hal_routes_fallback, debug_hal_schema, __init__, agent_config, agent_context, agent_create, agent_dispatch, agent_fallback, agent_loop_trigger, agent_permission_validator, agent_present, agent_reflect, agent_reflection, agent_registry, agent_retry, agent_runner, agent_runner_retry_integration, agent_tool_runner, agent_trust_delta_monitoring, agent_verify, ash_agent, auditor_agent, belief_versioning, cognitive_continuity_integration, core_beliefs_integration, critic_agent, delegate, delegate_stream, depth_controller, domain_sensitivity_flagging, export, fix, freeze_controller, hal_memory, hal_memory_patch, hal_openai_enhanced, health_monitor, historian_drift_report, instruction_validator, ip_violation_scanner, live_memory_inspection, llm_infer, logic_loader, logic_registry_validator, loop, loop_ci_test_runner, loop_execution_guard, loop_hardening_integration, loop_intent_sanitizer, loop_lineage_export_system, loop_map_visualizer, loop_monitor, loop_resume_engine, loop_summary_validator, loop_validation, loop_validator, memory_block_writer, memory_embed, memory_recall, memory_summarize, memory_summarizer, memory_summarizer_project, memory_thread, nova_agent, operator_alignment_profile_tracking, orchestrator_build, orchestrator_contract_integration, orchestrator_critic_integration, orchestrator_drift_integration, orchestrator_integration, orchestrator_logic, orchestrator_memory, orchestrator_memory_enhanced, orchestrator_present, orchestrator_rewind, orchestrator_scope, output_policy_enforcer, passive_reflection, pessimist_agent, pessimist_bias_tracking, pessimist_evaluation, plan_generate, planning_logic_integration, post_loop_summary_handler, project_manifest, project_state, project_state_watch, public_use_transparency_layer, recursive_reflection_engine, reflect, reflection_fatigue_scoring, reflection_grader, reflection_guardrails, reflection_styler, register_all_agents, rerun_decision_engine, rerun_reasoning_logger, reset_flags, safety_integration, safety_loop_summary, schema_validation, summary_realism_scorer, symbolic_memory_encoder, synthetic_identity_checker, task_result, task_supervisor, test_llm_infer, test_memory_summarize, test_memory_thread, tiered_orchestrator, train, trust_score_evaluator",
+    "Wire the following tools to workflow: __init__, agent_builder, api_request, architecture_validator, audio_input_handler, audio_transcriber, autonomous_research_chain, belief_calibrator, calendar_scheduler, code_executor, code_explainer, dns_tools, email_drafter, event_tracker, file_reader, file_writer, git_utils, github_commit, image_caption, lint_utils, multi_agent_debater, multi_file_editor, news_fetcher, notion_writer, package_installer, pdf_ingest, pitch_optimizer, refactor_suggester, repo_loader, repo_tools, resume_parser, screenshot_reader, search_google, slack_messenger, snapshot, spreadsheet_analyzer, status_tracker, stock_checker, test_runner, tone_converter, unit_test_writer, url_summarizer, vercel_deploy, video_summarizer, weather_checker, web_search, update_checklist",
+    "Verify all routes have appropriate error handling",
+    "Ensure all schemas have proper validation",
+    "Check that all agents have the necessary permissions"
+  ],
+  "last_updated": "2025-04-25T23:24:25.466051"
+}
