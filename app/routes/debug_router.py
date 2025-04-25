@@ -54,7 +54,7 @@ else:
     logger.warning("⚠️ Using fallback debug_status implementation")
 
 
-This module registers all debug-related routes with the FastAPI application.
+"""This module registers all debug-related routes with the FastAPI application."""
 """
 
 from fastapi import APIRouter
