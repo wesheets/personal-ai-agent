@@ -69,6 +69,14 @@
       ],
       "version": "v1.0.0",
       "checksum": "fixed"
+    },
+    "DiagnosticsRouteResponse": {
+      "file": "app/routes/diagnostics_routes.py",
+      "bound_to_routes": [
+        "/diagnostics/routes"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
     }
   },
   "routes": {
@@ -149,6 +157,12 @@
       "schema": "MemorySearchRequest",
       "status": "active",
       "errors": []
+    },
+    "/diagnostics/routes": {
+      "method": "GET",
+      "schema": "DiagnosticsRouteResponse",
+      "status": "active",
+      "errors": []
     }
   },
   "modules": {
@@ -166,6 +180,16 @@
       "file": "app/modules/memory_writer.py",
       "wrapped_with_schema": true,
       "last_updated": "2025-04-25T04:07:21.158701"
+    },
+    "memory_engine": {
+      "file": "app/api/modules/memory_engine.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-25T12:11:27.000000"
+    },
+    "hal_routes_fallback": {
+      "file": "app/fallbacks/fix_hal_routes.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-25T12:11:27.000000"
     }
   },
   "memory": {
@@ -177,12 +201,15 @@
     "schema_discovery_fallback": true,
     "test_route_integrity": false,
     "agent_contract_enforcement": true,
-    "drift_monitor_enabled": true
+    "drift_monitor_enabled": true,
+    "hal_routes_fallback": true,
+    "memory_engine_fallback": true,
+    "diagnostics_endpoint": true
   },
   "manifest_meta": {
     "version": "1.0.0",
     "created_at": "2025-04-24T23:47:07.446977",
-    "last_updated": "2025-04-25T11:50:28.810820",
+    "last_updated": "2025-04-25T12:14:15.536965",
     "boot_events": [
       {
         "timestamp": "2025-04-24T23:47:07.816573",
@@ -231,6 +258,10 @@
       {
         "timestamp": "2025-04-25T11:50:28.737195",
         "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T12:14:15.445492",
+        "version": "1.0.0"
       }
     ],
     "loaded_routes": [
@@ -243,7 +274,7 @@
       "export_routes",
       "fix_routes",
       "delegate_stream_routes",
-      "hal_routes",
+      "hal_routes_fallback",
       "memory_routes",
       "app_memory_routes",
       "loop_routes",
@@ -269,15 +300,30 @@
       "health_monitor_routes",
       "self_routes",
       "orchestrator_contract_routes",
-      "ash_routes",
       "dashboard_routes",
       "drift_routes",
       "forge_routes",
       "loop_validation_routes",
       "output_policy_routes",
       "pessimist_evaluation_routes",
-      "debug_analyzer"
+      "debug_analyzer",
+      "diagnostics_routes"
     ],
-    "memory_tag": "snapshot_route_fix_20250425_115221"
+    "memory_tag": "final_backend_fix_20250425_121127"
+  },
+  "diagnostics": {
+    "enabled": true,
+    "endpoints": [
+      {
+        "path": "/diagnostics/routes",
+        "description": "Provides information about loaded and failed routes, and fallbacks triggered",
+        "category": "diagnostics"
+      }
+    ],
+    "log_files": [
+      "logs/hal_route_failures.json",
+      "logs/memory_fallback.json",
+      "logs/final_route_status.json"
+    ]
   }
 }

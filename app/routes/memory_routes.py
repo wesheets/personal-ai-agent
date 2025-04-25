@@ -2,18 +2,22 @@
 Memory Routes Module for app/routes directory
 
 This module provides API routes for memory-related operations.
+The implementation avoids top-level runtime logic and initializes
+the memory engine inside each route handler.
 """
 from fastapi import APIRouter, Query, HTTPException
 from typing import Optional, Dict, Any
 import datetime
 import logging
-
-# Import memory operations
-from app.api.modules.memory import read_memory, write_memory
+import os
 
 # Configure logging
 logger = logging.getLogger("app.routes.memory_routes")
 
+# Ensure logs directory exists
+os.makedirs("/home/ubuntu/personal-ai-agent/logs", exist_ok=True)
+
+# Create router
 router = APIRouter(tags=["memory"])
 
 @router.get("/api/memory/ping")
@@ -43,6 +47,10 @@ async def memory_write_endpoint(request_data: dict):
     logger.info(f"🔍 DEBUG: memory_write endpoint called with project_id: {request_data.get('project_id', 'default')}")
     
     try:
+        # Initialize memory engine inside the route handler
+        from app.api.modules.memory_engine import get_memory_engine
+        memory_engine = get_memory_engine()
+        
         # Convert request data to expected format for write_memory
         memory_data = {
             "agent_id": request_data.get("agent", "default"),
@@ -53,12 +61,12 @@ async def memory_write_endpoint(request_data: dict):
             "chain_id": request_data.get("chain_id", "default"),
         }
         
-        # Write to memory
-        result = await write_memory(memory_data)
+        # Write to memory using the engine
+        result = await memory_engine.write_memory(memory_data)
         
         return {
-            "status": "success",
-            "message": "Memory write request processed",
+            "status": result.get("status", "success"),
+            "message": result.get("message", "Memory write request processed"),
             "content": request_data.get("content", ""),
             "project_id": request_data.get("project_id", "default"),
             "chain_id": request_data.get("chain_id", "default"),
@@ -66,6 +74,43 @@ async def memory_write_endpoint(request_data: dict):
         }
     except Exception as e:
         logger.error(f"Error in memory_write_endpoint: {str(e)}")
+        
+        # Log the error to memory_fallback.json
+        try:
+            import json
+            
+            log_file = "/home/ubuntu/personal-ai-agent/logs/memory_fallback.json"
+            
+            # Create log entry
+            log_entry = {
+                "timestamp": str(datetime.datetime.now()),
+                "event": "route_error",
+                "endpoint": "memory_write",
+                "error": str(e)
+            }
+            
+            # Check if log file exists
+            if os.path.exists(log_file):
+                # Read existing logs
+                try:
+                    with open(log_file, 'r') as f:
+                        logs = json.load(f)
+                        if not isinstance(logs, list):
+                            logs = [logs]
+                except json.JSONDecodeError:
+                    logs = []
+            else:
+                logs = []
+            
+            # Append new log entry
+            logs.append(log_entry)
+            
+            # Write updated logs
+            with open(log_file, 'w') as f:
+                json.dump(logs, f, indent=2)
+        except Exception as log_error:
+            logger.error(f"Failed to log memory route error: {str(log_error)}")
+        
         raise HTTPException(status_code=500, detail=f"Failed to write memory: {str(e)}")
 
 @router.get("/api/memory/read")
@@ -82,17 +127,58 @@ async def memory_read_endpoint(project_id: str = Query(..., description="Project
     logger.info(f"🔍 DEBUG: memory_read endpoint called with project_id: {project_id}")
     
     try:
-        # Get memory entries for the project
-        entries = await read_memory(agent_id=project_id, memory_type="project")
+        # Initialize memory engine inside the route handler
+        from app.api.modules.memory_engine import get_memory_engine
+        memory_engine = get_memory_engine()
+        
+        # Get memory entries for the project using the engine
+        entries = await memory_engine.read_memory(agent_id=project_id, memory_type="project")
         
         logger.info(f"✅ Successfully retrieved memory for project: {project_id}")
         return {
-            "status": "success",
-            "message": "Memory read successful",
+            "status": entries.get("status", "success"),
+            "message": entries.get("message", "Memory read successful"),
             "project_id": project_id,
             "entries": [entries],
             "timestamp": str(datetime.datetime.now())
         }
     except Exception as e:
         logger.error(f"❌ Error reading memory for project {project_id}: {str(e)}")
+        
+        # Log the error to memory_fallback.json
+        try:
+            import json
+            
+            log_file = "/home/ubuntu/personal-ai-agent/logs/memory_fallback.json"
+            
+            # Create log entry
+            log_entry = {
+                "timestamp": str(datetime.datetime.now()),
+                "event": "route_error",
+                "endpoint": "memory_read",
+                "error": str(e)
+            }
+            
+            # Check if log file exists
+            if os.path.exists(log_file):
+                # Read existing logs
+                try:
+                    with open(log_file, 'r') as f:
+                        logs = json.load(f)
+                        if not isinstance(logs, list):
+                            logs = [logs]
+                except json.JSONDecodeError:
+                    logs = []
+            else:
+                logs = []
+            
+            # Append new log entry
+            logs.append(log_entry)
+            
+            # Write updated logs
+            with open(log_file, 'w') as f:
+                json.dump(logs, f, indent=2)
+        except Exception as log_error:
+            logger.error(f"Failed to log memory route error: {str(log_error)}")
+        
         raise HTTPException(status_code=500, detail=f"Failed to read memory: {str(e)}")
