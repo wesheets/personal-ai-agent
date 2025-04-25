@@ -3,11 +3,7 @@ HAL routes registration module for main.py
 This module registers HAL routes with the FastAPI application.
 """
 from fastapi import FastAPI
-
-# Import HAL routes
-import sys
-import os
-sys.path.append(os.getcwd())  # Add current directory to path
+# Import HAL routes using absolute imports to avoid runtime context dependency
 from routes.hal_routes import router as hal_router
 
 def register_hal_routes(app: FastAPI, loaded_routes: list):

@@ -11,19 +11,15 @@ import logging
 import json
 import datetime
 import os
-import sys
-
-# Add app directory to path to fix imports
-sys.path.append(os.path.join(os.getcwd(), 'app'))
-
-# Import schemas directly from app.schemas
-from app.schemas.loop_schema import LoopResponseRequest, LoopResponseResult
 
 # Configure logging
 logger = logging.getLogger("routes.hal_routes")
 logger.info("🧠 HAL ROUTES: LOADING...")
 
-# Import memory operations
+# Import schemas directly from app.schemas using absolute imports
+from app.schemas.loop_schema import LoopResponseRequest, LoopResponseResult
+
+# Import memory operations using absolute imports
 from app.api.modules.memory import read_memory, write_memory
 
 # Define router
