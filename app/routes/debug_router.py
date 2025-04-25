@@ -1,15 +1,31 @@
 """
 Debug Router Module
-fix/debug-status-endpoint-deployment
 
 This module registers all debug-related routes with the FastAPI application.
 """
 
 from fastapi import APIRouter
 import logging
+import os
 
 # Configure logging
 logger = logging.getLogger("debug")
+
+# File existence check trap
+if os.path.exists("/app/routes/debug_status.py"):
+    print("🧠 debug_status.py file exists at runtime.")
+    logger.info("🧠 debug_status.py file exists at runtime.")
+else:
+    print("🧠 debug_status.py file NOT found at runtime.")
+    logger.warning("🧠 debug_status.py file NOT found at runtime.")
+
+# Also check the local path
+if os.path.exists("app/routes/debug_status.py"):
+    print("🧠 debug_status.py file exists at local path.")
+    logger.info("🧠 debug_status.py file exists at local path.")
+else:
+    print("🧠 debug_status.py file NOT found at local path.")
+    logger.warning("🧠 debug_status.py file NOT found at local path.")
 
 # Import the debug HAL schema router
 from app.routes.debug_hal_schema import router as hal_schema_router
@@ -52,23 +68,3 @@ else:
         return {"status": "degraded", "module": "debug", "message": "Using fallback implementation"}
     print("⚠️ Using fallback debug_status implementation")
     logger.warning("⚠️ Using fallback debug_status implementation")
-
-
-"""This module registers all debug-related routes with the FastAPI application."""
-
-from fastapi import APIRouter
-
-# Import debug routes
-from app.routes.debug_status import router as status_router
-from app.routes.debug_hal_schema import router as hal_schema_router
-
-# Create main debug router
-router = APIRouter(
-    prefix="/debug",
-    tags=["debug"],
-    responses={404: {"description": "Not found"}}
-)
-
-# Include all debug-related routers
-router.include_router(status_router, prefix="")
-router.include_router(hal_schema_router, prefix="")
