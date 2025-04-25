@@ -1,0 +1,37 @@
+[
+  {
+    "agent_name": "critic",
+    "role": "Unknown",
+    "registered_in_registry": true,
+    "registered_in_manifest": true,
+    "confirmed_active_endpoint": false
+  },
+  {
+    "agent_name": "forge",
+    "role": "Deep system builder agent responsible for creating endpoints, schemas, modules, and registering routes",
+    "registered_in_registry": true,
+    "registered_in_manifest": true,
+    "confirmed_active_endpoint": false
+  },
+  {
+    "agent_name": "hal",
+    "role": "Unknown",
+    "registered_in_registry": true,
+    "registered_in_manifest": true,
+    "confirmed_active_endpoint": false
+  },
+  {
+    "agent_name": "orchestrator",
+    "role": "Unknown",
+    "registered_in_registry": true,
+    "registered_in_manifest": true,
+    "confirmed_active_endpoint": false
+  },
+  {
+    "agent_name": "sage",
+    "role": "Unknown",
+    "registered_in_registry": true,
+    "registered_in_manifest": true,
+    "confirmed_active_endpoint": false
+  }
+]

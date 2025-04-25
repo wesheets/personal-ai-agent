@@ -1,0 +1,1765 @@
+{
+  "fixed_endpoints": [
+    {
+      "endpoint": {
+        "route_path": "/loop/snapshot/{loop_id}",
+        "method": "DELETE",
+        "status_code": 500,
+        "module_name": "loop",
+        "matching_schemas": [
+          "loop_schema",
+          "loop_snapshot_schema",
+          "loop_trace",
+          "loop_validation_schema"
+        ],
+        "best_schema": "loop_schema",
+        "fix_type": "server_error",
+        "priority": "high",
+        "schema_models": [
+          {
+            "name": "LoopResponseRequest",
+            "fields": {
+              "project_id": "str",
+              "loop_id": "str",
+              "agent": "str",
+              "input_key": "str",
+              "target_file": "str",
+              "model": "Optional[...]",
+              "temperature": "Optional[...]",
+              "max_tokens": "Optional[...]",
+              "metadata": "Optional[...]"
+            }
+          },
+          {
+            "name": "LoopResponseResult",
+            "fields": {
+              "status": "str",
+              "output_tag": "str",
+              "timestamp": "str",
+              "code": "str",
+              "metadata": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/loop",
+          "/loop/status",
+          "/loop/create",
+          "/loop/update",
+          "/loop/delete",
+          "/loop/list",
+          "/loop/get",
+          "/loop/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/loop_router.py",
+        "module_name": "loop",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "endpoint": {
+        "route_path": "/orchestrator/validate_delegation",
+        "method": "POST",
+        "status_code": 500,
+        "module_name": "orchestrator",
+        "matching_schemas": [
+          "orchestrator_schema"
+        ],
+        "best_schema": "orchestrator_schema",
+        "fix_type": "server_error",
+        "priority": "high",
+        "schema_models": [
+          {
+            "name": "OrchestratorConsultRequest",
+            "fields": {
+              "project_id": "str",
+              "query": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorInterpretRequest",
+            "fields": {
+              "project_id": "str",
+              "content": "str",
+              "content_type": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorPlanRequest",
+            "fields": {
+              "project_id": "str",
+              "task": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "TriggerResult",
+            "fields": {
+              "triggered_agent": "str",
+              "timestamp": "str",
+              "loop_count": "int",
+              "reason": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorDecision",
+            "fields": {
+              "timestamp": "str",
+              "loop_count": "int",
+              "last_agent": "Optional[...]",
+              "next_agent": "str",
+              "reason": "str"
+            }
+          },
+          {
+            "name": "PlanStep",
+            "fields": {
+              "agent": "str",
+              "purpose": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlan",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "steps": "List[...]",
+              "estimated_loops": "int",
+              "current_loop": "int"
+            }
+          },
+          {
+            "name": "DelegationResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "agent": "str",
+              "task": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "ResolutionResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "conflicts_found": "int",
+              "conflicts_resolved": "int",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlanResult",
+            "fields": {
+              "status": "str",
+              "task": "str",
+              "tools": "List[...]",
+              "project_id": "str",
+              "intent": "str",
+              "action": "str",
+              "timestamp": "str",
+              "output": "str",
+              "loop_id": "Optional[...]",
+              "next_agent": "Optional[...]",
+              "trigger_result": "Optional[...]",
+              "reason": "Optional[...]",
+              "completed_agent": "Optional[...]",
+              "all_loops_complete": "Optional[...]",
+              "decisions": "Optional[...]",
+              "decision": "Optional[...]",
+              "plan": "Optional[...]",
+              "delegated_agent": "Optional[...]",
+              "delegated_task": "Optional[...]",
+              "delegation_result": "Optional[...]",
+              "resolution": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorErrorResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "Optional[...]",
+              "tools": "Optional[...]",
+              "project_id": "Optional[...]",
+              "intent": "Optional[...]",
+              "action": "Optional[...]",
+              "timestamp": "Optional[...]",
+              "output": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/orchestrator",
+          "/orchestrator/status",
+          "/orchestrator/create",
+          "/orchestrator/update",
+          "/orchestrator/delete",
+          "/orchestrator/list",
+          "/orchestrator/get",
+          "/orchestrator/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+        "module_name": "orchestrator",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "endpoint": {
+        "route_path": "/orchestrator/check_recovery_authorization",
+        "method": "POST",
+        "status_code": 500,
+        "module_name": "orchestrator",
+        "matching_schemas": [
+          "orchestrator_schema"
+        ],
+        "best_schema": "orchestrator_schema",
+        "fix_type": "server_error",
+        "priority": "high",
+        "schema_models": [
+          {
+            "name": "OrchestratorConsultRequest",
+            "fields": {
+              "project_id": "str",
+              "query": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorInterpretRequest",
+            "fields": {
+              "project_id": "str",
+              "content": "str",
+              "content_type": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorPlanRequest",
+            "fields": {
+              "project_id": "str",
+              "task": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "TriggerResult",
+            "fields": {
+              "triggered_agent": "str",
+              "timestamp": "str",
+              "loop_count": "int",
+              "reason": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorDecision",
+            "fields": {
+              "timestamp": "str",
+              "loop_count": "int",
+              "last_agent": "Optional[...]",
+              "next_agent": "str",
+              "reason": "str"
+            }
+          },
+          {
+            "name": "PlanStep",
+            "fields": {
+              "agent": "str",
+              "purpose": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlan",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "steps": "List[...]",
+              "estimated_loops": "int",
+              "current_loop": "int"
+            }
+          },
+          {
+            "name": "DelegationResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "agent": "str",
+              "task": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "ResolutionResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "conflicts_found": "int",
+              "conflicts_resolved": "int",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlanResult",
+            "fields": {
+              "status": "str",
+              "task": "str",
+              "tools": "List[...]",
+              "project_id": "str",
+              "intent": "str",
+              "action": "str",
+              "timestamp": "str",
+              "output": "str",
+              "loop_id": "Optional[...]",
+              "next_agent": "Optional[...]",
+              "trigger_result": "Optional[...]",
+              "reason": "Optional[...]",
+              "completed_agent": "Optional[...]",
+              "all_loops_complete": "Optional[...]",
+              "decisions": "Optional[...]",
+              "decision": "Optional[...]",
+              "plan": "Optional[...]",
+              "delegated_agent": "Optional[...]",
+              "delegated_task": "Optional[...]",
+              "delegation_result": "Optional[...]",
+              "resolution": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorErrorResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "Optional[...]",
+              "tools": "Optional[...]",
+              "project_id": "Optional[...]",
+              "intent": "Optional[...]",
+              "action": "Optional[...]",
+              "timestamp": "Optional[...]",
+              "output": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/orchestrator",
+          "/orchestrator/status",
+          "/orchestrator/create",
+          "/orchestrator/update",
+          "/orchestrator/delete",
+          "/orchestrator/list",
+          "/orchestrator/get",
+          "/orchestrator/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+        "module_name": "orchestrator",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "endpoint": {
+        "route_path": "/orchestrator/handle_violation",
+        "method": "POST",
+        "status_code": 500,
+        "module_name": "orchestrator",
+        "matching_schemas": [
+          "orchestrator_schema"
+        ],
+        "best_schema": "orchestrator_schema",
+        "fix_type": "server_error",
+        "priority": "high",
+        "schema_models": [
+          {
+            "name": "OrchestratorConsultRequest",
+            "fields": {
+              "project_id": "str",
+              "query": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorInterpretRequest",
+            "fields": {
+              "project_id": "str",
+              "content": "str",
+              "content_type": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorPlanRequest",
+            "fields": {
+              "project_id": "str",
+              "task": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "TriggerResult",
+            "fields": {
+              "triggered_agent": "str",
+              "timestamp": "str",
+              "loop_count": "int",
+              "reason": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorDecision",
+            "fields": {
+              "timestamp": "str",
+              "loop_count": "int",
+              "last_agent": "Optional[...]",
+              "next_agent": "str",
+              "reason": "str"
+            }
+          },
+          {
+            "name": "PlanStep",
+            "fields": {
+              "agent": "str",
+              "purpose": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlan",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "steps": "List[...]",
+              "estimated_loops": "int",
+              "current_loop": "int"
+            }
+          },
+          {
+            "name": "DelegationResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "agent": "str",
+              "task": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "ResolutionResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "conflicts_found": "int",
+              "conflicts_resolved": "int",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlanResult",
+            "fields": {
+              "status": "str",
+              "task": "str",
+              "tools": "List[...]",
+              "project_id": "str",
+              "intent": "str",
+              "action": "str",
+              "timestamp": "str",
+              "output": "str",
+              "loop_id": "Optional[...]",
+              "next_agent": "Optional[...]",
+              "trigger_result": "Optional[...]",
+              "reason": "Optional[...]",
+              "completed_agent": "Optional[...]",
+              "all_loops_complete": "Optional[...]",
+              "decisions": "Optional[...]",
+              "decision": "Optional[...]",
+              "plan": "Optional[...]",
+              "delegated_agent": "Optional[...]",
+              "delegated_task": "Optional[...]",
+              "delegation_result": "Optional[...]",
+              "resolution": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorErrorResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "Optional[...]",
+              "tools": "Optional[...]",
+              "project_id": "Optional[...]",
+              "intent": "Optional[...]",
+              "action": "Optional[...]",
+              "timestamp": "Optional[...]",
+              "output": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/orchestrator",
+          "/orchestrator/status",
+          "/orchestrator/create",
+          "/orchestrator/update",
+          "/orchestrator/delete",
+          "/orchestrator/list",
+          "/orchestrator/get",
+          "/orchestrator/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+        "module_name": "orchestrator",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "endpoint": {
+        "route_path": "/health",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "health",
+        "matching_schemas": [
+          "health_monitor_schema"
+        ],
+        "best_schema": "health_monitor_schema",
+        "fix_type": "missing_route",
+        "priority": "medium",
+        "schema_models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/health_monitor",
+          "/health_monitor/status",
+          "/health_monitor/create",
+          "/health_monitor/update",
+          "/health_monitor/delete",
+          "/health_monitor/list",
+          "/health_monitor/get",
+          "/health_monitor/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "module_name": "health_monitor",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "endpoint": {
+        "route_path": "/health/config",
+        "method": "GET",
+        "status_code": 500,
+        "module_name": "health",
+        "matching_schemas": [
+          "health_monitor_schema"
+        ],
+        "best_schema": "health_monitor_schema",
+        "fix_type": "server_error",
+        "priority": "medium",
+        "schema_models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/health_monitor",
+          "/health_monitor/status",
+          "/health_monitor/create",
+          "/health_monitor/update",
+          "/health_monitor/delete",
+          "/health_monitor/list",
+          "/health_monitor/get",
+          "/health_monitor/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "module_name": "health_monitor",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": false
+      }
+    },
+    {
+      "endpoint": {
+        "route_path": "/health/check/{component_id}",
+        "method": "GET",
+        "status_code": 500,
+        "module_name": "health",
+        "matching_schemas": [
+          "health_monitor_schema"
+        ],
+        "best_schema": "health_monitor_schema",
+        "fix_type": "server_error",
+        "priority": "medium",
+        "schema_models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/health_monitor",
+          "/health_monitor/status",
+          "/health_monitor/create",
+          "/health_monitor/update",
+          "/health_monitor/delete",
+          "/health_monitor/list",
+          "/health_monitor/get",
+          "/health_monitor/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "module_name": "health_monitor",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": false
+      }
+    },
+    {
+      "endpoint": {
+        "route_path": "/health/maintenance/predict/{component_id}",
+        "method": "GET",
+        "status_code": 500,
+        "module_name": "health",
+        "matching_schemas": [
+          "health_monitor_schema"
+        ],
+        "best_schema": "health_monitor_schema",
+        "fix_type": "server_error",
+        "priority": "medium",
+        "schema_models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/health_monitor",
+          "/health_monitor/status",
+          "/health_monitor/create",
+          "/health_monitor/update",
+          "/health_monitor/delete",
+          "/health_monitor/list",
+          "/health_monitor/get",
+          "/health_monitor/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "module_name": "health_monitor",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": false
+      }
+    },
+    {
+      "endpoint": {
+        "route_path": "/critic/review",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "critic",
+        "matching_schemas": [
+          "critic_schema"
+        ],
+        "best_schema": "critic_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "CriticReviewRequest",
+            "fields": {
+              "loop_id": "str",
+              "agent_outputs": "Dict[...]",
+              "project_id": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticScores",
+            "fields": {
+              "technical_accuracy": "int",
+              "ux_clarity": "int",
+              "visual_design": "int",
+              "monetization_strategy": "int"
+            }
+          },
+          {
+            "name": "CriticUsage",
+            "fields": {
+              "prompt_tokens": "int",
+              "completion_tokens": "int",
+              "total_tokens": "int"
+            }
+          },
+          {
+            "name": "CriticReviewResult",
+            "fields": {
+              "status": "str",
+              "loop_id": "str",
+              "reflection": "Optional[...]",
+              "scores": "Optional[...]",
+              "rejection": "Optional[...]",
+              "rejection_reason": "Optional[...]",
+              "usage": "Optional[...]",
+              "timestamp": "Optional[...]",
+              "message": "Optional[...]",
+              "raw_response": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticRejectRequest",
+            "fields": {
+              "loop_id": "str",
+              "reason": "str",
+              "project_id": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticRejectResult",
+            "fields": {
+              "status": "str",
+              "loop_id": "str",
+              "rejection": "bool",
+              "rejection_reason": "str",
+              "timestamp": "Optional[...]",
+              "message": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticLogReasonRequest",
+            "fields": {
+              "loop_id": "str",
+              "reason_type": "str",
+              "reason_text": "str",
+              "project_id": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticLogReasonResult",
+            "fields": {
+              "status": "str",
+              "loop_id": "str",
+              "reason_type": "str",
+              "reason_text": "str",
+              "timestamp": "Optional[...]",
+              "message": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticErrorResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "Optional[...]",
+              "tools": "Optional[...]",
+              "project_id": "Optional[...]",
+              "loop_id": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/critic",
+          "/critic/status",
+          "/critic/create",
+          "/critic/update",
+          "/critic/delete",
+          "/critic/list",
+          "/critic/get",
+          "/critic/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/critic_router.py",
+        "module_name": "critic",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "endpoint": {
+        "route_path": "/context/{agent_id}",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "context",
+        "matching_schemas": [
+          "agent_context_schema"
+        ],
+        "best_schema": "agent_context_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "MemoryUsage",
+            "fields": {
+              "total_entries": "int",
+              "recent_entries": "int",
+              "tags_count": "Dict[...]",
+              "size_bytes": "Optional[...]"
+            }
+          },
+          {
+            "name": "LoopState",
+            "fields": {
+              "loop_id": "str",
+              "current_step": "int",
+              "total_steps": "int",
+              "started_at": "str",
+              "last_updated": "str",
+              "state": "str"
+            }
+          },
+          {
+            "name": "LastAgentAction",
+            "fields": {
+              "agent_id": "str",
+              "action_type": "str",
+              "timestamp": "str",
+              "status": "str",
+              "details": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentContextRequest",
+            "fields": {
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "include_memory_stats": "bool"
+            }
+          },
+          {
+            "name": "AgentContextResponse",
+            "fields": {
+              "agent_id": "str",
+              "state": "AgentState",
+              "loop_state": "Optional[...]",
+              "last_action": "Optional[...]",
+              "memory_usage": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentContextError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/agent_context",
+          "/agent_context/status",
+          "/agent_context/create",
+          "/agent_context/update",
+          "/agent_context/delete",
+          "/agent_context/list",
+          "/agent_context/get",
+          "/agent_context/search"
+        ],
+        "route_hints": []
+      },
+      "result": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+        "module_name": "agent_context",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": false
+      }
+    }
+  ],
+  "main_py_result": {
+    "success": true,
+    "main_py_path": "/home/ubuntu/personal-ai-agent/app/main.py",
+    "router_imports": [
+      [
+        "routes.agent_config_routes",
+        "router"
+      ],
+      [
+        "routes.agent_context_routes",
+        "router"
+      ],
+      [
+        "routes.agent_router",
+        "router"
+      ],
+      [
+        "routes.agent_routes",
+        "router"
+      ],
+      [
+        "routes.ash_routes",
+        "router"
+      ],
+      [
+        "routes.core_router",
+        "router"
+      ],
+      [
+        "routes.core_routes",
+        "router"
+      ],
+      [
+        "routes.critic_router",
+        "router"
+      ],
+      [
+        "routes.critic_routes",
+        "router"
+      ],
+      [
+        "routes.cto_router",
+        "router"
+      ],
+      [
+        "routes.cto_routes",
+        "router"
+      ],
+      [
+        "routes.dashboard_routes",
+        "router"
+      ],
+      [
+        "routes.debug_hal_schema",
+        "router"
+      ],
+      [
+        "routes.debug_router",
+        "router"
+      ],
+      [
+        "routes.debug_routes",
+        "router"
+      ],
+      [
+        "routes.debug_status",
+        "router"
+      ],
+      [
+        "routes.debugger_router",
+        "router"
+      ],
+      [
+        "routes.debugger_routes",
+        "router"
+      ],
+      [
+        "routes.delegate_stream_routes",
+        "router"
+      ],
+      [
+        "routes.diagnostics_routes",
+        "router"
+      ],
+      [
+        "routes.drift_routes",
+        "router"
+      ],
+      [
+        "routes.drift_routes_router",
+        "router"
+      ],
+      [
+        "routes.export_routes",
+        "router"
+      ],
+      [
+        "routes.fix_routes",
+        "router"
+      ],
+      [
+        "routes.forge_routes",
+        "router"
+      ],
+      [
+        "routes.guardian_router",
+        "router"
+      ],
+      [
+        "routes.guardian_routes",
+        "router"
+      ],
+      [
+        "routes.hal_routes",
+        "router"
+      ],
+      [
+        "routes.hal_routes_loader",
+        "router"
+      ],
+      [
+        "routes.hal_routes_router",
+        "router"
+      ],
+      [
+        "routes.health_monitor_routes",
+        "router"
+      ],
+      [
+        "routes.historian_router",
+        "router"
+      ],
+      [
+        "routes.historian_routes",
+        "router"
+      ],
+      [
+        "routes.loop_router",
+        "router"
+      ],
+      [
+        "routes.loop_routes",
+        "router"
+      ],
+      [
+        "routes.loop_validation_routes",
+        "router"
+      ],
+      [
+        "routes.memory_embed_routes",
+        "router"
+      ],
+      [
+        "routes.memory_recall_routes",
+        "router"
+      ],
+      [
+        "routes.memory_router",
+        "router"
+      ],
+      [
+        "routes.memory_routes",
+        "router"
+      ],
+      [
+        "routes.nova_router",
+        "router"
+      ],
+      [
+        "routes.nova_routes",
+        "router"
+      ],
+      [
+        "routes.observer_router",
+        "router"
+      ],
+      [
+        "routes.observer_routes",
+        "router"
+      ],
+      [
+        "routes.orchestrator_contract_routes",
+        "router"
+      ],
+      [
+        "routes.orchestrator_plan_routes",
+        "router"
+      ],
+      [
+        "routes.orchestrator_router",
+        "router"
+      ],
+      [
+        "routes.orchestrator_routes",
+        "router"
+      ],
+      [
+        "routes.output_policy_routes",
+        "router"
+      ],
+      [
+        "routes.persona_router",
+        "router"
+      ],
+      [
+        "routes.persona_routes",
+        "router"
+      ],
+      [
+        "routes.pessimist_evaluation_routes",
+        "router"
+      ],
+      [
+        "routes.pessimist_router",
+        "router"
+      ],
+      [
+        "routes.pessimist_routes",
+        "router"
+      ],
+      [
+        "routes.plan_generate_routes",
+        "router"
+      ],
+      [
+        "routes.reflection_router",
+        "router"
+      ],
+      [
+        "routes.reflection_routes",
+        "router"
+      ],
+      [
+        "routes.sage_router",
+        "router"
+      ],
+      [
+        "routes.sage_routes",
+        "router"
+      ],
+      [
+        "routes.self_router",
+        "router"
+      ],
+      [
+        "routes.self_routes",
+        "router"
+      ],
+      [
+        "routes.sitegen_router",
+        "router"
+      ],
+      [
+        "routes.sitegen_routes",
+        "router"
+      ],
+      [
+        "routes.snapshot_routes",
+        "router"
+      ],
+      [
+        "routes.status_debug",
+        "router"
+      ],
+      [
+        "routes.train_routes",
+        "router"
+      ],
+      [
+        "routes.trust_router",
+        "router"
+      ],
+      [
+        "routes.trust_routes",
+        "router"
+      ]
+    ]
+  },
+  "total_fixed": 10,
+  "success_count": 10,
+  "failure_count": 0
+}

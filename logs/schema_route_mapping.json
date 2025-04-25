@@ -1,0 +1,2161 @@
+[
+  {
+    "schema_name": "agent_config_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/agent_config_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "agent_config_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/config/{agent_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/config"
+          },
+          {
+            "method": "DELETE",
+            "path": "/config/{agent_id}"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "agent_config_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/config/{agent_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/config"
+          },
+          {
+            "method": "DELETE",
+            "path": "/config/{agent_id}"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "agent_context_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/agent_context_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "agent_context_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/context/{agent_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/context"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "agent_context_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/context/{agent_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/context"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "agent_contract_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/agent_contract_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "orchestrator_contract_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_contract_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/orchestrator/validate_contract"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/validate_delegation"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/handle_violation"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/check_recovery_authorization"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "orchestrator_contract_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_contract_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/orchestrator/validate_contract"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/validate_delegation"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/handle_violation"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/check_recovery_authorization"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "ash_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/ash_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "ash_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/ash_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/analyze"
+          },
+          {
+            "method": "POST",
+            "path": "/test"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "ash_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/ash_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/analyze"
+          },
+          {
+            "method": "POST",
+            "path": "/test"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "ceo_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/ceo_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [],
+    "modules_with_routers": []
+  },
+  {
+    "schema_name": "critic_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/critic_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "critic_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/critic_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/critic/status"
+          }
+        ]
+      },
+      {
+        "name": "critic_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/critic_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/critic/review"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "critic_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/critic_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/critic/status"
+          }
+        ]
+      },
+      {
+        "name": "critic_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/critic_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/critic/review"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "cto_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/cto_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "cto_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/cto_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/cto/status"
+          }
+        ]
+      },
+      {
+        "name": "cto_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/cto_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/audit"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "cto_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/cto_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/cto/status"
+          }
+        ]
+      },
+      {
+        "name": "cto_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/cto_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/audit"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "debug_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/debug_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "debug_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/debug_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status"
+          }
+        ]
+      },
+      {
+        "name": "debug_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/debug_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/debug/analyze-loop"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "debug_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/debug_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status"
+          }
+        ]
+      },
+      {
+        "name": "debug_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/debug_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/debug/analyze-loop"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "debugger_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/debugger_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "debugger_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/debugger_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/debugger/status"
+          }
+        ]
+      },
+      {
+        "name": "debugger_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/debugger_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/api/debugger/trace"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "debugger_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/debugger_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/debugger/status"
+          }
+        ]
+      },
+      {
+        "name": "debugger_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/debugger_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/api/debugger/trace"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "delegate_stream_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/delegate_stream_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "delegate_stream_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/delegate_stream_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status/{stream_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/status"
+          },
+          {
+            "method": "POST",
+            "path": "/close"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "delegate_stream_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/delegate_stream_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status/{stream_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/status"
+          },
+          {
+            "method": "POST",
+            "path": "/close"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "drift_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/drift_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "drift_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/drift_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/drift/history/{loop_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/drift/monitor"
+          }
+        ]
+      },
+      {
+        "name": "drift_routes_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/drift_routes_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/drift_routes/status"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "drift_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/drift_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/drift/history/{loop_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/drift/monitor"
+          }
+        ]
+      },
+      {
+        "name": "drift_routes_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/drift_routes_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/drift_routes/status"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "export_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/export_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "export_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/export_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status/{export_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/status"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "export_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/export_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status/{export_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/status"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "fix_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/fix_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "fix_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/fix_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status/{fix_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/status"
+          },
+          {
+            "method": "POST",
+            "path": "/rollback"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "fix_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/fix_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status/{fix_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/status"
+          },
+          {
+            "method": "POST",
+            "path": "/rollback"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "forge_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/forge_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "forge_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/forge_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/forge/build"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "forge_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/forge_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/forge/build"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "guardian_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/guardian_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "guardian_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/guardian_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/guardian/status"
+          }
+        ]
+      },
+      {
+        "name": "guardian_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/guardian_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/override"
+          },
+          {
+            "method": "POST",
+            "path": "/rollback"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "guardian_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/guardian_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/guardian/status"
+          }
+        ]
+      },
+      {
+        "name": "guardian_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/guardian_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/override"
+          },
+          {
+            "method": "POST",
+            "path": "/rollback"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "hal_agent",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/hal_agent.schema.json",
+    "schema_type": "json",
+    "potential_route_modules": [],
+    "modules_with_routers": []
+  },
+  {
+    "schema_name": "health_monitor_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/health_monitor_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "health_monitor_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health/check/{component_id}"
+          },
+          {
+            "method": "GET",
+            "path": "/health/system"
+          },
+          {
+            "method": "GET",
+            "path": "/health/maintenance/predict/{component_id}"
+          },
+          {
+            "method": "GET",
+            "path": "/health/config"
+          },
+          {
+            "method": "POST",
+            "path": "/health/check"
+          },
+          {
+            "method": "POST",
+            "path": "/health/maintenance/predict"
+          },
+          {
+            "method": "POST",
+            "path": "/health/healing"
+          },
+          {
+            "method": "POST",
+            "path": "/health/config"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "health_monitor_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health/check/{component_id}"
+          },
+          {
+            "method": "GET",
+            "path": "/health/system"
+          },
+          {
+            "method": "GET",
+            "path": "/health/maintenance/predict/{component_id}"
+          },
+          {
+            "method": "GET",
+            "path": "/health/config"
+          },
+          {
+            "method": "POST",
+            "path": "/health/check"
+          },
+          {
+            "method": "POST",
+            "path": "/health/maintenance/predict"
+          },
+          {
+            "method": "POST",
+            "path": "/health/healing"
+          },
+          {
+            "method": "POST",
+            "path": "/health/config"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "historian_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/historian_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "historian_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/historian_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/historian/status"
+          }
+        ]
+      },
+      {
+        "name": "historian_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/historian_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/api/historian/log"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "historian_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/historian_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/historian/status"
+          }
+        ]
+      },
+      {
+        "name": "historian_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/historian_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/api/historian/log"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "loop_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/loop_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "loop_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/loop_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/loop/status"
+          }
+        ]
+      },
+      {
+        "name": "loop_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/loop_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/api/loop/trace"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/plan"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/complete"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/respond"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/validate"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/trace"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/reset"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/persona-reflect"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "loop_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/loop_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/loop/status"
+          }
+        ]
+      },
+      {
+        "name": "loop_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/loop_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/api/loop/trace"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/plan"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/complete"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/respond"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/validate"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/trace"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/reset"
+          },
+          {
+            "method": "POST",
+            "path": "/api/loop/persona-reflect"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "loop_snapshot_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/loop_snapshot_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "snapshot_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/snapshot_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/loop/snapshot/list/{loop_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/loop/snapshot/save"
+          },
+          {
+            "method": "POST",
+            "path": "/loop/snapshot/restore"
+          },
+          {
+            "method": "DELETE",
+            "path": "/loop/snapshot/{loop_id}"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "snapshot_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/snapshot_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/loop/snapshot/list/{loop_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/loop/snapshot/save"
+          },
+          {
+            "method": "POST",
+            "path": "/loop/snapshot/restore"
+          },
+          {
+            "method": "DELETE",
+            "path": "/loop/snapshot/{loop_id}"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "loop_trace",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/loop_trace.py",
+    "schema_type": "python",
+    "potential_route_modules": [],
+    "modules_with_routers": []
+  },
+  {
+    "schema_name": "loop_validation_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/loop_validation_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "loop_validation_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/loop_validation_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/validate"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "loop_validation_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/loop_validation_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/validate"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "memory",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/memory.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "critic_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/critic_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/critic/review"
+          }
+        ]
+      },
+      {
+        "name": "drift_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/drift_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/drift/history/{loop_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/drift/monitor"
+          }
+        ]
+      },
+      {
+        "name": "memory_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/memory_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/memory/status"
+          }
+        ]
+      },
+      {
+        "name": "memory_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/memory_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/api/memory/ping"
+          },
+          {
+            "method": "GET",
+            "path": "/api/memory/read"
+          },
+          {
+            "method": "POST",
+            "path": "/api/memory/write"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "critic_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/critic_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/critic/review"
+          }
+        ]
+      },
+      {
+        "name": "drift_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/drift_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/drift/history/{loop_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/drift/monitor"
+          }
+        ]
+      },
+      {
+        "name": "memory_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/memory_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/memory/status"
+          }
+        ]
+      },
+      {
+        "name": "memory_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/memory_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/api/memory/ping"
+          },
+          {
+            "method": "GET",
+            "path": "/api/memory/read"
+          },
+          {
+            "method": "POST",
+            "path": "/api/memory/write"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "memory_embed_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/memory_embed_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "memory_embed_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/memory_embed_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/embed"
+          },
+          {
+            "method": "POST",
+            "path": "/embed/batch"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "memory_embed_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/memory_embed_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/embed"
+          },
+          {
+            "method": "POST",
+            "path": "/embed/batch"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "memory_recall_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/memory_recall_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "memory_recall_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/memory_recall_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/recall"
+          },
+          {
+            "method": "POST",
+            "path": "/recall"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "memory_recall_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/memory_recall_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/recall"
+          },
+          {
+            "method": "POST",
+            "path": "/recall"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "nova_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/nova_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "nova_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/nova_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/nova/status"
+          }
+        ]
+      },
+      {
+        "name": "nova_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/nova_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/build-ui"
+          },
+          {
+            "method": "POST",
+            "path": "/generate-component"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "nova_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/nova_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/nova/status"
+          }
+        ]
+      },
+      {
+        "name": "nova_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/nova_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/build-ui"
+          },
+          {
+            "method": "POST",
+            "path": "/generate-component"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "observer_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/observer_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "observer_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/observer_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/observer/status"
+          }
+        ]
+      },
+      {
+        "name": "observer_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/observer_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/journal"
+          },
+          {
+            "method": "POST",
+            "path": "/observe"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "observer_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/observer_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/observer/status"
+          }
+        ]
+      },
+      {
+        "name": "observer_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/observer_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/journal"
+          },
+          {
+            "method": "POST",
+            "path": "/observe"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "orchestrator_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/orchestrator_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "orchestrator_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/api/orchestrator/status"
+          }
+        ]
+      },
+      {
+        "name": "orchestrator_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/orchestrator/available-modes"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/loop-complete"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/validate-loop"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/determine-mode"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/visualize-loop"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/inspect-memory"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/memory-snapshot"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "orchestrator_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/api/orchestrator/status"
+          }
+        ]
+      },
+      {
+        "name": "orchestrator_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/orchestrator/available-modes"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/loop-complete"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/validate-loop"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/determine-mode"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/visualize-loop"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/inspect-memory"
+          },
+          {
+            "method": "POST",
+            "path": "/orchestrator/memory-snapshot"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "output_policy_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/output_policy_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "output_policy_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/output_policy_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/enforce"
+          },
+          {
+            "method": "POST",
+            "path": "/logs"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "output_policy_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/output_policy_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/enforce"
+          },
+          {
+            "method": "POST",
+            "path": "/logs"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "pessimist_evaluation_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/pessimist_evaluation_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "pessimist_evaluation_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/pessimist_evaluation_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/evaluate"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "pessimist_evaluation_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/pessimist_evaluation_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/evaluate"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "pessimist_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/pessimist_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "pessimist_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/pessimist_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/pessimist/status"
+          }
+        ]
+      },
+      {
+        "name": "pessimist_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/pessimist_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/check"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "pessimist_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/pessimist_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/pessimist/status"
+          }
+        ]
+      },
+      {
+        "name": "pessimist_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/pessimist_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/check"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "plan_generate_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/plan_generate_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "plan_generate_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/plan_generate_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/generate"
+          },
+          {
+            "method": "POST",
+            "path": "/generate"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "plan_generate_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/plan_generate_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/generate"
+          },
+          {
+            "method": "POST",
+            "path": "/generate"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "sage_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/sage_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "sage_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/sage_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/sage/status"
+          }
+        ]
+      },
+      {
+        "name": "sage_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/sage_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/review"
+          },
+          {
+            "method": "POST",
+            "path": "/run"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "sage_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/sage_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/sage/status"
+          }
+        ]
+      },
+      {
+        "name": "sage_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/sage_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/review"
+          },
+          {
+            "method": "POST",
+            "path": "/run"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "self_challenge_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/self_challenge_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "self_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/self_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/reflect"
+          },
+          {
+            "method": "POST",
+            "path": "/revise"
+          },
+          {
+            "method": "POST",
+            "path": "/reinforce"
+          },
+          {
+            "method": "POST",
+            "path": "/challenge"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "self_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/self_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/reflect"
+          },
+          {
+            "method": "POST",
+            "path": "/revise"
+          },
+          {
+            "method": "POST",
+            "path": "/reinforce"
+          },
+          {
+            "method": "POST",
+            "path": "/challenge"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "self_reflection_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/self_reflection_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "self_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/self_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/reflect"
+          },
+          {
+            "method": "POST",
+            "path": "/revise"
+          },
+          {
+            "method": "POST",
+            "path": "/reinforce"
+          },
+          {
+            "method": "POST",
+            "path": "/challenge"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "self_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/self_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/reflect"
+          },
+          {
+            "method": "POST",
+            "path": "/revise"
+          },
+          {
+            "method": "POST",
+            "path": "/reinforce"
+          },
+          {
+            "method": "POST",
+            "path": "/challenge"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "self_reinforcement_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/self_reinforcement_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "self_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/self_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/reflect"
+          },
+          {
+            "method": "POST",
+            "path": "/revise"
+          },
+          {
+            "method": "POST",
+            "path": "/reinforce"
+          },
+          {
+            "method": "POST",
+            "path": "/challenge"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "self_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/self_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/reflect"
+          },
+          {
+            "method": "POST",
+            "path": "/revise"
+          },
+          {
+            "method": "POST",
+            "path": "/reinforce"
+          },
+          {
+            "method": "POST",
+            "path": "/challenge"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "self_revision_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/self_revision_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "self_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/self_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/reflect"
+          },
+          {
+            "method": "POST",
+            "path": "/revise"
+          },
+          {
+            "method": "POST",
+            "path": "/reinforce"
+          },
+          {
+            "method": "POST",
+            "path": "/challenge"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "self_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/self_routes.py",
+        "match_type": "import",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "POST",
+            "path": "/reflect"
+          },
+          {
+            "method": "POST",
+            "path": "/revise"
+          },
+          {
+            "method": "POST",
+            "path": "/reinforce"
+          },
+          {
+            "method": "POST",
+            "path": "/challenge"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "sitegen_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/sitegen_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "sitegen_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/sitegen_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/sitegen/status"
+          }
+        ]
+      },
+      {
+        "name": "sitegen_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/sitegen_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/plan"
+          },
+          {
+            "method": "POST",
+            "path": "/analyze"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "sitegen_router",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/sitegen_router.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/sitegen/status"
+          }
+        ]
+      },
+      {
+        "name": "sitegen_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/sitegen_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/health"
+          },
+          {
+            "method": "POST",
+            "path": "/plan"
+          },
+          {
+            "method": "POST",
+            "path": "/analyze"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "train_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/train_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [
+      {
+        "name": "train_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/train_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status/{model_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/status"
+          }
+        ]
+      }
+    ],
+    "modules_with_routers": [
+      {
+        "name": "train_routes",
+        "path": "/home/ubuntu/personal-ai-agent/app/routes/train_routes.py",
+        "match_type": "direct",
+        "has_router": true,
+        "path_operations": [
+          {
+            "method": "GET",
+            "path": "/status/{model_id}"
+          },
+          {
+            "method": "POST",
+            "path": "/status"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "schema_name": "trainer_schema",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/trainer_schema.py",
+    "schema_type": "python",
+    "potential_route_modules": [],
+    "modules_with_routers": []
+  },
+  {
+    "schema_name": "hal_agent",
+    "schema_path": "/home/ubuntu/personal-ai-agent/app/schemas/schemas/hal_agent.schema.json",
+    "schema_type": "json",
+    "potential_route_modules": [],
+    "modules_with_routers": []
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "event_type": "endpoint_repair_report",
+  "timestamp": "20250425_2310",
+  "tag": "endpoint_repair_report_20250425_2310",
+  "success_rate": 29.4,
+  "operational_rate": 29.4,
+  "fixed_endpoints_success_rate": 0.0,
+  "critical_failures_count": 14,
+  "next_steps": "Deploy local fixes to server and continue fixing remaining endpoints"
+}

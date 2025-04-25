@@ -1,0 +1,850 @@
+{
+  "timestamp": "20250425_2246",
+  "memory_tag": "postman_sweep_20250425_2246",
+  "backend_url": "https://personal-ai-agent-ji4s.onrender.com",
+  "results": [
+    {
+      "route_path": "/config/{agent_id}",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 135
+    },
+    {
+      "route_path": "/context/{agent_id}",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 144
+    },
+    {
+      "route_path": "/config",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 161
+    },
+    {
+      "route_path": "/config/{agent_id}",
+      "method": "DELETE",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 179
+    },
+    {
+      "route_path": "/orchestrator/validate_delegation",
+      "method": "POST",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 159
+    },
+    {
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "method": "POST",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 133
+    },
+    {
+      "route_path": "/context",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 395
+    },
+    {
+      "route_path": "/analyze",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 123
+    },
+    {
+      "route_path": "/orchestrator/validate_contract",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 321
+    },
+    {
+      "route_path": "/orchestrator/handle_violation",
+      "method": "POST",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 330
+    },
+    {
+      "route_path": "/critic/review",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 140
+    },
+    {
+      "route_path": "/cto/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 131
+    },
+    {
+      "route_path": "/test",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 301
+    },
+    {
+      "route_path": "/critic/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 323
+    },
+    {
+      "route_path": "/status",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 163
+    },
+    {
+      "route_path": "/debug/analyze-loop",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 132
+    },
+    {
+      "route_path": "/health",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 312
+    },
+    {
+      "route_path": "/api/debugger/trace",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 138
+    },
+    {
+      "route_path": "/audit",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 325
+    },
+    {
+      "route_path": "/status",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 127
+    },
+    {
+      "route_path": "/status/{stream_id}",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 289
+    },
+    {
+      "route_path": "/debugger/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 326
+    },
+    {
+      "route_path": "/close",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 163
+    },
+    {
+      "route_path": "/status/{export_id}",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 124
+    },
+    {
+      "route_path": "/drift/monitor",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 295
+    },
+    {
+      "route_path": "/drift/history/{loop_id}",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 336
+    },
+    {
+      "route_path": "/status/{fix_id}",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 141
+    },
+    {
+      "route_path": "/drift_routes/status",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 300
+    },
+    {
+      "route_path": "/status",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 302
+    },
+    {
+      "route_path": "/status",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 132
+    },
+    {
+      "route_path": "/rollback",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 138
+    },
+    {
+      "route_path": "/forge/build",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 282
+    },
+    {
+      "route_path": "/guardian/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 305
+    },
+    {
+      "route_path": "/rollback",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 295
+    },
+    {
+      "route_path": "/override",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 304
+    },
+    {
+      "route_path": "/health/config",
+      "method": "GET",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 159
+    },
+    {
+      "route_path": "/health/check",
+      "method": "POST",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 155
+    },
+    {
+      "route_path": "/health/system",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 371
+    },
+    {
+      "route_path": "/health/healing",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 151
+    },
+    {
+      "route_path": "/health/maintenance/predict",
+      "method": "POST",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 306
+    },
+    {
+      "route_path": "/health/config",
+      "method": "POST",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 158
+    },
+    {
+      "route_path": "/loop/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 130
+    },
+    {
+      "route_path": "/api/historian/log",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 139
+    },
+    {
+      "route_path": "/historian/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 320
+    },
+    {
+      "route_path": "/api/loop/trace",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 130
+    },
+    {
+      "route_path": "/api/loop/complete",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 135
+    },
+    {
+      "route_path": "/api/loop/plan",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 190
+    },
+    {
+      "route_path": "/api/loop/trace",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 123
+    },
+    {
+      "route_path": "/api/loop/validate",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 286
+    },
+    {
+      "route_path": "/api/loop/respond",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 355
+    },
+    {
+      "route_path": "/api/loop/reset",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 192
+    },
+    {
+      "route_path": "/api/loop/persona-reflect",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 131
+    },
+    {
+      "route_path": "/loop/snapshot/list/{loop_id}",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 140
+    },
+    {
+      "route_path": "/loop/snapshot/save",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 135
+    },
+    {
+      "route_path": "/loop/snapshot/restore",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 125
+    },
+    {
+      "route_path": "/critic/review",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 152
+    },
+    {
+      "route_path": "/loop/snapshot/{loop_id}",
+      "method": "DELETE",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 294
+    },
+    {
+      "route_path": "/validate",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 308
+    },
+    {
+      "route_path": "/drift/history/{loop_id}",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 133
+    },
+    {
+      "route_path": "/drift/monitor",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 137
+    },
+    {
+      "route_path": "/memory/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 120
+    },
+    {
+      "route_path": "/api/memory/ping",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 150
+    },
+    {
+      "route_path": "/api/memory/read",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 120
+    },
+    {
+      "route_path": "/api/memory/write",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 125
+    },
+    {
+      "route_path": "/embed/batch",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 141
+    },
+    {
+      "route_path": "/recall",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 145
+    },
+    {
+      "route_path": "/recall",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 129
+    },
+    {
+      "route_path": "/embed",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 312
+    },
+    {
+      "route_path": "/nova/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 160
+    },
+    {
+      "route_path": "/generate-component",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 132
+    },
+    {
+      "route_path": "/health",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 273
+    },
+    {
+      "route_path": "/observer/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 109
+    },
+    {
+      "route_path": "/build-ui",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 344
+    },
+    {
+      "route_path": "/health",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 132
+    },
+    {
+      "route_path": "/journal",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 153
+    },
+    {
+      "route_path": "/observe",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 121
+    },
+    {
+      "route_path": "/api/orchestrator/status",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 130
+    },
+    {
+      "route_path": "/orchestrator/available-modes",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 134
+    },
+    {
+      "route_path": "/orchestrator/loop-complete",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 164
+    },
+    {
+      "route_path": "/orchestrator/determine-mode",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 128
+    },
+    {
+      "route_path": "/orchestrator/visualize-loop",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 143
+    },
+    {
+      "route_path": "/orchestrator/inspect-memory",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 137
+    },
+    {
+      "route_path": "/orchestrator/validate-loop",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 326
+    },
+    {
+      "route_path": "/orchestrator/memory-snapshot",
+      "method": "POST",
+      "status": "422 Unprocessable Entity",
+      "status_code": 422,
+      "response_time_ms": 143
+    },
+    {
+      "route_path": "/logs",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 127
+    },
+    {
+      "route_path": "/enforce",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 142
+    },
+    {
+      "route_path": "/pessimist/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 115
+    },
+    {
+      "route_path": "/health",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 142
+    },
+    {
+      "route_path": "/evaluate",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 340
+    },
+    {
+      "route_path": "/generate",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 135
+    },
+    {
+      "route_path": "/sage/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 130
+    },
+    {
+      "route_path": "/check",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 306
+    },
+    {
+      "route_path": "/generate",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 307
+    },
+    {
+      "route_path": "/run",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 173
+    },
+    {
+      "route_path": "/review",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 272
+    },
+    {
+      "route_path": "/reflect",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 113
+    },
+    {
+      "route_path": "/revise",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 124
+    },
+    {
+      "route_path": "/reflect",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 132
+    },
+    {
+      "route_path": "/reinforce",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 308
+    },
+    {
+      "route_path": "/challenge",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 319
+    },
+    {
+      "route_path": "/reinforce",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 129
+    },
+    {
+      "route_path": "/challenge",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 132
+    },
+    {
+      "route_path": "/revise",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 326
+    },
+    {
+      "route_path": "/revise",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 296
+    },
+    {
+      "route_path": "/reflect",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 322
+    },
+    {
+      "route_path": "/reinforce",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 313
+    },
+    {
+      "route_path": "/reflect",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 135
+    },
+    {
+      "route_path": "/challenge",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 140
+    },
+    {
+      "route_path": "/revise",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 131
+    },
+    {
+      "route_path": "/reinforce",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 117
+    },
+    {
+      "route_path": "/sitegen/status",
+      "method": "GET",
+      "status": "200 OK",
+      "status_code": 200,
+      "response_time_ms": 151
+    },
+    {
+      "route_path": "/challenge",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 324
+    },
+    {
+      "route_path": "/health",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 317
+    },
+    {
+      "route_path": "/analyze",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 146
+    },
+    {
+      "route_path": "/plan",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 324
+    },
+    {
+      "route_path": "/status",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 135
+    },
+    {
+      "route_path": "/status/{model_id}",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 333
+    },
+    {
+      "route_path": "/health/check/{component_id}",
+      "method": "GET",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 6138
+    },
+    {
+      "route_path": "/health/maintenance/predict/{component_id}",
+      "method": "GET",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 6331
+    }
+  ],
+  "analysis": {
+    "total_endpoints": 119,
+    "success_count": 20,
+    "unprocessable_count": 15,
+    "not_found_count": 77,
+    "method_not_allowed_count": 0,
+    "server_error_count": 7,
+    "error_count": 0,
+    "success_rate": 29.4
+  }
+}
