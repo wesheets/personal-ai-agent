@@ -1,1 +1,1 @@
-# force redeploy
+This file triggers a clean rebuild to ensure debug_status.py is included in deployment
