@@ -43,7 +43,7 @@ class HALAgent(Agent):
                 "vibe": "methodical",
                 "persona": "Careful implementer with strong safety focus"
             },
-            schema_path="schemas/hal_safety_check.schema.json",
+            schema_path="schemas/agent_output/hal_safety_check.schema.json",
             trust_score=0.92,
             contract_version="1.0.0"
         )
