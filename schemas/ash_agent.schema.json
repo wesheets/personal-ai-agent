@@ -1,0 +1,271 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ASH Agent Schema",
+  "description": "Schema for ASH agent requests and responses",
+  "type": "object",
+  "properties": {
+    "analysis_request": {
+      "type": "object",
+      "properties": {
+        "scenario_id": {
+          "type": "string",
+          "description": "Unique identifier for the scenario to analyze"
+        },
+        "context": {
+          "type": "object",
+          "description": "Context information for the analysis"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of constraints to consider in the analysis"
+        },
+        "risk_tolerance": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Risk tolerance level (0.0 to 1.0, with 1.0 being highest)"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of tools to use for the analysis"
+        }
+      },
+      "required": ["scenario_id", "context"],
+      "additionalProperties": false
+    },
+    "risk_factor": {
+      "type": "object",
+      "properties": {
+        "factor_id": {
+          "type": "string",
+          "description": "Unique identifier for the risk factor"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the risk factor"
+        },
+        "probability": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Probability of the risk factor (0.0 to 1.0)"
+        },
+        "impact": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Impact of the risk factor (0.0 to 1.0)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the risk factor"
+        },
+        "mitigation_strategies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of mitigation strategies"
+        }
+      },
+      "required": ["factor_id", "name", "probability", "impact", "description"],
+      "additionalProperties": false
+    },
+    "analysis_result": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "Status of the analysis (success, error)"
+        },
+        "scenario_id": {
+          "type": "string",
+          "description": "Scenario identifier"
+        },
+        "risk_assessment": {
+          "type": "string",
+          "description": "Overall risk assessment"
+        },
+        "risk_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/risk_factor"
+          },
+          "description": "List of identified risk factors"
+        },
+        "anomalies_detected": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of detected anomalies"
+        },
+        "recommended_actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of recommended actions"
+        },
+        "overall_risk_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Overall risk score (0.0 to 1.0)"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of the analysis"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message if status is error"
+        }
+      },
+      "required": ["status", "scenario_id", "timestamp"],
+      "additionalProperties": false
+    },
+    "test_request": {
+      "type": "object",
+      "properties": {
+        "scenario_id": {
+          "type": "string",
+          "description": "Unique identifier for the scenario to test"
+        },
+        "test_parameters": {
+          "type": "object",
+          "description": "Parameters for the test"
+        },
+        "expected_outcomes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of expected outcomes"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of tools to use for the test"
+        }
+      },
+      "required": ["scenario_id", "test_parameters"],
+      "additionalProperties": false
+    },
+    "test_result": {
+      "type": "object",
+      "properties": {
+        "test_id": {
+          "type": "string",
+          "description": "Unique identifier for the test"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the test"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the test (passed, failed, error)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the test"
+        },
+        "actual_outcome": {
+          "type": "string",
+          "description": "Actual outcome of the test"
+        },
+        "expected_outcome": {
+          "type": "string",
+          "description": "Expected outcome of the test"
+        }
+      },
+      "required": ["test_id", "name", "status", "description", "actual_outcome"],
+      "additionalProperties": false
+    },
+    "test_result_collection": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "Status of the test (success, error)"
+        },
+        "scenario_id": {
+          "type": "string",
+          "description": "Scenario identifier"
+        },
+        "test_summary": {
+          "type": "string",
+          "description": "Summary of the test results"
+        },
+        "test_results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/test_result"
+          },
+          "description": "List of individual test results"
+        },
+        "anomalies_detected": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of detected anomalies during testing"
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of recommendations based on test results"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of the test"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message if status is error"
+        }
+      },
+      "required": ["status", "scenario_id", "timestamp"],
+      "additionalProperties": false
+    },
+    "error_result": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["error"],
+          "description": "Status of the operation"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message"
+        },
+        "scenario_id": {
+          "type": "string",
+          "description": "Scenario identifier if applicable"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of the error"
+        }
+      },
+      "required": ["status", "message", "timestamp"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
