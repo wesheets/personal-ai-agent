@@ -1,0 +1,62 @@
+{
+  "registered_routes": [
+    "/agent/builder",
+    "/agent/ops",
+    "/agent/research",
+    "/agent/memory",
+    "/memory/add",
+    "/memory/search",
+    "/upload_file",
+    "/upload_base64"
+  ],
+  "enabled_modules": [
+    "core",
+    "memory",
+    "agents",
+    "tools",
+    "orchestrator",
+    "file_ingest"
+  ],
+  "agents_registered": [
+    {
+      "name": "builder",
+      "model": "gpt-4",
+      "personality": "Blunt, precise, senior backend engineer",
+      "memory_enabled": true,
+      "tools_enabled": true
+    },
+    {
+      "name": "ops",
+      "model": "claude-3-sonnet",
+      "personality": "Methodical DevOps specialist",
+      "memory_enabled": true,
+      "tools_enabled": true
+    },
+    {
+      "name": "research",
+      "model": "gpt-4",
+      "personality": "Thorough academic researcher",
+      "memory_enabled": true,
+      "tools_enabled": true
+    }
+  ],
+  "schemas_active": [
+    "memory_schema",
+    "agent_config_schema",
+    "tool_schema",
+    "execution_log_schema",
+    "rationale_log_schema",
+    "file_ingest_schema"
+  ],
+  "tools_enabled": [
+    "web_search",
+    "url_summarizer",
+    "pdf_ingest",
+    "code_executor",
+    "github_commit",
+    "image_caption",
+    "email_drafter"
+  ],
+  "timestamp": "20250425_221721",
+  "last_snapshot_hash": "7e82c462554230d8ac98fdd9e08bc9e82411f0fd184005c9a6c5b54edf79307c"
+}
