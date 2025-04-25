@@ -1,5 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from typing import Dict, List, Any, Optional
+"""
+Debug Router Module
+
+This module registers all debug-related routes with the FastAPI application.
+"""
+
+from fastapi import APIRouter
 import logging
 
 # Configure logging
@@ -29,13 +34,13 @@ router = APIRouter(
 )
 
 # Include the HAL schema debug router
-router.include_router(hal_schema_router)
+router.include_router(hal_schema_router, prefix="")
 print("✅ Included debug_hal_schema_router")
 logger.info("✅ Included debug_hal_schema_router")
 
 # Include the debug status router if loaded
 if status_router_loaded:
-    router.include_router(status_router)
+    router.include_router(status_router, prefix="")
     print("✅ Included debug_status_router")
     logger.info("✅ Included debug_status_router")
 else:
@@ -45,4 +50,4 @@ else:
         # Return the status of the debug module
         return {"status": "degraded", "module": "debug", "message": "Using fallback implementation"}
     print("⚠️ Using fallback debug_status implementation")
-    logger.warning("⚠️ Using fallback debug_status implementation")bug"}
+    logger.warning("⚠️ Using fallback debug_status implementation")
