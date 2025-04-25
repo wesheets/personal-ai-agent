@@ -1,0 +1,138 @@
+{
+  "timestamp": "20250425_2249",
+  "memory_tag": "endpoint_fix_20250425_2249",
+  "backend_url": "https://personal-ai-agent-ji4s.onrender.com",
+  "deployment_refresh": {
+    "status_code": 200,
+    "response_time_ms": 128,
+    "success": true
+  },
+  "critical_endpoints": 15,
+  "verification_results": [
+    {
+      "route_path": "/api/loop/trace",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 156,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/loop/complete",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 135,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/loop/plan",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 362,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/loop/trace",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 146,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/loop/respond",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 355,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/loop/reset",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 288,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/loop/persona-reflect",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 299,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/memory/ping",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 141,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/memory/read",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 132,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/memory/write",
+      "method": "POST",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 141,
+      "fixed": false
+    },
+    {
+      "route_path": "/api/orchestrator/status",
+      "method": "GET",
+      "status": "404 Not Found",
+      "status_code": 404,
+      "response_time_ms": 306,
+      "fixed": false
+    },
+    {
+      "route_path": "/orchestrator/validate_delegation",
+      "method": "POST",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 126,
+      "fixed": false
+    },
+    {
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "method": "POST",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 323,
+      "fixed": false
+    },
+    {
+      "route_path": "/orchestrator/handle_violation",
+      "method": "POST",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 138,
+      "fixed": false
+    },
+    {
+      "route_path": "/loop/snapshot/{loop_id}",
+      "method": "DELETE",
+      "status": "500 Internal Server Error",
+      "status_code": 500,
+      "response_time_ms": 146,
+      "fixed": false
+    }
+  ],
+  "analysis": {
+    "total_critical_endpoints": 15,
+    "fixed_count": 0,
+    "fix_rate": 0.0
+  }
+}

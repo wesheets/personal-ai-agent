@@ -1,0 +1,35 @@
+{
+  "timestamp": "20250425_1745621003912742",
+  "missing_routers_added": [
+    "critic_routes",
+    "cto_routes",
+    "debugger_routes",
+    "drift_routes_router",
+    "guardian_routes",
+    "historian_routes",
+    "loop_routes",
+    "nova_routes",
+    "observer_routes",
+    "pessimist_routes",
+    "sage_routes",
+    "self_routes",
+    "sitegen_routes"
+  ],
+  "schemas_connected": [
+    "critic_schema",
+    "cto_schema",
+    "debugger_schema",
+    "drift_schema",
+    "guardian_schema",
+    "historian_schema",
+    "loop_schema",
+    "nova_schema",
+    "observer_schema",
+    "pessimist_schema",
+    "sage_schema",
+    "self_challenge_schema",
+    "sitegen_schema"
+  ],
+  "path_operations_added": 33,
+  "backup_file": "/home/ubuntu/personal-ai-agent/app/main.py.bak"
+}

@@ -1,0 +1,413 @@
+[
+  {
+    "schema_name": "agent_config_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/config",
+      "/config/{agent_id}"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "agent_context_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/context",
+      "/context/{agent_id}"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "agent_contract_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/orchestrator/validate_contract",
+      "/orchestrator/validate_delegation",
+      "/orchestrator/handle_violation",
+      "/orchestrator/check_recovery_authorization"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "ash_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/analyze",
+      "/test"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "ceo_schema",
+    "file_present": true,
+    "bound_to_route": "None",
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "critic_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/critic/review"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "cto_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/audit",
+      "/health"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "debug_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/debug/analyze-loop"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "debugger_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/api/debugger/trace"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "delegate_stream_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/status/{stream_id}",
+      "/status",
+      "/close"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "drift_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/drift/monitor",
+      "/drift/history/{loop_id}"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "export_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/status/{export_id}",
+      "/status"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "fix_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/status/{fix_id}",
+      "/status",
+      "/rollback"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "forge_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/forge/build"
+    ],
+    "bound_to_agent": [
+      "forge"
+    ],
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "guardian_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/override",
+      "/rollback"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "health_monitor_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/health/check",
+      "/health/check/{component_id}",
+      "/health/system",
+      "/health/maintenance/predict",
+      "/health/maintenance/predict/{component_id}",
+      "/health/healing",
+      "/health/config"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "historian_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/api/historian/log"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "loop_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/api/loop/plan",
+      "/api/loop/complete",
+      "/api/loop/respond",
+      "/api/loop/validate",
+      "/api/loop/trace",
+      "/api/loop/reset",
+      "/api/loop/persona-reflect"
+    ],
+    "bound_to_agent": [
+      "critic",
+      "hal",
+      "orchestrator",
+      "sage"
+    ],
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "loop_snapshot_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/loop/snapshot/save",
+      "/loop/snapshot/restore",
+      "/loop/snapshot/list/{loop_id}",
+      "/loop/snapshot/{loop_id}"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "loop_trace",
+    "file_present": true,
+    "bound_to_route": "None",
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "loop_validation_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/validate"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "memory",
+    "file_present": true,
+    "bound_to_route": [
+      "/critic/review",
+      "/drift/monitor",
+      "/drift/history/{loop_id}"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "memory_embed_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/embed",
+      "/embed/batch"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "memory_recall_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/recall"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "nova_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/build-ui",
+      "/generate-component",
+      "/health"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "observer_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/journal",
+      "/observe",
+      "/health"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "orchestrator_schema",
+    "file_present": true,
+    "bound_to_route": "None",
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "output_policy_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/enforce",
+      "/logs"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "pessimist_evaluation_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/evaluate"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "pessimist_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/check",
+      "/health"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "plan_generate_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/generate"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "sage_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/review",
+      "/run"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "self_challenge_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/reflect",
+      "/revise",
+      "/reinforce",
+      "/challenge"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "self_reflection_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/reflect",
+      "/revise",
+      "/reinforce",
+      "/challenge"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "self_reinforcement_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/reflect",
+      "/revise",
+      "/reinforce",
+      "/challenge"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "self_revision_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/reflect",
+      "/revise",
+      "/reinforce",
+      "/challenge"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "sitegen_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/plan",
+      "/analyze",
+      "/health"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "train_schema",
+    "file_present": true,
+    "bound_to_route": [
+      "/status/{model_id}",
+      "/status"
+    ],
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "trainer_schema",
+    "file_present": true,
+    "bound_to_route": "None",
+    "bound_to_agent": "None",
+    "validated_pydantic": true
+  },
+  {
+    "schema_name": "hal_agent",
+    "file_present": true,
+    "bound_to_route": "None",
+    "bound_to_agent": "None",
+    "validated_pydantic": false
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "tag": "system_audit_post_hardening_20250425_2232",
+  "timestamp": "20250425_2232",
+  "type": "system_audit",
+  "description": "Post-Hardening System Audit - Comprehensive Backend Analysis",
+  "statistics": {
+    "routes": {
+      "total": 98,
+      "working": 3,
+      "percentage": 3.1
+    },
+    "agents": {
+      "total": 5,
+      "registered": 5,
+      "active": 0,
+      "percentage": 100.0
+    },
+    "schemas": {
+      "total": 40,
+      "validated": 39,
+      "bound_to_routes": 35,
+      "bound_to_agents": 2,
+      "percentage": 97.5
+    },
+    "modules": {
+      "total": 64,
+      "registered": 44,
+      "live": 0,
+      "percentage": 68.8
+    }
+  },
+  "critical_gaps": [
+    "No agent endpoints are active",
+    "Critical endpoint /agent/loop is not operational",
+    "Critical endpoint /agent/delegate is not operational",
+    "Critical endpoint /agent/forge is not operational",
+    "Critical endpoint /agent/hal is not operational",
+    "Memory system endpoints are not operational",
+    "Orchestrator endpoints are not operational",
+    "Most schemas are not properly bound to agents"
+  ],
+  "repair_priorities": [
+    "Deploy and activate agent endpoints, particularly /agent/forge and /agent/hal",
+    "Restore memory system functionality for agent context persistence",
+    "Fix orchestrator endpoints to enable agent coordination",
+    "Investigate backend deployment issues - most endpoints are returning 404",
+    "Fix schema-agent bindings to ensure proper contract enforcement"
+  ]
+}

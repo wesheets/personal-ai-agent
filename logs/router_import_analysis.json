@@ -1,0 +1,365 @@
+{
+  "imported_routers": [
+    "agent_config_routes",
+    "agent_context_routes",
+    "memory_recall_routes",
+    "memory_embed_routes",
+    "plan_generate_routes",
+    "train_routes",
+    "export_routes",
+    "fix_routes",
+    "delegate_stream_routes",
+    "snapshot_routes",
+    "orchestrator_plan_routes",
+    "health_monitor_routes",
+    "orchestrator_contract_routes",
+    "ash_routes",
+    "dashboard_routes",
+    "drift_routes",
+    "forge_routes",
+    "loop_validation_routes",
+    "output_policy_routes",
+    "pessimist_evaluation_routes",
+    "hal_routes",
+    "memory_routes",
+    "memory_router",
+    "loop_router",
+    "orchestrator_routes",
+    "core_router",
+    "agent_router",
+    "persona_router",
+    "debug_router",
+    "historian_router",
+    "debugger_router",
+    "orchestrator_router",
+    "critic_router",
+    "sage_router",
+    "guardian_router",
+    "pessimist_router",
+    "nova_router",
+    "cto_router",
+    "observer_router",
+    "sitegen_router",
+    "reflection_router",
+    "trust_router",
+    "self_router",
+    "dashboard_routes",
+    "forge_routes",
+    "debug_routes",
+    "drift_routes",
+    "output_policy_routes",
+    "snapshot_routes",
+    "orchestrator_plan_routes",
+    "health_monitor_routes",
+    "orchestrator_contract_routes",
+    "ash_routes",
+    "dashboard_routes",
+    "drift_routes",
+    "forge_routes",
+    "loop_validation_routes",
+    "output_policy_routes",
+    "pessimist_evaluation_routes",
+    "hal_routes",
+    "memory_routes",
+    "memory_router",
+    "loop_router",
+    "orchestrator_routes",
+    "core_router",
+    "agent_router",
+    "persona_router",
+    "debug_router",
+    "historian_router",
+    "debugger_router",
+    "orchestrator_router",
+    "critic_router",
+    "sage_router",
+    "guardian_router",
+    "pessimist_router",
+    "nova_router",
+    "cto_router",
+    "observer_router",
+    "sitegen_router",
+    "reflection_router",
+    "trust_router",
+    "self_router",
+    "dashboard_routes",
+    "forge_routes",
+    "debug_routes",
+    "drift_routes",
+    "output_policy_routes"
+  ],
+  "included_routers": [
+    "agent_config",
+    "agent_context",
+    "memory_recall",
+    "memory_embed",
+    "plan_generate",
+    "train",
+    "export",
+    "fix",
+    "delegate_stream",
+    "fallback",
+    "memory",
+    "loop",
+    "core",
+    "agent",
+    "persona",
+    "debug",
+    "historian",
+    "debugger",
+    "orchestrator",
+    "critic",
+    "sage",
+    "guardian",
+    "pessimist",
+    "nova",
+    "cto",
+    "observer",
+    "sitegen",
+    "reflection",
+    "trust",
+    "snapshot",
+    "orchestrator_plan",
+    "health_monitor",
+    "self",
+    "orchestrator_contract",
+    "ash",
+    "dashboard_routes",
+    "drift_routes",
+    "forge_routes",
+    "loop_validation_routes",
+    "output_policy_routes",
+    "pessimist_evaluation_routes",
+    "dashboard",
+    "forge",
+    "debug_analyzer",
+    "drift",
+    "output_policy",
+    "diagnostics"
+  ],
+  "missing_routers": [
+    {
+      "module_name": "critic_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/critic_routes.py",
+      "schema_name": "critic_schema",
+      "path_operations": [
+        {
+          "method": "POST",
+          "path": "/critic/review"
+        }
+      ]
+    },
+    {
+      "module_name": "cto_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/cto_routes.py",
+      "schema_name": "cto_schema",
+      "path_operations": [
+        {
+          "method": "GET",
+          "path": "/health"
+        },
+        {
+          "method": "POST",
+          "path": "/audit"
+        }
+      ]
+    },
+    {
+      "module_name": "debugger_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/debugger_routes.py",
+      "schema_name": "debugger_schema",
+      "path_operations": [
+        {
+          "method": "POST",
+          "path": "/api/debugger/trace"
+        }
+      ]
+    },
+    {
+      "module_name": "drift_routes_router",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/drift_routes_router.py",
+      "schema_name": "drift_schema",
+      "path_operations": [
+        {
+          "method": "GET",
+          "path": "/drift_routes/status"
+        }
+      ]
+    },
+    {
+      "module_name": "guardian_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/guardian_routes.py",
+      "schema_name": "guardian_schema",
+      "path_operations": [
+        {
+          "method": "POST",
+          "path": "/override"
+        },
+        {
+          "method": "POST",
+          "path": "/rollback"
+        }
+      ]
+    },
+    {
+      "module_name": "historian_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/historian_routes.py",
+      "schema_name": "historian_schema",
+      "path_operations": [
+        {
+          "method": "POST",
+          "path": "/api/historian/log"
+        }
+      ]
+    },
+    {
+      "module_name": "loop_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/loop_routes.py",
+      "schema_name": "loop_schema",
+      "path_operations": [
+        {
+          "method": "GET",
+          "path": "/api/loop/trace"
+        },
+        {
+          "method": "POST",
+          "path": "/api/loop/plan"
+        },
+        {
+          "method": "POST",
+          "path": "/api/loop/complete"
+        },
+        {
+          "method": "POST",
+          "path": "/api/loop/respond"
+        },
+        {
+          "method": "POST",
+          "path": "/api/loop/validate"
+        },
+        {
+          "method": "POST",
+          "path": "/api/loop/trace"
+        },
+        {
+          "method": "POST",
+          "path": "/api/loop/reset"
+        },
+        {
+          "method": "POST",
+          "path": "/api/loop/persona-reflect"
+        }
+      ]
+    },
+    {
+      "module_name": "nova_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/nova_routes.py",
+      "schema_name": "nova_schema",
+      "path_operations": [
+        {
+          "method": "GET",
+          "path": "/health"
+        },
+        {
+          "method": "POST",
+          "path": "/build-ui"
+        },
+        {
+          "method": "POST",
+          "path": "/generate-component"
+        }
+      ]
+    },
+    {
+      "module_name": "observer_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/observer_routes.py",
+      "schema_name": "observer_schema",
+      "path_operations": [
+        {
+          "method": "GET",
+          "path": "/health"
+        },
+        {
+          "method": "POST",
+          "path": "/journal"
+        },
+        {
+          "method": "POST",
+          "path": "/observe"
+        }
+      ]
+    },
+    {
+      "module_name": "pessimist_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/pessimist_routes.py",
+      "schema_name": "pessimist_schema",
+      "path_operations": [
+        {
+          "method": "GET",
+          "path": "/health"
+        },
+        {
+          "method": "POST",
+          "path": "/check"
+        }
+      ]
+    },
+    {
+      "module_name": "sage_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/sage_routes.py",
+      "schema_name": "sage_schema",
+      "path_operations": [
+        {
+          "method": "POST",
+          "path": "/review"
+        },
+        {
+          "method": "POST",
+          "path": "/run"
+        }
+      ]
+    },
+    {
+      "module_name": "self_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/self_routes.py",
+      "schema_name": "self_challenge_schema",
+      "path_operations": [
+        {
+          "method": "POST",
+          "path": "/reflect"
+        },
+        {
+          "method": "POST",
+          "path": "/revise"
+        },
+        {
+          "method": "POST",
+          "path": "/reinforce"
+        },
+        {
+          "method": "POST",
+          "path": "/challenge"
+        }
+      ]
+    },
+    {
+      "module_name": "sitegen_routes",
+      "path": "/home/ubuntu/personal-ai-agent/app/routes/sitegen_routes.py",
+      "schema_name": "sitegen_schema",
+      "path_operations": [
+        {
+          "method": "GET",
+          "path": "/health"
+        },
+        {
+          "method": "POST",
+          "path": "/plan"
+        },
+        {
+          "method": "POST",
+          "path": "/analyze"
+        }
+      ]
+    }
+  ]
+}

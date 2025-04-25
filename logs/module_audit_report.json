@@ -1,0 +1,386 @@
+[
+  {
+    "module_name": "agent_config_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Agent Configuration Routes"
+  },
+  {
+    "module_name": "agent_context_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Agent Context Routes"
+  },
+  {
+    "module_name": "agent_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "agent_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Agent Routes Module"
+  },
+  {
+    "module_name": "ash_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "ASH Agent Routes"
+  },
+  {
+    "module_name": "core_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "core_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Core Routes Module"
+  },
+  {
+    "module_name": "critic_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "critic_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "CRITIC Routes Module"
+  },
+  {
+    "module_name": "cto_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "cto_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "CTO Agent Routes"
+  },
+  {
+    "module_name": "dashboard_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Dashboard Routes Module"
+  },
+  {
+    "module_name": "debug_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Debug Router Module"
+  },
+  {
+    "module_name": "debug_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Debug Routes Module"
+  },
+  {
+    "module_name": "debugger_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "debugger_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Debugger Routes Module"
+  },
+  {
+    "module_name": "delegate_stream_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Delegate Stream Routes"
+  },
+  {
+    "module_name": "diagnostics_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Diagnostics Routes Module"
+  },
+  {
+    "module_name": "drift_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Drift Routes Module"
+  },
+  {
+    "module_name": "drift_routes_router",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "export_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Export Routes"
+  },
+  {
+    "module_name": "fix_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Fix Routes"
+  },
+  {
+    "module_name": "forge_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "FORGE Routes Module"
+  },
+  {
+    "module_name": "guardian_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "guardian_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "GUARDIAN Agent Routes"
+  },
+  {
+    "module_name": "hal_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Minimal HAL routes module"
+  },
+  {
+    "module_name": "hal_routes_router",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "health_monitor_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Health Monitor Routes - Hardening Step 9"
+  },
+  {
+    "module_name": "historian_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "historian_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Historian Routes Module"
+  },
+  {
+    "module_name": "loop_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "loop_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Updated loop_routes.py to integrate with HAL code generation functionality"
+  },
+  {
+    "module_name": "loop_validation_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Loop Sanity Validator Routes"
+  },
+  {
+    "module_name": "memory_embed_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Memory Embed Routes"
+  },
+  {
+    "module_name": "memory_recall_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Memory Recall Routes"
+  },
+  {
+    "module_name": "memory_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "memory_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Memory Routes Module for app/routes directory"
+  },
+  {
+    "module_name": "nova_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "nova_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "NOVA Agent Routes"
+  },
+  {
+    "module_name": "observer_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "observer_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "OBSERVER Agent Routes"
+  },
+  {
+    "module_name": "orchestrator_contract_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Orchestrator Routes with Contract Enforcement"
+  },
+  {
+    "module_name": "orchestrator_plan_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Orchestrator Plan Route with CRITIC Rejection Integration"
+  },
+  {
+    "module_name": "orchestrator_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Orchestrator Router Module"
+  },
+  {
+    "module_name": "orchestrator_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Orchestrator Routes Module"
+  },
+  {
+    "module_name": "output_policy_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Output Policy Routes Module"
+  },
+  {
+    "module_name": "persona_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "persona_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Persona Routes Module"
+  },
+  {
+    "module_name": "pessimist_evaluation_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "PESSIMIST Pre-Run Evaluation Routes"
+  },
+  {
+    "module_name": "pessimist_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "pessimist_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "PESSIMIST Agent Routes"
+  },
+  {
+    "module_name": "plan_generate_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Plan Generate Routes"
+  },
+  {
+    "module_name": "reflection_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "reflection_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Reflection Routes Module"
+  },
+  {
+    "module_name": "sage_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "sage_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "SAGE Agent Routes"
+  },
+  {
+    "module_name": "self_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "self_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "sitegen_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "sitegen_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "SITEGEN Agent Routes"
+  },
+  {
+    "module_name": "snapshot_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Snapshot Routes"
+  },
+  {
+    "module_name": "train_routes",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Train Routes"
+  },
+  {
+    "module_name": "trust_router",
+    "router_registered": true,
+    "live_on_backend": false,
+    "purpose": "Unknown"
+  },
+  {
+    "module_name": "trust_routes",
+    "router_registered": false,
+    "live_on_backend": false,
+    "purpose": "Trust Routes Module"
+  }
+]

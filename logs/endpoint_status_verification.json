@@ -1,0 +1,204 @@
+{
+  "timestamp": "20250425_2309",
+  "memory_tag": "endpoint_verification_20250425_2309",
+  "total_endpoints": 119,
+  "success_count": 20,
+  "unprocessable_count": 15,
+  "not_found_count": 77,
+  "server_error_count": 7,
+  "error_count": 0,
+  "success_rate": 29.4,
+  "fixed_endpoints": {
+    "total": 10,
+    "success_rate": 0.0,
+    "status_breakdown": {
+      "404": 8,
+      "500": 7
+    }
+  },
+  "status_endpoints": {
+    "404": 77,
+    "500": 7,
+    "422": 15,
+    "200": 20
+  },
+  "module_endpoints": {
+    "config": 3,
+    "context": 2,
+    "orchestrator": 11,
+    "critic": 3,
+    "status": 9,
+    "analyze": 2,
+    "cto": 1,
+    "api": 14,
+    "audit": 1,
+    "health": 13,
+    "test": 1,
+    "debug": 1,
+    "close": 1,
+    "drift": 4,
+    "debugger": 1,
+    "rollback": 2,
+    "forge": 1,
+    "guardian": 1,
+    "drift_routes": 1,
+    "override": 1,
+    "historian": 1,
+    "loop": 5,
+    "embed": 2,
+    "memory": 1,
+    "validate": 1,
+    "nova": 1,
+    "recall": 2,
+    "generate-component": 1,
+    "observer": 1,
+    "journal": 1,
+    "observe": 1,
+    "build-ui": 1,
+    "logs": 1,
+    "pessimist": 1,
+    "sage": 1,
+    "check": 1,
+    "enforce": 1,
+    "generate": 2,
+    "run": 1,
+    "review": 1,
+    "reinforce": 4,
+    "reflect": 4,
+    "revise": 4,
+    "challenge": 4,
+    "sitegen": 1,
+    "evaluate": 1,
+    "plan": 1
+  },
+  "critical_failures": [
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/validate_delegation",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/handle_violation",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/config",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "DELETE",
+      "route_path": "/loop/snapshot/{loop_id}",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/check/{component_id}",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/maintenance/predict/{component_id}",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/validate_delegation",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/handle_violation",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/config",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "DELETE",
+      "route_path": "/loop/snapshot/{loop_id}",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/check/{component_id}",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/maintenance/predict/{component_id}",
+      "status": "500 Internal Server Error",
+      "status_code": 500
+    }
+  ],
+  "next_batch_recommendations": [
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "reason": "Server error (500)",
+      "priority": "high"
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/validate_delegation",
+      "reason": "Server error (500)",
+      "priority": "high"
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/handle_violation",
+      "reason": "Server error (500)",
+      "priority": "high"
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/config",
+      "reason": "Server error (500)",
+      "priority": "high"
+    },
+    {
+      "method": "DELETE",
+      "route_path": "/loop/snapshot/{loop_id}",
+      "reason": "Server error (500)",
+      "priority": "high"
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/check/{component_id}",
+      "reason": "Server error (500)",
+      "priority": "high"
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/maintenance/predict/{component_id}",
+      "reason": "Server error (500)",
+      "priority": "high"
+    }
+  ]
+}

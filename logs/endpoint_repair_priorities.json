@@ -1,0 +1,5360 @@
+{
+  "total_endpoints": 41,
+  "total_batches": 5,
+  "critical_path_count": 4,
+  "fix_complexity_count": 41,
+  "module_importance_count": 14,
+  "common_pattern_count": 40,
+  "unified_priorities": [
+    {
+      "route_path": "/loop/snapshot/{loop_id}",
+      "method": "DELETE",
+      "status_code": 500,
+      "module_name": "loop",
+      "matching_schemas": [
+        "loop_schema",
+        "loop_snapshot_schema",
+        "loop_trace",
+        "loop_validation_schema"
+      ],
+      "best_schema": "loop_schema",
+      "fix_type": "server_error",
+      "priority": "high",
+      "schema_models": [
+        {
+          "name": "LoopResponseRequest",
+          "fields": {
+            "project_id": "str",
+            "loop_id": "str",
+            "agent": "str",
+            "input_key": "str",
+            "target_file": "str",
+            "model": "Optional[...]",
+            "temperature": "Optional[...]",
+            "max_tokens": "Optional[...]",
+            "metadata": "Optional[...]"
+          }
+        },
+        {
+          "name": "LoopResponseResult",
+          "fields": {
+            "status": "str",
+            "output_tag": "str",
+            "timestamp": "str",
+            "code": "str",
+            "metadata": "Optional[...]"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/loop",
+        "/loop/status",
+        "/loop/create",
+        "/loop/update",
+        "/loop/delete",
+        "/loop/list",
+        "/loop/get",
+        "/loop/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/orchestrator/validate_delegation",
+      "method": "POST",
+      "status_code": 500,
+      "module_name": "orchestrator",
+      "matching_schemas": [
+        "orchestrator_schema"
+      ],
+      "best_schema": "orchestrator_schema",
+      "fix_type": "server_error",
+      "priority": "high",
+      "schema_models": [
+        {
+          "name": "OrchestratorConsultRequest",
+          "fields": {
+            "project_id": "str",
+            "query": "str",
+            "context": "Optional[...]",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "OrchestratorInterpretRequest",
+          "fields": {
+            "project_id": "str",
+            "content": "str",
+            "content_type": "str",
+            "context": "Optional[...]",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "OrchestratorPlanRequest",
+          "fields": {
+            "project_id": "str",
+            "task": "str",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "TriggerResult",
+          "fields": {
+            "triggered_agent": "str",
+            "timestamp": "str",
+            "loop_count": "int",
+            "reason": "str",
+            "status": "str"
+          }
+        },
+        {
+          "name": "OrchestratorDecision",
+          "fields": {
+            "timestamp": "str",
+            "loop_count": "int",
+            "last_agent": "Optional[...]",
+            "next_agent": "str",
+            "reason": "str"
+          }
+        },
+        {
+          "name": "PlanStep",
+          "fields": {
+            "agent": "str",
+            "purpose": "str"
+          }
+        },
+        {
+          "name": "OrchestratorPlan",
+          "fields": {
+            "project_id": "str",
+            "timestamp": "str",
+            "steps": "List[...]",
+            "estimated_loops": "int",
+            "current_loop": "int"
+          }
+        },
+        {
+          "name": "DelegationResult",
+          "fields": {
+            "project_id": "str",
+            "timestamp": "str",
+            "agent": "str",
+            "task": "str",
+            "status": "str"
+          }
+        },
+        {
+          "name": "ResolutionResult",
+          "fields": {
+            "project_id": "str",
+            "timestamp": "str",
+            "conflicts_found": "int",
+            "conflicts_resolved": "int",
+            "status": "str"
+          }
+        },
+        {
+          "name": "OrchestratorPlanResult",
+          "fields": {
+            "status": "str",
+            "task": "str",
+            "tools": "List[...]",
+            "project_id": "str",
+            "intent": "str",
+            "action": "str",
+            "timestamp": "str",
+            "output": "str",
+            "loop_id": "Optional[...]",
+            "next_agent": "Optional[...]",
+            "trigger_result": "Optional[...]",
+            "reason": "Optional[...]",
+            "completed_agent": "Optional[...]",
+            "all_loops_complete": "Optional[...]",
+            "decisions": "Optional[...]",
+            "decision": "Optional[...]",
+            "plan": "Optional[...]",
+            "delegated_agent": "Optional[...]",
+            "delegated_task": "Optional[...]",
+            "delegation_result": "Optional[...]",
+            "resolution": "Optional[...]",
+            "error": "Optional[...]"
+          }
+        },
+        {
+          "name": "OrchestratorErrorResult",
+          "fields": {
+            "status": "str",
+            "message": "str",
+            "task": "Optional[...]",
+            "tools": "Optional[...]",
+            "project_id": "Optional[...]",
+            "intent": "Optional[...]",
+            "action": "Optional[...]",
+            "timestamp": "Optional[...]",
+            "output": "Optional[...]",
+            "error": "Optional[...]"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/orchestrator",
+        "/orchestrator/status",
+        "/orchestrator/create",
+        "/orchestrator/update",
+        "/orchestrator/delete",
+        "/orchestrator/list",
+        "/orchestrator/get",
+        "/orchestrator/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "method": "POST",
+      "status_code": 500,
+      "module_name": "orchestrator",
+      "matching_schemas": [
+        "orchestrator_schema"
+      ],
+      "best_schema": "orchestrator_schema",
+      "fix_type": "server_error",
+      "priority": "high",
+      "schema_models": [
+        {
+          "name": "OrchestratorConsultRequest",
+          "fields": {
+            "project_id": "str",
+            "query": "str",
+            "context": "Optional[...]",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "OrchestratorInterpretRequest",
+          "fields": {
+            "project_id": "str",
+            "content": "str",
+            "content_type": "str",
+            "context": "Optional[...]",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "OrchestratorPlanRequest",
+          "fields": {
+            "project_id": "str",
+            "task": "str",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "TriggerResult",
+          "fields": {
+            "triggered_agent": "str",
+            "timestamp": "str",
+            "loop_count": "int",
+            "reason": "str",
+            "status": "str"
+          }
+        },
+        {
+          "name": "OrchestratorDecision",
+          "fields": {
+            "timestamp": "str",
+            "loop_count": "int",
+            "last_agent": "Optional[...]",
+            "next_agent": "str",
+            "reason": "str"
+          }
+        },
+        {
+          "name": "PlanStep",
+          "fields": {
+            "agent": "str",
+            "purpose": "str"
+          }
+        },
+        {
+          "name": "OrchestratorPlan",
+          "fields": {
+            "project_id": "str",
+            "timestamp": "str",
+            "steps": "List[...]",
+            "estimated_loops": "int",
+            "current_loop": "int"
+          }
+        },
+        {
+          "name": "DelegationResult",
+          "fields": {
+            "project_id": "str",
+            "timestamp": "str",
+            "agent": "str",
+            "task": "str",
+            "status": "str"
+          }
+        },
+        {
+          "name": "ResolutionResult",
+          "fields": {
+            "project_id": "str",
+            "timestamp": "str",
+            "conflicts_found": "int",
+            "conflicts_resolved": "int",
+            "status": "str"
+          }
+        },
+        {
+          "name": "OrchestratorPlanResult",
+          "fields": {
+            "status": "str",
+            "task": "str",
+            "tools": "List[...]",
+            "project_id": "str",
+            "intent": "str",
+            "action": "str",
+            "timestamp": "str",
+            "output": "str",
+            "loop_id": "Optional[...]",
+            "next_agent": "Optional[...]",
+            "trigger_result": "Optional[...]",
+            "reason": "Optional[...]",
+            "completed_agent": "Optional[...]",
+            "all_loops_complete": "Optional[...]",
+            "decisions": "Optional[...]",
+            "decision": "Optional[...]",
+            "plan": "Optional[...]",
+            "delegated_agent": "Optional[...]",
+            "delegated_task": "Optional[...]",
+            "delegation_result": "Optional[...]",
+            "resolution": "Optional[...]",
+            "error": "Optional[...]"
+          }
+        },
+        {
+          "name": "OrchestratorErrorResult",
+          "fields": {
+            "status": "str",
+            "message": "str",
+            "task": "Optional[...]",
+            "tools": "Optional[...]",
+            "project_id": "Optional[...]",
+            "intent": "Optional[...]",
+            "action": "Optional[...]",
+            "timestamp": "Optional[...]",
+            "output": "Optional[...]",
+            "error": "Optional[...]"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/orchestrator",
+        "/orchestrator/status",
+        "/orchestrator/create",
+        "/orchestrator/update",
+        "/orchestrator/delete",
+        "/orchestrator/list",
+        "/orchestrator/get",
+        "/orchestrator/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/orchestrator/handle_violation",
+      "method": "POST",
+      "status_code": 500,
+      "module_name": "orchestrator",
+      "matching_schemas": [
+        "orchestrator_schema"
+      ],
+      "best_schema": "orchestrator_schema",
+      "fix_type": "server_error",
+      "priority": "high",
+      "schema_models": [
+        {
+          "name": "OrchestratorConsultRequest",
+          "fields": {
+            "project_id": "str",
+            "query": "str",
+            "context": "Optional[...]",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "OrchestratorInterpretRequest",
+          "fields": {
+            "project_id": "str",
+            "content": "str",
+            "content_type": "str",
+            "context": "Optional[...]",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "OrchestratorPlanRequest",
+          "fields": {
+            "project_id": "str",
+            "task": "str",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "TriggerResult",
+          "fields": {
+            "triggered_agent": "str",
+            "timestamp": "str",
+            "loop_count": "int",
+            "reason": "str",
+            "status": "str"
+          }
+        },
+        {
+          "name": "OrchestratorDecision",
+          "fields": {
+            "timestamp": "str",
+            "loop_count": "int",
+            "last_agent": "Optional[...]",
+            "next_agent": "str",
+            "reason": "str"
+          }
+        },
+        {
+          "name": "PlanStep",
+          "fields": {
+            "agent": "str",
+            "purpose": "str"
+          }
+        },
+        {
+          "name": "OrchestratorPlan",
+          "fields": {
+            "project_id": "str",
+            "timestamp": "str",
+            "steps": "List[...]",
+            "estimated_loops": "int",
+            "current_loop": "int"
+          }
+        },
+        {
+          "name": "DelegationResult",
+          "fields": {
+            "project_id": "str",
+            "timestamp": "str",
+            "agent": "str",
+            "task": "str",
+            "status": "str"
+          }
+        },
+        {
+          "name": "ResolutionResult",
+          "fields": {
+            "project_id": "str",
+            "timestamp": "str",
+            "conflicts_found": "int",
+            "conflicts_resolved": "int",
+            "status": "str"
+          }
+        },
+        {
+          "name": "OrchestratorPlanResult",
+          "fields": {
+            "status": "str",
+            "task": "str",
+            "tools": "List[...]",
+            "project_id": "str",
+            "intent": "str",
+            "action": "str",
+            "timestamp": "str",
+            "output": "str",
+            "loop_id": "Optional[...]",
+            "next_agent": "Optional[...]",
+            "trigger_result": "Optional[...]",
+            "reason": "Optional[...]",
+            "completed_agent": "Optional[...]",
+            "all_loops_complete": "Optional[...]",
+            "decisions": "Optional[...]",
+            "decision": "Optional[...]",
+            "plan": "Optional[...]",
+            "delegated_agent": "Optional[...]",
+            "delegated_task": "Optional[...]",
+            "delegation_result": "Optional[...]",
+            "resolution": "Optional[...]",
+            "error": "Optional[...]"
+          }
+        },
+        {
+          "name": "OrchestratorErrorResult",
+          "fields": {
+            "status": "str",
+            "message": "str",
+            "task": "Optional[...]",
+            "tools": "Optional[...]",
+            "project_id": "Optional[...]",
+            "intent": "Optional[...]",
+            "action": "Optional[...]",
+            "timestamp": "Optional[...]",
+            "output": "Optional[...]",
+            "error": "Optional[...]"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/orchestrator",
+        "/orchestrator/status",
+        "/orchestrator/create",
+        "/orchestrator/update",
+        "/orchestrator/delete",
+        "/orchestrator/list",
+        "/orchestrator/get",
+        "/orchestrator/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/health",
+      "method": "GET",
+      "status_code": 404,
+      "module_name": "health",
+      "matching_schemas": [
+        "health_monitor_schema"
+      ],
+      "best_schema": "health_monitor_schema",
+      "fix_type": "missing_route",
+      "priority": "medium",
+      "schema_models": [
+        {
+          "name": "HealthMetric",
+          "fields": {
+            "name": "str",
+            "value": "Union[...]",
+            "unit": "Optional[...]",
+            "threshold_warning": "Optional[...]",
+            "threshold_critical": "Optional[...]",
+            "status": "HealthStatus",
+            "timestamp": "datetime"
+          }
+        },
+        {
+          "name": "ComponentHealth",
+          "fields": {
+            "component_id": "str",
+            "component_name": "str",
+            "component_type": "ComponentType",
+            "status": "HealthStatus",
+            "metrics": "List[...]",
+            "last_checked": "datetime",
+            "issues": "List[...]",
+            "recommendations": "List[...]"
+          }
+        },
+        {
+          "name": "SystemHealthSummary",
+          "fields": {
+            "overall_status": "HealthStatus",
+            "component_statuses": "Dict[...]",
+            "critical_issues_count": "int",
+            "warning_issues_count": "int",
+            "healthy_components_count": "int",
+            "total_components_count": "int",
+            "last_updated": "datetime"
+          }
+        },
+        {
+          "name": "HealthCheckRequest",
+          "fields": {
+            "component_id": "Optional[...]",
+            "component_type": "Optional[...]",
+            "include_metrics": "bool",
+            "include_recommendations": "bool"
+          }
+        },
+        {
+          "name": "HealthCheckResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "summary": "SystemHealthSummary",
+            "components": "List[...]"
+          }
+        },
+        {
+          "name": "PredictiveMaintenanceRequest",
+          "fields": {
+            "component_id": "Optional[...]",
+            "component_type": "Optional[...]",
+            "time_horizon_hours": "int",
+            "confidence_threshold": "float"
+          }
+        },
+        {
+          "name": "MaintenancePrediction",
+          "fields": {
+            "component_id": "str",
+            "component_name": "str",
+            "component_type": "ComponentType",
+            "predicted_issue": "str",
+            "confidence": "float",
+            "time_to_failure": "Optional[...]",
+            "recommended_action": "str",
+            "priority": "str",
+            "prediction_timestamp": "datetime"
+          }
+        },
+        {
+          "name": "PredictiveMaintenanceResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "predictions": "List[...]",
+            "total_predictions_count": "int",
+            "high_priority_count": "int",
+            "medium_priority_count": "int",
+            "low_priority_count": "int"
+          }
+        },
+        {
+          "name": "SelfHealingRequest",
+          "fields": {
+            "component_id": "str",
+            "issue_description": "str",
+            "suggested_actions": "List[...]",
+            "auto_approve": "bool",
+            "max_impact_level": "str"
+          }
+        },
+        {
+          "name": "HealingActionResult",
+          "fields": {
+            "action": "SelfHealingAction",
+            "success": "bool",
+            "timestamp": "datetime",
+            "details": "str",
+            "impact_level": "str",
+            "duration_ms": "int"
+          }
+        },
+        {
+          "name": "SelfHealingResponse",
+          "fields": {
+            "request_id": "str",
+            "component_id": "str",
+            "timestamp": "datetime",
+            "issue_resolved": "bool",
+            "actions_performed": "List[...]",
+            "current_status": "HealthStatus",
+            "recommendations": "List[...]"
+          }
+        },
+        {
+          "name": "HealthMonitorConfigRequest",
+          "fields": {
+            "check_interval_seconds": "Optional[...]",
+            "enable_predictive_maintenance": "Optional[...]",
+            "enable_self_healing": "Optional[...]",
+            "alert_thresholds": "Optional[...]",
+            "excluded_components": "Optional[...]"
+          }
+        },
+        {
+          "name": "HealthMonitorConfigResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "current_config": "Dict",
+            "changes_applied": "Dict",
+            "restart_required": "bool"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/health_monitor",
+        "/health_monitor/status",
+        "/health_monitor/create",
+        "/health_monitor/update",
+        "/health_monitor/delete",
+        "/health_monitor/list",
+        "/health_monitor/get",
+        "/health_monitor/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/health/config",
+      "method": "GET",
+      "status_code": 500,
+      "module_name": "health",
+      "matching_schemas": [
+        "health_monitor_schema"
+      ],
+      "best_schema": "health_monitor_schema",
+      "fix_type": "server_error",
+      "priority": "medium",
+      "schema_models": [
+        {
+          "name": "HealthMetric",
+          "fields": {
+            "name": "str",
+            "value": "Union[...]",
+            "unit": "Optional[...]",
+            "threshold_warning": "Optional[...]",
+            "threshold_critical": "Optional[...]",
+            "status": "HealthStatus",
+            "timestamp": "datetime"
+          }
+        },
+        {
+          "name": "ComponentHealth",
+          "fields": {
+            "component_id": "str",
+            "component_name": "str",
+            "component_type": "ComponentType",
+            "status": "HealthStatus",
+            "metrics": "List[...]",
+            "last_checked": "datetime",
+            "issues": "List[...]",
+            "recommendations": "List[...]"
+          }
+        },
+        {
+          "name": "SystemHealthSummary",
+          "fields": {
+            "overall_status": "HealthStatus",
+            "component_statuses": "Dict[...]",
+            "critical_issues_count": "int",
+            "warning_issues_count": "int",
+            "healthy_components_count": "int",
+            "total_components_count": "int",
+            "last_updated": "datetime"
+          }
+        },
+        {
+          "name": "HealthCheckRequest",
+          "fields": {
+            "component_id": "Optional[...]",
+            "component_type": "Optional[...]",
+            "include_metrics": "bool",
+            "include_recommendations": "bool"
+          }
+        },
+        {
+          "name": "HealthCheckResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "summary": "SystemHealthSummary",
+            "components": "List[...]"
+          }
+        },
+        {
+          "name": "PredictiveMaintenanceRequest",
+          "fields": {
+            "component_id": "Optional[...]",
+            "component_type": "Optional[...]",
+            "time_horizon_hours": "int",
+            "confidence_threshold": "float"
+          }
+        },
+        {
+          "name": "MaintenancePrediction",
+          "fields": {
+            "component_id": "str",
+            "component_name": "str",
+            "component_type": "ComponentType",
+            "predicted_issue": "str",
+            "confidence": "float",
+            "time_to_failure": "Optional[...]",
+            "recommended_action": "str",
+            "priority": "str",
+            "prediction_timestamp": "datetime"
+          }
+        },
+        {
+          "name": "PredictiveMaintenanceResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "predictions": "List[...]",
+            "total_predictions_count": "int",
+            "high_priority_count": "int",
+            "medium_priority_count": "int",
+            "low_priority_count": "int"
+          }
+        },
+        {
+          "name": "SelfHealingRequest",
+          "fields": {
+            "component_id": "str",
+            "issue_description": "str",
+            "suggested_actions": "List[...]",
+            "auto_approve": "bool",
+            "max_impact_level": "str"
+          }
+        },
+        {
+          "name": "HealingActionResult",
+          "fields": {
+            "action": "SelfHealingAction",
+            "success": "bool",
+            "timestamp": "datetime",
+            "details": "str",
+            "impact_level": "str",
+            "duration_ms": "int"
+          }
+        },
+        {
+          "name": "SelfHealingResponse",
+          "fields": {
+            "request_id": "str",
+            "component_id": "str",
+            "timestamp": "datetime",
+            "issue_resolved": "bool",
+            "actions_performed": "List[...]",
+            "current_status": "HealthStatus",
+            "recommendations": "List[...]"
+          }
+        },
+        {
+          "name": "HealthMonitorConfigRequest",
+          "fields": {
+            "check_interval_seconds": "Optional[...]",
+            "enable_predictive_maintenance": "Optional[...]",
+            "enable_self_healing": "Optional[...]",
+            "alert_thresholds": "Optional[...]",
+            "excluded_components": "Optional[...]"
+          }
+        },
+        {
+          "name": "HealthMonitorConfigResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "current_config": "Dict",
+            "changes_applied": "Dict",
+            "restart_required": "bool"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/health_monitor",
+        "/health_monitor/status",
+        "/health_monitor/create",
+        "/health_monitor/update",
+        "/health_monitor/delete",
+        "/health_monitor/list",
+        "/health_monitor/get",
+        "/health_monitor/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/health/check/{component_id}",
+      "method": "GET",
+      "status_code": 500,
+      "module_name": "health",
+      "matching_schemas": [
+        "health_monitor_schema"
+      ],
+      "best_schema": "health_monitor_schema",
+      "fix_type": "server_error",
+      "priority": "medium",
+      "schema_models": [
+        {
+          "name": "HealthMetric",
+          "fields": {
+            "name": "str",
+            "value": "Union[...]",
+            "unit": "Optional[...]",
+            "threshold_warning": "Optional[...]",
+            "threshold_critical": "Optional[...]",
+            "status": "HealthStatus",
+            "timestamp": "datetime"
+          }
+        },
+        {
+          "name": "ComponentHealth",
+          "fields": {
+            "component_id": "str",
+            "component_name": "str",
+            "component_type": "ComponentType",
+            "status": "HealthStatus",
+            "metrics": "List[...]",
+            "last_checked": "datetime",
+            "issues": "List[...]",
+            "recommendations": "List[...]"
+          }
+        },
+        {
+          "name": "SystemHealthSummary",
+          "fields": {
+            "overall_status": "HealthStatus",
+            "component_statuses": "Dict[...]",
+            "critical_issues_count": "int",
+            "warning_issues_count": "int",
+            "healthy_components_count": "int",
+            "total_components_count": "int",
+            "last_updated": "datetime"
+          }
+        },
+        {
+          "name": "HealthCheckRequest",
+          "fields": {
+            "component_id": "Optional[...]",
+            "component_type": "Optional[...]",
+            "include_metrics": "bool",
+            "include_recommendations": "bool"
+          }
+        },
+        {
+          "name": "HealthCheckResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "summary": "SystemHealthSummary",
+            "components": "List[...]"
+          }
+        },
+        {
+          "name": "PredictiveMaintenanceRequest",
+          "fields": {
+            "component_id": "Optional[...]",
+            "component_type": "Optional[...]",
+            "time_horizon_hours": "int",
+            "confidence_threshold": "float"
+          }
+        },
+        {
+          "name": "MaintenancePrediction",
+          "fields": {
+            "component_id": "str",
+            "component_name": "str",
+            "component_type": "ComponentType",
+            "predicted_issue": "str",
+            "confidence": "float",
+            "time_to_failure": "Optional[...]",
+            "recommended_action": "str",
+            "priority": "str",
+            "prediction_timestamp": "datetime"
+          }
+        },
+        {
+          "name": "PredictiveMaintenanceResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "predictions": "List[...]",
+            "total_predictions_count": "int",
+            "high_priority_count": "int",
+            "medium_priority_count": "int",
+            "low_priority_count": "int"
+          }
+        },
+        {
+          "name": "SelfHealingRequest",
+          "fields": {
+            "component_id": "str",
+            "issue_description": "str",
+            "suggested_actions": "List[...]",
+            "auto_approve": "bool",
+            "max_impact_level": "str"
+          }
+        },
+        {
+          "name": "HealingActionResult",
+          "fields": {
+            "action": "SelfHealingAction",
+            "success": "bool",
+            "timestamp": "datetime",
+            "details": "str",
+            "impact_level": "str",
+            "duration_ms": "int"
+          }
+        },
+        {
+          "name": "SelfHealingResponse",
+          "fields": {
+            "request_id": "str",
+            "component_id": "str",
+            "timestamp": "datetime",
+            "issue_resolved": "bool",
+            "actions_performed": "List[...]",
+            "current_status": "HealthStatus",
+            "recommendations": "List[...]"
+          }
+        },
+        {
+          "name": "HealthMonitorConfigRequest",
+          "fields": {
+            "check_interval_seconds": "Optional[...]",
+            "enable_predictive_maintenance": "Optional[...]",
+            "enable_self_healing": "Optional[...]",
+            "alert_thresholds": "Optional[...]",
+            "excluded_components": "Optional[...]"
+          }
+        },
+        {
+          "name": "HealthMonitorConfigResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "current_config": "Dict",
+            "changes_applied": "Dict",
+            "restart_required": "bool"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/health_monitor",
+        "/health_monitor/status",
+        "/health_monitor/create",
+        "/health_monitor/update",
+        "/health_monitor/delete",
+        "/health_monitor/list",
+        "/health_monitor/get",
+        "/health_monitor/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/health/maintenance/predict/{component_id}",
+      "method": "GET",
+      "status_code": 500,
+      "module_name": "health",
+      "matching_schemas": [
+        "health_monitor_schema"
+      ],
+      "best_schema": "health_monitor_schema",
+      "fix_type": "server_error",
+      "priority": "medium",
+      "schema_models": [
+        {
+          "name": "HealthMetric",
+          "fields": {
+            "name": "str",
+            "value": "Union[...]",
+            "unit": "Optional[...]",
+            "threshold_warning": "Optional[...]",
+            "threshold_critical": "Optional[...]",
+            "status": "HealthStatus",
+            "timestamp": "datetime"
+          }
+        },
+        {
+          "name": "ComponentHealth",
+          "fields": {
+            "component_id": "str",
+            "component_name": "str",
+            "component_type": "ComponentType",
+            "status": "HealthStatus",
+            "metrics": "List[...]",
+            "last_checked": "datetime",
+            "issues": "List[...]",
+            "recommendations": "List[...]"
+          }
+        },
+        {
+          "name": "SystemHealthSummary",
+          "fields": {
+            "overall_status": "HealthStatus",
+            "component_statuses": "Dict[...]",
+            "critical_issues_count": "int",
+            "warning_issues_count": "int",
+            "healthy_components_count": "int",
+            "total_components_count": "int",
+            "last_updated": "datetime"
+          }
+        },
+        {
+          "name": "HealthCheckRequest",
+          "fields": {
+            "component_id": "Optional[...]",
+            "component_type": "Optional[...]",
+            "include_metrics": "bool",
+            "include_recommendations": "bool"
+          }
+        },
+        {
+          "name": "HealthCheckResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "summary": "SystemHealthSummary",
+            "components": "List[...]"
+          }
+        },
+        {
+          "name": "PredictiveMaintenanceRequest",
+          "fields": {
+            "component_id": "Optional[...]",
+            "component_type": "Optional[...]",
+            "time_horizon_hours": "int",
+            "confidence_threshold": "float"
+          }
+        },
+        {
+          "name": "MaintenancePrediction",
+          "fields": {
+            "component_id": "str",
+            "component_name": "str",
+            "component_type": "ComponentType",
+            "predicted_issue": "str",
+            "confidence": "float",
+            "time_to_failure": "Optional[...]",
+            "recommended_action": "str",
+            "priority": "str",
+            "prediction_timestamp": "datetime"
+          }
+        },
+        {
+          "name": "PredictiveMaintenanceResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "predictions": "List[...]",
+            "total_predictions_count": "int",
+            "high_priority_count": "int",
+            "medium_priority_count": "int",
+            "low_priority_count": "int"
+          }
+        },
+        {
+          "name": "SelfHealingRequest",
+          "fields": {
+            "component_id": "str",
+            "issue_description": "str",
+            "suggested_actions": "List[...]",
+            "auto_approve": "bool",
+            "max_impact_level": "str"
+          }
+        },
+        {
+          "name": "HealingActionResult",
+          "fields": {
+            "action": "SelfHealingAction",
+            "success": "bool",
+            "timestamp": "datetime",
+            "details": "str",
+            "impact_level": "str",
+            "duration_ms": "int"
+          }
+        },
+        {
+          "name": "SelfHealingResponse",
+          "fields": {
+            "request_id": "str",
+            "component_id": "str",
+            "timestamp": "datetime",
+            "issue_resolved": "bool",
+            "actions_performed": "List[...]",
+            "current_status": "HealthStatus",
+            "recommendations": "List[...]"
+          }
+        },
+        {
+          "name": "HealthMonitorConfigRequest",
+          "fields": {
+            "check_interval_seconds": "Optional[...]",
+            "enable_predictive_maintenance": "Optional[...]",
+            "enable_self_healing": "Optional[...]",
+            "alert_thresholds": "Optional[...]",
+            "excluded_components": "Optional[...]"
+          }
+        },
+        {
+          "name": "HealthMonitorConfigResponse",
+          "fields": {
+            "request_id": "str",
+            "timestamp": "datetime",
+            "current_config": "Dict",
+            "changes_applied": "Dict",
+            "restart_required": "bool"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/health_monitor",
+        "/health_monitor/status",
+        "/health_monitor/create",
+        "/health_monitor/update",
+        "/health_monitor/delete",
+        "/health_monitor/list",
+        "/health_monitor/get",
+        "/health_monitor/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/critic/review",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "critic",
+      "matching_schemas": [
+        "critic_schema"
+      ],
+      "best_schema": "critic_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "CriticReviewRequest",
+          "fields": {
+            "loop_id": "str",
+            "agent_outputs": "Dict[...]",
+            "project_id": "str",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "CriticScores",
+          "fields": {
+            "technical_accuracy": "int",
+            "ux_clarity": "int",
+            "visual_design": "int",
+            "monetization_strategy": "int"
+          }
+        },
+        {
+          "name": "CriticUsage",
+          "fields": {
+            "prompt_tokens": "int",
+            "completion_tokens": "int",
+            "total_tokens": "int"
+          }
+        },
+        {
+          "name": "CriticReviewResult",
+          "fields": {
+            "status": "str",
+            "loop_id": "str",
+            "reflection": "Optional[...]",
+            "scores": "Optional[...]",
+            "rejection": "Optional[...]",
+            "rejection_reason": "Optional[...]",
+            "usage": "Optional[...]",
+            "timestamp": "Optional[...]",
+            "message": "Optional[...]",
+            "raw_response": "Optional[...]"
+          }
+        },
+        {
+          "name": "CriticRejectRequest",
+          "fields": {
+            "loop_id": "str",
+            "reason": "str",
+            "project_id": "str",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "CriticRejectResult",
+          "fields": {
+            "status": "str",
+            "loop_id": "str",
+            "rejection": "bool",
+            "rejection_reason": "str",
+            "timestamp": "Optional[...]",
+            "message": "Optional[...]"
+          }
+        },
+        {
+          "name": "CriticLogReasonRequest",
+          "fields": {
+            "loop_id": "str",
+            "reason_type": "str",
+            "reason_text": "str",
+            "project_id": "str",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "CriticLogReasonResult",
+          "fields": {
+            "status": "str",
+            "loop_id": "str",
+            "reason_type": "str",
+            "reason_text": "str",
+            "timestamp": "Optional[...]",
+            "message": "Optional[...]"
+          }
+        },
+        {
+          "name": "CriticErrorResult",
+          "fields": {
+            "status": "str",
+            "message": "str",
+            "task": "Optional[...]",
+            "tools": "Optional[...]",
+            "project_id": "Optional[...]",
+            "loop_id": "Optional[...]"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/critic",
+        "/critic/status",
+        "/critic/create",
+        "/critic/update",
+        "/critic/delete",
+        "/critic/list",
+        "/critic/get",
+        "/critic/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/context/{agent_id}",
+      "method": "GET",
+      "status_code": 404,
+      "module_name": "context",
+      "matching_schemas": [
+        "agent_context_schema"
+      ],
+      "best_schema": "agent_context_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "MemoryUsage",
+          "fields": {
+            "total_entries": "int",
+            "recent_entries": "int",
+            "tags_count": "Dict[...]",
+            "size_bytes": "Optional[...]"
+          }
+        },
+        {
+          "name": "LoopState",
+          "fields": {
+            "loop_id": "str",
+            "current_step": "int",
+            "total_steps": "int",
+            "started_at": "str",
+            "last_updated": "str",
+            "state": "str"
+          }
+        },
+        {
+          "name": "LastAgentAction",
+          "fields": {
+            "agent_id": "str",
+            "action_type": "str",
+            "timestamp": "str",
+            "status": "str",
+            "details": "Optional[...]"
+          }
+        },
+        {
+          "name": "AgentContextRequest",
+          "fields": {
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "include_memory_stats": "bool"
+          }
+        },
+        {
+          "name": "AgentContextResponse",
+          "fields": {
+            "agent_id": "str",
+            "state": "AgentState",
+            "loop_state": "Optional[...]",
+            "last_action": "Optional[...]",
+            "memory_usage": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "AgentContextError",
+          "fields": {
+            "message": "str",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/agent_context",
+        "/agent_context/status",
+        "/agent_context/create",
+        "/agent_context/update",
+        "/agent_context/delete",
+        "/agent_context/list",
+        "/agent_context/get",
+        "/agent_context/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/context",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "context",
+      "matching_schemas": [
+        "agent_context_schema"
+      ],
+      "best_schema": "agent_context_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "MemoryUsage",
+          "fields": {
+            "total_entries": "int",
+            "recent_entries": "int",
+            "tags_count": "Dict[...]",
+            "size_bytes": "Optional[...]"
+          }
+        },
+        {
+          "name": "LoopState",
+          "fields": {
+            "loop_id": "str",
+            "current_step": "int",
+            "total_steps": "int",
+            "started_at": "str",
+            "last_updated": "str",
+            "state": "str"
+          }
+        },
+        {
+          "name": "LastAgentAction",
+          "fields": {
+            "agent_id": "str",
+            "action_type": "str",
+            "timestamp": "str",
+            "status": "str",
+            "details": "Optional[...]"
+          }
+        },
+        {
+          "name": "AgentContextRequest",
+          "fields": {
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "include_memory_stats": "bool"
+          }
+        },
+        {
+          "name": "AgentContextResponse",
+          "fields": {
+            "agent_id": "str",
+            "state": "AgentState",
+            "loop_state": "Optional[...]",
+            "last_action": "Optional[...]",
+            "memory_usage": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "AgentContextError",
+          "fields": {
+            "message": "str",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/agent_context",
+        "/agent_context/status",
+        "/agent_context/create",
+        "/agent_context/update",
+        "/agent_context/delete",
+        "/agent_context/list",
+        "/agent_context/get",
+        "/agent_context/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/config",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "config",
+      "matching_schemas": [
+        "agent_config_schema"
+      ],
+      "best_schema": "agent_config_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "ToolPermission",
+          "fields": {
+            "tool_id": "str",
+            "enabled": "bool",
+            "permission_level": "PermissionLevel",
+            "rate_limit": "Optional[...]"
+          }
+        },
+        {
+          "name": "FallbackBehavior",
+          "fields": {
+            "retry_count": "int",
+            "fallback_agent": "Optional[...]",
+            "error_response_template": "Optional[...]",
+            "log_failures": "bool"
+          }
+        },
+        {
+          "name": "AgentConfigRequest",
+          "fields": {
+            "agent_id": "str",
+            "permissions": "List[...]",
+            "fallback_behavior": "Optional[...]",
+            "memory_access_level": "PermissionLevel",
+            "custom_settings": "Optional[...]"
+          }
+        },
+        {
+          "name": "AgentConfigResponse",
+          "fields": {
+            "agent_id": "str",
+            "config_updated": "bool",
+            "permissions_count": "int",
+            "memory_access_level": "PermissionLevel",
+            "fallback_configured": "bool",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "AgentConfigError",
+          "fields": {
+            "message": "str",
+            "agent_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "AgentConfigGetRequest",
+          "fields": {
+            "agent_id": "str"
+          }
+        },
+        {
+          "name": "AgentConfigGetResponse",
+          "fields": {
+            "agent_id": "str",
+            "permissions": "List[...]",
+            "fallback_behavior": "Optional[...]",
+            "memory_access_level": "PermissionLevel",
+            "custom_settings": "Dict[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/agent_config",
+        "/agent_config/status",
+        "/agent_config/create",
+        "/agent_config/update",
+        "/agent_config/delete",
+        "/agent_config/list",
+        "/agent_config/get",
+        "/agent_config/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/config/{agent_id}",
+      "method": "GET",
+      "status_code": 404,
+      "module_name": "config",
+      "matching_schemas": [
+        "agent_config_schema"
+      ],
+      "best_schema": "agent_config_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "ToolPermission",
+          "fields": {
+            "tool_id": "str",
+            "enabled": "bool",
+            "permission_level": "PermissionLevel",
+            "rate_limit": "Optional[...]"
+          }
+        },
+        {
+          "name": "FallbackBehavior",
+          "fields": {
+            "retry_count": "int",
+            "fallback_agent": "Optional[...]",
+            "error_response_template": "Optional[...]",
+            "log_failures": "bool"
+          }
+        },
+        {
+          "name": "AgentConfigRequest",
+          "fields": {
+            "agent_id": "str",
+            "permissions": "List[...]",
+            "fallback_behavior": "Optional[...]",
+            "memory_access_level": "PermissionLevel",
+            "custom_settings": "Optional[...]"
+          }
+        },
+        {
+          "name": "AgentConfigResponse",
+          "fields": {
+            "agent_id": "str",
+            "config_updated": "bool",
+            "permissions_count": "int",
+            "memory_access_level": "PermissionLevel",
+            "fallback_configured": "bool",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "AgentConfigError",
+          "fields": {
+            "message": "str",
+            "agent_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "AgentConfigGetRequest",
+          "fields": {
+            "agent_id": "str"
+          }
+        },
+        {
+          "name": "AgentConfigGetResponse",
+          "fields": {
+            "agent_id": "str",
+            "permissions": "List[...]",
+            "fallback_behavior": "Optional[...]",
+            "memory_access_level": "PermissionLevel",
+            "custom_settings": "Dict[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/agent_config",
+        "/agent_config/status",
+        "/agent_config/create",
+        "/agent_config/update",
+        "/agent_config/delete",
+        "/agent_config/list",
+        "/agent_config/get",
+        "/agent_config/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/config/{agent_id}",
+      "method": "DELETE",
+      "status_code": 404,
+      "module_name": "config",
+      "matching_schemas": [
+        "agent_config_schema"
+      ],
+      "best_schema": "agent_config_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "ToolPermission",
+          "fields": {
+            "tool_id": "str",
+            "enabled": "bool",
+            "permission_level": "PermissionLevel",
+            "rate_limit": "Optional[...]"
+          }
+        },
+        {
+          "name": "FallbackBehavior",
+          "fields": {
+            "retry_count": "int",
+            "fallback_agent": "Optional[...]",
+            "error_response_template": "Optional[...]",
+            "log_failures": "bool"
+          }
+        },
+        {
+          "name": "AgentConfigRequest",
+          "fields": {
+            "agent_id": "str",
+            "permissions": "List[...]",
+            "fallback_behavior": "Optional[...]",
+            "memory_access_level": "PermissionLevel",
+            "custom_settings": "Optional[...]"
+          }
+        },
+        {
+          "name": "AgentConfigResponse",
+          "fields": {
+            "agent_id": "str",
+            "config_updated": "bool",
+            "permissions_count": "int",
+            "memory_access_level": "PermissionLevel",
+            "fallback_configured": "bool",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "AgentConfigError",
+          "fields": {
+            "message": "str",
+            "agent_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "AgentConfigGetRequest",
+          "fields": {
+            "agent_id": "str"
+          }
+        },
+        {
+          "name": "AgentConfigGetResponse",
+          "fields": {
+            "agent_id": "str",
+            "permissions": "List[...]",
+            "fallback_behavior": "Optional[...]",
+            "memory_access_level": "PermissionLevel",
+            "custom_settings": "Dict[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/agent_config",
+        "/agent_config/status",
+        "/agent_config/create",
+        "/agent_config/update",
+        "/agent_config/delete",
+        "/agent_config/list",
+        "/agent_config/get",
+        "/agent_config/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/validate",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "validate",
+      "matching_schemas": [
+        "validate_schema_hash"
+      ],
+      "best_schema": "validate_schema_hash",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "ValidateSchemaHashRequest",
+          "fields": {
+            "route_path": "str",
+            "expected_hash": "str"
+          }
+        },
+        {
+          "name": "ValidateSchemaHashResult",
+          "fields": {
+            "valid": "bool",
+            "actual_hash": "str",
+            "message": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/validate_hash",
+        "/validate_hash/status",
+        "/validate_hash/create",
+        "/validate_hash/update",
+        "/validate_hash/delete",
+        "/validate_hash/list",
+        "/validate_hash/get",
+        "/validate_hash/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/embed/batch",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "embed",
+      "matching_schemas": [
+        "memory_embed_schema"
+      ],
+      "best_schema": "memory_embed_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "MemoryEmbedRequest",
+          "fields": {
+            "content": "Union[...]",
+            "model": "EmbeddingModel",
+            "dimension": "Optional[...]",
+            "tags": "List[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]"
+          }
+        },
+        {
+          "name": "MemoryEmbedResponse",
+          "fields": {
+            "memory_id": "str",
+            "embedding_size": "int",
+            "model_used": "EmbeddingModel",
+            "tags": "List[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "MemoryEmbedError",
+          "fields": {
+            "message": "str",
+            "model": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "MemoryEmbedBatchRequest",
+          "fields": {
+            "items": "List[...]"
+          }
+        },
+        {
+          "name": "MemoryEmbedBatchResponse",
+          "fields": {
+            "results": "List[...]",
+            "errors": "List[...]",
+            "total_items": "int",
+            "successful_items": "int",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/memory_embed",
+        "/memory_embed/status",
+        "/memory_embed/create",
+        "/memory_embed/update",
+        "/memory_embed/delete",
+        "/memory_embed/list",
+        "/memory_embed/get",
+        "/memory_embed/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/recall",
+      "method": "GET",
+      "status_code": 404,
+      "module_name": "recall",
+      "matching_schemas": [
+        "memory_recall_schema"
+      ],
+      "best_schema": "memory_recall_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "MemoryRecallRequest",
+          "fields": {
+            "method": "RecallMethod",
+            "query": "str",
+            "limit": "int",
+            "offset": "int",
+            "sort_order": "RecallSortOrder",
+            "start_date": "Optional[...]",
+            "end_date": "Optional[...]",
+            "agent_filter": "Optional[...]",
+            "loop_filter": "Optional[...]"
+          }
+        },
+        {
+          "name": "MemoryEntry",
+          "fields": {
+            "memory_id": "str",
+            "content": "Dict[...]",
+            "tags": "List[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "timestamp": "str"
+          }
+        },
+        {
+          "name": "MemoryRecallResponse",
+          "fields": {
+            "query": "str",
+            "method": "RecallMethod",
+            "total_results": "int",
+            "returned_results": "int",
+            "results": "List[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "MemoryRecallError",
+          "fields": {
+            "message": "str",
+            "query": "Optional[...]",
+            "method": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/memory_recall",
+        "/memory_recall/status",
+        "/memory_recall/create",
+        "/memory_recall/update",
+        "/memory_recall/delete",
+        "/memory_recall/list",
+        "/memory_recall/get",
+        "/memory_recall/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/recall",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "recall",
+      "matching_schemas": [
+        "memory_recall_schema"
+      ],
+      "best_schema": "memory_recall_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "MemoryRecallRequest",
+          "fields": {
+            "method": "RecallMethod",
+            "query": "str",
+            "limit": "int",
+            "offset": "int",
+            "sort_order": "RecallSortOrder",
+            "start_date": "Optional[...]",
+            "end_date": "Optional[...]",
+            "agent_filter": "Optional[...]",
+            "loop_filter": "Optional[...]"
+          }
+        },
+        {
+          "name": "MemoryEntry",
+          "fields": {
+            "memory_id": "str",
+            "content": "Dict[...]",
+            "tags": "List[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "timestamp": "str"
+          }
+        },
+        {
+          "name": "MemoryRecallResponse",
+          "fields": {
+            "query": "str",
+            "method": "RecallMethod",
+            "total_results": "int",
+            "returned_results": "int",
+            "results": "List[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "MemoryRecallError",
+          "fields": {
+            "message": "str",
+            "query": "Optional[...]",
+            "method": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/memory_recall",
+        "/memory_recall/status",
+        "/memory_recall/create",
+        "/memory_recall/update",
+        "/memory_recall/delete",
+        "/memory_recall/list",
+        "/memory_recall/get",
+        "/memory_recall/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/embed",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "embed",
+      "matching_schemas": [
+        "memory_embed_schema"
+      ],
+      "best_schema": "memory_embed_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "MemoryEmbedRequest",
+          "fields": {
+            "content": "Union[...]",
+            "model": "EmbeddingModel",
+            "dimension": "Optional[...]",
+            "tags": "List[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]"
+          }
+        },
+        {
+          "name": "MemoryEmbedResponse",
+          "fields": {
+            "memory_id": "str",
+            "embedding_size": "int",
+            "model_used": "EmbeddingModel",
+            "tags": "List[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "MemoryEmbedError",
+          "fields": {
+            "message": "str",
+            "model": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "MemoryEmbedBatchRequest",
+          "fields": {
+            "items": "List[...]"
+          }
+        },
+        {
+          "name": "MemoryEmbedBatchResponse",
+          "fields": {
+            "results": "List[...]",
+            "errors": "List[...]",
+            "total_items": "int",
+            "successful_items": "int",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/memory_embed",
+        "/memory_embed/status",
+        "/memory_embed/create",
+        "/memory_embed/update",
+        "/memory_embed/delete",
+        "/memory_embed/list",
+        "/memory_embed/get",
+        "/memory_embed/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/observe",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "observe",
+      "matching_schemas": [
+        "observer_schema"
+      ],
+      "best_schema": "observer_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "ObserverTaskRequest",
+          "fields": {
+            "task": "str",
+            "date": "Optional[...]",
+            "tools": "Optional[...]"
+          }
+        },
+        {
+          "name": "ObservationEntry",
+          "fields": {
+            "date": "str",
+            "memory_summary": "str",
+            "behavior_observed": "Optional[...]",
+            "anomalies": "Optional[...]",
+            "vertical_progress": "Optional[...]",
+            "loops_observed": "Optional[...]",
+            "personality_notes": "Optional[...]",
+            "philosophical_questions": "Optional[...]"
+          }
+        },
+        {
+          "name": "ObserverTaskResult",
+          "fields": {
+            "status": "str",
+            "message": "str",
+            "task": "str",
+            "date": "str",
+            "entry": "Optional[...]",
+            "log_path": "Optional[...]",
+            "timestamp": "str"
+          }
+        },
+        {
+          "name": "ObserverErrorResult",
+          "fields": {
+            "status": "str",
+            "message": "str",
+            "task": "Optional[...]",
+            "timestamp": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/observer",
+        "/observer/status",
+        "/observer/create",
+        "/observer/update",
+        "/observer/delete",
+        "/observer/list",
+        "/observer/get",
+        "/observer/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/generate",
+      "method": "GET",
+      "status_code": 404,
+      "module_name": "generate",
+      "matching_schemas": [
+        "plan_generate_schema"
+      ],
+      "best_schema": "plan_generate_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "PlanGenerateRequest",
+          "fields": {
+            "goal": "str",
+            "plan_type": "PlanType",
+            "format": "PlanFormat",
+            "context": "Optional[...]",
+            "constraints": "Optional[...]",
+            "max_steps": "Optional[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]"
+          }
+        },
+        {
+          "name": "PlanStep",
+          "fields": {
+            "step_number": "int",
+            "description": "str",
+            "estimated_time": "Optional[...]",
+            "dependencies": "Optional[...]"
+          }
+        },
+        {
+          "name": "PlanGenerateResponse",
+          "fields": {
+            "plan_id": "str",
+            "goal": "str",
+            "plan_type": "PlanType",
+            "format": "PlanFormat",
+            "steps": "Optional[...]",
+            "content": "Optional[...]",
+            "total_steps": "int",
+            "estimated_completion_time": "Optional[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "PlanGenerateError",
+          "fields": {
+            "message": "str",
+            "goal": "Optional[...]",
+            "plan_type": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/plan_generate",
+        "/plan_generate/status",
+        "/plan_generate/create",
+        "/plan_generate/update",
+        "/plan_generate/delete",
+        "/plan_generate/list",
+        "/plan_generate/get",
+        "/plan_generate/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/generate",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "generate",
+      "matching_schemas": [
+        "plan_generate_schema"
+      ],
+      "best_schema": "plan_generate_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "PlanGenerateRequest",
+          "fields": {
+            "goal": "str",
+            "plan_type": "PlanType",
+            "format": "PlanFormat",
+            "context": "Optional[...]",
+            "constraints": "Optional[...]",
+            "max_steps": "Optional[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]"
+          }
+        },
+        {
+          "name": "PlanStep",
+          "fields": {
+            "step_number": "int",
+            "description": "str",
+            "estimated_time": "Optional[...]",
+            "dependencies": "Optional[...]"
+          }
+        },
+        {
+          "name": "PlanGenerateResponse",
+          "fields": {
+            "plan_id": "str",
+            "goal": "str",
+            "plan_type": "PlanType",
+            "format": "PlanFormat",
+            "steps": "Optional[...]",
+            "content": "Optional[...]",
+            "total_steps": "int",
+            "estimated_completion_time": "Optional[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "PlanGenerateError",
+          "fields": {
+            "message": "str",
+            "goal": "Optional[...]",
+            "plan_type": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/plan_generate",
+        "/plan_generate/status",
+        "/plan_generate/create",
+        "/plan_generate/update",
+        "/plan_generate/delete",
+        "/plan_generate/list",
+        "/plan_generate/get",
+        "/plan_generate/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/reflect",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "reflect",
+      "matching_schemas": [
+        "self_reflection_schema"
+      ],
+      "best_schema": "self_reflection_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "SelfInquiryRequest",
+          "fields": {
+            "loop_id": "str",
+            "project_id": "str",
+            "prompt": "str",
+            "initiator": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/self_reflection",
+        "/self_reflection/status",
+        "/self_reflection/create",
+        "/self_reflection/update",
+        "/self_reflection/delete",
+        "/self_reflection/list",
+        "/self_reflection/get",
+        "/self_reflection/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/run",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "run",
+      "matching_schemas": [
+        "rerun_decision"
+      ],
+      "best_schema": "rerun_decision",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "RerunDecision",
+          "fields": {
+            "decision": "str",
+            "loop_id": "str",
+            "original_loop_id": "Optional[...]",
+            "new_loop_id": "Optional[...]",
+            "rerun_reason": "Optional[...]",
+            "rerun_number": "Optional[...]",
+            "reason": "Optional[...]",
+            "orchestrator_persona": "Optional[...]",
+            "rerun_limit_reached": "Optional[...]",
+            "bias_echo_detected": "Optional[...]",
+            "fatigue_threshold_exceeded": "Optional[...]",
+            "force_finalized": "Optional[...]",
+            "rerun_trigger": "Optional[...]",
+            "rerun_reason_detail": "Optional[...]",
+            "overridden_by": "Optional[...]",
+            "alignment_score": "Optional[...]",
+            "drift_score": "Optional[...]",
+            "belief_conflict_flags": "Optional[...]",
+            "safety_triggered": "Optional[...]",
+            "safety_trigger_type": "Optional[...]",
+            "safety_severity": "Optional[...]",
+            "operator_triggered": "Optional[...]",
+            "operator_id": "Optional[...]",
+            "operator_reason": "Optional[...]",
+            "depth": "Optional[...]",
+            "depth_escalation": "Optional[...]",
+            "depth_escalation_reason": "Optional[...]",
+            "timestamp": "Optional[...]",
+            "execution_priority": "Optional[...]",
+            "schema_validated": "bool",
+            "validation_timestamp": "Optional[...]",
+            "validation_errors": "Optional[...]"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/rerun_decision",
+        "/rerun_decision/status",
+        "/rerun_decision/create",
+        "/rerun_decision/update",
+        "/rerun_decision/delete",
+        "/rerun_decision/list",
+        "/rerun_decision/get",
+        "/rerun_decision/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/reinforce",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "reinforce",
+      "matching_schemas": [
+        "self_reinforcement_schema"
+      ],
+      "best_schema": "self_reinforcement_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "BeliefReinforcementRequest",
+          "fields": {
+            "loop_id": "str",
+            "field": "str",
+            "reinforcement_reason": "str",
+            "initiator": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/self_reinforcement",
+        "/self_reinforcement/status",
+        "/self_reinforcement/create",
+        "/self_reinforcement/update",
+        "/self_reinforcement/delete",
+        "/self_reinforcement/list",
+        "/self_reinforcement/get",
+        "/self_reinforcement/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/challenge",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "challenge",
+      "matching_schemas": [
+        "self_challenge_schema"
+      ],
+      "best_schema": "self_challenge_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "BeliefChallengeRequest",
+          "fields": {
+            "loop_id": "str",
+            "field": "str",
+            "challenger": "str",
+            "challenge_reason": "str",
+            "initiator": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/self_challenge",
+        "/self_challenge/status",
+        "/self_challenge/create",
+        "/self_challenge/update",
+        "/self_challenge/delete",
+        "/self_challenge/list",
+        "/self_challenge/get",
+        "/self_challenge/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/plan",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "plan",
+      "matching_schemas": [
+        "plan_generate_schema"
+      ],
+      "best_schema": "plan_generate_schema",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "schema_models": [
+        {
+          "name": "PlanGenerateRequest",
+          "fields": {
+            "goal": "str",
+            "plan_type": "PlanType",
+            "format": "PlanFormat",
+            "context": "Optional[...]",
+            "constraints": "Optional[...]",
+            "max_steps": "Optional[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]"
+          }
+        },
+        {
+          "name": "PlanStep",
+          "fields": {
+            "step_number": "int",
+            "description": "str",
+            "estimated_time": "Optional[...]",
+            "dependencies": "Optional[...]"
+          }
+        },
+        {
+          "name": "PlanGenerateResponse",
+          "fields": {
+            "plan_id": "str",
+            "goal": "str",
+            "plan_type": "PlanType",
+            "format": "PlanFormat",
+            "steps": "Optional[...]",
+            "content": "Optional[...]",
+            "total_steps": "int",
+            "estimated_completion_time": "Optional[...]",
+            "agent_id": "Optional[...]",
+            "loop_id": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        },
+        {
+          "name": "PlanGenerateError",
+          "fields": {
+            "message": "str",
+            "goal": "Optional[...]",
+            "plan_type": "Optional[...]",
+            "timestamp": "str",
+            "version": "str"
+          }
+        }
+      ],
+      "potential_routes": [
+        "/plan_generate",
+        "/plan_generate/status",
+        "/plan_generate/create",
+        "/plan_generate/update",
+        "/plan_generate/delete",
+        "/plan_generate/list",
+        "/plan_generate/get",
+        "/plan_generate/search"
+      ],
+      "route_hints": []
+    },
+    {
+      "route_path": "/api/loop/complete",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/api/loop/trace",
+      "method": "GET",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/api/loop/plan",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/api/loop/trace",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/api/loop/persona-reflect",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/api/loop/reset",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/api/loop/respond",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/status",
+      "method": "GET",
+      "status_code": 404,
+      "module_name": "status",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/status",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "status",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/revise",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "revise",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/api/memory/ping",
+      "method": "GET",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/api/memory/write",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/api/memory/read",
+      "method": "GET",
+      "status_code": 404,
+      "module_name": "api",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    },
+    {
+      "route_path": "/analyze",
+      "method": "POST",
+      "status_code": 404,
+      "module_name": "analyze",
+      "matching_schemas": [],
+      "best_schema": null,
+      "fix_type": "missing_route",
+      "priority": "low"
+    }
+  ],
+  "repair_batches": [
+    [
+      {
+        "route_path": "/loop/snapshot/{loop_id}",
+        "method": "DELETE",
+        "status_code": 500,
+        "module_name": "loop",
+        "matching_schemas": [
+          "loop_schema",
+          "loop_snapshot_schema",
+          "loop_trace",
+          "loop_validation_schema"
+        ],
+        "best_schema": "loop_schema",
+        "fix_type": "server_error",
+        "priority": "high",
+        "schema_models": [
+          {
+            "name": "LoopResponseRequest",
+            "fields": {
+              "project_id": "str",
+              "loop_id": "str",
+              "agent": "str",
+              "input_key": "str",
+              "target_file": "str",
+              "model": "Optional[...]",
+              "temperature": "Optional[...]",
+              "max_tokens": "Optional[...]",
+              "metadata": "Optional[...]"
+            }
+          },
+          {
+            "name": "LoopResponseResult",
+            "fields": {
+              "status": "str",
+              "output_tag": "str",
+              "timestamp": "str",
+              "code": "str",
+              "metadata": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/loop",
+          "/loop/status",
+          "/loop/create",
+          "/loop/update",
+          "/loop/delete",
+          "/loop/list",
+          "/loop/get",
+          "/loop/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/orchestrator/validate_delegation",
+        "method": "POST",
+        "status_code": 500,
+        "module_name": "orchestrator",
+        "matching_schemas": [
+          "orchestrator_schema"
+        ],
+        "best_schema": "orchestrator_schema",
+        "fix_type": "server_error",
+        "priority": "high",
+        "schema_models": [
+          {
+            "name": "OrchestratorConsultRequest",
+            "fields": {
+              "project_id": "str",
+              "query": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorInterpretRequest",
+            "fields": {
+              "project_id": "str",
+              "content": "str",
+              "content_type": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorPlanRequest",
+            "fields": {
+              "project_id": "str",
+              "task": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "TriggerResult",
+            "fields": {
+              "triggered_agent": "str",
+              "timestamp": "str",
+              "loop_count": "int",
+              "reason": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorDecision",
+            "fields": {
+              "timestamp": "str",
+              "loop_count": "int",
+              "last_agent": "Optional[...]",
+              "next_agent": "str",
+              "reason": "str"
+            }
+          },
+          {
+            "name": "PlanStep",
+            "fields": {
+              "agent": "str",
+              "purpose": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlan",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "steps": "List[...]",
+              "estimated_loops": "int",
+              "current_loop": "int"
+            }
+          },
+          {
+            "name": "DelegationResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "agent": "str",
+              "task": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "ResolutionResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "conflicts_found": "int",
+              "conflicts_resolved": "int",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlanResult",
+            "fields": {
+              "status": "str",
+              "task": "str",
+              "tools": "List[...]",
+              "project_id": "str",
+              "intent": "str",
+              "action": "str",
+              "timestamp": "str",
+              "output": "str",
+              "loop_id": "Optional[...]",
+              "next_agent": "Optional[...]",
+              "trigger_result": "Optional[...]",
+              "reason": "Optional[...]",
+              "completed_agent": "Optional[...]",
+              "all_loops_complete": "Optional[...]",
+              "decisions": "Optional[...]",
+              "decision": "Optional[...]",
+              "plan": "Optional[...]",
+              "delegated_agent": "Optional[...]",
+              "delegated_task": "Optional[...]",
+              "delegation_result": "Optional[...]",
+              "resolution": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorErrorResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "Optional[...]",
+              "tools": "Optional[...]",
+              "project_id": "Optional[...]",
+              "intent": "Optional[...]",
+              "action": "Optional[...]",
+              "timestamp": "Optional[...]",
+              "output": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/orchestrator",
+          "/orchestrator/status",
+          "/orchestrator/create",
+          "/orchestrator/update",
+          "/orchestrator/delete",
+          "/orchestrator/list",
+          "/orchestrator/get",
+          "/orchestrator/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/orchestrator/check_recovery_authorization",
+        "method": "POST",
+        "status_code": 500,
+        "module_name": "orchestrator",
+        "matching_schemas": [
+          "orchestrator_schema"
+        ],
+        "best_schema": "orchestrator_schema",
+        "fix_type": "server_error",
+        "priority": "high",
+        "schema_models": [
+          {
+            "name": "OrchestratorConsultRequest",
+            "fields": {
+              "project_id": "str",
+              "query": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorInterpretRequest",
+            "fields": {
+              "project_id": "str",
+              "content": "str",
+              "content_type": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorPlanRequest",
+            "fields": {
+              "project_id": "str",
+              "task": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "TriggerResult",
+            "fields": {
+              "triggered_agent": "str",
+              "timestamp": "str",
+              "loop_count": "int",
+              "reason": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorDecision",
+            "fields": {
+              "timestamp": "str",
+              "loop_count": "int",
+              "last_agent": "Optional[...]",
+              "next_agent": "str",
+              "reason": "str"
+            }
+          },
+          {
+            "name": "PlanStep",
+            "fields": {
+              "agent": "str",
+              "purpose": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlan",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "steps": "List[...]",
+              "estimated_loops": "int",
+              "current_loop": "int"
+            }
+          },
+          {
+            "name": "DelegationResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "agent": "str",
+              "task": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "ResolutionResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "conflicts_found": "int",
+              "conflicts_resolved": "int",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlanResult",
+            "fields": {
+              "status": "str",
+              "task": "str",
+              "tools": "List[...]",
+              "project_id": "str",
+              "intent": "str",
+              "action": "str",
+              "timestamp": "str",
+              "output": "str",
+              "loop_id": "Optional[...]",
+              "next_agent": "Optional[...]",
+              "trigger_result": "Optional[...]",
+              "reason": "Optional[...]",
+              "completed_agent": "Optional[...]",
+              "all_loops_complete": "Optional[...]",
+              "decisions": "Optional[...]",
+              "decision": "Optional[...]",
+              "plan": "Optional[...]",
+              "delegated_agent": "Optional[...]",
+              "delegated_task": "Optional[...]",
+              "delegation_result": "Optional[...]",
+              "resolution": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorErrorResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "Optional[...]",
+              "tools": "Optional[...]",
+              "project_id": "Optional[...]",
+              "intent": "Optional[...]",
+              "action": "Optional[...]",
+              "timestamp": "Optional[...]",
+              "output": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/orchestrator",
+          "/orchestrator/status",
+          "/orchestrator/create",
+          "/orchestrator/update",
+          "/orchestrator/delete",
+          "/orchestrator/list",
+          "/orchestrator/get",
+          "/orchestrator/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/orchestrator/handle_violation",
+        "method": "POST",
+        "status_code": 500,
+        "module_name": "orchestrator",
+        "matching_schemas": [
+          "orchestrator_schema"
+        ],
+        "best_schema": "orchestrator_schema",
+        "fix_type": "server_error",
+        "priority": "high",
+        "schema_models": [
+          {
+            "name": "OrchestratorConsultRequest",
+            "fields": {
+              "project_id": "str",
+              "query": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorInterpretRequest",
+            "fields": {
+              "project_id": "str",
+              "content": "str",
+              "content_type": "str",
+              "context": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorPlanRequest",
+            "fields": {
+              "project_id": "str",
+              "task": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "TriggerResult",
+            "fields": {
+              "triggered_agent": "str",
+              "timestamp": "str",
+              "loop_count": "int",
+              "reason": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorDecision",
+            "fields": {
+              "timestamp": "str",
+              "loop_count": "int",
+              "last_agent": "Optional[...]",
+              "next_agent": "str",
+              "reason": "str"
+            }
+          },
+          {
+            "name": "PlanStep",
+            "fields": {
+              "agent": "str",
+              "purpose": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlan",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "steps": "List[...]",
+              "estimated_loops": "int",
+              "current_loop": "int"
+            }
+          },
+          {
+            "name": "DelegationResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "agent": "str",
+              "task": "str",
+              "status": "str"
+            }
+          },
+          {
+            "name": "ResolutionResult",
+            "fields": {
+              "project_id": "str",
+              "timestamp": "str",
+              "conflicts_found": "int",
+              "conflicts_resolved": "int",
+              "status": "str"
+            }
+          },
+          {
+            "name": "OrchestratorPlanResult",
+            "fields": {
+              "status": "str",
+              "task": "str",
+              "tools": "List[...]",
+              "project_id": "str",
+              "intent": "str",
+              "action": "str",
+              "timestamp": "str",
+              "output": "str",
+              "loop_id": "Optional[...]",
+              "next_agent": "Optional[...]",
+              "trigger_result": "Optional[...]",
+              "reason": "Optional[...]",
+              "completed_agent": "Optional[...]",
+              "all_loops_complete": "Optional[...]",
+              "decisions": "Optional[...]",
+              "decision": "Optional[...]",
+              "plan": "Optional[...]",
+              "delegated_agent": "Optional[...]",
+              "delegated_task": "Optional[...]",
+              "delegation_result": "Optional[...]",
+              "resolution": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          },
+          {
+            "name": "OrchestratorErrorResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "Optional[...]",
+              "tools": "Optional[...]",
+              "project_id": "Optional[...]",
+              "intent": "Optional[...]",
+              "action": "Optional[...]",
+              "timestamp": "Optional[...]",
+              "output": "Optional[...]",
+              "error": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/orchestrator",
+          "/orchestrator/status",
+          "/orchestrator/create",
+          "/orchestrator/update",
+          "/orchestrator/delete",
+          "/orchestrator/list",
+          "/orchestrator/get",
+          "/orchestrator/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/health",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "health",
+        "matching_schemas": [
+          "health_monitor_schema"
+        ],
+        "best_schema": "health_monitor_schema",
+        "fix_type": "missing_route",
+        "priority": "medium",
+        "schema_models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/health_monitor",
+          "/health_monitor/status",
+          "/health_monitor/create",
+          "/health_monitor/update",
+          "/health_monitor/delete",
+          "/health_monitor/list",
+          "/health_monitor/get",
+          "/health_monitor/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/health/config",
+        "method": "GET",
+        "status_code": 500,
+        "module_name": "health",
+        "matching_schemas": [
+          "health_monitor_schema"
+        ],
+        "best_schema": "health_monitor_schema",
+        "fix_type": "server_error",
+        "priority": "medium",
+        "schema_models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/health_monitor",
+          "/health_monitor/status",
+          "/health_monitor/create",
+          "/health_monitor/update",
+          "/health_monitor/delete",
+          "/health_monitor/list",
+          "/health_monitor/get",
+          "/health_monitor/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/health/check/{component_id}",
+        "method": "GET",
+        "status_code": 500,
+        "module_name": "health",
+        "matching_schemas": [
+          "health_monitor_schema"
+        ],
+        "best_schema": "health_monitor_schema",
+        "fix_type": "server_error",
+        "priority": "medium",
+        "schema_models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/health_monitor",
+          "/health_monitor/status",
+          "/health_monitor/create",
+          "/health_monitor/update",
+          "/health_monitor/delete",
+          "/health_monitor/list",
+          "/health_monitor/get",
+          "/health_monitor/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/health/maintenance/predict/{component_id}",
+        "method": "GET",
+        "status_code": 500,
+        "module_name": "health",
+        "matching_schemas": [
+          "health_monitor_schema"
+        ],
+        "best_schema": "health_monitor_schema",
+        "fix_type": "server_error",
+        "priority": "medium",
+        "schema_models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/health_monitor",
+          "/health_monitor/status",
+          "/health_monitor/create",
+          "/health_monitor/update",
+          "/health_monitor/delete",
+          "/health_monitor/list",
+          "/health_monitor/get",
+          "/health_monitor/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/critic/review",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "critic",
+        "matching_schemas": [
+          "critic_schema"
+        ],
+        "best_schema": "critic_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "CriticReviewRequest",
+            "fields": {
+              "loop_id": "str",
+              "agent_outputs": "Dict[...]",
+              "project_id": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticScores",
+            "fields": {
+              "technical_accuracy": "int",
+              "ux_clarity": "int",
+              "visual_design": "int",
+              "monetization_strategy": "int"
+            }
+          },
+          {
+            "name": "CriticUsage",
+            "fields": {
+              "prompt_tokens": "int",
+              "completion_tokens": "int",
+              "total_tokens": "int"
+            }
+          },
+          {
+            "name": "CriticReviewResult",
+            "fields": {
+              "status": "str",
+              "loop_id": "str",
+              "reflection": "Optional[...]",
+              "scores": "Optional[...]",
+              "rejection": "Optional[...]",
+              "rejection_reason": "Optional[...]",
+              "usage": "Optional[...]",
+              "timestamp": "Optional[...]",
+              "message": "Optional[...]",
+              "raw_response": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticRejectRequest",
+            "fields": {
+              "loop_id": "str",
+              "reason": "str",
+              "project_id": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticRejectResult",
+            "fields": {
+              "status": "str",
+              "loop_id": "str",
+              "rejection": "bool",
+              "rejection_reason": "str",
+              "timestamp": "Optional[...]",
+              "message": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticLogReasonRequest",
+            "fields": {
+              "loop_id": "str",
+              "reason_type": "str",
+              "reason_text": "str",
+              "project_id": "str",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticLogReasonResult",
+            "fields": {
+              "status": "str",
+              "loop_id": "str",
+              "reason_type": "str",
+              "reason_text": "str",
+              "timestamp": "Optional[...]",
+              "message": "Optional[...]"
+            }
+          },
+          {
+            "name": "CriticErrorResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "Optional[...]",
+              "tools": "Optional[...]",
+              "project_id": "Optional[...]",
+              "loop_id": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/critic",
+          "/critic/status",
+          "/critic/create",
+          "/critic/update",
+          "/critic/delete",
+          "/critic/list",
+          "/critic/get",
+          "/critic/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/context/{agent_id}",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "context",
+        "matching_schemas": [
+          "agent_context_schema"
+        ],
+        "best_schema": "agent_context_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "MemoryUsage",
+            "fields": {
+              "total_entries": "int",
+              "recent_entries": "int",
+              "tags_count": "Dict[...]",
+              "size_bytes": "Optional[...]"
+            }
+          },
+          {
+            "name": "LoopState",
+            "fields": {
+              "loop_id": "str",
+              "current_step": "int",
+              "total_steps": "int",
+              "started_at": "str",
+              "last_updated": "str",
+              "state": "str"
+            }
+          },
+          {
+            "name": "LastAgentAction",
+            "fields": {
+              "agent_id": "str",
+              "action_type": "str",
+              "timestamp": "str",
+              "status": "str",
+              "details": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentContextRequest",
+            "fields": {
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "include_memory_stats": "bool"
+            }
+          },
+          {
+            "name": "AgentContextResponse",
+            "fields": {
+              "agent_id": "str",
+              "state": "AgentState",
+              "loop_state": "Optional[...]",
+              "last_action": "Optional[...]",
+              "memory_usage": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentContextError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/agent_context",
+          "/agent_context/status",
+          "/agent_context/create",
+          "/agent_context/update",
+          "/agent_context/delete",
+          "/agent_context/list",
+          "/agent_context/get",
+          "/agent_context/search"
+        ],
+        "route_hints": []
+      }
+    ],
+    [
+      {
+        "route_path": "/context",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "context",
+        "matching_schemas": [
+          "agent_context_schema"
+        ],
+        "best_schema": "agent_context_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "MemoryUsage",
+            "fields": {
+              "total_entries": "int",
+              "recent_entries": "int",
+              "tags_count": "Dict[...]",
+              "size_bytes": "Optional[...]"
+            }
+          },
+          {
+            "name": "LoopState",
+            "fields": {
+              "loop_id": "str",
+              "current_step": "int",
+              "total_steps": "int",
+              "started_at": "str",
+              "last_updated": "str",
+              "state": "str"
+            }
+          },
+          {
+            "name": "LastAgentAction",
+            "fields": {
+              "agent_id": "str",
+              "action_type": "str",
+              "timestamp": "str",
+              "status": "str",
+              "details": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentContextRequest",
+            "fields": {
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "include_memory_stats": "bool"
+            }
+          },
+          {
+            "name": "AgentContextResponse",
+            "fields": {
+              "agent_id": "str",
+              "state": "AgentState",
+              "loop_state": "Optional[...]",
+              "last_action": "Optional[...]",
+              "memory_usage": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentContextError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/agent_context",
+          "/agent_context/status",
+          "/agent_context/create",
+          "/agent_context/update",
+          "/agent_context/delete",
+          "/agent_context/list",
+          "/agent_context/get",
+          "/agent_context/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/config",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "config",
+        "matching_schemas": [
+          "agent_config_schema"
+        ],
+        "best_schema": "agent_config_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "ToolPermission",
+            "fields": {
+              "tool_id": "str",
+              "enabled": "bool",
+              "permission_level": "PermissionLevel",
+              "rate_limit": "Optional[...]"
+            }
+          },
+          {
+            "name": "FallbackBehavior",
+            "fields": {
+              "retry_count": "int",
+              "fallback_agent": "Optional[...]",
+              "error_response_template": "Optional[...]",
+              "log_failures": "bool"
+            }
+          },
+          {
+            "name": "AgentConfigRequest",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentConfigResponse",
+            "fields": {
+              "agent_id": "str",
+              "config_updated": "bool",
+              "permissions_count": "int",
+              "memory_access_level": "PermissionLevel",
+              "fallback_configured": "bool",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetRequest",
+            "fields": {
+              "agent_id": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetResponse",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Dict[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/agent_config",
+          "/agent_config/status",
+          "/agent_config/create",
+          "/agent_config/update",
+          "/agent_config/delete",
+          "/agent_config/list",
+          "/agent_config/get",
+          "/agent_config/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/config/{agent_id}",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "config",
+        "matching_schemas": [
+          "agent_config_schema"
+        ],
+        "best_schema": "agent_config_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "ToolPermission",
+            "fields": {
+              "tool_id": "str",
+              "enabled": "bool",
+              "permission_level": "PermissionLevel",
+              "rate_limit": "Optional[...]"
+            }
+          },
+          {
+            "name": "FallbackBehavior",
+            "fields": {
+              "retry_count": "int",
+              "fallback_agent": "Optional[...]",
+              "error_response_template": "Optional[...]",
+              "log_failures": "bool"
+            }
+          },
+          {
+            "name": "AgentConfigRequest",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentConfigResponse",
+            "fields": {
+              "agent_id": "str",
+              "config_updated": "bool",
+              "permissions_count": "int",
+              "memory_access_level": "PermissionLevel",
+              "fallback_configured": "bool",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetRequest",
+            "fields": {
+              "agent_id": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetResponse",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Dict[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/agent_config",
+          "/agent_config/status",
+          "/agent_config/create",
+          "/agent_config/update",
+          "/agent_config/delete",
+          "/agent_config/list",
+          "/agent_config/get",
+          "/agent_config/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/config/{agent_id}",
+        "method": "DELETE",
+        "status_code": 404,
+        "module_name": "config",
+        "matching_schemas": [
+          "agent_config_schema"
+        ],
+        "best_schema": "agent_config_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "ToolPermission",
+            "fields": {
+              "tool_id": "str",
+              "enabled": "bool",
+              "permission_level": "PermissionLevel",
+              "rate_limit": "Optional[...]"
+            }
+          },
+          {
+            "name": "FallbackBehavior",
+            "fields": {
+              "retry_count": "int",
+              "fallback_agent": "Optional[...]",
+              "error_response_template": "Optional[...]",
+              "log_failures": "bool"
+            }
+          },
+          {
+            "name": "AgentConfigRequest",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentConfigResponse",
+            "fields": {
+              "agent_id": "str",
+              "config_updated": "bool",
+              "permissions_count": "int",
+              "memory_access_level": "PermissionLevel",
+              "fallback_configured": "bool",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetRequest",
+            "fields": {
+              "agent_id": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetResponse",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Dict[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/agent_config",
+          "/agent_config/status",
+          "/agent_config/create",
+          "/agent_config/update",
+          "/agent_config/delete",
+          "/agent_config/list",
+          "/agent_config/get",
+          "/agent_config/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/validate",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "validate",
+        "matching_schemas": [
+          "validate_schema_hash"
+        ],
+        "best_schema": "validate_schema_hash",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "ValidateSchemaHashRequest",
+            "fields": {
+              "route_path": "str",
+              "expected_hash": "str"
+            }
+          },
+          {
+            "name": "ValidateSchemaHashResult",
+            "fields": {
+              "valid": "bool",
+              "actual_hash": "str",
+              "message": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/validate_hash",
+          "/validate_hash/status",
+          "/validate_hash/create",
+          "/validate_hash/update",
+          "/validate_hash/delete",
+          "/validate_hash/list",
+          "/validate_hash/get",
+          "/validate_hash/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/embed/batch",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "embed",
+        "matching_schemas": [
+          "memory_embed_schema"
+        ],
+        "best_schema": "memory_embed_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "MemoryEmbedRequest",
+            "fields": {
+              "content": "Union[...]",
+              "model": "EmbeddingModel",
+              "dimension": "Optional[...]",
+              "tags": "List[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]"
+            }
+          },
+          {
+            "name": "MemoryEmbedResponse",
+            "fields": {
+              "memory_id": "str",
+              "embedding_size": "int",
+              "model_used": "EmbeddingModel",
+              "tags": "List[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "MemoryEmbedError",
+            "fields": {
+              "message": "str",
+              "model": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "MemoryEmbedBatchRequest",
+            "fields": {
+              "items": "List[...]"
+            }
+          },
+          {
+            "name": "MemoryEmbedBatchResponse",
+            "fields": {
+              "results": "List[...]",
+              "errors": "List[...]",
+              "total_items": "int",
+              "successful_items": "int",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/memory_embed",
+          "/memory_embed/status",
+          "/memory_embed/create",
+          "/memory_embed/update",
+          "/memory_embed/delete",
+          "/memory_embed/list",
+          "/memory_embed/get",
+          "/memory_embed/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/recall",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "recall",
+        "matching_schemas": [
+          "memory_recall_schema"
+        ],
+        "best_schema": "memory_recall_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "MemoryRecallRequest",
+            "fields": {
+              "method": "RecallMethod",
+              "query": "str",
+              "limit": "int",
+              "offset": "int",
+              "sort_order": "RecallSortOrder",
+              "start_date": "Optional[...]",
+              "end_date": "Optional[...]",
+              "agent_filter": "Optional[...]",
+              "loop_filter": "Optional[...]"
+            }
+          },
+          {
+            "name": "MemoryEntry",
+            "fields": {
+              "memory_id": "str",
+              "content": "Dict[...]",
+              "tags": "List[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str"
+            }
+          },
+          {
+            "name": "MemoryRecallResponse",
+            "fields": {
+              "query": "str",
+              "method": "RecallMethod",
+              "total_results": "int",
+              "returned_results": "int",
+              "results": "List[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "MemoryRecallError",
+            "fields": {
+              "message": "str",
+              "query": "Optional[...]",
+              "method": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/memory_recall",
+          "/memory_recall/status",
+          "/memory_recall/create",
+          "/memory_recall/update",
+          "/memory_recall/delete",
+          "/memory_recall/list",
+          "/memory_recall/get",
+          "/memory_recall/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/recall",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "recall",
+        "matching_schemas": [
+          "memory_recall_schema"
+        ],
+        "best_schema": "memory_recall_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "MemoryRecallRequest",
+            "fields": {
+              "method": "RecallMethod",
+              "query": "str",
+              "limit": "int",
+              "offset": "int",
+              "sort_order": "RecallSortOrder",
+              "start_date": "Optional[...]",
+              "end_date": "Optional[...]",
+              "agent_filter": "Optional[...]",
+              "loop_filter": "Optional[...]"
+            }
+          },
+          {
+            "name": "MemoryEntry",
+            "fields": {
+              "memory_id": "str",
+              "content": "Dict[...]",
+              "tags": "List[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str"
+            }
+          },
+          {
+            "name": "MemoryRecallResponse",
+            "fields": {
+              "query": "str",
+              "method": "RecallMethod",
+              "total_results": "int",
+              "returned_results": "int",
+              "results": "List[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "MemoryRecallError",
+            "fields": {
+              "message": "str",
+              "query": "Optional[...]",
+              "method": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/memory_recall",
+          "/memory_recall/status",
+          "/memory_recall/create",
+          "/memory_recall/update",
+          "/memory_recall/delete",
+          "/memory_recall/list",
+          "/memory_recall/get",
+          "/memory_recall/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/embed",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "embed",
+        "matching_schemas": [
+          "memory_embed_schema"
+        ],
+        "best_schema": "memory_embed_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "MemoryEmbedRequest",
+            "fields": {
+              "content": "Union[...]",
+              "model": "EmbeddingModel",
+              "dimension": "Optional[...]",
+              "tags": "List[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]"
+            }
+          },
+          {
+            "name": "MemoryEmbedResponse",
+            "fields": {
+              "memory_id": "str",
+              "embedding_size": "int",
+              "model_used": "EmbeddingModel",
+              "tags": "List[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "MemoryEmbedError",
+            "fields": {
+              "message": "str",
+              "model": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "MemoryEmbedBatchRequest",
+            "fields": {
+              "items": "List[...]"
+            }
+          },
+          {
+            "name": "MemoryEmbedBatchResponse",
+            "fields": {
+              "results": "List[...]",
+              "errors": "List[...]",
+              "total_items": "int",
+              "successful_items": "int",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/memory_embed",
+          "/memory_embed/status",
+          "/memory_embed/create",
+          "/memory_embed/update",
+          "/memory_embed/delete",
+          "/memory_embed/list",
+          "/memory_embed/get",
+          "/memory_embed/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/observe",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "observe",
+        "matching_schemas": [
+          "observer_schema"
+        ],
+        "best_schema": "observer_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "ObserverTaskRequest",
+            "fields": {
+              "task": "str",
+              "date": "Optional[...]",
+              "tools": "Optional[...]"
+            }
+          },
+          {
+            "name": "ObservationEntry",
+            "fields": {
+              "date": "str",
+              "memory_summary": "str",
+              "behavior_observed": "Optional[...]",
+              "anomalies": "Optional[...]",
+              "vertical_progress": "Optional[...]",
+              "loops_observed": "Optional[...]",
+              "personality_notes": "Optional[...]",
+              "philosophical_questions": "Optional[...]"
+            }
+          },
+          {
+            "name": "ObserverTaskResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "str",
+              "date": "str",
+              "entry": "Optional[...]",
+              "log_path": "Optional[...]",
+              "timestamp": "str"
+            }
+          },
+          {
+            "name": "ObserverErrorResult",
+            "fields": {
+              "status": "str",
+              "message": "str",
+              "task": "Optional[...]",
+              "timestamp": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/observer",
+          "/observer/status",
+          "/observer/create",
+          "/observer/update",
+          "/observer/delete",
+          "/observer/list",
+          "/observer/get",
+          "/observer/search"
+        ],
+        "route_hints": []
+      }
+    ],
+    [
+      {
+        "route_path": "/generate",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "generate",
+        "matching_schemas": [
+          "plan_generate_schema"
+        ],
+        "best_schema": "plan_generate_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "PlanGenerateRequest",
+            "fields": {
+              "goal": "str",
+              "plan_type": "PlanType",
+              "format": "PlanFormat",
+              "context": "Optional[...]",
+              "constraints": "Optional[...]",
+              "max_steps": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]"
+            }
+          },
+          {
+            "name": "PlanStep",
+            "fields": {
+              "step_number": "int",
+              "description": "str",
+              "estimated_time": "Optional[...]",
+              "dependencies": "Optional[...]"
+            }
+          },
+          {
+            "name": "PlanGenerateResponse",
+            "fields": {
+              "plan_id": "str",
+              "goal": "str",
+              "plan_type": "PlanType",
+              "format": "PlanFormat",
+              "steps": "Optional[...]",
+              "content": "Optional[...]",
+              "total_steps": "int",
+              "estimated_completion_time": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "PlanGenerateError",
+            "fields": {
+              "message": "str",
+              "goal": "Optional[...]",
+              "plan_type": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/plan_generate",
+          "/plan_generate/status",
+          "/plan_generate/create",
+          "/plan_generate/update",
+          "/plan_generate/delete",
+          "/plan_generate/list",
+          "/plan_generate/get",
+          "/plan_generate/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/generate",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "generate",
+        "matching_schemas": [
+          "plan_generate_schema"
+        ],
+        "best_schema": "plan_generate_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "PlanGenerateRequest",
+            "fields": {
+              "goal": "str",
+              "plan_type": "PlanType",
+              "format": "PlanFormat",
+              "context": "Optional[...]",
+              "constraints": "Optional[...]",
+              "max_steps": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]"
+            }
+          },
+          {
+            "name": "PlanStep",
+            "fields": {
+              "step_number": "int",
+              "description": "str",
+              "estimated_time": "Optional[...]",
+              "dependencies": "Optional[...]"
+            }
+          },
+          {
+            "name": "PlanGenerateResponse",
+            "fields": {
+              "plan_id": "str",
+              "goal": "str",
+              "plan_type": "PlanType",
+              "format": "PlanFormat",
+              "steps": "Optional[...]",
+              "content": "Optional[...]",
+              "total_steps": "int",
+              "estimated_completion_time": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "PlanGenerateError",
+            "fields": {
+              "message": "str",
+              "goal": "Optional[...]",
+              "plan_type": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/plan_generate",
+          "/plan_generate/status",
+          "/plan_generate/create",
+          "/plan_generate/update",
+          "/plan_generate/delete",
+          "/plan_generate/list",
+          "/plan_generate/get",
+          "/plan_generate/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/reflect",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "reflect",
+        "matching_schemas": [
+          "self_reflection_schema"
+        ],
+        "best_schema": "self_reflection_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "SelfInquiryRequest",
+            "fields": {
+              "loop_id": "str",
+              "project_id": "str",
+              "prompt": "str",
+              "initiator": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/self_reflection",
+          "/self_reflection/status",
+          "/self_reflection/create",
+          "/self_reflection/update",
+          "/self_reflection/delete",
+          "/self_reflection/list",
+          "/self_reflection/get",
+          "/self_reflection/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/run",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "run",
+        "matching_schemas": [
+          "rerun_decision"
+        ],
+        "best_schema": "rerun_decision",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "RerunDecision",
+            "fields": {
+              "decision": "str",
+              "loop_id": "str",
+              "original_loop_id": "Optional[...]",
+              "new_loop_id": "Optional[...]",
+              "rerun_reason": "Optional[...]",
+              "rerun_number": "Optional[...]",
+              "reason": "Optional[...]",
+              "orchestrator_persona": "Optional[...]",
+              "rerun_limit_reached": "Optional[...]",
+              "bias_echo_detected": "Optional[...]",
+              "fatigue_threshold_exceeded": "Optional[...]",
+              "force_finalized": "Optional[...]",
+              "rerun_trigger": "Optional[...]",
+              "rerun_reason_detail": "Optional[...]",
+              "overridden_by": "Optional[...]",
+              "alignment_score": "Optional[...]",
+              "drift_score": "Optional[...]",
+              "belief_conflict_flags": "Optional[...]",
+              "safety_triggered": "Optional[...]",
+              "safety_trigger_type": "Optional[...]",
+              "safety_severity": "Optional[...]",
+              "operator_triggered": "Optional[...]",
+              "operator_id": "Optional[...]",
+              "operator_reason": "Optional[...]",
+              "depth": "Optional[...]",
+              "depth_escalation": "Optional[...]",
+              "depth_escalation_reason": "Optional[...]",
+              "timestamp": "Optional[...]",
+              "execution_priority": "Optional[...]",
+              "schema_validated": "bool",
+              "validation_timestamp": "Optional[...]",
+              "validation_errors": "Optional[...]"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/rerun_decision",
+          "/rerun_decision/status",
+          "/rerun_decision/create",
+          "/rerun_decision/update",
+          "/rerun_decision/delete",
+          "/rerun_decision/list",
+          "/rerun_decision/get",
+          "/rerun_decision/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/reinforce",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "reinforce",
+        "matching_schemas": [
+          "self_reinforcement_schema"
+        ],
+        "best_schema": "self_reinforcement_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "BeliefReinforcementRequest",
+            "fields": {
+              "loop_id": "str",
+              "field": "str",
+              "reinforcement_reason": "str",
+              "initiator": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/self_reinforcement",
+          "/self_reinforcement/status",
+          "/self_reinforcement/create",
+          "/self_reinforcement/update",
+          "/self_reinforcement/delete",
+          "/self_reinforcement/list",
+          "/self_reinforcement/get",
+          "/self_reinforcement/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/challenge",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "challenge",
+        "matching_schemas": [
+          "self_challenge_schema"
+        ],
+        "best_schema": "self_challenge_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "BeliefChallengeRequest",
+            "fields": {
+              "loop_id": "str",
+              "field": "str",
+              "challenger": "str",
+              "challenge_reason": "str",
+              "initiator": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/self_challenge",
+          "/self_challenge/status",
+          "/self_challenge/create",
+          "/self_challenge/update",
+          "/self_challenge/delete",
+          "/self_challenge/list",
+          "/self_challenge/get",
+          "/self_challenge/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/plan",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "plan",
+        "matching_schemas": [
+          "plan_generate_schema"
+        ],
+        "best_schema": "plan_generate_schema",
+        "fix_type": "missing_route",
+        "priority": "low",
+        "schema_models": [
+          {
+            "name": "PlanGenerateRequest",
+            "fields": {
+              "goal": "str",
+              "plan_type": "PlanType",
+              "format": "PlanFormat",
+              "context": "Optional[...]",
+              "constraints": "Optional[...]",
+              "max_steps": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]"
+            }
+          },
+          {
+            "name": "PlanStep",
+            "fields": {
+              "step_number": "int",
+              "description": "str",
+              "estimated_time": "Optional[...]",
+              "dependencies": "Optional[...]"
+            }
+          },
+          {
+            "name": "PlanGenerateResponse",
+            "fields": {
+              "plan_id": "str",
+              "goal": "str",
+              "plan_type": "PlanType",
+              "format": "PlanFormat",
+              "steps": "Optional[...]",
+              "content": "Optional[...]",
+              "total_steps": "int",
+              "estimated_completion_time": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "PlanGenerateError",
+            "fields": {
+              "message": "str",
+              "goal": "Optional[...]",
+              "plan_type": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ],
+        "potential_routes": [
+          "/plan_generate",
+          "/plan_generate/status",
+          "/plan_generate/create",
+          "/plan_generate/update",
+          "/plan_generate/delete",
+          "/plan_generate/list",
+          "/plan_generate/get",
+          "/plan_generate/search"
+        ],
+        "route_hints": []
+      },
+      {
+        "route_path": "/api/loop/complete",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/api/loop/trace",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/api/loop/plan",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      }
+    ],
+    [
+      {
+        "route_path": "/api/loop/trace",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/api/loop/persona-reflect",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/api/loop/reset",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/api/loop/respond",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/status",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "status",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/status",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "status",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/revise",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "revise",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/api/memory/ping",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/api/memory/write",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      },
+      {
+        "route_path": "/api/memory/read",
+        "method": "GET",
+        "status_code": 404,
+        "module_name": "api",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      }
+    ],
+    [
+      {
+        "route_path": "/analyze",
+        "method": "POST",
+        "status_code": 404,
+        "module_name": "analyze",
+        "matching_schemas": [],
+        "best_schema": null,
+        "fix_type": "missing_route",
+        "priority": "low"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,688 @@
+[
+  {
+    "route_path": "/agent/builder",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/ops",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/research",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/memory",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/loop",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/delegate",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/forge",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/hal",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/nova",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/sage",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/critic",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/pessimist",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/add",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/search",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/delete",
+    "method": "DELETE",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/update",
+    "method": "PUT",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/list",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/clear",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/stats",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/export",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/import",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/upload_file",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/upload_base64",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/tools/web_search",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/tools/url_summarizer",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/tools/pdf_ingest",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/tools/code_executor",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/tools/github_commit",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/tools/image_caption",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/tools/email_drafter",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/system/status",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/system/snapshot",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/system/health",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/system/logs",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/system/config",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/system/restart",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/orchestrator/status",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/orchestrator/start",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/orchestrator/stop",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/orchestrator/consult",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/plan/generate",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/plan/execute",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/plan/status",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/plan/cancel",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/auth/login",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/auth/logout",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/auth/register",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/auth/verify",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/auth/reset",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/user/profile",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/user/update",
+    "method": "PUT",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/user/delete",
+    "method": "DELETE",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/user/preferences",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/admin/users",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/admin/logs",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/admin/config",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/admin/stats",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/api/v1/status",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/api/v1/agents",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/api/v1/tools",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/api/v1/memory",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/webhook/github",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/webhook/slack",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/training/start",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/training/status",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/training/stop",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/feedback/submit",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/feedback/list",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/docs",
+    "method": "GET",
+    "status": "200 OK",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/redoc",
+    "method": "GET",
+    "status": "200 OK",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/openapi.json",
+    "method": "GET",
+    "status": "200 OK",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/builder/config",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/ops/config",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/agent/research/config",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/thread",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/thread/list",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/thread/update",
+    "method": "PUT",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/memory/thread/delete",
+    "method": "DELETE",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/tools/list",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/tools/status",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/system/version",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/system/update",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/orchestrator/agents",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/orchestrator/tools",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/plan/list",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/plan/delete",
+    "method": "DELETE",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/auth/refresh",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/user/sessions",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/admin/system",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/admin/memory",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/api/v1/system",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/api/v1/orchestrator",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/webhook/custom",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/training/export",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/training/import",
+    "method": "POST",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/feedback/stats",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  },
+  {
+    "route_path": "/feedback/export",
+    "method": "GET",
+    "status": "404 Not Found",
+    "bound_schema": "Unknown",
+    "responsible_agent": "Unknown"
+  }
+]
