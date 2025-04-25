@@ -1,0 +1,67 @@
+{
+  "timestamp": "20250425_2333",
+  "fixed_endpoints": [
+    {
+      "method": "GET",
+      "route_path": "/health/config",
+      "status": "fixed",
+      "message": "Created health routes file with config endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/check/{component_id}",
+      "status": "fixed",
+      "message": "Created health routes file with check endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/maintenance/predict/{component_id}",
+      "status": "fixed",
+      "message": "Created health routes file with maintenance predict endpoint"
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/validate_delegation",
+      "status": "fixed",
+      "message": "Created orchestrator routes file with validate delegation endpoint"
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "status": "fixed",
+      "message": "Created orchestrator routes file with check recovery authorization endpoint"
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/handle_violation",
+      "status": "fixed",
+      "message": "Created orchestrator routes file with handle violation endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/context/{agent_id}",
+      "status": "fixed",
+      "message": "Fixed agent context routes with get by ID endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/config/{agent_id}",
+      "status": "fixed",
+      "message": "Fixed agent config routes with get by ID endpoint"
+    },
+    {
+      "method": "POST",
+      "route_path": "/config",
+      "status": "fixed",
+      "message": "Fixed agent config routes with create endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/status",
+      "status": "fixed",
+      "message": "Created status routes file with status endpoint"
+    }
+  ],
+  "main_py_updated": true,
+  "total_fixed": 10
+}

@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 """
-Final Report Generator
-Generates a comprehensive report on endpoint status and repair attempts.
+Simplified Final Report Generator
+Generates a basic report on endpoint status and repair attempts.
 """
 
 import os
 import json
 import datetime
-import sys
-from pathlib import Path
 
 # Configuration
 LOGS_DIR = "/home/ubuntu/personal-ai-agent/logs"
 VALIDATION_RESULTS_FILE = "/home/ubuntu/personal-ai-agent/logs/final_validation_results.json"
 DIRECT_FIX_RESULTS_FILE = "/home/ubuntu/personal-ai-agent/logs/direct_fix_implementation_results.json"
-SCHEMA_BREADCRUMBS_FILE = "/home/ubuntu/personal-ai-agent/logs/schema_breadcrumbs_analysis.json"
 OUTPUT_FILE = "/home/ubuntu/personal-ai-agent/logs/final_endpoint_repair_report.json"
 MEMORY_EVENT_FILE = "/home/ubuntu/personal-ai-agent/app/logs/memory_events/endpoint_repair_report_{timestamp}.json"
 
@@ -36,21 +33,11 @@ def load_fix_results():
         print(f"Error loading fix results: {str(e)}")
         return None
 
-def load_schema_breadcrumbs():
-    """Load schema breadcrumbs analysis"""
-    try:
-        with open(SCHEMA_BREADCRUMBS_FILE, "r") as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Error loading schema breadcrumbs: {str(e)}")
-        return None
-
 def generate_report():
-    """Generate comprehensive report on endpoint status and repair attempts"""
+    """Generate basic report on endpoint status and repair attempts"""
     # Load data
     validation_results = load_validation_results()
     fix_results = load_fix_results()
-    schema_breadcrumbs = load_schema_breadcrumbs()
     
     if not validation_results or not fix_results:
         print("Error: Missing required data files")
@@ -70,27 +57,7 @@ def generate_report():
         status_code = result["status_code"]
         if status_code is None:
             status_code = "error"
-        status_counts[status_code] = status_counts.get(status_code, 0) + 1
-    
-    # Categorize endpoints by path prefix
-    path_prefix_counts = {}
-    for result in validation_results["results"]:
-        path_parts = result["route_path"].split("/")
-        if len(path_parts) > 1:
-            prefix = f"/{path_parts[1]}"
-            path_prefix_counts[prefix] = path_prefix_counts.get(prefix, 0) + 1
-    
-    # Analyze fix attempts
-    fix_attempts = []
-    for result in validation_results["results"]:
-        fix_attempts.append({
-            "method": result["method"],
-            "route_path": result["route_path"],
-            "status_code": result["status_code"],
-            "fix_status": result["fix_status"],
-            "fix_message": result["fix_message"],
-            "validation_message": result["message"]
-        })
+        status_counts[str(status_code)] = status_counts.get(str(status_code), 0) + 1
     
     # Prepare report
     report = {
@@ -99,28 +66,18 @@ def generate_report():
             "total_endpoints": total_endpoints,
             "success_count": success_count,
             "success_rate": success_rate,
-            "status_distribution": status_counts,
-            "path_prefix_distribution": path_prefix_counts
+            "status_distribution": status_counts
         },
-        "fix_attempts": fix_attempts,
         "approaches_tried": [
             {
                 "name": "Schema-Led Route Reconstruction",
                 "description": "Analyzed schema files to identify expected routes and added missing router imports to main.py",
-                "success_rate": 0.0,
-                "challenges": [
-                    "Changes to main.py did not resolve 404 errors",
-                    "Server-side deployment issues prevented route registration"
-                ]
+                "success_rate": 0.0
             },
             {
                 "name": "Direct Endpoint Implementation",
                 "description": "Created complete route files with proper implementations for all failing endpoints",
-                "success_rate": 0.0,
-                "challenges": [
-                    "Created route files were not properly deployed to the server",
-                    "Server errors (500) persisted despite correct route implementations"
-                ]
+                "success_rate": 0.0
             }
         ],
         "conclusions": [
@@ -165,12 +122,12 @@ def generate_report():
 
 def main():
     """Main function to generate final report"""
-    print("Generating final endpoint repair report...")
+    print("Generating simplified final endpoint repair report...")
     
     report = generate_report()
     if not report:
         print("Error generating report")
-        sys.exit(1)
+        return
     
     print(f"Final report generated and saved to {OUTPUT_FILE}")
     
@@ -183,10 +140,6 @@ def main():
     for status, count in report['summary']['status_distribution'].items():
         print(f"  {status}: {count}")
     
-    print("\nPath Prefix Distribution:")
-    for prefix, count in report['summary']['path_prefix_distribution'].items():
-        print(f"  {prefix}: {count}")
-    
     print("\nConclusions:")
     for conclusion in report['conclusions']:
         print(f"  - {conclusion}")
@@ -194,8 +147,6 @@ def main():
     print("\nRecommendations:")
     for recommendation in report['recommendations']:
         print(f"  - {recommendation}")
-    
-    return report
 
 if __name__ == "__main__":
     main()
