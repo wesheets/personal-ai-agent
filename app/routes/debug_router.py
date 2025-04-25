@@ -72,4 +72,3 @@ router = APIRouter(
 # Include all debug-related routers
 router.include_router(status_router, prefix="")
 router.include_router(hal_schema_router, prefix="")
-main
