@@ -1,0 +1,41 @@
+# Implementation Plan for Debug Status Endpoint Enhancement
+
+## Overview
+This implementation enhances the debug status endpoint to provide comprehensive testing of all critical system endpoints. The enhanced endpoint will verify that all expected FastAPI routes are present in the live app, respond with 200 status codes, and map to the correct files.
+
+## Changes Made
+1. Enhanced `/debug/status` endpoint to include comprehensive testing of all critical system endpoints
+2. Added `check_all_endpoints()` function to verify accessibility of all specified endpoints
+3. Added `determine_endpoint_source_file()` helper function to map endpoints to their source files
+4. Modified `get_deployment_status()` to include endpoint status in overall status determination
+5. Added Request parameter to `get_deployment_status()` to access base URL for endpoint testing
+
+## Endpoints Tested
+- `/debug/status`
+- `/debug/hal-schema`
+- `/api/memory`
+- `/api/agent`
+- `/api/orchestrator`
+- `/api/plan`
+- `/api/fix`
+- `/api/delegate`
+- `/api/critic`
+- `/api/sage`
+- `/api/nova`
+- `/api/hal/status`
+- `/dashboard`
+- `/health`
+- `/diagnostics/routes`
+
+## Deployment Notes
+- The debug router is correctly included in main.py at lines 523-528
+- If `/debug/status` still returns 404 in production after deployment, the issue may be elsewhere in the deployment pipeline
+- Possible issues could include CORS configuration, proxy settings, or route precedence conflicts
+- The enhanced debug status endpoint should help diagnose these issues by providing detailed information about all components and endpoints
+
+## Verification Steps
+1. Access `/debug/status` endpoint in production
+2. Verify that all components show as operational or provide specific degradation details
+3. Check that all critical endpoints are listed in the endpoints section of the response
+4. Verify that endpoints correctly map to their source files
+5. Confirm that overall_status accurately reflects the health of all components and endpoints
