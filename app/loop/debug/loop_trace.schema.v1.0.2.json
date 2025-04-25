@@ -1,5 +1,5 @@
 {
-  "$schema": "http:
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Loop Trace Schema",
   "description": "Schema for loop execution trace data with cognitive stability enhancements",
   "type": "object",
