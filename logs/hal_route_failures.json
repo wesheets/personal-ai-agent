@@ -1,0 +1,35 @@
+[
+  {
+    "timestamp": "2025-04-25T12:12:20.000000",
+    "event": "log_file_created",
+    "message": "HAL route failures log file created"
+  },
+  {
+    "timestamp": "2025-04-25 12:14:15.353544",
+    "event": "import_failure",
+    "error": "No module named 'app.routes.hal_routes'"
+  },
+  {
+    "timestamp": "2025-04-25 12:14:15.489001",
+    "event": "fallback_activated",
+    "message": "HAL routes fallback mechanism activated due to loading errors"
+  },
+  {
+    "timestamp": "2025-04-25 12:14:15.490064",
+    "event": "error",
+    "error_type": "schema_missing",
+    "message": "HAL schema file not found at /home/ubuntu/personal-ai-agent/app/schemas/hal_agent.schema.json"
+  },
+  {
+    "timestamp": "2025-04-25 12:14:15.490472",
+    "event": "error",
+    "error_type": "registry_missing",
+    "message": "HAL agent not found in agent_registry.json"
+  },
+  {
+    "timestamp": "2025-04-25 12:14:15.490857",
+    "event": "error",
+    "error_type": "contract_missing",
+    "message": "HAL agent not found in agent_contracts.json"
+  }
+]
