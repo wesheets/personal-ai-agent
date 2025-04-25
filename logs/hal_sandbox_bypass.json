@@ -1,0 +1,14 @@
+[
+  {
+    "timestamp": "2025-04-25 13:26:46.677479",
+    "event": "sandbox_bypass",
+    "bypass_type": "schema_validation",
+    "message": "Skipping HAL schema validation in sandbox mode"
+  },
+  {
+    "timestamp": "2025-04-25 13:26:46.677821",
+    "event": "sandbox_bypass",
+    "bypass_type": "agent_registration",
+    "message": "Skipping HAL agent registration validation in sandbox mode"
+  }
+]
