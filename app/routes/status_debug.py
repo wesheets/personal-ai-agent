@@ -18,6 +18,17 @@ from typing import Dict, Any, List, Optional
 # Configure logging
 logger = logging.getLogger("app.routes.debug_status")
 
+def get_environment_info():
+    import os, sys
+    return {
+        "python_version": sys.version,
+        "cwd": os.getcwd(),
+        "env_vars": {
+            k: v for k, v in os.environ.items()
+            if k.startswith("APP_") or k.startswith("OPENAI") or k.startswith("PORT")
+        }
+    }
+
 # Create router
 router = APIRouter(
     tags=["debug"],
