@@ -1,5 +1,5 @@
 {
-  "$schema": "http:
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Prompt Analysis Schema",
   "description": "Schema for prompt analysis data in Orchestrator Thought Partner Mode",
   "type": "object",
