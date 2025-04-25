@@ -55,7 +55,6 @@ else:
 
 
 """This module registers all debug-related routes with the FastAPI application."""
-"""
 
 from fastapi import APIRouter
 
