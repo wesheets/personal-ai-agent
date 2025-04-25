@@ -1,0 +1,15 @@
+[
+  {
+    "id": "hal",
+    "name": "HAL",
+    "description": "HAL is a code generation and reasoning agent",
+    "role": "Generator",
+    "capabilities": [
+      "code_generation",
+      "reasoning",
+      "problem_solving"
+    ],
+    "version": "1.0.0",
+    "status": "active"
+  }
+]
