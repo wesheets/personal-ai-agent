@@ -14,6 +14,197 @@ import re
 # Configure logging
 logger = logging.getLogger("drift_monitor")
 
+async def detect_loop_drift(loop_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Detect drift in loop execution data.
+    
+    Args:
+        loop_data: Dictionary containing loop execution data
+            
+    Returns:
+        Dictionary containing drift detection result
+    """
+    try:
+        logger.info("Detecting loop drift")
+        
+        # Create monitor instance
+        monitor = BeliefDriftMonitor()
+        
+        # Extract data from loop_data
+        project_id = loop_data.get("project_id", "unknown")
+        sage_summaries = loop_data.get("sage_summaries", [])
+        critic_logs = loop_data.get("critic_logs", [])
+        project_goals = loop_data.get("project_goals", {})
+        
+        # Monitor belief drift
+        result = monitor.monitor_belief_drift(
+            project_id=project_id,
+            sage_summaries=sage_summaries,
+            critic_logs=critic_logs,
+            project_goals=project_goals
+        )
+        
+        return result
+    except Exception as e:
+        logger.error(f"Error detecting loop drift: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Failed to detect loop drift: {str(e)}",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+async def log_drift(drift_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Log drift detection results to the system.
+    
+    Args:
+        drift_data: Dictionary containing drift detection data
+            
+    Returns:
+        Dictionary containing log result
+    """
+    try:
+        logger.info("Logging drift detection results")
+        
+        # Extract data
+        project_id = drift_data.get("project_id", "unknown")
+        drift_detected = drift_data.get("drift_detected", False)
+        overall_alignment = drift_data.get("overall_alignment", 0.0)
+        
+        # Generate log tag
+        log_tag = f"drift_log_{project_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+        
+        # Create log entry
+        log_entry = {
+            "project_id": project_id,
+            "drift_detected": drift_detected,
+            "overall_alignment": overall_alignment,
+            "drift_data": drift_data,
+            "timestamp": datetime.utcnow().isoformat(),
+            "log_tag": log_tag
+        }
+        
+        # In a real implementation, this would write to a persistent store
+        logger.info(f"Drift log created for project {project_id}: drift={drift_detected}, alignment={overall_alignment:.2f}")
+        
+        return {
+            "status": "success",
+            "message": "Drift log created successfully",
+            "log_tag": log_tag,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error logging drift: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Failed to log drift: {str(e)}",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+async def get_previous_output(project_id: str, output_type: str = "drift") -> Dict[str, Any]:
+    """
+    Get previous output for a specific project and type.
+    
+    Args:
+        project_id: The project identifier
+        output_type: The type of output to retrieve
+            
+    Returns:
+        Dictionary containing previous output data
+    """
+    try:
+        logger.info(f"Getting previous {output_type} output for project: {project_id}")
+        
+        # In a real implementation, this would query a database
+        # For now, return mock data
+        
+        if output_type == "drift":
+            return {
+                "project_id": project_id,
+                "drift_detected": False,
+                "overall_alignment": 0.85,
+                "timestamp": (datetime.utcnow() - datetime.timedelta(days=1)).isoformat(),
+                "recommendations": [
+                    {
+                        "type": "info",
+                        "priority": "low",
+                        "description": "Previous alignment was within acceptable range."
+                    }
+                ]
+            }
+        else:
+            return {
+                "project_id": project_id,
+                "output_type": output_type,
+                "content": f"Previous {output_type} output for project {project_id}",
+                "timestamp": (datetime.utcnow() - datetime.timedelta(days=1)).isoformat()
+            }
+    except Exception as e:
+        logger.error(f"Error getting previous output: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Failed to get previous output: {str(e)}",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+async def determine_recommended_action(drift_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Determine recommended action based on drift data.
+    
+    Args:
+        drift_data: Dictionary containing drift detection data
+            
+    Returns:
+        Dictionary containing recommended action
+    """
+    try:
+        logger.info("Determining recommended action based on drift data")
+        
+        # Extract data
+        project_id = drift_data.get("project_id", "unknown")
+        drift_detected = drift_data.get("drift_detected", False)
+        overall_alignment = drift_data.get("overall_alignment", 0.0)
+        
+        # Determine action based on alignment score
+        if not drift_detected or overall_alignment >= 0.8:
+            action = {
+                "type": "continue",
+                "priority": "low",
+                "description": "Continue with current approach. Alignment is good."
+            }
+        elif overall_alignment >= 0.6:
+            action = {
+                "type": "review",
+                "priority": "medium",
+                "description": "Review recent changes and consider minor adjustments to improve alignment."
+            }
+        elif overall_alignment >= 0.4:
+            action = {
+                "type": "adjust",
+                "priority": "high",
+                "description": "Significant drift detected. Adjust approach to better align with project goals."
+            }
+        else:
+            action = {
+                "type": "reset",
+                "priority": "critical",
+                "description": "Critical drift detected. Consider resetting approach or reviewing project goals."
+            }
+        
+        return {
+            "status": "success",
+            "project_id": project_id,
+            "recommended_action": action,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error determining recommended action: {str(e)}")
+        return {
+            "status": "error",
+            "message": f"Failed to determine recommended action: {str(e)}",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
 class BeliefDriftMonitor:
     """
     Belief Drift Monitor for detecting drift in belief alignment.

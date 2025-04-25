@@ -24,6 +24,17 @@
         "schema_fallback"
       ],
       "checksum": "initial"
+    },
+    "ash": {
+      "tools": [
+        "memory_read",
+        "memory_write"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "schema_fallback"
+      ],
+      "checksum": "initial"
     }
   },
   "schemas": {
@@ -42,6 +53,22 @@
       ],
       "version": "v1.0.0",
       "checksum": "initial"
+    },
+    "HalSafetyCheck": {
+      "file": "schemas/agent_output/hal_safety_check.schema.json",
+      "bound_to_routes": [
+        "/hal/safety_check"
+      ],
+      "version": "v1.0.0",
+      "checksum": "fixed"
+    },
+    "AshAgentSchema": {
+      "file": "schemas/ash_agent.schema.json",
+      "bound_to_routes": [
+        "/ash/process"
+      ],
+      "version": "v1.0.0",
+      "checksum": "fixed"
     }
   },
   "routes": {
@@ -98,6 +125,30 @@
       "schema": "PolicyLogRequest",
       "status": "tested",
       "errors": []
+    },
+    "/drift/monitor": {
+      "method": "POST",
+      "schema": "DriftMonitorRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/hal/safety_check": {
+      "method": "POST",
+      "schema": "HalSafetyCheck",
+      "status": "active",
+      "errors": []
+    },
+    "/memory/add": {
+      "method": "POST",
+      "schema": "MemoryAddRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/memory/search": {
+      "method": "POST",
+      "schema": "MemorySearchRequest",
+      "status": "active",
+      "errors": []
     }
   },
   "modules": {
@@ -105,6 +156,16 @@
       "file": "app/modules/hal_openai.py",
       "wrapped_with_schema": true,
       "last_updated": "2025-04-24T23:47:07.446977"
+    },
+    "drift_monitor": {
+      "file": "app/modules/drift_monitor.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-25T04:07:21.158701"
+    },
+    "memory_writer": {
+      "file": "app/modules/memory_writer.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-25T04:07:21.158701"
     }
   },
   "memory": {
@@ -115,12 +176,13 @@
     "schema_checksum_tracking": true,
     "schema_discovery_fallback": true,
     "test_route_integrity": false,
-    "agent_contract_enforcement": true
+    "agent_contract_enforcement": true,
+    "drift_monitor_enabled": true
   },
   "manifest_meta": {
     "version": "1.0.0",
     "created_at": "2025-04-24T23:47:07.446977",
-    "last_updated": "2025-04-24T23:47:07.960943",
+    "last_updated": "2025-04-25T04:07:21.158701",
     "boot_events": [
       {
         "timestamp": "2025-04-24T23:47:07.816573",
@@ -170,7 +232,11 @@
       "forge_routes",
       "loop_validation_routes",
       "output_policy_routes",
-      "pessimist_evaluation_routes"
-    ]
+      "pessimist_evaluation_routes",
+      "hal_routes",
+      "memory_routes",
+      "drift_routes"
+    ],
+    "memory_tag": "final_route_fix_20250425_040746"
   }
 }
