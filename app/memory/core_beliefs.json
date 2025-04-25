@@ -61,37 +61,37 @@
     "purpose": {
       "last_reinforced_at": "2025-04-23T03:04:59.598150",
       "reinforcement_reason": "Operator affirmed alignment after 5 revisions",
-      "locked": True
+      "locked": true
     },
     "role": {
       "last_reinforced_at": null,
       "reinforcement_reason": null,
-      "locked": False
+      "locked": false
     },
     "created_by": {
       "last_reinforced_at": null,
       "reinforcement_reason": null,
-      "locked": False
+      "locked": false
     },
     "limitations": {
       "last_reinforced_at": null,
       "reinforcement_reason": null,
-      "locked": False
+      "locked": false
     },
     "loop_reflection": {
       "last_reinforced_at": null,
       "reinforcement_reason": null,
-      "locked": False
+      "locked": false
     },
     "emotional_model": {
       "last_reinforced_at": null,
       "reinforcement_reason": null,
-      "locked": False
+      "locked": false
     },
     "confidence_model": {
       "last_reinforced_at": null,
       "reinforcement_reason": null,
-      "locked": False
+      "locked": false
     }
   },
   "challenge_log": {
