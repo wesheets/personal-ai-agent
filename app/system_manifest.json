@@ -182,7 +182,7 @@
   "manifest_meta": {
     "version": "1.0.0",
     "created_at": "2025-04-24T23:47:07.446977",
-    "last_updated": "2025-04-25T04:07:21.158701",
+    "last_updated": "2025-04-25T11:50:28.810820",
     "boot_events": [
       {
         "timestamp": "2025-04-24T23:47:07.816573",
@@ -190,6 +190,46 @@
       },
       {
         "timestamp": "2025-04-24T23:47:07.897987",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:43:23.598692",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:43:23.690521",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:43:53.666756",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:43:53.747494",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:44:24.105969",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:44:24.182356",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:48:27.094642",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:48:27.181190",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:50:28.653609",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:50:28.737195",
         "version": "1.0.0"
       }
     ],
@@ -203,6 +243,8 @@
       "export_routes",
       "fix_routes",
       "delegate_stream_routes",
+      "hal_routes",
+      "memory_routes",
       "app_memory_routes",
       "loop_routes",
       "routes_orchestrator_routes",
@@ -229,14 +271,13 @@
       "orchestrator_contract_routes",
       "ash_routes",
       "dashboard_routes",
+      "drift_routes",
       "forge_routes",
       "loop_validation_routes",
       "output_policy_routes",
       "pessimist_evaluation_routes",
-      "hal_routes",
-      "memory_routes",
-      "drift_routes"
+      "debug_analyzer"
     ],
-    "memory_tag": "route_wireup_complete_20250425_042108"
+    "memory_tag": "snapshot_route_fix_20250425_115221"
   }
 }

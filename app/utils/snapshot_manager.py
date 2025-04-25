@@ -237,6 +237,36 @@ async def delete_snapshot(loop_id: str) -> bool:
         logger.error(f"❌ Error deleting snapshot: {str(e)}")
         return False
 
+async def get_loop_snapshot(loop_id: str) -> Dict[str, Any]:
+    """
+    Get a snapshot of the current loop state.
+    This is a wrapper around load_snapshot that returns a dictionary format
+    suitable for debug analysis.
+    
+    Args:
+        loop_id: The ID of the loop to get a snapshot for
+        
+    Returns:
+        Dictionary containing the loop snapshot data
+    """
+    snapshot = await load_snapshot(loop_id)
+    if not snapshot:
+        return {
+            "loop_id": loop_id,
+            "status": "not_found",
+            "timestamp": datetime.now().isoformat(),
+            "error": "No snapshot found for this loop ID"
+        }
+    
+    return {
+        "loop_id": loop_id,
+        "status": "success",
+        "timestamp": snapshot.timestamp,
+        "agent_sequence": snapshot.agent_sequence,
+        "memory_state": snapshot.memory_state,
+        "notes": snapshot.notes
+    }
+
 async def get_memory_state(loop_id: str) -> Dict[str, Any]:
     """
     Get the current memory state for a loop.

@@ -1,12 +1,40 @@
 """
 ORCHESTRATOR Agent Schema Definitions
-
 This module defines the schemas for ORCHESTRATOR agent requests and responses.
 """
-
 from typing import Dict, Any, List, Optional, Union
 from pydantic import BaseModel, Field
 
+class OrchestratorConsultRequest(BaseModel):
+    """
+    Schema for ORCHESTRATOR agent consultation request.
+    """
+    project_id: str = Field(..., description="Project identifier")
+    query: str = Field(..., description="Consultation query or question")
+    context: Optional[Dict[str, Any]] = Field(
+        default={},
+        description="Additional context for the consultation"
+    )
+    tools: Optional[List[str]] = Field(
+        default=["reflect", "analyze", "advise"],
+        description="List of tools to use for consultation"
+    )
+
+class OrchestratorInterpretRequest(BaseModel):
+    """
+    Schema for ORCHESTRATOR agent interpretation request.
+    """
+    project_id: str = Field(..., description="Project identifier")
+    content: str = Field(..., description="Content to interpret")
+    content_type: str = Field(..., description="Type of content (e.g., 'code', 'text', 'data')")
+    context: Optional[Dict[str, Any]] = Field(
+        default={},
+        description="Additional context for interpretation"
+    )
+    tools: Optional[List[str]] = Field(
+        default=["analyze", "explain", "summarize"],
+        description="List of tools to use for interpretation"
+    )
 
 class OrchestratorPlanRequest(BaseModel):
     """
