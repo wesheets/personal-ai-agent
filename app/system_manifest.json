@@ -174,6 +174,12 @@
       "schema": "DiagnosticsRouteResponse",
       "status": "active",
       "errors": []
+    },
+    "/debug/hal-schema": {
+      "method": "GET",
+      "schema": "None",
+      "status": "pending_deployment",
+      "errors": []
     }
   },
   "modules": {
@@ -201,6 +207,11 @@
       "file": "app/fallbacks/fix_hal_routes.py",
       "wrapped_with_schema": true,
       "last_updated": "2025-04-25T13:25:06.000000"
+    },
+    "debug_hal_schema": {
+      "file": "app/routes/debug_hal_schema.py",
+      "wrapped_with_schema": false,
+      "last_updated": "2025-04-25T14:54:53.000000"
     }
   },
   "memory": {
@@ -221,7 +232,7 @@
   "manifest_meta": {
     "version": "1.0.0",
     "created_at": "2025-04-24T23:47:07.446977",
-    "last_updated": "2025-04-25T13:25:23.000000",
+    "last_updated": "2025-04-25T14:56:51.000000",
     "boot_events": [
       {
         "timestamp": "2025-04-24T23:47:07.816573",
@@ -323,9 +334,10 @@
       "output_policy_routes",
       "pessimist_evaluation_routes",
       "debug_analyzer",
-      "diagnostics_routes"
+      "diagnostics_routes",
+      "debug_hal_schema"
     ],
-    "memory_tag": "hal_sandbox_override_implemented_20250425_132523"
+    "memory_tag": "hal_deploy_verification_20250425_145651"
   },
   "diagnostics": {
     "enabled": true,
@@ -334,6 +346,11 @@
         "path": "/diagnostics/routes",
         "description": "Provides information about loaded and failed routes, and fallbacks triggered",
         "category": "diagnostics"
+      },
+      {
+        "path": "/debug/hal-schema",
+        "description": "Verifies if the HAL schema file exists at runtime and returns detailed filesystem information",
+        "category": "debug"
       }
     ],
     "log_files": [
@@ -341,7 +358,8 @@
       "logs/memory_fallback.json",
       "logs/final_route_status.json",
       "logs/hal_schema_verification_20250425_130919.json",
-      "logs/hal_sandbox_bypass.json"
+      "logs/hal_sandbox_bypass.json",
+      "logs/hal_deploy_fs_trace_20250425_145630.json"
     ]
   },
   "hal_schema_verification": {
@@ -350,6 +368,17 @@
     "issue": "Path mismatch between repository and runtime expectations",
     "log_file": "logs/hal_schema_verification_20250425_130919.json",
     "recommended_action": "Move or copy the schema file from app/schemas/schemas/hal_agent.schema.json to app/schemas/hal_agent.schema.json"
+  },
+  "hal_schema_deployment_status": {
+    "debug_endpoint_added": "2025-04-25T14:54:53.000000",
+    "verification_pending": true,
+    "local_verification": {
+      "expected_runtime_path_exists": true,
+      "repository_path_exists": true,
+      "both_paths_exist": true
+    },
+    "log_file": "logs/hal_deploy_fs_trace_20250425_145630.json",
+    "next_steps": "Deploy debug endpoint and access /debug/hal-schema to verify file existence in production"
   },
   "sandbox_behavior_override": {
     "hal_schema_validation": {
