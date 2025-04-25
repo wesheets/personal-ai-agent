@@ -53,7 +53,7 @@ AGENT_CONTRACTS = {}
 
 def load_agent_contracts():
     """
-    Load agent contracts from the contracts directory.
+    Load agent contracts from the contracts directory or from the combined agent_contracts.json file.
     
     Returns:
         Dict containing agent contracts
@@ -66,9 +66,27 @@ def load_agent_contracts():
             os.makedirs(CONTRACTS_DIR)
             logger.info(f"✅ Created contracts directory at {CONTRACTS_DIR}")
         
-        # Load all contract files
+        # First try to load the combined agent_contracts.json file
+        combined_contract_path = os.path.join(CONTRACTS_DIR, "agent_contracts.json")
+        if os.path.exists(combined_contract_path):
+            with open(combined_contract_path, "r") as f:
+                contract_json = json.load(f)
+                
+                # Correctly iterate over the contract dictionary using .items()
+                for agent_id, contract_data in contract_json.items():
+                    # Convert to AgentContract if schema is available
+                    if schema_available:
+                        contract = AgentContract(**contract_data)
+                        contracts[agent_id] = contract
+                    else:
+                        contracts[agent_id] = contract_data
+                
+                logger.info(f"✅ Loaded {len(contracts)} agent contracts from combined file")
+                return contracts
+        
+        # If combined file doesn't exist, load individual contract files
         for filename in os.listdir(CONTRACTS_DIR):
-            if filename.endswith(".json"):
+            if filename.endswith(".json") and filename != "agent_contracts.json":
                 agent_id = filename.split(".")[0]
                 contract_path = os.path.join(CONTRACTS_DIR, filename)
                 
