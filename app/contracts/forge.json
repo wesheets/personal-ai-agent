@@ -18,8 +18,8 @@
         "retry_with_simplified_input",
         "create_recovery_snapshot"
     ],
-    "output_must_be_wrapped": True,
-    "can_initiate_recovery": True,
+    "output_must_be_wrapped": true,
+    "can_initiate_recovery": true,
     "version": "1.0.0",
     "description": "Deep system builder agent responsible for creating endpoints, schemas, modules, and registering routes",
     "capabilities": [
