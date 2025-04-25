@@ -51,7 +51,7 @@ class AshAgent(Agent):
                 "emotion": "low",
                 "directness": "high"
             },
-            schema_path="app/schemas/ash_schema.py",
+            schema_path="schemas/ash_agent.schema.json",
             trust_score=0.85,
             contract_version="1.0.0"
         )
