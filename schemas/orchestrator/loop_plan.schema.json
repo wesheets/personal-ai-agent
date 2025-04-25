@@ -1,5 +1,5 @@
 {
-  "$schema": "http:
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Loop Plan Schema",
   "description": "Schema for validating Orchestrator loop plans",
   "type": "object",
@@ -68,5 +68,5 @@
       "maximum": 1
     }
   },
-  "additionalProperties": False
+  "additionalProperties": false
 }

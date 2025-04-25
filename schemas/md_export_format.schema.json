@@ -1,5 +1,5 @@
 {
-  "$schema": "http:
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Markdown Export Format Schema",
   "description": "Schema for loop lineage export in Markdown format",
   "type": "object",

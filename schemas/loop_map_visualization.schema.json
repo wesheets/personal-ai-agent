@@ -1,5 +1,5 @@
 {
-  "$schema": "http:
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Loop Map Visualization Schema",
   "description": "Schema for loop map visualization data structure",
   "type": "object",
