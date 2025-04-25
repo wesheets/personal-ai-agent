@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-04-25T15:25:30Z",
+  "event": "hal_schema_path_resolution_fix",
+  "status": "completed",
+  "details": {
+    "issue_identified": "Hardcoded path to HAL schema file causing failure in Railway deployment",
+    "root_cause": "Path '/home/ubuntu/personal-ai-agent/app/schemas/hal_agent.schema.json' does not exist in Docker container environment",
+    "solution_implemented": "Flexible path resolution that checks multiple possible locations",
+    "paths_checked": [
+      "app/schemas/hal_agent.schema.json",
+      "app/schemas/schemas/hal_agent.schema.json",
+      "/app/schemas/hal_agent.schema.json",
+      "/app/schemas/schemas/hal_agent.schema.json",
+      "/home/ubuntu/personal-ai-agent/app/schemas/hal_agent.schema.json",
+      "/home/ubuntu/personal-ai-agent/app/schemas/schemas/hal_agent.schema.json",
+      "{module_dir}/../schemas/hal_agent.schema.json",
+      "{module_dir}/../schemas/schemas/hal_agent.schema.json"
+    ],
+    "expected_outcome": "HAL schema file will be found regardless of deployment environment",
+    "verification_method": "Debug endpoint and HAL routes loading status"
+  }
+}

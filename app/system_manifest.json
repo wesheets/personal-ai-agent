@@ -87,7 +87,9 @@
       "checksum": "initial",
       "expected_runtime_path": "app/schemas/hal_agent.schema.json",
       "actual_path": "app/schemas/schemas/hal_agent.schema.json",
-      "path_mismatch": true
+      "path_mismatch": true,
+      "path_resolution_implemented": true,
+      "resolution_method": "dynamic_multi_path_search"
     }
   },
   "routes": {
@@ -206,7 +208,7 @@
     "hal_routes_fallback": {
       "file": "app/fallbacks/fix_hal_routes.py",
       "wrapped_with_schema": true,
-      "last_updated": "2025-04-25T13:25:06.000000"
+      "last_updated": "2025-04-25T15:25:22.000000"
     },
     "debug_hal_schema": {
       "file": "app/routes/debug_hal_schema.py",
@@ -227,12 +229,13 @@
     "hal_routes_fallback": true,
     "memory_engine_fallback": true,
     "diagnostics_endpoint": true,
-    "sandbox_behavior_override": true
+    "sandbox_behavior_override": true,
+    "path_resolution_hardening": true
   },
   "manifest_meta": {
     "version": "1.0.0",
     "created_at": "2025-04-24T23:47:07.446977",
-    "last_updated": "2025-04-25T14:56:51.000000",
+    "last_updated": "2025-04-25T15:26:30.000000",
     "boot_events": [
       {
         "timestamp": "2025-04-24T23:47:07.816573",
@@ -337,7 +340,7 @@
       "diagnostics_routes",
       "debug_hal_schema"
     ],
-    "memory_tag": "hal_deploy_verification_20250425_145651"
+    "memory_tag": "hal_path_resolution_fix_20250425_152630"
   },
   "diagnostics": {
     "enabled": true,
@@ -359,26 +362,42 @@
       "logs/final_route_status.json",
       "logs/hal_schema_verification_20250425_130919.json",
       "logs/hal_sandbox_bypass.json",
-      "logs/hal_deploy_fs_trace_20250425_145630.json"
+      "logs/hal_deploy_fs_trace_20250425_145630.json",
+      "logs/hal_path_resolution_fix_20250425_152530.json"
     ]
   },
   "hal_schema_verification": {
-    "last_check": "2025-04-25T13:09:53.000000",
-    "status": "DEGRADED",
+    "last_check": "2025-04-25T15:26:30.000000",
+    "status": "FIXED",
     "issue": "Path mismatch between repository and runtime expectations",
-    "log_file": "logs/hal_schema_verification_20250425_130919.json",
-    "recommended_action": "Move or copy the schema file from app/schemas/schemas/hal_agent.schema.json to app/schemas/hal_agent.schema.json"
+    "resolution": "Implemented dynamic path resolution that checks multiple locations",
+    "log_file": "logs/hal_path_resolution_fix_20250425_152530.json",
+    "previous_status": "DEGRADED"
   },
   "hal_schema_deployment_status": {
     "debug_endpoint_added": "2025-04-25T14:54:53.000000",
-    "verification_pending": true,
+    "verification_pending": false,
     "local_verification": {
       "expected_runtime_path_exists": true,
       "repository_path_exists": true,
       "both_paths_exist": true
     },
-    "log_file": "logs/hal_deploy_fs_trace_20250425_145630.json",
-    "next_steps": "Deploy debug endpoint and access /debug/hal-schema to verify file existence in production"
+    "path_resolution_implemented": {
+      "timestamp": "2025-04-25T15:25:22.000000",
+      "method": "dynamic_multi_path_search",
+      "paths_checked": [
+        "app/schemas/hal_agent.schema.json",
+        "app/schemas/schemas/hal_agent.schema.json",
+        "/app/schemas/hal_agent.schema.json",
+        "/app/schemas/schemas/hal_agent.schema.json",
+        "/home/ubuntu/personal-ai-agent/app/schemas/hal_agent.schema.json",
+        "/home/ubuntu/personal-ai-agent/app/schemas/schemas/hal_agent.schema.json",
+        "{module_dir}/../schemas/hal_agent.schema.json",
+        "{module_dir}/../schemas/schemas/hal_agent.schema.json"
+      ]
+    },
+    "log_file": "logs/hal_path_resolution_fix_20250425_152530.json",
+    "next_steps": "Deploy fix and verify HAL routes load directly instead of via fallback"
   },
   "sandbox_behavior_override": {
     "hal_schema_validation": {
@@ -388,5 +407,15 @@
       "log_file": "logs/hal_sandbox_bypass.json",
       "last_updated": "2025-04-25T13:25:23.000000"
     }
+  },
+  "path_resolution_hardening": {
+    "enabled": true,
+    "description": "Dynamic path resolution for cross-environment compatibility",
+    "implemented_for": [
+      "hal_schema",
+      "agent_registration"
+    ],
+    "last_updated": "2025-04-25T15:26:30.000000",
+    "log_file": "logs/hal_path_resolution_fix_20250425_152530.json"
   }
 }

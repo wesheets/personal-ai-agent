@@ -11,12 +11,13 @@ import logging
 import datetime
 import socket
 from typing import Dict, Any, Optional
+import sys
 
 # Configure logging
 logger = logging.getLogger("app.fallbacks.fix_hal_routes")
 
 # Ensure logs directory exists
-os.makedirs("/home/ubuntu/personal-ai-agent/logs", exist_ok=True)
+os.makedirs("logs", exist_ok=True)
 
 # Sandbox detection
 IS_SANDBOX = os.getenv("MANUS_SANDBOX", "false").lower() == "true"
@@ -98,6 +99,42 @@ def register_hal_routes() -> APIRouter:
     
     return router
 
+def find_schema_file() -> str:
+    """
+    Finds the HAL schema file by checking multiple possible locations.
+    
+    Returns:
+        str: Path to the HAL schema file if found, empty string otherwise
+    """
+    # List of possible schema file locations to check
+    possible_paths = [
+        # Relative paths from current working directory
+        os.path.join("app", "schemas", "hal_agent.schema.json"),
+        os.path.join("app", "schemas", "schemas", "hal_agent.schema.json"),
+        
+        # Absolute paths with different base directories
+        os.path.join("/app", "schemas", "hal_agent.schema.json"),
+        os.path.join("/app", "schemas", "schemas", "hal_agent.schema.json"),
+        
+        # Legacy path for backward compatibility
+        os.path.join("/home", "ubuntu", "personal-ai-agent", "app", "schemas", "hal_agent.schema.json"),
+        os.path.join("/home", "ubuntu", "personal-ai-agent", "app", "schemas", "schemas", "hal_agent.schema.json"),
+        
+        # Paths relative to the module location
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "schemas", "hal_agent.schema.json"),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "schemas", "schemas", "hal_agent.schema.json"),
+    ]
+    
+    # Check each path
+    for path in possible_paths:
+        if os.path.exists(path):
+            logger.info(f"Found HAL schema file at: {path}")
+            return path
+    
+    # If we get here, no schema file was found
+    logger.error("HAL schema file not found in any of the expected locations")
+    return ""
+
 def verify_hal_schema() -> bool:
     """
     Verifies that hal_agent.schema.json exists and is valid JSON.
@@ -112,17 +149,19 @@ def verify_hal_schema() -> bool:
         log_sandbox_bypass("schema_validation", "Skipping HAL schema validation in sandbox mode")
         return True
     
-    schema_path = "/home/ubuntu/personal-ai-agent/app/schemas/hal_agent.schema.json"
+    # Find the schema file
+    schema_path = find_schema_file()
+    
     try:
-        if not os.path.exists(schema_path):
-            logger.error(f"HAL schema file not found at {schema_path}")
-            log_error("schema_missing", f"HAL schema file not found at {schema_path}")
+        if not schema_path:
+            logger.error("HAL schema file not found in any of the expected locations")
+            log_error("schema_missing", "HAL schema file not found in any of the expected locations")
             return False
         
         with open(schema_path, 'r') as f:
             json.load(f)  # Attempt to parse JSON
         
-        logger.info("HAL schema validation successful")
+        logger.info(f"HAL schema validation successful using file at: {schema_path}")
         return True
     except json.JSONDecodeError as e:
         logger.error(f"HAL schema validation failed: {str(e)}")
@@ -147,13 +186,35 @@ def verify_hal_agent_registration() -> bool:
         log_sandbox_bypass("agent_registration", "Skipping HAL agent registration validation in sandbox mode")
         return True
     
-    registry_path = "/home/ubuntu/personal-ai-agent/app/config/agent_registry.json"
-    contracts_path = "/home/ubuntu/personal-ai-agent/app/config/agent_contracts.json"
+    # Find possible config paths
+    config_paths = [
+        os.path.join("app", "config"),
+        os.path.join("/app", "config"),
+        os.path.join("/home", "ubuntu", "personal-ai-agent", "app", "config"),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "config"),
+    ]
+    
+    registry_path = ""
+    contracts_path = ""
+    
+    # Find the registry and contracts files
+    for base_path in config_paths:
+        reg_path = os.path.join(base_path, "agent_registry.json")
+        con_path = os.path.join(base_path, "agent_contracts.json")
+        
+        if os.path.exists(reg_path) and not registry_path:
+            registry_path = reg_path
+        
+        if os.path.exists(con_path) and not contracts_path:
+            contracts_path = con_path
+        
+        if registry_path and contracts_path:
+            break
     
     try:
         # Check agent_registry.json
         registry_valid = False
-        if os.path.exists(registry_path):
+        if registry_path and os.path.exists(registry_path):
             with open(registry_path, 'r') as f:
                 registry = json.load(f)
                 if any(agent.get('id') == 'hal' for agent in registry):
@@ -161,7 +222,7 @@ def verify_hal_agent_registration() -> bool:
         
         # Check agent_contracts.json
         contracts_valid = False
-        if os.path.exists(contracts_path):
+        if contracts_path and os.path.exists(contracts_path):
             with open(contracts_path, 'r') as f:
                 contracts = json.load(f)
                 if 'hal' in contracts:
@@ -173,9 +234,9 @@ def verify_hal_agent_registration() -> bool:
         else:
             logger.error("HAL agent registration validation failed")
             if not registry_valid:
-                log_error("registry_missing", "HAL agent not found in agent_registry.json")
+                log_error("registry_missing", f"HAL agent not found in agent_registry.json (checked: {registry_path})")
             if not contracts_valid:
-                log_error("contract_missing", "HAL agent not found in agent_contracts.json")
+                log_error("contract_missing", f"HAL agent not found in agent_contracts.json (checked: {contracts_path})")
         
         return result
     except Exception as e:
@@ -211,7 +272,7 @@ def log_fallback_activation():
         log_sandbox_bypass("fallback_activated", "HAL routes fallback mechanism activated in sandbox mode")
         return
     
-    log_file = "/home/ubuntu/personal-ai-agent/logs/hal_route_failures.json"
+    log_file = "logs/hal_route_failures.json"
     
     try:
         # Create log entry
@@ -259,7 +320,7 @@ def log_error(error_type: str, message: str):
         log_sandbox_bypass(f"error_{error_type}", message)
         return
     
-    log_file = "/home/ubuntu/personal-ai-agent/logs/hal_route_failures.json"
+    log_file = "logs/hal_route_failures.json"
     
     try:
         # Create log entry
@@ -303,7 +364,7 @@ def log_sandbox_bypass(bypass_type: str, message: str):
         bypass_type: Type of bypass
         message: Bypass message
     """
-    log_file = "/home/ubuntu/personal-ai-agent/logs/hal_sandbox_bypass.json"
+    log_file = "logs/hal_sandbox_bypass.json"
     
     try:
         # Create log entry
