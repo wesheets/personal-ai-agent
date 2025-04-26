@@ -1,59 +1,58 @@
-import os
+"""
+Vector Memory Module
+
+This module provides a vector-based memory system for storing and retrieving
+agent interactions and other information.
+"""
+import logging
 import time
 import uuid
+import numpy as np
 from typing import Dict, List, Any, Optional, Tuple
-import logging
 
 # Configure logging
-logger = logging.getLogger("vector_memory")
+logger = logging.getLogger("app.core.vector_memory")
 
-# Singleton instance
-_vector_memory_instance = None
-
-def get_vector_memory() -> 'VectorMemorySystem':
+class MockMemorySystem:
     """
-    Get the singleton instance of VectorMemorySystem
-    
-    Returns:
-        The VectorMemorySystem instance
+    A mock implementation of a vector memory system for development and testing.
     """
-    global _vector_memory_instance
-    if _vector_memory_instance is None:
-        _vector_memory_instance = VectorMemorySystem()
-    return _vector_memory_instance
-
-class VectorMemorySystem:
-    """Mock Vector memory system for development/testing"""
     
     def __init__(self):
-        """Initialize the mock vector memory system"""
-        logger.info("Initializing mock VectorMemorySystem for development/testing")
-        
-        # In-memory storage for memories
+        """Initialize the mock memory system."""
         self.memories = []
-        
-        # Table name for vector storage (kept for compatibility)
-        self.table_name = "agent_memories"
-        
-        logger.info("Mock VectorMemorySystem initialized successfully")
-        print("✅ Mock VectorMemorySystem initialized for development/testing")
-    
-    def _ensure_table_exists(self):
-        """Mock method for table creation"""
-        pass
+        logger.info("Initialized mock memory system")
     
     def _get_embedding(self, text: str) -> List[float]:
         """
-        Mock embedding generation - returns a fixed-length vector of zeros
+        Generate a mock embedding for text.
         
         Args:
-            text: The text to get embedding for
+            text: The text to generate an embedding for
             
         Returns:
-            A mock embedding vector
+            A list of floats representing the embedding
         """
-        # Return a mock embedding (vector of zeros)
-        return [0.0] * 384  # Standard embedding length
+        # Generate a deterministic but unique embedding based on the text
+        # This is just for testing - real embeddings would use a proper model
+        import hashlib
+        
+        # Get hash of text
+        text_hash = hashlib.md5(text.encode()).hexdigest()
+        
+        # Convert hash to a list of floats
+        embedding = []
+        for i in range(0, len(text_hash), 2):
+            if i + 2 <= len(text_hash):
+                hex_pair = text_hash[i:i+2]
+                float_val = int(hex_pair, 16) / 255.0  # Normalize to 0-1
+                embedding.append(float_val)
+        
+        # Pad to standard embedding length
+        while len(embedding) < 32:
+            embedding.append(0.0)
+        
+        return embedding[:32]  # Truncate to standard embedding length
     
     async def store_memory(self, content: str, metadata: Optional[Dict[str, Any]] = None, priority: bool = False) -> Tuple[str, Optional[str]]:
         """
@@ -200,3 +199,91 @@ class VectorMemorySystem:
             context_parts.append(memory_text)
         
         return "\n".join(context_parts)
+
+    # Add adapter methods to match the expected API in memory_api_routes.py
+    async def add_memory(self, project_id: str, content: str, metadata: Optional[Dict[str, Any]] = None, 
+                         tags: Optional[List[str]] = None, agent_id: Optional[str] = None) -> str:
+        """
+        Adapter method for add_memory to match the API expected by memory_api_routes.py
+        
+        Args:
+            project_id: The project ID
+            content: The text content to store
+            metadata: Optional metadata about the memory
+            tags: Optional tags for the memory
+            agent_id: Optional agent ID
+            
+        Returns:
+            Memory ID
+        """
+        # Prepare metadata with additional fields
+        combined_metadata = metadata or {}
+        combined_metadata["project_id"] = project_id
+        
+        if tags:
+            combined_metadata["tags"] = tags
+        
+        if agent_id:
+            combined_metadata["agent_id"] = agent_id
+        
+        # Call the underlying store_memory method
+        memory_id, _ = await self.store_memory(content, combined_metadata)
+        return memory_id
+    
+    async def search_memory(self, project_id: str, query: str, limit: int = 5, 
+                           tags: Optional[List[str]] = None, agent_id: Optional[str] = None,
+                           threshold: float = 0.0) -> List[Dict[str, Any]]:
+        """
+        Adapter method for search_memory to match the API expected by memory_api_routes.py
+        
+        Args:
+            project_id: The project ID
+            query: The search query
+            limit: Maximum number of results to return
+            tags: Optional tags to filter by
+            agent_id: Optional agent ID to filter by
+            threshold: Similarity threshold
+            
+        Returns:
+            List of memory items
+        """
+        # Get all memories
+        results, _ = await self.search_memories(query, limit)
+        
+        # Filter by project_id
+        filtered_results = []
+        for memory in results:
+            metadata = memory.get("metadata", {})
+            
+            # Check project_id
+            if metadata.get("project_id") != project_id:
+                continue
+            
+            # Check tags if specified
+            if tags and not any(tag in metadata.get("tags", []) for tag in tags):
+                continue
+            
+            # Check agent_id if specified
+            if agent_id and metadata.get("agent_id") != agent_id:
+                continue
+            
+            filtered_results.append(memory)
+        
+        return filtered_results
+
+# Singleton instance
+_memory_system = None
+
+def get_memory_engine():
+    """
+    Get the memory engine instance.
+    
+    Returns:
+        The memory engine instance
+    """
+    global _memory_system
+    
+    if _memory_system is None:
+        _memory_system = MockMemorySystem()
+    
+    return _memory_system
