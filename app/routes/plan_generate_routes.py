@@ -36,6 +36,13 @@ async def generate_plan_endpoint(request: PlanGenerateRequest = Body(...)):
     Returns:
         Plan generation response
     """
+    # Validate goal parameter is not empty
+    if not request.goal or request.goal.strip() == "":
+        raise HTTPException(
+            status_code=422,
+            detail="Goal parameter cannot be empty"
+        )
+        
     try:
         result = generate_plan(request.dict())
         
@@ -47,6 +54,9 @@ async def generate_plan_endpoint(request: PlanGenerateRequest = Body(...)):
             )
         
         return result
+    except HTTPException as he:
+        # Re-raise HTTP exceptions to preserve status code
+        raise he
     except Exception as e:
         error_response = PlanGenerateError(
             message=f"Error generating plan: {str(e)}",
@@ -82,6 +92,13 @@ async def generate_plan_get_endpoint(
     Returns:
         Plan generation response
     """
+    # Validate goal parameter is not empty
+    if not goal or goal.strip() == "":
+        raise HTTPException(
+            status_code=422,
+            detail="Goal parameter cannot be empty"
+        )
+        
     try:
         request_data = {
             "goal": goal,
@@ -103,6 +120,9 @@ async def generate_plan_get_endpoint(
             )
         
         return result
+    except HTTPException as he:
+        # Re-raise HTTP exceptions to preserve status code
+        raise he
     except Exception as e:
         error_response = PlanGenerateError(
             message=f"Error generating plan: {str(e)}",
