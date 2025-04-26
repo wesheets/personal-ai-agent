@@ -45,7 +45,7 @@
         "/api/sage/beliefs"
       ],
       "passes_full_test": false,
-      "logic_notes": "Loop validation now returns 200 OK with valid input. Plan generation endpoint still returns 500 for empty goal parameter instead of 422. Fix implemented but not yet deployed to live server.",
+      "logic_notes": "Loop validation now returns 200 OK with valid input. Plan generation endpoint still returns 500 for empty goal parameter instead of 422. Fix implemented but not yet deployed to live server. Schema validation middleware implemented to address common issues across endpoints.",
       "checklist": [
         {
           "item": "Implement advanced task prioritization",
@@ -68,9 +68,10 @@
           "status": "completed"
         },
         {
- fix/priority-1-plan-loop
           "item": "Fix empty goal parameter handling",
-
+          "status": "in_progress"
+        },
+        {
           "item": "Forge delegation endpoint active",
           "status": "in_progress"
         },
@@ -88,16 +89,15 @@
         },
         {
           "item": "SAGE beliefs system operational",
- main
           "status": "in_progress"
+        },
+        {
+          "item": "Schema validation middleware implemented",
+          "status": "completed"
         }
       ],
       "last_tested_by": "manus",
- fix/priority-1-plan-loop
-      "last_modified": "2025-04-26T02:35:52Z"
-
-      "last_modified": "2025-04-26T02:10:58Z"
- main
+      "last_modified": "2025-04-26T04:14:57Z"
     },
     {
       "agent_id": "sage",
@@ -254,11 +254,55 @@
       ],
       "last_tested_by": "manus",
       "last_modified": "2025-04-26T00:28:40Z"
+    },
+    {
+      "agent_id": "system",
+      "role": "Infrastructure Manager",
+      "tools_enabled": ["deployment_manager", "configuration_handler", "error_monitor"],
+      "input_schema": "system_schema",
+      "output_schema": "system_status_schema",
+      "responsible_routes": ["/diagnostics/routes"],
+      "passes_full_test": false,
+      "logic_notes": "Fixed deployment issues by implementing render.yaml configuration. Addressed router import alignment in main.py. Implemented schema validation middleware for standardized error handling and default values.",
+      "checklist": [
+        {
+          "item": "Fix upload_base64_routes import",
+          "status": "completed"
+        },
+        {
+          "item": "Align router imports in main.py",
+          "status": "completed"
+        },
+        {
+          "item": "Implement render.yaml for deployment configuration",
+          "status": "completed"
+        },
+        {
+          "item": "Implement schema validation middleware",
+          "status": "completed"
+        },
+        {
+          "item": "Monitor deployment success",
+          "status": "in_progress"
+        }
+      ],
+      "last_tested_by": "manus",
+      "last_modified": "2025-04-26T04:14:57Z"
     }
   ],
- fix/priority-1-plan-loop
-  "last_updated": "2025-04-26T02:35:52Z"
-
-  "last_updated": "2025-04-26T02:10:58Z"
- main
+  "strategic_approach": {
+    "deployment_fix": {
+      "problem": "Changes to main.py not automatically triggering deployments on Render",
+      "solution": "Implemented render.yaml with explicit deployment configuration",
+      "status": "Implemented, awaiting verification",
+      "documentation": "/logs/render_deployment_fix.md"
+    },
+    "schema_validation": {
+      "problem": "Common schema validation issues affecting ~90% of endpoints",
+      "solution": "Implemented middleware for standardized error handling and default values",
+      "status": "Implemented, awaiting verification",
+      "documentation": "/logs/schema_validation_fix_report.md"
+    }
+  },
+  "last_updated": "2025-04-26T04:14:57Z"
 }
