@@ -7,7 +7,15 @@ import uvicorn
 from fastapi.staticfiles import StaticFiles
 import datetime
 from app.routes.agent_routes import router as agent_router
-from app.routes.memory_routes import router as memory_router
+
+# Load memory routes with try/except for proper variable definition
+try:
+    from app.routes.memory_routes import router as memory_router
+    routes_memory_loaded = True
+    print("✅ Loaded memory_router")
+except ImportError:
+    routes_memory_loaded = False
+    print("⚠️ Failed to load memory_router")
 # Import file upload routes with try-except for safer handling
 try:
     from app.routes.upload_file_routes import router as upload_file_router
