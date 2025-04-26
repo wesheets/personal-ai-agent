@@ -6,8 +6,8 @@ from fastapi import FastAPI
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 import datetime
-from app.routes import agent_routes
-from app.routes import memory_routes
+from app.routes.agent_routes import router as agent_router
+from app.routes.memory_routes import router as memory_router
 # Import file upload routes with try-except for safer handling
 try:
     from app.routes.upload_file_routes import router as upload_file_router
@@ -902,9 +902,9 @@ async def get_routes_diagnostics():
     return response
 
 app.include_router(diagnostics_router)
-app.include_router(agent_routes.router)
-app.include_router(memory_routes.router)
-app.include_router(upload_file_routes.router)
+app.include_router(agent_router)
+app.include_router(memory_router)
+app.include_router(upload_file_router)
 # Removed upload_base64_routes.router to fix deployment issue
 loaded_routes.append("diagnostics_routes")
 print("✅ Included diagnostics_router")
