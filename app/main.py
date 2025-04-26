@@ -6,8 +6,8 @@ from fastapi import FastAPI
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 import datetime
-from app.routes import agent_routes
-from app.routes import memory_routes
+from app.routes.agent_routes import router as agent_router
+from app.routes.memory_routes import router as memory_router
 # Import file upload routes with try-except for safer handling
 try:
     from app.routes.upload_file_routes import router as upload_file_router
@@ -18,6 +18,15 @@ except ImportError:
     print("⚠️ Could not load upload_file_routes directly")
 # Removed import to fix deployment issue
 # from app.routes import upload_base64_routes
+
+# Import schema validation integration
+try:
+    from app.core.schema_validation_integration import add_schema_validation_middleware
+    schema_validation_loaded = True
+    print("✅ Schema validation middleware loaded")
+except ImportError:
+    schema_validation_loaded = False
+    print("⚠️ Could not load schema validation middleware")
 
 # Import routes
 from app.routes.agent_config_routes import router as agent_config_router
@@ -173,14 +182,6 @@ except Exception as e:
             json.dump(logs, f, indent=2)
     except Exception as log_error:
         print(f"⚠️ Failed to log HAL routes failure: {log_error}")
-
-try:
-    from app.routes.memory_routes import router as memory_routes
-    routes_memory_loaded = True
-    print("✅ Directly loaded routes/memory_routes")
-except ImportError:
-    routes_memory_loaded = False
-    print("⚠️ Could not load routes/memory_routes directly")
 
 try:
     from app.routes.memory_router import router as memory_router
@@ -393,6 +394,14 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Add schema validation middleware if loaded
+if schema_validation_loaded:
+    try:
+        add_schema_validation_middleware(app)
+        print("✅ Schema validation middleware added to application")
+    except Exception as e:
+        print(f"⚠️ Failed to add schema validation middleware: {e}")
+
 # Initialize system manifest
 try:
     from app.utils.manifest_manager import initialize_manifest, register_system_boot, register_loaded_routes
@@ -472,341 +481,385 @@ print("✅ Included delegate_stream_router")
 # Include HAL routes with priority (first)
 if hal_routes_loaded:
     app.include_router(hal_routes, prefix="/api")
-    print("✅ Included hal_router with /api prefix (PRIORITY)")
     loaded_routes.append("hal_routes")
+    print("✅ Included hal_routes")
 else:
-    # Use fallback mechanism for HAL routes
+    # Create fallback router for HAL routes
     try:
-        from app.fallbacks.fix_hal_routes import register_hal_routes
-        fallback_router = register_hal_routes()
-        app.include_router(fallback_router)
-        print("✅ Included fallback HAL router (DEGRADED MODE)")
-        loaded_routes.append("hal_routes_fallback")
-        fallbacks_triggered["hal"] = True
-        failed_routes.append("hal_routes")
-    except Exception as e:
-        print(f"❌ Failed to load HAL routes fallback: {e}")
-        failed_routes.append("hal_routes")
-        failed_routes.append("hal_routes_fallback")
-        # Log the fallback failure
-        import os
-        import json
-        import datetime
-        os.makedirs("logs", exist_ok=True)
+        from fastapi import APIRouter
+        fallback_router = APIRouter(prefix="/api/hal", tags=["hal"])
         
-        try:
-            log_file = "logs/hal_route_failures.json"
-            log_entry = {
-                "timestamp": str(datetime.datetime.now()),
-                "event": "fallback_failure",
-                "error": str(e)
-            }
-            
-            # Check if log file exists
-            if os.path.exists(log_file):
-                # Read existing logs
-                try:
-                    with open(log_file, 'r') as f:
-                        logs = json.load(f)
-                        if not isinstance(logs, list):
-                            logs = [logs]
-                except json.JSONDecodeError:
-                    logs = []
-            else:
-                logs = []
-            
-            # Append new log entry
-            logs.append(log_entry)
-            
-            # Write updated logs
-            with open(log_file, 'w') as f:
-                json.dump(logs, f, indent=2)
-        except Exception as log_error:
-            print(f"⚠️ Failed to log HAL routes fallback failure: {log_error}")
+        @fallback_router.get("/status")
+        async def hal_status_fallback():
+            return {"status": "HAL routes not loaded, using fallback", "timestamp": str(datetime.datetime.now())}
+        
+        app.include_router(fallback_router)
+        loaded_routes.append("hal_fallback")
+        fallbacks_triggered["hal"] = True
+        print("✅ Included HAL fallback router")
+    except Exception as e:
+        print(f"⚠️ Failed to create HAL fallback router: {e}")
+        if "hal_fallback" not in failed_routes:
+            failed_routes.append("hal_fallback")
 
-# Include memory routes from routes directory with priority
+# Include memory routes with priority (second)
 if routes_memory_loaded:
     app.include_router(memory_routes, prefix="/api")
-    print("✅ Included routes/memory_routes with /api prefix (PRIORITY)")
     loaded_routes.append("memory_routes")
+    print("✅ Included memory_routes")
 else:
-    failed_routes.append("memory_routes")
+    # Create fallback router for memory routes
+    try:
+        from fastapi import APIRouter
+        memory_fallback_router = APIRouter(prefix="/api/memory", tags=["memory"])
+        
+        @memory_fallback_router.get("/status")
+        async def memory_status_fallback():
+            return {"status": "Memory routes not loaded, using fallback", "timestamp": str(datetime.datetime.now())}
+        
+        app.include_router(memory_fallback_router)
+        loaded_routes.append("memory_fallback")
+        fallbacks_triggered["memory"] = True
+        print("✅ Included memory fallback router")
+    except Exception as e:
+        print(f"⚠️ Failed to create memory fallback router: {e}")
+        if "memory_fallback" not in failed_routes:
+            failed_routes.append("memory_fallback")
 
-# Include routes with explicit paths without prefix
+# Include memory router if loaded
 if memory_routes_loaded:
     app.include_router(memory_router)  # No prefix as routes already include /api/
-    print("✅ Included memory_router without prefix")
-    loaded_routes.append("app_memory_routes")
+    loaded_routes.append("memory_router")
+    print("✅ Included memory_router")
 else:
-    failed_routes.append("app_memory_routes")
+    if "memory_router" not in failed_routes:
+        failed_routes.append("memory_router")
 
-# Include Memory API Router
+# Include memory API router if loaded
 if memory_api_routes_loaded:
     app.include_router(memory_api_router)  # No prefix as routes already include /api/
-    print("✅ Included memory_api_router without prefix")
-    loaded_routes.append("memory_api_routes")
+    loaded_routes.append("memory_api_router")
+    print("✅ Included memory_api_router")
 else:
-    failed_routes.append("memory_api_routes")
-    
-# Include PESSIMIST Evaluation Router
+    if "memory_api_router" not in failed_routes:
+        failed_routes.append("memory_api_router")
+
+# Include pessimist evaluation router if loaded
 if pessimist_evaluation_routes_loaded:
     app.include_router(pessimist_evaluation_router)  # No prefix as routes already include /api/
-    print("✅ Included pessimist_evaluation_router without prefix")
-    loaded_routes.append("pessimist_evaluation_routes")
+    loaded_routes.append("pessimist_evaluation_router")
+    print("✅ Included pessimist_evaluation_router")
 else:
-    failed_routes.append("pessimist_evaluation_routes")
-    
-# Include SAGE Beliefs Router
+    if "pessimist_evaluation_router" not in failed_routes:
+        failed_routes.append("pessimist_evaluation_router")
+
+# Include sage beliefs router if loaded
 if sage_beliefs_routes_loaded:
     app.include_router(sage_beliefs_router)  # No prefix as routes already include /api/
-    print("✅ Included sage_beliefs_router without prefix")
-    loaded_routes.append("sage_beliefs_routes")
+    loaded_routes.append("sage_beliefs_router")
+    print("✅ Included sage_beliefs_router")
 else:
-    failed_routes.append("sage_beliefs_routes")
+    if "sage_beliefs_router" not in failed_routes:
+        failed_routes.append("sage_beliefs_router")
 
+# Include loop router if loaded
 if loop_routes_loaded:
     app.include_router(loop_router)  # No prefix as routes already include /api/
-    print("✅ Included loop_router without prefix")
-    loaded_routes.append("loop_routes")
+    loaded_routes.append("loop_router")
+    print("✅ Included loop_router")
 else:
-    failed_routes.append("loop_routes")
+    if "loop_router" not in failed_routes:
+        failed_routes.append("loop_router")
 
-# Include orchestrator routes from routes directory with HIGHEST priority - MUST BE FIRST
+# Include orchestrator routes if loaded
 if routes_orchestrator_loaded:
     app.include_router(orchestrator_routes, prefix="/api")
-    print("✅ Included routes/orchestrator_routes with /api prefix (HIGHEST PRIORITY)")
-    loaded_routes.append("routes_orchestrator_routes")
+    loaded_routes.append("orchestrator_routes")
+    print("✅ Included orchestrator_routes")
 else:
-    failed_routes.append("routes_orchestrator_routes")
+    if "orchestrator_routes" not in failed_routes:
+        failed_routes.append("orchestrator_routes")
 
-# Include directly imported routers
+# Include core router if loaded
 if core_routes_loaded:
     app.include_router(core_router)
+    loaded_routes.append("core_router")
     print("✅ Included core_router")
-    loaded_routes.append("core_routes")
 else:
-    failed_routes.append("core_routes")
+    if "core_router" not in failed_routes:
+        failed_routes.append("core_router")
 
+# Include agent router if loaded
 if agent_routes_loaded:
     app.include_router(agent_router)
+    loaded_routes.append("agent_router")
     print("✅ Included agent_router")
-    loaded_routes.append("agent_routes")
 else:
-    failed_routes.append("agent_routes")
+    if "agent_router" not in failed_routes:
+        failed_routes.append("agent_router")
 
+# Include persona router if loaded
 if persona_routes_loaded:
     app.include_router(persona_router)
+    loaded_routes.append("persona_router")
     print("✅ Included persona_router")
-    loaded_routes.append("persona_routes")
 else:
-    failed_routes.append("persona_routes")
+    if "persona_router" not in failed_routes:
+        failed_routes.append("persona_router")
 
+# Include debug router if loaded
 if debug_routes_loaded:
     app.include_router(debug_router)
+    loaded_routes.append("debug_router")
     print("✅ Included debug_router")
-    loaded_routes.append("debug_routes")
 else:
-    failed_routes.append("debug_routes")
+    if "debug_router" not in failed_routes:
+        failed_routes.append("debug_router")
 
-# Include historian and debugger routers
+# Include historian router if loaded
 if historian_routes_loaded:
     app.include_router(historian_router)
+    loaded_routes.append("historian_router")
     print("✅ Included historian_router")
-    loaded_routes.append("historian_routes")
 else:
-    failed_routes.append("historian_routes")
+    if "historian_router" not in failed_routes:
+        failed_routes.append("historian_router")
 
+# Include debugger router if loaded
 if debugger_routes_loaded:
     app.include_router(debugger_router)
+    loaded_routes.append("debugger_router")
     print("✅ Included debugger_router")
-    loaded_routes.append("debugger_routes")
 else:
-    failed_routes.append("debugger_routes")
+    if "debugger_router" not in failed_routes:
+        failed_routes.append("debugger_router")
 
-# Include app/routes/orchestrator_routes.py AFTER routes/orchestrator_routes.py to prevent overriding
+# Include orchestrator router if loaded
 if orchestrator_routes_loaded:
     app.include_router(orchestrator_router)
-    print("✅ Included orchestrator_router (LOWER PRIORITY)")
-    loaded_routes.append("orchestrator_routes")
+    loaded_routes.append("orchestrator_router")
+    print("✅ Included orchestrator_router")
 else:
-    failed_routes.append("orchestrator_routes")
+    if "orchestrator_router" not in failed_routes:
+        failed_routes.append("orchestrator_router")
 
-# Include CRITIC, ORCHESTRATOR, and SAGE routers
+# Include critic router if loaded
 if critic_routes_loaded:
     app.include_router(critic_router)
+    loaded_routes.append("critic_router")
     print("✅ Included critic_router")
-    loaded_routes.append("critic_routes")
 else:
-    failed_routes.append("critic_routes")
+    if "critic_router" not in failed_routes:
+        failed_routes.append("critic_router")
 
-# Include CRITIC Review Router
+# Include critic review router if loaded
 if critic_review_routes_loaded:
     app.include_router(critic_review_router)
+    loaded_routes.append("critic_review_router")
     print("✅ Included critic_review_router")
-    loaded_routes.append("critic_review_routes")
 else:
-    failed_routes.append("critic_review_routes")
+    if "critic_review_router" not in failed_routes:
+        failed_routes.append("critic_review_router")
 
+# Include sage router if loaded
 if sage_routes_loaded:
     app.include_router(sage_router)
+    loaded_routes.append("sage_router")
     print("✅ Included sage_router")
-    loaded_routes.append("sage_routes")
 else:
-    failed_routes.append("sage_routes")
+    if "sage_router" not in failed_routes:
+        failed_routes.append("sage_router")
 
-# Include Phase 3 agent routers
+# Include guardian router if loaded
 if guardian_routes_loaded:
     app.include_router(guardian_router)
+    loaded_routes.append("guardian_router")
     print("✅ Included guardian_router")
-    loaded_routes.append("guardian_routes")
 else:
-    failed_routes.append("guardian_routes")
+    if "guardian_router" not in failed_routes:
+        failed_routes.append("guardian_router")
 
-# Include Phase 2 agent routers
+# Include pessimist router if loaded
 if pessimist_routes_loaded:
     app.include_router(pessimist_router)
+    loaded_routes.append("pessimist_router")
     print("✅ Included pessimist_router")
-    loaded_routes.append("pessimist_routes")
 else:
-    failed_routes.append("pessimist_routes")
+    if "pessimist_router" not in failed_routes:
+        failed_routes.append("pessimist_router")
 
+# Include nova router if loaded
 if nova_routes_loaded:
     app.include_router(nova_router)
+    loaded_routes.append("nova_router")
     print("✅ Included nova_router")
-    loaded_routes.append("nova_routes")
 else:
-    failed_routes.append("nova_routes")
+    if "nova_router" not in failed_routes:
+        failed_routes.append("nova_router")
 
+# Include cto router if loaded
 if cto_routes_loaded:
     app.include_router(cto_router)
+    loaded_routes.append("cto_router")
     print("✅ Included cto_router")
-    loaded_routes.append("cto_routes")
 else:
-    failed_routes.append("cto_routes")
+    if "cto_router" not in failed_routes:
+        failed_routes.append("cto_router")
 
+# Include observer router if loaded
 if observer_routes_loaded:
     app.include_router(observer_router)
+    loaded_routes.append("observer_router")
     print("✅ Included observer_router")
-    loaded_routes.append("observer_routes")
 else:
-    failed_routes.append("observer_routes")
+    if "observer_router" not in failed_routes:
+        failed_routes.append("observer_router")
 
+# Include sitegen router if loaded
 if sitegen_routes_loaded:
     app.include_router(sitegen_router)
+    loaded_routes.append("sitegen_router")
     print("✅ Included sitegen_router")
-    loaded_routes.append("sitegen_routes")
 else:
-    failed_routes.append("sitegen_routes")
+    if "sitegen_router" not in failed_routes:
+        failed_routes.append("sitegen_router")
 
+# Include reflection router if loaded
 if reflection_routes_loaded:
     app.include_router(reflection_router)
+    loaded_routes.append("reflection_router")
     print("✅ Included reflection_router")
-    loaded_routes.append("reflection_routes")
 else:
-    failed_routes.append("reflection_routes")
+    if "reflection_router" not in failed_routes:
+        failed_routes.append("reflection_router")
 
+# Include trust router if loaded
 if trust_routes_loaded:
     app.include_router(trust_router)
+    loaded_routes.append("trust_router")
     print("✅ Included trust_router")
-    loaded_routes.append("trust_routes")
 else:
-    failed_routes.append("trust_routes")
+    if "trust_router" not in failed_routes:
+        failed_routes.append("trust_router")
 
-# Include missing routes identified in diagnostic report
+# Include snapshot router if loaded
 if snapshot_routes_loaded:
     app.include_router(snapshot_router)
+    loaded_routes.append("snapshot_router")
     print("✅ Included snapshot_router")
-    loaded_routes.append("snapshot_routes")
 else:
-    failed_routes.append("snapshot_routes")
+    if "snapshot_router" not in failed_routes:
+        failed_routes.append("snapshot_router")
 
+# Include orchestrator plan router if loaded
 if orchestrator_plan_routes_loaded:
     app.include_router(orchestrator_plan_router)
+    loaded_routes.append("orchestrator_plan_router")
     print("✅ Included orchestrator_plan_router")
-    loaded_routes.append("orchestrator_plan_routes")
 else:
-    failed_routes.append("orchestrator_plan_routes")
+    if "orchestrator_plan_router" not in failed_routes:
+        failed_routes.append("orchestrator_plan_router")
 
+# Include health monitor router if loaded
 if health_monitor_routes_loaded:
     app.include_router(health_monitor_router)
+    loaded_routes.append("health_monitor_router")
     print("✅ Included health_monitor_router")
-    loaded_routes.append("health_monitor_routes")
 else:
-    failed_routes.append("health_monitor_routes")
+    if "health_monitor_router" not in failed_routes:
+        failed_routes.append("health_monitor_router")
 
-# Include upload file routes
+# Include upload file router if loaded
 if upload_file_routes_loaded:
     app.include_router(upload_file_router)
+    loaded_routes.append("upload_file_router")
     print("✅ Included upload_file_router")
-    loaded_routes.append("upload_file_routes")
 else:
-    failed_routes.append("upload_file_routes")
+    if "upload_file_router" not in failed_routes:
+        failed_routes.append("upload_file_router")
 
+# Include self router if loaded
 if self_routes_loaded:
     app.include_router(self_router)
+    loaded_routes.append("self_router")
     print("✅ Included self_router")
-    loaded_routes.append("self_routes")
 else:
-    failed_routes.append("self_routes")
+    if "self_router" not in failed_routes:
+        failed_routes.append("self_router")
 
+# Include orchestrator contract router if loaded
 if orchestrator_contract_routes_loaded:
     app.include_router(orchestrator_contract_router)
+    loaded_routes.append("orchestrator_contract_router")
     print("✅ Included orchestrator_contract_router")
-    loaded_routes.append("orchestrator_contract_routes")
 else:
-    failed_routes.append("orchestrator_contract_routes")
+    if "orchestrator_contract_router" not in failed_routes:
+        failed_routes.append("orchestrator_contract_router")
 
+# Include ash router if loaded
 if ash_routes_loaded:
     app.include_router(ash_router)
+    loaded_routes.append("ash_router")
     print("✅ Included ash_router")
-    loaded_routes.append("ash_routes")
 else:
-    failed_routes.append("ash_routes")
+    if "ash_router" not in failed_routes:
+        failed_routes.append("ash_router")
 
-# Include previously orphaned routes
+# Include dashboard routes router if loaded
 if dashboard_routes_loaded:
     app.include_router(dashboard_routes_router)
+    loaded_routes.append("dashboard_routes_router")
     print("✅ Included dashboard_routes_router")
-    loaded_routes.append("dashboard_routes")
 else:
-    failed_routes.append("dashboard_routes")
+    if "dashboard_routes_router" not in failed_routes:
+        failed_routes.append("dashboard_routes_router")
 
+# Include drift routes router if loaded
 if drift_routes_loaded:
     app.include_router(drift_routes_router)
+    loaded_routes.append("drift_routes_router")
     print("✅ Included drift_routes_router")
-    loaded_routes.append("drift_routes")
 else:
-    failed_routes.append("drift_routes")
+    if "drift_routes_router" not in failed_routes:
+        failed_routes.append("drift_routes_router")
 
+# Include forge routes router if loaded
 if forge_routes_loaded:
     app.include_router(forge_routes_router)
+    loaded_routes.append("forge_routes_router")
     print("✅ Included forge_routes_router")
-    loaded_routes.append("forge_routes")
 else:
-    failed_routes.append("forge_routes")
+    if "forge_routes_router" not in failed_routes:
+        failed_routes.append("forge_routes_router")
 
+# Include loop validation routes router if loaded
 if loop_validation_routes_loaded:
     app.include_router(loop_validation_routes_router)
+    loaded_routes.append("loop_validation_routes_router")
     print("✅ Included loop_validation_routes_router")
-    loaded_routes.append("loop_validation_routes")
 else:
-    failed_routes.append("loop_validation_routes")
+    if "loop_validation_routes_router" not in failed_routes:
+        failed_routes.append("loop_validation_routes_router")
 
+# Include output policy routes router if loaded
 if output_policy_routes_loaded:
     app.include_router(output_policy_routes_router)
+    loaded_routes.append("output_policy_routes_router")
     print("✅ Included output_policy_routes_router")
-    loaded_routes.append("output_policy_routes")
 else:
-    failed_routes.append("output_policy_routes")
+    if "output_policy_routes_router" not in failed_routes:
+        failed_routes.append("output_policy_routes_router")
 
+# Include pessimist evaluation routes router if loaded
 if pessimist_evaluation_routes_loaded:
     app.include_router(pessimist_evaluation_routes_router)
+    loaded_routes.append("pessimist_evaluation_routes_router")
     print("✅ Included pessimist_evaluation_routes_router")
-    loaded_routes.append("pessimist_evaluation_routes")
 else:
-    failed_routes.append("pessimist_evaluation_routes")
+    if "pessimist_evaluation_routes_router" not in failed_routes:
+        failed_routes.append("pessimist_evaluation_routes_router")
 
-# Dashboard routes - Hard-wired registration (kept for backward compatibility)
+# Hard-wired registrations (kept for backward compatibility)
 try:
     from app.routes.dashboard_routes import router as dashboard_router
     # Only include if not already included above
@@ -875,7 +928,6 @@ except ImportError as e:
 from fastapi import APIRouter
 import os
 import json
-
 diagnostics_router = APIRouter(tags=["diagnostics"])
 
 @diagnostics_router.get("/diagnostics/routes")
@@ -902,9 +954,9 @@ async def get_routes_diagnostics():
     return response
 
 app.include_router(diagnostics_router)
-app.include_router(agent_routes.router)
-app.include_router(memory_routes.router)
-app.include_router(upload_file_routes.router)
+app.include_router(agent_router)
+app.include_router(memory_router)
+app.include_router(upload_file_router)
 # Removed upload_base64_routes.router to fix deployment issue
 loaded_routes.append("diagnostics_routes")
 print("✅ Included diagnostics_router")
@@ -940,6 +992,7 @@ except Exception as e:
 # Run the application
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 # clean deploy
 # force clean rebuild Fri Apr 25 20:26:00 UTC 2025
 # force clean build Fri Apr 25 20:53:47 UTC 2025
