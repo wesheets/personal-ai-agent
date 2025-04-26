@@ -1,0 +1,264 @@
+{
+  "timestamp": "20250425_2328",
+  "batch_size": 10,
+  "success_count": 1,
+  "warning_count": 3,
+  "error_count": 6,
+  "fixed_endpoints": [
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/health/config",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix",
+      "status": "error",
+      "message": "Could not find route file for GET /health/config",
+      "route_file": null,
+      "function_name": null,
+      "changes": null
+    },
+    {
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/orchestrator/validate_delegation",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix",
+      "status": "error",
+      "message": "Could not find route handler for POST /orchestrator/validate_delegation in /home/ubuntu/personal-ai-agent/app/routes/orchestrator_routes.py",
+      "route_file": null,
+      "function_name": null,
+      "changes": null
+    },
+    {
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/orchestrator/check_recovery_authorization",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix",
+      "status": "error",
+      "message": "Could not find route handler for POST /orchestrator/check_recovery_authorization in /home/ubuntu/personal-ai-agent/app/routes/orchestrator_routes.py",
+      "route_file": null,
+      "function_name": null,
+      "changes": null
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/context/{agent_id}",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "fix_type": "route_implementation",
+      "status": "warning",
+      "message": "Route GET /context/{agent_id} already exists in /home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+      "route_file": null,
+      "function_name": null,
+      "changes": null
+    },
+    {
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/orchestrator/handle_violation",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix",
+      "status": "error",
+      "message": "Could not find route handler for POST /orchestrator/handle_violation in /home/ubuntu/personal-ai-agent/app/routes/orchestrator_routes.py",
+      "route_file": null,
+      "function_name": null,
+      "changes": null
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/config/{agent_id}",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "fix_type": "route_implementation",
+      "status": "warning",
+      "message": "Route GET /config/{agent_id} already exists in /home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+      "route_file": null,
+      "function_name": null,
+      "changes": null
+    },
+    {
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/config",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "fix_type": "route_implementation",
+      "status": "warning",
+      "message": "Route POST /config already exists in /home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+      "route_file": null,
+      "function_name": null,
+      "changes": null
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/health/check/{component_id}",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix",
+      "status": "error",
+      "message": "Could not find route file for GET /health/check/{component_id}",
+      "route_file": null,
+      "function_name": null,
+      "changes": null
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/health/maintenance/predict/{component_id}",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix",
+      "status": "error",
+      "message": "Could not find route file for GET /health/maintenance/predict/{component_id}",
+      "route_file": null,
+      "function_name": null,
+      "changes": null
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/status",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "fix_type": "route_implementation",
+      "status": "success",
+      "message": "Implemented route GET /status",
+      "route_file": "/home/ubuntu/personal-ai-agent/app/routes/train_routes.py",
+      "function_name": "get_status",
+      "changes": "Added route handler and ensured router is properly imported and included"
+    }
+  ],
+  "results": [
+    {
+      "status": "error",
+      "message": "Could not find route file for GET /health/config",
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/health/config",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix"
+    },
+    {
+      "status": "error",
+      "message": "Could not find route handler for POST /orchestrator/validate_delegation in /home/ubuntu/personal-ai-agent/app/routes/orchestrator_routes.py",
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/orchestrator/validate_delegation",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix"
+    },
+    {
+      "status": "error",
+      "message": "Could not find route handler for POST /orchestrator/check_recovery_authorization in /home/ubuntu/personal-ai-agent/app/routes/orchestrator_routes.py",
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/orchestrator/check_recovery_authorization",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix"
+    },
+    {
+      "status": "warning",
+      "message": "Route GET /context/{agent_id} already exists in /home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/context/{agent_id}",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "fix_type": "route_implementation"
+    },
+    {
+      "status": "error",
+      "message": "Could not find route handler for POST /orchestrator/handle_violation in /home/ubuntu/personal-ai-agent/app/routes/orchestrator_routes.py",
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/orchestrator/handle_violation",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix"
+    },
+    {
+      "status": "warning",
+      "message": "Route GET /config/{agent_id} already exists in /home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/config/{agent_id}",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "fix_type": "route_implementation"
+    },
+    {
+      "status": "warning",
+      "message": "Route POST /config already exists in /home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/config",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "fix_type": "route_implementation"
+    },
+    {
+      "status": "error",
+      "message": "Could not find route file for GET /health/check/{component_id}",
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/health/check/{component_id}",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix"
+    },
+    {
+      "status": "error",
+      "message": "Could not find route file for GET /health/maintenance/predict/{component_id}",
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/health/maintenance/predict/{component_id}",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "fix_type": "server_error_fix"
+    },
+    {
+      "status": "success",
+      "message": "Implemented route GET /status",
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/status",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "fix_type": "route_implementation",
+      "route_file": "/home/ubuntu/personal-ai-agent/app/routes/train_routes.py",
+      "function_name": "get_status",
+      "changes": "Added route handler and ensured router is properly imported and included"
+    }
+  ]
+}

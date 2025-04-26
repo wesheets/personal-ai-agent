@@ -1,0 +1,566 @@
+{
+  "timestamp": "20250425_2322",
+  "success_rate": 29.4,
+  "success_rate_change": 0.0,
+  "fixed_endpoints": [
+    {
+      "method": "DELETE",
+      "route_path": "/loop/snapshot/{loop_id}",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "fix_type": "server_error",
+      "priority": "high",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/loop_router.py",
+        "module_name": "loop",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/validate_delegation",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "fix_type": "server_error",
+      "priority": "high",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+        "module_name": "orchestrator",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "fix_type": "server_error",
+      "priority": "high",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+        "module_name": "orchestrator",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/handle_violation",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "fix_type": "server_error",
+      "priority": "high",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+        "module_name": "orchestrator",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "method": "GET",
+      "route_path": "/health",
+      "status_code": 404,
+      "status": "404 Not Found",
+      "fix_type": "missing_route",
+      "priority": "medium",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "module_name": "health_monitor",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/config",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "fix_type": "server_error",
+      "priority": "medium",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "module_name": "health_monitor",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": false
+      }
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/check/{component_id}",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "fix_type": "server_error",
+      "priority": "medium",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "module_name": "health_monitor",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": false
+      }
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/maintenance/predict/{component_id}",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "fix_type": "server_error",
+      "priority": "medium",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "module_name": "health_monitor",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": false
+      }
+    },
+    {
+      "method": "POST",
+      "route_path": "/critic/review",
+      "status_code": 404,
+      "status": "404 Not Found",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/critic_router.py",
+        "module_name": "critic",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": true
+      }
+    },
+    {
+      "method": "GET",
+      "route_path": "/context/{agent_id}",
+      "status_code": 404,
+      "status": "404 Not Found",
+      "fix_type": "missing_route",
+      "priority": "low",
+      "fix_details": {
+        "success": true,
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+        "module_name": "agent_context",
+        "router_var": "router",
+        "created_file": false,
+        "added_endpoint": false
+      }
+    }
+  ],
+  "status_breakdown": {
+    "500": 7,
+    "404": 3
+  },
+  "issues": [
+    {
+      "issue_type": "server_errors",
+      "description": "Some fixed endpoints are still returning server errors",
+      "affected_endpoints": [
+        {
+          "method": "DELETE",
+          "route_path": "/loop/snapshot/{loop_id}",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "high",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/loop_router.py",
+            "module_name": "loop",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "POST",
+          "route_path": "/orchestrator/validate_delegation",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "high",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+            "module_name": "orchestrator",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "POST",
+          "route_path": "/orchestrator/check_recovery_authorization",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "high",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+            "module_name": "orchestrator",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "POST",
+          "route_path": "/orchestrator/handle_violation",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "high",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+            "module_name": "orchestrator",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "GET",
+          "route_path": "/health/config",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "medium",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+            "module_name": "health_monitor",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": false
+          }
+        },
+        {
+          "method": "GET",
+          "route_path": "/health/check/{component_id}",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "medium",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+            "module_name": "health_monitor",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": false
+          }
+        },
+        {
+          "method": "GET",
+          "route_path": "/health/maintenance/predict/{component_id}",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "medium",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+            "module_name": "health_monitor",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": false
+          }
+        }
+      ],
+      "severity": "high"
+    },
+    {
+      "issue_type": "not_found",
+      "description": "Some fixed endpoints are still returning 404 Not Found",
+      "affected_endpoints": [
+        {
+          "method": "GET",
+          "route_path": "/health",
+          "status_code": 404,
+          "status": "404 Not Found",
+          "fix_type": "missing_route",
+          "priority": "medium",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+            "module_name": "health_monitor",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "POST",
+          "route_path": "/critic/review",
+          "status_code": 404,
+          "status": "404 Not Found",
+          "fix_type": "missing_route",
+          "priority": "low",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/critic_router.py",
+            "module_name": "critic",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "GET",
+          "route_path": "/context/{agent_id}",
+          "status_code": 404,
+          "status": "404 Not Found",
+          "fix_type": "missing_route",
+          "priority": "low",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+            "module_name": "agent_context",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": false
+          }
+        }
+      ],
+      "severity": "high"
+    },
+    {
+      "issue_type": "no_improvements",
+      "description": "None of the fixed endpoints improved their status",
+      "affected_endpoints": [
+        {
+          "method": "DELETE",
+          "route_path": "/loop/snapshot/{loop_id}",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "high",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/loop_router.py",
+            "module_name": "loop",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "POST",
+          "route_path": "/orchestrator/validate_delegation",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "high",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+            "module_name": "orchestrator",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "POST",
+          "route_path": "/orchestrator/check_recovery_authorization",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "high",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+            "module_name": "orchestrator",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "POST",
+          "route_path": "/orchestrator/handle_violation",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "high",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/orchestrator_router.py",
+            "module_name": "orchestrator",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "GET",
+          "route_path": "/health",
+          "status_code": 404,
+          "status": "404 Not Found",
+          "fix_type": "missing_route",
+          "priority": "medium",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+            "module_name": "health_monitor",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "GET",
+          "route_path": "/health/config",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "medium",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+            "module_name": "health_monitor",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": false
+          }
+        },
+        {
+          "method": "GET",
+          "route_path": "/health/check/{component_id}",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "medium",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+            "module_name": "health_monitor",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": false
+          }
+        },
+        {
+          "method": "GET",
+          "route_path": "/health/maintenance/predict/{component_id}",
+          "status_code": 500,
+          "status": "500 Internal Server Error",
+          "fix_type": "server_error",
+          "priority": "medium",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+            "module_name": "health_monitor",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": false
+          }
+        },
+        {
+          "method": "POST",
+          "route_path": "/critic/review",
+          "status_code": 404,
+          "status": "404 Not Found",
+          "fix_type": "missing_route",
+          "priority": "low",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/critic_router.py",
+            "module_name": "critic",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": true
+          }
+        },
+        {
+          "method": "GET",
+          "route_path": "/context/{agent_id}",
+          "status_code": 404,
+          "status": "404 Not Found",
+          "fix_type": "missing_route",
+          "priority": "low",
+          "fix_details": {
+            "success": true,
+            "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+            "module_name": "agent_context",
+            "router_var": "router",
+            "created_file": false,
+            "added_endpoint": false
+          }
+        }
+      ],
+      "severity": "critical"
+    }
+  ],
+  "recommendations": [
+    {
+      "recommendation": "Verify deployment process",
+      "description": "Check if the fixes were actually deployed to the production server",
+      "steps": [
+        "Confirm deployment logs show successful deployment",
+        "Check if the server was restarted after deployment",
+        "Verify the deployed code matches the fixed code"
+      ],
+      "priority": "critical"
+    },
+    {
+      "recommendation": "Investigate server errors",
+      "description": "Check server logs to understand why fixed endpoints are still returning errors",
+      "steps": [
+        "Access server logs for error details",
+        "Check for syntax errors or missing dependencies",
+        "Verify environment variables and configuration"
+      ],
+      "priority": "high"
+    },
+    {
+      "recommendation": "Check routing configuration",
+      "description": "Verify that routes are properly registered in the application",
+      "steps": [
+        "Confirm main.py includes all router imports",
+        "Check that app.include_router() calls are present for all routers",
+        "Verify route paths match the expected format"
+      ],
+      "priority": "high"
+    },
+    {
+      "recommendation": "Continue with next batch of fixes",
+      "description": "Proceed with fixing the next batch of endpoints while investigating deployment issues",
+      "steps": [
+        "Identify high-priority endpoints for the next batch",
+        "Implement fixes for these endpoints",
+        "Include more detailed logging to diagnose deployment issues"
+      ],
+      "priority": "medium"
+    },
+    {
+      "recommendation": "Consider direct server-side fixes",
+      "description": "If deployment issues persist, consider making changes directly on the server",
+      "steps": [
+        "Request server access credentials",
+        "Make minimal changes directly on the server to test deployment",
+        "Document any changes made for future reference"
+      ],
+      "priority": "low"
+    }
+  ]
+}

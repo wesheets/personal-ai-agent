@@ -1,0 +1,40 @@
+{
+  "timestamp": "20250425_2321",
+  "memory_tag": "postman_sweep_after_deployment_20250425_2321",
+  "comparison": {
+    "current_analysis": {
+      "total_endpoints": 119,
+      "success_count": 20,
+      "unprocessable_count": 15,
+      "not_found_count": 77,
+      "method_not_allowed_count": 0,
+      "server_error_count": 7,
+      "error_count": 0,
+      "fixed_count": 15,
+      "fixed_success_count": 0,
+      "fixed_failure_count": 15,
+      "success_rate": 29.4,
+      "fix_success_rate": 0.0
+    },
+    "previous_analysis": {
+      "total_endpoints": 119,
+      "success_count": 20,
+      "unprocessable_count": 15,
+      "not_found_count": 77,
+      "method_not_allowed_count": 0,
+      "server_error_count": 7,
+      "error_count": 0,
+      "fixed_count": 10,
+      "fixed_success_count": 0,
+      "fixed_failure_count": 15,
+      "success_rate": 29.4,
+      "fix_success_rate": 0.0
+    },
+    "success_rate_change": 0.0,
+    "fix_success_rate_change": 0.0,
+    "improved_endpoints_count": 0,
+    "degraded_endpoints_count": 0,
+    "improved_endpoints": [],
+    "degraded_endpoints": []
+  }
+}

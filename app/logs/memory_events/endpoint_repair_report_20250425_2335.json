@@ -1,5 +1,6 @@
 {
-  "timestamp": "20250425_2337",
+  "event_type": "endpoint_repair_report",
+  "timestamp": "20250425_2335",
   "summary": {
     "total_endpoints": 10,
     "success_count": 0,
@@ -7,20 +8,15 @@
     "status_distribution": {
       "500": 6,
       "404": 4
+    },
+    "path_prefix_distribution": {
+      "/orchestrator": 3,
+      "/health": 3,
+      "/config": 2,
+      "/context": 1,
+      "/status": 1
     }
   },
-  "approaches_tried": [
-    {
-      "name": "Schema-Led Route Reconstruction",
-      "description": "Analyzed schema files to identify expected routes and added missing router imports to main.py",
-      "success_rate": 0.0
-    },
-    {
-      "name": "Direct Endpoint Implementation",
-      "description": "Created complete route files with proper implementations for all failing endpoints",
-      "success_rate": 0.0
-    }
-  ],
   "conclusions": [
     "All implemented fixes were successful locally but failed on the live server",
     "The 404 errors suggest route registration issues on the server",
@@ -33,5 +29,6 @@
     "Verify that the FastAPI application is properly configured on the server",
     "Consider redeploying the entire application with the latest changes",
     "Implement monitoring to detect when endpoints go down"
-  ]
+  ],
+  "report_file": "/home/ubuntu/personal-ai-agent/logs/final_endpoint_repair_report.json"
 }

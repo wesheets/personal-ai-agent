@@ -1,0 +1,138 @@
+{
+  "timestamp": "20250425_2334",
+  "total_endpoints": 10,
+  "success_count": 0,
+  "success_rate": 0.0,
+  "results": [
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/orchestrator/check_recovery_authorization",
+      "status_code": 500,
+      "status": "error",
+      "message": "Endpoint returned 500",
+      "response": {
+        "detail": "Error checking recovery authorization: 400: Must specify agent_id and recovery_type"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Created orchestrator routes file with check recovery authorization endpoint"
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/handle_violation",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/orchestrator/handle_violation",
+      "status_code": 500,
+      "status": "error",
+      "message": "Endpoint returned 500",
+      "response": {
+        "detail": "Error handling violation: 400: Must specify agent_id and violation"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Created orchestrator routes file with handle violation endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/config",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/health/config",
+      "status_code": 500,
+      "status": "error",
+      "message": "Endpoint returned 500",
+      "response": {
+        "text": "Internal Server Error"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Created health routes file with config endpoint"
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/validate_delegation",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/orchestrator/validate_delegation",
+      "status_code": 500,
+      "status": "error",
+      "message": "Endpoint returned 500",
+      "response": {
+        "detail": "Error validating delegation: 400: Must specify from_agent, to_agent, and output_schema"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Created orchestrator routes file with validate delegation endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/config/{agent_id}",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/config/test_agent_id",
+      "status_code": 404,
+      "status": "error",
+      "message": "Endpoint returned 404",
+      "response": {
+        "detail": "Not Found"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Fixed agent config routes with get by ID endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/context/{agent_id}",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/context/test_agent_id",
+      "status_code": 404,
+      "status": "error",
+      "message": "Endpoint returned 404",
+      "response": {
+        "detail": "Not Found"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Fixed agent context routes with get by ID endpoint"
+    },
+    {
+      "method": "POST",
+      "route_path": "/config",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/config",
+      "status_code": 404,
+      "status": "error",
+      "message": "Endpoint returned 404",
+      "response": {
+        "detail": "Not Found"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Fixed agent config routes with create endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/status",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/status",
+      "status_code": 404,
+      "status": "error",
+      "message": "Endpoint returned 404",
+      "response": {
+        "detail": "Not Found"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Created status routes file with status endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/maintenance/predict/{component_id}",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/health/maintenance/predict/test_component_id",
+      "status_code": 500,
+      "status": "error",
+      "message": "Endpoint returned 500",
+      "response": {
+        "text": "Internal Server Error"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Created health routes file with maintenance predict endpoint"
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/check/{component_id}",
+      "url": "https://personal-ai-agent-ji4s.onrender.com/health/check/test_component_id",
+      "status_code": 500,
+      "status": "error",
+      "message": "Endpoint returned 500",
+      "response": {
+        "text": "Internal Server Error"
+      },
+      "fix_status": "fixed",
+      "fix_message": "Created health routes file with check endpoint"
+    }
+  ]
+}

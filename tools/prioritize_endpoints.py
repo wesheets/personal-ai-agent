@@ -1,176 +1,262 @@
 #!/usr/bin/env python3
 """
-Endpoint Repair Prioritizer
-Prioritizes non-operational endpoints for repair based on various criteria.
+Endpoint Prioritizer
+Prioritizes the next batch of non-operational endpoints for fixing based on identification results.
 """
 
 import os
 import json
+import datetime
 from collections import defaultdict
 
 # Configuration
 LOGS_DIR = "/home/ubuntu/personal-ai-agent/logs"
-NON_OPERATIONAL_FILE = "/home/ubuntu/personal-ai-agent/logs/non_operational_endpoints.json"
-OUTPUT_FILE = "/home/ubuntu/personal-ai-agent/logs/endpoint_repair_priorities.json"
+REMAINING_ENDPOINTS_FILE = "/home/ubuntu/personal-ai-agent/logs/remaining_non_operational_endpoints.json"
+DEPLOYMENT_ANALYSIS_FILE = "/home/ubuntu/personal-ai-agent/logs/deployment_fix_analysis.json"
+OUTPUT_FILE = "/home/ubuntu/personal-ai-agent/logs/next_batch_priorities.json"
+BATCH_SIZE = 10  # Number of endpoints to include in the next batch
 
-def load_non_operational_endpoints():
-    """Load non-operational endpoints analysis"""
-    with open(NON_OPERATIONAL_FILE, "r") as f:
+def load_remaining_endpoints():
+    """Load remaining non-operational endpoints"""
+    with open(REMAINING_ENDPOINTS_FILE, "r") as f:
         return json.load(f)
 
-def prioritize_by_critical_path(non_operational):
-    """Prioritize endpoints by critical path"""
-    critical_paths = non_operational["critical_paths"]
-    
-    # Sort critical paths by priority
-    critical_paths.sort(key=lambda x: 0 if x["priority"] == "high" else (1 if x["priority"] == "medium" else 2))
-    
-    return critical_paths
+def load_deployment_analysis():
+    """Load deployment fix analysis"""
+    with open(DEPLOYMENT_ANALYSIS_FILE, "r") as f:
+        return json.load(f)
 
-def prioritize_by_fix_complexity(non_operational):
-    """Prioritize endpoints by fix complexity"""
-    # Endpoints with schema models are easier to fix
-    endpoints_with_models = non_operational["endpoints_with_schema_models"]
+def prioritize_by_status(endpoints):
+    """Prioritize endpoints by their status code"""
+    # 500 errors are higher priority than 404s
+    status_priority = {
+        500: 1,
+        "error": 2,
+        404: 3
+    }
     
-    # Sort by fix type (server_error is more complex than missing_route)
-    endpoints_with_models.sort(key=lambda x: 0 if x["fix_type"] == "missing_route" else 1)
-    
-    return endpoints_with_models
+    # Sort endpoints by status priority
+    return sorted(endpoints, key=lambda x: status_priority.get(x["status_code"], 999))
 
-def prioritize_by_module_importance(non_operational):
-    """Prioritize endpoints by module importance"""
-    module_endpoints = non_operational["module_endpoints"]
-    
-    # Define important modules in order of importance
-    important_modules = [
-        "agent", "memory", "loop", "orchestrator", "hal", "forge",
-        "health", "guardian", "historian", "nova", "sage",
-        "drift", "debugger", "critic"
+def prioritize_by_module(endpoints):
+    """Prioritize endpoints by their module importance"""
+    # Define critical modules in order of importance
+    critical_modules = [
+        "agent",
+        "memory",
+        "loop",
+        "orchestrator",
+        "hal",
+        "forge",
+        "health",
+        "api",
+        "debug"
     ]
     
-    prioritized_by_module = []
-    
-    # Add endpoints from important modules in order
-    for module in important_modules:
-        if module in module_endpoints:
-            prioritized_by_module.extend(module_endpoints[module])
-    
-    return prioritized_by_module
-
-def prioritize_by_common_patterns(non_operational):
-    """Prioritize endpoints by common patterns"""
-    common_patterns = non_operational["common_patterns"]
-    fix_recommendations = []
-    
-    # Flatten all endpoints
-    for module_endpoints in non_operational["module_endpoints"].values():
-        fix_recommendations.extend(module_endpoints)
-    
-    # Group endpoints by pattern
-    pattern_endpoints = defaultdict(list)
-    for endpoint in fix_recommendations:
+    # Assign priority scores based on module
+    for endpoint in endpoints:
         route_path = endpoint["route_path"]
         parts = route_path.strip("/").split("/")
         
-        if len(parts) >= 2:
-            pattern = f"/{parts[0]}/{parts[1]}"
-        elif len(parts) == 1:
-            pattern = f"/{parts[0]}"
+        if parts:
+            module = parts[0]
+            if module in critical_modules:
+                endpoint["module_priority"] = critical_modules.index(module) + 1
+            else:
+                endpoint["module_priority"] = len(critical_modules) + 1
         else:
-            pattern = "/"
-        
-        pattern_endpoints[pattern].append(endpoint)
+            endpoint["module_priority"] = len(critical_modules) + 2
     
-    # Sort patterns by frequency
-    prioritized_by_pattern = []
-    for pattern, _ in common_patterns:
-        if pattern in pattern_endpoints:
-            prioritized_by_pattern.extend(pattern_endpoints[pattern])
-    
-    return prioritized_by_pattern
+    # Sort endpoints by module priority
+    return sorted(endpoints, key=lambda x: x["module_priority"])
 
-def create_repair_batches(prioritized_endpoints, batch_size=10):
-    """Create repair batches of endpoints"""
-    batches = []
+def prioritize_by_schema_match(endpoints):
+    """Prioritize endpoints that have schema matches"""
+    # Endpoints with schema matches are easier to fix
+    return sorted(endpoints, key=lambda x: 0 if x.get("schema_match") else 1)
+
+def prioritize_by_method(endpoints):
+    """Prioritize endpoints by HTTP method importance"""
+    # Define method priority (GET and POST are most important)
+    method_priority = {
+        "GET": 1,
+        "POST": 2,
+        "PUT": 3,
+        "DELETE": 4,
+        "PATCH": 5
+    }
     
-    # Create batches
-    for i in range(0, len(prioritized_endpoints), batch_size):
-        batch = prioritized_endpoints[i:i+batch_size]
-        batches.append(batch)
+    # Sort endpoints by method priority
+    return sorted(endpoints, key=lambda x: method_priority.get(x["method"], 999))
+
+def calculate_composite_priority(endpoints):
+    """Calculate a composite priority score for each endpoint"""
+    # Define weights for different factors
+    weights = {
+        "status": 0.4,  # Status code is most important
+        "module": 0.3,  # Module importance is next
+        "schema": 0.2,  # Having a schema match helps
+        "method": 0.1   # Method is least important
+    }
     
-    return batches
+    # Calculate normalized scores for each factor
+    status_scores = {}
+    status_priority = {500: 1, "error": 2, 404: 3}
+    for i, endpoint in enumerate(prioritize_by_status(endpoints)):
+        status_scores[f"{endpoint['method']}:{endpoint['route_path']}"] = 1 - (i / len(endpoints))
+    
+    module_scores = {}
+    for i, endpoint in enumerate(prioritize_by_module(endpoints)):
+        module_scores[f"{endpoint['method']}:{endpoint['route_path']}"] = 1 - (i / len(endpoints))
+    
+    schema_scores = {}
+    for i, endpoint in enumerate(prioritize_by_schema_match(endpoints)):
+        schema_scores[f"{endpoint['method']}:{endpoint['route_path']}"] = 1 - (i / len(endpoints))
+    
+    method_scores = {}
+    for i, endpoint in enumerate(prioritize_by_method(endpoints)):
+        method_scores[f"{endpoint['method']}:{endpoint['route_path']}"] = 1 - (i / len(endpoints))
+    
+    # Calculate composite score for each endpoint
+    for endpoint in endpoints:
+        key = f"{endpoint['method']}:{endpoint['route_path']}"
+        endpoint["composite_score"] = (
+            weights["status"] * status_scores[key] +
+            weights["module"] * module_scores[key] +
+            weights["schema"] * schema_scores[key] +
+            weights["method"] * method_scores[key]
+        )
+    
+    # Sort endpoints by composite score (higher is higher priority)
+    return sorted(endpoints, key=lambda x: x["composite_score"], reverse=True)
+
+def select_next_batch(prioritized_endpoints, batch_size=BATCH_SIZE):
+    """Select the next batch of endpoints to fix"""
+    return prioritized_endpoints[:batch_size]
+
+def generate_fix_strategies(batch):
+    """Generate fix strategies for each endpoint in the batch"""
+    strategies = []
+    
+    for endpoint in batch:
+        strategy = {
+            "endpoint": {
+                "method": endpoint["method"],
+                "route_path": endpoint["route_path"],
+                "status_code": endpoint["status_code"],
+                "status": endpoint["status"]
+            },
+            "priority_score": endpoint["composite_score"],
+            "has_schema_match": endpoint.get("schema_match") is not None
+        }
+        
+        # Determine fix type based on status code and schema match
+        if endpoint["status_code"] == 500:
+            strategy["fix_type"] = "server_error_fix"
+            strategy["fix_description"] = "Fix server error by debugging and resolving the exception"
+        elif endpoint["status_code"] == 404:
+            if endpoint.get("schema_match"):
+                strategy["fix_type"] = "route_implementation"
+                strategy["fix_description"] = "Implement missing route handler using schema definition"
+                strategy["schema_info"] = endpoint["schema_match"]
+            else:
+                strategy["fix_type"] = "route_registration"
+                strategy["fix_description"] = "Register missing route in the application"
+        else:
+            strategy["fix_type"] = "general_fix"
+            strategy["fix_description"] = "Investigate and fix the issue"
+        
+        # Add specific steps based on fix type
+        if strategy["fix_type"] == "server_error_fix":
+            strategy["fix_steps"] = [
+                "Check server logs for error details",
+                "Debug the exception in the route handler",
+                "Fix the code causing the error",
+                "Add error handling to prevent future errors"
+            ]
+        elif strategy["fix_type"] == "route_implementation":
+            strategy["fix_steps"] = [
+                "Create or update the route handler function",
+                "Implement request validation using the schema",
+                "Add basic response logic",
+                "Return appropriate status codes and responses"
+            ]
+        elif strategy["fix_type"] == "route_registration":
+            strategy["fix_steps"] = [
+                "Create a new route module if needed",
+                "Implement a basic route handler",
+                "Register the route in the application",
+                "Update main.py to include the router"
+            ]
+        else:
+            strategy["fix_steps"] = [
+                "Investigate the specific issue",
+                "Implement appropriate fixes",
+                "Test the endpoint",
+                "Document the changes"
+            ]
+        
+        strategies.append(strategy)
+    
+    return strategies
 
 def main():
-    """Main function to prioritize endpoints for repair"""
-    print("Starting endpoint repair prioritization...")
+    """Main function to prioritize endpoints and select the next batch"""
+    print("Starting endpoint prioritization...")
     
-    # Load non-operational endpoints analysis
-    non_operational = load_non_operational_endpoints()
-    print(f"Loaded analysis for {non_operational['total_non_operational']} non-operational endpoints")
+    # Load data
+    remaining_endpoints = load_remaining_endpoints()
+    deployment_analysis = load_deployment_analysis()
+    print(f"Loaded {remaining_endpoints['non_operational_count']} non-operational endpoints")
     
-    # Prioritize by critical path
-    critical_path_priorities = prioritize_by_critical_path(non_operational)
-    print(f"Prioritized {len(critical_path_priorities)} endpoints by critical path")
+    # Get non-operational endpoints
+    non_operational = remaining_endpoints["non_operational_endpoints"]
     
-    # Prioritize by fix complexity
-    fix_complexity_priorities = prioritize_by_fix_complexity(non_operational)
-    print(f"Prioritized {len(fix_complexity_priorities)} endpoints by fix complexity")
+    # Prioritize endpoints
+    prioritized_endpoints = calculate_composite_priority(non_operational)
+    print(f"Prioritized {len(prioritized_endpoints)} endpoints")
     
-    # Prioritize by module importance
-    module_importance_priorities = prioritize_by_module_importance(non_operational)
-    print(f"Prioritized {len(module_importance_priorities)} endpoints by module importance")
+    # Select next batch
+    next_batch = select_next_batch(prioritized_endpoints)
+    print(f"Selected {len(next_batch)} endpoints for the next batch")
     
-    # Prioritize by common patterns
-    common_pattern_priorities = prioritize_by_common_patterns(non_operational)
-    print(f"Prioritized {len(common_pattern_priorities)} endpoints by common patterns")
+    # Generate fix strategies
+    fix_strategies = generate_fix_strategies(next_batch)
+    print(f"Generated fix strategies for {len(fix_strategies)} endpoints")
     
-    # Create a unified priority list
-    # Start with critical paths
-    unified_priorities = []
-    endpoint_ids = set()
-    
-    # Add endpoints from each priority list, avoiding duplicates
-    for priority_list in [critical_path_priorities, module_importance_priorities, fix_complexity_priorities, common_pattern_priorities]:
-        for endpoint in priority_list:
-            endpoint_id = f"{endpoint['method']}:{endpoint['route_path']}"
-            if endpoint_id not in endpoint_ids:
-                unified_priorities.append(endpoint)
-                endpoint_ids.add(endpoint_id)
-    
-    print(f"Created unified priority list with {len(unified_priorities)} endpoints")
-    
-    # Create repair batches
-    repair_batches = create_repair_batches(unified_priorities)
-    print(f"Created {len(repair_batches)} repair batches")
+    # Generate timestamp
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M")
     
     # Create output directory if it doesn't exist
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     
     # Prepare output
     output = {
-        "total_endpoints": len(unified_priorities),
-        "total_batches": len(repair_batches),
-        "critical_path_count": len(critical_path_priorities),
-        "fix_complexity_count": len(fix_complexity_priorities),
-        "module_importance_count": len(module_importance_priorities),
-        "common_pattern_count": len(common_pattern_priorities),
-        "unified_priorities": unified_priorities,
-        "repair_batches": repair_batches
+        "timestamp": timestamp,
+        "total_non_operational": remaining_endpoints["non_operational_count"],
+        "batch_size": len(next_batch),
+        "batch_endpoints": next_batch,
+        "fix_strategies": fix_strategies
     }
     
     # Save output to file
     with open(OUTPUT_FILE, 'w') as f:
         json.dump(output, f, indent=2)
     
-    print(f"Endpoint repair prioritization completed. Results saved to {OUTPUT_FILE}")
+    print(f"Endpoint prioritization completed. Results saved to {OUTPUT_FILE}")
     
-    # Print summary of first batch
-    print("\nFirst Repair Batch:")
-    for i, endpoint in enumerate(repair_batches[0][:5]):
-        print(f"  {i+1}. {endpoint['method']} {endpoint['route_path']} (Priority: {endpoint['priority']}, Fix Type: {endpoint['fix_type']})")
+    # Print summary
+    print("\nNext Batch Summary:")
+    print(f"Total Non-Operational Endpoints: {output['total_non_operational']}")
+    print(f"Batch Size: {output['batch_size']}")
     
-    if len(repair_batches[0]) > 5:
-        print(f"  ... and {len(repair_batches[0]) - 5} more endpoints in first batch")
+    print("\nTop 5 Endpoints to Fix:")
+    for i, strategy in enumerate(fix_strategies[:5]):
+        endpoint = strategy["endpoint"]
+        print(f"  {i+1}. {endpoint['method']} {endpoint['route_path']} ({endpoint['status']})")
+        print(f"     Fix Type: {strategy['fix_type']}")
+        print(f"     Priority Score: {strategy['priority_score']:.4f}")
+        print(f"     Has Schema Match: {strategy['has_schema_match']}")
     
     return output
 

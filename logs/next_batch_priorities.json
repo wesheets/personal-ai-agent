@@ -1,0 +1,1324 @@
+{
+  "timestamp": "20250425_2326",
+  "total_non_operational": 84,
+  "batch_size": 10,
+  "batch_endpoints": [
+    {
+      "method": "GET",
+      "route_path": "/health/config",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "was_fixed": true,
+      "schema_match": {
+        "schema_name": "health_monitor_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/health_monitor_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ]
+      },
+      "module_priority": 7,
+      "composite_score": 0.9178571428571429
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/validate_delegation",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "was_fixed": true,
+      "schema_match": null,
+      "module_priority": 4,
+      "composite_score": 0.8869047619047619
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/check_recovery_authorization",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "was_fixed": true,
+      "schema_match": null,
+      "module_priority": 4,
+      "composite_score": 0.875
+    },
+    {
+      "method": "GET",
+      "route_path": "/context/{agent_id}",
+      "status_code": 404,
+      "status": "404 Not Found",
+      "was_fixed": true,
+      "schema_match": {
+        "schema_name": "agent_context_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/agent_context_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+        "models": [
+          {
+            "name": "MemoryUsage",
+            "fields": {
+              "total_entries": "int",
+              "recent_entries": "int",
+              "tags_count": "Dict[...]",
+              "size_bytes": "Optional[...]"
+            }
+          },
+          {
+            "name": "LoopState",
+            "fields": {
+              "loop_id": "str",
+              "current_step": "int",
+              "total_steps": "int",
+              "started_at": "str",
+              "last_updated": "str",
+              "state": "str"
+            }
+          },
+          {
+            "name": "LastAgentAction",
+            "fields": {
+              "agent_id": "str",
+              "action_type": "str",
+              "timestamp": "str",
+              "status": "str",
+              "details": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentContextRequest",
+            "fields": {
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "include_memory_stats": "bool"
+            }
+          },
+          {
+            "name": "AgentContextResponse",
+            "fields": {
+              "agent_id": "str",
+              "state": "AgentState",
+              "loop_state": "Optional[...]",
+              "last_action": "Optional[...]",
+              "memory_usage": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentContextError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ]
+      },
+      "module_priority": 10,
+      "composite_score": 0.8666666666666666
+    },
+    {
+      "method": "POST",
+      "route_path": "/orchestrator/handle_violation",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "was_fixed": true,
+      "schema_match": null,
+      "module_priority": 4,
+      "composite_score": 0.8630952380952381
+    },
+    {
+      "method": "GET",
+      "route_path": "/config/{agent_id}",
+      "status_code": 404,
+      "status": "404 Not Found",
+      "was_fixed": false,
+      "schema_match": {
+        "schema_name": "agent_config_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/agent_config_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+        "models": [
+          {
+            "name": "ToolPermission",
+            "fields": {
+              "tool_id": "str",
+              "enabled": "bool",
+              "permission_level": "PermissionLevel",
+              "rate_limit": "Optional[...]"
+            }
+          },
+          {
+            "name": "FallbackBehavior",
+            "fields": {
+              "retry_count": "int",
+              "fallback_agent": "Optional[...]",
+              "error_response_template": "Optional[...]",
+              "log_failures": "bool"
+            }
+          },
+          {
+            "name": "AgentConfigRequest",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentConfigResponse",
+            "fields": {
+              "agent_id": "str",
+              "config_updated": "bool",
+              "permissions_count": "int",
+              "memory_access_level": "PermissionLevel",
+              "fallback_configured": "bool",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetRequest",
+            "fields": {
+              "agent_id": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetResponse",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Dict[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ]
+      },
+      "module_priority": 10,
+      "composite_score": 0.8547619047619047
+    },
+    {
+      "method": "POST",
+      "route_path": "/config",
+      "status_code": 404,
+      "status": "404 Not Found",
+      "was_fixed": false,
+      "schema_match": {
+        "schema_name": "agent_config_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/agent_config_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+        "models": [
+          {
+            "name": "ToolPermission",
+            "fields": {
+              "tool_id": "str",
+              "enabled": "bool",
+              "permission_level": "PermissionLevel",
+              "rate_limit": "Optional[...]"
+            }
+          },
+          {
+            "name": "FallbackBehavior",
+            "fields": {
+              "retry_count": "int",
+              "fallback_agent": "Optional[...]",
+              "error_response_template": "Optional[...]",
+              "log_failures": "bool"
+            }
+          },
+          {
+            "name": "AgentConfigRequest",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentConfigResponse",
+            "fields": {
+              "agent_id": "str",
+              "config_updated": "bool",
+              "permissions_count": "int",
+              "memory_access_level": "PermissionLevel",
+              "fallback_configured": "bool",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetRequest",
+            "fields": {
+              "agent_id": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetResponse",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Dict[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ]
+      },
+      "module_priority": 10,
+      "composite_score": 0.851190476190476
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/check/{component_id}",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "was_fixed": true,
+      "schema_match": {
+        "schema_name": "health_monitor_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/health_monitor_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ]
+      },
+      "module_priority": 7,
+      "composite_score": 0.8404761904761904
+    },
+    {
+      "method": "GET",
+      "route_path": "/health/maintenance/predict/{component_id}",
+      "status_code": 500,
+      "status": "500 Internal Server Error",
+      "was_fixed": true,
+      "schema_match": {
+        "schema_name": "health_monitor_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/health_monitor_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/health_monitor_routes.py",
+        "models": [
+          {
+            "name": "HealthMetric",
+            "fields": {
+              "name": "str",
+              "value": "Union[...]",
+              "unit": "Optional[...]",
+              "threshold_warning": "Optional[...]",
+              "threshold_critical": "Optional[...]",
+              "status": "HealthStatus",
+              "timestamp": "datetime"
+            }
+          },
+          {
+            "name": "ComponentHealth",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "status": "HealthStatus",
+              "metrics": "List[...]",
+              "last_checked": "datetime",
+              "issues": "List[...]",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "SystemHealthSummary",
+            "fields": {
+              "overall_status": "HealthStatus",
+              "component_statuses": "Dict[...]",
+              "critical_issues_count": "int",
+              "warning_issues_count": "int",
+              "healthy_components_count": "int",
+              "total_components_count": "int",
+              "last_updated": "datetime"
+            }
+          },
+          {
+            "name": "HealthCheckRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "include_metrics": "bool",
+              "include_recommendations": "bool"
+            }
+          },
+          {
+            "name": "HealthCheckResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "summary": "SystemHealthSummary",
+              "components": "List[...]"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceRequest",
+            "fields": {
+              "component_id": "Optional[...]",
+              "component_type": "Optional[...]",
+              "time_horizon_hours": "int",
+              "confidence_threshold": "float"
+            }
+          },
+          {
+            "name": "MaintenancePrediction",
+            "fields": {
+              "component_id": "str",
+              "component_name": "str",
+              "component_type": "ComponentType",
+              "predicted_issue": "str",
+              "confidence": "float",
+              "time_to_failure": "Optional[...]",
+              "recommended_action": "str",
+              "priority": "str",
+              "prediction_timestamp": "datetime"
+            }
+          },
+          {
+            "name": "PredictiveMaintenanceResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "predictions": "List[...]",
+              "total_predictions_count": "int",
+              "high_priority_count": "int",
+              "medium_priority_count": "int",
+              "low_priority_count": "int"
+            }
+          },
+          {
+            "name": "SelfHealingRequest",
+            "fields": {
+              "component_id": "str",
+              "issue_description": "str",
+              "suggested_actions": "List[...]",
+              "auto_approve": "bool",
+              "max_impact_level": "str"
+            }
+          },
+          {
+            "name": "HealingActionResult",
+            "fields": {
+              "action": "SelfHealingAction",
+              "success": "bool",
+              "timestamp": "datetime",
+              "details": "str",
+              "impact_level": "str",
+              "duration_ms": "int"
+            }
+          },
+          {
+            "name": "SelfHealingResponse",
+            "fields": {
+              "request_id": "str",
+              "component_id": "str",
+              "timestamp": "datetime",
+              "issue_resolved": "bool",
+              "actions_performed": "List[...]",
+              "current_status": "HealthStatus",
+              "recommendations": "List[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigRequest",
+            "fields": {
+              "check_interval_seconds": "Optional[...]",
+              "enable_predictive_maintenance": "Optional[...]",
+              "enable_self_healing": "Optional[...]",
+              "alert_thresholds": "Optional[...]",
+              "excluded_components": "Optional[...]"
+            }
+          },
+          {
+            "name": "HealthMonitorConfigResponse",
+            "fields": {
+              "request_id": "str",
+              "timestamp": "datetime",
+              "current_config": "Dict",
+              "changes_applied": "Dict",
+              "restart_required": "bool"
+            }
+          }
+        ]
+      },
+      "module_priority": 7,
+      "composite_score": 0.8285714285714285
+    },
+    {
+      "method": "GET",
+      "route_path": "/status",
+      "status_code": 404,
+      "status": "404 Not Found",
+      "was_fixed": false,
+      "schema_match": {
+        "schema_name": "train_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/train_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/train_routes.py",
+        "models": [
+          {
+            "name": "TrainRequest",
+            "fields": {
+              "model_type": "TrainingModel",
+              "training_data": "Union[...]",
+              "data_format": "TrainingDataFormat",
+              "model_name": "str",
+              "hyperparameters": "Optional[...]",
+              "validation_split": "Optional[...]",
+              "max_epochs": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]"
+            }
+          },
+          {
+            "name": "TrainingMetrics",
+            "fields": {
+              "accuracy": "Optional[...]",
+              "precision": "Optional[...]",
+              "recall": "Optional[...]",
+              "f1_score": "Optional[...]",
+              "loss": "float",
+              "val_loss": "Optional[...]",
+              "epochs_completed": "int",
+              "training_time": "float"
+            }
+          },
+          {
+            "name": "TrainResponse",
+            "fields": {
+              "model_id": "str",
+              "model_name": "str",
+              "model_type": "TrainingModel",
+              "status": "str",
+              "metrics": "Optional[...]",
+              "examples_processed": "int",
+              "model_size": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "TrainError",
+            "fields": {
+              "message": "str",
+              "model_type": "Optional[...]",
+              "model_name": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "TrainStatusRequest",
+            "fields": {
+              "model_id": "str"
+            }
+          },
+          {
+            "name": "TrainStatusResponse",
+            "fields": {
+              "model_id": "str",
+              "model_name": "str",
+              "status": "str",
+              "progress": "Optional[...]",
+              "current_epoch": "Optional[...]",
+              "total_epochs": "Optional[...]",
+              "estimated_completion": "Optional[...]",
+              "error_message": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ]
+      },
+      "module_priority": 10,
+      "composite_score": 0.8214285714285715
+    }
+  ],
+  "fix_strategies": [
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/health/config",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "priority_score": 0.9178571428571429,
+      "has_schema_match": true,
+      "fix_type": "server_error_fix",
+      "fix_description": "Fix server error by debugging and resolving the exception",
+      "fix_steps": [
+        "Check server logs for error details",
+        "Debug the exception in the route handler",
+        "Fix the code causing the error",
+        "Add error handling to prevent future errors"
+      ]
+    },
+    {
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/orchestrator/validate_delegation",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "priority_score": 0.8869047619047619,
+      "has_schema_match": false,
+      "fix_type": "server_error_fix",
+      "fix_description": "Fix server error by debugging and resolving the exception",
+      "fix_steps": [
+        "Check server logs for error details",
+        "Debug the exception in the route handler",
+        "Fix the code causing the error",
+        "Add error handling to prevent future errors"
+      ]
+    },
+    {
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/orchestrator/check_recovery_authorization",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "priority_score": 0.875,
+      "has_schema_match": false,
+      "fix_type": "server_error_fix",
+      "fix_description": "Fix server error by debugging and resolving the exception",
+      "fix_steps": [
+        "Check server logs for error details",
+        "Debug the exception in the route handler",
+        "Fix the code causing the error",
+        "Add error handling to prevent future errors"
+      ]
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/context/{agent_id}",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "priority_score": 0.8666666666666666,
+      "has_schema_match": true,
+      "fix_type": "route_implementation",
+      "fix_description": "Implement missing route handler using schema definition",
+      "schema_info": {
+        "schema_name": "agent_context_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/agent_context_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_context_routes.py",
+        "models": [
+          {
+            "name": "MemoryUsage",
+            "fields": {
+              "total_entries": "int",
+              "recent_entries": "int",
+              "tags_count": "Dict[...]",
+              "size_bytes": "Optional[...]"
+            }
+          },
+          {
+            "name": "LoopState",
+            "fields": {
+              "loop_id": "str",
+              "current_step": "int",
+              "total_steps": "int",
+              "started_at": "str",
+              "last_updated": "str",
+              "state": "str"
+            }
+          },
+          {
+            "name": "LastAgentAction",
+            "fields": {
+              "agent_id": "str",
+              "action_type": "str",
+              "timestamp": "str",
+              "status": "str",
+              "details": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentContextRequest",
+            "fields": {
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "include_memory_stats": "bool"
+            }
+          },
+          {
+            "name": "AgentContextResponse",
+            "fields": {
+              "agent_id": "str",
+              "state": "AgentState",
+              "loop_state": "Optional[...]",
+              "last_action": "Optional[...]",
+              "memory_usage": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentContextError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ]
+      },
+      "fix_steps": [
+        "Create or update the route handler function",
+        "Implement request validation using the schema",
+        "Add basic response logic",
+        "Return appropriate status codes and responses"
+      ]
+    },
+    {
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/orchestrator/handle_violation",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "priority_score": 0.8630952380952381,
+      "has_schema_match": false,
+      "fix_type": "server_error_fix",
+      "fix_description": "Fix server error by debugging and resolving the exception",
+      "fix_steps": [
+        "Check server logs for error details",
+        "Debug the exception in the route handler",
+        "Fix the code causing the error",
+        "Add error handling to prevent future errors"
+      ]
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/config/{agent_id}",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "priority_score": 0.8547619047619047,
+      "has_schema_match": true,
+      "fix_type": "route_implementation",
+      "fix_description": "Implement missing route handler using schema definition",
+      "schema_info": {
+        "schema_name": "agent_config_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/agent_config_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+        "models": [
+          {
+            "name": "ToolPermission",
+            "fields": {
+              "tool_id": "str",
+              "enabled": "bool",
+              "permission_level": "PermissionLevel",
+              "rate_limit": "Optional[...]"
+            }
+          },
+          {
+            "name": "FallbackBehavior",
+            "fields": {
+              "retry_count": "int",
+              "fallback_agent": "Optional[...]",
+              "error_response_template": "Optional[...]",
+              "log_failures": "bool"
+            }
+          },
+          {
+            "name": "AgentConfigRequest",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentConfigResponse",
+            "fields": {
+              "agent_id": "str",
+              "config_updated": "bool",
+              "permissions_count": "int",
+              "memory_access_level": "PermissionLevel",
+              "fallback_configured": "bool",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetRequest",
+            "fields": {
+              "agent_id": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetResponse",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Dict[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ]
+      },
+      "fix_steps": [
+        "Create or update the route handler function",
+        "Implement request validation using the schema",
+        "Add basic response logic",
+        "Return appropriate status codes and responses"
+      ]
+    },
+    {
+      "endpoint": {
+        "method": "POST",
+        "route_path": "/config",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "priority_score": 0.851190476190476,
+      "has_schema_match": true,
+      "fix_type": "route_implementation",
+      "fix_description": "Implement missing route handler using schema definition",
+      "schema_info": {
+        "schema_name": "agent_config_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/agent_config_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/agent_config_routes.py",
+        "models": [
+          {
+            "name": "ToolPermission",
+            "fields": {
+              "tool_id": "str",
+              "enabled": "bool",
+              "permission_level": "PermissionLevel",
+              "rate_limit": "Optional[...]"
+            }
+          },
+          {
+            "name": "FallbackBehavior",
+            "fields": {
+              "retry_count": "int",
+              "fallback_agent": "Optional[...]",
+              "error_response_template": "Optional[...]",
+              "log_failures": "bool"
+            }
+          },
+          {
+            "name": "AgentConfigRequest",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Optional[...]"
+            }
+          },
+          {
+            "name": "AgentConfigResponse",
+            "fields": {
+              "agent_id": "str",
+              "config_updated": "bool",
+              "permissions_count": "int",
+              "memory_access_level": "PermissionLevel",
+              "fallback_configured": "bool",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigError",
+            "fields": {
+              "message": "str",
+              "agent_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetRequest",
+            "fields": {
+              "agent_id": "str"
+            }
+          },
+          {
+            "name": "AgentConfigGetResponse",
+            "fields": {
+              "agent_id": "str",
+              "permissions": "List[...]",
+              "fallback_behavior": "Optional[...]",
+              "memory_access_level": "PermissionLevel",
+              "custom_settings": "Dict[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ]
+      },
+      "fix_steps": [
+        "Create or update the route handler function",
+        "Implement request validation using the schema",
+        "Add basic response logic",
+        "Return appropriate status codes and responses"
+      ]
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/health/check/{component_id}",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "priority_score": 0.8404761904761904,
+      "has_schema_match": true,
+      "fix_type": "server_error_fix",
+      "fix_description": "Fix server error by debugging and resolving the exception",
+      "fix_steps": [
+        "Check server logs for error details",
+        "Debug the exception in the route handler",
+        "Fix the code causing the error",
+        "Add error handling to prevent future errors"
+      ]
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/health/maintenance/predict/{component_id}",
+        "status_code": 500,
+        "status": "500 Internal Server Error"
+      },
+      "priority_score": 0.8285714285714285,
+      "has_schema_match": true,
+      "fix_type": "server_error_fix",
+      "fix_description": "Fix server error by debugging and resolving the exception",
+      "fix_steps": [
+        "Check server logs for error details",
+        "Debug the exception in the route handler",
+        "Fix the code causing the error",
+        "Add error handling to prevent future errors"
+      ]
+    },
+    {
+      "endpoint": {
+        "method": "GET",
+        "route_path": "/status",
+        "status_code": 404,
+        "status": "404 Not Found"
+      },
+      "priority_score": 0.8214285714285715,
+      "has_schema_match": true,
+      "fix_type": "route_implementation",
+      "fix_description": "Implement missing route handler using schema definition",
+      "schema_info": {
+        "schema_name": "train_schema",
+        "schema_file": "/home/ubuntu/personal-ai-agent/app/schemas/train_schema.py",
+        "route_file": "/home/ubuntu/personal-ai-agent/app/routes/train_routes.py",
+        "models": [
+          {
+            "name": "TrainRequest",
+            "fields": {
+              "model_type": "TrainingModel",
+              "training_data": "Union[...]",
+              "data_format": "TrainingDataFormat",
+              "model_name": "str",
+              "hyperparameters": "Optional[...]",
+              "validation_split": "Optional[...]",
+              "max_epochs": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]"
+            }
+          },
+          {
+            "name": "TrainingMetrics",
+            "fields": {
+              "accuracy": "Optional[...]",
+              "precision": "Optional[...]",
+              "recall": "Optional[...]",
+              "f1_score": "Optional[...]",
+              "loss": "float",
+              "val_loss": "Optional[...]",
+              "epochs_completed": "int",
+              "training_time": "float"
+            }
+          },
+          {
+            "name": "TrainResponse",
+            "fields": {
+              "model_id": "str",
+              "model_name": "str",
+              "model_type": "TrainingModel",
+              "status": "str",
+              "metrics": "Optional[...]",
+              "examples_processed": "int",
+              "model_size": "Optional[...]",
+              "agent_id": "Optional[...]",
+              "loop_id": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "TrainError",
+            "fields": {
+              "message": "str",
+              "model_type": "Optional[...]",
+              "model_name": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          },
+          {
+            "name": "TrainStatusRequest",
+            "fields": {
+              "model_id": "str"
+            }
+          },
+          {
+            "name": "TrainStatusResponse",
+            "fields": {
+              "model_id": "str",
+              "model_name": "str",
+              "status": "str",
+              "progress": "Optional[...]",
+              "current_epoch": "Optional[...]",
+              "total_epochs": "Optional[...]",
+              "estimated_completion": "Optional[...]",
+              "error_message": "Optional[...]",
+              "timestamp": "str",
+              "version": "str"
+            }
+          }
+        ]
+      },
+      "fix_steps": [
+        "Create or update the route handler function",
+        "Implement request validation using the schema",
+        "Add basic response logic",
+        "Return appropriate status codes and responses"
+      ]
+    }
+  ]
+}
