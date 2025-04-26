@@ -1,0 +1,2657 @@
+{
+  "modules": [
+    {
+      "name": "agents/memory_agent.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "api/agent.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/agent/builder.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/agent/memory.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/agent/memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "api/agent/ops.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/agent/planner.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/agent/planner.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "api/agent/research.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/agent_status.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/control.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/delegate_route.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/delegate_route.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "api/delegate_stream.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/delegate_stream.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "api/goals.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/logs.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/memory.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "api/memory_viewer.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/memory_viewer.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/agent.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/agent_context.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/delegate.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/delegate.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/feedback.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/memory_engine.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/observer.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/orchestrator.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/plan.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/plan.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/plan_models.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/project.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/project_summary.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/respond.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/respond.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/stream.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/system.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/system.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "api/modules/user_context.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/orchestrator/chain.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/orchestrator/consult.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/orchestrator/scope.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/orchestrator/start_project.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/orchestrator/status.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/project/start.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/projects/projects.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/respond.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/streaming_route.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/streaming_route.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "api/system_routes.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "api/task/status.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "core/agent_coordinator.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/agent_registry.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/agent_registry_enhanced.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "core/agent_registry_enhanced.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/agent_router.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/boot.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/confidence_retry.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/error_logger.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/escalation_manager.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/forge.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/input_gateway.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/input_router.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/memory_api_quota_guard.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/memory_context_reviewer.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/memory_manager.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/nudge_manager.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/orchestrator.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/planner_agent_enhancer.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/planner_orchestrator.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/prompt_manager.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/rationale_logger.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/run.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/seeding.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/self_evaluation.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/shared_memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/task_persistence.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/task_state_manager.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/task_tagger.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/tool_router.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "core/vector_memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "db/memory_db.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "fallbacks/fix_hal_routes.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "memory/__init__.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "memory/project_memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/agent_fallback.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "modules/agent_reflect.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/agent_reflection.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/core_beliefs_integration.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/delegate.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "modules/drift_monitor.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/hal_memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/hal_memory_patch.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/historian_drift_report.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/live_memory_inspection.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/logic_loader.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "modules/loop.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "modules/memory_block_writer.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/memory_embed.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/memory_recall.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/memory_summarize.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/memory_summarizer.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/memory_summarizer_project.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/memory_thread.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/memory_writer.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/orchestrator_contract_integration.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "modules/orchestrator_drift_integration.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/orchestrator_memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/orchestrator_memory_enhanced.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/passive_reflection.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/plan/__init__.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/plan/execute_chain.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/plan/scope.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/plan_generate.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/planning_logic_integration.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/recursive_reflection_engine.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/reflect.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/reflection_fatigue_scoring.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/reflection_grader.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/reflection_guardrails.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/reflection_styler.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/register_all_agents.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "modules/summary_realism_scorer.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/symbolic_memory_encoder.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "modules/trust_score_evaluator.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/core_routes.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/debugger_routes.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "routes/drift_routes.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/drift_routes_router.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/health_monitor_routes.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "routes/historian_routes.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "routes/memory_api_routes.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/memory_embed_routes.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/memory_recall_routes.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/memory_router.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/memory_routes.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/orchestrator_contract_routes.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "routes/orchestrator_plan_routes.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/plan_generate_routes.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/reflection_router.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/reflection_routes.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "routes/self_routes.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "routes/status_debug.py",
+      "category": "API Router",
+      "status": "active"
+    },
+    {
+      "name": "schemas/drift_schema.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "schemas/memory.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "schemas/memory_embed_schema.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "schemas/memory_recall_schema.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "schemas/memory_schema.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "schemas/plan_generate_schema.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "system/checklist_engine.py",
+      "category": "Agent Module",
+      "status": "active"
+    },
+    {
+      "name": "utils/reflection_analyzer.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    },
+    {
+      "name": "validators/memory_retry_logic_checker.py",
+      "category": "Reflection/Memory/Core",
+      "status": "active"
+    }
+  ],
+  "schemas": [
+    {
+      "name": "AgentAllocation",
+      "file": "schemas/ceo_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "AgentConfigError",
+      "file": "schemas/agent_config_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/agent_config_routes.py"
+      ]
+    },
+    {
+      "name": "AgentConfigGetRequest",
+      "file": "schemas/agent_config_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "AgentConfigGetResponse",
+      "file": "schemas/agent_config_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/agent_config_routes.py"
+      ]
+    },
+    {
+      "name": "AgentConfigRequest",
+      "file": "schemas/agent_config_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/agent_config_routes.py"
+      ]
+    },
+    {
+      "name": "AgentConfigResponse",
+      "file": "schemas/agent_config_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/agent_config_routes.py"
+      ]
+    },
+    {
+      "name": "AgentContextError",
+      "file": "schemas/agent_context_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/agent_context_routes.py"
+      ]
+    },
+    {
+      "name": "AgentContextRequest",
+      "file": "api/modules/agent_context_models.py",
+      "status": "active",
+      "used_by": [
+        "routes/agent_context_routes.py",
+        "api/modules/agent_context.py",
+        "api/modules/agent_context_models.py"
+      ]
+    },
+    {
+      "name": "AgentContextRequest",
+      "file": "schemas/agent_context_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/agent_context_routes.py",
+        "api/modules/agent_context.py",
+        "api/modules/agent_context_models.py"
+      ]
+    },
+    {
+      "name": "AgentContextResponse",
+      "file": "api/modules/agent_context_models.py",
+      "status": "active",
+      "used_by": [
+        "routes/agent_context_routes.py",
+        "api/modules/agent_context.py",
+        "api/modules/agent_context_models.py"
+      ]
+    },
+    {
+      "name": "AgentContextResponse",
+      "file": "schemas/agent_context_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/agent_context_routes.py",
+        "api/modules/agent_context.py",
+        "api/modules/agent_context_models.py"
+      ]
+    },
+    {
+      "name": "AgentContract",
+      "file": "schemas/agent_contract_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "AgentPermissionViolation",
+      "file": "schemas/loop_trace.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "AgentStep",
+      "file": "models/workflow.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "AgentStepMetadata",
+      "file": "models/workflow.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "AgentStepReflection",
+      "file": "models/workflow.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "AshAnalysisRequest",
+      "file": "schemas/ash_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/ash_routes.py"
+      ]
+    },
+    {
+      "name": "AshAnalysisResult",
+      "file": "schemas/ash_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/ash_routes.py"
+      ]
+    },
+    {
+      "name": "AshErrorResult",
+      "file": "schemas/ash_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/ash_routes.py"
+      ]
+    },
+    {
+      "name": "AshTestRequest",
+      "file": "schemas/ash_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/ash_routes.py"
+      ]
+    },
+    {
+      "name": "AshTestResult",
+      "file": "schemas/ash_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/ash_routes.py"
+      ]
+    },
+    {
+      "name": "BeliefAlignmentScore",
+      "file": "schemas/historian_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "BeliefChallengeRequest",
+      "file": "schemas/self_challenge_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/self_routes.py"
+      ]
+    },
+    {
+      "name": "BeliefInsight",
+      "file": "schemas/sage_beliefs_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/sage_beliefs_routes.py"
+      ]
+    },
+    {
+      "name": "BeliefReinforcementRequest",
+      "file": "schemas/self_reinforcement_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/self_routes.py"
+      ]
+    },
+    {
+      "name": "BeliefRevisionRequest",
+      "file": "schemas/self_revision_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/self_routes.py"
+      ]
+    },
+    {
+      "name": "BeliefScore",
+      "file": "schemas/sage_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "BiasAnalysis",
+      "file": "schemas/pessimist_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "BiasTag",
+      "file": "schemas/loop_trace.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "BiasTagDetail",
+      "file": "schemas/pessimist_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CEOErrorResult",
+      "file": "schemas/ceo_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CEOPlanResult",
+      "file": "schemas/ceo_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CEOReviewRequest",
+      "file": "schemas/ceo_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CTOAuditRequest",
+      "file": "schemas/cto_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/cto_routes.py"
+      ]
+    },
+    {
+      "name": "CTOAuditResult",
+      "file": "schemas/cto_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/cto_routes.py"
+      ]
+    },
+    {
+      "name": "CTOErrorResult",
+      "file": "schemas/cto_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/cto_routes.py"
+      ]
+    },
+    {
+      "name": "CTOIssue",
+      "file": "schemas/cto_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "ComponentBuildResult",
+      "file": "schemas/forge_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "ComponentHealth",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "ContractValidationRequest",
+      "file": "schemas/agent_contract_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/orchestrator_contract_routes.py"
+      ]
+    },
+    {
+      "name": "ContractValidationResponse",
+      "file": "schemas/agent_contract_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/orchestrator_contract_routes.py"
+      ]
+    },
+    {
+      "name": "ContractViolation",
+      "file": "schemas/agent_contract_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CriticErrorResult",
+      "file": "schemas/critic_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CriticLogReasonRequest",
+      "file": "schemas/critic_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CriticLogReasonResult",
+      "file": "schemas/critic_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CriticRejectRequest",
+      "file": "schemas/critic_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CriticRejectResult",
+      "file": "schemas/critic_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CriticReviewRequest",
+      "file": "schemas/critic_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/critic_review_routes.py"
+      ]
+    },
+    {
+      "name": "CriticReviewResult",
+      "file": "schemas/critic_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CriticScores",
+      "file": "schemas/critic_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "CriticUsage",
+      "file": "schemas/critic_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "DebuggerReport",
+      "file": "schemas/debugger_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "DebuggerTraceRequest",
+      "file": "schemas/debugger_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "DebuggerTraceResult",
+      "file": "schemas/debugger_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/debugger_routes.py"
+      ]
+    },
+    {
+      "name": "DelegationResult",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "DriftMonitorRequest",
+      "file": "schemas/drift_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/drift_routes.py",
+        "modules/orchestrator_drift_integration.py"
+      ]
+    },
+    {
+      "name": "DriftMonitorResponse",
+      "file": "schemas/drift_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/drift_routes.py"
+      ]
+    },
+    {
+      "name": "ExportError",
+      "file": "schemas/export_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/export_routes.py"
+      ]
+    },
+    {
+      "name": "ExportRequest",
+      "file": "schemas/export_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/export_routes.py"
+      ]
+    },
+    {
+      "name": "ExportResponse",
+      "file": "schemas/export_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/export_routes.py"
+      ]
+    },
+    {
+      "name": "ExportStatusRequest",
+      "file": "schemas/export_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/export_routes.py"
+      ]
+    },
+    {
+      "name": "ExportStatusResponse",
+      "file": "schemas/export_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/export_routes.py"
+      ]
+    },
+    {
+      "name": "FallbackBehavior",
+      "file": "schemas/agent_config_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "FixError",
+      "file": "schemas/fix_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/fix_routes.py"
+      ]
+    },
+    {
+      "name": "FixRequest",
+      "file": "schemas/fix_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/fix_routes.py"
+      ]
+    },
+    {
+      "name": "FixResponse",
+      "file": "schemas/fix_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/fix_routes.py"
+      ]
+    },
+    {
+      "name": "FixRollbackRequest",
+      "file": "schemas/fix_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/fix_routes.py"
+      ]
+    },
+    {
+      "name": "FixRollbackResponse",
+      "file": "schemas/fix_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/fix_routes.py"
+      ]
+    },
+    {
+      "name": "FixStatusRequest",
+      "file": "schemas/fix_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/fix_routes.py"
+      ]
+    },
+    {
+      "name": "FixStatusResponse",
+      "file": "schemas/fix_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/fix_routes.py"
+      ]
+    },
+    {
+      "name": "ForgeBuildRequest",
+      "file": "schemas/forge_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/forge_build_routes.py",
+        "routes/forge_routes.py"
+      ]
+    },
+    {
+      "name": "ForgeBuildResult",
+      "file": "schemas/forge_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/forge_routes.py"
+      ]
+    },
+    {
+      "name": "ForgeRevisionRequest",
+      "file": "schemas/forge_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "ForgeRevisionResult",
+      "file": "schemas/forge_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "GuardianAlertRequest",
+      "file": "schemas/guardian_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/guardian_routes.py"
+      ]
+    },
+    {
+      "name": "GuardianErrorResult",
+      "file": "schemas/guardian_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/guardian_routes.py"
+      ]
+    },
+    {
+      "name": "GuardianResponse",
+      "file": "schemas/guardian_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/guardian_routes.py"
+      ]
+    },
+    {
+      "name": "GuardianRollbackRequest",
+      "file": "schemas/guardian_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/guardian_routes.py"
+      ]
+    },
+    {
+      "name": "GuardianRollbackResult",
+      "file": "schemas/guardian_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/guardian_routes.py"
+      ]
+    },
+    {
+      "name": "HealingActionResult",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "HealthCheckRequest",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/health_monitor_routes.py",
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "HealthCheckResponse",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/health_monitor_routes.py",
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "HealthMetric",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "HealthMonitorConfigRequest",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/health_monitor_routes.py",
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "HealthMonitorConfigResponse",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/health_monitor_routes.py",
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "HistorianAlert",
+      "file": "schemas/historian_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "HistorianDriftRequest",
+      "file": "schemas/historian_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "HistorianDriftResult",
+      "file": "schemas/historian_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/historian_routes.py"
+      ]
+    },
+    {
+      "name": "LastAgentAction",
+      "file": "schemas/agent_context_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "LoopCompleteRequest",
+      "file": "schemas/loop_trace.py",
+      "status": "active",
+      "used_by": [
+        "routes/orchestrator_routes.py"
+      ]
+    },
+    {
+      "name": "LoopDebugRequest",
+      "file": "schemas/debug_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/debug_routes.py"
+      ]
+    },
+    {
+      "name": "LoopDebugResult",
+      "file": "schemas/debug_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/debug_routes.py"
+      ]
+    },
+    {
+      "name": "LoopDriftLog",
+      "file": "schemas/drift_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/drift_routes.py"
+      ]
+    },
+    {
+      "name": "LoopIssue",
+      "file": "schemas/debug_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "LoopReflectionResult",
+      "file": "schemas/loop_trace.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "LoopResponseRequest",
+      "file": "schemas/loop_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/loop_routes.py"
+      ]
+    },
+    {
+      "name": "LoopResponseResult",
+      "file": "schemas/loop_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/loop_routes.py"
+      ]
+    },
+    {
+      "name": "LoopSnapshot",
+      "file": "schemas/loop_snapshot_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "LoopState",
+      "file": "schemas/agent_context_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "LoopTraceItem",
+      "file": "schemas/loop_trace.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "LoopValidationError",
+      "file": "schemas/loop_validation_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/loop_validation_routes.py",
+        "modules/loop_validation.py"
+      ]
+    },
+    {
+      "name": "LoopValidationRequest",
+      "file": "schemas/loop_validation_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/loop_validation_routes.py",
+        "modules/loop_validation.py"
+      ]
+    },
+    {
+      "name": "LoopValidationResult",
+      "file": "schemas/loop_validation_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/loop_validation_routes.py",
+        "modules/loop_validation.py"
+      ]
+    },
+    {
+      "name": "MaintenancePrediction",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "MemoryAddRequest",
+      "file": "schemas/memory_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_api_routes.py",
+        "api/memory.py"
+      ]
+    },
+    {
+      "name": "MemoryAddResponse",
+      "file": "schemas/memory_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_api_routes.py"
+      ]
+    },
+    {
+      "name": "MemoryEmbedBatchRequest",
+      "file": "schemas/memory_embed_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_embed_routes.py"
+      ]
+    },
+    {
+      "name": "MemoryEmbedBatchResponse",
+      "file": "schemas/memory_embed_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_embed_routes.py"
+      ]
+    },
+    {
+      "name": "MemoryEmbedError",
+      "file": "schemas/memory_embed_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_embed_routes.py"
+      ]
+    },
+    {
+      "name": "MemoryEmbedRequest",
+      "file": "schemas/memory_embed_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_embed_routes.py"
+      ]
+    },
+    {
+      "name": "MemoryEmbedResponse",
+      "file": "schemas/memory_embed_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_embed_routes.py"
+      ]
+    },
+    {
+      "name": "MemoryEntry",
+      "file": "schemas/memory_recall_schema.py",
+      "status": "active",
+      "used_by": [
+        "api/memory_viewer.py"
+      ]
+    },
+    {
+      "name": "MemoryEntry",
+      "file": "schemas/memory_schema.py",
+      "status": "active",
+      "used_by": [
+        "api/memory_viewer.py"
+      ]
+    },
+    {
+      "name": "MemoryItem",
+      "file": "schemas/memory.py",
+      "status": "active",
+      "used_by": [
+        "modules/memory_thread.py",
+        "api/agent/memory.py"
+      ]
+    },
+    {
+      "name": "MemoryRecallError",
+      "file": "schemas/memory_recall_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_recall_routes.py"
+      ]
+    },
+    {
+      "name": "MemoryRecallRequest",
+      "file": "schemas/memory_recall_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_recall_routes.py"
+      ]
+    },
+    {
+      "name": "MemoryRecallResponse",
+      "file": "schemas/memory_recall_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_recall_routes.py"
+      ]
+    },
+    {
+      "name": "MemorySearchRequest",
+      "file": "schemas/memory_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_api_routes.py",
+        "api/memory.py"
+      ]
+    },
+    {
+      "name": "MemorySearchResponse",
+      "file": "schemas/memory_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/memory_api_routes.py",
+        "api/memory.py"
+      ]
+    },
+    {
+      "name": "MemoryUsage",
+      "file": "schemas/agent_context_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "ModelInfo",
+      "file": "schemas/trainer_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "NovaUIRequest",
+      "file": "schemas/nova_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/nova_routes.py"
+      ]
+    },
+    {
+      "name": "NovaUIRequestFallback",
+      "file": "schemas/nova_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "NovaUIResult",
+      "file": "schemas/nova_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/nova_routes.py"
+      ]
+    },
+    {
+      "name": "NovaUIResultFallback",
+      "file": "schemas/nova_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/nova_routes.py"
+      ]
+    },
+    {
+      "name": "ObservationEntry",
+      "file": "schemas/observer_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "ObserverErrorResult",
+      "file": "schemas/observer_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/observer_routes.py"
+      ]
+    },
+    {
+      "name": "ObserverTaskRequest",
+      "file": "schemas/observer_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/observer_routes.py"
+      ]
+    },
+    {
+      "name": "ObserverTaskResult",
+      "file": "schemas/observer_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/observer_routes.py"
+      ]
+    },
+    {
+      "name": "OrchestratorConsultRequest",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "OrchestratorDecision",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "OrchestratorErrorResult",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "OrchestratorInterpretRequest",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "OrchestratorPlan",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "OrchestratorPlanRequest",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/orchestrator_plan_routes.py"
+      ]
+    },
+    {
+      "name": "OrchestratorPlanResult",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "OutputPolicyRequest",
+      "file": "schemas/output_policy_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/output_policy_routes.py",
+        "modules/output_policy_enforcer.py"
+      ]
+    },
+    {
+      "name": "OutputPolicyResult",
+      "file": "schemas/output_policy_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/output_policy_routes.py",
+        "modules/output_policy_enforcer.py"
+      ]
+    },
+    {
+      "name": "PatchPlan",
+      "file": "schemas/debugger_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "PatchProjectStateRequest",
+      "file": "models/project_state.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "PessimistAssessment",
+      "file": "schemas/pessimist_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "PessimistCheckRequest",
+      "file": "schemas/pessimist_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/pessimist_routes.py",
+        "modules/pessimist_evaluation.py"
+      ]
+    },
+    {
+      "name": "PessimistCheckResult",
+      "file": "schemas/pessimist_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/pessimist_routes.py",
+        "modules/pessimist_evaluation.py"
+      ]
+    },
+    {
+      "name": "PessimistErrorResult",
+      "file": "schemas/pessimist_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/pessimist_routes.py"
+      ]
+    },
+    {
+      "name": "PessimistEvaluateRequest",
+      "file": "schemas/pessimist_evaluation_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/pessimist_evaluation_routes.py"
+      ]
+    },
+    {
+      "name": "PessimistEvaluateResponse",
+      "file": "schemas/pessimist_evaluation_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/pessimist_evaluation_routes.py"
+      ]
+    },
+    {
+      "name": "PlanGenerateError",
+      "file": "schemas/plan_generate_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/plan_generate_routes.py"
+      ]
+    },
+    {
+      "name": "PlanGenerateRequest",
+      "file": "api/modules/plan_models.py",
+      "status": "active",
+      "used_by": [
+        "routes/plan_generate_routes.py",
+        "api/modules/plan.py",
+        "api/modules/plan_models.py"
+      ]
+    },
+    {
+      "name": "PlanGenerateRequest",
+      "file": "schemas/plan_generate_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/plan_generate_routes.py",
+        "api/modules/plan.py",
+        "api/modules/plan_models.py"
+      ]
+    },
+    {
+      "name": "PlanGenerateResponse",
+      "file": "api/modules/plan_models.py",
+      "status": "active",
+      "used_by": [
+        "routes/plan_generate_routes.py",
+        "api/modules/plan.py",
+        "api/modules/plan_models.py"
+      ]
+    },
+    {
+      "name": "PlanGenerateResponse",
+      "file": "schemas/plan_generate_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/plan_generate_routes.py",
+        "api/modules/plan.py",
+        "api/modules/plan_models.py"
+      ]
+    },
+    {
+      "name": "PlanStep",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "PlanStep",
+      "file": "schemas/plan_generate_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "PolicyLogEntry",
+      "file": "schemas/output_policy_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "PolicyLogRequest",
+      "file": "schemas/output_policy_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/output_policy_routes.py"
+      ]
+    },
+    {
+      "name": "PolicyLogResponse",
+      "file": "schemas/output_policy_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/output_policy_routes.py"
+      ]
+    },
+    {
+      "name": "PredictiveMaintenanceRequest",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/health_monitor_routes.py",
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "PredictiveMaintenanceResponse",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/health_monitor_routes.py",
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "ProjectContext",
+      "file": "api/modules/agent_context_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/agent_context.py",
+        "api/modules/agent_context_models.py"
+      ]
+    },
+    {
+      "name": "ProjectInitiateRequest",
+      "file": "api/modules/project_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/project.py",
+        "api/modules/project_models.py"
+      ]
+    },
+    {
+      "name": "ProjectInitiateResponse",
+      "file": "api/modules/project_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/project.py",
+        "api/modules/project_models.py"
+      ]
+    },
+    {
+      "name": "RepairSuggestion",
+      "file": "schemas/debug_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "RerunDecision",
+      "file": "schemas/loop_trace.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "RerunDecision",
+      "file": "schemas/rerun_decision.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "ResolutionResult",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "RespondRequest",
+      "file": "api/modules/respond_models.py",
+      "status": "active",
+      "used_by": [
+        "api/respond.py",
+        "api/modules/respond.py",
+        "api/modules/respond_models.py"
+      ]
+    },
+    {
+      "name": "RespondResponse",
+      "file": "api/modules/respond_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/respond.py",
+        "api/modules/respond_models.py"
+      ]
+    },
+    {
+      "name": "RiskAssessment",
+      "file": "schemas/pessimist_evaluation_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/pessimist_evaluation_routes.py"
+      ]
+    },
+    {
+      "name": "RiskFactor",
+      "file": "schemas/ash_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "SageBeliefRequest",
+      "file": "schemas/sage_beliefs_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/sage_beliefs_routes.py"
+      ]
+    },
+    {
+      "name": "SageBeliefResponse",
+      "file": "schemas/sage_beliefs_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/sage_beliefs_routes.py"
+      ]
+    },
+    {
+      "name": "SageErrorResult",
+      "file": "schemas/sage_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "SageReviewRequest",
+      "file": "schemas/sage_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/sage_routes.py"
+      ]
+    },
+    {
+      "name": "SageReviewResult",
+      "file": "schemas/sage_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/sage_routes.py"
+      ]
+    },
+    {
+      "name": "SageScoreBeliefRequest",
+      "file": "schemas/sage_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "SageScoreBeliefResult",
+      "file": "schemas/sage_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "SageSummarizeRequest",
+      "file": "schemas/sage_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "SageSummarizeResult",
+      "file": "schemas/sage_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "SchemaEntry",
+      "file": "registries/schema_registry.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "SchemaRegistry",
+      "file": "registries/schema_registry.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "SelfHealingRequest",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/health_monitor_routes.py",
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "SelfHealingResponse",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/health_monitor_routes.py",
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "SelfInquiryRequest",
+      "file": "schemas/self_reflection_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/self_routes.py"
+      ]
+    },
+    {
+      "name": "SiteGenErrorResult",
+      "file": "schemas/sitegen_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/sitegen_routes.py"
+      ]
+    },
+    {
+      "name": "SiteGenTaskRequest",
+      "file": "schemas/sitegen_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/sitegen_routes.py"
+      ]
+    },
+    {
+      "name": "SiteGenTaskResult",
+      "file": "schemas/sitegen_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/sitegen_routes.py"
+      ]
+    },
+    {
+      "name": "SiteLayout",
+      "file": "schemas/sitegen_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "SnapshotResponse",
+      "file": "schemas/loop_snapshot_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/snapshot_routes.py"
+      ]
+    },
+    {
+      "name": "SnapshotRestoreRequest",
+      "file": "schemas/loop_snapshot_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/snapshot_routes.py"
+      ]
+    },
+    {
+      "name": "SnapshotSaveRequest",
+      "file": "schemas/loop_snapshot_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/snapshot_routes.py"
+      ]
+    },
+    {
+      "name": "StartLoopRequest",
+      "file": "models/loop.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "StreamCloseRequest",
+      "file": "schemas/delegate_stream_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/delegate_stream_routes.py"
+      ]
+    },
+    {
+      "name": "StreamCloseResponse",
+      "file": "schemas/delegate_stream_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/delegate_stream_routes.py"
+      ]
+    },
+    {
+      "name": "StreamError",
+      "file": "schemas/delegate_stream_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/delegate_stream_routes.py"
+      ]
+    },
+    {
+      "name": "StreamEvent",
+      "file": "schemas/delegate_stream_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "StreamRequest",
+      "file": "schemas/delegate_stream_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/delegate_stream_routes.py"
+      ]
+    },
+    {
+      "name": "StreamResponse",
+      "file": "schemas/delegate_stream_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/delegate_stream_routes.py"
+      ]
+    },
+    {
+      "name": "StreamStatusRequest",
+      "file": "schemas/delegate_stream_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/delegate_stream_routes.py"
+      ]
+    },
+    {
+      "name": "StreamStatusResponse",
+      "file": "schemas/delegate_stream_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/delegate_stream_routes.py"
+      ]
+    },
+    {
+      "name": "SummarizationRequest",
+      "file": "schemas/memory.py",
+      "status": "active",
+      "used_by": [
+        "modules/memory_summarize.py",
+        "api/orchestrator/status.py"
+      ]
+    },
+    {
+      "name": "SystemHealthSummary",
+      "file": "schemas/health_monitor_schema.py",
+      "status": "active",
+      "used_by": [
+        "modules/health_monitor.py"
+      ]
+    },
+    {
+      "name": "TaskItem",
+      "file": "api/modules/agent_context_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/agent_context.py",
+        "api/modules/agent_context_models.py"
+      ]
+    },
+    {
+      "name": "TaskPlan",
+      "file": "api/modules/plan_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/plan.py",
+        "api/modules/plan_models.py"
+      ]
+    },
+    {
+      "name": "TestResult",
+      "file": "schemas/ash_schema.py",
+      "status": "active",
+      "used_by": [
+        "modules/loop_ci_test_runner.py"
+      ]
+    },
+    {
+      "name": "ThreadRequest",
+      "file": "schemas/memory.py",
+      "status": "active",
+      "used_by": [
+        "modules/memory_thread.py"
+      ]
+    },
+    {
+      "name": "ToolPermission",
+      "file": "schemas/agent_config_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "TrainError",
+      "file": "schemas/train_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/train_routes.py"
+      ]
+    },
+    {
+      "name": "TrainRequest",
+      "file": "schemas/train_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/train_routes.py"
+      ]
+    },
+    {
+      "name": "TrainResponse",
+      "file": "schemas/train_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/train_routes.py"
+      ]
+    },
+    {
+      "name": "TrainStatusRequest",
+      "file": "schemas/train_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/train_routes.py"
+      ]
+    },
+    {
+      "name": "TrainStatusResponse",
+      "file": "schemas/train_schema.py",
+      "status": "active",
+      "used_by": [
+        "routes/train_routes.py"
+      ]
+    },
+    {
+      "name": "TrainerErrorResult",
+      "file": "schemas/trainer_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "TrainerTaskRequest",
+      "file": "schemas/trainer_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "TrainerTaskResult",
+      "file": "schemas/trainer_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "TrainingMetrics",
+      "file": "schemas/train_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "TrainingMetrics",
+      "file": "schemas/trainer_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "TriggerResult",
+      "file": "schemas/orchestrator_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "UIComponent",
+      "file": "schemas/nova_schema.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "UserContextGetRequest",
+      "file": "api/modules/user_context_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/user_context_models.py"
+      ]
+    },
+    {
+      "name": "UserContextGetResponse",
+      "file": "api/modules/user_context_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/user_context.py",
+        "api/modules/user_context_models.py"
+      ]
+    },
+    {
+      "name": "UserContextRegisterRequest",
+      "file": "api/modules/user_context_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/user_context.py",
+        "api/modules/user_context_models.py"
+      ]
+    },
+    {
+      "name": "UserContextRegisterResponse",
+      "file": "api/modules/user_context_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/user_context.py",
+        "api/modules/user_context_models.py"
+      ]
+    },
+    {
+      "name": "UserGoalPlanRequest",
+      "file": "api/modules/plan_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/plan.py",
+        "api/modules/plan_models.py",
+        "api/modules/project.py"
+      ]
+    },
+    {
+      "name": "UserGoalPlanResponse",
+      "file": "api/modules/plan_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/plan.py",
+        "api/modules/plan_models.py"
+      ]
+    },
+    {
+      "name": "UserGoalPlanTask",
+      "file": "api/modules/plan_models.py",
+      "status": "active",
+      "used_by": [
+        "api/modules/plan.py",
+        "api/modules/plan_models.py"
+      ]
+    },
+    {
+      "name": "ValidateSchemaHashRequest",
+      "file": "schemas/validate_schema_hash.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "ValidateSchemaHashResult",
+      "file": "schemas/validate_schema_hash.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "ValidationIssue",
+      "file": "schemas/loop_validation_schema.py",
+      "status": "active",
+      "used_by": [
+        "modules/loop_validation.py"
+      ]
+    },
+    {
+      "name": "ValidationRecommendation",
+      "file": "schemas/loop_validation_schema.py",
+      "status": "active",
+      "used_by": [
+        "modules/loop_validation.py"
+      ]
+    },
+    {
+      "name": "WorkflowResponse",
+      "file": "models/workflow.py",
+      "status": "planned",
+      "used_by": []
+    },
+    {
+      "name": "hal_agent",
+      "file": "schemas/hal_agent.schema.json",
+      "status": "active",
+      "used_by": [
+        "routes/debug_hal_schema.py"
+      ]
+    },
+    {
+      "name": "hal_agent",
+      "file": "schemas/schemas/hal_agent.schema.json",
+      "status": "active",
+      "used_by": [
+        "routes/debug_hal_schema.py"
+      ]
+    },
+    {
+      "name": "loop_trace",
+      "file": "loop/debug/loop_trace.schema.json",
+      "status": "planned",
+      "used_by": []
+    }
+  ],
+  "endpoints": [],
+  "components": [
+    {
+      "name": "MemoryViewer",
+      "path": "src/components/MemoryViewer.jsx",
+      "type": "Cognitive",
+      "status": "active",
+      "linked_to": [
+        "/api/memory"
+      ]
+    },
+    {
+      "name": "MemoryBrowser",
+      "path": "src/components/MemoryBrowser.jsx",
+      "type": "Cognitive",
+      "status": "active",
+      "linked_to": [
+        "/api/memory"
+      ]
+    },
+    {
+      "name": "MemoryIndexService",
+      "path": "src/components/MemoryIndexService.jsx",
+      "type": "Cognitive",
+      "status": "active",
+      "linked_to": [
+        "/api/memory"
+      ]
+    },
+    {
+      "name": "MemoryUserScoping",
+      "path": "src/components/MemoryUserScoping.jsx",
+      "type": "Cognitive",
+      "status": "active",
+      "linked_to": [
+        "/api/memory"
+      ]
+    },
+    {
+      "name": "LoopStatusPanel",
+      "path": "src/components/LoopStatusPanel.jsx",
+      "type": "Cognitive",
+      "status": "active",
+      "linked_to": [
+        "/api/project/state"
+      ]
+    },
+    {
+      "name": "SystemIntegrityPanel",
+      "path": "src/components/SystemIntegrityPanel.jsx",
+      "type": "System",
+      "status": "active",
+      "linked_to": [
+        "/api/system/health"
+      ]
+    },
+    {
+      "name": "AgentManifestViewer",
+      "path": "src/components/AgentManifestViewer.jsx",
+      "type": "System",
+      "status": "active",
+      "linked_to": [
+        "/api/system"
+      ]
+    },
+    {
+      "name": "DashboardView",
+      "path": "src/components/DashboardView.jsx",
+      "type": "System",
+      "status": "active",
+      "linked_to": [
+        "/api/system"
+      ]
+    },
+    {
+      "name": "MainConsolePanel",
+      "path": "src/components/MainConsolePanel.jsx",
+      "type": "System",
+      "status": "active",
+      "linked_to": []
+    },
+    {
+      "name": "FileTreePanel",
+      "path": "src/components/FileTreePanel.jsx",
+      "type": "System",
+      "status": "active",
+      "linked_to": []
+    },
+    {
+      "name": "OverrideControls",
+      "path": "src/components/OverrideControls.jsx",
+      "type": "Cognitive",
+      "status": "active",
+      "linked_to": []
+    },
+    {
+      "name": "AgentChatPanel",
+      "path": "src/components/AgentChatPanel.jsx",
+      "type": "Visual",
+      "status": "active",
+      "linked_to": []
+    },
+    {
+      "name": "AgentActivityMap",
+      "path": "src/components/AgentActivityMap.jsx",
+      "type": "Visual",
+      "status": "active",
+      "linked_to": []
+    },
+    {
+      "name": "AgentActivityPings",
+      "path": "src/components/AgentActivityPings.jsx",
+      "type": "Visual",
+      "status": "active",
+      "linked_to": []
+    },
+    {
+      "name": "AgentDebugFeedback",
+      "path": "src/components/AgentDebugFeedback.jsx",
+      "type": "System",
+      "status": "active",
+      "linked_to": []
+    }
+  ],
+  "memory_tag": "pice_snapshot_verified_20250426"
+}
