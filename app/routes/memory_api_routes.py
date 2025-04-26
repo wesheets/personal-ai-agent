@@ -43,26 +43,45 @@ async def add_memory(request: MemoryAddRequest = Body(...)):
             )
         
         # Initialize memory engine
-        from app.core.vector_memory import get_memory_engine
-        memory_engine = get_memory_engine()
+        try:
+            from app.core.vector_memory import get_memory_engine
+            memory_engine = get_memory_engine()
+            logger.info("Successfully initialized memory engine")
+        except Exception as init_error:
+            logger.error(f"Failed to initialize memory engine: {str(init_error)}")
+            return MemoryAddResponse(
+                status="error",
+                message=f"Failed to initialize memory engine: {str(init_error)}",
+                memory_id=None,
+                timestamp=str(datetime.datetime.now())
+            )
         
         # Add memory entry
-        memory_id = await memory_engine.add_memory(
-            project_id=request.project_id,
-            content=request.content,
-            metadata=request.metadata,
-            tags=request.tags,
-            agent_id=request.agent_id
-        )
-        
-        logger.info(f"Successfully added memory with ID: {memory_id}")
-        
-        return MemoryAddResponse(
-            status="success",
-            message="Memory added successfully",
-            memory_id=memory_id,
-            timestamp=str(datetime.datetime.now())
-        )
+        try:
+            memory_id = await memory_engine.add_memory(
+                project_id=request.project_id,
+                content=request.content,
+                metadata=request.metadata,
+                tags=request.tags,
+                agent_id=request.agent_id
+            )
+            
+            logger.info(f"Successfully added memory with ID: {memory_id}")
+            
+            return MemoryAddResponse(
+                status="success",
+                message="Memory added successfully",
+                memory_id=memory_id,
+                timestamp=str(datetime.datetime.now())
+            )
+        except Exception as add_error:
+            logger.error(f"Error in memory_engine.add_memory: {str(add_error)}")
+            return MemoryAddResponse(
+                status="error",
+                message=f"Failed to add memory: {str(add_error)}",
+                memory_id=None,
+                timestamp=str(datetime.datetime.now())
+            )
     except Exception as e:
         logger.error(f"Error adding memory: {str(e)}")
         
@@ -71,6 +90,7 @@ async def add_memory(request: MemoryAddRequest = Body(...)):
             import json
             
             log_file = "/home/ubuntu/personal-ai-agent/logs/memory_fallback.json"
+            os.makedirs(os.path.dirname(log_file), exist_ok=True)
             
             # Create log entry
             log_entry = {
@@ -136,28 +156,49 @@ async def search_memory(request: MemorySearchRequest):
             )
         
         # Initialize memory engine
-        from app.core.vector_memory import get_memory_engine
-        memory_engine = get_memory_engine()
+        try:
+            from app.core.vector_memory import get_memory_engine
+            memory_engine = get_memory_engine()
+            logger.info("Successfully initialized memory engine")
+        except Exception as init_error:
+            logger.error(f"Failed to initialize memory engine: {str(init_error)}")
+            return MemorySearchResponse(
+                status="error",
+                message=f"Failed to initialize memory engine: {str(init_error)}",
+                results=[],
+                count=0,
+                timestamp=str(datetime.datetime.now())
+            )
         
         # Search memory entries
-        results = await memory_engine.search_memory(
-            project_id=request.project_id,
-            query=request.query,
-            limit=request.limit,
-            tags=request.tags,
-            agent_id=request.agent_id,
-            threshold=request.threshold
-        )
-        
-        logger.info(f"Found {len(results)} memory entries matching the query")
-        
-        return MemorySearchResponse(
-            status="success",
-            message="Memory search completed successfully",
-            results=results,
-            count=len(results),
-            timestamp=str(datetime.datetime.now())
-        )
+        try:
+            results = await memory_engine.search_memory(
+                project_id=request.project_id,
+                query=request.query,
+                limit=request.limit,
+                tags=request.tags,
+                agent_id=request.agent_id,
+                threshold=request.threshold
+            )
+            
+            logger.info(f"Found {len(results)} memory entries matching the query")
+            
+            return MemorySearchResponse(
+                status="success",
+                message="Memory search completed successfully",
+                results=results,
+                count=len(results),
+                timestamp=str(datetime.datetime.now())
+            )
+        except Exception as search_error:
+            logger.error(f"Error in memory_engine.search_memory: {str(search_error)}")
+            return MemorySearchResponse(
+                status="error",
+                message=f"Failed to search memory: {str(search_error)}",
+                results=[],
+                count=0,
+                timestamp=str(datetime.datetime.now())
+            )
     except Exception as e:
         logger.error(f"Error searching memory: {str(e)}")
         
@@ -166,6 +207,7 @@ async def search_memory(request: MemorySearchRequest):
             import json
             
             log_file = "/home/ubuntu/personal-ai-agent/logs/memory_fallback.json"
+            os.makedirs(os.path.dirname(log_file), exist_ok=True)
             
             # Create log entry
             log_entry = {
