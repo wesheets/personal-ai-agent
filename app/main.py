@@ -24,8 +24,7 @@ try:
 except ImportError:
     upload_file_routes_loaded = False
     print("⚠️ Could not load upload_file_routes directly")
-# Removed import to fix deployment issue
-# from app.routes import upload_base64_routes
+from app.routes.forge_build_routes import router as forge_build_router
 
 # Import schema validation integration
 try:
@@ -965,7 +964,7 @@ app.include_router(diagnostics_router)
 app.include_router(agent_router)
 app.include_router(memory_router)
 app.include_router(upload_file_router)
-# Removed upload_base64_routes.router to fix deployment issue
+app.include_router(forge_build_router)
 loaded_routes.append("diagnostics_routes")
 print("✅ Included diagnostics_router")
 
