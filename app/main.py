@@ -8,7 +8,14 @@ from fastapi.staticfiles import StaticFiles
 import datetime
 from app.routes import agent_routes
 from app.routes import memory_routes
-from app.routes import upload_file_routes
+# Import file upload routes with try-except for safer handling
+try:
+    from app.routes.upload_file_routes import router as upload_file_router
+    upload_file_routes_loaded = True
+    print("✅ Directly loaded upload_file_routes")
+except ImportError:
+    upload_file_routes_loaded = False
+    print("⚠️ Could not load upload_file_routes directly")
 from app.routes import upload_base64_routes
 
 # Import routes
