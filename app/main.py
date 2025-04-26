@@ -18,6 +18,15 @@ from app.routes.export_routes import router as export_router
 from app.routes.fix_routes import router as fix_router
 from app.routes.delegate_stream_routes import router as delegate_stream_router
 
+# Import file upload routes
+try:
+    from app.routes.upload_file_routes import router as upload_file_router
+    upload_file_routes_loaded = True
+    print("✅ Directly loaded upload_file_routes")
+except ImportError:
+    upload_file_routes_loaded = False
+    print("⚠️ Could not load upload_file_routes directly")
+
 # Import missing routes identified in diagnostic report
 try:
     from app.routes.snapshot_routes import router as snapshot_router
@@ -644,6 +653,14 @@ if health_monitor_routes_loaded:
     loaded_routes.append("health_monitor_routes")
 else:
     failed_routes.append("health_monitor_routes")
+
+# Include upload file routes
+if upload_file_routes_loaded:
+    app.include_router(upload_file_router)
+    print("✅ Included upload_file_router")
+    loaded_routes.append("upload_file_routes")
+else:
+    failed_routes.append("upload_file_routes")
 
 if self_routes_loaded:
     app.include_router(self_router)
