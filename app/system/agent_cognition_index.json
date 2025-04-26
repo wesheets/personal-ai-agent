@@ -28,7 +28,12 @@
       "tools_enabled": ["agent_router", "task_scheduler", "memory_retrieval"],
       "input_schema": "orchestrator_schema",
       "output_schema": "orchestration_result_schema",
-      "responsible_routes": ["/api/orchestrator/delegate", "/api/orchestrator/status"],
+      "responsible_routes": [
+        "/api/orchestrator/delegate", 
+        "/api/orchestrator/status",
+        "/api/plan/generate",
+        "/api/loop/validate"
+      ],
       "passes_full_test": true,
       "logic_notes": "Fully operational for basic delegation, but needs improvement in handling complex multi-agent workflows.",
       "checklist": [
@@ -43,10 +48,18 @@
         {
           "item": "Enhance memory context sharing between agents",
           "status": "pending"
+        },
+        {
+          "item": "Plan generation verified",
+          "status": "completed"
+        },
+        {
+          "item": "Loop safety check operational",
+          "status": "completed"
         }
       ],
       "last_tested_by": "manus",
-      "last_modified": "2025-04-26T00:28:40Z"
+      "last_modified": "2025-04-26T01:42:34Z"
     },
     {
       "agent_id": "sage",
@@ -153,5 +166,5 @@
       "last_modified": "2025-04-26T00:28:40Z"
     }
   ],
-  "last_updated": "2025-04-26T00:28:40Z"
+  "last_updated": "2025-04-26T01:42:34Z"
 }

@@ -1,0 +1,42 @@
+{
+  "endpoint": "/api/loop/validate",
+  "method": "POST",
+  "status_code": 422,
+  "response_time_ms": 187,
+  "timestamp": "2025-04-26T01:40:25Z",
+  "request_body": {
+    "project_id": "test_project",
+    "loop_id": "test_loop",
+    "planned_agents": ["ORCHESTRATOR"],
+    "planned_steps": {
+      "input": {"query": "test query"},
+      "processing": {"agent": "ORCHESTRATOR", "operation": "delegate"},
+      "output": {"result": "string", "status": "string", "metadata": {}}
+    },
+    "max_loops": 3,
+    "context": {"priority": "high", "timeout_seconds": 300}
+  },
+  "response_body": {
+    "detail": [
+      {
+        "type": "missing",
+        "loc": ["body", "expected_schema"],
+        "msg": "Field required",
+        "input": {
+          "project_id": "test_project",
+          "loop_id": "test_loop",
+          "planned_agents": ["ORCHESTRATOR"],
+          "planned_steps": {
+            "input": {"query": "test query"},
+            "processing": {"agent": "ORCHESTRATOR", "operation": "delegate"},
+            "output": {"result": "string", "status": "string", "metadata": {}}
+          },
+          "max_loops": 3,
+          "context": {"priority": "high", "timeout_seconds": 300}
+        }
+      }
+    ]
+  },
+  "validation_result": "PARTIAL_SUCCESS",
+  "notes": "Endpoint is operational but returns a validation error due to missing required field 'expected_schema' in the request body. Need to update schema definition to include this field."
+}

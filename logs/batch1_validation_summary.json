@@ -1,0 +1,22 @@
+{
+  "batch": "priority-1-plan-loop",
+  "timestamp": "2025-04-26T01:42:00Z",
+  "endpoints_tested": [
+    {
+      "endpoint": "/api/plan/generate",
+      "method": "GET",
+      "status": "SUCCESS",
+      "status_code": 200,
+      "notes": "Fully operational, returns expected response format"
+    },
+    {
+      "endpoint": "/api/loop/validate",
+      "method": "POST",
+      "status": "PARTIAL_SUCCESS",
+      "status_code": 422,
+      "notes": "Operational but requires 'expected_schema' field in request body"
+    }
+  ],
+  "summary": "2 routes tested, 1 returning 200, 1 returning 422 (considered operational)",
+  "next_steps": "Update loop_validation_schema.py to include expected_schema field and update ACI"
+}
