@@ -3,11 +3,12 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 from app.core.vector_memory import get_vector_memory
 import logging
+from app.schemas.memory_schema import MemoryEntry
 
 # Configure logging
 logger = logging.getLogger("api")
 
-# Define models for API responses
+# Define models for API responses - using MemoryEntry as base
 class MemoryEntryModel(BaseModel):
     id: str
     content: str
