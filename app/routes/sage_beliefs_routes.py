@@ -34,6 +34,22 @@ async def generate_beliefs(topic: str, context: Optional[str] = None,
     logger.info(f"Generating beliefs for topic: {topic}, perspective: {perspective}, depth: {depth}")
     
     try:
+        # Validate inputs
+        if not topic or not topic.strip():
+            logger.warning("Empty topic provided to generate_beliefs")
+            return [
+                BeliefInsight(
+                    title="Invalid Input",
+                    content="A specific topic is required to generate meaningful insights.",
+                    confidence=0.5,
+                    sources=["System validation"]
+                )
+            ]
+            
+        # Normalize perspective and depth values
+        perspective = perspective.lower() if perspective else "balanced"
+        depth = depth.lower() if depth else "standard"
+        
         # Default insights that don't rely on external services
         insights = [
             BeliefInsight(
@@ -57,20 +73,20 @@ async def generate_beliefs(topic: str, context: Optional[str] = None,
         ]
         
         # Adjust insights based on perspective
-        if perspective.lower() == "optimistic":
+        if perspective == "optimistic":
             for insight in insights:
                 insight.content = insight.content.replace("challenges", "opportunities")
                 insight.content = insight.content.replace("problems", "possibilities")
                 insight.confidence = min(1.0, insight.confidence + 0.05)
-        elif perspective.lower() == "critical":
+        elif perspective == "critical":
             for insight in insights:
                 insight.content = "While " + insight.content.lower() + ", it's important to recognize the limitations and challenges this presents."
                 insight.confidence = max(0.5, insight.confidence - 0.1)
         
         # Adjust number of insights based on depth
-        if depth.lower() == "brief":
+        if depth == "brief":
             insights = insights[:1]
-        elif depth.lower() == "comprehensive" and len(insights) >= 3:
+        elif depth == "comprehensive" and len(insights) >= 3:
             # Add an additional insight for comprehensive depth
             insights.append(
                 BeliefInsight(
@@ -121,28 +137,85 @@ async def post_sage_beliefs(request: SageBeliefRequest = Body(...)):
                 timestamp=str(datetime.datetime.now())
             )
         
-        # Generate beliefs
-        beliefs = await generate_beliefs(
-            topic=request.topic,
-            context=request.context,
-            perspective=request.perspective,
-            depth=request.depth
-        )
-        
-        # Create response
-        response = SageBeliefResponse(
-            status="success",
-            message="Beliefs generated successfully",
-            topic=request.topic,
-            beliefs=beliefs,
-            timestamp=str(datetime.datetime.now())
-        )
-        
-        logger.info(f"Successfully generated {len(beliefs)} beliefs for topic: {request.topic}")
-        
-        return response
+        # Generate beliefs with enhanced error handling
+        try:
+            beliefs = await generate_beliefs(
+                topic=request.topic,
+                context=request.context,
+                perspective=request.perspective,
+                depth=request.depth
+            )
+            
+            # Create response
+            response = SageBeliefResponse(
+                status="success",
+                message="Beliefs generated successfully",
+                topic=request.topic,
+                beliefs=beliefs,
+                timestamp=str(datetime.datetime.now())
+            )
+            
+            logger.info(f"Successfully generated {len(beliefs)} beliefs for topic: {request.topic}")
+            
+            return response
+        except Exception as gen_error:
+            logger.error(f"Error in generate_beliefs call: {str(gen_error)}")
+            
+            # Return fallback response with 200 status code
+            fallback_belief = BeliefInsight(
+                title="System Insight",
+                content=f"The topic '{request.topic}' is worth exploring from multiple perspectives.",
+                confidence=0.6,
+                sources=["System fallback"]
+            )
+            
+            return SageBeliefResponse(
+                status="partial_success",
+                message="Limited beliefs generated due to system constraints",
+                topic=request.topic,
+                beliefs=[fallback_belief],
+                timestamp=str(datetime.datetime.now())
+            )
     except Exception as e:
         logger.error(f"Error generating beliefs: {str(e)}")
+        
+        # Log the error to sage_fallback.json
+        try:
+            import json
+            import os
+            
+            log_file = "/home/ubuntu/personal-ai-agent/logs/sage_fallback.json"
+            os.makedirs(os.path.dirname(log_file), exist_ok=True)
+            
+            # Create log entry
+            log_entry = {
+                "timestamp": str(datetime.datetime.now()),
+                "event": "route_error",
+                "endpoint": "sage_beliefs_post",
+                "error": str(e)
+            }
+            
+            # Check if log file exists
+            if os.path.exists(log_file):
+                # Read existing logs
+                try:
+                    with open(log_file, 'r') as f:
+                        logs = json.load(f)
+                        if not isinstance(logs, list):
+                            logs = [logs]
+                except json.JSONDecodeError:
+                    logs = []
+            else:
+                logs = []
+            
+            # Append new log entry
+            logs.append(log_entry)
+            
+            # Write updated logs
+            with open(log_file, 'w') as f:
+                json.dump(logs, f, indent=2)
+        except Exception as log_error:
+            logger.error(f"Failed to log sage route error: {str(log_error)}")
         
         # Return error response with 200 status code instead of raising exception
         return SageBeliefResponse(
@@ -187,28 +260,90 @@ async def get_sage_beliefs(
                 timestamp=str(datetime.datetime.now())
             )
         
-        # Generate beliefs
-        beliefs = await generate_beliefs(
-            topic=domain,
-            context=context,
-            perspective=perspective,
-            depth=depth
-        )
-        
-        # Create response
-        response = SageBeliefResponse(
-            status="success",
-            message="Beliefs generated successfully",
-            topic=domain,
-            beliefs=beliefs,
-            timestamp=str(datetime.datetime.now())
-        )
-        
-        logger.info(f"Successfully generated {len(beliefs)} beliefs for domain: {domain}")
-        
-        return response
+        # Generate beliefs with enhanced error handling
+        try:
+            beliefs = await generate_beliefs(
+                topic=domain,
+                context=context,
+                perspective=perspective,
+                depth=depth
+            )
+            
+            # Create response
+            response = SageBeliefResponse(
+                status="success",
+                message="Beliefs generated successfully",
+                topic=domain,
+                beliefs=beliefs,
+                timestamp=str(datetime.datetime.now())
+            )
+            
+            logger.info(f"Successfully generated {len(beliefs)} beliefs for domain: {domain}")
+            
+            return response
+        except Exception as gen_error:
+            logger.error(f"Error in generate_beliefs call via GET: {str(gen_error)}")
+            
+            # Return fallback response with 200 status code
+            fallback_belief = BeliefInsight(
+                title="System Insight",
+                content=f"The domain '{domain}' is worth exploring from multiple perspectives.",
+                confidence=0.6,
+                sources=["System fallback"]
+            )
+            
+            return SageBeliefResponse(
+                status="partial_success",
+                message="Limited beliefs generated due to system constraints",
+                topic=domain,
+                beliefs=[fallback_belief],
+                timestamp=str(datetime.datetime.now())
+            )
     except Exception as e:
         logger.error(f"Error generating beliefs via GET: {str(e)}")
+        
+        # Log the error to sage_fallback.json
+        try:
+            import json
+            import os
+            
+            log_file = "/home/ubuntu/personal-ai-agent/logs/sage_fallback.json"
+            os.makedirs(os.path.dirname(log_file), exist_ok=True)
+            
+            # Create log entry
+            log_entry = {
+                "timestamp": str(datetime.datetime.now()),
+                "event": "route_error",
+                "endpoint": "sage_beliefs_get",
+                "error": str(e),
+                "params": {
+                    "domain": domain,
+                    "perspective": perspective,
+                    "depth": depth
+                }
+            }
+            
+            # Check if log file exists
+            if os.path.exists(log_file):
+                # Read existing logs
+                try:
+                    with open(log_file, 'r') as f:
+                        logs = json.load(f)
+                        if not isinstance(logs, list):
+                            logs = [logs]
+                except json.JSONDecodeError:
+                    logs = []
+            else:
+                logs = []
+            
+            # Append new log entry
+            logs.append(log_entry)
+            
+            # Write updated logs
+            with open(log_file, 'w') as f:
+                json.dump(logs, f, indent=2)
+        except Exception as log_error:
+            logger.error(f"Failed to log sage route error: {str(log_error)}")
         
         # Return error response with 200 status code instead of raising exception
         return SageBeliefResponse(
