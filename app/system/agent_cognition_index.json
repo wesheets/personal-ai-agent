@@ -1,0 +1,157 @@
+{
+  "agents": [
+    {
+      "agent_id": "forge",
+      "role": "System Builder",
+      "tools_enabled": ["module_generator", "router_writer"],
+      "input_schema": "forge_schema",
+      "output_schema": "build_log_schema",
+      "responsible_routes": ["/api/forge/build"],
+      "passes_full_test": false,
+      "logic_notes": "Cannot yet handle nested builds or import rewrites.",
+      "checklist": [
+        {
+          "item": "Enable nested scaffolding",
+          "status": "in_progress"
+        },
+        {
+          "item": "Fix import rewriter",
+          "status": "pending"
+        }
+      ],
+      "last_tested_by": "manus",
+      "last_modified": "2025-04-26T00:28:40Z"
+    },
+    {
+      "agent_id": "orchestrator",
+      "role": "Task Delegator",
+      "tools_enabled": ["agent_router", "task_scheduler", "memory_retrieval"],
+      "input_schema": "orchestrator_schema",
+      "output_schema": "orchestration_result_schema",
+      "responsible_routes": ["/api/orchestrator/delegate", "/api/orchestrator/status"],
+      "passes_full_test": true,
+      "logic_notes": "Fully operational for basic delegation, but needs improvement in handling complex multi-agent workflows.",
+      "checklist": [
+        {
+          "item": "Implement advanced task prioritization",
+          "status": "pending"
+        },
+        {
+          "item": "Add failure recovery mechanisms",
+          "status": "in_progress"
+        },
+        {
+          "item": "Enhance memory context sharing between agents",
+          "status": "pending"
+        }
+      ],
+      "last_tested_by": "manus",
+      "last_modified": "2025-04-26T00:28:40Z"
+    },
+    {
+      "agent_id": "sage",
+      "role": "Strategic Advisor",
+      "tools_enabled": ["research_tools", "memory_search", "plan_generator"],
+      "input_schema": "sage_schema",
+      "output_schema": "strategic_advice_schema",
+      "responsible_routes": ["/api/sage/advise"],
+      "passes_full_test": true,
+      "logic_notes": "Strong strategic reasoning capabilities, but occasionally lacks specificity in technical domains.",
+      "checklist": [
+        {
+          "item": "Enhance technical domain knowledge",
+          "status": "in_progress"
+        },
+        {
+          "item": "Improve citation of sources",
+          "status": "completed"
+        },
+        {
+          "item": "Add support for visual planning outputs",
+          "status": "pending"
+        }
+      ],
+      "last_tested_by": "manus",
+      "last_modified": "2025-04-26T00:28:40Z"
+    },
+    {
+      "agent_id": "nova",
+      "role": "Creative Designer",
+      "tools_enabled": ["design_tools", "image_generator", "style_analyzer"],
+      "input_schema": "nova_schema",
+      "output_schema": "creative_output_schema",
+      "responsible_routes": ["/api/nova/create", "/api/nova/iterate"],
+      "passes_full_test": false,
+      "logic_notes": "Strong in visual design concepts but needs improvement in maintaining consistency across iterations.",
+      "checklist": [
+        {
+          "item": "Implement style consistency tracker",
+          "status": "in_progress"
+        },
+        {
+          "item": "Add support for brand guidelines",
+          "status": "pending"
+        },
+        {
+          "item": "Enhance feedback incorporation mechanisms",
+          "status": "pending"
+        }
+      ],
+      "last_tested_by": "manus",
+      "last_modified": "2025-04-26T00:28:40Z"
+    },
+    {
+      "agent_id": "pessimist",
+      "role": "Risk Analyzer",
+      "tools_enabled": ["risk_assessment", "failure_mode_analysis", "security_scanner"],
+      "input_schema": "pessimist_schema",
+      "output_schema": "risk_analysis_schema",
+      "responsible_routes": ["/api/pessimist/analyze"],
+      "passes_full_test": true,
+      "logic_notes": "Excellent at identifying potential failure points, but sometimes overly cautious.",
+      "checklist": [
+        {
+          "item": "Calibrate risk severity ratings",
+          "status": "in_progress"
+        },
+        {
+          "item": "Add mitigation suggestion capabilities",
+          "status": "completed"
+        },
+        {
+          "item": "Implement comparative risk analysis",
+          "status": "pending"
+        }
+      ],
+      "last_tested_by": "manus",
+      "last_modified": "2025-04-26T00:28:40Z"
+    },
+    {
+      "agent_id": "hal",
+      "role": "System Core",
+      "tools_enabled": ["memory_manager", "agent_coordinator", "system_monitor"],
+      "input_schema": "hal_agent_schema",
+      "output_schema": "system_response_schema",
+      "responsible_routes": ["/api/hal/process", "/api/hal/status"],
+      "passes_full_test": true,
+      "logic_notes": "Core functionality stable, but needs enhancement in handling concurrent agent operations.",
+      "checklist": [
+        {
+          "item": "Implement advanced concurrency management",
+          "status": "in_progress"
+        },
+        {
+          "item": "Enhance system health monitoring",
+          "status": "completed"
+        },
+        {
+          "item": "Add predictive resource allocation",
+          "status": "pending"
+        }
+      ],
+      "last_tested_by": "manus",
+      "last_modified": "2025-04-26T00:28:40Z"
+    }
+  ],
+  "last_updated": "2025-04-26T00:28:40Z"
+}
