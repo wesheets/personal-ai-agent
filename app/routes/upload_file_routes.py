@@ -54,4 +54,4 @@ async def upload_file(file: UploadFile = File(...)):
             "size": os.path.getsize(file_path),
             "path": file_path
         }
-    }    }
+    }
