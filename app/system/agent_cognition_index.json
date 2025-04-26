@@ -8,7 +8,7 @@
       "output_schema": "build_log_schema",
       "responsible_routes": ["/api/forge/build"],
       "passes_full_test": false,
-      "logic_notes": "Cannot yet handle nested builds or import rewrites.",
+      "logic_notes": "Endpoint implemented in codebase but not active on live server. Requires deployment.",
       "checklist": [
         {
           "item": "Enable nested scaffolding",
@@ -17,10 +17,14 @@
         {
           "item": "Fix import rewriter",
           "status": "pending"
+        },
+        {
+          "item": "Forge delegation endpoint active",
+          "status": "in_progress"
         }
       ],
       "last_tested_by": "manus",
-      "last_modified": "2025-04-26T00:28:40Z"
+      "last_modified": "2025-04-26T01:56:22Z"
     },
     {
       "agent_id": "orchestrator",
@@ -32,7 +36,9 @@
         "/api/orchestrator/delegate", 
         "/api/orchestrator/status",
         "/api/plan/generate",
-        "/api/loop/validate"
+        "/api/loop/validate",
+        "/api/forge/build",
+        "/api/critic/review"
       ],
       "passes_full_test": true,
       "logic_notes": "Fully operational for basic delegation, but needs improvement in handling complex multi-agent workflows.",
@@ -56,10 +62,18 @@
         {
           "item": "Loop safety check operational",
           "status": "completed"
+        },
+        {
+          "item": "Forge delegation endpoint active",
+          "status": "in_progress"
+        },
+        {
+          "item": "CRITIC review hook passing",
+          "status": "in_progress"
         }
       ],
       "last_tested_by": "manus",
-      "last_modified": "2025-04-26T01:42:34Z"
+      "last_modified": "2025-04-26T01:56:22Z"
     },
     {
       "agent_id": "sage",
@@ -140,6 +154,24 @@
       "last_modified": "2025-04-26T00:28:40Z"
     },
     {
+      "agent_id": "critic",
+      "role": "Quality Reviewer",
+      "tools_enabled": ["review", "reject", "log_reason"],
+      "input_schema": "critic_schema",
+      "output_schema": "critic_review_schema",
+      "responsible_routes": ["/api/critic/review"],
+      "passes_full_test": false,
+      "logic_notes": "Endpoint implemented in codebase but not active on live server. Requires deployment.",
+      "checklist": [
+        {
+          "item": "CRITIC review hook passing",
+          "status": "in_progress"
+        }
+      ],
+      "last_tested_by": "manus",
+      "last_modified": "2025-04-26T01:56:22Z"
+    },
+    {
       "agent_id": "hal",
       "role": "System Core",
       "tools_enabled": ["memory_manager", "agent_coordinator", "system_monitor"],
@@ -166,5 +198,5 @@
       "last_modified": "2025-04-26T00:28:40Z"
     }
   ],
-  "last_updated": "2025-04-26T01:42:34Z"
+  "last_updated": "2025-04-26T01:56:22Z"
 }

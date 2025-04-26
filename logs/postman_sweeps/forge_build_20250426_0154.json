@@ -1,0 +1,19 @@
+{
+  "endpoint": "/api/forge/build",
+  "method": "POST",
+  "status_code": 404,
+  "response_time_ms": 187,
+  "timestamp": "2025-04-26T01:53:08Z",
+  "request_body": {
+    "project_id": "test_project",
+    "loop_id": "test_loop",
+    "components": ["api", "schema"],
+    "version": "1.0",
+    "description": "Test build request"
+  },
+  "response_body": {
+    "detail": "Not Found"
+  },
+  "validation_result": "FAILED",
+  "notes": "Endpoint is implemented in the codebase but returns 404 Not Found on the live server. Changes may need to be deployed to production."
+}

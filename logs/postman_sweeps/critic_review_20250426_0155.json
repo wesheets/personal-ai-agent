@@ -1,0 +1,21 @@
+{
+  "endpoint": "/api/critic/review",
+  "method": "POST",
+  "status_code": 404,
+  "response_time_ms": 165,
+  "timestamp": "2025-04-26T01:53:34Z",
+  "request_body": {
+    "loop_id": "test_loop",
+    "agent": "test_agent",
+    "output": {
+      "result": "test result"
+    },
+    "project_id": "test_project",
+    "tools": ["review"]
+  },
+  "response_body": {
+    "detail": "Not Found"
+  },
+  "validation_result": "FAILED",
+  "notes": "Endpoint is newly implemented in the codebase but returns 404 Not Found on the live server. Changes need to be deployed to production."
+}
