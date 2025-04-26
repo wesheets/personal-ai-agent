@@ -1,0 +1,21 @@
+# Render Deployment Configuration
+
+# This file defines how Render should build and deploy your application
+# Documentation: https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: personal-ai-agent
+    env: python
+    region: oregon
+    plan: standard
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd app && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: PORT
+        value: 8000
+    autoDeploy: true
+    healthCheckPath: /diagnostics/routes
