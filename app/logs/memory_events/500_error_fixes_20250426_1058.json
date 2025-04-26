@@ -1,0 +1,30 @@
+{
+  "memory_tag": "500_error_fixes_20250426_1058",
+  "timestamp": "2025-04-26T10:58:50Z",
+  "event_type": "endpoint_fix",
+  "status": "implemented",
+  "summary": "Implemented fixes for memory and sage endpoints returning 500 errors",
+  "details": {
+    "issues_addressed": [
+      "Memory endpoints returning 500 Internal Server Error for valid requests",
+      "Sage beliefs endpoint returning 500 Internal Server Error for valid requests"
+    ],
+    "implementation": {
+      "files_modified": [
+        "app/core/vector_memory.py",
+        "app/routes/sage_beliefs_routes.py"
+      ],
+      "branch": "fix/500-errors-memory-sage",
+      "key_changes": [
+        "Enhanced memory adapter methods with improved logging and error handling",
+        "Added GET handler for sage beliefs endpoint to support query parameters",
+        "Maintained backward compatibility for both endpoints"
+      ]
+    }
+  },
+  "next_steps": [
+    "Create pull request for the fixes",
+    "Wait for PR to be merged and deployed",
+    "Verify fixes after deployment"
+  ]
+}
