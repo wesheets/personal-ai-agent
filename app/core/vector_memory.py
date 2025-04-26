@@ -1,123 +1,130 @@
 """
-Vector Memory Module
+Vector Memory System
 
-This module provides a vector-based memory system for storing and retrieving
-agent interactions and other information.
+This module provides a simple vector memory system for storing and retrieving text.
 """
-import logging
+import os
 import time
-import uuid
-import numpy as np
-from typing import Dict, List, Any, Optional, Tuple
+import json
+import logging
+import asyncio
+from typing import Dict, List, Tuple, Any, Optional
 
 # Configure logging
 logger = logging.getLogger("app.core.vector_memory")
 
 class MockMemorySystem:
     """
-    A mock implementation of a vector memory system for development and testing.
+    A mock implementation of a vector memory system.
+    This is used for development and testing.
     """
     
     def __init__(self):
         """Initialize the mock memory system."""
         self.memories = []
-        logger.info("Initialized mock memory system")
+        self.next_id = 1
+        
+        # Load existing memories if available
+        self._load_memories()
     
-    def _get_embedding(self, text: str) -> List[float]:
+    def _load_memories(self):
+        """Load memories from disk if available."""
+        try:
+            memory_file = os.path.join(os.path.dirname(__file__), "../data/memories.json")
+            if os.path.exists(memory_file):
+                with open(memory_file, "r") as f:
+                    self.memories = json.load(f)
+                
+                # Find the highest ID to continue from
+                if self.memories:
+                    highest_id = max([int(m.get("id", "0").replace("mem_", "")) for m in self.memories])
+                    self.next_id = highest_id + 1
+                
+                logger.info(f"Loaded {len(self.memories)} memories from disk")
+        except Exception as e:
+            logger.error(f"Failed to load memories from disk: {e}")
+    
+    def _save_memories(self):
+        """Save memories to disk."""
+        try:
+            # Ensure data directory exists
+            os.makedirs(os.path.join(os.path.dirname(__file__), "../data"), exist_ok=True)
+            
+            memory_file = os.path.join(os.path.dirname(__file__), "../data/memories.json")
+            with open(memory_file, "w") as f:
+                json.dump(self.memories, f, indent=2)
+            
+            logger.info(f"Saved {len(self.memories)} memories to disk")
+        except Exception as e:
+            logger.error(f"Failed to save memories to disk: {e}")
+    
+    async def store_memory(self, text: str, metadata: Optional[Dict[str, Any]] = None) -> Tuple[str, Dict[str, Any]]:
         """
-        Generate a mock embedding for text.
+        Store a text in the memory system.
         
         Args:
-            text: The text to generate an embedding for
+            text: The text to store
+            metadata: Optional metadata about the text
             
         Returns:
-            A list of floats representing the embedding
+            Tuple of (memory_id, memory_object)
         """
-        # Generate a deterministic but unique embedding based on the text
-        # This is just for testing - real embeddings would use a proper model
-        import hashlib
-        
-        # Get hash of text
-        text_hash = hashlib.md5(text.encode()).hexdigest()
-        
-        # Convert hash to a list of floats
-        embedding = []
-        for i in range(0, len(text_hash), 2):
-            if i + 2 <= len(text_hash):
-                hex_pair = text_hash[i:i+2]
-                float_val = int(hex_pair, 16) / 255.0  # Normalize to 0-1
-                embedding.append(float_val)
-        
-        # Pad to standard embedding length
-        while len(embedding) < 32:
-            embedding.append(0.0)
-        
-        return embedding[:32]  # Truncate to standard embedding length
-    
-    async def store_memory(self, content: str, metadata: Optional[Dict[str, Any]] = None, priority: bool = False) -> Tuple[str, Optional[str]]:
-        """
-        Store a memory in the mock memory system
-        
-        Args:
-            content: The text content to store
-            metadata: Optional metadata about the memory
-            priority: Whether this is a priority memory
-            
-        Returns:
-            Tuple of (memory ID, warning message or None)
-        """
-        # Generate a unique ID
-        memory_id = str(uuid.uuid4())
+        # Create memory ID
+        memory_id = f"mem_{self.next_id}"
+        self.next_id += 1
         
         # Create memory object
         memory = {
             "id": memory_id,
-            "content": content,
+            "content": text,
             "metadata": metadata or {},
-            "embedding": self._get_embedding(content),
-            "priority": priority,
             "created_at": time.time()
         }
         
-        # Store in memory
+        # Add to memories
         self.memories.append(memory)
         
-        logger.info(f"Stored memory with ID: {memory_id}")
-        return memory_id, None
+        # Save to disk
+        self._save_memories()
+        
+        return memory_id, memory
     
-    async def search_memories(self, query: str, limit: int = 5, priority_only: bool = False) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    async def search_memories(self, query: str, limit: int = 5) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
         """
-        Mock memory search - returns most recent memories
+        Search for memories similar to the query.
         
         Args:
             query: The search query
             limit: Maximum number of results to return
-            priority_only: Whether to only return priority memories
             
         Returns:
-            Tuple of (list of memory items sorted by recency, warning message or None)
+            Tuple of (list of memories, search metadata)
         """
-        # Filter memories if priority_only is True
-        filtered_memories = [m for m in self.memories if not priority_only or m.get("priority", False)]
+        # In a real implementation, this would use vector similarity search
+        # For this mock, we'll just do simple substring matching
+        results = []
         
-        # Sort by created_at (most recent first)
-        sorted_memories = sorted(filtered_memories, key=lambda m: m.get("created_at", 0), reverse=True)
+        for memory in self.memories:
+            if query.lower() in memory["content"].lower():
+                results.append(memory)
+        
+        # Sort by recency (newest first)
+        results.sort(key=lambda x: x.get("created_at", 0), reverse=True)
         
         # Limit results
-        results = sorted_memories[:limit]
+        results = results[:limit]
         
-        logger.info(f"Returning {len(results)} mock memories")
-        return results, None
+        return results, {"method": "substring_match", "query": query}
     
-    async def get_memory_by_id(self, memory_id: str) -> Optional[Dict[str, Any]]:
+    async def get_memory(self, memory_id: str) -> Optional[Dict[str, Any]]:
         """
-        Get a specific memory by ID
+        Get a memory by ID
         
         Args:
             memory_id: The ID of the memory to retrieve
             
         Returns:
-            The memory item or None if not found
+            The memory object or None if not found
         """
         for memory in self.memories:
             if memory.get("id") == memory_id:
@@ -125,20 +132,89 @@ class MockMemorySystem:
         
         return None
     
-    async def update_memory_priority(self, memory_id: str, priority: bool) -> bool:
+    async def update_memory(self, memory_id: str, updates: Dict[str, Any]) -> bool:
         """
-        Update the priority flag of a memory
+        Update a memory by ID
         
         Args:
             memory_id: The ID of the memory to update
-            priority: The new priority value
+            updates: Dictionary of fields to update
             
         Returns:
             True if updated, False if not found
         """
         for memory in self.memories:
             if memory.get("id") == memory_id:
-                memory["priority"] = priority
+                # Update fields
+                for key, value in updates.items():
+                    if key == "metadata" and isinstance(value, dict) and isinstance(memory.get("metadata"), dict):
+                        # Merge metadata
+                        memory["metadata"].update(value)
+                    else:
+                        memory[key] = value
+                
+                # Save changes
+                self._save_memories()
+                
+                return True
+        
+        return False
+    
+    async def tag_memory(self, memory_id: str, tags: List[str]) -> bool:
+        """
+        Add tags to a memory
+        
+        Args:
+            memory_id: The ID of the memory to tag
+            tags: List of tags to add
+            
+        Returns:
+            True if tagged, False if not found
+        """
+        for memory in self.memories:
+            if memory.get("id") == memory_id:
+                # Initialize metadata and tags if needed
+                if "metadata" not in memory:
+                    memory["metadata"] = {}
+                
+                if "tags" not in memory["metadata"]:
+                    memory["metadata"]["tags"] = []
+                
+                # Add new tags
+                for tag in tags:
+                    if tag not in memory["metadata"]["tags"]:
+                        memory["metadata"]["tags"].append(tag)
+                
+                # Save changes
+                self._save_memories()
+                
+                return True
+        
+        return False
+    
+    async def set_priority(self, memory_id: str, priority: bool = True) -> bool:
+        """
+        Set a memory as priority
+        
+        Args:
+            memory_id: The ID of the memory to update
+            priority: Whether this is a priority memory
+            
+        Returns:
+            True if updated, False if not found
+        """
+        for memory in self.memories:
+            if memory.get("id") == memory_id:
+                # Initialize metadata if needed
+                if "metadata" not in memory:
+                    memory["metadata"] = {}
+                
+                # Set priority flag
+                memory["metadata"]["priority"] = priority
+                
+                # Save changes
+                self._save_memories()
+                
                 return True
         
         return False
@@ -156,6 +232,10 @@ class MockMemorySystem:
         for i, memory in enumerate(self.memories):
             if memory.get("id") == memory_id:
                 self.memories.pop(i)
+                
+                # Save changes
+                self._save_memories()
+                
                 return True
         
         return False
@@ -200,7 +280,7 @@ class MockMemorySystem:
         
         return "\n".join(context_parts)
 
-    # Add adapter methods to match the expected API in memory_api_routes.py
+    # Adapter methods to match the expected API in memory_api_routes.py
     async def add_memory(self, project_id: str, content: str, metadata: Optional[Dict[str, Any]] = None, 
                          tags: Optional[List[str]] = None, agent_id: Optional[str] = None) -> str:
         """
@@ -216,19 +296,32 @@ class MockMemorySystem:
         Returns:
             Memory ID
         """
-        # Prepare metadata with additional fields
-        combined_metadata = metadata or {}
-        combined_metadata["project_id"] = project_id
-        
-        if tags:
-            combined_metadata["tags"] = tags
-        
-        if agent_id:
-            combined_metadata["agent_id"] = agent_id
-        
-        # Call the underlying store_memory method
-        memory_id, _ = await self.store_memory(content, combined_metadata)
-        return memory_id
+        try:
+            # Log the parameters for debugging
+            logger.info(f"add_memory called with: project_id={project_id}, content={content[:50]}..., metadata={metadata}, tags={tags}, agent_id={agent_id}")
+            
+            # Prepare metadata with additional fields
+            combined_metadata = metadata or {}
+            combined_metadata["project_id"] = project_id
+            
+            if tags:
+                combined_metadata["tags"] = tags
+            
+            if agent_id:
+                combined_metadata["agent_id"] = agent_id
+            
+            # Call the underlying store_memory method
+            memory_id, _ = await self.store_memory(content, combined_metadata)
+            
+            # Log success
+            logger.info(f"Successfully added memory with ID: {memory_id}")
+            
+            return memory_id
+        except Exception as e:
+            # Log the error
+            logger.error(f"Error in add_memory adapter: {str(e)}")
+            # Re-raise to ensure the error is properly handled
+            raise
     
     async def search_memory(self, project_id: str, query: str, limit: int = 5, 
                            tags: Optional[List[str]] = None, agent_id: Optional[str] = None,
@@ -247,29 +340,44 @@ class MockMemorySystem:
         Returns:
             List of memory items
         """
-        # Get all memories
-        results, _ = await self.search_memories(query, limit)
-        
-        # Filter by project_id
-        filtered_results = []
-        for memory in results:
-            metadata = memory.get("metadata", {})
+        try:
+            # Log the parameters for debugging
+            logger.info(f"search_memory called with: project_id={project_id}, query={query}, limit={limit}, tags={tags}, agent_id={agent_id}, threshold={threshold}")
             
-            # Check project_id
-            if metadata.get("project_id") != project_id:
-                continue
+            # Get all memories
+            results, _ = await self.search_memories(query, limit)
             
-            # Check tags if specified
-            if tags and not any(tag in metadata.get("tags", []) for tag in tags):
-                continue
+            # Log initial results
+            logger.info(f"Initial search returned {len(results)} results")
             
-            # Check agent_id if specified
-            if agent_id and metadata.get("agent_id") != agent_id:
-                continue
+            # Filter by project_id
+            filtered_results = []
+            for memory in results:
+                metadata = memory.get("metadata", {})
+                
+                # Check project_id
+                if metadata.get("project_id") != project_id:
+                    continue
+                
+                # Check tags if specified
+                if tags and not any(tag in metadata.get("tags", []) for tag in tags):
+                    continue
+                
+                # Check agent_id if specified
+                if agent_id and metadata.get("agent_id") != agent_id:
+                    continue
+                
+                filtered_results.append(memory)
             
-            filtered_results.append(memory)
-        
-        return filtered_results
+            # Log filtered results
+            logger.info(f"After filtering, returning {len(filtered_results)} results")
+            
+            return filtered_results
+        except Exception as e:
+            # Log the error
+            logger.error(f"Error in search_memory adapter: {str(e)}")
+            # Re-raise to ensure the error is properly handled
+            raise
 
 # Singleton instance
 _memory_system = None
@@ -285,5 +393,6 @@ def get_memory_engine():
     
     if _memory_system is None:
         _memory_system = MockMemorySystem()
+        logger.info("Initialized new MockMemorySystem instance")
     
     return _memory_system

@@ -8,10 +8,13 @@ import datetime
 from typing import Dict, List, Any, Optional
 from fastapi import APIRouter, HTTPException, Body, Query
 from pydantic import BaseModel, Field
+
 # Import schemas
 from app.schemas.sage_beliefs_schema import SageBeliefRequest, SageBeliefResponse, BeliefInsight
+
 # Configure logging
 logger = logging.getLogger("app.routes.sage_beliefs_routes")
+
 # Create router with API prefix
 router = APIRouter(
     prefix="/api/sage",
@@ -19,109 +22,11 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
-# Add GET endpoint to handle requests with query parameters
-@router.get("/beliefs", response_model=SageBeliefResponse)
-async def get_sage_beliefs_get(
-    domain: str = Query(None, description="Domain or topic to get beliefs about"),
-    perspective: str = Query("balanced", description="Perspective to consider (balanced, optimistic, critical)"),
-    depth: str = Query("standard", description="Depth of insights (brief, standard, comprehensive)")
-):
+# Helper function to generate beliefs
+async def generate_beliefs(topic: str, context: Optional[str] = None, 
+                          perspective: str = "balanced", depth: str = "standard") -> List[BeliefInsight]:
     """
-    Retrieve sage beliefs and insights on a given topic using GET method.
-    
-    Args:
-        domain: Domain or topic to get beliefs about
-        perspective: Perspective to consider
-        depth: Depth of insights
-        
-    Returns:
-        SageBeliefResponse containing the beliefs and insights
-    """
-    try:
-        logger.info(f"Retrieving sage beliefs for domain: {domain} (GET method)")
-        
-        # Validate domain parameter
-        if not domain:
-            raise HTTPException(
-                status_code=422,
-                detail="Domain parameter is required"
-            )
-        
-        # Generate a unique belief ID
-        import uuid
-        belief_id = f"belief_{uuid.uuid4().hex[:8]}"
-        
-        # In a real implementation, this would call the actual sage beliefs system
-        # For now, we'll generate insights based on the domain and perspective
-        
-        beliefs_results = generate_beliefs(
-            topic=domain,
-            context=None,
-            perspective=perspective,
-            depth=depth
-        )
-        
-        return SageBeliefResponse(
-            status="success",
-            message="Beliefs retrieved successfully",
-            belief_id=belief_id,
-            topic=domain,
-            perspective=perspective,
-            insights=beliefs_results,
-            timestamp=str(datetime.datetime.now())
-        )
-    except HTTPException as e:
-        # Re-raise HTTP exceptions
-        raise e
-    except Exception as e:
-        logger.error(f"Error retrieving sage beliefs: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve beliefs: {str(e)}")
-
-# Keep the original POST endpoint for backward compatibility
-@router.post("/beliefs", response_model=SageBeliefResponse)
-async def get_sage_beliefs(request: SageBeliefRequest = Body(...)):
-    """
-    Retrieve sage beliefs and insights on a given topic.
-    
-    Args:
-        request: The sage belief request containing topic and context
-        
-    Returns:
-        SageBeliefResponse containing the beliefs and insights
-    """
-    try:
-        logger.info(f"Retrieving sage beliefs for topic: {request.topic}")
-        
-        # Generate a unique belief ID
-        import uuid
-        belief_id = f"belief_{uuid.uuid4().hex[:8]}"
-        
-        # In a real implementation, this would call the actual sage beliefs system
-        # For now, we'll generate insights based on the topic and perspective
-        
-        beliefs_results = generate_beliefs(
-            topic=request.topic,
-            context=request.context,
-            perspective=request.perspective,
-            depth=request.depth
-        )
-        
-        return SageBeliefResponse(
-            status="success",
-            message="Beliefs retrieved successfully",
-            belief_id=belief_id,
-            topic=request.topic,
-            perspective=request.perspective,
-            insights=beliefs_results,
-            timestamp=str(datetime.datetime.now())
-        )
-    except Exception as e:
-        logger.error(f"Error retrieving sage beliefs: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve beliefs: {str(e)}")
-
-def generate_beliefs(topic: str, context: Optional[str], perspective: str = "balanced", depth: str = "standard") -> List[BeliefInsight]:
-    """
-    Generate beliefs and insights based on the topic and perspective.
+    Generate beliefs about a specific topic.
     
     Args:
         topic: The topic to generate beliefs about
@@ -230,3 +135,89 @@ def generate_beliefs(topic: str, context: Optional[str], perspective: str = "bal
         )
     
     return insights
+
+# POST endpoint for backward compatibility
+@router.post("/beliefs", response_model=SageBeliefResponse)
+async def post_sage_beliefs(request: SageBeliefRequest = Body(...)):
+    """
+    Get beliefs and insights about a specific topic (POST method).
+    
+    Args:
+        request: The request body containing topic and optional parameters
+        
+    Returns:
+        SageBeliefResponse containing the generated beliefs
+    """
+    try:
+        logger.info(f"Processing POST request for sage beliefs on topic: {request.topic}")
+        
+        # Generate beliefs
+        beliefs = await generate_beliefs(
+            topic=request.topic,
+            context=request.context,
+            perspective=request.perspective,
+            depth=request.depth
+        )
+        
+        # Create response
+        response = SageBeliefResponse(
+            status="success",
+            message="Beliefs generated successfully",
+            topic=request.topic,
+            beliefs=beliefs,
+            timestamp=str(datetime.datetime.now())
+        )
+        
+        logger.info(f"Successfully generated {len(beliefs)} beliefs for topic: {request.topic}")
+        
+        return response
+    except Exception as e:
+        logger.error(f"Error generating beliefs: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate beliefs: {str(e)}")
+
+# GET endpoint to support query parameters
+@router.get("/beliefs", response_model=SageBeliefResponse)
+async def get_sage_beliefs(
+    domain: str = Query(..., description="The domain or topic to generate beliefs about"),
+    context: Optional[str] = Query(None, description="Additional context for the beliefs"),
+    perspective: str = Query("balanced", description="The perspective to consider (balanced, optimistic, critical)"),
+    depth: str = Query("standard", description="The depth of insights (brief, standard, comprehensive)")
+):
+    """
+    Get beliefs and insights about a specific topic (GET method).
+    
+    Args:
+        domain: The domain or topic to generate beliefs about
+        context: Additional context for the beliefs
+        perspective: The perspective to consider
+        depth: The depth of insights
+        
+    Returns:
+        SageBeliefResponse containing the generated beliefs
+    """
+    try:
+        logger.info(f"Processing GET request for sage beliefs on domain: {domain}")
+        
+        # Generate beliefs
+        beliefs = await generate_beliefs(
+            topic=domain,
+            context=context,
+            perspective=perspective,
+            depth=depth
+        )
+        
+        # Create response
+        response = SageBeliefResponse(
+            status="success",
+            message="Beliefs generated successfully",
+            topic=domain,
+            beliefs=beliefs,
+            timestamp=str(datetime.datetime.now())
+        )
+        
+        logger.info(f"Successfully generated {len(beliefs)} beliefs for domain: {domain}")
+        
+        return response
+    except Exception as e:
+        logger.error(f"Error generating beliefs via GET: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate beliefs: {str(e)}")
