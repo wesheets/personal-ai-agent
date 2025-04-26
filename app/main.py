@@ -27,6 +27,7 @@ except ImportError:
 from app.routes.forge_build_routes import router as forge_build_router
 from app.routes.critic_review_routes import router as critic_review_router
 from app.routes.pessimist_evaluation_routes import router as pessimist_evaluation_router
+from app.routes.sage_beliefs_routes import router as sage_beliefs_router
 
 # Import schema validation integration
 try:
@@ -969,6 +970,7 @@ app.include_router(upload_file_router)
 app.include_router(forge_build_router)
 app.include_router(critic_review_router)
 app.include_router(pessimist_evaluation_router)
+app.include_router(sage_beliefs_router)
 loaded_routes.append("diagnostics_routes")
 print("✅ Included diagnostics_router")
 
