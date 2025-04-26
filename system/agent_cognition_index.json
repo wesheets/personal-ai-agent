@@ -1,0 +1,298 @@
+{
+  "agents": [
+    {
+      "name": "Ash",
+      "input_schema": [
+        "objective",
+        "memory_trace"
+      ],
+      "output_schema": [
+        "reflection",
+        "action_plan"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "Ash",
+      "input_schema": [
+        "objective",
+        "memory_trace"
+      ],
+      "output_schema": [
+        "reflection",
+        "risk_assessment"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "CEOAgent",
+      "input_schema": [
+        "loop_summary",
+        "beliefs",
+        "memory"
+      ],
+      "output_schema": [
+        "ceo_insight",
+        "satisfaction_trend"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "Core.Forge",
+      "input_schema": [
+        "objective",
+        "memory_trace"
+      ],
+      "output_schema": [
+        "reflection",
+        "action_plan"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "Critic",
+      "input_schema": [
+        "loop_id",
+        "agent_outputs",
+        "project_id"
+      ],
+      "output_schema": [
+        "status",
+        "reflection",
+        "scores",
+        "rejection",
+        "rejection_reason"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "CTO",
+      "input_schema": [
+        "project_id",
+        "tools"
+      ],
+      "output_schema": [
+        "status",
+        "issues_found",
+        "issues",
+        "summary"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "Debugger",
+      "input_schema": [
+        "loop_id",
+        "failure_logs",
+        "memory",
+        "loop_context"
+      ],
+      "output_schema": [
+        "updated_memory",
+        "failure_type",
+        "patch_plan",
+        "next_agent",
+        "suggested_fix"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "GUARDIAN",
+      "input_schema": [
+        "alert_type",
+        "severity",
+        "description"
+      ],
+      "output_schema": [
+        "status",
+        "alert_id",
+        "actions_taken",
+        "system_status"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "HAL 9000",
+      "input_schema": [
+        "objective",
+        "memory_trace"
+      ],
+      "output_schema": [
+        "reflection",
+        "action_plan"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "Historian",
+      "input_schema": [
+        "loop_id",
+        "loop_summary",
+        "recent_loops",
+        "beliefs",
+        "memory"
+      ],
+      "output_schema": [
+        "updated_memory",
+        "alignment_score",
+        "missing_beliefs",
+        "suggestion"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "MemoryAgent",
+      "input_schema": [
+        "objective",
+        "memory_trace"
+      ],
+      "output_schema": [
+        "reflection",
+        "memory_summary"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "NOVA",
+      "input_schema": [
+        "task",
+        "project_id",
+        "tools"
+      ],
+      "output_schema": [
+        "status",
+        "message",
+        "files_created",
+        "ui_components"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "OBSERVER",
+      "input_schema": [
+        "task",
+        "date",
+        "tools"
+      ],
+      "output_schema": [
+        "status",
+        "message",
+        "entry",
+        "log_path"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "OpsAgent",
+      "input_schema": [
+        "objective",
+        "memory_trace"
+      ],
+      "output_schema": [
+        "reflection",
+        "action_plan"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "Orchestrator",
+      "input_schema": [
+        "task",
+        "project_id"
+      ],
+      "output_schema": [
+        "status",
+        "output",
+        "next_agent",
+        "trigger_result",
+        "decisions"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "Pessimist",
+      "input_schema": [
+        "loop_id",
+        "summary"
+      ],
+      "output_schema": [
+        "assessment",
+        "bias_analysis",
+        "status"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "Sage",
+      "input_schema": [
+        "loop_id",
+        "summary_text",
+        "project_id"
+      ],
+      "output_schema": [
+        "status",
+        "belief_scores",
+        "reflection_text",
+        "timestamp"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "SITEGEN",
+      "input_schema": [
+        "task",
+        "project_id",
+        "site_parameters",
+        "tools"
+      ],
+      "output_schema": [
+        "status",
+        "message",
+        "analysis",
+        "layout",
+        "market_fit",
+        "recommendations"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    },
+    {
+      "name": "TRAINER",
+      "input_schema": [
+        "task",
+        "model_id",
+        "project_id",
+        "dataset_id",
+        "parameters",
+        "tools"
+      ],
+      "output_schema": [
+        "status",
+        "message",
+        "metrics",
+        "model_info",
+        "recommendations"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active"
+    }
+  ],
+  "memory_tag": "aci_snapshot_verified_20250426"
+}
