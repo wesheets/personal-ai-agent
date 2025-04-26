@@ -512,7 +512,7 @@ else:
 
 # Include memory routes with priority (second)
 if routes_memory_loaded:
-    app.include_router(memory_routes, prefix="/api")
+    app.include_router(memory_router, prefix="/api")
     loaded_routes.append("memory_routes")
     print("✅ Included memory_routes")
 else:
