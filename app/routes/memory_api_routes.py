@@ -29,7 +29,7 @@ class MemoryAddRequest(BaseModel):
     """
     Schema for memory add request.
     """
-    project_id: str
+    project_id: Optional[str] = "default_project"
     content: str
     metadata: Optional[Dict[str, Any]] = {}
     tags: Optional[List[str]] = []
@@ -48,7 +48,7 @@ class MemorySearchRequest(BaseModel):
     """
     Schema for memory search request.
     """
-    project_id: str
+    project_id: Optional[str] = "default_project"
     query: str
     limit: Optional[int] = 10
     tags: Optional[List[str]] = []
