@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Cognition Index Schema",
+  "description": "Schema for validating the agent cognition index structure",
+  "type": "object",
+  "required": ["agents", "last_updated"],
+  "properties": {
+    "agents": {
+      "type": "array",
+      "description": "List of agent cognitive states",
+      "items": {
+        "type": "object",
+        "required": [
+          "agent_id",
+          "role",
+          "tools_enabled",
+          "input_schema",
+          "output_schema",
+          "responsible_routes",
+          "passes_full_test",
+          "logic_notes",
+          "checklist",
+          "last_tested_by",
+          "last_modified"
+        ],
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "description": "Agent name (e.g., 'forge', 'orchestrator')"
+          },
+          "role": {
+            "type": "string",
+            "description": "Assigned cognitive role (e.g., 'Builder', 'Delegator')"
+          },
+          "tools_enabled": {
+            "type": "array",
+            "description": "List of tools or modules the agent has access to",
+            "items": {
+              "type": "string"
+            }
+          },
+          "input_schema": {
+            "type": "string",
+            "description": "Schema expected as input"
+          },
+          "output_schema": {
+            "type": "string",
+            "description": "Schema expected as output"
+          },
+          "responsible_routes": {
+            "type": "array",
+            "description": "List of routes this agent is tied to",
+            "items": {
+              "type": "string"
+            }
+          },
+          "passes_full_test": {
+            "type": "boolean",
+            "description": "Boolean indicating if full functionality is confirmed"
+          },
+          "logic_notes": {
+            "type": "string",
+            "description": "Description of current gaps, flaws, or cognitive challenges"
+          },
+          "checklist": {
+            "type": "array",
+            "description": "List of known logic tasks for improvement (with status)",
+            "items": {
+              "type": "object",
+              "required": ["item", "status"],
+              "properties": {
+                "item": {
+                  "type": "string",
+                  "description": "Description of the task"
+                },
+                "status": {
+                  "type": "string",
+                  "description": "Current status of the task",
+                  "enum": ["pending", "in_progress", "completed", "blocked"]
+                }
+              }
+            }
+          },
+          "last_tested_by": {
+            "type": "string",
+            "description": "Last human or agent who tested its logic"
+          },
+          "last_modified": {
+            "type": "string",
+            "description": "UTC ISO timestamp of last update",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "last_updated": {
+      "type": "string",
+      "description": "UTC ISO timestamp of when the index was last updated",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}
