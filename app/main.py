@@ -54,9 +54,11 @@ except ImportError as e:
 # Agent routes
 try:
     from app.routes.agent_routes import router as agent_router
+    agent_routes_loaded = True
     loaded_routes.append("agent")
     print("✅ Agent routes loaded")
 except ImportError as e:
+    agent_routes_loaded = False
     print(f"⚠️ Failed to load agent routes: {e}")
     failed_routes.append("agent")
 
@@ -82,6 +84,17 @@ except ImportError as e:
     print(f"⚠️ Failed to load upload file routes: {e}")
     failed_routes.append("upload_file")
 
+# Memory API routes
+try:
+    from app.routes.memory_api_routes import router as memory_api_router
+    memory_api_routes_loaded = True
+    loaded_routes.append("memory_api")
+    print("✅ Memory API routes loaded")
+except ImportError as e:
+    memory_api_routes_loaded = False
+    print(f"⚠️ Failed to load memory API routes: {e}")
+    failed_routes.append("memory_api")
+
 # Loop validation routes
 try:
     from app.routes.loop_validation_routes import router as loop_validation_router
@@ -103,17 +116,6 @@ except ImportError as e:
     plan_generate_routes_loaded = False
     print(f"⚠️ Failed to load plan generate routes: {e}")
     failed_routes.append("plan_generate")
-
-# Memory API routes
-try:
-    from app.routes.memory_api_routes import router as memory_api_router
-    memory_api_routes_loaded = True
-    loaded_routes.append("memory_api")
-    print("✅ Memory API routes loaded")
-except ImportError as e:
-    memory_api_routes_loaded = False
-    print(f"⚠️ Failed to load memory API routes: {e}")
-    failed_routes.append("memory_api")
 
 # Forge build routes
 try:
@@ -159,96 +161,82 @@ except ImportError as e:
     print(f"⚠️ Failed to load sage beliefs routes: {e}")
     failed_routes.append("sage_beliefs")
 
-# Health monitor routes - Hard-wired registration
+# Health monitor routes
 try:
     from app.routes.health_monitor_routes import router as health_monitor_router
-    # Only include if not already included above
-    if "health_monitor" not in loaded_routes:
-        app.include_router(health_monitor_router)
-        loaded_routes.append("health_monitor")
-        print("✅ Health monitor routes loaded (legacy)")
+    health_monitor_routes_loaded = True
+    loaded_routes.append("health_monitor")
+    print("✅ Health monitor routes loaded")
 except ImportError as e:
+    health_monitor_routes_loaded = False
     print(f"⚠️ Failed to load health monitor routes: {e}")
-    if "health_monitor" not in failed_routes:
-        failed_routes.append("health_monitor")
+    failed_routes.append("health_monitor")
 
-# Orchestrator contract routes - Hard-wired registration
+# Orchestrator contract routes
 try:
     from app.routes.orchestrator_contract_routes import router as orchestrator_contract_router
-    # Only include if not already included above
-    if "orchestrator_contract" not in loaded_routes:
-        app.include_router(orchestrator_contract_router)
-        loaded_routes.append("orchestrator_contract")
-        print("✅ Orchestrator contract routes loaded (legacy)")
+    orchestrator_contract_routes_loaded = True
+    loaded_routes.append("orchestrator_contract")
+    print("✅ Orchestrator contract routes loaded")
 except ImportError as e:
+    orchestrator_contract_routes_loaded = False
     print(f"⚠️ Failed to load orchestrator contract routes: {e}")
-    if "orchestrator_contract" not in failed_routes:
-        failed_routes.append("orchestrator_contract")
+    failed_routes.append("orchestrator_contract")
 
-# Snapshot routes - Hard-wired registration
+# Snapshot routes
 try:
     from app.routes.snapshot_routes import router as snapshot_router
-    # Only include if not already included above
-    if "snapshot" not in loaded_routes:
-        app.include_router(snapshot_router)
-        loaded_routes.append("snapshot")
-        print("✅ Snapshot routes loaded (legacy)")
+    snapshot_routes_loaded = True
+    loaded_routes.append("snapshot")
+    print("✅ Snapshot routes loaded")
 except ImportError as e:
+    snapshot_routes_loaded = False
     print(f"⚠️ Failed to load snapshot routes: {e}")
-    if "snapshot" not in failed_routes:
-        failed_routes.append("snapshot")
+    failed_routes.append("snapshot")
 
-# Forge routes - Hard-wired registration (kept for backward compatibility)
+# Forge routes (kept for backward compatibility)
 try:
     from app.routes.forge_routes import router as forge_router
-    # Only include if not already included above
-    if "forge" not in loaded_routes:
-        app.include_router(forge_router)
-        loaded_routes.append("forge")
-        print("✅ Forge routes loaded (legacy)")
+    forge_routes_loaded = True
+    loaded_routes.append("forge")
+    print("✅ Forge routes loaded")
 except ImportError as e:
+    forge_routes_loaded = False
     print(f"⚠️ Failed to load forge routes: {e}")
-    if "forge" not in failed_routes:
-        failed_routes.append("forge")
+    failed_routes.append("forge")
 
-# Debug Analyzer routes - Hard-wired registration
+# Debug Analyzer routes
 try:
     from app.routes.debug_routes import router as debug_analyzer_router
-    # Only include if not already included above
-    if "debug_analyzer" not in loaded_routes:
-        app.include_router(debug_analyzer_router)
-        loaded_routes.append("debug_analyzer")
-        print("✅ Debug Analyzer routes loaded (legacy)")
+    debug_analyzer_routes_loaded = True
+    loaded_routes.append("debug_analyzer")
+    print("✅ Debug Analyzer routes loaded")
 except ImportError as e:
+    debug_analyzer_routes_loaded = False
     print(f"⚠️ Failed to load Debug Analyzer routes: {e}")
-    if "debug_analyzer" not in failed_routes:
-        failed_routes.append("debug_analyzer")
+    failed_routes.append("debug_analyzer")
 
-# Drift routes - Hard-wired registration (kept for backward compatibility)
+# Drift routes (kept for backward compatibility)
 try:
     from app.routes.drift_routes import router as drift_router
-    # Only include if not already included above
-    if "drift_routes" not in loaded_routes:
-        app.include_router(drift_router)
-        loaded_routes.append("drift")
-        print("✅ Drift routes loaded (legacy)")
+    drift_routes_loaded = True
+    loaded_routes.append("drift")
+    print("✅ Drift routes loaded")
 except ImportError as e:
+    drift_routes_loaded = False
     print(f"⚠️ Failed to load Drift routes: {e}")
-    if "drift" not in failed_routes:
-        failed_routes.append("drift")
+    failed_routes.append("drift")
 
-# Output Policy routes - Hard-wired registration (kept for backward compatibility)
+# Output Policy routes (kept for backward compatibility)
 try:
     from app.routes.output_policy_routes import router as output_policy_router
-    # Only include if not already included above
-    if "output_policy_routes" not in loaded_routes:
-        app.include_router(output_policy_router)
-        loaded_routes.append("output_policy")
-        print("✅ Output Policy routes loaded (legacy)")
+    output_policy_routes_loaded = True
+    loaded_routes.append("output_policy")
+    print("✅ Output Policy routes loaded")
 except ImportError as e:
+    output_policy_routes_loaded = False
     print(f"⚠️ Failed to load Output Policy routes: {e}")
-    if "output_policy" not in failed_routes:
-        failed_routes.append("output_policy")
+    failed_routes.append("output_policy")
 
 # Add diagnostics endpoint
 from fastapi import APIRouter
@@ -279,12 +267,56 @@ async def get_routes_diagnostics():
     
     return response
 
+# Include all routers with proper error handling
+# First include the diagnostics router
 app.include_router(diagnostics_router)
-app.include_router(agent_router)
-app.include_router(memory_router)
-app.include_router(upload_file_router)
+loaded_routes.append("diagnostics_routes")
+print("✅ Included diagnostics_router")
 
-# Include the new endpoint routers with proper error handling
+# Include core routers that should always be available
+if agent_routes_loaded:
+    try:
+        app.include_router(agent_router)
+        print("✅ Included agent_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include agent_router: {e}")
+        
+if memory_routes_loaded:
+    try:
+        app.include_router(memory_router)
+        print("✅ Included memory_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include memory_router: {e}")
+        
+if upload_file_routes_loaded:
+    try:
+        app.include_router(upload_file_router)
+        print("✅ Included upload_file_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include upload_file_router: {e}")
+
+# Include API endpoint routers
+if memory_api_routes_loaded:
+    try:
+        app.include_router(memory_api_router)
+        print("✅ Included memory_api_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include memory_api_router: {e}")
+
+if loop_validation_routes_loaded:
+    try:
+        app.include_router(loop_validation_router)
+        print("✅ Included loop_validation_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include loop_validation_router: {e}")
+
+if plan_generate_routes_loaded:
+    try:
+        app.include_router(plan_generate_router)
+        print("✅ Included plan_generate_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include plan_generate_router: {e}")
+
 if forge_build_routes_loaded:
     try:
         app.include_router(forge_build_router)
@@ -313,8 +345,55 @@ if sage_beliefs_routes_loaded:
     except Exception as e:
         print(f"⚠️ Failed to include sage_beliefs_router: {e}")
 
-loaded_routes.append("diagnostics_routes")
-print("✅ Included diagnostics_router")
+# Include legacy routers
+if health_monitor_routes_loaded:
+    try:
+        app.include_router(health_monitor_router)
+        print("✅ Included health_monitor_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include health_monitor_router: {e}")
+
+if orchestrator_contract_routes_loaded:
+    try:
+        app.include_router(orchestrator_contract_router)
+        print("✅ Included orchestrator_contract_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include orchestrator_contract_router: {e}")
+
+if snapshot_routes_loaded:
+    try:
+        app.include_router(snapshot_router)
+        print("✅ Included snapshot_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include snapshot_router: {e}")
+
+if forge_routes_loaded:
+    try:
+        app.include_router(forge_router)
+        print("✅ Included forge_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include forge_router: {e}")
+
+if debug_analyzer_routes_loaded:
+    try:
+        app.include_router(debug_analyzer_router)
+        print("✅ Included debug_analyzer_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include debug_analyzer_router: {e}")
+
+if drift_routes_loaded:
+    try:
+        app.include_router(drift_router)
+        print("✅ Included drift_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include drift_router: {e}")
+
+if output_policy_routes_loaded:
+    try:
+        app.include_router(output_policy_router)
+        print("✅ Included output_policy_router")
+    except Exception as e:
+        print(f"⚠️ Failed to include output_policy_router: {e}")
 
 # Register loaded routes in manifest if manifest is initialized
 if manifest_initialized:
@@ -351,3 +430,4 @@ if __name__ == "__main__":
 # clean deploy
 # force clean rebuild Fri Apr 25 20:26:00 UTC 2025
 # force clean build Fri Apr 25 20:53:47 UTC 2025
+# comprehensive endpoint fix Sat Apr 26 10:41:30 UTC 2025
