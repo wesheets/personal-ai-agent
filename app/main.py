@@ -16,7 +16,8 @@ try:
 except ImportError:
     upload_file_routes_loaded = False
     print("⚠️ Could not load upload_file_routes directly")
-from app.routes import upload_base64_routes
+# Removed import to fix deployment issue
+# from app.routes import upload_base64_routes
 
 # Import routes
 from app.routes.agent_config_routes import router as agent_config_router
@@ -904,7 +905,7 @@ app.include_router(diagnostics_router)
 app.include_router(agent_routes.router)
 app.include_router(memory_routes.router)
 app.include_router(upload_file_routes.router)
-app.include_router(upload_base64_routes.router)
+# Removed upload_base64_routes.router to fix deployment issue
 loaded_routes.append("diagnostics_routes")
 print("✅ Included diagnostics_router")
 
