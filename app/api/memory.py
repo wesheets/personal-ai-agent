@@ -1,21 +1,18 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel
 from typing import Dict, Any, Optional, List
-from app.core.vector_memory import VectorMemorySystem
+from app.core.vector_memory import get_memory_engine
 from app.db.supabase_manager import get_supabase_client
+from app.schemas.memory_schema import (
+    MemoryAddRequest,
+    MemorySearchRequest,
+    MemorySearchResponse
+)
 
 router = APIRouter()
-memory_system = VectorMemorySystem()
+memory_system = get_memory_engine()
 
-class MemoryAddRequest(BaseModel):
-    content: str
-    metadata: Optional[Dict[str, Any]] = None
-    priority: Optional[bool] = False
-
-class MemorySearchRequest(BaseModel):
-    query: str
-    limit: Optional[int] = 5
-    priority_only: Optional[bool] = False
+# Using imported schemas from memory_schema.py instead of local definitions
 
 class MemoryResponse(BaseModel):
     id: str
@@ -24,10 +21,6 @@ class MemoryResponse(BaseModel):
     similarity: Optional[float] = None
     priority: bool
     created_at: str
-
-class MemorySearchResponse(BaseModel):
-    results: List[MemoryResponse]
-    metadata: Dict[str, Any]
 
 class MemoryUpdatePriorityRequest(BaseModel):
     priority: bool
