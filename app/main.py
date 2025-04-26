@@ -6,6 +6,10 @@ from fastapi import FastAPI
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 import datetime
+from app.routes import agent_routes
+from app.routes import memory_routes
+from app.routes import upload_file_routes
+from app.routes import upload_base64_routes
 
 # Import routes
 from app.routes.agent_config_routes import router as agent_config_router
@@ -248,6 +252,15 @@ try:
 except ImportError:
     critic_routes_loaded = False
     print("⚠️ Could not load critic_router directly")
+
+# Load CRITIC Review Routes
+try:
+    from app.routes.critic_review_routes import router as critic_review_router
+    critic_review_routes_loaded = True
+    print("✅ Directly loaded critic_review_router")
+except ImportError:
+    critic_review_routes_loaded = False
+    print("⚠️ Could not load critic_review_router directly")
 
 try:
     from app.routes.sage_router import router as sage_router
@@ -558,6 +571,14 @@ if critic_routes_loaded:
 else:
     failed_routes.append("critic_routes")
 
+# Include CRITIC Review Router
+if critic_review_routes_loaded:
+    app.include_router(critic_review_router)
+    print("✅ Included critic_review_router")
+    loaded_routes.append("critic_review_routes")
+else:
+    failed_routes.append("critic_review_routes")
+
 if sage_routes_loaded:
     app.include_router(sage_router)
     print("✅ Included sage_router")
@@ -805,6 +826,10 @@ async def get_routes_diagnostics():
     return response
 
 app.include_router(diagnostics_router)
+app.include_router(agent_routes.router)
+app.include_router(memory_routes.router)
+app.include_router(upload_file_routes.router)
+app.include_router(upload_base64_routes.router)
 loaded_routes.append("diagnostics_routes")
 print("✅ Included diagnostics_router")
 
