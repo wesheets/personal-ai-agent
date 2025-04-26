@@ -6,6 +6,10 @@ from fastapi import FastAPI
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 import datetime
+from app.routes import agent_routes
+from app.routes import memory_routes
+from app.routes import upload_file_routes
+from app.routes import upload_base64_routes
 
 # Import routes
 from app.routes.agent_config_routes import router as agent_config_router
@@ -169,6 +173,15 @@ except ImportError:
     memory_routes_loaded = False
     print("⚠️ Could not load memory_router directly")
 
+# Load Memory API Routes
+try:
+    from app.routes.memory_api_routes import router as memory_api_router
+    memory_api_routes_loaded = True
+    print("✅ Directly loaded memory_api_router")
+except ImportError:
+    memory_api_routes_loaded = False
+    print("⚠️ Could not load memory_api_router directly")
+
 try:
     from app.routes.loop_router import router as loop_router
     loop_routes_loaded = True
@@ -248,6 +261,33 @@ try:
 except ImportError:
     critic_routes_loaded = False
     print("⚠️ Could not load critic_router directly")
+
+# Load CRITIC Review Routes
+try:
+    from app.routes.critic_review_routes import router as critic_review_router
+    critic_review_routes_loaded = True
+    print("✅ Directly loaded critic_review_router")
+except ImportError:
+    critic_review_routes_loaded = False
+    print("⚠️ Could not load critic_review_router directly")
+
+# Load PESSIMIST Evaluation Routes
+try:
+    from app.routes.pessimist_evaluation_routes import router as pessimist_evaluation_router
+    pessimist_evaluation_routes_loaded = True
+    print("✅ Directly loaded pessimist_evaluation_router")
+except ImportError:
+    pessimist_evaluation_routes_loaded = False
+    print("⚠️ Could not load pessimist_evaluation_router directly")
+
+# Load SAGE Beliefs Routes
+try:
+    from app.routes.sage_beliefs_routes import router as sage_beliefs_router
+    sage_beliefs_routes_loaded = True
+    print("✅ Directly loaded sage_beliefs_router")
+except ImportError:
+    sage_beliefs_routes_loaded = False
+    print("⚠️ Could not load sage_beliefs_router directly")
 
 try:
     from app.routes.sage_router import router as sage_router
@@ -483,6 +523,30 @@ if memory_routes_loaded:
 else:
     failed_routes.append("app_memory_routes")
 
+# Include Memory API Router
+if memory_api_routes_loaded:
+    app.include_router(memory_api_router)  # No prefix as routes already include /api/
+    print("✅ Included memory_api_router without prefix")
+    loaded_routes.append("memory_api_routes")
+else:
+    failed_routes.append("memory_api_routes")
+    
+# Include PESSIMIST Evaluation Router
+if pessimist_evaluation_routes_loaded:
+    app.include_router(pessimist_evaluation_router)  # No prefix as routes already include /api/
+    print("✅ Included pessimist_evaluation_router without prefix")
+    loaded_routes.append("pessimist_evaluation_routes")
+else:
+    failed_routes.append("pessimist_evaluation_routes")
+    
+# Include SAGE Beliefs Router
+if sage_beliefs_routes_loaded:
+    app.include_router(sage_beliefs_router)  # No prefix as routes already include /api/
+    print("✅ Included sage_beliefs_router without prefix")
+    loaded_routes.append("sage_beliefs_routes")
+else:
+    failed_routes.append("sage_beliefs_routes")
+
 if loop_routes_loaded:
     app.include_router(loop_router)  # No prefix as routes already include /api/
     print("✅ Included loop_router without prefix")
@@ -557,6 +621,14 @@ if critic_routes_loaded:
     loaded_routes.append("critic_routes")
 else:
     failed_routes.append("critic_routes")
+
+# Include CRITIC Review Router
+if critic_review_routes_loaded:
+    app.include_router(critic_review_router)
+    print("✅ Included critic_review_router")
+    loaded_routes.append("critic_review_routes")
+else:
+    failed_routes.append("critic_review_routes")
 
 if sage_routes_loaded:
     app.include_router(sage_router)
@@ -805,6 +877,10 @@ async def get_routes_diagnostics():
     return response
 
 app.include_router(diagnostics_router)
+app.include_router(agent_routes.router)
+app.include_router(memory_routes.router)
+app.include_router(upload_file_routes.router)
+app.include_router(upload_base64_routes.router)
 loaded_routes.append("diagnostics_routes")
 print("✅ Included diagnostics_router")
 
