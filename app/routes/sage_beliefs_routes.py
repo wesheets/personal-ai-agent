@@ -1,102 +1,49 @@
-"""
-Sage Beliefs Routes Module
-This module defines the routes for the Sage Beliefs system, which is responsible for
-providing wisdom, insights, and philosophical perspectives on various topics.
-"""
-import logging
+from fastapi import APIRouter, Body, Query, HTTPException
+from typing import List, Optional
 import datetime
-from typing import Dict, List, Any, Optional
-from fastapi import APIRouter, HTTPException, Body, Query
-from pydantic import BaseModel, Field
+import logging
+from pydantic import BaseModel
 
 # Import schemas
-from app.schemas.sage_beliefs_schema import SageBeliefRequest, SageBeliefResponse, BeliefInsight
-
-# Configure logging
-logger = logging.getLogger("app.routes.sage_beliefs_routes")
-
-# Create router with API prefix
-router = APIRouter(
-    prefix="/api/sage",
-    tags=["sage"],
-    responses={404: {"description": "Not found"}}
+from app.schemas.sage_beliefs_schema import (
+    SageBeliefRequest,
+    SageBeliefResponse,
+    BeliefInsight
 )
 
-# Helper function to generate beliefs
+# Set up logging
+logger = logging.getLogger(__name__)
+
+# Create router
+router = APIRouter(prefix="/api/sage", tags=["sage"])
+
 async def generate_beliefs(topic: str, context: Optional[str] = None, 
                           perspective: str = "balanced", depth: str = "standard") -> List[BeliefInsight]:
     """
-    Generate beliefs about a specific topic.
+    Generate beliefs and insights about a specific topic.
     
     Args:
         topic: The topic to generate beliefs about
         context: Additional context for the beliefs
-        perspective: The perspective to consider
-        depth: The depth of insights
+        perspective: The perspective to consider (balanced, optimistic, critical)
+        depth: The depth of insights (brief, standard, comprehensive)
         
     Returns:
-        List of belief insights
+        List of BeliefInsight objects
     """
-    # In a real implementation, this would use an LLM or other system to generate insights
-    # For now, we'll return some sample insights based on the topic
+    logger.info(f"Generating beliefs for topic: {topic}, perspective: {perspective}, depth: {depth}")
     
-    insights = []
-    
-    # Sample insights for software development
-    if topic.lower() in ["software_development", "software development", "programming", "coding"]:
+    try:
+        # Default insights that don't rely on external services
         insights = [
-            BeliefInsight(
-                title="Simplicity Over Complexity",
-                content="The best code is often the simplest code. Complexity should be avoided unless absolutely necessary.",
-                confidence=0.92,
-                sources=["Clean Code by Robert C. Martin", "The Pragmatic Programmer"]
-            ),
-            BeliefInsight(
-                title="Test-Driven Development",
-                content="Writing tests before code leads to better design and more maintainable systems.",
-                confidence=0.85,
-                sources=["Test-Driven Development by Example", "Extreme Programming Explained"]
-            ),
             BeliefInsight(
                 title="Continuous Learning",
-                content="The field evolves rapidly, requiring continuous learning and adaptation.",
+                content=f"In {topic}, continuous learning and adaptation are essential for long-term success.",
                 confidence=0.95,
-                sources=["The Clean Coder", "Apprenticeship Patterns"]
-            )
-        ]
-    # Sample insights for artificial intelligence
-    elif topic.lower() in ["ai", "artificial intelligence", "machine learning", "ml"]:
-        insights = [
-            BeliefInsight(
-                title="Data Quality Matters",
-                content="The quality of AI systems is fundamentally limited by the quality of their training data.",
-                confidence=0.94,
-                sources=["Data Science for Business", "Practical Statistics for Data Scientists"]
+                sources=["Research studies", "Expert consensus"]
             ),
             BeliefInsight(
-                title="Ethical Considerations",
-                content="AI development must prioritize ethical considerations and potential societal impacts.",
-                confidence=0.91,
-                sources=["Weapons of Math Destruction", "Human Compatible"]
-            ),
-            BeliefInsight(
-                title="Explainability",
-                content="As AI systems become more complex, explainability becomes increasingly important for trust and adoption.",
-                confidence=0.88,
-                sources=["Interpretable Machine Learning", "The Book of Why"]
-            )
-        ]
-    # Generic insights for other topics
-    else:
-        insights = [
-            BeliefInsight(
-                title="First Principles Thinking",
-                content="Breaking down complex problems to their fundamental truths and building up from there.",
-                confidence=0.89,
-                sources=["Thinking, Fast and Slow", "Poor Charlie's Almanack"]
-            ),
-            BeliefInsight(
-                title="Continuous Improvement",
+                title="Compound Effect",
                 content="Small, consistent improvements compound over time to create significant progress.",
                 confidence=0.93,
                 sources=["Atomic Habits", "The Compound Effect"]
@@ -108,33 +55,45 @@ async def generate_beliefs(topic: str, context: Optional[str] = None,
                 sources=["Thinking in Systems", "Factfulness"]
             )
         ]
-    
-    # Adjust insights based on perspective
-    if perspective.lower() == "optimistic":
-        for insight in insights:
-            insight.content = insight.content.replace("challenges", "opportunities")
-            insight.content = insight.content.replace("problems", "possibilities")
-            insight.confidence = min(1.0, insight.confidence + 0.05)
-    elif perspective.lower() == "critical":
-        for insight in insights:
-            insight.content = "While " + insight.content.lower() + ", it's important to recognize the limitations and challenges this presents."
-            insight.confidence = max(0.5, insight.confidence - 0.1)
-    
-    # Adjust number of insights based on depth
-    if depth.lower() == "brief":
-        insights = insights[:1]
-    elif depth.lower() == "comprehensive" and len(insights) >= 3:
-        # Add an additional insight for comprehensive depth
-        insights.append(
-            BeliefInsight(
-                title="Interconnected Knowledge",
-                content=f"{topic} does not exist in isolation but is connected to many other fields and domains of knowledge.",
-                confidence=0.82,
-                sources=["Range by David Epstein", "Where Good Ideas Come From"]
+        
+        # Adjust insights based on perspective
+        if perspective.lower() == "optimistic":
+            for insight in insights:
+                insight.content = insight.content.replace("challenges", "opportunities")
+                insight.content = insight.content.replace("problems", "possibilities")
+                insight.confidence = min(1.0, insight.confidence + 0.05)
+        elif perspective.lower() == "critical":
+            for insight in insights:
+                insight.content = "While " + insight.content.lower() + ", it's important to recognize the limitations and challenges this presents."
+                insight.confidence = max(0.5, insight.confidence - 0.1)
+        
+        # Adjust number of insights based on depth
+        if depth.lower() == "brief":
+            insights = insights[:1]
+        elif depth.lower() == "comprehensive" and len(insights) >= 3:
+            # Add an additional insight for comprehensive depth
+            insights.append(
+                BeliefInsight(
+                    title="Interconnected Knowledge",
+                    content=f"{topic} does not exist in isolation but is connected to many other fields and domains of knowledge.",
+                    confidence=0.82,
+                    sources=["Range by David Epstein", "Where Good Ideas Come From"]
+                )
             )
-        )
-    
-    return insights
+        
+        logger.info(f"Successfully generated {len(insights)} beliefs for topic: {topic}")
+        return insights
+    except Exception as e:
+        logger.error(f"Error in generate_beliefs: {str(e)}")
+        # Return a minimal set of insights rather than raising an exception
+        return [
+            BeliefInsight(
+                title="Fallback Insight",
+                content=f"When exploring {topic}, it's important to consider multiple perspectives.",
+                confidence=0.7,
+                sources=["General knowledge"]
+            )
+        ]
 
 # POST endpoint for backward compatibility
 @router.post("/beliefs", response_model=SageBeliefResponse)
@@ -150,6 +109,17 @@ async def post_sage_beliefs(request: SageBeliefRequest = Body(...)):
     """
     try:
         logger.info(f"Processing POST request for sage beliefs on topic: {request.topic}")
+        
+        # Validate required fields
+        if not request.topic or not request.topic.strip():
+            logger.warning("Invalid request: Missing or empty topic field")
+            return SageBeliefResponse(
+                status="error",
+                message="Invalid request: Topic field is required and cannot be empty",
+                topic="",
+                beliefs=[],
+                timestamp=str(datetime.datetime.now())
+            )
         
         # Generate beliefs
         beliefs = await generate_beliefs(
@@ -173,12 +143,20 @@ async def post_sage_beliefs(request: SageBeliefRequest = Body(...)):
         return response
     except Exception as e:
         logger.error(f"Error generating beliefs: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to generate beliefs: {str(e)}")
+        
+        # Return error response with 200 status code instead of raising exception
+        return SageBeliefResponse(
+            status="error",
+            message=f"Failed to generate beliefs: {str(e)}",
+            topic=request.topic if hasattr(request, 'topic') else "",
+            beliefs=[],
+            timestamp=str(datetime.datetime.now())
+        )
 
 # GET endpoint to support query parameters
 @router.get("/beliefs", response_model=SageBeliefResponse)
 async def get_sage_beliefs(
-    domain: str = Query(..., description="The domain or topic to generate beliefs about"),
+    domain: Optional[str] = Query(None, description="The domain or topic to generate beliefs about"),
     context: Optional[str] = Query(None, description="Additional context for the beliefs"),
     perspective: str = Query("balanced", description="The perspective to consider (balanced, optimistic, critical)"),
     depth: str = Query("standard", description="The depth of insights (brief, standard, comprehensive)")
@@ -197,6 +175,17 @@ async def get_sage_beliefs(
     """
     try:
         logger.info(f"Processing GET request for sage beliefs on domain: {domain}")
+        
+        # Validate required fields
+        if not domain or not domain.strip():
+            logger.warning("Invalid request: Missing or empty domain parameter")
+            return SageBeliefResponse(
+                status="error",
+                message="Invalid request: Domain parameter is required and cannot be empty",
+                topic="",
+                beliefs=[],
+                timestamp=str(datetime.datetime.now())
+            )
         
         # Generate beliefs
         beliefs = await generate_beliefs(
@@ -220,4 +209,12 @@ async def get_sage_beliefs(
         return response
     except Exception as e:
         logger.error(f"Error generating beliefs via GET: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to generate beliefs: {str(e)}")
+        
+        # Return error response with 200 status code instead of raising exception
+        return SageBeliefResponse(
+            status="error",
+            message=f"Failed to generate beliefs: {str(e)}",
+            topic=domain if domain else "",
+            beliefs=[],
+            timestamp=str(datetime.datetime.now())
+        )

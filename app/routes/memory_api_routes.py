@@ -1,83 +1,46 @@
-"""
-Memory API Routes Module
-This module defines the routes for memory operations in the application.
-Includes:
-- /api/memory/add for adding new memory entries
-- /api/memory/search for searching existing memory entries
-"""
-import logging
+from fastapi import APIRouter, Body, Query, HTTPException, Depends
+from typing import List, Dict, Any, Optional
 import datetime
 import os
-from typing import Dict, List, Any, Optional
-from fastapi import APIRouter, HTTPException, Query, Body, Depends
-from pydantic import BaseModel
+import logging
 
-# Import schemas
-from app.schemas.memory import MemoryItem, ThreadRequest, SummarizationRequest
-
-# Configure logging
-logger = logging.getLogger("app.routes.memory_api_routes")
-
-# Create router with API prefix
-router = APIRouter(
-    prefix="/api/memory",
-    tags=["memory"],
-    responses={404: {"description": "Not found"}}
+from app.schemas.memory_schema import (
+    MemoryAddRequest,
+    MemoryAddResponse,
+    MemorySearchRequest,
+    MemorySearchResponse,
+    MemoryEntry
 )
 
-class MemoryAddRequest(BaseModel):
-    """
-    Schema for memory add request.
-    """
-    project_id: Optional[str] = "default_project"
-    content: str
-    metadata: Optional[Dict[str, Any]] = {}
-    tags: Optional[List[str]] = []
-    agent_id: Optional[str] = "system"
+# Set up logging
+logger = logging.getLogger(__name__)
 
-class MemoryAddResponse(BaseModel):
-    """
-    Schema for memory add response.
-    """
-    status: str
-    message: str
-    memory_id: str
-    timestamp: str
-
-class MemorySearchRequest(BaseModel):
-    """
-    Schema for memory search request.
-    """
-    project_id: Optional[str] = "default_project"
-    query: str
-    limit: Optional[int] = 10
-    tags: Optional[List[str]] = []
-    agent_id: Optional[str] = None
-    threshold: Optional[float] = 0.7
-
-class MemorySearchResponse(BaseModel):
-    """
-    Schema for memory search response.
-    """
-    status: str
-    message: str
-    results: List[Dict[str, Any]]
-    count: int
-    timestamp: str
+# Create router
+router = APIRouter(prefix="/api/memory", tags=["memory"])
 
 @router.post("/add", response_model=MemoryAddResponse)
-async def add_memory(request: MemoryAddRequest):
+async def add_memory(request: MemoryAddRequest = Body(...)):
     """
     Add a new memory entry to the vector store.
     
     Args:
-        request: The memory add request containing project_id, content, and optional metadata
+        request: The memory entry to add containing project_id, content, and optional metadata
         
     Returns:
-        MemoryAddResponse containing the status and memory_id
+        MemoryAddResponse containing the generated memory_id
     """
     try:
         logger.info(f"Adding memory for project {request.project_id}")
+        
+        # Validate required fields
+        if not request.content or not request.content.strip():
+            logger.warning("Invalid request: Missing or empty content field")
+            return MemoryAddResponse(
+                status="error",
+                message="Invalid request: Content field is required and cannot be empty",
+                memory_id=None,
+                timestamp=str(datetime.datetime.now())
+            )
         
         # Initialize memory engine
         from app.core.vector_memory import get_memory_engine
@@ -139,7 +102,13 @@ async def add_memory(request: MemoryAddRequest):
         except Exception as log_error:
             logger.error(f"Failed to log memory route error: {str(log_error)}")
         
-        raise HTTPException(status_code=500, detail=f"Failed to add memory: {str(e)}")
+        # Return error response with 200 status code instead of raising exception
+        return MemoryAddResponse(
+            status="error",
+            message=f"Failed to add memory: {str(e)}",
+            memory_id=None,
+            timestamp=str(datetime.datetime.now())
+        )
 
 @router.post("/search", response_model=MemorySearchResponse)
 async def search_memory(request: MemorySearchRequest):
@@ -154,6 +123,17 @@ async def search_memory(request: MemorySearchRequest):
     """
     try:
         logger.info(f"Searching memory for project {request.project_id} with query: {request.query}")
+        
+        # Validate required fields
+        if not request.query or not request.query.strip():
+            logger.warning("Invalid request: Missing or empty query field")
+            return MemorySearchResponse(
+                status="error",
+                message="Invalid request: Query field is required and cannot be empty",
+                results=[],
+                count=0,
+                timestamp=str(datetime.datetime.now())
+            )
         
         # Initialize memory engine
         from app.core.vector_memory import get_memory_engine
@@ -217,4 +197,11 @@ async def search_memory(request: MemorySearchRequest):
         except Exception as log_error:
             logger.error(f"Failed to log memory route error: {str(log_error)}")
         
-        raise HTTPException(status_code=500, detail=f"Failed to search memory: {str(e)}")
+        # Return error response with 200 status code instead of raising exception
+        return MemorySearchResponse(
+            status="error",
+            message=f"Failed to search memory: {str(e)}",
+            results=[],
+            count=0,
+            timestamp=str(datetime.datetime.now())
+        )
