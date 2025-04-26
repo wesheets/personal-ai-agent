@@ -38,7 +38,11 @@
         "/api/plan/generate",
         "/api/loop/validate",
         "/api/forge/build",
-        "/api/critic/review"
+        "/api/critic/review",
+        "/api/memory/add",
+        "/api/memory/search",
+        "/api/pessimist/evaluate",
+        "/api/sage/beliefs"
       ],
       "passes_full_test": true,
       "logic_notes": "Fully operational for basic delegation, but needs improvement in handling complex multi-agent workflows.",
@@ -70,10 +74,22 @@
         {
           "item": "CRITIC review hook passing",
           "status": "in_progress"
+        },
+        {
+          "item": "Memory operations implemented",
+          "status": "in_progress"
+        },
+        {
+          "item": "PESSIMIST evaluation active",
+          "status": "in_progress"
+        },
+        {
+          "item": "SAGE beliefs system operational",
+          "status": "in_progress"
         }
       ],
       "last_tested_by": "manus",
-      "last_modified": "2025-04-26T01:56:22Z"
+      "last_modified": "2025-04-26T02:10:58Z"
     },
     {
       "agent_id": "sage",
@@ -81,9 +97,9 @@
       "tools_enabled": ["research_tools", "memory_search", "plan_generator"],
       "input_schema": "sage_schema",
       "output_schema": "strategic_advice_schema",
-      "responsible_routes": ["/api/sage/advise"],
-      "passes_full_test": true,
-      "logic_notes": "Strong strategic reasoning capabilities, but occasionally lacks specificity in technical domains.",
+      "responsible_routes": ["/api/sage/advise", "/api/sage/beliefs"],
+      "passes_full_test": false,
+      "logic_notes": "Strong strategic reasoning capabilities, but occasionally lacks specificity in technical domains. Beliefs endpoint implemented but not active on live server.",
       "checklist": [
         {
           "item": "Enhance technical domain knowledge",
@@ -96,10 +112,14 @@
         {
           "item": "Add support for visual planning outputs",
           "status": "pending"
+        },
+        {
+          "item": "Beliefs system operational",
+          "status": "in_progress"
         }
       ],
       "last_tested_by": "manus",
-      "last_modified": "2025-04-26T00:28:40Z"
+      "last_modified": "2025-04-26T02:10:58Z"
     },
     {
       "agent_id": "nova",
@@ -133,9 +153,9 @@
       "tools_enabled": ["risk_assessment", "failure_mode_analysis", "security_scanner"],
       "input_schema": "pessimist_schema",
       "output_schema": "risk_analysis_schema",
-      "responsible_routes": ["/api/pessimist/analyze"],
-      "passes_full_test": true,
-      "logic_notes": "Excellent at identifying potential failure points, but sometimes overly cautious.",
+      "responsible_routes": ["/api/pessimist/analyze", "/api/pessimist/evaluate"],
+      "passes_full_test": false,
+      "logic_notes": "Excellent at identifying potential failure points, but sometimes overly cautious. Evaluation endpoint partially operational but requires schema updates.",
       "checklist": [
         {
           "item": "Calibrate risk severity ratings",
@@ -148,10 +168,14 @@
         {
           "item": "Implement comparative risk analysis",
           "status": "pending"
+        },
+        {
+          "item": "Risk evaluation endpoint operational",
+          "status": "in_progress"
         }
       ],
       "last_tested_by": "manus",
-      "last_modified": "2025-04-26T00:28:40Z"
+      "last_modified": "2025-04-26T02:10:58Z"
     },
     {
       "agent_id": "critic",
@@ -170,6 +194,32 @@
       ],
       "last_tested_by": "manus",
       "last_modified": "2025-04-26T01:56:22Z"
+    },
+    {
+      "agent_id": "memory",
+      "role": "Knowledge Store",
+      "tools_enabled": ["vector_storage", "embedding_generator", "context_retrieval"],
+      "input_schema": "memory_schema",
+      "output_schema": "memory_result_schema",
+      "responsible_routes": ["/api/memory/add", "/api/memory/search"],
+      "passes_full_test": false,
+      "logic_notes": "Memory endpoints implemented in codebase but not active on live server. Requires deployment.",
+      "checklist": [
+        {
+          "item": "Memory add endpoint operational",
+          "status": "in_progress"
+        },
+        {
+          "item": "Memory search endpoint operational",
+          "status": "in_progress"
+        },
+        {
+          "item": "Implement memory context sharing",
+          "status": "pending"
+        }
+      ],
+      "last_tested_by": "manus",
+      "last_modified": "2025-04-26T02:10:58Z"
     },
     {
       "agent_id": "hal",
@@ -198,5 +248,5 @@
       "last_modified": "2025-04-26T00:28:40Z"
     }
   ],
-  "last_updated": "2025-04-26T01:56:22Z"
+  "last_updated": "2025-04-26T02:10:58Z"
 }
