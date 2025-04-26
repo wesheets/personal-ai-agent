@@ -173,6 +173,15 @@ except ImportError:
     memory_routes_loaded = False
     print("⚠️ Could not load memory_router directly")
 
+# Load Memory API Routes
+try:
+    from app.routes.memory_api_routes import router as memory_api_router
+    memory_api_routes_loaded = True
+    print("✅ Directly loaded memory_api_router")
+except ImportError:
+    memory_api_routes_loaded = False
+    print("⚠️ Could not load memory_api_router directly")
+
 try:
     from app.routes.loop_router import router as loop_router
     loop_routes_loaded = True
@@ -261,6 +270,24 @@ try:
 except ImportError:
     critic_review_routes_loaded = False
     print("⚠️ Could not load critic_review_router directly")
+
+# Load PESSIMIST Evaluation Routes
+try:
+    from app.routes.pessimist_evaluation_routes import router as pessimist_evaluation_router
+    pessimist_evaluation_routes_loaded = True
+    print("✅ Directly loaded pessimist_evaluation_router")
+except ImportError:
+    pessimist_evaluation_routes_loaded = False
+    print("⚠️ Could not load pessimist_evaluation_router directly")
+
+# Load SAGE Beliefs Routes
+try:
+    from app.routes.sage_beliefs_routes import router as sage_beliefs_router
+    sage_beliefs_routes_loaded = True
+    print("✅ Directly loaded sage_beliefs_router")
+except ImportError:
+    sage_beliefs_routes_loaded = False
+    print("⚠️ Could not load sage_beliefs_router directly")
 
 try:
     from app.routes.sage_router import router as sage_router
@@ -495,6 +522,30 @@ if memory_routes_loaded:
     loaded_routes.append("app_memory_routes")
 else:
     failed_routes.append("app_memory_routes")
+
+# Include Memory API Router
+if memory_api_routes_loaded:
+    app.include_router(memory_api_router)  # No prefix as routes already include /api/
+    print("✅ Included memory_api_router without prefix")
+    loaded_routes.append("memory_api_routes")
+else:
+    failed_routes.append("memory_api_routes")
+    
+# Include PESSIMIST Evaluation Router
+if pessimist_evaluation_routes_loaded:
+    app.include_router(pessimist_evaluation_router)  # No prefix as routes already include /api/
+    print("✅ Included pessimist_evaluation_router without prefix")
+    loaded_routes.append("pessimist_evaluation_routes")
+else:
+    failed_routes.append("pessimist_evaluation_routes")
+    
+# Include SAGE Beliefs Router
+if sage_beliefs_routes_loaded:
+    app.include_router(sage_beliefs_router)  # No prefix as routes already include /api/
+    print("✅ Included sage_beliefs_router without prefix")
+    loaded_routes.append("sage_beliefs_routes")
+else:
+    failed_routes.append("sage_beliefs_routes")
 
 if loop_routes_loaded:
     app.include_router(loop_router)  # No prefix as routes already include /api/
