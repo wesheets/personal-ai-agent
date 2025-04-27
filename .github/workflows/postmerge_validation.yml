@@ -1,136 +1,28 @@
 name: Post-Merge Surface Validation
 
 on:
-  push:
-    branches: [ main, master ]
   pull_request:
-    types: [ closed ]
-    branches: [ main, master ]
+    branches:
+      - main
 
 jobs:
   validate-surfaces:
-    if: github.event.pull_request.merged == true || github.event_name == 'push'
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install jsonschema
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    
-    - name: Run Post-Merge Surface Validation
-      id: validation
-      run: |
-        echo "::group::Post-Merge Surface Validation"
-        echo "Running post-merge validation..."
-        export PROMETHIOS_BASE_PATH=$GITHUB_WORKSPACE
-        python -m app.startup_validation.postmerge_validator --base-path=$GITHUB_WORKSPACE --verbose
-        VALIDATION_STATUS=$?
-        echo "::endgroup::"
-        
-        # Set output variables
-        echo "status=$VALIDATION_STATUS" >> $GITHUB_OUTPUT
-        
-        if [ $VALIDATION_STATUS -eq 0 ]; then
-          echo "✅ Post-merge validation completed successfully. All surfaces are healthy."
-          exit 0
-        elif [ $VALIDATION_STATUS -eq 1 ]; then
-          echo "⚠️ Post-merge validation completed with drift detected. See report for details."
-          # We don't fail the workflow, but we mark it as having drift
-          echo "drift=true" >> $GITHUB_OUTPUT
-        else
-          echo "❌ Post-merge validation failed with an error."
-          exit 1
-        fi
-    
-    - name: Upload validation report
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: validation-reports
-        path: |
-          logs/postmerge_drift_report_*.json
-          logs/postmerge_validation_*.log
-    
-    - name: Notify on drift detection
-      if: steps.validation.outputs.drift == 'true'
-      uses: actions/github-script@v6
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const fs = require('fs');
-          const path = require('path');
-          
-          // Find the latest drift report
-          const logsDir = path.join(process.env.GITHUB_WORKSPACE, 'logs');
-          const files = fs.readdirSync(logsDir);
-          const driftReports = files.filter(file => file.startsWith('postmerge_drift_report_'));
-          const latestReport = driftReports.sort().reverse()[0];
-          
-          if (!latestReport) {
-            console.log('No drift report found');
-            return;
-          }
-          
-          // Read the report
-          const reportPath = path.join(logsDir, latestReport);
-          const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-          
-          // Create issue content
-          const title = `🚨 Surface Drift Detected: ${report.surface_health_score.toFixed(1)}% Health Score`;
-          
-          let body = `## Post-Merge Surface Validation Results\n\n`;
-          body += `**Health Score:** ${report.surface_health_score.toFixed(1)}%\n`;
-          body += `**Memory Tag:** ${report.memory_tag}\n`;
-          body += `**Drift Issues:** ${report.surface_drift.length}\n\n`;
-          
-          body += `### Surface Health Breakdown\n`;
-          body += `- Agents: ${report.agents_health.toFixed(1)}%\n`;
-          body += `- Modules: ${report.modules_health.toFixed(1)}%\n`;
-          body += `- Schemas: ${report.schemas_health.toFixed(1)}%\n`;
-          body += `- Endpoints: ${report.endpoints_health.toFixed(1)}%\n`;
-          body += `- Components: ${report.components_health.toFixed(1)}%\n\n`;
-          
-          body += `### Top Drift Issues\n`;
-          const topIssues = report.surface_drift.slice(0, 10);
-          topIssues.forEach((issue, index) => {
-            body += `${index + 1}. **${issue.type.toUpperCase()}:** ${issue.path} - ${issue.issue}\n`;
-          });
-          
-          if (report.surface_drift.length > 10) {
-            body += `\n... and ${report.surface_drift.length - 10} more issues.\n`;
-          }
-          
-          body += `\n### Operator Action Required\n`;
-          body += `No automatic repairs have been performed. Operator intervention is required to address these drift issues.\n`;
-          body += `\nFull report available in workflow artifacts: \`${latestReport}\`\n`;
-          
-          // Create issue
-          github.rest.issues.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            title: title,
-            body: body,
-            labels: ['surface-drift', 'operator-attention-required']
-          });
-          
-          // Also comment on the PR if this was triggered by a PR
-          if (context.payload.pull_request) {
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-              body: `# ⚠️ Surface Drift Detected\n\nThis pull request has introduced surface drift with a health score of ${report.surface_health_score.toFixed(1)}%.\n\nAn issue has been created to track this: #${context.issue.number}\n\nPlease review the issue for details and take appropriate action.`
-            });
-          }
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install jsonschema
+
+      - name: Run Post-Merge Validation
+        run: |
+          # Ensure Python can find the app module
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          python app/validation/postmerge_validator.py
