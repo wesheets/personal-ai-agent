@@ -1,0 +1,97 @@
+2025-04-27 19:48:39,409 - endpoint_validator - INFO - Logging initialized at level DEBUG
+2025-04-27 19:48:39,409 - endpoint_validator - INFO - Log file: /home/ubuntu/personal-ai-agent/logs/endpoint_validation_20250427.log
+2025-04-27 19:48:39,410 - endpoint_validator - INFO - Starting Promethios Endpoint Health Validation
+2025-04-27 19:48:39,410 - endpoint_validator - INFO - Discovered 22 endpoints
+2025-04-27 19:48:39,410 - endpoint_validator - INFO - Starting validation of 22 endpoints with 5 workers
+2025-04-27 19:48:39,410 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/health
+2025-04-27 19:48:39,411 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/status
+2025-04-27 19:48:39,412 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/agent/list
+2025-04-27 19:48:39,413 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/agent/run
+2025-04-27 19:48:39,414 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/agent/status
+2025-04-27 19:48:39,417 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,419 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,421 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,422 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,423 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,426 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/agent/status: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/agent/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be830>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,426 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/status: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4beb60>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,427 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/memory/list
+2025-04-27 19:48:39,427 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/agent/status
+2025-04-27 19:48:39,428 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/memory/get
+2025-04-27 19:48:39,429 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,429 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/health: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bdf30>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,430 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/agent/list: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/agent/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bef50>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,430 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/status
+2025-04-27 19:48:39,431 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,432 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/agent/run: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/agent/run (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bf250>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,432 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/memory/create
+2025-04-27 19:48:39,433 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/goals/list
+2025-04-27 19:48:39,433 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/health
+2025-04-27 19:48:39,434 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/memory/list: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/memory/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4832b0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,434 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/goals/create
+2025-04-27 19:48:39,436 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,437 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,437 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/agent/list
+2025-04-27 19:48:39,437 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/logs/list
+2025-04-27 19:48:39,438 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/memory/get: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/memory/get (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483310>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,439 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,441 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/agent/run
+2025-04-27 19:48:39,442 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,442 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/goals/list: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/goals/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bf3d0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,443 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/control/status
+2025-04-27 19:48:39,443 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/memory/create: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/memory/create (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a5085e0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,444 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/memory/list
+2025-04-27 19:48:39,444 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/delegate/task
+2025-04-27 19:48:39,446 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,447 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/goals/create: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/goals/create (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a508d90>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,447 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/orchestrator/consult
+2025-04-27 19:48:39,447 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/memory/get
+2025-04-27 19:48:39,448 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/logs/list: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/logs/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a509660>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,448 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,449 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/orchestrator/respond
+2025-04-27 19:48:39,450 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,451 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/goals/list
+2025-04-27 19:48:39,451 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/orchestrator/confirm
+2025-04-27 19:48:39,451 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/control/status: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/control/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be740>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,453 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,454 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/memory/create
+2025-04-27 19:48:39,455 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,455 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/delegate/task: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/delegate/task (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483790>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,456 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/orchestrator/credentials
+2025-04-27 19:48:39,457 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/orchestrator/consult: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/consult (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a509930>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,457 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/goals/create
+2025-04-27 19:48:39,458 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/orchestrator/checkpoint
+2025-04-27 19:48:39,459 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/orchestrator/respond: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/respond (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be2f0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,460 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,461 - endpoint_validator - DEBUG - Validating endpoint: GET http://localhost:8000/api/orchestrator/status
+2025-04-27 19:48:39,461 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/orchestrator/confirm: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/confirm (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a50a680>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,461 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/logs/list
+2025-04-27 19:48:39,462 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,463 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/orchestrator/approve
+2025-04-27 19:48:39,464 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,465 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/orchestrator/delegate
+2025-04-27 19:48:39,465 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/control/status
+2025-04-27 19:48:39,466 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/orchestrator/credentials: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/credentials (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483e80>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,467 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,468 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/orchestrator/checkpoint: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/checkpoint (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a509270>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,470 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,470 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/delegate/task
+2025-04-27 19:48:39,470 - endpoint_validator - DEBUG - Validating endpoint: POST http://localhost:8000/api/orchestrator/reflect
+2025-04-27 19:48:39,472 - endpoint_validator - ERROR - Error validating endpoint GET http://localhost:8000/api/orchestrator/status: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a508be0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,473 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/orchestrator/approve: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/approve (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a50ae60>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,473 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/orchestrator/consult
+2025-04-27 19:48:39,475 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): localhost:8000
+2025-04-27 19:48:39,475 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/orchestrator/respond
+2025-04-27 19:48:39,476 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/orchestrator/delegate: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/delegate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be6e0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,476 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/orchestrator/confirm
+2025-04-27 19:48:39,477 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/orchestrator/credentials
+2025-04-27 19:48:39,477 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/orchestrator/checkpoint
+2025-04-27 19:48:39,477 - endpoint_validator - ERROR - Error validating endpoint POST http://localhost:8000/api/orchestrator/reflect: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/reflect (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483640>: Failed to establish a new connection: [Errno 111] Connection refused'))
+2025-04-27 19:48:39,477 - endpoint_validator - INFO - ❌ FAIL - GET http://localhost:8000/api/orchestrator/status
+2025-04-27 19:48:39,478 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/orchestrator/approve
+2025-04-27 19:48:39,478 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/orchestrator/delegate
+2025-04-27 19:48:39,478 - endpoint_validator - INFO - ❌ FAIL - POST http://localhost:8000/api/orchestrator/reflect
+2025-04-27 19:48:39,479 - endpoint_validator - INFO - Completed validation of 22 endpoints
+2025-04-27 19:48:39,479 - endpoint_validator - INFO - Generated drift report: 22 endpoints, 0 passed, 22 failed, 0.0% health score
+2025-04-27 19:48:39,480 - endpoint_validator - INFO - Saved drift report to /home/ubuntu/personal-ai-agent/logs/endpoint_drift_report_20250427.json
+2025-04-27 19:48:39,480 - endpoint_validator - WARNING - Endpoint validation completed with 22 failed endpoints
