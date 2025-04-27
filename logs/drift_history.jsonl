@@ -1,0 +1,1 @@
+{"timestamp": "2025-04-27T21:00:02Z", "event_type": "agent_archival", "details": {"archived_agents": ["ash.py", "hal.py", "orchestrator.py"], "reason": "Legacy agent shims removed for SDK compliance and surface drift prevention. Archival authorized by Operator."}}
