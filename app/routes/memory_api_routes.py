@@ -4,9 +4,9 @@ import datetime
 import os
 import logging
 
+from app.schemas.memory.memory_add_schema import MemoryAddResponse
 from app.schemas.memory_schema import (
     MemoryAddRequest,
-    MemoryAddResponse,
     MemorySearchRequest,
     MemorySearchResponse,
     MemoryEntry

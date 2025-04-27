@@ -7,39 +7,40 @@ This module defines the agent-related routes for the Promethios API.
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional, List
 from app.utils.persona_utils import get_current_persona
+from app.schemas.agent.analyze_prompt_schema import AnalyzePromptRequest, AnalyzePromptResponse
 
 router = APIRouter(tags=["agent"])
 
-@router.post("/analyze-prompt")
-async def analyze_prompt(data: Dict[str, Any]):
+@router.post("/analyze-prompt", response_model=AnalyzePromptResponse)
+async def analyze_prompt(data: AnalyzePromptRequest):
     """
     Thought Partner prompt analysis.
     """
-    prompt = data.get("prompt")
-    loop_id = data.get("loop_id")
+    prompt = data.prompt
+    loop_id = data.loop_id
     
     if not prompt or not loop_id:
         raise HTTPException(status_code=400, detail="prompt and loop_id are required")
     
     # Get the current persona for this loop
-    orchestrator_persona = data.get("orchestrator_persona")
+    orchestrator_persona = data.orchestrator_persona
     if not orchestrator_persona:
         orchestrator_persona = get_current_persona(loop_id)
     
     # This would normally analyze the prompt
     # For now, return a mock response
-    return {
-        "analysis": {
+    return AnalyzePromptResponse(
+        analysis={
             "intent": "information_seeking",
             "complexity": "medium",
             "domain": "general",
             "emotional_tone": "neutral",
             "required_agents": ["researcher", "planner", "critic"]
         },
-        "loop_id": loop_id,
-        "orchestrator_persona": orchestrator_persona,
-        "status": "success"
-    }
+        loop_id=loop_id,
+        orchestrator_persona=orchestrator_persona,
+        status="success"
+    )
 
 @router.post("/generate-variants")
 async def generate_variants(data: Dict[str, Any]):

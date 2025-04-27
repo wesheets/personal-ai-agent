@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from pydantic import BaseModel
 from typing import Dict, Any, Optional, List
 from app.core.openai_client import get_openai_client
 from app.core.prompt_manager import PromptManager
@@ -7,6 +6,7 @@ from app.core.memory_manager import MemoryManager
 from app.core.vector_memory import VectorMemorySystem
 from app.db.database import get_database
 from app.db.supabase_manager import get_supabase_client
+from app.schemas.builder.builder_schema import BuilderResponse
 
 router = APIRouter()
 prompt_manager = PromptManager()
@@ -18,10 +18,6 @@ class BuilderRequest(BaseModel):
     context: Optional[Dict[str, Any]] = None
     save_to_memory: Optional[bool] = True
     model: Optional[str] = None  # Allow model override via API parameter
-
-class BuilderResponse(BaseModel):
-    output: str
-    metadata: Dict[str, Any]
 
 async def save_interaction_to_memory(input_text: str, output_text: str, metadata: Dict[str, Any]):
     """Background task to save interaction to memory"""

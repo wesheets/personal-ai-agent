@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from app.core.agent_registry import AGENT_REGISTRY
 from app.providers.openai_provider import OpenAIProvider
 from app.agents.memory_agent import handle_memory_task
+from app.schemas.delegate.delegate_stream_schema import DelegateStreamRequest
 import logging
 import os
 import json
@@ -22,10 +23,17 @@ except Exception as e:
 @router.post("/api/delegate-stream")
 async def delegate_stream(request: Request):
     body = await request.json()
-    agent_id = body.get("agent_id", "core-forge").lower()
-    prompt = body.get("prompt", "")
-    history = body.get("history", [])
-    thread_id = body.get("threadId", str(uuid.uuid4()))
+    
+    # Validate request against schema
+    try:
+        request_data = DelegateStreamRequest(**body)
+        agent_id = request_data.agent_id
+        prompt = request_data.prompt
+        history = request_data.history
+        thread_id = request_data.thread_id or str(uuid.uuid4())
+    except Exception as e:
+        logger.error(f"Request validation error: {str(e)}")
+        return JSONResponse(status_code=400, content={"error": f"Invalid request format: {str(e)}"})
     
     if agent_id not in AGENT_REGISTRY:
         return JSONResponse(status_code=404, content={"error": f"Agent '{agent_id}' not found"})
