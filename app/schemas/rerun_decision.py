@@ -14,7 +14,6 @@ import logging
 
 # Configure logging
 logging.basicConfig(
-    filename='/debug/schema_trace.log',
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
