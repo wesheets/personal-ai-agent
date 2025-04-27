@@ -1,0 +1,341 @@
+{
+  "timestamp": "2025-04-27T19:48:39.479354",
+  "total_endpoints": 22,
+  "passed_endpoints": 0,
+  "failed_endpoints": 22,
+  "endpoint_health_score": 0.0,
+  "failed_endpoint_details": [
+    {
+      "url": "http://localhost:8000/api/agent/status",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/agent/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be830>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/status",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4beb60>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/health",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bdf30>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/agent/list",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/agent/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bef50>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/agent/run",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/agent/run (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bf250>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/memory/list",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/memory/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4832b0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/memory/get",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/memory/get (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483310>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/goals/list",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/goals/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bf3d0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/memory/create",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/memory/create (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a5085e0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/goals/create",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/goals/create (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a508d90>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/logs/list",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/logs/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a509660>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/control/status",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/control/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be740>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/delegate/task",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/delegate/task (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483790>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/consult",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/consult (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a509930>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/respond",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/respond (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be2f0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/confirm",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/confirm (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a50a680>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/credentials",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/credentials (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483e80>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/checkpoint",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/checkpoint (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a509270>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/status",
+      "method": "GET",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a508be0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/approve",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/approve (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a50ae60>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/delegate",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/delegate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be6e0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/reflect",
+      "method": "POST",
+      "status_code": null,
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/reflect (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483640>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    }
+  ],
+  "validation_results": [
+    {
+      "url": "http://localhost:8000/api/agent/status",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/agent/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be830>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.427340"
+    },
+    {
+      "url": "http://localhost:8000/api/status",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4beb60>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.427981"
+    },
+    {
+      "url": "http://localhost:8000/api/health",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bdf30>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.432587"
+    },
+    {
+      "url": "http://localhost:8000/api/agent/list",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/agent/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bef50>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.433073"
+    },
+    {
+      "url": "http://localhost:8000/api/agent/run",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/agent/run (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bf250>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.434764"
+    },
+    {
+      "url": "http://localhost:8000/api/memory/list",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/memory/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4832b0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.437792"
+    },
+    {
+      "url": "http://localhost:8000/api/memory/get",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/memory/get (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483310>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.443224"
+    },
+    {
+      "url": "http://localhost:8000/api/goals/list",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/goals/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4bf3d0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.444914"
+    },
+    {
+      "url": "http://localhost:8000/api/memory/create",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/memory/create (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a5085e0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.447295"
+    },
+    {
+      "url": "http://localhost:8000/api/goals/create",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/goals/create (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a508d90>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.449685"
+    },
+    {
+      "url": "http://localhost:8000/api/logs/list",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/logs/list (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a509660>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.451422"
+    },
+    {
+      "url": "http://localhost:8000/api/control/status",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/control/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be740>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.456132"
+    },
+    {
+      "url": "http://localhost:8000/api/delegate/task",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/delegate/task (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483790>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.458625"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/consult",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/consult (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a509930>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.461063"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/respond",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/respond (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be2f0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.463134"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/confirm",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/confirm (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a50a680>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.465318"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/credentials",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/credentials (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483e80>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.470913"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/checkpoint",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/checkpoint (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a509270>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.472484"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/status",
+      "method": "GET",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a508be0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.475385"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/approve",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/approve (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a50ae60>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.475635"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/delegate",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/delegate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a4be6e0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.476961"
+    },
+    {
+      "url": "http://localhost:8000/api/orchestrator/reflect",
+      "method": "POST",
+      "status_code": null,
+      "validation_status": "fail",
+      "failure_reason": "Exception: HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/orchestrator/reflect (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f244a483640>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "response_time_ms": 0,
+      "timestamp": "2025-04-27T19:48:39.478187"
+    }
+  ]
+}
