@@ -1,0 +1,2122 @@
+{
+  "startup_validation_date": "2025-04-27",
+  "surface_health_score": 10.1,
+  "agents_health": "0.0%",
+  "modules_health": "0.0%",
+  "schemas_health": "0.4%",
+  "endpoints_health": "100.0%",
+  "components_health": "0.0%",
+  "surface_drift": [
+    {
+      "type": "agent",
+      "path": "Ash",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "Ash",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "CEOAgent",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "Core.Forge",
+      "issue": "Agent file does not exist in /app/agents/"
+    },
+    {
+      "type": "agent",
+      "path": "Critic",
+      "issue": "Agent file does not exist in /app/agents/"
+    },
+    {
+      "type": "agent",
+      "path": "CTO",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "Debugger",
+      "issue": "Agent file does not exist in /app/agents/"
+    },
+    {
+      "type": "agent",
+      "path": "GUARDIAN",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "HAL 9000",
+      "issue": "Agent file does not exist in /app/agents/"
+    },
+    {
+      "type": "agent",
+      "path": "Historian",
+      "issue": "Agent file does not exist in /app/agents/"
+    },
+    {
+      "type": "agent",
+      "path": "MemoryAgent",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "NOVA",
+      "issue": "Agent file does not exist in /app/agents/"
+    },
+    {
+      "type": "agent",
+      "path": "OBSERVER",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "OpsAgent",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "Orchestrator",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "Pessimist",
+      "issue": "Agent file does not exist in /app/agents/"
+    },
+    {
+      "type": "agent",
+      "path": "Sage",
+      "issue": "Agent file does not exist in /app/agents/"
+    },
+    {
+      "type": "agent",
+      "path": "SITEGEN",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "agent",
+      "path": "TRAINER",
+      "issue": "Agent cannot be imported (syntax errors or missing dependencies)"
+    },
+    {
+      "type": "module",
+      "path": "agents/memory_agent.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/agent.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/agent/builder.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/agent/memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/agent/memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/agent/ops.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/agent/planner.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/agent/planner.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/agent/research.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/agent_status.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/control.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/delegate_route.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/delegate_route.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/delegate_stream.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/delegate_stream.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/goals.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/logs.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/memory_viewer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/memory_viewer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/agent.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/agent_context.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/delegate.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/delegate.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/feedback.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/memory_engine.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/observer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/orchestrator.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/plan.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/plan.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/plan_models.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/project.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/project_summary.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/respond.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/respond.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/stream.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/system.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/system.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/modules/user_context.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/orchestrator/chain.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/orchestrator/consult.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/orchestrator/scope.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/orchestrator/start_project.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/orchestrator/status.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/project/start.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/projects/projects.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/respond.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/streaming_route.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/streaming_route.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/system_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "api/task/status.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/agent_coordinator.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/agent_registry.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/agent_registry_enhanced.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/agent_registry_enhanced.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/agent_router.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/boot.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/confidence_retry.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/error_logger.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/escalation_manager.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/forge.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/input_gateway.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/input_router.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/memory_api_quota_guard.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/memory_context_reviewer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/memory_manager.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/nudge_manager.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/orchestrator.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/planner_agent_enhancer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/planner_orchestrator.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/prompt_manager.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/rationale_logger.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/run.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/seeding.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/self_evaluation.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/shared_memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/task_persistence.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/task_state_manager.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/task_tagger.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/tool_router.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "core/vector_memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "db/memory_db.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "fallbacks/fix_hal_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "memory/__init__.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "memory/project_memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/agent_fallback.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/agent_reflect.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/agent_reflection.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/core_beliefs_integration.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/delegate.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/drift_monitor.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/hal_memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/hal_memory_patch.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/historian_drift_report.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/live_memory_inspection.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/logic_loader.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/loop.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/memory_block_writer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/memory_embed.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/memory_recall.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/memory_summarize.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/memory_summarizer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/memory_summarizer_project.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/memory_thread.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/memory_writer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/orchestrator_contract_integration.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/orchestrator_drift_integration.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/orchestrator_memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/orchestrator_memory_enhanced.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/passive_reflection.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/plan/__init__.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/plan/execute_chain.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/plan/scope.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/plan_generate.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/planning_logic_integration.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/recursive_reflection_engine.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/reflect.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/reflection_fatigue_scoring.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/reflection_grader.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/reflection_guardrails.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/reflection_styler.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/register_all_agents.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/summary_realism_scorer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/symbolic_memory_encoder.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "modules/trust_score_evaluator.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/core_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/debugger_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/drift_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/drift_routes_router.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/health_monitor_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/historian_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/memory_api_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/memory_embed_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/memory_recall_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/memory_router.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/memory_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/orchestrator_contract_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/orchestrator_plan_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/plan_generate_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/reflection_router.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/reflection_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/self_routes.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "routes/status_debug.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "schemas/drift_schema.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "schemas/memory.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "schemas/memory_embed_schema.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "schemas/memory_recall_schema.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "schemas/memory_schema.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "schemas/plan_generate_schema.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "system/checklist_engine.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "utils/reflection_analyzer.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "module",
+      "path": "validators/memory_retry_logic_checker.py",
+      "issue": "Module file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ceo_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_config_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_config_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_config_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_config_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_config_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_context_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/agent_context_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_context_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/agent_context_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_context_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_contract_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_trace.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "models/workflow.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "models/workflow.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "models/workflow.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ash_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ash_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ash_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ash_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ash_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/historian_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/self_challenge_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_beliefs_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/self_reinforcement_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/self_revision_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/pessimist_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_trace.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/pessimist_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ceo_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ceo_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ceo_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/cto_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/cto_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/cto_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/cto_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/forge_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_contract_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_contract_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_contract_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/critic_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/critic_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/critic_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/critic_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/critic_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/critic_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/critic_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/critic_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/critic_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/debugger_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/debugger_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/debugger_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/drift_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/drift_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/export_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/export_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/export_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/export_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/export_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_config_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/fix_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/fix_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/fix_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/fix_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/fix_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/fix_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/fix_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/forge_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/forge_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/forge_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/forge_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/guardian_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/guardian_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/guardian_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/guardian_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/guardian_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/historian_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/historian_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/historian_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_context_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_trace.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/debug_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/debug_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/drift_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/debug_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_trace.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_snapshot_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_context_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_trace.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_validation_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_validation_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_validation_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_embed_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_embed_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_embed_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_embed_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_embed_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_recall_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_recall_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_recall_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_recall_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_context_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/trainer_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/nova_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/nova_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/nova_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/nova_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/observer_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/observer_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/observer_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/observer_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/output_policy_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/output_policy_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/debugger_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "models/project_state.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/pessimist_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/pessimist_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/pessimist_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/pessimist_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/pessimist_evaluation_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/pessimist_evaluation_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/plan_generate_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/plan_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/plan_generate_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/plan_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/plan_generate_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/plan_generate_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/output_policy_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/output_policy_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/output_policy_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/agent_context_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/project_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/project_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/debug_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_trace.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/rerun_decision.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/respond_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/respond_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/pessimist_evaluation_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ash_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_beliefs_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_beliefs_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sage_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "registries/schema_registry.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "registries/schema_registry.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/self_reflection_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sitegen_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sitegen_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sitegen_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/sitegen_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_snapshot_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_snapshot_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_snapshot_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "models/loop.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/delegate_stream_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/delegate_stream_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/delegate_stream_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/delegate_stream_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/delegate_stream_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/delegate_stream_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/delegate_stream_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/delegate_stream_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/health_monitor_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/agent_context_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/plan_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/ash_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/memory.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/agent_config_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/train_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/train_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/train_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/train_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/train_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/trainer_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/trainer_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/trainer_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/train_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/trainer_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/orchestrator_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/nova_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/user_context_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/user_context_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/user_context_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/user_context_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/plan_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/plan_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "api/modules/plan_models.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/validate_schema_hash.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/validate_schema_hash.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_validation_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/loop_validation_schema.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "models/workflow.py",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "schemas/schemas/hal_agent.schema.json",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "schema",
+      "path": "loop/debug/loop_trace.schema.json",
+      "issue": "Schema file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/MemoryViewer.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/MemoryBrowser.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/MemoryIndexService.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/MemoryUserScoping.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/LoopStatusPanel.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/SystemIntegrityPanel.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/AgentManifestViewer.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/DashboardView.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/MainConsolePanel.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/FileTreePanel.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/OverrideControls.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/AgentChatPanel.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/AgentActivityMap.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/AgentActivityPings.jsx",
+      "issue": "Component file does not exist"
+    },
+    {
+      "type": "component",
+      "path": "src/components/AgentDebugFeedback.jsx",
+      "issue": "Component file does not exist"
+    }
+  ],
+  "memory_tag": "startup_surface_drift_detected_20250427",
+  "agents_count": 19,
+  "modules_count": 155,
+  "schemas_count": 233,
+  "endpoints_count": 0,
+  "components_count": 15
+}
