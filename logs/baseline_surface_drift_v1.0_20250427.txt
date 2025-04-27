@@ -1,0 +1,38 @@
+## Baseline Surface Drift v1.0 Marker
+Date: April 27, 2025
+Time: 19:18:00 UTC
+
+### Baseline Summary
+This file marks the initial baseline drift state for Promethios cognitive surfaces.
+It establishes the reference point for all future drift comparisons and trend analysis.
+
+### Baseline Metrics
+- timestamp: 2025-04-27T19:18:00Z
+- surface_health_score: 10.1%
+- drift_issues_detected: 421
+
+### Baseline Note
+Baseline Drift Acceptance — Surface Health 10.1%
+
+This baseline represents the initial state of Promethios cognitive surfaces after
+the completion of Phase 2.1 (Startup Surface Validation) and Phase 2.2 (Post-Merge
+Surface Validation). The current drift issues have been accepted as the baseline
+for future comparison, with the understanding that they will be addressed in
+future healing phases.
+
+### Drift Categories
+- Agent import errors
+- Missing agent files
+- Module import issues
+- Schema validation failures
+- Component reference issues
+
+### Governance Statement
+This baseline drift marker is established under Operator governance. No automatic
+repairs are performed at this stage. All future drift measurements will be compared
+against this baseline to track system health trends over time.
+
+### Next Steps
+Phase 2.3 (Drift Reporting Hardening) will implement comprehensive drift tracking
+and reporting mechanisms to monitor system health over time, preparing for future
+healing phases while maintaining operator sovereignty.

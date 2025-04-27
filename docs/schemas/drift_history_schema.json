@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Drift History Entry Schema",
+  "description": "Schema for entries in the drift history JSONL file",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "surface_health_score",
+    "drift_issues_detected",
+    "validation_source",
+    "validation_summary"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the validation was performed"
+    },
+    "surface_health_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Overall health score as a percentage (0-100)"
+    },
+    "drift_issues_detected": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of drift issues detected during validation"
+    },
+    "validation_source": {
+      "type": "string",
+      "enum": ["startup", "post-merge"],
+      "description": "Source of the validation (startup or post-merge)"
+    },
+    "validation_summary": {
+      "type": "string",
+      "description": "Brief summary of the validation results"
+    },
+    "agent_health_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Health score for agents as a percentage (0-100)"
+    },
+    "module_health_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Health score for modules as a percentage (0-100)"
+    },
+    "schema_health_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Health score for schemas as a percentage (0-100)"
+    },
+    "endpoint_health_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Health score for endpoints as a percentage (0-100)"
+    },
+    "component_health_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Health score for components as a percentage (0-100)"
+    },
+    "memory_tag": {
+      "type": "string",
+      "description": "Memory tag created for this validation run"
+    },
+    "drift_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Categories of drift issues detected"
+    }
+  },
+  "additionalProperties": false
+}
