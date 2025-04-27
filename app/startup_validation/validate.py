@@ -23,6 +23,10 @@ from app.startup_validation.utils.surface_loader import load_cognitive_surfaces
 from app.startup_validation.utils.health_scorer import calculate_overall_health_score, format_health_percentage
 from app.startup_validation.utils.drift_reporter import generate_drift_report, save_drift_report
 from app.startup_validation.utils.memory_tagger import create_memory_tag, update_system_status, save_memory_tag_file
+feature/phase-2-3-drift-reporting
+from app.utils.drift_trend_logger import log_drift_event
+
+main
 
 from app.startup_validation.validators.agent_validator import validate_agents
 from app.startup_validation.validators.module_validator import validate_modules
@@ -174,6 +178,19 @@ def main():
         # Update system status
         update_system_status(memory_tag, report)
         
+feature/phase-2-3-drift-reporting
+        # Log drift event to drift history
+        drift_event = {
+            "surface_health_score": report["surface_health_score"],
+            "drift_issues_detected": len(report.get("surface_drift", [])),
+            "validation_source": "startup",
+            "validation_summary": f"Startup validation - {'Drift detected' if drift_detected else 'No drift detected'}"
+        }
+        drift_history_file = log_drift_event(drift_event)
+        logger.info(f"Drift event logged to {drift_history_file}")
+        
+
+main
         # Log completion
         if drift_detected:
             logger.warning(f"Surface drift detected. Report saved to {report_path}")
@@ -182,6 +199,10 @@ def main():
             print(f"⚠️  Report saved to {report_path}")
             print(f"⚠️  Memory tag: {memory_tag}")
             print(f"⚠️  {len(report['surface_drift'])} drift issues found")
+feature/phase-2-3-drift-reporting
+            print(f"⚠️  Drift history updated: {drift_history_file}")
+
+main
             print("\nTop 5 drift issues:")
             for i, issue in enumerate(report['surface_drift'][:5]):
                 print(f"  {i+1}. {issue['type'].upper()}: {issue['path']} - {issue['issue']}")
@@ -192,6 +213,10 @@ def main():
             print(f"\n✅ ALL SURFACES VALIDATED: {report['surface_health_score']:.1f}% health score")
             print(f"✅ Report saved to {report_path}")
             print(f"✅ Memory tag: {memory_tag}")
+feature/phase-2-3-drift-reporting
+            print(f"✅ Drift history updated: {drift_history_file}")
+
+main
             print(f"✅ All cognitive surfaces are healthy")
         
         return 0 if not drift_detected else 1
