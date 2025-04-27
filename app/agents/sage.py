@@ -9,7 +9,11 @@ import logging
 import traceback
 import datetime
 import json
+import time
 from typing import Dict, Any, List, Optional
+
+# Import Agent SDK
+from agent_sdk.agent_sdk import Agent, validate_schema
 
 # Configure logging
 logger = logging.getLogger("agents.sage")
@@ -27,16 +31,59 @@ except ImportError:
         logger.info(f"Mock memory write: {agent_id}, {memory_type}, {tag}, {len(str(value))} chars")
         return {"status": "success", "message": "Mock memory write successful"}
 
-class SageAgent:
+class SageAgent(Agent):
     """
     SageAgent analyzes CRITIC-approved loops, logs belief/emotion scores,
     and generates structured belief maps.
     """
     def __init__(self, tools: List[str] = None):
+        # Define agent properties
+        name = "Sage"
+        role = "Belief Analyzer"
+        tools_list = tools or ["reflect", "summarize", "score_belief"]
+        permissions = ["read_memory", "write_memory", "analyze_content"]
+        description = "Analyzes CRITIC-approved loops, logs belief/emotion scores, and generates structured belief maps for cognitive understanding."
+        tone_profile = {
+            "analytical": "high",
+            "philosophical": "high",
+            "reflective": "high",
+            "insightful": "medium",
+            "balanced": "medium"
+        }
+        
+        # Define schema paths
+        input_schema_path = "app/schemas/sage/input_schema.json"
+        output_schema_path = "app/schemas/sage/output_schema.json"
+        
+        # Initialize the Agent base class
+        super().__init__(
+            name=name,
+            role=role,
+            tools=tools_list,
+            permissions=permissions,
+            description=description,
+            tone_profile=tone_profile,
+            schema_path=output_schema_path,
+            version="1.0.0",
+            status="active",
+            trust_score=0.88,
+            contract_version="1.0.0"
+        )
+        
         self.agent_id = "sage"
-        self.name = "Sage"
-        self.description = "Analyzes CRITIC-approved loops, logs belief/emotion scores"
-        self.tools = tools or ["reflect", "summarize", "score_belief"]
+        self.input_schema_path = input_schema_path
+    
+    def validate_input(self, data: Dict[str, Any]) -> bool:
+        """
+        Validate input data against the input schema.
+        
+        Args:
+            data: Input data to validate
+            
+        Returns:
+            True if validation succeeds, False otherwise
+        """
+        return validate_schema(data, self.input_schema_path)
     
     async def reflect(self, loop_id: str, summary_text: str) -> Dict[str, Any]:
         """
@@ -114,6 +161,10 @@ class SageAgent:
                 "loop_id": loop_id
             }
             
+            # Validate output
+            if not self.validate_schema(result):
+                logger.warning(f"Output validation failed for reflect result")
+            
             # Log to memory if available
             if memory_available:
                 memory_tag = f"sage_summary_{loop_id}"
@@ -135,11 +186,18 @@ class SageAgent:
             logger.error(traceback.format_exc())
             
             # Return error response
-            return {
+            error_result = {
                 "status": "error",
                 "message": error_msg,
-                "loop_id": loop_id
+                "loop_id": loop_id,
+                "timestamp": datetime.datetime.utcnow().isoformat()
             }
+            
+            # Validate output
+            if not self.validate_schema(error_result):
+                logger.warning(f"Output validation failed for reflect error result")
+            
+            return error_result
     
     async def summarize(self, loop_id: str, content: str) -> Dict[str, Any]:
         """
@@ -177,6 +235,10 @@ class SageAgent:
                 "loop_id": loop_id
             }
             
+            # Validate output
+            if not self.validate_schema(result):
+                logger.warning(f"Output validation failed for summarize result")
+            
             # Log to memory if available
             if memory_available:
                 memory_tag = f"sage_summary_{loop_id}"
@@ -196,11 +258,18 @@ class SageAgent:
             logger.error(traceback.format_exc())
             
             # Return error response
-            return {
+            error_result = {
                 "status": "error",
                 "message": error_msg,
-                "loop_id": loop_id
+                "loop_id": loop_id,
+                "timestamp": datetime.datetime.utcnow().isoformat()
             }
+            
+            # Validate output
+            if not self.validate_schema(error_result):
+                logger.warning(f"Output validation failed for summarize error result")
+            
+            return error_result
     
     async def score_belief(self, loop_id: str, belief: str) -> Dict[str, Any]:
         """
@@ -248,6 +317,10 @@ class SageAgent:
                 "loop_id": loop_id
             }
             
+            # Validate output
+            if not self.validate_schema(result):
+                logger.warning(f"Output validation failed for score_belief result")
+            
             # Log to memory if available
             if memory_available:
                 memory_tag = f"sage_belief_{loop_id}_{hash(belief) % 10000}"
@@ -267,11 +340,18 @@ class SageAgent:
             logger.error(traceback.format_exc())
             
             # Return error response
-            return {
+            error_result = {
                 "status": "error",
                 "message": error_msg,
-                "loop_id": loop_id
+                "loop_id": loop_id,
+                "timestamp": datetime.datetime.utcnow().isoformat()
             }
+            
+            # Validate output
+            if not self.validate_schema(error_result):
+                logger.warning(f"Output validation failed for score_belief error result")
+            
+            return error_result
     
     def _generate_reflection(self, beliefs: List[Dict[str, Any]]) -> str:
         """
@@ -321,147 +401,126 @@ class SageAgent:
         reflection = " ".join(reflection_parts)
         
         return reflection
+    
+    async def execute(self, task: str, project_id: str = None, tools: List[str] = None, **kwargs) -> Dict[str, Any]:
+        """
+        Execute the agent's main functionality.
+        
+        Args:
+            task: The task to execute
+            project_id: The project identifier (optional)
+            tools: List of tools to use (optional)
+            **kwargs: Additional arguments
+            
+        Returns:
+            Dict containing the result of the execution
+        """
+        try:
+            logger.info(f"SageAgent.execute called with task: {task}, project_id: {project_id}")
+            
+            # Prepare input data for validation
+            input_data = {
+                "task": task,
+                "project_id": project_id
+            }
+            
+            # Add any additional kwargs to input data
+            input_data.update(kwargs)
+            
+            # Validate input
+            if not self.validate_input(input_data):
+                logger.warning(f"Input validation failed for task: {task}")
+            
+            # Parse task to determine action
+            if task.startswith("reflect:"):
+                # Extract loop_id and summary_text from task
+                parts = task.split(":", 1)[1].strip().split("|")
+                if len(parts) < 2:
+                    raise ValueError("Invalid reflect task format. Expected 'reflect:loop_id|summary_text'")
+                
+                loop_id = parts[0].strip()
+                summary_text = parts[1].strip()
+                
+                # Call reflect method
+                return await self.reflect(loop_id, summary_text)
+                
+            elif task.startswith("summarize:"):
+                # Extract loop_id and content from task
+                parts = task.split(":", 1)[1].strip().split("|")
+                if len(parts) < 2:
+                    raise ValueError("Invalid summarize task format. Expected 'summarize:loop_id|content'")
+                
+                loop_id = parts[0].strip()
+                content = parts[1].strip()
+                
+                # Call summarize method
+                return await self.summarize(loop_id, content)
+                
+            elif task.startswith("score_belief:"):
+                # Extract loop_id and belief from task
+                parts = task.split(":", 1)[1].strip().split("|")
+                if len(parts) < 2:
+                    raise ValueError("Invalid score_belief task format. Expected 'score_belief:loop_id|belief'")
+                
+                loop_id = parts[0].strip()
+                belief = parts[1].strip()
+                
+                # Call score_belief method
+                return await self.score_belief(loop_id, belief)
+                
+            else:
+                # Default to mock reflection for testing
+                logger.warning(f"Unknown task format: {task}. Using mock reflection.")
+                
+                # Create mock summary text
+                mock_summary = f"This is a mock summary for project {project_id or 'unknown'}. It contains some positive aspects like improved user experience and efficient code structure. However, there are also some concerns about scalability and performance under heavy load."
+                
+                # Call reflect method with mock data
+                return await self.reflect(f"mock-{project_id or 'unknown'}", mock_summary)
+                
+        except Exception as e:
+            error_msg = f"Error in SageAgent.execute: {str(e)}"
+            logger.error(error_msg)
+            logger.error(traceback.format_exc())
+            
+            # Return error response
+            error_result = {
+                "status": "error",
+                "message": error_msg,
+                "loop_id": kwargs.get("loop_id", f"error-{time.time()}"),
+                "timestamp": datetime.datetime.utcnow().isoformat()
+            }
+            
+            # Validate output
+            if not self.validate_schema(error_result):
+                logger.warning(f"Output validation failed for execute error result")
+            
+            return error_result
+
+# Create an instance of the agent
+sage_agent = SageAgent()
 
 # Main function to run the sage agent
-async def run_sage_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[str, Any]:
+async def run_sage_agent(task: str, project_id: str = None, tools: List[str] = None) -> Dict[str, Any]:
     """
     Run the SAGE agent with the given task, project_id, and tools.
     
+    This function provides backward compatibility with the legacy implementation
+    while using the new Agent SDK pattern.
+    
     Args:
         task: The task to execute
-        project_id: The project identifier
+        project_id: The project identifier (optional)
         tools: List of tools to use (optional)
         
     Returns:
         Dict containing the result of the execution
     """
-    try:
-        logger.info(f"Running SAGE agent with task: {task}, project_id: {project_id}")
-        
-        # Initialize tools if None
-        if tools is None:
-            tools = ["reflect", "summarize", "score_belief"]
-        
-        # Create sage agent instance
-        sage = SageAgent(tools)
-        
-        # Parse task to determine action
-        if task.startswith("reflect:"):
-            # Extract loop_id and summary_text from task
-            parts = task.split(":", 1)[1].strip().split("|")
-            if len(parts) < 2:
-                raise ValueError("Invalid reflect task format. Expected 'reflect:loop_id|summary_text'")
-            
-            loop_id = parts[0].strip()
-            summary_text = parts[1].strip()
-            
-            # Call reflect method
-            return await sage.reflect(loop_id, summary_text)
-            
-        elif task.startswith("summarize:"):
-            # Extract loop_id and content from task
-            parts = task.split(":", 1)[1].strip().split("|")
-            if len(parts) < 2:
-                raise ValueError("Invalid summarize task format. Expected 'summarize:loop_id|content'")
-            
-            loop_id = parts[0].strip()
-            content = parts[1].strip()
-            
-            # Call summarize method
-            return await sage.summarize(loop_id, content)
-            
-        elif task.startswith("score_belief:"):
-            # Extract loop_id and belief from task
-            parts = task.split(":", 1)[1].strip().split("|")
-            if len(parts) < 2:
-                raise ValueError("Invalid score_belief task format. Expected 'score_belief:loop_id|belief'")
-            
-            loop_id = parts[0].strip()
-            belief = parts[1].strip()
-            
-            # Call score_belief method
-            return await sage.score_belief(loop_id, belief)
-            
-        else:
-            # Default to mock reflection for testing
-            logger.warning(f"Unknown task format: {task}. Using mock reflection.")
-            
-            # Create mock summary text
-            mock_summary = f"This is a mock summary for project {project_id}. It contains some positive aspects like improved user experience and efficient code structure. However, there are also some concerns about scalability and performance under heavy load."
-            
-            # Call reflect method with mock data
-            return await sage.reflect(f"mock-{project_id}", mock_summary)
-            
-    except Exception as e:
-        error_msg = f"Error running SAGE agent: {str(e)}"
-        logger.error(error_msg)
-        logger.error(traceback.format_exc())
-        
-        # Return error response
-        return {
-            "status": "error",
-            "message": error_msg,
-            "task": task,
-            "tools": tools if tools else [],
-            "project_id": project_id
-        }
+    # Execute the agent
+    return await sage_agent.execute(
+        task=task,
+        project_id=project_id,
+        tools=tools
+    )
 
-# Test function for isolated testing
-async def test_sage_agent():
-    """
-    Test the SAGE agent in isolation.
-    
-    Returns:
-        Dict containing test results
-    """
-    print("\n=== Testing SAGE Agent in isolation ===\n")
-    
-    try:
-        # Create test data
-        loop_id = "test-loop-123"
-        summary_text = "This project implements a collaborative document editing platform. The user interface is clean and intuitive, making it easy for new users to get started. The backend architecture uses microservices for scalability, but there are concerns about the complexity of deployment and maintenance. Overall, the project shows promise but needs more work on documentation and testing."
-        
-        # Run the agent with reflect task
-        task = f"reflect:{loop_id}|{summary_text}"
-        result = await run_sage_agent(task, "test-project")
-        
-        # Print the result
-        print(f"\nReflect Result:")
-        print(f"Status: {result.get('status', 'unknown')}")
-        print(f"Reflection: {result.get('reflection_text', 'No reflection')}")
-        print(f"Beliefs: {len(result.get('belief_scores', []))} extracted")
-        
-        # Test summarization
-        content = "This is a lengthy document that contains multiple paragraphs of information about the project. It discusses various aspects including architecture, user interface, performance considerations, and future plans. The document is quite detailed and would benefit from summarization to extract the key points quickly."
-        task = f"summarize:{loop_id}|{content}"
-        summarize_result = await run_sage_agent(task, "test-project")
-        
-        print(f"\nSummarize Result:")
-        print(f"Status: {summarize_result.get('status', 'unknown')}")
-        print(f"Summary: {summarize_result.get('summary', 'No summary')}")
-        
-        # Test belief scoring
-        belief = "The microservice architecture provides good scalability but increases operational complexity"
-        task = f"score_belief:{loop_id}|{belief}"
-        score_result = await run_sage_agent(task, "test-project")
-        
-        print(f"\nScore Belief Result:")
-        print(f"Status: {score_result.get('status', 'unknown')}")
-        print(f"Confidence: {score_result.get('confidence', 'unknown')}")
-        print(f"Emotional Weight: {score_result.get('emotional_weight', 'unknown')}")
-        
-        return {
-            "reflect_result": result,
-            "summarize_result": summarize_result,
-            "score_result": score_result
-        }
-        
-    except Exception as e:
-        error_msg = f"Error testing SAGE agent: {str(e)}"
-        print(f"❌ {error_msg}")
-        print(traceback.format_exc())
-        
-        return {
-            "status": "error",
-            "message": error_msg
-        }
+# memory_tag: healed_phase3.3

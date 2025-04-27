@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DebugAnalyzerAgentOutputSchema",
+  "description": "Schema for validating output from the Debug Analyzer Agent",
+  "type": "object",
+  "properties": {
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier for the loop being analyzed"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Unique identifier for the project"
+    },
+    "issues": {
+      "type": "array",
+      "description": "List of identified issues",
+      "items": {
+        "type": "object",
+        "properties": {
+          "issue_type": {
+            "type": "string",
+            "description": "Type of issue identified"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the issue"
+          },
+          "severity": {
+            "type": "string",
+            "description": "Severity level of the issue",
+            "enum": ["low", "medium", "high", "critical"]
+          },
+          "affected_agent": {
+            "type": ["string", "null"],
+            "description": "Agent affected by the issue"
+          },
+          "affected_memory_tags": {
+            "type": "array",
+            "description": "Memory tags affected by the issue",
+            "items": {
+              "type": "string"
+            }
+          },
+          "timestamp": {
+            "type": ["string", "null"],
+            "description": "Timestamp when the issue occurred"
+          }
+        },
+        "required": ["issue_type", "description", "severity", "affected_memory_tags"]
+      }
+    },
+    "agents": {
+      "type": "array",
+      "description": "List of agents involved in the loop execution",
+      "items": {
+        "type": "string"
+      }
+    },
+    "failed_agents": {
+      "type": "array",
+      "description": "List of agents that failed during execution",
+      "items": {
+        "type": "string"
+      }
+    },
+    "memory_tags_checked": {
+      "type": "array",
+      "description": "List of memory tags checked during analysis",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "description": "List of repair suggestions",
+      "items": {
+        "type": "object",
+        "properties": {
+          "suggestion_type": {
+            "type": "string",
+            "description": "Type of repair suggestion"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the suggestion"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Priority of the suggestion (1-5, 1 being highest)"
+          },
+          "target_agent": {
+            "type": ["string", "null"],
+            "description": "Agent targeted by the suggestion"
+          },
+          "required_changes": {
+            "type": "array",
+            "description": "List of required changes",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expected_outcome": {
+            "type": "string",
+            "description": "Expected outcome of applying the suggestion"
+          }
+        },
+        "required": ["suggestion_type", "description", "priority", "required_changes", "expected_outcome"]
+      }
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "Confidence score of the analysis (0.0-1.0)",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "analysis_timestamp": {
+      "type": "string",
+      "description": "Timestamp of the analysis"
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the analysis"
+    },
+    "status": {
+      "type": "string",
+      "description": "Status of the operation",
+      "enum": ["success", "error", "blocked"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Message describing the result of the operation"
+    }
+  },
+  "required": ["loop_id", "project_id", "issues", "agents", "failed_agents", "memory_tags_checked", "recommendations", "confidence_score", "analysis_timestamp", "version"]
+}

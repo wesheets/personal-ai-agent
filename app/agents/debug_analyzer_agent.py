@@ -9,26 +9,117 @@ import os
 import json
 import logging
 import traceback
+import time
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 
-# Import schemas
-from app.schemas.debug_schema import LoopDebugRequest, LoopDebugResult, LoopIssue, RepairSuggestion
-
-# Import memory operations
-from app.modules.memory_writer import write_memory, read_memory
-from app.modules.orchestrator_memory_enhanced import log_loop_event
-
-# Import project state operations
-from app.modules.project_state import read_project_state
-
-# Import snapshot operations
-from app.utils.snapshot_manager import get_loop_snapshot
+# Import Agent SDK
+from agent_sdk.agent_sdk import Agent, validate_schema
 
 # Configure logging
 logger = logging.getLogger("app.agents.debug_analyzer")
 
-class DebugAnalyzerAgent:
+# Import memory operations
+try:
+    from app.modules.memory_writer import write_memory, read_memory
+    MEMORY_WRITER_AVAILABLE = True
+except ImportError:
+    MEMORY_WRITER_AVAILABLE = False
+    logger.warning("⚠️ memory_writer import failed")
+    
+    # Mock implementations for testing
+    async def write_memory(project_id, tag, value):
+        logger.info(f"Mock memory write: {project_id}, {tag}, {len(str(value))} chars")
+        return {"status": "success", "message": "Mock memory write successful"}
+    
+    async def read_memory(project_id, tag):
+        logger.info(f"Mock memory read: {project_id}, {tag}")
+        return {"status": "success", "data": {}}
+
+# Import orchestrator memory operations
+try:
+    from app.modules.orchestrator_memory_enhanced import log_loop_event
+    ORCHESTRATOR_MEMORY_AVAILABLE = True
+except ImportError:
+    ORCHESTRATOR_MEMORY_AVAILABLE = False
+    logger.warning("⚠️ orchestrator_memory_enhanced import failed")
+    
+    # Mock implementation for testing
+    async def log_loop_event(loop_id, project_id, agent, task, result_tag, status, additional_data=None):
+        logger.info(f"Mock log_loop_event: {loop_id}, {project_id}, {agent}, {task}, {result_tag}, {status}")
+        return {"status": "success"}
+
+# Import project state operations
+try:
+    from app.modules.project_state import read_project_state
+    PROJECT_STATE_AVAILABLE = True
+except ImportError:
+    PROJECT_STATE_AVAILABLE = False
+    logger.warning("⚠️ project_state import failed")
+    
+    # Mock implementation for testing
+    def read_project_state(project_id):
+        logger.info(f"Mock read_project_state: {project_id}")
+        return {"loop_count": 0, "agents_involved": ["hal"], "files_created": []}
+
+# Import snapshot operations
+try:
+    from app.utils.snapshot_manager import get_loop_snapshot
+    SNAPSHOT_MANAGER_AVAILABLE = True
+except ImportError:
+    SNAPSHOT_MANAGER_AVAILABLE = False
+    logger.warning("⚠️ snapshot_manager import failed")
+    
+    # Mock implementation for testing
+    async def get_loop_snapshot(loop_id):
+        logger.info(f"Mock get_loop_snapshot: {loop_id}")
+        return None
+
+class LoopIssue:
+    """Class representing an issue identified in a loop execution."""
+    
+    def __init__(self, issue_type, description, severity, affected_agent=None, affected_memory_tags=None, timestamp=None):
+        self.issue_type = issue_type
+        self.description = description
+        self.severity = severity
+        self.affected_agent = affected_agent
+        self.affected_memory_tags = affected_memory_tags or []
+        self.timestamp = timestamp
+    
+    def dict(self):
+        """Convert to dictionary representation."""
+        return {
+            "issue_type": self.issue_type,
+            "description": self.description,
+            "severity": self.severity,
+            "affected_agent": self.affected_agent,
+            "affected_memory_tags": self.affected_memory_tags,
+            "timestamp": self.timestamp
+        }
+
+class RepairSuggestion:
+    """Class representing a repair suggestion for an identified issue."""
+    
+    def __init__(self, suggestion_type, description, priority, target_agent=None, required_changes=None, expected_outcome=None):
+        self.suggestion_type = suggestion_type
+        self.description = description
+        self.priority = priority
+        self.target_agent = target_agent
+        self.required_changes = required_changes or []
+        self.expected_outcome = expected_outcome or ""
+    
+    def dict(self):
+        """Convert to dictionary representation."""
+        return {
+            "suggestion_type": self.suggestion_type,
+            "description": self.description,
+            "priority": self.priority,
+            "target_agent": self.target_agent,
+            "required_changes": self.required_changes,
+            "expected_outcome": self.expected_outcome
+        }
+
+class DebugAnalyzerAgent(Agent):
     """
     Debug Analyzer Agent implementation.
     
@@ -36,53 +127,115 @@ class DebugAnalyzerAgent:
     identifying issues, and suggesting repairs.
     """
     
-    def __init__(self):
-        """Initialize the Debug Analyzer Agent with required configuration."""
-        self.name = "debug-analyzer-agent"
-        self.role = "Loop Diagnostic Tool"
-        self.tools = ["analyze_memory", "diagnose_loop", "recommend_fix"]
-        self.permissions = ["read_memory", "write_memory"]
-        self.description = "Diagnostic agent for analyzing failed or incomplete loop executions"
-        self.version = "1.0.0"
-        self.status = "active"
-        self.tone_profile = {
-            "style": "technical",
-            "emotion": "neutral",
-            "vibe": "analytical",
-            "persona": "Precise diagnostician with a focus on root cause analysis"
+    def __init__(self, tools: List[str] = None):
+        """Initialize the Debug Analyzer Agent with SDK compliance."""
+        # Define agent properties
+        name = "Debug Analyzer"
+        role = "Loop Diagnostic Tool"
+        tools_list = tools or ["analyze_memory", "diagnose_loop", "recommend_fix"]
+        permissions = ["read_memory", "write_memory", "read_logs"]
+        description = "Diagnostic agent for analyzing failed or incomplete loop executions, identifying issues, and suggesting repairs."
+        tone_profile = {
+            "analytical": "high",
+            "technical": "high",
+            "precise": "high",
+            "neutral": "medium",
+            "helpful": "medium"
         }
-        self.schema_path = "schemas/debug_schema.py"
-        self.trust_score = 0.90
-        self.contract_version = "1.0.0"
+        
+        # Define schema paths
+        input_schema_path = "app/schemas/debug_analyzer/input_schema.json"
+        output_schema_path = "app/schemas/debug_analyzer/output_schema.json"
+        
+        # Initialize the Agent base class
+        super().__init__(
+            name=name,
+            role=role,
+            tools=tools_list,
+            permissions=permissions,
+            description=description,
+            tone_profile=tone_profile,
+            schema_path=output_schema_path,
+            version="1.0.0",
+            status="active",
+            trust_score=0.90,
+            contract_version="1.0.0"
+        )
+        
+        self.input_schema_path = input_schema_path
     
-    async def analyze_loop(self, 
-                request: LoopDebugRequest) -> LoopDebugResult:
+    def validate_input(self, data: Dict[str, Any]) -> bool:
         """
-        Analyze a failed or incomplete loop execution.
+        Validate input data against the input schema.
         
         Args:
-            request: The debug request containing loop_id, project_id, and optional filters
+            data: Input data to validate
             
         Returns:
-            LoopDebugResult containing the diagnosis of the loop execution
+            True if validation succeeds, False otherwise
+        """
+        return validate_schema(data, self.input_schema_path)
+    
+    async def execute(self, loop_id: str, project_id: str, version: str = "1.0.0", 
+                     agent_filter: List[str] = None, raw_log_text: str = None, 
+                     task: str = None, **kwargs) -> Dict[str, Any]:
+        """
+        Execute the agent's main functionality.
+        
+        Args:
+            loop_id: Unique identifier for the loop being analyzed
+            project_id: Unique identifier for the project
+            version: Version of the analysis request (optional)
+            agent_filter: Optional list of agents to filter analysis by
+            raw_log_text: Optional raw log text to analyze
+            task: Task to be performed by the Debug Analyzer agent (optional)
+            **kwargs: Additional arguments
+            
+        Returns:
+            Dict containing the result of the execution
         """
         try:
-            logger.info(f"Running Debug Analyzer agent for loop: {request.loop_id}, project: {request.project_id}")
-            print(f"🔍 Debug Analyzer analyzing loop '{request.loop_id}' for project '{request.project_id}'")
+            logger.info(f"DebugAnalyzerAgent.execute called with loop_id: {loop_id}, project_id: {project_id}")
+            
+            # Prepare input data for validation
+            input_data = {
+                "loop_id": loop_id,
+                "project_id": project_id,
+                "version": version
+            }
+            
+            if agent_filter:
+                input_data["agent_filter"] = agent_filter
+            
+            if raw_log_text:
+                input_data["raw_log_text"] = raw_log_text
+            
+            if task:
+                input_data["task"] = task
+            
+            # Add any additional kwargs to input data
+            input_data.update(kwargs)
+            
+            # Validate input
+            if not self.validate_input(input_data):
+                logger.warning(f"Input validation failed for loop_id: {loop_id}")
             
             # Log the start of the analysis
-            await log_loop_event(
-                loop_id=request.loop_id,
-                project_id=request.project_id,
-                agent="debug_analyzer",
-                task="analyze_loop_execution",
-                result_tag=f"loop_diagnosis_{request.loop_id}_v{request.version}",
-                status="in_progress",
-                additional_data={"version": request.version}
-            )
+            if ORCHESTRATOR_MEMORY_AVAILABLE:
+                await log_loop_event(
+                    loop_id=loop_id,
+                    project_id=project_id,
+                    agent="debug_analyzer",
+                    task="analyze_loop_execution",
+                    result_tag=f"loop_diagnosis_{loop_id}_v{version}",
+                    status="in_progress",
+                    additional_data={"version": version}
+                )
             
             # Read project state
-            project_state = read_project_state(request.project_id)
+            project_state = {}
+            if PROJECT_STATE_AVAILABLE:
+                project_state = read_project_state(project_id)
             
             # Initialize analysis variables
             issues = []
@@ -92,106 +245,108 @@ class DebugAnalyzerAgent:
             
             # Get loop snapshot if available
             loop_snapshot = None
-            try:
-                loop_snapshot = await get_loop_snapshot(request.loop_id)
-                if loop_snapshot:
-                    memory_tags_checked.append(f"loop_snapshot_{request.loop_id}")
-                    # Extract agents involved from snapshot
-                    if "agents_involved" in loop_snapshot:
-                        agents_involved.extend(loop_snapshot["agents_involved"])
-                    # Check for failed steps in snapshot
-                    if "steps" in loop_snapshot:
-                        for step in loop_snapshot["steps"]:
-                            if step.get("status") == "failed":
-                                agent = step.get("agent")
-                                if agent and agent not in failed_agents:
-                                    failed_agents.append(agent)
-                                issues.append(LoopIssue(
-                                    issue_type="step_failure",
-                                    description=f"Step '{step.get('name', 'unknown')}' failed during execution",
-                                    severity="high",
-                                    affected_agent=agent,
-                                    affected_memory_tags=[],
-                                    timestamp=step.get("timestamp")
-                                ))
-            except Exception as e:
-                logger.warning(f"⚠️ Could not get loop snapshot: {str(e)}")
-                issues.append(LoopIssue(
-                    issue_type="missing_snapshot",
-                    description=f"Could not retrieve loop snapshot: {str(e)}",
-                    severity="medium",
-                    affected_agent=None,
-                    affected_memory_tags=[f"loop_snapshot_{request.loop_id}"]
-                ))
+            if SNAPSHOT_MANAGER_AVAILABLE:
+                try:
+                    loop_snapshot = await get_loop_snapshot(loop_id)
+                    if loop_snapshot:
+                        memory_tags_checked.append(f"loop_snapshot_{loop_id}")
+                        # Extract agents involved from snapshot
+                        if "agents_involved" in loop_snapshot:
+                            agents_involved.extend(loop_snapshot["agents_involved"])
+                        # Check for failed steps in snapshot
+                        if "steps" in loop_snapshot:
+                            for step in loop_snapshot["steps"]:
+                                if step.get("status") == "failed":
+                                    agent = step.get("agent")
+                                    if agent and agent not in failed_agents:
+                                        failed_agents.append(agent)
+                                    issues.append(LoopIssue(
+                                        issue_type="step_failure",
+                                        description=f"Step '{step.get('name', 'unknown')}' failed during execution",
+                                        severity="high",
+                                        affected_agent=agent,
+                                        affected_memory_tags=[],
+                                        timestamp=step.get("timestamp")
+                                    ))
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not get loop snapshot: {str(e)}")
+                    issues.append(LoopIssue(
+                        issue_type="missing_snapshot",
+                        description=f"Could not retrieve loop snapshot: {str(e)}",
+                        severity="medium",
+                        affected_agent=None,
+                        affected_memory_tags=[f"loop_snapshot_{loop_id}"]
+                    ))
             
             # Check memory tags for specific agents
             memory_tags_to_check = [
-                f"forge_build_log_{request.loop_id}",
-                f"critic_review_{request.loop_id}",
-                f"pessimist_reject_log_{request.loop_id}",
-                f"sage_summary_{request.loop_id}"
+                f"forge_build_log_{loop_id}",
+                f"critic_review_{loop_id}",
+                f"pessimist_reject_log_{loop_id}",
+                f"sage_summary_{loop_id}"
             ]
             
             # Filter memory tags if agent_filter is provided
-            if request.agent_filter:
+            if agent_filter:
                 filtered_tags = []
                 for tag in memory_tags_to_check:
-                    for agent in request.agent_filter:
+                    for agent in agent_filter:
                         if agent.lower() in tag.lower():
                             filtered_tags.append(tag)
                             break
                 memory_tags_to_check = filtered_tags
             
             # Check each memory tag
-            for tag in memory_tags_to_check:
-                try:
-                    memory_data = await read_memory(
-                        project_id=request.project_id,
-                        tag=tag
-                    )
-                    memory_tags_checked.append(tag)
-                    
-                    # Extract agent from tag
-                    agent = None
-                    if "forge" in tag:
-                        agent = "forge"
-                    elif "critic" in tag:
-                        agent = "critic"
-                    elif "pessimist" in tag:
-                        agent = "pessimist"
-                    elif "sage" in tag:
-                        agent = "sage"
-                    
-                    if agent and agent not in agents_involved:
-                        agents_involved.append(agent)
-                    
-                    # Check for errors or failures in memory data
-                    if isinstance(memory_data, dict):
-                        if memory_data.get("status") == "failed" or memory_data.get("error"):
-                            if agent and agent not in failed_agents:
-                                failed_agents.append(agent)
-                            issues.append(LoopIssue(
-                                issue_type="agent_failure",
-                                description=f"{agent.upper() if agent else 'Unknown agent'} failed: {memory_data.get('error', 'Unknown error')}",
-                                severity="high",
-                                affected_agent=agent,
-                                affected_memory_tags=[tag],
-                                timestamp=memory_data.get("timestamp")
-                            ))
-                except Exception as e:
-                    logger.warning(f"⚠️ Could not read memory tag {tag}: {str(e)}")
-                    issues.append(LoopIssue(
-                        issue_type="missing_memory",
-                        description=f"Memory tag {tag} is missing or inaccessible",
-                        severity="medium",
-                        affected_agent=None,
-                        affected_memory_tags=[tag]
-                    ))
+            if MEMORY_WRITER_AVAILABLE:
+                for tag in memory_tags_to_check:
+                    try:
+                        memory_data = await read_memory(
+                            project_id=project_id,
+                            tag=tag
+                        )
+                        memory_tags_checked.append(tag)
+                        
+                        # Extract agent from tag
+                        agent = None
+                        if "forge" in tag:
+                            agent = "forge"
+                        elif "critic" in tag:
+                            agent = "critic"
+                        elif "pessimist" in tag:
+                            agent = "pessimist"
+                        elif "sage" in tag:
+                            agent = "sage"
+                        
+                        if agent and agent not in agents_involved:
+                            agents_involved.append(agent)
+                        
+                        # Check for errors or failures in memory data
+                        if isinstance(memory_data, dict):
+                            if memory_data.get("status") == "failed" or memory_data.get("error"):
+                                if agent and agent not in failed_agents:
+                                    failed_agents.append(agent)
+                                issues.append(LoopIssue(
+                                    issue_type="agent_failure",
+                                    description=f"{agent.upper() if agent else 'Unknown agent'} failed: {memory_data.get('error', 'Unknown error')}",
+                                    severity="high",
+                                    affected_agent=agent,
+                                    affected_memory_tags=[tag],
+                                    timestamp=memory_data.get("timestamp")
+                                ))
+                    except Exception as e:
+                        logger.warning(f"⚠️ Could not read memory tag {tag}: {str(e)}")
+                        issues.append(LoopIssue(
+                            issue_type="missing_memory",
+                            description=f"Memory tag {tag} is missing or inaccessible",
+                            severity="medium",
+                            affected_agent=None,
+                            affected_memory_tags=[tag]
+                        ))
             
             # Process raw log text if provided
-            if request.raw_log_text:
+            if raw_log_text:
                 # Simple analysis of raw log text
-                log_lines = request.raw_log_text.split("\n")
+                log_lines = raw_log_text.split("\n")
                 for line in log_lines:
                     if "error" in line.lower() or "exception" in line.lower() or "failed" in line.lower():
                         # Extract agent name if present
@@ -225,95 +380,111 @@ class DebugAnalyzerAgent:
             )
             
             # Create debug result
-            debug_result = LoopDebugResult(
-                loop_id=request.loop_id,
-                project_id=request.project_id,
-                issues=issues,
-                agents=agents_involved,
-                failed_agents=failed_agents,
-                memory_tags_checked=memory_tags_checked,
-                recommendations=recommendations,
-                confidence_score=confidence_score,
-                analysis_timestamp=datetime.utcnow().isoformat(),
-                version=request.version
-            )
+            debug_result = {
+                "loop_id": loop_id,
+                "project_id": project_id,
+                "issues": [issue.dict() for issue in issues],
+                "agents": agents_involved,
+                "failed_agents": failed_agents,
+                "memory_tags_checked": memory_tags_checked,
+                "recommendations": [rec.dict() for rec in recommendations],
+                "confidence_score": confidence_score,
+                "analysis_timestamp": datetime.utcnow().isoformat(),
+                "version": version,
+                "status": "success",
+                "message": f"Analysis completed with {len(issues)} issues identified"
+            }
+            
+            # Validate output
+            if not self.validate_schema(debug_result):
+                logger.warning(f"Output validation failed for debug result")
             
             # Log the debug result
-            await write_memory(
-                project_id=request.project_id,
-                tag=f"loop_diagnosis_{request.loop_id}_v{request.version}",
-                value=debug_result.dict()
-            )
+            if MEMORY_WRITER_AVAILABLE:
+                await write_memory(
+                    project_id=project_id,
+                    tag=f"loop_diagnosis_{loop_id}_v{version}",
+                    value=debug_result
+                )
             
             # Log the completion of the analysis
-            await log_loop_event(
-                loop_id=request.loop_id,
-                project_id=request.project_id,
-                agent="debug_analyzer",
-                task="analyze_loop_execution",
-                result_tag=f"loop_diagnosis_{request.loop_id}_v{request.version}",
-                status="completed",
-                additional_data={
-                    "version": request.version,
-                    "issues_count": len(issues),
-                    "failed_agents": failed_agents,
-                    "confidence_score": confidence_score
-                }
-            )
+            if ORCHESTRATOR_MEMORY_AVAILABLE:
+                await log_loop_event(
+                    loop_id=loop_id,
+                    project_id=project_id,
+                    agent="debug_analyzer",
+                    task="analyze_loop_execution",
+                    result_tag=f"loop_diagnosis_{loop_id}_v{version}",
+                    status="completed",
+                    additional_data={
+                        "version": version,
+                        "issues_count": len(issues),
+                        "failed_agents": failed_agents,
+                        "confidence_score": confidence_score
+                    }
+                )
             
             logger.info(f"✅ Debug Analyzer completed analysis with confidence score {confidence_score}")
             return debug_result
             
         except Exception as e:
-            error_msg = f"Error running Debug Analyzer agent: {str(e)}"
+            error_msg = f"Error in DebugAnalyzerAgent.execute: {str(e)}"
             logger.error(error_msg)
             logger.error(traceback.format_exc())
-            print(f"❌ {error_msg}")
             
             # Try to log the error
-            try:
-                await log_loop_event(
-                    loop_id=request.loop_id,
-                    project_id=request.project_id,
-                    agent="debug_analyzer",
-                    task="analyze_loop_execution",
-                    result_tag=f"loop_diagnosis_{request.loop_id}_v{request.version}",
-                    status="failed",
-                    additional_data={"error": error_msg}
-                )
-            except Exception as log_error:
-                logger.error(f"❌ Error logging failure: {str(log_error)}")
+            if ORCHESTRATOR_MEMORY_AVAILABLE:
+                try:
+                    await log_loop_event(
+                        loop_id=loop_id,
+                        project_id=project_id,
+                        agent="debug_analyzer",
+                        task="analyze_loop_execution",
+                        result_tag=f"loop_diagnosis_{loop_id}_v{version}",
+                        status="failed",
+                        additional_data={"error": error_msg}
+                    )
+                except Exception as log_error:
+                    logger.error(f"❌ Error logging failure: {str(log_error)}")
             
             # Return error response that will pass schema validation
-            return LoopDebugResult(
-                loop_id=request.loop_id,
-                project_id=request.project_id,
-                issues=[
-                    LoopIssue(
-                        issue_type="analyzer_failure",
-                        description=f"Debug Analyzer failed: {error_msg}",
-                        severity="critical",
-                        affected_agent="debug_analyzer",
-                        affected_memory_tags=[]
-                    )
+            error_result = {
+                "loop_id": loop_id,
+                "project_id": project_id,
+                "issues": [
+                    {
+                        "issue_type": "analyzer_failure",
+                        "description": f"Debug Analyzer failed: {error_msg}",
+                        "severity": "critical",
+                        "affected_agent": "debug_analyzer",
+                        "affected_memory_tags": []
+                    }
                 ],
-                agents=[],
-                failed_agents=["debug_analyzer"],
-                memory_tags_checked=[],
-                recommendations=[
-                    RepairSuggestion(
-                        suggestion_type="retry",
-                        description="Retry Debug Analyzer with more detailed logs",
-                        priority=1,
-                        target_agent="debug_analyzer",
-                        required_changes=["Provide raw_log_text", "Check system logs"],
-                        expected_outcome="Debug Analyzer should complete with more information"
-                    )
+                "agents": [],
+                "failed_agents": ["debug_analyzer"],
+                "memory_tags_checked": [],
+                "recommendations": [
+                    {
+                        "suggestion_type": "retry",
+                        "description": "Retry Debug Analyzer with more detailed logs",
+                        "priority": 1,
+                        "target_agent": "debug_analyzer",
+                        "required_changes": ["Provide raw_log_text", "Check system logs"],
+                        "expected_outcome": "Debug Analyzer should complete with more information"
+                    }
                 ],
-                confidence_score=0.0,
-                analysis_timestamp=datetime.utcnow().isoformat(),
-                version=request.version
-            )
+                "confidence_score": 0.0,
+                "analysis_timestamp": datetime.utcnow().isoformat(),
+                "version": version,
+                "status": "error",
+                "message": error_msg
+            }
+            
+            # Validate output
+            if not self.validate_schema(error_result):
+                logger.warning(f"Output validation failed for error result")
+            
+            return error_result
     
     def _generate_repair_suggestions(self, 
                               issues: List[LoopIssue],
@@ -359,100 +530,129 @@ class DebugAnalyzerAgent:
                     priority=1,
                     target_agent=agent,
                     required_changes=[f"Create or restore {tag}" for tag in affected_tags],
-                    expected_outcome=f"{agent.upper()} should complete with the required memory data"
+                    expected_outcome=f"Agent {agent} should be able to access required memory data"
                 ))
             
-            # Check for agent failures
+            # Check for agent failure issues
             agent_failure_issues = [i for i in agent_specific_issues if i.issue_type == "agent_failure"]
             if agent_failure_issues:
                 recommendations.append(RepairSuggestion(
-                    suggestion_type="retry",
-                    description=f"Retry {agent} with modified parameters",
+                    suggestion_type="fix_agent",
+                    description=f"Fix {agent} agent implementation",
                     priority=2,
                     target_agent=agent,
-                    required_changes=["Increase timeout", "Provide fallback data"],
-                    expected_outcome=f"{agent.upper()} should complete with modified parameters"
+                    required_changes=["Check agent code for errors", "Verify agent dependencies"],
+                    expected_outcome=f"Agent {agent} should execute without errors"
                 ))
             
-            # Check for step failures
+            # Check for step failure issues
             step_failure_issues = [i for i in agent_specific_issues if i.issue_type == "step_failure"]
             if step_failure_issues:
                 recommendations.append(RepairSuggestion(
-                    suggestion_type="skip_step",
-                    description=f"Skip failed steps in {agent} or provide alternative implementation",
+                    suggestion_type="retry_step",
+                    description=f"Retry failed step for {agent}",
                     priority=3,
                     target_agent=agent,
-                    required_changes=["Mark steps as optional", "Provide alternative implementation"],
-                    expected_outcome=f"{agent.upper()} should complete by skipping problematic steps"
+                    required_changes=["Ensure prerequisites are met", "Check for transient errors"],
+                    expected_outcome=f"Step should complete successfully on retry"
                 ))
         
         # Add general recommendations if no specific ones were generated
         if not recommendations:
-            # Check for missing snapshot
-            if any(i.issue_type == "missing_snapshot" for i in issues):
+            if issues:
                 recommendations.append(RepairSuggestion(
-                    suggestion_type="create_snapshot",
-                    description="Create a new loop snapshot",
+                    suggestion_type="general_fix",
+                    description="Address identified issues and retry execution",
                     priority=1,
-                    target_agent="orchestrator",
-                    required_changes=["Trigger snapshot creation"],
-                    expected_outcome="Loop snapshot should be available for analysis"
+                    target_agent=None,
+                    required_changes=["Fix identified issues", "Retry execution"],
+                    expected_outcome="Loop should execute successfully"
                 ))
-            
-            # Add fallback recommendation
-            recommendations.append(RepairSuggestion(
-                suggestion_type="restart_loop",
-                description="Restart the loop with additional logging",
-                priority=4,
-                target_agent="orchestrator",
-                required_changes=["Enable verbose logging", "Set longer timeouts"],
-                expected_outcome="Loop should complete with more diagnostic information"
-            ))
+            else:
+                recommendations.append(RepairSuggestion(
+                    suggestion_type="gather_more_info",
+                    description="Gather more information about the loop execution",
+                    priority=1,
+                    target_agent=None,
+                    required_changes=["Enable detailed logging", "Check system logs"],
+                    expected_outcome="More information should be available for diagnosis"
+                ))
         
         return recommendations
     
     def _calculate_confidence_score(self,
-                            issues: List[LoopIssue],
-                            memory_tags_checked: List[str],
-                            memory_tags_to_check: List[str],
-                            loop_snapshot_available: bool) -> float:
+                             issues: List[LoopIssue],
+                             memory_tags_checked: List[str],
+                             memory_tags_to_check: List[str],
+                             loop_snapshot_available: bool) -> float:
         """
         Calculate confidence score based on available data.
         
         Args:
             issues: List of identified issues
-            memory_tags_checked: List of memory tags successfully checked
+            memory_tags_checked: List of memory tags checked during analysis
             memory_tags_to_check: List of memory tags that should be checked
-            loop_snapshot_available: Whether a loop snapshot was available
+            loop_snapshot_available: Whether loop snapshot is available
             
         Returns:
-            Confidence score between 0.0 and 1.0
+            Confidence score (0.0-1.0)
         """
         # Base confidence
         confidence = 0.5
         
-        # Adjust based on memory tag coverage
+        # Adjust based on memory tags coverage
         if memory_tags_to_check:
-            memory_coverage = len(memory_tags_checked) / len(memory_tags_to_check)
-            confidence += memory_coverage * 0.3
+            coverage = len(memory_tags_checked) / len(memory_tags_to_check)
+            confidence += coverage * 0.2
         
-        # Adjust based on snapshot availability
+        # Adjust based on loop snapshot availability
         if loop_snapshot_available:
             confidence += 0.1
         
         # Adjust based on issues found
         if issues:
-            # More issues generally means more confidence in the diagnosis
-            issue_factor = min(len(issues) * 0.05, 0.2)
-            confidence += issue_factor
-            
-            # But if we have analyzer failures, reduce confidence
-            analyzer_failures = [i for i in issues if i.issue_type == "analyzer_failure"]
-            if analyzer_failures:
-                confidence -= 0.3
+            # More issues generally means more confidence in the analysis
+            confidence += min(len(issues) * 0.05, 0.2)
         else:
-            # No issues found might mean we missed something
+            # No issues could mean either everything is fine or we missed something
             confidence -= 0.1
         
-        # Ensure confidence is between 0.0 and 1.0
-        return max(0.0, min(1.0, confidence))
+        # Ensure confidence is within bounds
+        confidence = max(0.0, min(confidence, 1.0))
+        
+        return confidence
+
+# Create an instance of the agent
+debug_analyzer_agent = DebugAnalyzerAgent()
+
+async def run_debug_analyzer_agent(loop_id: str, project_id: str, version: str = "1.0.0", 
+                                  agent_filter: List[str] = None, raw_log_text: str = None,
+                                  task: str = None) -> Dict[str, Any]:
+    """
+    Run the Debug Analyzer agent with the given parameters.
+    
+    This function provides backward compatibility with the legacy implementation
+    while using the new Agent SDK pattern.
+    
+    Args:
+        loop_id: Unique identifier for the loop being analyzed
+        project_id: Unique identifier for the project
+        version: Version of the analysis request (optional)
+        agent_filter: Optional list of agents to filter analysis by
+        raw_log_text: Optional raw log text to analyze
+        task: Task to be performed by the Debug Analyzer agent (optional)
+        
+    Returns:
+        Dict containing the result of the execution
+    """
+    # Execute the agent
+    return await debug_analyzer_agent.execute(
+        loop_id=loop_id,
+        project_id=project_id,
+        version=version,
+        agent_filter=agent_filter,
+        raw_log_text=raw_log_text,
+        task=task
+    )
+
+# memory_tag: healed_phase3.3

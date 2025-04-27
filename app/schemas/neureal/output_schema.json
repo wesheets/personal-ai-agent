@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NeurealAgentOutputSchema",
+  "description": "Schema for validating output from the Neureal Agent",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "description": "Status of the operation",
+      "enum": ["success", "error"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Response message or error description"
+    },
+    "task_input": {
+      "type": "string",
+      "description": "Original task input"
+    },
+    "content": {
+      "type": "string",
+      "description": "Generated content response"
+    },
+    "emotional_vectors": {
+      "type": "array",
+      "description": "Emotional vectors identified in the response",
+      "items": {
+        "type": "object",
+        "properties": {
+          "emotion": {
+            "type": "string",
+            "description": "Name of the emotion"
+          },
+          "intensity": {
+            "type": "number",
+            "description": "Intensity of the emotion (0.0-1.0)",
+            "minimum": 0.0,
+            "maximum": 1.0
+          }
+        },
+        "required": ["emotion", "intensity"]
+      }
+    },
+    "sensory_layers": {
+      "type": "array",
+      "description": "Sensory layers identified in the response",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sense": {
+            "type": "string",
+            "description": "Type of sense (visual, auditory, etc.)"
+          },
+          "elements": {
+            "type": "array",
+            "description": "Elements associated with this sense",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["sense", "elements"]
+      }
+    },
+    "immersion_score": {
+      "type": "number",
+      "description": "Overall immersion score (0.0-1.0)",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO format timestamp of when the operation was performed"
+    }
+  },
+  "required": ["status", "message", "task_input", "timestamp"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "enum": ["success"] }
+        }
+      },
+      "then": {
+        "required": ["content"]
+      }
+    }
+  ]
+}

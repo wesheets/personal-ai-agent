@@ -12,6 +12,9 @@ import time
 import os
 from typing import Dict, Any, List, Optional
 
+# Import Agent SDK
+from agent_sdk.agent_sdk import Agent, validate_schema
+
 # Configure logging
 logger = logging.getLogger("agents.critic")
 
@@ -36,16 +39,47 @@ except ImportError:
         logger.info(f"Mock memory write: {agent_id}, {memory_type}, {tag}, {len(str(value))} chars")
         return {"status": "success", "message": "Mock memory write successful"}
 
-class CriticAgent:
+class CriticAgent(Agent):
     """
     CriticAgent evaluates the outputs of other agents, validates loop outputs,
     applies rejections, and logs reasoning.
     """
     def __init__(self, tools: List[str] = None):
+        # Define agent properties
+        name = "Critic"
+        role = "Quality Evaluator"
+        tools_list = tools or ["review", "reject", "log_reason"]
+        permissions = ["read_agent_outputs", "write_memory", "reject_outputs"]
+        description = "Evaluates agent outputs for quality and improvement opportunities, validates loop outputs, applies rejections, and logs reasoning."
+        tone_profile = {
+            "analytical": "high",
+            "objective": "high",
+            "constructive": "high",
+            "detailed": "medium",
+            "formal": "medium"
+        }
+        
+        # Define schema paths
+        input_schema_path = "app/schemas/critic/input_schema.json"
+        output_schema_path = "app/schemas/critic/output_schema.json"
+        
+        # Initialize the Agent base class
+        super().__init__(
+            name=name,
+            role=role,
+            tools=tools_list,
+            permissions=permissions,
+            description=description,
+            tone_profile=tone_profile,
+            schema_path=output_schema_path,
+            version="1.0.0",
+            status="active",
+            trust_score=0.9,
+            contract_version="1.0.0"
+        )
+        
         self.agent_id = "critic"
-        self.name = "Critic"
-        self.description = "Evaluates agent outputs for quality and improvement opportunities"
-        self.tools = tools or ["review", "reject", "log_reason"]
+        self.input_schema_path = input_schema_path
         
         # Check if OpenAI API key is available
         api_key = os.getenv("OPENAI_API_KEY")
@@ -83,7 +117,8 @@ class CriticAgent:
                 return {
                     "status": "error",
                     "message": error_msg,
-                    "loop_id": loop_id
+                    "loop_id": loop_id,
+                    "timestamp": time.time()
                 }
             
             # Prepare system message
@@ -160,6 +195,10 @@ If the output has critical flaws that require rejection, set "rejection" to true
                     "timestamp": time.time()
                 }
                 
+                # Validate against schema
+                if not self.validate_schema(review_result):
+                    logger.warning(f"Review result failed schema validation for loop: {loop_id}")
+                
                 # Write to memory if available
                 if memory_available:
                     memory_tag = f"critic_review_{loop_id}"
@@ -179,7 +218,8 @@ If the output has critical flaws that require rejection, set "rejection" to true
                     "status": "error",
                     "message": error_msg,
                     "loop_id": loop_id,
-                    "raw_response": content
+                    "raw_response": content,
+                    "timestamp": time.time()
                 }
             except ValueError as e:
                 error_msg = f"Invalid response structure: {str(e)}"
@@ -188,7 +228,8 @@ If the output has critical flaws that require rejection, set "rejection" to true
                     "status": "error",
                     "message": error_msg,
                     "loop_id": loop_id,
-                    "raw_response": content
+                    "raw_response": content,
+                    "timestamp": time.time()
                 }
                 
         except Exception as e:
@@ -198,7 +239,8 @@ If the output has critical flaws that require rejection, set "rejection" to true
             return {
                 "status": "error",
                 "message": error_msg,
-                "loop_id": loop_id
+                "loop_id": loop_id,
+                "timestamp": time.time()
             }
     
     async def reject(self, loop_id: str, reason: str) -> Dict[str, Any]:
@@ -223,6 +265,10 @@ If the output has critical flaws that require rejection, set "rejection" to true
                 "timestamp": time.time()
             }
             
+            # Validate against schema
+            if not self.validate_schema(rejection_result):
+                logger.warning(f"Rejection result failed schema validation for loop: {loop_id}")
+            
             # Write to memory if available
             if memory_available:
                 memory_tag = f"critic_rejection_{loop_id}"
@@ -242,7 +288,8 @@ If the output has critical flaws that require rejection, set "rejection" to true
             return {
                 "status": "error",
                 "message": error_msg,
-                "loop_id": loop_id
+                "loop_id": loop_id,
+                "timestamp": time.time()
             }
     
     async def log_reason(self, loop_id: str, reason_type: str, reason_text: str) -> Dict[str, Any]:
@@ -268,6 +315,10 @@ If the output has critical flaws that require rejection, set "rejection" to true
                 "timestamp": time.time()
             }
             
+            # Validate against schema
+            if not self.validate_schema(log_result):
+                logger.warning(f"Log reason result failed schema validation for loop: {loop_id}")
+            
             # Write to memory if available
             if memory_available:
                 memory_tag = f"critic_reason_{loop_id}_{reason_type}"
@@ -287,17 +338,127 @@ If the output has critical flaws that require rejection, set "rejection" to true
             return {
                 "status": "error",
                 "message": error_msg,
-                "loop_id": loop_id
+                "loop_id": loop_id,
+                "timestamp": time.time()
+            }
+    
+    def validate_input(self, data: Dict[str, Any]) -> bool:
+        """
+        Validate input data against the input schema.
+        
+        Args:
+            data: Input data to validate
+            
+        Returns:
+            True if validation succeeds, False otherwise
+        """
+        return validate_schema(data, self.input_schema_path)
+    
+    async def execute(self, task: str, project_id: str = None, **kwargs) -> Dict[str, Any]:
+        """
+        Execute the agent's main functionality.
+        
+        Args:
+            task: The task to execute
+            project_id: The project identifier (optional)
+            **kwargs: Additional arguments
+            
+        Returns:
+            Dict containing the result of the execution
+        """
+        try:
+            logger.info(f"CriticAgent.execute called with task: {task}, project_id: {project_id}")
+            
+            # Prepare input data for validation
+            input_data = {
+                "task": task,
+                "project_id": project_id
+            }
+            
+            # Add any additional kwargs to input data
+            input_data.update(kwargs)
+            
+            # Validate input
+            if not self.validate_input(input_data):
+                logger.warning(f"Input validation failed for task: {task}")
+            
+            # Parse task to determine action
+            if task.startswith("review:"):
+                # Extract loop_id and agent_outputs from task
+                parts = task.split(":", 1)[1].strip().split("|")
+                if len(parts) < 2:
+                    raise ValueError("Invalid review task format. Expected 'review:loop_id|{agent_outputs_json}'")
+                
+                loop_id = parts[0].strip()
+                try:
+                    agent_outputs = json.loads(parts[1].strip())
+                except json.JSONDecodeError:
+                    raise ValueError("Invalid agent_outputs JSON in review task")
+                
+                # Call review method
+                return await self.review(loop_id, agent_outputs)
+                
+            elif task.startswith("reject:"):
+                # Extract loop_id and reason from task
+                parts = task.split(":", 1)[1].strip().split("|")
+                if len(parts) < 2:
+                    raise ValueError("Invalid reject task format. Expected 'reject:loop_id|reason'")
+                
+                loop_id = parts[0].strip()
+                reason = parts[1].strip()
+                
+                # Call reject method
+                return await self.reject(loop_id, reason)
+                
+            elif task.startswith("log_reason:"):
+                # Extract loop_id, reason_type, and reason_text from task
+                parts = task.split(":", 1)[1].strip().split("|")
+                if len(parts) < 3:
+                    raise ValueError("Invalid log_reason task format. Expected 'log_reason:loop_id|reason_type|reason_text'")
+                
+                loop_id = parts[0].strip()
+                reason_type = parts[1].strip()
+                reason_text = parts[2].strip()
+                
+                # Call log_reason method
+                return await self.log_reason(loop_id, reason_type, reason_text)
+                
+            else:
+                # Default to mock review for testing
+                logger.warning(f"Unknown task format: {task}. Using mock review.")
+                
+                # Create mock agent outputs
+                mock_outputs = {
+                    "hal": "Mock HAL output for testing",
+                    "ash": "Mock ASH output for testing",
+                    "nova": "Mock NOVA output for testing"
+                }
+                
+                # Call review method with mock data
+                return await self.review(f"mock-{project_id or 'unknown'}", mock_outputs)
+                
+        except Exception as e:
+            error_msg = f"Error in CriticAgent.execute: {str(e)}"
+            logger.error(error_msg)
+            logger.error(traceback.format_exc())
+            
+            # Return error response
+            return {
+                "status": "error",
+                "message": error_msg,
+                "task": task,
+                "project_id": project_id,
+                "timestamp": time.time()
             }
 
 # Main function to run the critic agent
-async def run_critic_agent(task: str, project_id: str, tools: List[str] = None) -> Dict[str, Any]:
+async def run_critic_agent(task: str, project_id: str = None, tools: List[str] = None) -> Dict[str, Any]:
     """
     Run the CRITIC agent with the given task, project_id, and tools.
     
     Args:
         task: The task to execute
-        project_id: The project identifier
+        project_id: The project identifier (optional)
         tools: List of tools to use (optional)
         
     Returns:
@@ -313,60 +474,8 @@ async def run_critic_agent(task: str, project_id: str, tools: List[str] = None) 
         # Create critic agent instance
         critic = CriticAgent(tools)
         
-        # Parse task to determine action
-        if task.startswith("review:"):
-            # Extract loop_id and agent_outputs from task
-            parts = task.split(":", 1)[1].strip().split("|")
-            if len(parts) < 2:
-                raise ValueError("Invalid review task format. Expected 'review:loop_id|{agent_outputs_json}'")
-            
-            loop_id = parts[0].strip()
-            try:
-                agent_outputs = json.loads(parts[1].strip())
-            except json.JSONDecodeError:
-                raise ValueError("Invalid agent_outputs JSON in review task")
-            
-            # Call review method
-            return await critic.review(loop_id, agent_outputs)
-            
-        elif task.startswith("reject:"):
-            # Extract loop_id and reason from task
-            parts = task.split(":", 1)[1].strip().split("|")
-            if len(parts) < 2:
-                raise ValueError("Invalid reject task format. Expected 'reject:loop_id|reason'")
-            
-            loop_id = parts[0].strip()
-            reason = parts[1].strip()
-            
-            # Call reject method
-            return await critic.reject(loop_id, reason)
-            
-        elif task.startswith("log_reason:"):
-            # Extract loop_id, reason_type, and reason_text from task
-            parts = task.split(":", 1)[1].strip().split("|")
-            if len(parts) < 3:
-                raise ValueError("Invalid log_reason task format. Expected 'log_reason:loop_id|reason_type|reason_text'")
-            
-            loop_id = parts[0].strip()
-            reason_type = parts[1].strip()
-            reason_text = parts[2].strip()
-            
-            # Call log_reason method
-            return await critic.log_reason(loop_id, reason_type, reason_text)
-            
-        else:
-            # Default to mock review for testing
-            logger.warning(f"Unknown task format: {task}. Using mock review.")
-            
-            # Create mock agent outputs
-            mock_outputs = {
-                "hal": "Mock HAL output for testing",
-                "ash": "Mock ASH output for testing",
-                "nova": "Mock NOVA output for testing"
-            }
-            
-            # Call review method with mock data
-            return await critic.review(f"mock-{project_id}", mock_outputs)
+        # Execute the task
+        return await critic.execute(task, project_id)
             
     except Exception as e:
         error_msg = f"Error running CRITIC agent: {str(e)}"
@@ -379,7 +488,8 @@ async def run_critic_agent(task: str, project_id: str, tools: List[str] = None) 
             "message": error_msg,
             "task": task,
             "tools": tools if tools else [],
-            "project_id": project_id
+            "project_id": project_id,
+            "timestamp": time.time()
         }
 
 # Test function for isolated testing
@@ -443,5 +553,8 @@ async def test_critic_agent():
         
         return {
             "status": "error",
-            "message": error_msg
+            "message": error_msg,
+            "timestamp": time.time()
         }
+
+# memory_tag: healed_phase3.3

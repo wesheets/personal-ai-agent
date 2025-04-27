@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LifeTreeAgentOutputSchema",
+  "description": "Schema for validating output from the LifeTree Agent",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "description": "Status of the operation",
+      "enum": ["success", "error"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Response message or error description"
+    },
+    "task_input": {
+      "type": "string",
+      "description": "Original task input"
+    },
+    "content": {
+      "type": "string",
+      "description": "Generated content response"
+    },
+    "memory_structures": {
+      "type": "array",
+      "description": "Memory structures created or referenced",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of memory structure",
+            "enum": ["legacy", "emotional", "memory_chain", "scaffold"]
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the memory structure"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the memory structure"
+          }
+        },
+        "required": ["type", "name", "description"]
+      }
+    },
+    "emotional_tags": {
+      "type": "array",
+      "description": "Emotional tags identified in the response",
+      "items": {
+        "type": "string"
+      }
+    },
+    "preservation_score": {
+      "type": "number",
+      "description": "Memory preservation score (0.0-1.0)",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO format timestamp of when the operation was performed"
+    }
+  },
+  "required": ["status", "message", "task_input", "timestamp"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "enum": ["success"] }
+        }
+      },
+      "then": {
+        "required": ["content"]
+      }
+    }
+  ]
+}

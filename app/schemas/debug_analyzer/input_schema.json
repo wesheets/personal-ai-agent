@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DebugAnalyzerAgentInputSchema",
+  "description": "Schema for validating input to the Debug Analyzer Agent",
+  "type": "object",
+  "properties": {
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier for the loop being analyzed"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Unique identifier for the project"
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the analysis request",
+      "default": "1.0.0"
+    },
+    "agent_filter": {
+      "type": "array",
+      "description": "Optional list of agents to filter analysis by",
+      "items": {
+        "type": "string"
+      }
+    },
+    "raw_log_text": {
+      "type": "string",
+      "description": "Optional raw log text to analyze"
+    },
+    "task": {
+      "type": "string",
+      "description": "Task to be performed by the Debug Analyzer agent"
+    }
+  },
+  "required": ["loop_id", "project_id"]
+}

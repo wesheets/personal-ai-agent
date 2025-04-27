@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SageAgentInputSchema",
+  "description": "Schema for validating input to the Sage Agent",
+  "type": "object",
+  "properties": {
+    "task": {
+      "type": "string",
+      "description": "Task to be performed by the Sage agent"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Unique identifier for the project"
+    },
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier for the loop being analyzed"
+    },
+    "summary_text": {
+      "type": "string",
+      "description": "Summary text to analyze for beliefs"
+    },
+    "content": {
+      "type": "string",
+      "description": "Content to summarize"
+    },
+    "belief": {
+      "type": "string",
+      "description": "Belief statement to score"
+    },
+    "tools": {
+      "type": "array",
+      "description": "List of tools to use for the task",
+      "items": {
+        "type": "string",
+        "enum": ["reflect", "summarize", "score_belief"]
+      }
+    }
+  },
+  "required": ["task"],
+  "oneOf": [
+    {
+      "properties": {
+        "task": {
+          "pattern": "^reflect:"
+        }
+      },
+      "required": ["loop_id", "summary_text"]
+    },
+    {
+      "properties": {
+        "task": {
+          "pattern": "^summarize:"
+        }
+      },
+      "required": ["loop_id", "content"]
+    },
+    {
+      "properties": {
+        "task": {
+          "pattern": "^score_belief:"
+        }
+      },
+      "required": ["loop_id", "belief"]
+    }
+  ]
+}
