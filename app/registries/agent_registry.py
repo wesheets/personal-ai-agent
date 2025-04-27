@@ -4,8 +4,13 @@ Agent Registry
 This module defines the registry of all agents in the Promethios system.
 It provides a centralized registry for agent definitions, capabilities, and metadata.
 
+feature/agent-recovery-pessimist-skeptic
 Generated on: 2025-04-27 20:56:44
 Memory tag: agent_registry_surface_updated_20250427
+
+Generated on: 2025-04-26 19:55:38
+Memory tag: agent_registry_surface_finalized_20250426
+main
 """
 
 from typing import Dict, Any, List
@@ -342,27 +347,41 @@ AGENT_REGISTRY = {
         "status": "active"
     },
     "pessimist": {
+feature/agent-recovery-pessimist-skeptic
         "name": "PessimistAgent",
         "type": "persona",
         "description": "Evaluates content for optimism bias, vague language, and confidence mismatches.",
         "system_prompt": "You are the PessimistAgent. Analyze summaries for potential biases, track bias patterns, and identify when the same bias repeats across iterations.",
+
+        "name": "Pessimist",
+        "type": "persona",
+        "description": "Bias detection and tracking specialist.",
+        "system_prompt": "You are the Pessimist. Analyze for potential biases, track bias patterns, and identify when the same bias repeats across iterations.",
+main
         "tools": [
             "analyze_bias",
             "detect_echo",
             "track_bias",
+feature/agent-recovery-pessimist-skeptic
             "evaluate_summary_tone",
             "generate_pessimist_alert"
+
+main
         ],
         "input_schema": [
             "loop_id",
             "summary",
+feature/agent-recovery-pessimist-skeptic
             "feedback",
             "plan_confidence_score"
+
+main
         ],
         "output_schema": [
             "assessment",
             "bias_analysis",
             "status",
+feature/agent-recovery-pessimist-skeptic
             "alerts"
         ],
         "status": "active",
@@ -391,6 +410,10 @@ AGENT_REGISTRY = {
         ],
         "status": "planned",
         "recovery_status": "minimal_recovery_20250427"
+
+        ],
+        "status": "active"
+main
     },
     "sage": {
         "name": "Sage",
@@ -511,6 +534,7 @@ def get_agents_by_type(agent_type: str) -> List[str]:
 
 # Registry metadata
 REGISTRY_METADATA = {
+feature/agent-recovery-pessimist-skeptic
     "total_agents": 20,
     "last_updated": "2025-04-27",
     "memory_tag": "agent_registry_surface_updated_20250427",
@@ -524,4 +548,9 @@ REGISTRY_METADATA = {
             }
         }
     ]
+
+    "total_agents": 19,
+    "last_updated": "2025-04-26",
+    "memory_tag": "agent_registry_surface_finalized_20250426"
+main
 }

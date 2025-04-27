@@ -1,41 +1,20 @@
 {
-  "system_status": {
-    "name": "Promethios Cognitive OS",
-    "version": "0.9.3",
-    "last_updated": "2025-04-22",
-    "status": "operational"
-  },
-  "agent_schema_compliance": {
-    "phase": "2/2",
-    "core_agents": "100% SDK + schema compliant",
-    "plugin_agents": "100% schema compliant",
-    "memory_safe_writes": true,
-    "schema_registry_enabled": true,
-    "timestamp": "2025-04-22"
-  },
-  "core_components": {
-    "loop_engine": "active",
-    "memory_system": "active",
-    "agent_registry": "active",
-    "plugin_system": "active",
-    "schema_validation": "active"
-  },
-  "schema_validation": {
-    "components": {
-      "loop_lineage_export": "validated",
-      "loop_map_visualization": "validated",
-      "visual_settings": "validated",
-      "rerun_decision": "validated",
-      "md_export_format": "validated",
-      "html_export_format": "validated"
+  "system_health": {
+    "status": "healthy",
+    "last_checked": "2025-04-26T19:59:36.314015",
+    "memory_surface": {
+      "total_agents": 19,
+      "total_modules": 155,
+      "total_schemas": 233,
+      "total_endpoints": 0,
+      "total_components": 15
     },
-    "last_validation": "2025-04-22T02:49:41Z",
-    "validation_status": "complete"
-  },
-  "maintenance": {
-    "last_maintenance": "2025-04-22",
-    "next_scheduled": "2025-05-15",
-    "current_task": "Schema Compliance Phase 2 - Complete",
-    "priority": "normal"
+    "memory_tags": {
+      "agent_code": "agent_code_surface_aligned_20250426",
+      "agent_registry": "agent_registry_surface_finalized_20250426",
+      "aci": "aci_snapshot_verified_20250426",
+      "pice": "pice_snapshot_verified_20250426",
+      "system": "system_surface_memory_stabilized_20250426"
+    }
   }
 }
