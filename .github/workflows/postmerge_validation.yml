@@ -23,4 +23,6 @@ jobs:
 
       - name: Run Post-Merge Validation
         run: |
+          # Ensure Python can find the app module
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
           python app/validation/postmerge_validator.py
