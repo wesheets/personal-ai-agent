@@ -13,6 +13,8 @@ from app.schemas.loop_schema import (
     LoopResponseRequest,
     LoopResponseResult
 )
+from app.schemas.loop.loop_reset_schema import LoopResetRequest, LoopResetResponse
+from app.schemas.loop.loop_trace_schema import LoopTraceRequest, LoopTraceResponse
 
 # Import memory operations
 from app.modules.memory_writer import write_memory
@@ -73,20 +75,6 @@ class LoopValidateResponse(BaseModel):
     validation_result: Dict[str, Any]
     prepared_loop: Dict[str, Any]
     processed_by: str
-
-class LoopTraceResponse(BaseModel):
-    traces: List[Dict[str, Any]]
-
-class LoopTraceRequest(BaseModel):
-    loop_id: str
-    status: str
-    timestamp: Optional[str] = None
-    summary: Optional[str] = None
-
-class LoopResetResponse(BaseModel):
-    status: str
-    message: str
-    timestamp: str
 
 class PersonaReflectRequest(BaseModel):
     persona: str
@@ -387,17 +375,17 @@ async def add_loop_trace(data: LoopTraceRequest):
     }
 
 @router.post("/api/loop/reset", response_model=LoopResetResponse)
-async def reset_loop():
+async def reset_loop(request: LoopResetRequest = None):
     """
     Memory reset for clean test runs.
     """
     # This would normally reset loop-related memory
     # For now, return a success response
-    return {
-        "status": "success",
-        "message": "Loop memory reset successfully",
-        "timestamp": datetime.now().isoformat()
-    }
+    return LoopResetResponse(
+        status="success",
+        message="Loop memory reset successfully",
+        timestamp=datetime.now().isoformat()
+    )
 
 @router.post("/api/loop/persona-reflect", response_model=PersonaReflectResponse)
 async def persona_reflect(data: PersonaReflectRequest):

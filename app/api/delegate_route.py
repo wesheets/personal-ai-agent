@@ -9,6 +9,7 @@ from app.core.agent_registry import AGENT_PERSONALITIES
 from app.providers.openai_provider import OpenAIProvider
 from app.agents.memory_agent import handle_memory_task
 from app.core.agent_loader import get_agent, get_all_agents
+from app.schemas.delegate.delegate_schema import DelegateResponse
 import logging
 import inspect
 import uuid
@@ -24,7 +25,7 @@ except Exception as e:
     logger.error(f"❌ Failed to initialize OpenAI provider: {str(e)}")
     openai_provider = None
 
-@router.get("/agent/list")
+@router.get("/agent/list", response_model=AgentListResponse)
 async def list_agents(request: Request):
     """
     Returns a list of all available agent personalities with their metadata.
@@ -111,9 +112,9 @@ async def list_agents(request: Request):
                 filtered_agents.append(agent)
         agents_list = filtered_agents
     
-    return JSONResponse(content=agents_list)
+    return JSONResponse(content={"agents": agents_list, "count": len(agents_list)})
 
-@router.post("/agent/delegate")
+@router.post("/agent/delegate", response_model=DelegateResponse)
 async def delegate(request: Request):
     try:
         logger.info(f"🧠 Delegate route hit: {inspect.currentframe().f_code.co_filename}")
@@ -159,11 +160,12 @@ async def delegate(request: Request):
         
         if not user_input.strip():
             logger.error(f"🔥 Empty input received for agent: {agent_id}")
-            return JSONResponse(status_code=400, content={
-                "status": "error",
-                "message": "Input cannot be empty",
-                "agent": personality["name"] if personality else agent_id,
-            })
+            return DelegateResponse(
+                status="error",
+                result="Input cannot be empty",
+                task_id=thread_id,
+                metadata={"agent": personality["name"] if personality else agent_id}
+            )
         
         logger.info(f"🧠 {agent_id.upper()} received input: {user_input}")
         
@@ -207,13 +209,16 @@ async def delegate(request: Request):
                     agent_registry[agent_id]["agent_state"] = "idle"
                     save_agent_registry()
                 
-                return JSONResponse(content={
-                    "status": "success",
-                    "agent": personality["name"],
-                    "message": f"[{personality['name'].upper()}] {response_content}",
-                    "tone": personality["tone"],
-                    "received": body
-                })
+                return DelegateResponse(
+                    status="success",
+                    result=f"[{personality['name'].upper()}] {response_content}",
+                    task_id=thread_id,
+                    metadata={
+                        "agent": personality["name"],
+                        "tone": personality["tone"],
+                        "received": body
+                    }
+                )
             except Exception as e:
                 logger.error(f"🔥 OpenAI processing error: {str(e)}")
                 
@@ -222,13 +227,16 @@ async def delegate(request: Request):
                     agent_registry[agent_id]["agent_state"] = "idle"
                     save_agent_registry()
                     
-                return JSONResponse(content={
-                    "status": "success",
-                    "agent": personality["name"],
-                    "message": f"I encountered an error processing your request: {str(e)}. Please try again.",
-                    "tone": personality["tone"],
-                    "received": body
-                })
+                return DelegateResponse(
+                    status="error",
+                    result=f"I encountered an error processing your request: {str(e)}. Please try again.",
+                    task_id=thread_id,
+                    metadata={
+                        "agent": personality["name"],
+                        "tone": personality["tone"],
+                        "received": body
+                    }
+                )
         
         # Try to use OpenAI provider even if personality is not found
         if openai_provider and not personality:
@@ -265,13 +273,16 @@ async def delegate(request: Request):
                 handle_memory_task(f"LOG: {agent_id} replied: {response_content[:60]}")
                 handle_memory_task(f"SUMMARY: {agent_id} reflected: {response_content[:80]}")
                 
-                return JSONResponse(content={
-                    "status": "success",
-                    "agent": agent_id,
-                    "message": f"[{agent_id.upper()}] {response_content}",
-                    "tone": "neutral",
-                    "received": body
-                })
+                return DelegateResponse(
+                    status="success",
+                    result=f"[{agent_id.upper()}] {response_content}",
+                    task_id=thread_id,
+                    metadata={
+                        "agent": agent_id,
+                        "tone": "neutral",
+                        "received": body
+                    }
+                )
             except Exception as e:
                 logger.error(f"🔥 OpenAI processing error for unknown agent: {str(e)}")
                 # Continue to fallback
@@ -281,17 +292,21 @@ async def delegate(request: Request):
         if personality:
             fallback_msg = f"Unable to process request with {personality['name']}. OpenAI provider is not available."
             
-        return JSONResponse(content={
-            "status": "error",
-            "agent": personality["name"] if personality else agent_id,
-            "message": fallback_msg,
-            "tone": personality["tone"] if personality else "neutral",
-            "received": body
-        })
+        return DelegateResponse(
+            status="error",
+            result=fallback_msg,
+            task_id=thread_id,
+            metadata={
+                "agent": personality["name"] if personality else agent_id,
+                "tone": personality["tone"] if personality else "neutral",
+                "received": body
+            }
+        )
     except Exception as e:
         logger.error(f"🔥 Delegate route error: {str(e)}")
-        return JSONResponse(status_code=500, content={
-            "status": "error",
-            "message": "Delegate route failed unexpectedly.",
-            "error": str(e)
-        })
+        return DelegateResponse(
+            status="error",
+            result="Delegate route failed unexpectedly.",
+            task_id=str(uuid.uuid4()),
+            metadata={"error": str(e)}
+        )

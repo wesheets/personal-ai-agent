@@ -1,8 +1,7 @@
 """
-API endpoint for the AgentRunner module.
+Agent Modules API Module
 
-This module provides REST API endpoints for executing agents in isolation,
-and for creating and registering new agents dynamically.
+This module provides API endpoints for agent operations including listing agents.
 """
 
 print("📁 Loaded: agent.py (AgentRunner route file)")
@@ -21,6 +20,9 @@ import uuid
 
 # Import memory-related functions
 from app.modules.memory_writer import write_memory, memory_store, generate_reflection
+
+# Import schemas
+from app.schemas.agent.agent_list_schema import AgentListResponse
 
 # Configure logging
 logger = logging.getLogger("api.modules.agent")
@@ -311,7 +313,7 @@ async def create_agent(agent: AgentCreateRequest):
             }
         )
 
-@router.get("/list")
+@router.get("/list", response_model=AgentListResponse)
 async def list_agents():
     """
     Returns a list of all registered agents in the system.
@@ -345,10 +347,10 @@ async def list_agents():
             agents_list.append(agent_entry)
         
         # Return response
-        return {
-            "status": "ok",
-            "agents": agents_list
-        }
+        return AgentListResponse(
+            status="ok",
+            agents=agents_list
+        )
     except Exception as e:
         logger.error(f"Error listing agents: {str(e)}")
         logger.error(traceback.format_exc())
@@ -701,119 +703,4 @@ async def loop_agent(request: Request):
 #     This endpoint handles task delegation between agents, including memory logging
 #     and optional auto-execution of the delegated task.
 #     
-#     Request body:
-#     - from_agent: ID of the agent delegating the task
-#     - to_agent: ID of the agent receiving the task
-#     - task: Description of the task to delegate
-#     - auto_execute: (Optional) Whether to automatically execute the task
-#     
-#     Returns:
-#     - status: "ok" if successful, "error" if error occurred
-#     - delegation_id: UUID for the delegation
-#     - to_agent: ID of the agent receiving the task
-#     - result_summary: Summary of the delegation result
-#     - feedback_required: Boolean indicating if feedback is required
-#     """
-#     try:
-#         # Parse request body
-#         body = await request.json()
-#         delegate_request = AgentDelegateRequest(**body)
-#         
-#         # Ensure core agents exist before running
-#         ensure_core_agents_exist()
-#         
-#         # Check if agents exist
-#         if delegate_request.from_agent not in agent_registry:
-#             return JSONResponse(
-#                 status_code=404,
-#                 content={
-#                     "status": "error",
-#                     "message": f"Agent with ID '{delegate_request.from_agent}' not found"
-#                 }
-#             )
-#             
-#         if delegate_request.to_agent not in agent_registry:
-#             return JSONResponse(
-#                 status_code=404,
-#                 content={
-#                     "status": "error",
-#                     "message": f"Agent with ID '{delegate_request.to_agent}' not found"
-#                 }
-#             )
-#         
-#         # Get current delegation depth
-#         current_delegation_depth = delegate_request.delegation_depth if delegate_request.delegation_depth is not None else 0
-#         
-#         # Check if max_delegation_depth has been reached
-#         if current_delegation_depth >= system_caps["max_delegation_depth"]:
-#             # Log the failure to memory
-#             memory = write_memory(
-#                 agent_id=delegate_request.from_agent,
-#                 type="system_halt",
-#                 content=f"Delegation depth exceeded: {current_delegation_depth} levels reached for delegation to {delegate_request.to_agent}",
-#                 tags=["error", "delegation_limit", "system_halt"]
-#             )
-#             
-#             # Return error response
-#             return JSONResponse(
-#                 status_code=429,  # Too Many Requests
-#                 content={
-#                     "status": "error",
-#                     "reason": "Delegation depth exceeded",
-#                     "delegation_depth": current_delegation_depth,
-#                     "agent_id": delegate_request.to_agent
-#                 }
-#             )
-#         
-#         # Generate delegation_id for tracking
-#         delegation_id = str(uuid.uuid4())
-#         
-#         # Format the delegation message
-#         from_agent = delegate_request.from_agent.upper()
-#         to_agent = delegate_request.to_agent.upper()
-#         delegation_message = f"Received task from {from_agent}: {delegate_request.task}"
-#         
-#         # Write delegation memory for the receiving agent
-#         memory = write_memory(
-#             agent_id=delegate_request.to_agent,
-#             type="delegation_log",
-#             content=delegation_message,
-#             tags=[f"from:{delegate_request.from_agent}"]
-#         )
-#         
-#         # Write delegation memory for the delegating agent
-#         delegating_message = f"Delegated task to {to_agent}: {delegate_request.task}"
-#         from_memory = write_memory(
-#             agent_id=delegate_request.from_agent,
-#             type="delegation_log",
-#             content=delegating_message,
-#             tags=[f"to:{delegate_request.to_agent}"]
-#         )
-#         
-#         # Update agent states
-#         agent_registry[delegate_request.from_agent]["agent_state"] = "delegating"
-#         agent_registry[delegate_request.from_agent]["last_active"] = datetime.utcnow().isoformat()
-#         
-#         agent_registry[delegate_request.to_agent]["agent_state"] = "assigned"
-#         agent_registry[delegate_request.to_agent]["last_active"] = datetime.utcnow().isoformat()
-#         save_agent_registry()
-#         
-#         # Return structured response
-#         return {
-#             "status": "ok",
-#             "delegation_id": delegation_id,
-#             "to_agent": delegate_request.to_agent,
-#             "delegation_depth": current_delegation_depth + 1,  # Increment delegation depth
-#             "result_summary": "Agent accepted task.",
-#             "feedback_required": False
-#         }
-#     except Exception as e:
-#         logger.error(f"Error delegating task: {str(e)}")
-#         logger.error(traceback.format_exc())
-#         return JSONResponse(
-#             status_code=500,
-#             content={
-#                 "status": "error",
-#                 "message": f"Failed to delegate task: {str(e)}"
-#             }
-#         )
+#     Request body

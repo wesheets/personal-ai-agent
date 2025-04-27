@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from app.core.orchestrator import get_orchestrator
 import logging
 from fastapi.responses import JSONResponse
+from app.schemas.control.edit_prompt_schema import EditPromptRequest
 
 # Configure logging
 logger = logging.getLogger("api")
@@ -48,9 +49,6 @@ class AgentTaskRequest(BaseModel):
                 }
             }
         }
-
-class EditPromptModel(BaseModel):
-    prompt: str
 
 # Create router
 router = APIRouter()
@@ -123,7 +121,7 @@ async def get_agent_status():
         return AgentStatusResponseModel(agents=[])
 
 @router.post("/agent/goal/{task_id}/edit-prompt", response_model=Dict[str, str])
-async def edit_task_prompt(task_id: str, prompt_data: EditPromptModel):
+async def edit_task_prompt(task_id: str, prompt_data: EditPromptRequest):
     logger.info(f"Editing prompt for task {task_id}")
     orchestrator = get_orchestrator()
     if orchestrator.execution_mode != "manual":
