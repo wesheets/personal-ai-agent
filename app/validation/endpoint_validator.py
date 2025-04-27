@@ -74,6 +74,16 @@ class EndpointValidator:
         self.max_workers = max_workers
         self.logger = logging.getLogger('endpoint_validator')
         
+        # Define expected fields for different endpoint types
+        self.expected_fields = {
+            "default": ["status"],
+            "agent": ["status", "agent_id", "data"],
+            "memory": ["status", "memory_id", "data"],
+            "orchestrator": ["status", "request_id", "success"],
+            "health": ["status", "version", "uptime"],
+            "status": ["status", "system_state", "components"]
+        }
+        
     def discover_endpoints(self) -> List[Dict[str, Any]]:
         """
         Discover API endpoints in the system.
@@ -90,32 +100,32 @@ class EndpointValidator:
         
         # Basic endpoints from app/api directory
         api_endpoints = [
-            {"method": "GET", "path": "/api/health"},
-            {"method": "GET", "path": "/api/status"},
-            {"method": "GET", "path": "/api/agent/list"},
-            {"method": "POST", "path": "/api/agent/run"},
-            {"method": "GET", "path": "/api/agent/status"},
-            {"method": "GET", "path": "/api/memory/list"},
-            {"method": "GET", "path": "/api/memory/get"},
-            {"method": "POST", "path": "/api/memory/create"},
-            {"method": "GET", "path": "/api/goals/list"},
-            {"method": "POST", "path": "/api/goals/create"},
-            {"method": "GET", "path": "/api/logs/list"},
-            {"method": "GET", "path": "/api/control/status"},
-            {"method": "POST", "path": "/api/delegate/task"}
+            {"method": "GET", "path": "/api/health", "endpoint_type": "health"},
+            {"method": "GET", "path": "/api/status", "endpoint_type": "status"},
+            {"method": "GET", "path": "/api/agent/list", "endpoint_type": "agent"},
+            {"method": "POST", "path": "/api/agent/run", "endpoint_type": "agent"},
+            {"method": "GET", "path": "/api/agent/status", "endpoint_type": "agent"},
+            {"method": "GET", "path": "/api/memory/list", "endpoint_type": "memory"},
+            {"method": "GET", "path": "/api/memory/get", "endpoint_type": "memory"},
+            {"method": "POST", "path": "/api/memory/create", "endpoint_type": "memory"},
+            {"method": "GET", "path": "/api/goals/list", "endpoint_type": "default"},
+            {"method": "POST", "path": "/api/goals/create", "endpoint_type": "default"},
+            {"method": "GET", "path": "/api/logs/list", "endpoint_type": "default"},
+            {"method": "GET", "path": "/api/control/status", "endpoint_type": "default"},
+            {"method": "POST", "path": "/api/delegate/task", "endpoint_type": "default"}
         ]
         
         # Orchestrator endpoints
         orchestrator_endpoints = [
-            {"method": "POST", "path": "/api/orchestrator/consult"},
-            {"method": "POST", "path": "/api/orchestrator/respond"},
-            {"method": "POST", "path": "/api/orchestrator/confirm"},
-            {"method": "POST", "path": "/api/orchestrator/credentials"},
-            {"method": "POST", "path": "/api/orchestrator/checkpoint"},
-            {"method": "GET", "path": "/api/orchestrator/status"},
-            {"method": "POST", "path": "/api/orchestrator/approve"},
-            {"method": "POST", "path": "/api/orchestrator/delegate"},
-            {"method": "POST", "path": "/api/orchestrator/reflect"}
+            {"method": "POST", "path": "/api/orchestrator/consult", "endpoint_type": "orchestrator"},
+            {"method": "POST", "path": "/api/orchestrator/respond", "endpoint_type": "orchestrator"},
+            {"method": "POST", "path": "/api/orchestrator/confirm", "endpoint_type": "orchestrator"},
+            {"method": "POST", "path": "/api/orchestrator/credentials", "endpoint_type": "orchestrator"},
+            {"method": "POST", "path": "/api/orchestrator/checkpoint", "endpoint_type": "orchestrator"},
+            {"method": "GET", "path": "/api/orchestrator/status", "endpoint_type": "orchestrator"},
+            {"method": "POST", "path": "/api/orchestrator/approve", "endpoint_type": "orchestrator"},
+            {"method": "POST", "path": "/api/orchestrator/delegate", "endpoint_type": "orchestrator"},
+            {"method": "POST", "path": "/api/orchestrator/reflect", "endpoint_type": "orchestrator"}
         ]
         
         # Combine all endpoints
@@ -123,6 +133,59 @@ class EndpointValidator:
         
         self.logger.info(f"Discovered {len(all_endpoints)} endpoints")
         return all_endpoints
+    
+    def validate_payload(self, response: requests.Response, endpoint_type: str) -> Dict[str, Any]:
+        """
+        Validate the response payload from an endpoint.
+        
+        Args:
+            response: HTTP response object
+            endpoint_type: Type of endpoint (agent, memory, orchestrator, etc.)
+            
+        Returns:
+            Dictionary with payload validation results
+        """
+        # Initialize validation result
+        validation_result = {
+            "payload_validation_status": "fail",
+            "payload_drift_type": None,
+            "missing_fields": [],
+            "payload_size_bytes": 0,
+            "is_json": False
+        }
+        
+        # Check if response has content
+        if not response.text or not response.text.strip():
+            validation_result["payload_drift_type"] = "EmptyPayload"
+            return validation_result
+        
+        # Check if response is JSON
+        try:
+            payload = response.json()
+            validation_result["is_json"] = True
+            validation_result["payload_size_bytes"] = len(response.text)
+        except json.JSONDecodeError:
+            validation_result["payload_drift_type"] = "MalformedResponse"
+            return validation_result
+        
+        # Check if payload is empty object or array
+        if not payload:
+            validation_result["payload_drift_type"] = "EmptyPayload"
+            return validation_result
+        
+        # Get expected fields for this endpoint type
+        expected_fields = self.expected_fields.get(endpoint_type, self.expected_fields["default"])
+        
+        # Check for missing fields
+        missing_fields = [field for field in expected_fields if field not in payload]
+        validation_result["missing_fields"] = missing_fields
+        
+        if missing_fields:
+            validation_result["payload_drift_type"] = "MissingFields"
+        else:
+            validation_result["payload_validation_status"] = "pass"
+            
+        return validation_result
     
     def validate_endpoint(self, endpoint: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -136,6 +199,7 @@ class EndpointValidator:
         """
         method = endpoint["method"]
         path = endpoint["path"]
+        endpoint_type = endpoint.get("endpoint_type", "default")
         url = f"{self.base_url}{path}"
         
         # Replace path parameters with placeholder values
@@ -167,7 +231,12 @@ class EndpointValidator:
                     "validation_status": "fail",
                     "failure_reason": f"Unsupported method: {method}",
                     "response_time_ms": 0,
-                    "timestamp": datetime.datetime.now().isoformat()
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "payload_validation_status": "fail",
+                    "payload_drift_type": "UnsupportedMethod",
+                    "missing_fields": [],
+                    "payload_size_bytes": 0,
+                    "is_json": False
                 }
             
             end_time = datetime.datetime.now()
@@ -176,16 +245,34 @@ class EndpointValidator:
             # Check if response is successful (status code 2xx)
             is_success = 200 <= response.status_code < 300
             
-            # Optionally check if response has a non-empty payload
-            has_payload = False
-            try:
-                if response.text and response.text.strip():
-                    has_payload = True
-            except:
-                pass
+            # Validate payload if response is successful
+            payload_validation = self.validate_payload(response, endpoint_type) if is_success else {
+                "payload_validation_status": "fail",
+                "payload_drift_type": "HttpError",
+                "missing_fields": [],
+                "payload_size_bytes": 0,
+                "is_json": False
+            }
             
-            validation_status = "pass" if is_success else "fail"
-            failure_reason = None if is_success else f"HTTP {response.status_code}: {response.reason}"
+            # Determine overall validation status
+            validation_status = "pass" if is_success and payload_validation["payload_validation_status"] == "pass" else "fail"
+            
+            # Determine failure reason
+            if not is_success:
+                failure_reason = f"HTTP {response.status_code}: {response.reason}"
+            elif payload_validation["payload_validation_status"] == "fail":
+                drift_type = payload_validation["payload_drift_type"]
+                if drift_type == "EmptyPayload":
+                    failure_reason = "Empty response payload"
+                elif drift_type == "MalformedResponse":
+                    failure_reason = "Malformed JSON response"
+                elif drift_type == "MissingFields":
+                    missing = ", ".join(payload_validation["missing_fields"])
+                    failure_reason = f"Missing required fields: {missing}"
+                else:
+                    failure_reason = f"Payload validation failed: {drift_type}"
+            else:
+                failure_reason = None
             
             result = {
                 "url": url,
@@ -194,8 +281,9 @@ class EndpointValidator:
                 "validation_status": validation_status,
                 "failure_reason": failure_reason,
                 "response_time_ms": response_time_ms,
-                "has_payload": has_payload,
-                "timestamp": datetime.datetime.now().isoformat()
+                "timestamp": datetime.datetime.now().isoformat(),
+                "endpoint_type": endpoint_type,
+                **payload_validation
             }
             
             self.logger.debug(f"Endpoint validation result: {method} {url} - {validation_status}")
@@ -210,7 +298,13 @@ class EndpointValidator:
                 "validation_status": "fail",
                 "failure_reason": f"Exception: {str(e)}",
                 "response_time_ms": 0,
-                "timestamp": datetime.datetime.now().isoformat()
+                "timestamp": datetime.datetime.now().isoformat(),
+                "endpoint_type": endpoint_type,
+                "payload_validation_status": "fail",
+                "payload_drift_type": "ConnectionError",
+                "missing_fields": [],
+                "payload_size_bytes": 0,
+                "is_json": False
             }
     
     def validate_all_endpoints(self) -> List[Dict[str, Any]]:
@@ -243,7 +337,13 @@ class EndpointValidator:
                         "validation_status": "fail",
                         "failure_reason": f"Exception during processing: {str(e)}",
                         "response_time_ms": 0,
-                        "timestamp": datetime.datetime.now().isoformat()
+                        "timestamp": datetime.datetime.now().isoformat(),
+                        "endpoint_type": endpoint.get("endpoint_type", "default"),
+                        "payload_validation_status": "fail",
+                        "payload_drift_type": "ProcessingError",
+                        "missing_fields": [],
+                        "payload_size_bytes": 0,
+                        "is_json": False
                     })
         
         self.logger.info(f"Completed validation of {len(endpoints)} endpoints")
@@ -263,8 +363,23 @@ class EndpointValidator:
         passed_endpoints = sum(1 for result in results if result["validation_status"] == "pass")
         failed_endpoints = total_endpoints - passed_endpoints
         
-        # Calculate health score as percentage of passing endpoints
-        health_score = (passed_endpoints / total_endpoints) * 100 if total_endpoints > 0 else 0
+        # Calculate endpoint health score as percentage of passing endpoints
+        endpoint_health_score = (passed_endpoints / total_endpoints) * 100 if total_endpoints > 0 else 0
+        
+        # Calculate payload health metrics
+        endpoints_with_payload = sum(1 for result in results if result["status_code"] is not None and 200 <= result["status_code"] < 300)
+        passed_payloads = sum(1 for result in results if result["payload_validation_status"] == "pass")
+        failed_payloads = endpoints_with_payload - passed_payloads
+        
+        # Calculate payload health score as percentage of passing payloads
+        payload_health_score = (passed_payloads / endpoints_with_payload) * 100 if endpoints_with_payload > 0 else 0
+        
+        # Count drift types
+        drift_type_counts = {}
+        for result in results:
+            if result["payload_drift_type"]:
+                drift_type = result["payload_drift_type"]
+                drift_type_counts[drift_type] = drift_type_counts.get(drift_type, 0) + 1
         
         # Get details of failed endpoints
         failed_endpoint_details = [
@@ -272,7 +387,9 @@ class EndpointValidator:
                 "url": result["url"],
                 "method": result["method"],
                 "status_code": result["status_code"],
-                "failure_reason": result["failure_reason"]
+                "failure_reason": result["failure_reason"],
+                "payload_drift_type": result["payload_drift_type"],
+                "missing_fields": result["missing_fields"]
             }
             for result in results if result["validation_status"] == "fail"
         ]
@@ -283,12 +400,19 @@ class EndpointValidator:
             "total_endpoints": total_endpoints,
             "passed_endpoints": passed_endpoints,
             "failed_endpoints": failed_endpoints,
-            "endpoint_health_score": round(health_score, 1),
+            "endpoint_health_score": round(endpoint_health_score, 1),
+            "endpoints_with_payload": endpoints_with_payload,
+            "passed_payloads": passed_payloads,
+            "failed_payloads": failed_payloads,
+            "payload_health_score": round(payload_health_score, 1),
+            "drift_type_counts": drift_type_counts,
             "failed_endpoint_details": failed_endpoint_details,
             "validation_results": results
         }
         
-        self.logger.info(f"Generated drift report: {total_endpoints} endpoints, {passed_endpoints} passed, {failed_endpoints} failed, {health_score:.1f}% health score")
+        self.logger.info(f"Generated drift report: {total_endpoints} endpoints, {passed_endpoints} passed, {failed_endpoints} failed")
+        self.logger.info(f"Endpoint health score: {endpoint_health_score:.1f}%, Payload health score: {payload_health_score:.1f}%")
+        self.logger.info(f"Drift types detected: {drift_type_counts}")
         return report
     
     def save_drift_report(self, report: Dict[str, Any]) -> str:
@@ -337,7 +461,7 @@ def main():
     logger = setup_logging(args.verbose)
     
     try:
-        logger.info("Starting Promethios Endpoint Health Validation")
+        logger.info("Starting Promethios Endpoint Health and Payload Validation")
         
         # Create endpoint validator
         validator = EndpointValidator(base_url=args.base_url, max_workers=args.max_workers)
@@ -354,10 +478,14 @@ def main():
         # Log completion
         if report["failed_endpoints"] > 0:
             logger.warning(f"Endpoint validation completed with {report['failed_endpoints']} failed endpoints")
-            print(f"\n⚠️  ENDPOINT VALIDATION COMPLETED: {report['endpoint_health_score']:.1f}% health score")
-            print(f"⚠️  {report['failed_endpoints']} of {report['total_endpoints']} endpoints failed")
+            print(f"\n⚠️  ENDPOINT VALIDATION COMPLETED:")
+            print(f"⚠️  Endpoint Health: {report['endpoint_health_score']:.1f}% ({report['failed_endpoints']} of {report['total_endpoints']} endpoints failed)")
+            print(f"⚠️  Payload Health: {report['payload_health_score']:.1f}% ({report['failed_payloads']} of {report['endpoints_with_payload']} payloads failed)")
             print(f"⚠️  Report saved to {report_path}")
-            print("\nFailed endpoints:")
+            print("\nDrift types detected:")
+            for drift_type, count in report['drift_type_counts'].items():
+                print(f"  - {drift_type}: {count} instances")
+            print("\nFailed endpoints (top 5):")
             for i, endpoint in enumerate(report['failed_endpoint_details'][:5]):  # Show top 5 failures
                 print(f"  {i+1}. {endpoint['method']} {endpoint['url']} - {endpoint['failure_reason']}")
             if len(report['failed_endpoint_details']) > 5:
@@ -365,8 +493,9 @@ def main():
             print("\nNo automatic repairs will be performed. Operator intervention required.")
         else:
             logger.info(f"All endpoints validated successfully")
-            print(f"\n✅ ALL ENDPOINTS VALIDATED: {report['endpoint_health_score']:.1f}% health score")
-            print(f"✅ {report['passed_endpoints']} of {report['total_endpoints']} endpoints passed")
+            print(f"\n✅ ALL ENDPOINTS VALIDATED:")
+            print(f"✅ Endpoint Health: {report['endpoint_health_score']:.1f}% (all endpoints passed)")
+            print(f"✅ Payload Health: {report['payload_health_score']:.1f}% (all payloads passed)")
             print(f"✅ Report saved to {report_path}")
         
         return 0 if report["failed_endpoints"] == 0 else 1

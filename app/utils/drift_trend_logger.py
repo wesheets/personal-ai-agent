@@ -78,18 +78,25 @@ def get_recent_drift_history(limit: int = 10) -> List[Dict[str, Any]]:
     # Return limited number of entries
     return entries[:limit]
 
-def get_recent_health_scores(limit: int = 5) -> List[float]:
+def get_recent_health_scores(limit: int = 5, score_type: str = "surface") -> List[float]:
     """
-    Get recent surface health scores.
+    Get recent health scores.
     
     Args:
         limit: Maximum number of scores to return
+        score_type: Type of health score to retrieve (surface, endpoint, payload)
         
     Returns:
-        List of recent surface health scores
+        List of recent health scores
     """
     entries = get_recent_drift_history(limit)
-    return [entry.get("surface_health_score", 0) for entry in entries]
+    
+    if score_type == "endpoint":
+        return [entry.get("endpoint_health_score", 0) for entry in entries if "endpoint_health_score" in entry]
+    elif score_type == "payload":
+        return [entry.get("payload_health_score", 0) for entry in entries if "payload_health_score" in entry]
+    else:  # Default to surface health score
+        return [entry.get("surface_health_score", 0) for entry in entries]
 
 def calculate_health_trend(scores: List[float]) -> Dict[str, Any]:
     """
@@ -137,3 +144,54 @@ def calculate_health_trend(scores: List[float]) -> Dict[str, Any]:
         "magnitude": magnitude,
         "description": description
     }
+
+def get_drift_type_summary(limit: int = 5) -> Dict[str, int]:
+    """
+    Get summary of recent drift types.
+    
+    Args:
+        limit: Maximum number of entries to analyze
+        
+    Returns:
+        Dictionary with drift type counts
+    """
+    entries = get_recent_drift_history(limit)
+    
+    # Collect all drift types
+    drift_type_counts = {}
+    for entry in entries:
+        if "drift_type_counts" in entry:
+            for drift_type, count in entry["drift_type_counts"].items():
+                drift_type_counts[drift_type] = drift_type_counts.get(drift_type, 0) + count
+    
+    return drift_type_counts
+
+def get_payload_health_trend(limit: int = 5) -> Dict[str, Any]:
+    """
+    Get payload health trend from recent drift history.
+    
+    Args:
+        limit: Maximum number of entries to analyze
+        
+    Returns:
+        Dictionary with trend information
+    """
+    # Get recent payload health scores
+    scores = get_recent_health_scores(limit, score_type="payload")
+    
+    # Calculate trend
+    trend = calculate_health_trend(scores)
+    
+    # Get drift type summary
+    drift_types = get_drift_type_summary(limit)
+    
+    # Add drift types to trend
+    trend["drift_types"] = drift_types
+    
+    # Add most common drift type
+    if drift_types:
+        most_common_drift_type = max(drift_types.items(), key=lambda x: x[1])
+        trend["most_common_drift_type"] = most_common_drift_type[0]
+        trend["most_common_drift_count"] = most_common_drift_type[1]
+    
+    return trend
