@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ObserverAgentOutputSchema",
+  "description": "Schema for validating output from the Observer Agent",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "description": "Status of the operation",
+      "enum": ["success", "error"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Message describing the result of the operation"
+    },
+    "task": {
+      "type": "string",
+      "description": "Task that was performed",
+      "enum": ["journal", "observe", "reflect"]
+    },
+    "date": {
+      "type": "string",
+      "description": "Date of the observation entry",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "entry": {
+      "type": "object",
+      "description": "Observation entry details",
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "Date of the observation entry"
+        },
+        "memory_summary": {
+          "type": "string",
+          "description": "Summary of system memory"
+        },
+        "behavior_observed": {
+          "type": "string",
+          "description": "Description of observed system behavior"
+        },
+        "anomalies": {
+          "type": "string",
+          "description": "Description of anomalies or failures"
+        },
+        "vertical_progress": {
+          "type": "string",
+          "description": "Description of vertical progress"
+        },
+        "loops_observed": {
+          "type": "string",
+          "description": "Description of observed loops"
+        },
+        "personality_notes": {
+          "type": "string",
+          "description": "Notes on system personality"
+        },
+        "philosophical_questions": {
+          "type": "string",
+          "description": "Philosophical questions raised"
+        }
+      },
+      "required": ["date", "memory_summary", "behavior_observed", "anomalies", "vertical_progress", "loops_observed", "personality_notes", "philosophical_questions"]
+    },
+    "log_path": {
+      "type": "string",
+      "description": "Path to the log file"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO format timestamp of when the operation was performed"
+    }
+  },
+  "required": ["status", "message", "task"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "enum": ["success"] },
+          "task": { "enum": ["journal"] }
+        }
+      },
+      "then": {
+        "required": ["date", "entry", "log_path"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CriticAgentInputSchema",
+  "description": "Schema for validating input to the Critic Agent",
+  "type": "object",
+  "properties": {
+    "task": {
+      "type": "string",
+      "description": "Task to be performed by the critic agent"
+    },
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier for the loop being evaluated"
+    },
+    "agent_outputs": {
+      "type": "object",
+      "description": "Outputs from various agents to be evaluated",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "reason_type": {
+      "type": "string",
+      "description": "Type of reason for logging (e.g., 'improvement', 'concern', 'praise')",
+      "enum": ["improvement", "concern", "praise", "other"]
+    },
+    "reason_text": {
+      "type": "string",
+      "description": "Detailed explanation for the reason being logged"
+    }
+  },
+  "required": ["task"],
+  "oneOf": [
+    {
+      "properties": {
+        "task": {
+          "pattern": "^review:"
+        }
+      },
+      "required": ["loop_id", "agent_outputs"]
+    },
+    {
+      "properties": {
+        "task": {
+          "pattern": "^reject:"
+        }
+      },
+      "required": ["loop_id", "reason_text"]
+    },
+    {
+      "properties": {
+        "task": {
+          "pattern": "^log_reason:"
+        }
+      },
+      "required": ["loop_id", "reason_type", "reason_text"]
+    }
+  ]
+}

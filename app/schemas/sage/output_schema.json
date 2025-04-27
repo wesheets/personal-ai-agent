@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SageAgentOutputSchema",
+  "description": "Schema for validating output from the Sage Agent",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "description": "Status of the operation",
+      "enum": ["success", "error"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Error message if status is error"
+    },
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier for the loop being analyzed"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO format timestamp of when the operation was performed"
+    },
+    "belief_scores": {
+      "type": "array",
+      "description": "List of belief scores extracted from the summary",
+      "items": {
+        "type": "object",
+        "properties": {
+          "belief": {
+            "type": "string",
+            "description": "Belief statement"
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence score for the belief (0.0-1.0)",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "emotional_weight": {
+            "type": ["number", "null"],
+            "description": "Emotional weight of the belief (-1.0 to 1.0)",
+            "minimum": -1.0,
+            "maximum": 1.0
+          }
+        },
+        "required": ["belief", "confidence"]
+      }
+    },
+    "reflection_text": {
+      "type": "string",
+      "description": "Reflection text summarizing the beliefs"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Generated summary of the provided content"
+    },
+    "original_word_count": {
+      "type": "integer",
+      "description": "Word count of the original content"
+    },
+    "summary_word_count": {
+      "type": "integer",
+      "description": "Word count of the generated summary"
+    },
+    "compression_ratio": {
+      "type": "number",
+      "description": "Ratio of summary word count to original word count"
+    },
+    "belief": {
+      "type": "string",
+      "description": "Belief statement that was scored"
+    }
+  },
+  "required": ["status", "loop_id", "timestamp"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "enum": ["error"] }
+        }
+      },
+      "then": {
+        "required": ["message"]
+      }
+    }
+  ],
+  "oneOf": [
+    {
+      "properties": {
+        "belief_scores": { "type": "array" },
+        "reflection_text": { "type": "string" }
+      },
+      "required": ["belief_scores", "reflection_text"]
+    },
+    {
+      "properties": {
+        "summary": { "type": "string" },
+        "original_word_count": { "type": "integer" },
+        "summary_word_count": { "type": "integer" },
+        "compression_ratio": { "type": "number" }
+      },
+      "required": ["summary", "original_word_count", "summary_word_count", "compression_ratio"]
+    },
+    {
+      "properties": {
+        "belief": { "type": "string" },
+        "confidence": { "type": "number" },
+        "emotional_weight": { "type": ["number", "null"] }
+      },
+      "required": ["belief", "confidence"]
+    }
+  ]
+}

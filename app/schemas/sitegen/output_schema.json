@@ -1,0 +1,139 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SiteGenAgentOutputSchema",
+  "description": "Schema for validating output from the SiteGen Agent",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "description": "Status of the operation",
+      "enum": ["success", "error"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Message describing the result of the operation"
+    },
+    "task": {
+      "type": "string",
+      "description": "Task that was performed"
+    },
+    "project_id": {
+      "type": ["string", "null"],
+      "description": "Unique identifier for the project"
+    },
+    "analysis": {
+      "type": "string",
+      "description": "Analysis of the site based on provided parameters"
+    },
+    "recommendations": {
+      "type": "array",
+      "description": "List of recommendations",
+      "items": {
+        "type": "string"
+      }
+    },
+    "layout": {
+      "type": "object",
+      "description": "Layout of the site",
+      "properties": {
+        "layout_type": {
+          "type": "string",
+          "description": "Type of layout"
+        },
+        "dimensions": {
+          "type": "object",
+          "description": "Dimensions of the site",
+          "properties": {
+            "width": {
+              "type": "number",
+              "description": "Width of the site in meters"
+            },
+            "depth": {
+              "type": "number",
+              "description": "Depth of the site in meters"
+            },
+            "height": {
+              "type": "number",
+              "description": "Height of the site in meters"
+            }
+          },
+          "required": ["width", "depth", "height"]
+        },
+        "zones": {
+          "type": "array",
+          "description": "List of zones in the layout",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the zone"
+              },
+              "size": {
+                "type": "number",
+                "description": "Size of the zone in square meters"
+              },
+              "position": {
+                "type": "string",
+                "description": "Position of the zone"
+              }
+            },
+            "required": ["name", "size", "position"]
+          }
+        },
+        "features": {
+          "type": "array",
+          "description": "List of features in the layout",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["layout_type", "dimensions", "zones", "features"]
+    },
+    "market_fit": {
+      "type": "object",
+      "description": "Market fit evaluation",
+      "properties": {
+        "score": {
+          "type": "number",
+          "description": "Market fit score (0.0-1.0)",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "strengths": {
+          "type": "array",
+          "description": "List of strengths",
+          "items": {
+            "type": "string"
+          }
+        },
+        "weaknesses": {
+          "type": "array",
+          "description": "List of weaknesses",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["score", "strengths", "weaknesses"]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO format timestamp of when the operation was performed"
+    }
+  },
+  "required": ["status", "message", "task"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "enum": ["success"] }
+        }
+      },
+      "then": {
+        "required": ["analysis", "recommendations", "layout", "market_fit"]
+      }
+    }
+  ]
+}
