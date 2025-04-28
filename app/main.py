@@ -51,27 +51,37 @@ except ImportError as e:
     print(f"⚠️ Failed to load status debug routes: {e}")
     failed_routes.append("status_debug")
 
-# Agent routes
+# Core Router Wiring - Phase 2.6 Batch 1.1 # memory_tag: phase2.6_batch1.1_core_router_wiring
 try:
     from app.routes.agent_routes import router as agent_router
-    agent_routes_loaded = True
-    loaded_routes.append("agent")
-    print("✅ Agent routes loaded")
-except ImportError as e:
-    agent_routes_loaded = False
-    print(f"⚠️ Failed to load agent routes: {e}")
-    failed_routes.append("agent")
-
-# Memory routes
-try:
     from app.routes.memory_routes import router as memory_router
-    memory_routes_loaded = True
-    loaded_routes.append("memory")
-    print("✅ Memory routes loaded")
+    from app.routes.loop_routes import router as loop_router
+    
+    # Include core routers with proper API prefixes
+    app.include_router(agent_router, prefix="/api/agent")
+    app.include_router(memory_router, prefix="/api/memory")
+    app.include_router(loop_router, prefix="/api/loop")
+    
+    loaded_routes.extend(["agent", "memory", "loop"])
+    print("✅ Core routers (agent, memory, loop) loaded with proper API prefixes")
 except ImportError as e:
-    memory_routes_loaded = False
-    print(f"⚠️ Failed to load memory routes: {e}")
-    failed_routes.append("memory")
+    print(f"⚠️ Failed to load core routers: {e}")
+    failed_routes.extend(["agent", "memory", "loop"])
+
+# Reflection and Drift Router Wiring - Phase 2.6 Batch 1.2 # memory_tag: phase2.6_batch1.2_reflection_drift_wiring
+try:
+    from app.routes.reflection_routes import router as reflection_router
+    from app.routes.drift_routes import router as drift_router
+    
+    # Include reflection and drift routers with proper API prefixes
+    app.include_router(reflection_router, prefix="/api/reflection")
+    app.include_router(drift_router, prefix="/api/drift")
+    
+    loaded_routes.extend(["reflection", "drift"])
+    print("✅ Reflection and Drift routers loaded with proper API prefixes")
+except ImportError as e:
+    print(f"⚠️ Failed to load reflection and drift routers: {e}")
+    failed_routes.extend(["reflection", "drift"])
 
 # Upload file routes
 try:
@@ -216,17 +226,6 @@ except ImportError as e:
     print(f"⚠️ Failed to load Debug Analyzer routes: {e}")
     failed_routes.append("debug_analyzer")
 
-# Drift routes (kept for backward compatibility)
-try:
-    from app.routes.drift_routes import router as drift_router
-    drift_routes_loaded = True
-    loaded_routes.append("drift")
-    print("✅ Drift routes loaded")
-except ImportError as e:
-    drift_routes_loaded = False
-    print(f"⚠️ Failed to load Drift routes: {e}")
-    failed_routes.append("drift")
-
 # Output Policy routes (kept for backward compatibility)
 try:
     from app.routes.output_policy_routes import router as output_policy_router
@@ -273,21 +272,7 @@ app.include_router(diagnostics_router)
 loaded_routes.append("diagnostics_routes")
 print("✅ Included diagnostics_router")
 
-# Include core routers that should always be available
-if agent_routes_loaded:
-    try:
-        app.include_router(agent_router)
-        print("✅ Included agent_router")
-    except Exception as e:
-        print(f"⚠️ Failed to include agent_router: {e}")
-        
-if memory_routes_loaded:
-    try:
-        app.include_router(memory_router)
-        print("✅ Included memory_router")
-    except Exception as e:
-        print(f"⚠️ Failed to include memory_router: {e}")
-        
+# Include upload file router
 if upload_file_routes_loaded:
     try:
         app.include_router(upload_file_router)
@@ -381,13 +366,6 @@ if debug_analyzer_routes_loaded:
     except Exception as e:
         print(f"⚠️ Failed to include debug_analyzer_router: {e}")
 
-if drift_routes_loaded:
-    try:
-        app.include_router(drift_router)
-        print("✅ Included drift_router")
-    except Exception as e:
-        print(f"⚠️ Failed to include drift_router: {e}")
-
 if output_policy_routes_loaded:
     try:
         app.include_router(output_policy_router)
@@ -431,3 +409,5 @@ if __name__ == "__main__":
 # force clean rebuild Fri Apr 25 20:26:00 UTC 2025
 # force clean build Fri Apr 25 20:53:47 UTC 2025
 # comprehensive endpoint fix Sat Apr 26 10:41:30 UTC 2025
+# core router wiring Mon Apr 28 01:12:00 UTC 2025
+# reflection and drift router wiring Mon Apr 28 01:19:45 UTC 2025
