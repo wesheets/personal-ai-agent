@@ -4,7 +4,7 @@ Drift Routes Module
 This module provides API routes for drift monitoring and reporting,
 enabling detection of changes in loop outputs, agent behaviors, or schema versions.
 
-memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
+memory_tag: phase3.0_sprint3_cognitive_loop_deepening
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Request
@@ -12,12 +12,17 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 import logging
 import traceback
+import uuid
 
 # Import schemas
 from app.schemas.drift_schema import (
     DriftMonitorRequest,
     LoopDriftLog,
-    DriftMonitorResponse
+    DriftMonitorResponse,
+    DriftAutoHealRequest,
+    DriftAutoHealResponse,
+    DriftLogEntry,
+    DriftLogResponse
 )
 
 # Import drift monitor
@@ -57,6 +62,9 @@ router = APIRouter(tags=["drift"])
 if manifest_available:
     try:
         register_route("/drift/monitor", "POST", "DriftMonitorRequest", "active")
+        register_route("/drift/report", "POST", "DriftMonitorRequest", "active")
+        register_route("/drift/auto-heal", "POST", "DriftAutoHealRequest", "active")
+        register_route("/drift/log", "GET", "DriftLogResponse", "active")
         update_hardening_layer("drift_monitor_enabled", True)
         logging.info("✅ Drift routes registered with manifest")
     except Exception as e:
@@ -188,12 +196,130 @@ async def monitor_drift(request: DriftMonitorRequest):
             recommended_action="log_error"
         )
 
+@router.post("/drift/auto-heal", response_model=DriftAutoHealResponse)
+async def auto_heal_drift(request: DriftAutoHealRequest):
+    """
+    Start drift auto-healing.
+    
+    This endpoint initiates an auto-healing process for detected drift
+    in loop outputs or agent behaviors.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+    """
+    try:
+        # Log the request
+        logger.info(f"Received auto-heal request for loop: {request.loop_id}, agent: {request.agent}")
+        
+        # Generate a unique healing ID
+        healing_id = f"heal_{uuid.uuid4().hex[:8]}"
+        
+        # In a real implementation, this would initiate an asynchronous healing process
+        # For now, we'll just return a success response with the healing ID
+        
+        return DriftAutoHealResponse(
+            healing_id=healing_id,
+            status="initiated",
+            loop_id=request.loop_id,
+            agent=request.agent,
+            healing_strategy=request.healing_strategy,
+            started_at=datetime.utcnow().isoformat(),
+            message=f"Auto-healing initiated for {request.agent} in loop {request.loop_id} using {request.healing_strategy} strategy"
+        )
+    
+    except Exception as e:
+        logger.error(f"❌ Error initiating auto-healing: {str(e)}")
+        logger.error(traceback.format_exc())
+        
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error initiating auto-healing: {str(e)}"
+        )
+
+@router.get("/drift/log", response_model=DriftLogResponse)
+async def get_drift_logs(loop_id: Optional[str] = None, agent: Optional[str] = None):
+    """
+    Retrieve drift logs.
+    
+    This endpoint returns drift logs, optionally filtered by loop_id and/or agent.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+    """
+    try:
+        # Log the request
+        logger.info(f"Retrieving drift logs for loop: {loop_id or 'all'}, agent: {agent or 'all'}")
+        
+        # In a real implementation, this would retrieve drift logs from storage
+        # For now, return mock data
+        
+        # Create mock entries
+        entries = []
+        
+        # Add some mock entries based on filters
+        if loop_id:
+            # Add entries for specific loop
+            entries.append(DriftLogEntry(
+                log_id=f"drift_log_{uuid.uuid4().hex[:8]}",
+                loop_id=loop_id,
+                agent=agent or "hal",
+                drift_score=0.75,
+                drift_detected=True,
+                timestamp=datetime.utcnow().isoformat(),
+                healing_status="not_attempted"
+            ))
+            
+            if not agent:
+                # Add another entry for a different agent in the same loop
+                entries.append(DriftLogEntry(
+                    log_id=f"drift_log_{uuid.uuid4().hex[:8]}",
+                    loop_id=loop_id,
+                    agent="critic",
+                    drift_score=0.15,
+                    drift_detected=False,
+                    timestamp=datetime.utcnow().isoformat(),
+                    healing_status=None
+                ))
+        else:
+            # Add entries for multiple loops
+            for i in range(1, 4):
+                mock_loop_id = f"loop_00{i}"
+                mock_agent = agent or ("hal" if i % 2 == 0 else "critic")
+                
+                if not agent or mock_agent == agent:
+                    entries.append(DriftLogEntry(
+                        log_id=f"drift_log_{uuid.uuid4().hex[:8]}",
+                        loop_id=mock_loop_id,
+                        agent=mock_agent,
+                        drift_score=0.25 * i,
+                        drift_detected=i > 2,
+                        timestamp=datetime.utcnow().isoformat(),
+                        healing_status="completed" if i == 1 else "not_attempted"
+                    ))
+        
+        return DriftLogResponse(
+            status="success",
+            loop_id=loop_id,
+            agent=agent,
+            entries=entries,
+            count=len(entries)
+        )
+    
+    except Exception as e:
+        logger.error(f"❌ Error retrieving drift logs: {str(e)}")
+        logger.error(traceback.format_exc())
+        
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error retrieving drift logs: {str(e)}"
+        )
+
 @router.get("/drift/history/{loop_id}")
 async def get_drift_history(loop_id: str, agent: Optional[str] = None):
     """
     Get drift history for a loop.
     
     This endpoint returns the drift history for a loop, optionally filtered by agent.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
     """
     try:
         # Read all drift logs for the loop

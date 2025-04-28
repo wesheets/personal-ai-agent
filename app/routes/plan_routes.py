@@ -3,7 +3,7 @@ Plan Routes Module
 
 This module defines the API routes for plan operations.
 
-memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
+memory_tag: phase3.0_sprint3_cognitive_loop_deepening
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Request, Query
@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 import logging
 from datetime import datetime
 import traceback
+import uuid
 
 # Import manifest manager if available
 try:
@@ -33,6 +34,8 @@ if manifest_available:
         register_route("/plan/create", "POST", "PlanCreateRequest", "active")
         register_route("/plan/{plan_id}", "GET", "PlanGetRequest", "active")
         register_route("/plan/update", "PUT", "PlanUpdateRequest", "active")
+        register_route("/plan/execute", "POST", "PlanExecuteRequest", "active")
+        register_route("/plan/status/{execution_id}", "GET", "PlanStatusRequest", "active")
         logging.info("✅ Plan routes registered with manifest")
     except Exception as e:
         logging.error(f"❌ Failed to register plan routes with manifest: {str(e)}")
@@ -43,7 +46,7 @@ class PlanCreateRequest(BaseModel):
     
     This schema defines the structure of requests to create a new plan.
     
-    memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
     """
     title: str = Field(..., description="Title of the plan")
     description: Optional[str] = Field(None, description="Description of the plan")
@@ -64,7 +67,7 @@ class PlanGetRequest(BaseModel):
     
     This schema defines the structure of requests to retrieve a plan.
     
-    memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
     """
     plan_id: str = Field(..., description="Unique identifier for the plan")
     
@@ -80,6 +83,8 @@ class PlanUpdateRequest(BaseModel):
     Schema for plan update requests.
     
     This schema defines the structure of requests to update a plan.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
     """
     plan_id: str = Field(..., description="Unique identifier for the plan")
     title: Optional[str] = Field(None, description="Updated title of the plan")
@@ -95,6 +100,83 @@ class PlanUpdateRequest(BaseModel):
             }
         }
 
+class PlanExecuteRequest(BaseModel):
+    """
+    Schema for plan execution requests.
+    
+    This schema defines the structure of requests to execute a plan.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+    """
+    plan_id: str = Field(..., description="Unique identifier for the plan to execute")
+    parameters: Optional[Dict[str, Any]] = Field(None, description="Execution parameters")
+    timeout: Optional[int] = Field(3600, description="Execution timeout in seconds")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "plan_id": "plan_123",
+                "parameters": {"environment": "production", "debug_mode": False},
+                "timeout": 7200
+            }
+        }
+
+class PlanExecutionResponse(BaseModel):
+    """
+    Schema for plan execution responses.
+    
+    This schema defines the structure of responses from plan execution operations.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+    """
+    execution_id: str = Field(..., description="Unique identifier for the execution")
+    plan_id: str = Field(..., description="Identifier of the executed plan")
+    status: str = Field(..., description="Execution status")
+    message: str = Field(..., description="Status message")
+    started_at: str = Field(..., description="Execution start timestamp")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "execution_id": "exec_abc123",
+                "plan_id": "plan_123",
+                "status": "running",
+                "message": "Plan execution started",
+                "started_at": "2025-04-28T07:54:00Z"
+            }
+        }
+
+class PlanExecutionStatusResponse(BaseModel):
+    """
+    Schema for plan execution status responses.
+    
+    This schema defines the structure of responses from plan execution status operations.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+    """
+    execution_id: str = Field(..., description="Unique identifier for the execution")
+    plan_id: str = Field(..., description="Identifier of the executed plan")
+    status: str = Field(..., description="Execution status")
+    progress: float = Field(..., description="Execution progress (0-100)")
+    current_step: Optional[str] = Field(None, description="Current execution step")
+    message: str = Field(..., description="Status message")
+    started_at: str = Field(..., description="Execution start timestamp")
+    updated_at: str = Field(..., description="Status update timestamp")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "execution_id": "exec_abc123",
+                "plan_id": "plan_123",
+                "status": "in_progress",
+                "progress": 45.5,
+                "current_step": "Implementation",
+                "message": "Executing step 3 of 5",
+                "started_at": "2025-04-28T07:54:00Z",
+                "updated_at": "2025-04-28T08:15:30Z"
+            }
+        }
+
 @router.post("/create")
 async def create_plan(request: PlanCreateRequest):
     """
@@ -102,7 +184,7 @@ async def create_plan(request: PlanCreateRequest):
     
     This endpoint creates a new plan with the specified title, description, and steps.
     
-    memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
     """
     try:
         # Log the request
@@ -138,7 +220,7 @@ async def get_plan(plan_id: str):
     
     This endpoint retrieves a plan with the specified ID.
     
-    memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
     """
     try:
         # Log the request
@@ -172,6 +254,8 @@ async def update_plan(request: PlanUpdateRequest):
     Update a plan.
     
     This endpoint updates a plan with the specified ID.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
     """
     try:
         # Log the request
@@ -198,4 +282,80 @@ async def update_plan(request: PlanUpdateRequest):
         raise HTTPException(
             status_code=500,
             detail=f"Error updating plan: {str(e)}"
+        )
+
+@router.post("/execute", response_model=PlanExecutionResponse)
+async def execute_plan(request: PlanExecuteRequest):
+    """
+    Execute a basic plan.
+    
+    This endpoint initiates the execution of a plan with the specified parameters.
+    Returns a unique execution_id that can be used to retrieve the execution status.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+    """
+    try:
+        # Log the request
+        logger.info(f"Executing plan: {request.plan_id}")
+        
+        # Generate a unique execution ID
+        execution_id = f"exec_{uuid.uuid4().hex[:8]}"
+        
+        # In a real implementation, this would initiate an asynchronous execution process
+        # For now, we'll just return a success response with the execution ID
+        
+        return PlanExecutionResponse(
+            execution_id=execution_id,
+            plan_id=request.plan_id,
+            status="running",
+            message=f"Execution of plan {request.plan_id} started",
+            started_at=datetime.utcnow().isoformat()
+        )
+    
+    except Exception as e:
+        logger.error(f"❌ Error executing plan: {str(e)}")
+        logger.error(traceback.format_exc())
+        
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error executing plan: {str(e)}"
+        )
+
+@router.get("/status/{execution_id}", response_model=PlanExecutionStatusResponse)
+async def get_execution_status(execution_id: str):
+    """
+    Retrieve plan execution status.
+    
+    This endpoint retrieves the status of a previously initiated plan execution.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+    """
+    try:
+        # Log the request
+        logger.info(f"Getting execution status: {execution_id}")
+        
+        # In a real implementation, this would retrieve execution status from storage
+        # For now, return a mock response
+        
+        # Extract plan_id from execution_id (in a real implementation, this would be retrieved from storage)
+        plan_id = f"plan_{execution_id.split('_')[1][:6]}"
+        
+        return PlanExecutionStatusResponse(
+            execution_id=execution_id,
+            plan_id=plan_id,
+            status="in_progress",
+            progress=65.0,
+            current_step="Testing",
+            message="Executing step 4 of 5",
+            started_at=(datetime.utcnow().replace(minute=datetime.utcnow().minute-30)).isoformat(),
+            updated_at=datetime.utcnow().isoformat()
+        )
+    
+    except Exception as e:
+        logger.error(f"❌ Error getting execution status: {str(e)}")
+        logger.error(traceback.format_exc())
+        
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error getting execution status: {str(e)}"
         )

@@ -1,6 +1,82 @@
 {
   "agents": [
     {
+      "name": "PlanExecutor",
+      "input_schema": [
+        "plan_id",
+        "parameters",
+        "timeout"
+      ],
+      "output_schema": [
+        "execution_id",
+        "plan_id",
+        "status",
+        "message",
+        "started_at"
+      ],
+      "registered_module": "plan_registry.py",
+      "status": "active",
+      "api_surface": "/api/plan"
+    },
+    {
+      "name": "PlanStatusRetriever",
+      "input_schema": [
+        "execution_id"
+      ],
+      "output_schema": [
+        "execution_id",
+        "plan_id",
+        "status",
+        "progress",
+        "current_step",
+        "message",
+        "started_at",
+        "updated_at"
+      ],
+      "registered_module": "plan_registry.py",
+      "status": "active",
+      "api_surface": "/api/plan"
+    },
+    {
+      "name": "DriftAutoHealer",
+      "input_schema": [
+        "loop_id",
+        "agent",
+        "drift_log_id",
+        "healing_strategy",
+        "parameters"
+      ],
+      "output_schema": [
+        "healing_id",
+        "status",
+        "loop_id",
+        "agent",
+        "healing_strategy",
+        "started_at",
+        "message"
+      ],
+      "registered_module": "drift_registry.py",
+      "status": "active",
+      "api_surface": "/api/drift"
+    },
+    {
+      "name": "DriftLogRetriever",
+      "input_schema": [
+        "loop_id",
+        "agent"
+      ],
+      "output_schema": [
+        "status",
+        "loop_id",
+        "agent",
+        "entries",
+        "count"
+      ],
+      "registered_module": "drift_registry.py",
+      "status": "active",
+      "api_surface": "/api/drift"
+    },
+    {
       "name": "ReflectionTrigger",
       "input_schema": [
         "source",
@@ -584,5 +660,5 @@
       "api_surface": "/api/loop"
     }
   ],
-  "memory_tag": "phase3.0_sprint2_memory_surface_update"
+  "memory_tag": "phase3.0_sprint3_cognitive_loop_deepening"
 }
