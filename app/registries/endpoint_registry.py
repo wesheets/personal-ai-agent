@@ -16,6 +16,44 @@ class EndpointEntry(BaseModel):
 
 # Initialize the endpoint registry
 ENDPOINT_REGISTRY = [
+    # --- Phase 4 Sprint 1 Endpoints ---
+    {
+        "path": "/api/reflection/chain",
+        "method": "POST",
+        "input_schema": "ReflectionChainRequest",
+        "output_schema": "ReflectionChainResponse",
+        "module": "app/routes/reflection_routes.py",
+        "status": "active",
+        "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
+    },
+    {
+        "path": "/api/plan/execute",
+        "method": "POST",
+        "input_schema": "PlanExecutionRequest",
+        "output_schema": "PlanExecutionResponse",
+        "module": "app/routes/plan_routes.py",
+        "status": "active",
+        "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
+    },
+    {
+        "path": "/api/drift/auto-heal",
+        "method": "POST",
+        "input_schema": "DriftHealingRequest",
+        "output_schema": "DriftHealingResult",
+        "module": "app/routes/drift_routes.py",
+        "status": "active",
+        "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
+    },
+    # --- Existing Endpoints ---
+    {
+        "path": "/api/plan/chain",
+        "method": "POST",
+        "input_schema": "PlanChainRequest",
+        "output_schema": "PlanChainResponse",
+        "module": "app/routes/plan_routes.py",
+        "status": "active",
+        "memory_tag": "phase3.0_sprint4_cognitive_reflection_plan_chaining"
+    },
     {
         "path": "/api/reflection/trigger-scan-deep",
         "method": "POST",
@@ -561,36 +599,45 @@ ENDPOINT_REGISTRY = [
         "status": "active"
     },
     {
-        "path": "/delegate-stream",
+        "path": "/delegate",
         "method": "POST",
         "input_schema": "Request",
         "output_schema": None,
-        "module": "api/streaming_route.py",
+        "module": "api/delegate_route.py",
         "status": "active"
     },
     {
-        "path": "/delete/{memory_id}",
-        "method": "DELETE",
-        "input_schema": None,
-        "output_schema": None,
-        "module": "api/memory.py",
-        "status": "planned"
+        "path": "/delegate-stream",
+        "method": "POST",
+        "input_schema": "StreamRequest",
+        "output_schema": "StreamResponse",
+        "module": "routes/delegate_stream_routes.py",
+        "status": "active"
     },
     {
-        "path": "/diagnostics/routes",
+        "path": "/devops",
+        "method": "POST",
+        "input_schema": "OpsAgentRequest",
+        "output_schema": "OpsAgentResponse",
+        "module": "routes/ops_agent_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/docs",
         "method": "GET",
         "input_schema": None,
         "output_schema": None,
-        "module": "routes/diagnostics_routes.py",
+        "module": "api/docs.py",
         "status": "planned"
     },
     {
-        "path": "/drift-summary",
+        "path": "/drift/report",
         "method": "POST",
-        "input_schema": "Dict",
-        "output_schema": None,
-        "module": "routes/agent_routes.py",
-        "status": "active"
+        "input_schema": "DriftReportRequest",
+        "output_schema": "DriftReportResponse",
+        "module": "app/routes/drift_routes.py",
+        "status": "active",
+        "memory_tag": "phase3.0_sprint2_reflection_drift_plan_activation"
     },
     {
         "path": "/drift/status",
@@ -601,35 +648,19 @@ ENDPOINT_REGISTRY = [
         "status": "planned"
     },
     {
-        "path": "/echo",
-        "method": "POST",
-        "input_schema": "EchoRequest",
-        "output_schema": "EchoResponse",
-        "module": "routes/echo_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/edit",
-        "method": "POST",
-        "input_schema": "EditRequest",
-        "output_schema": "EditResponse",
-        "module": "routes/edit_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/embed",
-        "method": "POST",
-        "input_schema": "EmbedRequest",
-        "output_schema": "EmbedResponse",
-        "module": "routes/embed_routes.py",
-        "status": "active"
-    },
-    {
         "path": "/evaluate",
         "method": "POST",
-        "input_schema": "EvaluateRequest",
-        "output_schema": "EvaluateResponse",
-        "module": "routes/evaluate_routes.py",
+        "input_schema": "CEOReviewRequest",
+        "output_schema": "CEOReviewResult",
+        "module": "routes/ceo_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/execute",
+        "method": "POST",
+        "input_schema": "AshExecutionRequest",
+        "output_schema": "AshExecutionResult",
+        "module": "routes/ash_routes.py",
         "status": "active"
     },
     {
@@ -637,93 +668,62 @@ ENDPOINT_REGISTRY = [
         "method": "POST",
         "input_schema": "ExecuteRequest",
         "output_schema": "ExecuteResponse",
-        "module": "routes/execute_routes.py",
+        "module": "app/routes/execute_routes.py",
+        "status": "active",
+        "memory_tag": "phase3.0_sprint1.1_integration_cleanup"
+    },
+    {
+        "path": "/execute/{agent_id}",
+        "method": "POST",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/delegate_route.py",
         "status": "active"
     },
     {
-        "path": "/explain",
-        "method": "POST",
-        "input_schema": "ExplainRequest",
-        "output_schema": "ExplainResponse",
-        "module": "routes/explain_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/extract",
-        "method": "POST",
-        "input_schema": "ExtractRequest",
-        "output_schema": "ExtractResponse",
-        "module": "routes/extract_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/filter",
-        "method": "POST",
-        "input_schema": "FilterRequest",
-        "output_schema": "FilterResponse",
-        "module": "routes/filter_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/fix",
-        "method": "POST",
-        "input_schema": "FixRequest",
-        "output_schema": "FixResponse",
-        "module": "routes/fix_routes.py",
-        "status": "active"
+        "path": "/forge/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/forge_router.py",
+        "status": "planned"
     },
     {
         "path": "/generate",
         "method": "POST",
-        "input_schema": "GenerateRequest",
-        "output_schema": "GenerateResponse",
-        "module": "routes/generate_routes.py",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/orchestrator/generate.py",
         "status": "active"
     },
     {
-        "path": "/get",
+        "path": "/generate-code",
+        "method": "POST",
+        "input_schema": "Dict",
+        "output_schema": None,
+        "module": "routes/agent_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/get/{key}",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
+        "input_schema": None,
+        "output_schema": None,
         "module": "api/memory.py",
         "status": "active"
     },
     {
-        "path": "/get/{memory_id}",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "Dict",
-        "module": "api/memory.py",
+        "path": "/goal",
+        "method": "POST",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/goal_route.py",
         "status": "active"
     },
     {
         "path": "/goal/{task_id}",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": "Dict",
-        "module": "api/control.py",
-        "status": "active"
-    },
-    {
-        "path": "/goal/{task_id}/edit-prompt",
-        "method": "POST",
-        "input_schema": "Dict",
-        "output_schema": "Dict",
-        "module": "api/control.py",
-        "status": "active"
-    },
-    {
-        "path": "/goal/{task_id}/edit-system",
-        "method": "POST",
-        "input_schema": "Dict",
-        "output_schema": "Dict",
-        "module": "api/control.py",
-        "status": "active"
-    },
-    {
-        "path": "/goal/{task_id}/restart",
-        "method": "POST",
-        "input_schema": null,
+        "input_schema": None,
         "output_schema": "Dict",
         "module": "api/control.py",
         "status": "active"
@@ -731,620 +731,561 @@ ENDPOINT_REGISTRY = [
     {
         "path": "/goal/{task_id}/status",
         "method": "GET",
-        "input_schema": null,
+        "input_schema": None,
         "output_schema": "Dict",
         "module": "api/control.py",
         "status": "active"
     },
     {
-        "path": "/goal/{task_id}/stop",
-        "method": "POST",
-        "input_schema": null,
-        "output_schema": "Dict",
-        "module": "api/control.py",
-        "status": "active"
-    },
-    {
-        "path": "/goals",
+        "path": "/guardian/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
-        "module": "api/control.py",
-        "status": "active"
-    },
-    {
-        "path": "/goals/create",
-        "method": "POST",
-        "input_schema": "Dict",
-        "output_schema": "Dict",
-        "module": "api/control.py",
-        "status": "active"
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/guardian_router.py",
+        "status": "planned"
     },
     {
         "path": "/hal/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/hal_router.py",
         "status": "planned"
     },
     {
         "path": "/health",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "api/health.py",
         "status": "planned"
     },
     {
         "path": "/historian/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/historian_router.py",
         "status": "planned"
     },
     {
         "path": "/history",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
-        "module": "api/history.py",
-        "status": "planned"
-    },
-    {
-        "path": "/history/{session_id}",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
-        "module": "api/history.py",
-        "status": "planned"
-    },
-    {
-        "path": "/init",
-        "method": "POST",
-        "input_schema": "StreamInitRequest",
-        "output_schema": "StreamInitResponse",
-        "module": "routes/delegate_stream_routes.py",
+        "input_schema": "Optional",
+        "output_schema": None,
+        "module": "api/memory.py",
         "status": "active"
     },
     {
-        "path": "/inspect",
+        "path": "/journal",
         "method": "POST",
-        "input_schema": "InspectRequest",
-        "output_schema": "InspectResponse",
-        "module": "routes/inspect_routes.py",
+        "input_schema": "ObserverJournalRequest",
+        "output_schema": "ObserverJournalResponse",
+        "module": "routes/observer_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/journal/{entry_id}",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": "ObserverJournalEntry",
+        "module": "routes/observer_routes.py",
         "status": "active"
     },
     {
         "path": "/list",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
-        "module": "api/agent.py",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "api/modules/agent.py",
         "status": "active"
+    },
+    {
+        "path": "/logs",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "api/logs.py",
+        "status": "planned"
     },
     {
         "path": "/loop/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/loop_router.py",
         "status": "planned"
     },
     {
-        "path": "/memory",
-        "method": "POST",
-        "input_schema": "MemoryRequest",
-        "output_schema": "MemoryResponse",
-        "module": "routes/memory_routes.py",
-        "status": "active"
+        "path": "/memory/get/{key}",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": "MemoryGetKeyResponse",
+        "module": "app/routes/memory_routes.py",
+        "status": "active",
+        "memory_tag": "phase3.0_sprint1.1_integration_cleanup"
     },
     {
         "path": "/memory/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/memory_router.py",
         "status": "planned"
     },
     {
-        "path": "/message",
-        "method": "POST",
-        "input_schema": "MessageRequest",
-        "output_schema": "MessageResponse",
-        "module": "routes/message_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/message/{session_id}",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
-        "module": "api/message.py",
-        "status": "active"
-    },
-    {
-        "path": "/message/{session_id}",
-        "method": "POST",
-        "input_schema": "Dict",
-        "output_schema": "Dict",
-        "module": "api/message.py",
-        "status": "active"
-    },
-    {
-        "path": "/message/{session_id}/status",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "Dict",
-        "module": "api/message.py",
-        "status": "active"
-    },
-    {
-        "path": "/messages",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
-        "module": "api/message.py",
-        "status": "active"
-    },
-    {
-        "path": "/messages/create",
-        "method": "POST",
-        "input_schema": "Dict",
-        "output_schema": "Dict",
-        "module": "api/message.py",
-        "status": "active"
-    },
-    {
         "path": "/nova/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/nova_router.py",
+        "status": "planned"
+    },
+    {
+        "path": "/observer/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/observer_router.py",
+        "status": "planned"
+    },
+    {
+        "path": "/ops/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/ops_agent_router.py",
         "status": "planned"
     },
     {
         "path": "/orchestrator/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/orchestrator_router.py",
         "status": "planned"
     },
     {
-        "path": "/parse",
-        "method": "POST",
-        "input_schema": "ParseRequest",
-        "output_schema": "ParseResponse",
-        "module": "routes/parse_routes.py",
-        "status": "active"
-    },
-    {
         "path": "/pessimist/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/pessimist_router.py",
         "status": "planned"
     },
     {
         "path": "/plan",
         "method": "POST",
-        "input_schema": "PlanRequest",
-        "output_schema": "PlanResponse",
-        "module": "routes/plan_routes.py",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/orchestrator/plan.py",
         "status": "active"
     },
     {
-        "path": "/planner/status",
+        "path": "/plan/activate",
+        "method": "POST",
+        "input_schema": "PlanActivationRequest",
+        "output_schema": "PlanActivationResponse",
+        "module": "app/routes/plan_routes.py",
+        "status": "active",
+        "memory_tag": "phase3.0_sprint2_reflection_drift_plan_activation"
+    },
+    {
+        "path": "/plan/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
-        "module": "routes/planner_router.py",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/plan_router.py",
         "status": "planned"
-    },
-    {
-        "path": "/predict",
-        "method": "POST",
-        "input_schema": "PredictRequest",
-        "output_schema": "PredictResponse",
-        "module": "routes/predict_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/process",
-        "method": "POST",
-        "input_schema": "ProcessRequest",
-        "output_schema": "ProcessResponse",
-        "module": "routes/process_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/project",
-        "method": "POST",
-        "input_schema": "ProjectRequest",
-        "output_schema": "ProjectResponse",
-        "module": "routes/project_routes.py",
-        "status": "active"
     },
     {
         "path": "/project/{project_id}",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": "Dict",
+        "input_schema": None,
+        "output_schema": None,
         "module": "api/projects/projects.py",
         "status": "active"
     },
     {
-        "path": "/project/{project_id}/tasks",
+        "path": "/project/{project_id}",
+        "method": "POST",
+        "input_schema": "ProjectUpdateRequest",
+        "output_schema": None,
+        "module": "api/projects/projects.py",
+        "status": "active"
+    },
+    {
+        "path": "/project/{project_id}",
+        "method": "DELETE",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "api/projects/projects.py",
+        "status": "active"
+    },
+    {
+        "path": "/project/{project_id}/memory",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
-        "module": "api/projects/projects.py",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "api/projects/memory.py",
         "status": "active"
     },
     {
-        "path": "/project/{project_id}/tasks/create",
+        "path": "/project/{project_id}/memory",
+        "method": "POST",
+        "input_schema": "MemoryUpdateRequest",
+        "output_schema": None,
+        "module": "api/projects/memory.py",
+        "status": "active"
+    },
+    {
+        "path": "/project/{project_id}/reflection",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "app/routes/reflection_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/project/{project_id}/reflection",
         "method": "POST",
         "input_schema": "Dict",
-        "output_schema": "Dict",
-        "module": "api/projects/projects.py",
+        "output_schema": None,
+        "module": "app/routes/reflection_routes.py",
         "status": "active"
+    },
+    {
+        "path": "/project/{project_id}/reflection/history",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "app/routes/reflection_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/project/{project_id}/reflection",
+        "method": "DELETE",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "app/routes/reflection_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/project/{project_id}/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "api/projects/status.py",
+        "status": "planned"
     },
     {
         "path": "/projects",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
+        "method": "POST",
+        "input_schema": "ProjectCreateRequest",
+        "output_schema": None,
         "module": "api/projects/projects.py",
         "status": "active"
     },
     {
-        "path": "/projects/create",
+        "path": "/projects/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/project_router.py",
+        "status": "planned"
+    },
+    {
+        "path": "/prompt",
         "method": "POST",
-        "input_schema": "Dict",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/prompt_route.py",
+        "status": "active"
+    },
+    {
+        "path": "/prompt/{prompt_id}",
+        "method": "GET",
+        "input_schema": None,
         "output_schema": "Dict",
-        "module": "api/projects/projects.py",
+        "module": "api/control.py",
+        "status": "active"
+    },
+    {
+        "path": "/prompt/{prompt_id}/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": "Dict",
+        "module": "api/control.py",
         "status": "active"
     },
     {
         "path": "/query",
         "method": "POST",
-        "input_schema": "QueryRequest",
-        "output_schema": "QueryResponse",
-        "module": "routes/query_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/rank",
-        "method": "POST",
-        "input_schema": "RankRequest",
-        "output_schema": "RankResponse",
-        "module": "routes/rank_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/read",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
+        "input_schema": "MemoryQueryRequest",
+        "output_schema": None,
         "module": "api/memory.py",
-        "status": "active"
-    },
-    {
-        "path": "/read/{memory_id}",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "Dict",
-        "module": "api/memory.py",
-        "status": "active"
-    },
-    {
-        "path": "/reason",
-        "method": "POST",
-        "input_schema": "ReasonRequest",
-        "output_schema": "ReasonResponse",
-        "module": "routes/reason_routes.py",
         "status": "active"
     },
     {
         "path": "/reflect",
         "method": "POST",
-        "input_schema": "ReflectRequest",
-        "output_schema": "ReflectResponse",
-        "module": "routes/reflect_routes.py",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/orchestrator/reflect.py",
+        "status": "active"
+    },
+    {
+        "path": "/reflection/result/{reflection_id}",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": "ReflectionResultResponse",
+        "module": "app/routes/reflection_routes.py",
         "status": "active"
     },
     {
         "path": "/reflection/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/reflection_router.py",
         "status": "planned"
+    },
+    {
+        "path": "/reflection/trigger",
+        "method": "POST",
+        "input_schema": "ReflectionTriggerRequest",
+        "output_schema": "ReflectionResponse",
+        "module": "app/routes/reflection_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/reflection/trigger-scan",
+        "method": "POST",
+        "input_schema": "ReflectionScanRequest",
+        "output_schema": "ReflectionResponse",
+        "module": "app/routes/reflection_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/reflection/{reflection_id}",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "app/routes/reflection_routes.py",
+        "status": "active"
     },
     {
         "path": "/register",
         "method": "POST",
         "input_schema": "AgentRegisterRequest",
-        "output_schema": "AgentRegisterResponse",
-        "module": "routes/agent_register_routes.py",
+        "output_schema": None,
+        "module": "api/modules/agent.py",
         "status": "active"
     },
     {
-        "path": "/registry/status",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
-        "module": "routes/registry_router.py",
-        "status": "planned"
-    },
-    {
-        "path": "/render",
+        "path": "/resolve",
         "method": "POST",
-        "input_schema": "RenderRequest",
-        "output_schema": "RenderResponse",
-        "module": "routes/render_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/respond",
-        "method": "POST",
-        "input_schema": "RespondRequest",
-        "output_schema": "RespondResponse",
-        "module": "routes/respond_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/review",
-        "method": "POST",
-        "input_schema": "ReviewRequest",
-        "output_schema": "ReviewResponse",
-        "module": "routes/review_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/route",
-        "method": "POST",
-        "input_schema": "RouteRequest",
-        "output_schema": "RouteResponse",
-        "module": "routes/route_routes.py",
+        "input_schema": "AshResolutionRequest",
+        "output_schema": "AshResolutionResult",
+        "module": "routes/ash_routes.py",
         "status": "active"
     },
     {
         "path": "/sage/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/sage_router.py",
         "status": "planned"
     },
     {
         "path": "/scan",
         "method": "POST",
-        "input_schema": "ScanRequest",
-        "output_schema": "ScanResponse",
-        "module": "routes/scan_routes.py",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/orchestrator/scan.py",
         "status": "active"
     },
     {
-        "path": "/search",
-        "method": "POST",
-        "input_schema": "SearchRequest",
-        "output_schema": "SearchResponse",
-        "module": "routes/search_routes.py",
-        "status": "active"
+        "path": "/schema/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/schema_router.py",
+        "status": "planned"
     },
     {
         "path": "/self/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/self_router.py",
         "status": "planned"
     },
     {
-        "path": "/send",
-        "method": "POST",
-        "input_schema": "StreamSendRequest",
-        "output_schema": "StreamSendResponse",
-        "module": "routes/delegate_stream_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/session",
-        "method": "POST",
-        "input_schema": "SessionRequest",
-        "output_schema": "SessionResponse",
-        "module": "routes/session_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/session/{session_id}",
+        "path": "/sitegen/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": "Dict",
-        "module": "api/session.py",
-        "status": "active"
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/sitegen_router.py",
+        "status": "planned"
     },
     {
-        "path": "/session/{session_id}/messages",
+        "path": "/skeptic/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
-        "module": "api/session.py",
-        "status": "active"
-    },
-    {
-        "path": "/session/{session_id}/status",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "Dict",
-        "module": "api/session.py",
-        "status": "active"
-    },
-    {
-        "path": "/sessions",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
-        "module": "api/session.py",
-        "status": "active"
-    },
-    {
-        "path": "/sessions/create",
-        "method": "POST",
-        "input_schema": "Dict",
-        "output_schema": "Dict",
-        "module": "api/session.py",
-        "status": "active"
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/skeptic_router.py",
+        "status": "planned"
     },
     {
         "path": "/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "api/status.py",
         "status": "planned"
+    },
+    {
+        "path": "/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "api/modules/agent.py",
+        "status": "active"
     },
     {
         "path": "/stream",
         "method": "POST",
         "input_schema": "StreamRequest",
         "output_schema": "StreamResponse",
-        "module": "routes/stream_routes.py",
+        "module": "routes/delegate_stream_routes.py",
         "status": "active"
+    },
+    {
+        "path": "/stream/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/delegate_stream_router.py",
+        "status": "planned"
     },
     {
         "path": "/summarize",
         "method": "POST",
-        "input_schema": "SummarizeRequest",
-        "output_schema": "SummarizeResponse",
-        "module": "routes/summarize_routes.py",
+        "input_schema": "SageSummaryRequest",
+        "output_schema": "SageSummaryResponse",
+        "module": "routes/sage_summary_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/sync",
+        "method": "POST",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/orchestrator/sync.py",
         "status": "active"
     },
     {
         "path": "/system/status",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
+        "input_schema": None,
+        "output_schema": None,
         "module": "routes/system_router.py",
         "status": "planned"
     },
     {
         "path": "/task",
         "method": "POST",
-        "input_schema": "TaskRequest",
-        "output_schema": "TaskResponse",
-        "module": "routes/task_routes.py",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/task_route.py",
         "status": "active"
     },
     {
         "path": "/task/{task_id}",
         "method": "GET",
-        "input_schema": null,
+        "input_schema": None,
         "output_schema": "Dict",
-        "module": "api/task.py",
+        "module": "api/control.py",
         "status": "active"
     },
     {
         "path": "/task/{task_id}/status",
         "method": "GET",
-        "input_schema": null,
+        "input_schema": None,
         "output_schema": "Dict",
-        "module": "api/task.py",
-        "status": "active"
-    },
-    {
-        "path": "/tasks",
-        "method": "GET",
-        "input_schema": null,
-        "output_schema": "List",
-        "module": "api/task.py",
-        "status": "active"
-    },
-    {
-        "path": "/tasks/create",
-        "method": "POST",
-        "input_schema": "Dict",
-        "output_schema": "Dict",
-        "module": "api/task.py",
+        "module": "api/control.py",
         "status": "active"
     },
     {
         "path": "/test",
         "method": "POST",
-        "input_schema": "TestRequest",
-        "output_schema": "TestResponse",
-        "module": "routes/test_routes.py",
+        "input_schema": "AshTestRequest",
+        "output_schema": "AshTestResult",
+        "module": "routes/ash_routes.py",
         "status": "active"
     },
     {
-        "path": "/trace",
+        "path": "/train",
         "method": "POST",
-        "input_schema": "TraceRequest",
-        "output_schema": "TraceResponse",
-        "module": "routes/trace_routes.py",
+        "input_schema": "TrainerRequest",
+        "output_schema": "TrainerResponse",
+        "module": "routes/trainer_routes.py",
         "status": "active"
     },
     {
-        "path": "/transform",
-        "method": "POST",
-        "input_schema": "TransformRequest",
-        "output_schema": "TransformResponse",
-        "module": "routes/transform_routes.py",
-        "status": "active"
-    },
-    {
-        "path": "/translate",
-        "method": "POST",
-        "input_schema": "TranslateRequest",
-        "output_schema": "TranslateResponse",
-        "module": "routes/translate_routes.py",
-        "status": "active"
+        "path": "/trainer/status",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "routes/trainer_router.py",
+        "status": "planned"
     },
     {
         "path": "/upload",
         "method": "POST",
-        "input_schema": null,
-        "output_schema": null,
-        "module": "routes/upload_file_routes.py",
-        "status": "planned"
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/upload_file.py",
+        "status": "active"
     },
     {
         "path": "/validate",
         "method": "POST",
-        "input_schema": "ValidateRequest",
-        "output_schema": "ValidateResponse",
-        "module": "routes/validate_routes.py",
+        "input_schema": "Request",
+        "output_schema": None,
+        "module": "api/orchestrator/validate.py",
         "status": "active"
     },
     {
-        "path": "/verify",
+        "path": "/validate-schema",
         "method": "POST",
-        "input_schema": "VerifyRequest",
-        "output_schema": "VerifyResponse",
-        "module": "routes/verify_routes.py",
+        "input_schema": "CTOSchemaRequest",
+        "output_schema": "CTOSchemaResult",
+        "module": "routes/cto_routes.py",
         "status": "active"
     },
     {
-        "path": "/version",
+        "path": "/ws",
         "method": "GET",
-        "input_schema": null,
-        "output_schema": null,
-        "module": "api/version.py",
+        "input_schema": None,
+        "output_schema": None,
+        "module": "api/websocket.py",
         "status": "planned"
-    },
-    {
-        "path": "/write",
-        "method": "POST",
-        "input_schema": "MemoryWriteRequest",
-        "output_schema": null,
-        "module": "api/memory.py",
-        "status": "active"
     }
 ]
 
-# For backward compatibility, also provide the endpoints as a list
-ENDPOINT_LIST = ENDPOINT_REGISTRY
+# Helper function to get endpoint by path and method
+def get_endpoint(path: str, method: str) -> Optional[EndpointEntry]:
+    """Get endpoint entry by path and method."""
+    for entry in ENDPOINT_REGISTRY:
+        if entry["path"] == path and entry["method"] == method:
+            return EndpointEntry(**entry)
+    return None
+
+# Helper function to get all endpoints
+def get_all_endpoints() -> List[EndpointEntry]:
+    """Get all endpoint entries."""
+    return [EndpointEntry(**entry) for entry in ENDPOINT_REGISTRY]
+

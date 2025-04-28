@@ -1,3 +1,4 @@
+# memory_tag: phase4.0_sprint1_cognitive_reflection_chain_activation
 """
 Reflection Routes Module
 
@@ -16,12 +17,17 @@ import logging
 # Import reflection modules
 from app.modules.reflection_scanner import trigger_scan_deep
 from app.modules.reflection_analyzer import analyze_reflection
+from app.modules.reflection_chain_weaver import weave_reflection_chain
 
 # Import reflection schemas
 from app.schemas.reflection_schemas import (
     ReflectionScanRequest,
     ReflectionScanResponse,
     ReflectionAnalysisResult
+)
+from app.schemas.reflection_chain_schemas import (
+    ReflectionChainRequest,
+    ReflectionChainResponse
 )
 
 # Configure logging
@@ -62,6 +68,31 @@ class ReflectionResultResponse(BaseModel):
 # Note: The original ReflectionScanRequest has been replaced by the imported schema from reflection_schemas.py
 
 router = APIRouter(tags=["reflection"])
+
+# memory_tag: phase4.0_sprint1_cognitive_reflection_chain_activation
+@router.post("/reflection/chain", response_model=ReflectionChainResponse)
+async def create_reflection_chain(request: ReflectionChainRequest):
+    """
+    Create a chain of reflections, identifying meta-patterns and potentially triggering actions.
+    
+    This endpoint weaves multiple reflection insights into a coherent chain or narrative,
+    potentially identifying meta-patterns or escalating critical drifts based on combined insights.
+    
+    Returns a detailed chain result with meta-insights and triggered actions.
+    """
+    logger.info(f"Starting reflection chain weaving for {len(request.reflection_ids)} reflections")
+    
+    try:
+        # Call the reflection chain weaver module function
+        chain_result = await weave_reflection_chain(request)
+        
+        logger.info(f"Reflection chain weaving completed successfully with ID: {chain_result.chain_id}")
+        
+        # Return the chain result
+        return chain_result
+    except Exception as e:
+        logger.error(f"Error during reflection chain weaving: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to complete reflection chain weaving: {str(e)}")
 
 @router.post("/reflection/trigger-scan-deep", response_model=ReflectionScanResponse)
 async def trigger_deep_reflection_scan(request: ReflectionScanRequest):
