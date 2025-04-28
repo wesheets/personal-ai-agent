@@ -67,12 +67,12 @@ class ReflectionAnalyzer:
                 insights=[],
                 drift_triggers=[],
                 recovery_paths=[],
-                summary=ReflectionSummary(insight_count=0, drift_trigger_count=0, recovery_path_count=0, reflection_health=0.0)
+                summary=ReflectionAnalysisSummary(insight_count=0, drift_trigger_count=0, recovery_path_count=0, reflection_health=0.0)
             )
         
         # Analyze reflection data
         insights_raw = self._analyze_reflection_data(reflection_data)
-        insights = [ReflectionInsight(**insight) for insight in insights_raw]
+        insights = [Insight(**insight) for insight in insights_raw]
         
         # Generate drift triggers
         drift_triggers_raw = self._identify_drift_triggers(reflection_data)
