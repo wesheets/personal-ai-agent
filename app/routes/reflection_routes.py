@@ -26,6 +26,8 @@ from app.schemas.reflection_schemas import (
     ReflectionAnalysisResult
 )
 from app.schemas.reflection_chain_schemas import (
+from .schemas.reflectionchain_schemas import ReflectionChainRequest
+from .schemas.reflectionchain_schemas import ReflectionChainResponse
     ReflectionChainRequest,
     ReflectionChainResponse
 )

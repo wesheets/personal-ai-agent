@@ -46,6 +46,8 @@ except ImportError:
 # Import manifest manager if available
 try:
     from app.utils.manifest_manager import register_route, update_hardening_layer
+from .schemas.drifthealing_schemas import DriftHealingRequest
+from .schemas.drifthealing_schemas import DriftHealingResult
     manifest_available = True
 except ImportError:
     manifest_available = False

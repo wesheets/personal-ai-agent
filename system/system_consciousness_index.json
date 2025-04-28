@@ -1,5 +1,76 @@
 {
-  "schemas": [],
+  "schemas": [
+    {
+      "name": "app/schemas/drifthealing_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/drift",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/schemas/loopvalidate_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/loop",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/schemas/planchain_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/plan",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/schemas/plancreate_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/plan",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/schemas/planexecution_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/plan",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/schemas/planupdate_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/plan",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/schemas/reflectionchain_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/reflection",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/schemas/snapshotrestore_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/snapshot",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/schemas/snapshot_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/snapshot",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/schemas/snapshotsave_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/snapshot",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    }
+  ],
   "modules": [
     {
       "name": "app/modules/reflection_chain_weaver.py",

@@ -34,6 +34,8 @@ from app.agents.critic import run_critic_agent
 
 # Import code generation module
 from app.modules.code_generation.hal_code_generator import process_build_task
+from .schemas.loopvalidate_schemas import LoopValidateRequest
+from .schemas.loopvalidate_schemas import LoopValidateResponse
 
 # Configure logging
 logger = logging.getLogger("app.routes.loop_routes")
@@ -558,7 +560,7 @@ async def get_loop_trace(project_id: Optional[str] = None):
         ]
     }
 
-@router.post("/api/loop/trace")
+@router.post("/trace")
 async def add_loop_trace(data: LoopTraceRequest):
     """
     Inject synthetic loop trace.
