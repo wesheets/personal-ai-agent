@@ -317,6 +317,48 @@
       "api_surface": "/api/project"
     },
     {
+      "name": "app/routes/agent_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/agent"
+    },
+    {
+      "name": "app/routes/memory_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/memory"
+    },
+    {
+      "name": "app/routes/loop_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/loop"
+    },
+    {
+      "name": "app/schemas/agent/agent_list_schema.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/agent"
+    },
+    {
+      "name": "app/schemas/memory/memory_add_schema.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/memory"
+    },
+    {
+      "name": "app/schemas/memory/memory_get_key_schema.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/memory"
+    },
+    {
+      "name": "app/schemas/loop/loop_create_schema.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/loop"
+    },
+    {
       "name": "core/agent_coordinator.py",
       "category": "Reflection/Memory/Core",
       "status": "active"
@@ -659,22 +701,7 @@
       "category": "Reflection/Memory/Core",
       "status": "active",
       "api_surface": "/api/reflection"
-    },
-    {
-      "name": "modules/reflection_fatigue_scoring.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/reflection_grader.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/reflection_guardrails.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
     }
   ],
-  "memory_tag": "phase2.6_memory_surface_update_post_batch1.5"
+  "memory_tag": "phase3.0_sprint1_memory_surface_update"
 }

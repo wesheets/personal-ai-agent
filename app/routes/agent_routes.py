@@ -2,14 +2,52 @@
 Agent Routes Module
 
 This module defines the agent-related routes for the Promethios API.
+
+# memory_tag: phase3.0_sprint1_core_cognitive_handler_activation
 """
 
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional, List
 from app.utils.persona_utils import get_current_persona
 from app.schemas.agent.analyze_prompt_schema import AnalyzePromptRequest, AnalyzePromptResponse
+from app.schemas.agent.agent_list_schema import AgentListResponse
+import json
+import os
 
 router = APIRouter(tags=["agent"])
+
+@router.get("/list", response_model=AgentListResponse)
+async def list_agents():
+    """
+    Get a list of all available agents from the Agent Cognition Index.
+    
+    Returns:
+        AgentListResponse: A response containing the list of agents and their metadata.
+    """
+    try:
+        # Read the agent cognition index file
+        aci_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
+                               "system", "agent_cognition_index.json")
+        
+        with open(aci_path, 'r') as f:
+            aci_data = json.load(f)
+        
+        # Extract the agents list
+        agents = aci_data.get("agents", [])
+        
+        return AgentListResponse(
+            status="ok",
+            agents=agents,
+            message=f"Successfully retrieved {len(agents)} agents"
+        )
+    except Exception as e:
+        # Log the error and return a generic error response
+        print(f"Error retrieving agent list: {str(e)}")
+        return AgentListResponse(
+            status="error",
+            agents=[],
+            message="Failed to retrieve agent list"
+        )
 
 @router.post("/analyze-prompt", response_model=AnalyzePromptResponse)
 async def analyze_prompt(data: AnalyzePromptRequest):

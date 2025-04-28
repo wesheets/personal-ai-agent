@@ -410,7 +410,89 @@
       "registered_module": "agent_registry.py",
       "status": "active",
       "api_surface": "/api/project"
+    },
+    {
+      "name": "AgentRegistry",
+      "input_schema": [
+        "query_type",
+        "filters"
+      ],
+      "output_schema": [
+        "status",
+        "agents",
+        "count",
+        "message"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active",
+      "api_surface": "/api/agent"
+    },
+    {
+      "name": "MemoryStore",
+      "input_schema": [
+        "key",
+        "value",
+        "metadata"
+      ],
+      "output_schema": [
+        "status",
+        "memory_id",
+        "key",
+        "message"
+      ],
+      "registered_module": "memory_registry.py",
+      "status": "active",
+      "api_surface": "/api/memory"
+    },
+    {
+      "name": "MemoryRetriever",
+      "input_schema": [
+        "key"
+      ],
+      "output_schema": [
+        "status",
+        "key",
+        "value",
+        "memory_id",
+        "timestamp"
+      ],
+      "registered_module": "memory_registry.py",
+      "status": "active",
+      "api_surface": "/api/memory"
+    },
+    {
+      "name": "LoopCreator",
+      "input_schema": [
+        "plan_id",
+        "loop_type",
+        "metadata"
+      ],
+      "output_schema": [
+        "status",
+        "loop_id",
+        "plan_id",
+        "message"
+      ],
+      "registered_module": "loop_registry.py",
+      "status": "active",
+      "api_surface": "/api/loop"
+    },
+    {
+      "name": "LoopRetriever",
+      "input_schema": [
+        "loop_id"
+      ],
+      "output_schema": [
+        "status",
+        "loop_id",
+        "plan_id",
+        "loop_type",
+        "timestamp"
+      ],
+      "registered_module": "loop_registry.py",
+      "status": "active",
+      "api_surface": "/api/loop"
     }
   ],
-  "memory_tag": "phase2.6_memory_surface_update_post_batch1.5"
+  "memory_tag": "phase3.0_sprint1_memory_surface_update"
 }
