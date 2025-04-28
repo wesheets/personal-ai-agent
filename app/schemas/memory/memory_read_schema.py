@@ -32,3 +32,13 @@ class MemoryReadByIdResponse(BaseModel):
     task_id: Optional[str] = Field(None, description="ID of the associated task")
     metadata: Optional[Dict[str, Any]] = Field(default={}, description="Additional metadata")
     status: str = Field(..., description="Status of the operation")
+
+
+
+# memory_tag: phase3.3b_critical_surface_patch
+class MemoryReadRequest(BaseModel):
+    """
+    Schema for memory read request.
+    """
+    memory_id: str
+    include_full_context: bool = False
