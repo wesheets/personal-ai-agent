@@ -1,6 +1,24 @@
 {
   "modules": [
     {
+      "name": "app/routes/reflection_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/reflection"
+    },
+    {
+      "name": "app/routes/drift_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/drift"
+    },
+    {
+      "name": "app/schemas/drift_schema.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/drift"
+    },
+    {
       "name": "agents/memory_agent.py",
       "category": "Reflection/Memory/Core",
       "status": "active"
@@ -377,5 +395,5 @@
       "api_surface": "/api/loop"
     }
   ],
-  "memory_tag": "phase3.0_sprint1.1_integration_cleanup"
+  "memory_tag": "phase3.0_sprint2_memory_surface_update"
 }

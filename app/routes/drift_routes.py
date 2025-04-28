@@ -3,6 +3,8 @@ Drift Routes Module
 
 This module provides API routes for drift monitoring and reporting,
 enabling detection of changes in loop outputs, agent behaviors, or schema versions.
+
+memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Request
@@ -59,6 +61,16 @@ if manifest_available:
         logging.info("✅ Drift routes registered with manifest")
     except Exception as e:
         logging.error(f"❌ Failed to register drift routes with manifest: {str(e)}")
+
+@router.post("/drift/report", response_model=DriftMonitorResponse)
+async def report_drift(request: DriftMonitorRequest):
+    """
+    Report drift between previous and current loop outputs.
+    
+    This endpoint compares current output with previous output (from tag, snapshot, or history)
+    and returns a drift score and recommended action.
+    """
+    return await monitor_drift(request)
 
 @router.post("/drift/monitor", response_model=DriftMonitorResponse)
 async def monitor_drift(request: DriftMonitorRequest):

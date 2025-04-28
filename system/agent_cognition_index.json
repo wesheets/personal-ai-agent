@@ -1,6 +1,96 @@
 {
   "agents": [
     {
+      "name": "ReflectionTrigger",
+      "input_schema": [
+        "source",
+        "context",
+        "priority"
+      ],
+      "output_schema": [
+        "reflection_id",
+        "status",
+        "message",
+        "timestamp"
+      ],
+      "registered_module": "reflection_registry.py",
+      "status": "active",
+      "api_surface": "/api/reflection"
+    },
+    {
+      "name": "ReflectionRetriever",
+      "input_schema": [
+        "reflection_id"
+      ],
+      "output_schema": [
+        "reflection_id",
+        "status",
+        "source",
+        "insights",
+        "recommendations",
+        "timestamp"
+      ],
+      "registered_module": "reflection_registry.py",
+      "status": "active",
+      "api_surface": "/api/reflection"
+    },
+    {
+      "name": "DriftReporter",
+      "input_schema": [
+        "loop_id",
+        "agent",
+        "current_output_tag",
+        "previous_output_tag",
+        "snapshot_id",
+        "threshold"
+      ],
+      "output_schema": [
+        "status",
+        "drift_log",
+        "recommended_action"
+      ],
+      "registered_module": "drift_registry.py",
+      "status": "active",
+      "api_surface": "/api/drift"
+    },
+    {
+      "name": "PlanCreator",
+      "input_schema": [
+        "title",
+        "description",
+        "steps"
+      ],
+      "output_schema": [
+        "status",
+        "message",
+        "plan_id",
+        "title",
+        "description",
+        "steps",
+        "created_at"
+      ],
+      "registered_module": "plan_registry.py",
+      "status": "active",
+      "api_surface": "/api/plan"
+    },
+    {
+      "name": "PlanRetriever",
+      "input_schema": [
+        "plan_id"
+      ],
+      "output_schema": [
+        "status",
+        "plan_id",
+        "title",
+        "description",
+        "steps",
+        "created_at"
+      ],
+      "registered_module": "plan_registry.py",
+      "status": "active",
+      "api_surface": "/api/plan"
+    },
+    {
       "name": "Ash",
       "input_schema": [
         "objective",
@@ -494,5 +584,5 @@
       "api_surface": "/api/loop"
     }
   ],
-  "memory_tag": "phase3.0_sprint1.1_integration_cleanup"
+  "memory_tag": "phase3.0_sprint2_memory_surface_update"
 }

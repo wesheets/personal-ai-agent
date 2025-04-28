@@ -3,6 +3,8 @@ Drift Monitoring Schema Module
 
 This module defines the data models for loop drift monitoring,
 enabling detection of changes in loop outputs, agent behaviors, or schema versions.
+
+memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
 """
 
 from pydantic import BaseModel, Field

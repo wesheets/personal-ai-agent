@@ -7,8 +7,75 @@ This module defines the reflection-related routes for the Promethios API.
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, Optional, List
 from pydantic import BaseModel
+import uuid
+from datetime import datetime
+
+# memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
+class ReflectionTriggerRequest(BaseModel):
+    """
+    Request model for triggering a reflection cycle.
+    """
+    source: str
+    context: Optional[Dict[str, Any]] = None
+    priority: Optional[str] = "normal"
+
+# memory_tag: phase3.0_sprint2_reflection_drift_plan_activation
+class ReflectionResponse(BaseModel):
+    """
+    Response model for reflection operations.
+    """
+    reflection_id: str
+    status: str
+    message: str
+    timestamp: str
 
 router = APIRouter(tags=["reflection"])
+
+@router.post("/reflection/trigger")
+async def trigger_reflection(request: ReflectionTriggerRequest) -> ReflectionResponse:
+    """
+    Trigger a basic reflection cycle.
+    
+    This endpoint initiates a new reflection cycle based on the provided source and context.
+    Returns a unique reflection_id that can be used to retrieve the reflection results.
+    """
+    # Generate a unique reflection ID
+    reflection_id = str(uuid.uuid4())
+    
+    # In a real implementation, this would initiate an asynchronous reflection process
+    # For now, we'll just return a success response with the reflection ID
+    
+    return ReflectionResponse(
+        reflection_id=reflection_id,
+        status="initiated",
+        message=f"Reflection cycle initiated from source: {request.source}",
+        timestamp=datetime.utcnow().isoformat()
+    )
+
+@router.get("/reflection/{reflection_id}")
+async def get_reflection(reflection_id: str):
+    """
+    Retrieve reflection metadata for a specific reflection ID.
+    
+    This endpoint returns the metadata and results of a previously triggered reflection cycle.
+    """
+    # In a real implementation, this would retrieve reflection data from storage
+    # For now, return a mock response
+    return {
+        "reflection_id": reflection_id,
+        "status": "completed",
+        "source": "system",
+        "insights": [
+            "System performance is within expected parameters",
+            "Memory usage is optimal",
+            "No significant anomalies detected"
+        ],
+        "recommendations": [
+            "Continue monitoring system performance",
+            "No immediate actions required"
+        ],
+        "timestamp": datetime.utcnow().isoformat(),
+    }
 
 @router.get("/reflection/{project_id}")
 async def get_project_reflection(project_id: str):
