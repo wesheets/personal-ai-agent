@@ -1,6 +1,45 @@
 {
   "agents": [
     {
+      "name": "ReflectionScanner",
+      "input_schema": [
+        "scan_depth",
+        "include_agents",
+        "include_modules",
+        "include_schemas",
+        "filters"
+      ],
+      "output_schema": [
+        "scan_id",
+        "timestamp",
+        "status",
+        "reflection_nodes",
+        "summary"
+      ],
+      "registered_module": "reflection_registry.py",
+      "status": "active",
+      "api_surface": "/api/reflection"
+    },
+    {
+      "name": "ReflectionAnalyzer",
+      "input_schema": [
+        "reflection_id"
+      ],
+      "output_schema": [
+        "analysis_id",
+        "reflection_id",
+        "timestamp",
+        "status",
+        "insights",
+        "drift_triggers",
+        "recovery_paths",
+        "summary"
+      ],
+      "registered_module": "reflection_registry.py",
+      "status": "active",
+      "api_surface": "/api/reflection"
+    },
+    {
       "name": "PlanExecutor",
       "input_schema": [
         "plan_id",
@@ -660,5 +699,5 @@
       "api_surface": "/api/loop"
     }
   ],
-  "memory_tag": "phase3.0_sprint3_cognitive_loop_deepening"
+  "memory_tag": "phase3.0_sprint4_cognitive_reflection_plan_chaining"
 }

@@ -17,6 +17,22 @@ class EndpointEntry(BaseModel):
 # Initialize the endpoint registry
 ENDPOINT_REGISTRY = [
     {
+        "path": "/api/reflection/trigger-scan-deep",
+        "method": "POST",
+        "input_schema": "ReflectionScanRequest",
+        "output_schema": "ReflectionScanResponse",
+        "module": "app/routes/reflection_routes.py",
+        "status": "active"
+    },
+    {
+        "path": "/api/reflection/analyze/{reflection_id}",
+        "method": "GET",
+        "input_schema": None,
+        "output_schema": "ReflectionAnalysisResult",
+        "module": "app/routes/reflection_routes.py",
+        "status": "active"
+    },
+    {
         "path": "",
         "method": "POST",
         "input_schema": "Request",
