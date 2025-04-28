@@ -2,6 +2,24 @@
   "schemas": [],
   "modules": [
     {
+      "name": "app/modules/reflection_scanner.py",
+      "category": "Reflection Module",
+      "status": "active",
+      "api_surface": "/api/reflection"
+    },
+    {
+      "name": "app/modules/reflection_analyzer.py",
+      "category": "Reflection Module",
+      "status": "active",
+      "api_surface": "/api/reflection"
+    },
+    {
+      "name": "app/schemas/reflection_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/reflection"
+    },
+    {
       "name": "app/routes/reflection_routes.py",
       "category": "API Router",
       "status": "active",
@@ -396,5 +414,5 @@
       "api_surface": "/api/loop"
     }
   ],
-  "memory_tag": "phase3.0_sprint3.1_drift_patch_memory_surface"
+  "memory_tag": "phase3.0_sprint4_cognitive_reflection_plan_chaining"
 }

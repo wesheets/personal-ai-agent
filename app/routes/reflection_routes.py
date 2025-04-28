@@ -3,7 +3,7 @@ Reflection Routes Module
 
 This module defines the reflection-related routes for the Promethios API.
 
-# memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+# memory_tag: phase3.0_sprint4_cognitive_reflection_plan_chaining
 """
 
 from fastapi import APIRouter, HTTPException, Depends
@@ -13,10 +13,21 @@ import uuid
 from datetime import datetime
 import logging
 
+# Import reflection modules
+from app.modules.reflection_scanner import trigger_scan_deep
+from app.modules.reflection_analyzer import analyze_reflection
+
+# Import reflection schemas
+from app.schemas.reflection_schemas import (
+    ReflectionScanRequest,
+    ReflectionScanResponse,
+    ReflectionAnalysisResult
+)
+
 # Configure logging
 logger = logging.getLogger("app.routes.reflection_routes")
 
-# memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+# memory_tag: phase3.0_sprint4_cognitive_reflection_plan_chaining
 class ReflectionTriggerRequest(BaseModel):
     """
     Request model for triggering a reflection cycle.
@@ -25,25 +36,7 @@ class ReflectionTriggerRequest(BaseModel):
     context: Optional[Dict[str, Any]] = None
     priority: Optional[str] = "normal"
 
-# memory_tag: phase3.0_sprint3_cognitive_loop_deepening
-class ReflectionScanRequest(BaseModel):
-    """
-    Request model for triggering a reflection surface scan.
-    """
-    target: str = Field(..., description="Target surface to scan")
-    depth: Optional[int] = Field(1, description="Scan depth level")
-    include_metadata: Optional[bool] = Field(False, description="Whether to include metadata in scan results")
-    
-    class Config:
-        schema_extra = {
-            "example": {
-                "target": "memory_surface",
-                "depth": 2,
-                "include_metadata": True
-            }
-        }
-
-# memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+# memory_tag: phase3.0_sprint4_cognitive_reflection_plan_chaining
 class ReflectionResponse(BaseModel):
     """
     Response model for reflection operations.
@@ -53,7 +46,7 @@ class ReflectionResponse(BaseModel):
     message: str
     timestamp: str
 
-# memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+# memory_tag: phase3.0_sprint4_cognitive_reflection_plan_chaining
 class ReflectionResultResponse(BaseModel):
     """
     Response model for reflection result operations.
@@ -66,7 +59,64 @@ class ReflectionResultResponse(BaseModel):
     timestamp: str
     metadata: Optional[Dict[str, Any]] = None
 
+# Note: The original ReflectionScanRequest has been replaced by the imported schema from reflection_schemas.py
+
 router = APIRouter(tags=["reflection"])
+
+@router.post("/reflection/trigger-scan-deep", response_model=ReflectionScanResponse)
+async def trigger_deep_reflection_scan(request: ReflectionScanRequest):
+    """
+    Trigger a full system reflection deep scan.
+    
+    This endpoint initiates a comprehensive scan of memory surfaces to identify reflection nodes,
+    analyze potential drift triggers, and map recovery paths.
+    
+    Returns a detailed scan result with identified reflection nodes and summary statistics.
+    
+    # memory_tag: phase3.0_sprint4_cognitive_reflection_plan_chaining
+    """
+    logger.info(f"Starting deep reflection scan with parameters: {request.dict()}")
+    
+    try:
+        # Convert Pydantic model to dict for the module function
+        scan_params = request.dict()
+        
+        # Call the scanner module function
+        scan_result = trigger_scan_deep(scan_params)
+        
+        logger.info(f"Deep reflection scan completed successfully with ID: {scan_result['scan_id']}")
+        
+        # Return the scan result
+        return scan_result
+    except Exception as e:
+        logger.error(f"Error during deep reflection scan: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to complete deep reflection scan: {str(e)}")
+
+@router.get("/reflection/analyze/{reflection_id}", response_model=ReflectionAnalysisResult)
+async def analyze_reflection_node(reflection_id: str):
+    """
+    Analyze a specific reflection surface by ID.
+    
+    This endpoint performs deep analysis on a specific reflection node to identify
+    drift triggers, recovery paths, and generate insights.
+    
+    Returns a detailed analysis result with insights, drift triggers, and recovery paths.
+    
+    # memory_tag: phase3.0_sprint4_cognitive_reflection_plan_chaining
+    """
+    logger.info(f"Starting reflection analysis for ID: {reflection_id}")
+    
+    try:
+        # Call the analyzer module function
+        analysis_result = analyze_reflection(reflection_id)
+        
+        logger.info(f"Reflection analysis completed successfully with ID: {analysis_result['analysis_id']}")
+        
+        # Return the analysis result
+        return analysis_result
+    except Exception as e:
+        logger.error(f"Error during reflection analysis: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to complete reflection analysis: {str(e)}")
 
 @router.post("/reflection/trigger-scan", response_model=ReflectionResponse)
 async def trigger_reflection_scan(request: ReflectionScanRequest):
