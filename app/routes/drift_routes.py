@@ -199,6 +199,7 @@ async def monitor_drift(request: DriftMonitorRequest):
             recommended_action="log_error"
         )
 
+# memory_tag: phase4.0_sprint1_post_build_validation_activation_control
 @router.post("/drift/auto-heal", response_model=DriftHealingResult)
 async def auto_heal_drift_endpoint(request: DriftHealingRequest):
     """
@@ -207,26 +208,18 @@ async def auto_heal_drift_endpoint(request: DriftHealingRequest):
     This endpoint initiates an auto-healing process for a specific drift issue
     using the provided strategy and parameters, leveraging the DriftAutoHealer module.
     
-    memory_tag: phase4.0_sprint1_cognitive_reflection_chain_activation
+    NOTE: This endpoint is currently frozen as part of controlled activation.
     """
-    try:
-        # Log the request
-        logger.info(f"Received auto-heal request for drift ID: {request.drift_id} with strategy: {request.strategy}")
-        
-        # Call the drift auto-healer module
-        response = await auto_heal_drift_module(request)
-        
-        return response
+    logger.info(f"Received auto-heal request for drift ID: {request.drift_id}, but endpoint is frozen")
     
-    except Exception as e:
-        logger.error(f"❌ Error initiating auto-healing for drift {request.drift_id}: {str(e)}")
-        logger.error(traceback.format_exc())
-        
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error initiating auto-healing: {str(e)}"
-        )
-
+    # Return a controlled response indicating the endpoint is frozen
+    return DriftHealingResult(
+        healing_attempt_id=f"frozen_heal_{uuid.uuid4().hex[:8]}",
+        drift_id=request.drift_id,
+        status="frozen",
+        message="This endpoint is currently frozen as part of controlled activation. The drift auto-healing functionality is temporarily disabled.",
+        timestamp=datetime.utcnow().isoformat()
+    )
 @router.get("/drift/log", response_model=DriftLogResponse)
 async def get_drift_logs(loop_id: Optional[str] = None, agent: Optional[str] = None):
     """
