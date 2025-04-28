@@ -38,7 +38,9 @@ class MemoryReadByIdResponse(BaseModel):
 # memory_tag: phase3.3b_critical_surface_patch
 class MemoryReadRequest(BaseModel):
     """
-    Schema for memory read request.
+    Minimal schema for memory read request (placeholder).
     """
-    memory_id: str
-    include_full_context: bool = False
+    query: Optional[Dict[str, Any]] = Field(default={}, description="Query filters for memory retrieval")
+    limit: Optional[int] = Field(default=100, description="Maximum number of memories to return")
+    offset: Optional[int] = Field(default=0, description="Offset for pagination")
+
