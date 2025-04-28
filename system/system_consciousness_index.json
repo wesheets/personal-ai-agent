@@ -167,7 +167,8 @@
     {
       "name": "api/modules/plan.py",
       "category": "Agent Module",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/plan"
     },
     {
       "name": "api/modules/plan.py",
@@ -213,6 +214,12 @@
       "name": "api/modules/system.py",
       "category": "Agent Module",
       "status": "active"
+    },
+    {
+      "name": "api/modules/train.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/train"
     },
     {
       "name": "api/modules/user_context.py",
@@ -278,6 +285,36 @@
       "name": "api/task/status.py",
       "category": "API Router",
       "status": "active"
+    },
+    {
+      "name": "app/routes/plan_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/plan"
+    },
+    {
+      "name": "app/routes/train_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/train"
+    },
+    {
+      "name": "app/routes/execute_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/execute"
+    },
+    {
+      "name": "app/routes/snapshot_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/snapshot"
+    },
+    {
+      "name": "routes/project_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/project"
     },
     {
       "name": "core/agent_coordinator.py",
@@ -591,17 +628,20 @@
     {
       "name": "modules/plan/execute_chain.py",
       "category": "Reflection/Memory/Core",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/execute"
     },
     {
       "name": "modules/plan/scope.py",
       "category": "Reflection/Memory/Core",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/plan"
     },
     {
       "name": "modules/plan_generate.py",
       "category": "Reflection/Memory/Core",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/plan"
     },
     {
       "name": "modules/planning_logic_integration.py",
@@ -634,88 +674,7 @@
       "name": "modules/reflection_guardrails.py",
       "category": "Reflection/Memory/Core",
       "status": "active"
-    },
-    {
-      "name": "modules/reflection_styler.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/register_all_agents.py",
-      "category": "Agent Module",
-      "status": "active"
-    },
-    {
-      "name": "modules/summary_realism_scorer.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/symbolic_memory_encoder.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/trust_score_evaluator.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "routes/agent_routes.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/agent"
-    },
-    {
-      "name": "routes/memory_routes.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/memory"
-    },
-    {
-      "name": "routes/loop_routes.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/loop"
-    },
-    {
-      "name": "routes/reflection_routes.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/reflection"
-    },
-    {
-      "name": "routes/drift_routes.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/drift"
-    },
-    {
-      "name": "routes/core_routes.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "routes/debugger_routes.py",
-      "category": "API Router",
-      "status": "active"
-    },
-    {
-      "name": "routes/drift_routes_router.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active",
-      "api_surface": "/api/drift"
-    },
-    {
-      "name": "routes/health_monitor_routes.py",
-      "category": "API Router",
-      "status": "active"
-    },
-    {
-      "name": "routes/historian_routes.py",
-      "category": "API Router",
-      "status": "active"
     }
   ],
-  "memory_tag": "phase2.6_memory_surface_update_post_batch1.1_1.2"
+  "memory_tag": "phase2.6_memory_surface_update_post_batch1.5"
 }

@@ -83,6 +83,49 @@ except ImportError as e:
     print(f"⚠️ Failed to load reflection and drift routers: {e}")
     failed_routes.extend(["reflection", "drift"])
 
+# Execution and Planning Router Wiring - Phase 2.6 Batch 1.3 # memory_tag: phase2.6_batch1.3_execution_planning_router_wiring
+try:
+    from app.routes.plan_routes import router as plan_router
+    from app.routes.train_routes import router as train_router
+    from app.routes.execute_routes import router as execute_router
+    
+    # Include execution and planning routers with proper API prefixes
+    app.include_router(plan_router, prefix="/api/plan")
+    app.include_router(train_router, prefix="/api/train")
+    app.include_router(execute_router, prefix="/api/execute")
+    
+    loaded_routes.extend(["plan", "train", "execute"])
+    print("✅ Execution and Planning routers (plan, train, execute) loaded with proper API prefixes")
+except ImportError as e:
+    print(f"⚠️ Failed to load execution and planning routers: {e}")
+    failed_routes.extend(["plan", "train", "execute"])
+
+# Memory Utility Router Wiring - Phase 2.6 Batch 1.4 # memory_tag: phase2.6_batch1.4_memory_utility_router_wiring
+try:
+    from app.routes.snapshot_routes import router as snapshot_router
+    
+    # Include memory utility router with proper API prefix
+    app.include_router(snapshot_router, prefix="/api/snapshot")
+    
+    loaded_routes.append("snapshot")
+    print("✅ Memory Utility router (snapshot) loaded with proper API prefix")
+except ImportError as e:
+    print(f"⚠️ Failed to load memory utility router: {e}")
+    failed_routes.append("snapshot")
+
+# Extended System Router Wiring - Phase 2.6 Batch 1.5 # memory_tag: phase2.6_batch1.5_extended_system_router_wiring
+try:
+    from routes.project_routes import router as project_router
+    
+    # Include extended system router with proper API prefix
+    app.include_router(project_router, prefix="/api/project")
+    
+    loaded_routes.append("project")
+    print("✅ Extended System router (project) loaded with proper API prefix")
+except ImportError as e:
+    print(f"⚠️ Failed to load extended system router: {e}")
+    failed_routes.append("project")
+
 # Upload file routes
 try:
     from app.routes.upload_file_routes import router as upload_file_router
@@ -192,17 +235,6 @@ except ImportError as e:
     orchestrator_contract_routes_loaded = False
     print(f"⚠️ Failed to load orchestrator contract routes: {e}")
     failed_routes.append("orchestrator_contract")
-
-# Snapshot routes
-try:
-    from app.routes.snapshot_routes import router as snapshot_router
-    snapshot_routes_loaded = True
-    loaded_routes.append("snapshot")
-    print("✅ Snapshot routes loaded")
-except ImportError as e:
-    snapshot_routes_loaded = False
-    print(f"⚠️ Failed to load snapshot routes: {e}")
-    failed_routes.append("snapshot")
 
 # Forge routes (kept for backward compatibility)
 try:
@@ -345,13 +377,6 @@ if orchestrator_contract_routes_loaded:
     except Exception as e:
         print(f"⚠️ Failed to include orchestrator_contract_router: {e}")
 
-if snapshot_routes_loaded:
-    try:
-        app.include_router(snapshot_router)
-        print("✅ Included snapshot_router")
-    except Exception as e:
-        print(f"⚠️ Failed to include snapshot_router: {e}")
-
 if forge_routes_loaded:
     try:
         app.include_router(forge_router)
@@ -411,3 +436,6 @@ if __name__ == "__main__":
 # comprehensive endpoint fix Sat Apr 26 10:41:30 UTC 2025
 # core router wiring Mon Apr 28 01:12:00 UTC 2025
 # reflection and drift router wiring Mon Apr 28 01:19:45 UTC 2025
+# execution and planning router wiring Mon Apr 28 02:13:00 UTC 2025
+# memory utility router wiring Mon Apr 28 02:30:00 UTC 2025
+# extended system router wiring Mon Apr 28 03:05:00 UTC 2025
