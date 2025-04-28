@@ -1,12 +1,17 @@
 """
 Updated loop_routes.py to integrate with HAL code generation functionality
+
+# memory_tag: phase3.0_sprint1_core_cognitive_handler_activation
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Path
 from typing import Dict, Any, Optional, List
 from pydantic import BaseModel
 from datetime import datetime
 import logging
 import traceback
+import uuid
+import os
+import json
 
 # Import schemas
 from app.schemas.loop_schema import (
@@ -15,6 +20,7 @@ from app.schemas.loop_schema import (
 )
 from app.schemas.loop.loop_reset_schema import LoopResetRequest, LoopResetResponse
 from app.schemas.loop.loop_trace_schema import LoopTraceRequest, LoopTraceResponse
+from app.schemas.loop.loop_create_schema import LoopCreateRequest, LoopCreateResponse
 
 # Import memory operations
 from app.modules.memory_writer import write_memory
@@ -31,6 +37,9 @@ from app.modules.code_generation.hal_code_generator import process_build_task
 
 # Configure logging
 logger = logging.getLogger("app.routes.loop_routes")
+
+# Ensure logs directory exists
+os.makedirs("/home/ubuntu/personal-ai-agent/logs", exist_ok=True)
 
 router = APIRouter(tags=["loop"])
 
@@ -86,6 +95,194 @@ class PersonaReflectResponse(BaseModel):
     persona: str
     loop_id: str
     message: str
+
+@router.post("/create", response_model=LoopCreateResponse)
+async def create_loop(request: LoopCreateRequest):
+    """
+    Create a simple loop record with plan ID and loop type.
+    
+    Args:
+        request: LoopCreateRequest containing plan_id and loop_type
+            
+    Returns:
+        LoopCreateResponse containing status and loop_id
+    """
+    logger.info(f"🔍 DEBUG: loop_create endpoint called with plan_id: {request.plan_id}")
+    
+    try:
+        # In a real implementation, this would store the data in a database
+        # For this minimal viable handler, we'll store it in a simple JSON file
+        
+        loop_file = "/home/ubuntu/personal-ai-agent/logs/simple_loop_store.json"
+        
+        # Generate a unique loop ID
+        loop_id = str(uuid.uuid4())
+        
+        # Create loop entry
+        loop_entry = {
+            "loop_id": loop_id,
+            "plan_id": request.plan_id,
+            "loop_type": request.loop_type,
+            "metadata": request.metadata,
+            "status": "created",
+            "timestamp": str(datetime.now())
+        }
+        
+        # Check if loop file exists
+        if os.path.exists(loop_file):
+            # Read existing loop entries
+            try:
+                with open(loop_file, 'r') as f:
+                    loop_store = json.load(f)
+                    if not isinstance(loop_store, dict):
+                        loop_store = {}
+            except json.JSONDecodeError:
+                loop_store = {}
+        else:
+            loop_store = {}
+        
+        # Add new loop entry
+        loop_store[loop_id] = loop_entry
+        
+        # Write updated loop store
+        with open(loop_file, 'w') as f:
+            json.dump(loop_store, f, indent=2)
+        
+        logger.info(f"✅ Successfully created loop with ID: {loop_id}")
+        return LoopCreateResponse(
+            loop_id=loop_id,
+            plan_id=request.plan_id,
+            loop_type=request.loop_type,
+            status="success",
+            timestamp=str(datetime.now()),
+            metadata=request.metadata
+        )
+    except Exception as e:
+        logger.error(f"❌ Error creating loop with plan_id {request.plan_id}: {str(e)}")
+        
+        # Log the error to loop_fallback.json
+        try:
+            log_file = "/home/ubuntu/personal-ai-agent/logs/loop_fallback.json"
+            
+            # Create log entry
+            log_entry = {
+                "timestamp": str(datetime.now()),
+                "event": "route_error",
+                "endpoint": "loop_create",
+                "error": str(e)
+            }
+            
+            # Check if log file exists
+            if os.path.exists(log_file):
+                # Read existing logs
+                try:
+                    with open(log_file, 'r') as f:
+                        logs = json.load(f)
+                        if not isinstance(logs, list):
+                            logs = [logs]
+                except json.JSONDecodeError:
+                    logs = []
+            else:
+                logs = []
+            
+            # Append new log entry
+            logs.append(log_entry)
+            
+            # Write updated logs
+            with open(log_file, 'w') as f:
+                json.dump(logs, f, indent=2)
+        except Exception as log_error:
+            logger.error(f"Failed to log loop route error: {str(log_error)}")
+        
+        raise HTTPException(status_code=500, detail=f"Failed to create loop: {str(e)}")
+
+@router.get("/{loop_id}", response_model=LoopCreateResponse)
+async def get_loop(loop_id: str = Path(..., description="Loop ID to retrieve")):
+    """
+    Retrieve existing loop metadata by loop_id.
+    
+    Args:
+        loop_id: The loop ID to retrieve
+            
+    Returns:
+        LoopCreateResponse containing the loop metadata
+    """
+    logger.info(f"🔍 DEBUG: loop_get endpoint called with loop_id: {loop_id}")
+    
+    try:
+        # In a real implementation, this would retrieve data from a database
+        # For this minimal viable handler, we'll retrieve it from the simple JSON file
+        
+        loop_file = "/home/ubuntu/personal-ai-agent/logs/simple_loop_store.json"
+        
+        # Check if loop file exists
+        if not os.path.exists(loop_file):
+            raise HTTPException(status_code=404, detail=f"Loop ID not found: {loop_id}")
+        
+        # Read loop entries
+        try:
+            with open(loop_file, 'r') as f:
+                loop_store = json.load(f)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=500, detail="Failed to read loop store")
+        
+        # Check if loop_id exists
+        if loop_id not in loop_store:
+            raise HTTPException(status_code=404, detail=f"Loop ID not found: {loop_id}")
+        
+        # Get loop entry
+        loop_entry = loop_store[loop_id]
+        
+        logger.info(f"✅ Successfully retrieved loop with ID: {loop_id}")
+        return LoopCreateResponse(
+            loop_id=loop_id,
+            plan_id=loop_entry["plan_id"],
+            loop_type=loop_entry["loop_type"],
+            status="success",
+            timestamp=loop_entry["timestamp"],
+            metadata=loop_entry.get("metadata")
+        )
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error retrieving loop with ID {loop_id}: {str(e)}")
+        
+        # Log the error to loop_fallback.json
+        try:
+            log_file = "/home/ubuntu/personal-ai-agent/logs/loop_fallback.json"
+            
+            # Create log entry
+            log_entry = {
+                "timestamp": str(datetime.now()),
+                "event": "route_error",
+                "endpoint": "loop_get",
+                "error": str(e)
+            }
+            
+            # Check if log file exists
+            if os.path.exists(log_file):
+                # Read existing logs
+                try:
+                    with open(log_file, 'r') as f:
+                        logs = json.load(f)
+                        if not isinstance(logs, list):
+                            logs = [logs]
+                except json.JSONDecodeError:
+                    logs = []
+            else:
+                logs = []
+            
+            # Append new log entry
+            logs.append(log_entry)
+            
+            # Write updated logs
+            with open(log_file, 'w') as f:
+                json.dump(logs, f, indent=2)
+        except Exception as log_error:
+            logger.error(f"Failed to log loop route error: {str(log_error)}")
+        
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve loop: {str(e)}")
 
 @router.post("/api/loop/plan", response_model=LoopPlanResponse)
 async def plan_loop(request: LoopPlanRequest):

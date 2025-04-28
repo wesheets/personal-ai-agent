@@ -317,364 +317,65 @@
       "api_surface": "/api/project"
     },
     {
-      "name": "core/agent_coordinator.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/agent_registry.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/agent_registry_enhanced.py",
-      "category": "Agent Module",
-      "status": "active"
-    },
-    {
-      "name": "core/agent_registry_enhanced.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/agent_router.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/boot.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/confidence_retry.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/error_logger.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/escalation_manager.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/forge.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/input_gateway.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/input_router.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/memory_api_quota_guard.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/memory_context_reviewer.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/memory_manager.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/nudge_manager.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/orchestrator.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/planner_agent_enhancer.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/planner_orchestrator.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/prompt_manager.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/rationale_logger.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/run.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/seeding.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/self_evaluation.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/shared_memory.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/task_persistence.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/task_state_manager.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/task_tagger.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/tool_router.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "core/vector_memory.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "db/memory_db.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "fallbacks/fix_hal_routes.py",
-      "category": "Agent Module",
-      "status": "active"
-    },
-    {
-      "name": "memory.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "memory/__init__.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "memory/project_memory.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/agent_fallback.py",
-      "category": "Agent Module",
-      "status": "active"
-    },
-    {
-      "name": "modules/agent_reflect.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/agent_reflection.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/core_beliefs_integration.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/delegate.py",
-      "category": "Agent Module",
-      "status": "active"
-    },
-    {
-      "name": "modules/drift_monitor.py",
-      "category": "Reflection/Memory/Core",
+      "name": "app/routes/agent_routes.py",
+      "category": "API Router",
       "status": "active",
-      "api_surface": "/api/drift"
+      "api_surface": "/api/agent"
     },
     {
-      "name": "modules/hal_memory.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
+      "name": "app/routes/memory_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/memory"
     },
     {
-      "name": "modules/hal_memory_patch.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/historian_drift_report.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/live_memory_inspection.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/logic_loader.py",
-      "category": "Agent Module",
-      "status": "active"
-    },
-    {
-      "name": "modules/loop.py",
-      "category": "Agent Module",
+      "name": "app/routes/loop_routes.py",
+      "category": "API Router",
       "status": "active",
       "api_surface": "/api/loop"
     },
     {
-      "name": "modules/memory_block_writer.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/memory_embed.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/memory_recall.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/memory_summarize.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/memory_summarizer.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/memory_summarizer_project.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/memory_thread.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/memory_writer.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/orchestrator_contract_integration.py",
-      "category": "Agent Module",
-      "status": "active"
-    },
-    {
-      "name": "modules/orchestrator_drift_integration.py",
-      "category": "Reflection/Memory/Core",
+      "name": "app/schemas/agent/agent_list_schema.py",
+      "category": "Schema Definition",
       "status": "active",
-      "api_surface": "/api/drift"
+      "api_surface": "/api/agent"
     },
     {
-      "name": "modules/orchestrator_memory.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/orchestrator_memory_enhanced.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/passive_reflection.py",
-      "category": "Reflection/Memory/Core",
+      "name": "app/schemas/memory/memory_add_schema.py",
+      "category": "Schema Definition",
       "status": "active",
-      "api_surface": "/api/reflection"
+      "api_surface": "/api/memory"
     },
     {
-      "name": "modules/plan/__init__.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/plan/execute_chain.py",
-      "category": "Reflection/Memory/Core",
+      "name": "app/schemas/memory/memory_get_key_schema.py",
+      "category": "Schema Definition",
       "status": "active",
-      "api_surface": "/api/execute"
+      "api_surface": "/api/memory"
     },
     {
-      "name": "modules/plan/scope.py",
-      "category": "Reflection/Memory/Core",
+      "name": "app/schemas/loop/loop_create_schema.py",
+      "category": "Schema Definition",
       "status": "active",
-      "api_surface": "/api/plan"
+      "api_surface": "/api/loop"
     },
     {
-      "name": "modules/plan_generate.py",
-      "category": "Reflection/Memory/Core",
+      "name": "app/schemas/loop/loop_reset_schema.py",
+      "category": "Schema Definition",
       "status": "active",
-      "api_surface": "/api/plan"
+      "api_surface": "/api/loop"
     },
     {
-      "name": "modules/planning_logic_integration.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/recursive_reflection_engine.py",
-      "category": "Reflection/Memory/Core",
+      "name": "app/schemas/memory/__init__.py",
+      "category": "Schema Definition",
       "status": "active",
-      "api_surface": "/api/reflection"
+      "api_surface": "/api/memory"
     },
     {
-      "name": "modules/reflect.py",
-      "category": "Reflection/Memory/Core",
+      "name": "app/schemas/loop/__init__.py",
+      "category": "Schema Definition",
       "status": "active",
-      "api_surface": "/api/reflection"
-    },
-    {
-      "name": "modules/reflection_fatigue_scoring.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/reflection_grader.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
-    },
-    {
-      "name": "modules/reflection_guardrails.py",
-      "category": "Reflection/Memory/Core",
-      "status": "active"
+      "api_surface": "/api/loop"
     }
   ],
-  "memory_tag": "phase2.6_memory_surface_update_post_batch1.5"
+  "memory_tag": "phase3.0_sprint1.1_integration_cleanup"
 }
