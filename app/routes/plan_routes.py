@@ -26,12 +26,6 @@ from app.modules.plan_executor import execute_plan as execute_plan_module
 # Import manifest manager if available
 try:
     from app.utils.manifest_manager import register_route
-from .schemas.planchain_schemas import PlanChainRequest
-from .schemas.planchain_schemas import PlanChainResponse
-from .schemas.plancreate_schemas import PlanCreateRequest
-from .schemas.planexecution_schemas import PlanExecutionRequest
-from .schemas.planexecution_schemas import PlanExecutionResponse
-from .schemas.planupdate_schemas import PlanUpdateRequest
     manifest_available = True
 except ImportError:
     manifest_available = False
