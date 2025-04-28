@@ -6,6 +6,7 @@ and recovery paths. It performs deep analysis on reflection data to identify pat
 
 # memory_tag: phase3.0_sprint4_cognitive_reflection_plan_chaining
 # memory_tag: phase3.0_sprint4_batch3_stub_creation (Module Schema Wrapped)
+# memory_tag: phase3.0_sprint4_batch3_backward_breadcrumb_audit
 """
 
 import os
@@ -16,10 +17,27 @@ from typing import Dict, List, Any, Optional, Tuple
 from uuid import uuid4
 
 # Import schemas
-from app.schemas.reflection_schemas import Insight, ReflectionAnalysisResult, DriftTrigger, RecoveryPath, ReflectionSummary
+from app.schemas.reflection_schemas import Insight, ReflectionAnalysisResult, DriftTrigger, RecoveryPath, ReflectionAnalysisSummary, ReflectionSummary
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+# Wrapper function to maintain backward compatibility with router imports
+# memory_tag: phase3.0_sprint4_batch3_backward_breadcrumb_audit
+async def analyze_reflection(reflection_id: str) -> ReflectionAnalysisResult:
+    """
+    Wrapper function for backward compatibility with router imports.
+    Analyzes a specific reflection surface by ID.
+    
+    Args:
+        reflection_id: ID of the reflection to analyze
+            
+    Returns:
+        ReflectionAnalysisResult object containing analysis results
+    """
+    logger.info(f"Wrapper: Starting reflection analysis for ID: {reflection_id}")
+    analyzer = ReflectionAnalyzer()
+    return analyzer.analyze_reflection(reflection_id)
 
 class ReflectionAnalyzer:
     """
@@ -83,7 +101,7 @@ class ReflectionAnalyzer:
         recovery_paths = [RecoveryPath(**path) for path in recovery_paths_raw]
         
         # Calculate summary
-        summary = ReflectionSummary(
+        summary = ReflectionAnalysisSummary(
             insight_count=len(insights),
             drift_trigger_count=len(drift_triggers),
             recovery_path_count=len(recovery_paths),
@@ -96,7 +114,6 @@ class ReflectionAnalyzer:
             reflection_id=reflection_id,
             timestamp=self.analysis_timestamp,
             status="completed",
-            reflection_data=reflection_data, # Keep raw data for context
             insights=insights,
             drift_triggers=drift_triggers,
             recovery_paths=recovery_paths,
@@ -230,7 +247,7 @@ class ReflectionAnalyzer:
             "insight_id": str(uuid4()),
             "type": "general",
             "title": "Reflection Node Identified",
-            "description": f"Identified reflection node of type 	'{source_type}	' with name 	'{reflection_data.get('name', 'unknown')}	'",
+            "description": f"Identified reflection node of type '{source_type}' with name '{reflection_data.get('name', 'unknown')}'",
             "confidence": 1.0
         })
         return insights
@@ -243,14 +260,14 @@ class ReflectionAnalyzer:
         memory_tag = metadata.get("memory_tag", "")
 
         if "reflection" in role.lower():
-            insights.append({"insight_id": str(uuid4()), "type": "agent_role", "title": "Reflection Role Identified", "description": f"Agent has a reflection-related role: 	'{role}	'", "confidence": 0.9})
+            insights.append({"insight_id": str(uuid4()), "type": "agent_role", "title": "Reflection Role Identified", "description": f"Agent has a reflection-related role: '{role}'", "confidence": 0.9})
         
         reflection_capabilities = [cap for cap in capabilities if "reflection" in cap.lower()]
         if reflection_capabilities:
             insights.append({"insight_id": str(uuid4()), "type": "agent_capabilities", "title": "Reflection Capabilities Identified", "description": f"Agent has {len(reflection_capabilities)} reflection-related capabilities", "confidence": 0.8, "details": {"capabilities": reflection_capabilities}})
         
         if memory_tag and "reflection" in memory_tag.lower():
-            insights.append({"insight_id": str(uuid4()), "type": "memory_tag", "title": "Reflection Memory Tag Identified", "description": f"Agent has a reflection-related memory tag: 	'{memory_tag}	'", "confidence": 0.9})
+            insights.append({"insight_id": str(uuid4()), "type": "memory_tag", "title": "Reflection Memory Tag Identified", "description": f"Agent has a reflection-related memory tag: '{memory_tag}'", "confidence": 0.9})
         
         return insights
 
@@ -268,7 +285,7 @@ class ReflectionAnalyzer:
             insights.append({"insight_id": str(uuid4()), "type": "module_status", "title": "Active Reflection Module", "description": "Reflection module is currently active in the system", "confidence": 0.9})
         
         if api_surface and "reflection" in api_surface.lower():
-            insights.append({"insight_id": str(uuid4()), "type": "api_surface", "title": "Reflection API Surface Identified", "description": f"Module exposes a reflection-related API surface: 	'{api_surface}	'", "confidence": 0.9})
+            insights.append({"insight_id": str(uuid4()), "type": "api_surface", "title": "Reflection API Surface Identified", "description": f"Module exposes a reflection-related API surface: '{api_surface}'", "confidence": 0.9})
         
         return insights
 
@@ -280,13 +297,13 @@ class ReflectionAnalyzer:
         api_surface = metadata.get("api_surface", "")
 
         if "reflection" in category.lower():
-            insights.append({"insight_id": str(uuid4()), "type": "schema_category", "title": "Reflection Schema Category Identified", "description": f"Schema is categorized as 	'{category}	'", "confidence": 0.9})
+            insights.append({"insight_id": str(uuid4()), "type": "schema_category", "title": "Reflection Schema Category Identified", "description": f"Schema is categorized as '{category}'", "confidence": 0.9})
         
         if status == "active":
             insights.append({"insight_id": str(uuid4()), "type": "schema_status", "title": "Active Reflection Schema", "description": "Reflection schema is currently active in the system", "confidence": 0.9})
         
         if api_surface and "reflection" in api_surface.lower():
-            insights.append({"insight_id": str(uuid4()), "type": "api_surface", "title": "Reflection API Surface Identified", "description": f"Schema is associated with a reflection-related API surface: 	'{api_surface}	'", "confidence": 0.9})
+            insights.append({"insight_id": str(uuid4()), "type": "api_surface", "title": "Reflection API Surface Identified", "description": f"Schema is associated with a reflection-related API surface: '{api_surface}'", "confidence": 0.9})
         
         return insights
 
@@ -308,10 +325,10 @@ class ReflectionAnalyzer:
             if not metadata.get("capabilities"): drift_triggers.append({"trigger_id": str(uuid4()), "type": "missing_capabilities", "description": "Agent lacks defined capabilities", "severity": "medium"})
             if not metadata.get("memory_tag"): drift_triggers.append({"trigger_id": str(uuid4()), "type": "missing_memory_tag", "description": "Agent lacks a memory tag", "severity": "high"})
         elif source_type == "module":
-            if metadata.get("status") != "active": drift_triggers.append({"trigger_id": str(uuid4()), "type": "inactive_module", "description": f"Module status is 	'{metadata.get('status')}	'", "severity": "medium"})
+            if metadata.get("status") != "active": drift_triggers.append({"trigger_id": str(uuid4()), "type": "inactive_module", "description": f"Module status is '{metadata.get('status')}'", "severity": "medium"})
             if not metadata.get("api_surface"): drift_triggers.append({"trigger_id": str(uuid4()), "type": "missing_api_surface", "description": "Module lacks a defined API surface", "severity": "low"})
         elif source_type == "schema":
-            if metadata.get("status") != "active": drift_triggers.append({"trigger_id": str(uuid4()), "type": "inactive_schema", "description": f"Schema status is 	'{metadata.get('status')}	'", "severity": "medium"})
+            if metadata.get("status") != "active": drift_triggers.append({"trigger_id": str(uuid4()), "type": "inactive_schema", "description": f"Schema status is '{metadata.get('status')}'", "severity": "medium"})
 
         return drift_triggers
 
@@ -328,54 +345,110 @@ class ReflectionAnalyzer:
         """
         recovery_paths = []
         source_type = reflection_data.get("source_type", "unknown")
-        source_id = reflection_data.get("source_id", "unknown")
-
+        
         for trigger in drift_triggers:
-            path = {"path_id": str(uuid4()), "trigger_id": trigger["trigger_id"], "suggested_action": "No suggestion", "confidence": 0.5}
-            if trigger["type"] == "missing_memory_tag":
-                path["suggested_action"] = f"Assign appropriate memory tag to {source_type} 	'{source_id}	'"
-                path["confidence"] = 0.8
-            elif trigger["type"] == "inactive_module" or trigger["type"] == "inactive_schema":
-                path["suggested_action"] = f"Review and activate {source_type} 	'{source_id}	' or remove if obsolete"
-                path["confidence"] = 0.7
-            recovery_paths.append(path)
+            trigger_type = trigger.get("type", "unknown")
             
+            if trigger_type == "missing_capabilities":
+                recovery_paths.append({
+                    "path_id": str(uuid4()),
+                    "trigger_id": trigger.get("trigger_id"),
+                    "title": "Add Agent Capabilities",
+                    "description": "Define appropriate capabilities for the agent based on its role and function",
+                    "steps": [
+                        "Identify core agent functionality",
+                        "Define capabilities list",
+                        "Update agent definition with capabilities",
+                        "Validate agent functionality with new capabilities"
+                    ],
+                    "estimated_effort": "medium"
+                })
+            elif trigger_type == "missing_memory_tag":
+                recovery_paths.append({
+                    "path_id": str(uuid4()),
+                    "trigger_id": trigger.get("trigger_id"),
+                    "title": "Add Memory Tag",
+                    "description": "Add appropriate memory tag to the agent definition",
+                    "steps": [
+                        "Identify appropriate sprint/phase for the agent",
+                        "Add memory tag comment to agent definition",
+                        "Update agent registry with memory tag",
+                        "Validate memory surfaces for tag propagation"
+                    ],
+                    "estimated_effort": "low"
+                })
+            elif trigger_type == "inactive_module":
+                recovery_paths.append({
+                    "path_id": str(uuid4()),
+                    "trigger_id": trigger.get("trigger_id"),
+                    "title": "Activate Module",
+                    "description": "Activate the module and ensure it's properly registered",
+                    "steps": [
+                        "Update module status to 'active'",
+                        "Ensure module is properly registered in module registry",
+                        "Validate module functionality",
+                        "Update memory surfaces to reflect active status"
+                    ],
+                    "estimated_effort": "medium"
+                })
+            elif trigger_type == "missing_api_surface":
+                recovery_paths.append({
+                    "path_id": str(uuid4()),
+                    "trigger_id": trigger.get("trigger_id"),
+                    "title": "Define API Surface",
+                    "description": "Define appropriate API surface for the module",
+                    "steps": [
+                        "Identify module's primary functionality",
+                        "Define appropriate API endpoints",
+                        "Update module definition with API surface",
+                        "Validate API surface functionality"
+                    ],
+                    "estimated_effort": "medium"
+                })
+            elif trigger_type == "inactive_schema":
+                recovery_paths.append({
+                    "path_id": str(uuid4()),
+                    "trigger_id": trigger.get("trigger_id"),
+                    "title": "Activate Schema",
+                    "description": "Activate the schema and ensure it's properly registered",
+                    "steps": [
+                        "Update schema status to 'active'",
+                        "Ensure schema is properly registered in schema registry",
+                        "Validate schema usage in relevant modules",
+                        "Update memory surfaces to reflect active status"
+                    ],
+                    "estimated_effort": "low"
+                })
+        
         return recovery_paths
-
+    
     def _calculate_reflection_health(self, insights: List[Dict[str, Any]], drift_triggers: List[Dict[str, Any]], recovery_paths: List[Dict[str, Any]]) -> float:
         """
-        Calculate a simple reflection health score.
+        Calculate reflection health score based on insights, drift triggers, and recovery paths.
         
         Args:
-            insights: List of generated insights
-            drift_triggers: List of identified drift triggers
-            recovery_paths: List of generated recovery paths
+            insights: List of insights generated
+            drift_triggers: List of drift triggers identified
+            recovery_paths: List of recovery paths generated
             
         Returns:
-            A health score between 0.0 and 1.0
+            Reflection health score (0.0 to 1.0)
         """
-        # Simple scoring: more insights = better, more triggers = worse
-        base_score = 0.5
-        insight_bonus = min(len(insights) * 0.05, 0.3) # Max 0.3 bonus
-        trigger_penalty = min(len(drift_triggers) * 0.1, 0.5) # Max 0.5 penalty
+        # Start with perfect health
+        health = 1.0
         
-        health_score = max(0.0, min(1.0, base_score + insight_bonus - trigger_penalty))
-        return round(health_score, 2)
-
-# Create singleton instance
-analyzer = ReflectionAnalyzer()
-
-def analyze_reflection_node(reflection_id: str) -> ReflectionAnalysisResult:
-    """
-    Analyze a specific reflection surface by ID.
-    
-    Args:
-        reflection_id: ID of the reflection to analyze
+        # Reduce health based on drift triggers
+        for trigger in drift_triggers:
+            severity = trigger.get("severity", "low")
+            if severity == "high": health -= 0.2
+            elif severity == "medium": health -= 0.1
+            elif severity == "low": health -= 0.05
         
-    Returns:
-        ReflectionAnalysisResult object containing analysis results
-    """
-    # Re-initialize analyzer for each request to get a new analysis_id and timestamp
-    current_analyzer = ReflectionAnalyzer()
-    return current_analyzer.analyze_reflection(reflection_id)
-
+        # Improve health based on recovery paths (but not above starting point)
+        recovery_coverage = min(len(recovery_paths) / max(len(drift_triggers), 1), 1.0)
+        health += recovery_coverage * 0.1
+        
+        # Ensure health is within bounds
+        health = max(0.0, min(health, 1.0))
+        
+        return health
