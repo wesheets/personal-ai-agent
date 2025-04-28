@@ -52,7 +52,7 @@ if manifest_available:
     except Exception as e:
         logging.error(f"❌ Failed to register snapshot routes with manifest: {str(e)}")
 
-@router.post("/loop/snapshot/save", response_model=SnapshotResponse)
+@router.post("/save", response_model=SnapshotResponse)
 async def save_loop_snapshot(request: SnapshotSaveRequest):
     """
     Save a snapshot of the current loop state.
@@ -93,7 +93,7 @@ async def save_loop_snapshot(request: SnapshotSaveRequest):
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error saving snapshot: {str(e)}")
 
-@router.post("/loop/snapshot/restore", response_model=SnapshotResponse)
+@router.post("/restore", response_model=SnapshotResponse)
 async def restore_loop_snapshot(request: SnapshotRestoreRequest):
     """
     Restore a loop from a previously saved snapshot.
@@ -126,7 +126,7 @@ async def restore_loop_snapshot(request: SnapshotRestoreRequest):
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error restoring snapshot: {str(e)}")
 
-@router.get("/loop/snapshot/list/{loop_id}")
+@router.get("/list/{loop_id}")
 async def list_loop_snapshots(loop_id: str):
     """
     List all snapshots for a loop.
@@ -149,7 +149,7 @@ async def list_loop_snapshots(loop_id: str):
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error listing snapshots: {str(e)}")
 
-@router.delete("/loop/snapshot/{loop_id}")
+@router.delete("/{loop_id}")
 async def delete_loop_snapshot(loop_id: str):
     """
     Delete a snapshot for a loop.

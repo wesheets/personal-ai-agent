@@ -70,7 +70,7 @@ class ReflectionResultResponse(BaseModel):
 router = APIRouter(tags=["reflection"])
 
 # memory_tag: phase4.0_sprint1_post_build_validation_activation_control
-@router.post("/reflection/chain", response_model=ReflectionChainResponse)
+@router.post("/chain", response_model=ReflectionChainResponse)
 async def create_reflection_chain(request: ReflectionChainRequest):
     """
     Create a chain of reflections, identifying meta-patterns and potentially triggering actions.
@@ -95,7 +95,7 @@ async def create_reflection_chain(request: ReflectionChainRequest):
         created_at=datetime.utcnow()
     )
 
-@router.post("/reflection/trigger-scan-deep", response_model=ReflectionScanResponse)
+@router.post("/trigger-scan-deep", response_model=ReflectionScanResponse)
 async def trigger_deep_reflection_scan(request: ReflectionScanRequest):
     """
     Trigger a full system reflection deep scan.
@@ -124,7 +124,7 @@ async def trigger_deep_reflection_scan(request: ReflectionScanRequest):
         logger.error(f"Error during deep reflection scan: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to complete deep reflection scan: {str(e)}")
 
-@router.get("/reflection/analyze/{reflection_id}", response_model=ReflectionAnalysisResult)
+@router.get("/analyze/{reflection_id}", response_model=ReflectionAnalysisResult)
 async def analyze_reflection_node(reflection_id: str):
     """
     Analyze a specific reflection surface by ID.
