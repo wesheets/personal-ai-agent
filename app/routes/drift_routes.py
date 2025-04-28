@@ -1,10 +1,9 @@
+# memory_tag: phase4.0_sprint1_cognitive_reflection_chain_activation
+
 """
 Drift Routes Module
 
-This module provides API routes for drift monitoring and reporting,
-enabling detection of changes in loop outputs, agent behaviors, or schema versions.
-
-memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+This module provides API routes for drift monitoring, reporting, and healing.
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Request
@@ -14,24 +13,24 @@ import logging
 import traceback
 import uuid
 
-# Import schemas
+# Import drift monitoring schemas and module
 from app.schemas.drift_schema import (
     DriftMonitorRequest,
     LoopDriftLog,
     DriftMonitorResponse,
-    DriftAutoHealRequest,
-    DriftAutoHealResponse,
     DriftLogEntry,
     DriftLogResponse
 )
-
-# Import drift monitor
 from app.modules.drift_monitor import (
     detect_loop_drift,
     log_drift,
     get_previous_output,
     determine_recommended_action
 )
+
+# Import drift healing schemas and module
+from app.schemas.drift_healing_schemas import DriftHealingRequest, DriftHealingResult
+from app.modules.drift_auto_healer import auto_heal_drift as auto_heal_drift_module
 
 # Import memory operations
 try:
@@ -63,7 +62,7 @@ if manifest_available:
     try:
         register_route("/drift/monitor", "POST", "DriftMonitorRequest", "active")
         register_route("/drift/report", "POST", "DriftMonitorRequest", "active")
-        register_route("/drift/auto-heal", "POST", "DriftAutoHealRequest", "active")
+        register_route("/drift/auto-heal", "POST", "DriftHealingRequest", "active") # Updated schema
         register_route("/drift/log", "GET", "DriftLogResponse", "active")
         update_hardening_layer("drift_monitor_enabled", True)
         logging.info("✅ Drift routes registered with manifest")
@@ -77,6 +76,8 @@ async def report_drift(request: DriftMonitorRequest):
     
     This endpoint compares current output with previous output (from tag, snapshot, or history)
     and returns a drift score and recommended action.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
     """
     return await monitor_drift(request)
 
@@ -87,6 +88,8 @@ async def monitor_drift(request: DriftMonitorRequest):
     
     This endpoint compares current output with previous output (from tag, snapshot, or history)
     and returns a drift score and recommended action.
+    
+    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
     """
     try:
         # Read the current output from memory
@@ -196,38 +199,27 @@ async def monitor_drift(request: DriftMonitorRequest):
             recommended_action="log_error"
         )
 
-@router.post("/drift/auto-heal", response_model=DriftAutoHealResponse)
-async def auto_heal_drift(request: DriftAutoHealRequest):
+@router.post("/drift/auto-heal", response_model=DriftHealingResult)
+async def auto_heal_drift_endpoint(request: DriftHealingRequest):
     """
-    Start drift auto-healing.
+    Attempt to automatically heal detected drift.
     
-    This endpoint initiates an auto-healing process for detected drift
-    in loop outputs or agent behaviors.
+    This endpoint initiates an auto-healing process for a specific drift issue
+    using the provided strategy and parameters, leveraging the DriftAutoHealer module.
     
-    memory_tag: phase3.0_sprint3_cognitive_loop_deepening
+    memory_tag: phase4.0_sprint1_cognitive_reflection_chain_activation
     """
     try:
         # Log the request
-        logger.info(f"Received auto-heal request for loop: {request.loop_id}, agent: {request.agent}")
+        logger.info(f"Received auto-heal request for drift ID: {request.drift_id} with strategy: {request.strategy}")
         
-        # Generate a unique healing ID
-        healing_id = f"heal_{uuid.uuid4().hex[:8]}"
+        # Call the drift auto-healer module
+        response = await auto_heal_drift_module(request)
         
-        # In a real implementation, this would initiate an asynchronous healing process
-        # For now, we'll just return a success response with the healing ID
-        
-        return DriftAutoHealResponse(
-            healing_id=healing_id,
-            status="initiated",
-            loop_id=request.loop_id,
-            agent=request.agent,
-            healing_strategy=request.healing_strategy,
-            started_at=datetime.utcnow().isoformat(),
-            message=f"Auto-healing initiated for {request.agent} in loop {request.loop_id} using {request.healing_strategy} strategy"
-        )
+        return response
     
     except Exception as e:
-        logger.error(f"❌ Error initiating auto-healing: {str(e)}")
+        logger.error(f"❌ Error initiating auto-healing for drift {request.drift_id}: {str(e)}")
         logger.error(traceback.format_exc())
         
         raise HTTPException(
@@ -361,3 +353,4 @@ async def get_drift_history(loop_id: str, agent: Optional[str] = None):
             "message": f"Error getting drift history: {str(e)}",
             "drift_logs": []
         }
+

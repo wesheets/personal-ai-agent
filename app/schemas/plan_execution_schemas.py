@@ -1,4 +1,4 @@
-# memory_tag: phase3.0_sprint4_batch3_stub_creation
+# memory_tag: phase4.0_sprint1_cognitive_reflection_chain_activation
 
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
@@ -25,14 +25,16 @@ class PlanExecutionResponse(BaseModel):
     execution_id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="Unique identifier for this specific execution instance.")
     plan_id: str = Field(..., description="The unique identifier of the plan being executed.")
     status: str = Field(..., description="The initial status of the plan execution (e.g., \"started\", \"queued\").")
-    started_at: datetime = Field(default_factory=datetime.utcnow, description="Timestamp when the execution was initiated.")
+    message: Optional[str] = Field(None, description="Optional message providing additional execution details.")
+    started_at: str = Field(..., description="Timestamp when the execution was initiated.")
 
     class Config:
         json_schema_extra = {
             "example": {
                 "execution_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
                 "plan_id": "d47ac10b-58cc-4372-a567-0e02b2c3d479",
-                "status": "started",
+                "status": "initialized",
+                "message": "Plan execution initialized and queued",
                 "started_at": "2025-04-28T12:30:00Z"
             }
         }

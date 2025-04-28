@@ -1,6 +1,27 @@
 {
   "agents": [
     {
+      "name": "ReflectionChainWeaver",
+      "input_schema": [
+        "reflection_id",
+        "max_depth",
+        "max_iterations",
+        "goal_context"
+      ],
+      "output_schema": [
+        "chain_id",
+        "reflection_id",
+        "nodes",
+        "edges",
+        "summary",
+        "status"
+      ],
+      "registered_module": "reflection_registry.py",
+      "status": "active",
+      "api_surface": "/api/reflection",
+      "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
+    },
+    {
       "name": "PlanChainer",
       "input_schema": [
         "reflection_id",
@@ -713,5 +734,6 @@
       "api_surface": "/api/loop"
     }
   ],
-  "memory_tag": "phase3.0_sprint4_cognitive_reflection_plan_chaining"
+  "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
 }
+

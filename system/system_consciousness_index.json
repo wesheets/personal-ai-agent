@@ -2,6 +2,32 @@
   "schemas": [],
   "modules": [
     {
+      "name": "app/modules/reflection_chain_weaver.py",
+      "category": "Reflection Module",
+      "status": "active",
+      "api_surface": "/api/reflection",
+      "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
+    },
+    {
+      "name": "app/schemas/reflection_chain_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/reflection",
+      "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
+    },
+    {
+      "name": "app/modules/plan_chainer.py",
+      "category": "Plan Module",
+      "status": "active",
+      "api_surface": "/api/plan"
+    },
+    {
+      "name": "app/schemas/plan_chain_schemas.py",
+      "category": "Schema Definition",
+      "status": "active",
+      "api_surface": "/api/plan"
+    },
+    {
       "name": "app/modules/reflection_scanner.py",
       "category": "Reflection Module",
       "status": "active",
@@ -414,5 +440,6 @@
       "api_surface": "/api/loop"
     }
   ],
-  "memory_tag": "phase3.0_sprint4_cognitive_reflection_plan_chaining"
+  "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
 }
+

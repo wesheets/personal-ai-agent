@@ -4,7 +4,7 @@ Agent Registry
 This module defines the registry of all agents in the Promethios system.
 It provides a centralized registry for agent definitions, capabilities, and metadata.
 
-# memory_tag: phase3.0_sprint4_batch3_stub_creation
+# memory_tag: phase4.0_sprint1_cognitive_reflection_chain_activation
 """
 
 from typing import Dict, Any, List
@@ -57,7 +57,7 @@ AGENT_REGISTRY = {
         "name": "Core.Forge",
         "type": "persona",
         "description": "Architect-class AI for Promethios OS.",
-        "system_prompt": "You are Core.Forge, the system's lead intelligence architect. Be clear, concise, and driven by purpose.",
+        "system_prompt": "You are Core.Forge, the system\'s lead intelligence architect. Be clear, concise, and driven by purpose.",
         "tools": [
             "orchestrate",
             "design",
@@ -339,8 +339,8 @@ AGENT_REGISTRY = {
         "tools": ["execute_step", "handle_errors", "update_status"],
         "input_schema": "PlanExecutionRequest",
         "output_schema": "PlanExecutionResponse",
-        "status": "stub",
-        "memory_tag": "phase3.0_sprint4_batch3_stub_creation"
+        "status": "active", # Updated from stub
+        "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation" # Updated tag
     },
     "PlanStatusRetrieverAgent": {
         "name": "PlanStatusRetrieverAgent",
@@ -361,8 +361,8 @@ AGENT_REGISTRY = {
         "tools": ["apply_patch", "validate_healing", "log_action"],
         "input_schema": "DriftHealingRequest",
         "output_schema": "DriftHealingResult",
-        "status": "stub",
-        "memory_tag": "phase3.0_sprint4_batch3_stub_creation"
+        "status": "active", # Updated from stub
+        "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation" # Updated tag
     },
     "DriftLogRetrieverAgent": {
         "name": "DriftLogRetrieverAgent",
@@ -375,55 +375,17 @@ AGENT_REGISTRY = {
         "status": "stub",
         "memory_tag": "phase3.0_sprint4_batch3_stub_creation"
     },
-}
-
-
-# Helper function to get agent by ID
-def get_agent(agent_id: str) -> Dict[str, Any]:
-    """
-    Get agent definition by ID.
-    
-    Args:
-        agent_id: The ID of the agent to retrieve
-        
-    Returns:
-        Dictionary containing the agent definition, or empty dict if not found
-    """
-    # Normalize agent_id by replacing hyphens with underscores if needed for lookup
-    normalized_id = agent_id.replace("-", "_")
-    # Try original ID first, then normalized ID
-    return AGENT_REGISTRY.get(agent_id, AGENT_REGISTRY.get(normalized_id, {}))
-
-# Helper function to get all agents
-def get_all_agents() -> List[str]:
-    """
-    Get a list of all agent IDs.
-    
-    Returns:
-        List of all agent IDs in the registry
-    """
-    return list(AGENT_REGISTRY.keys())
-
-# Helper function to get agents by type
-def get_agents_by_type(agent_type: str) -> List[str]:
-    """
-    Get a list of agent IDs of a specific type.
-    
-    Args:
-        agent_type: The type of agents to retrieve
-        
-    Returns:
-        List of agent IDs matching the specified type
-    """
-    return [agent_id for agent_id, agent in AGENT_REGISTRY.items() 
-            if agent.get("type") == agent_type]
-
-
-# Registry metadata
-REGISTRY_METADATA = {
-    "total_agents": len(AGENT_REGISTRY),
-    "last_updated": "2025-04-28", # Updated date
-    "memory_tag": "phase3.0_sprint4_batch3_stub_creation",
-    "description": "Registry updated with stubs and schema links for Phase 3 Sprint 4 Batch 3 agents."
+    # --- Phase 4 Sprint 1 Agents ---
+    "ReflectionChainWeaverAgent": {
+        "name": "ReflectionChainWeaverAgent",
+        "type": "cognitive",
+        "description": "Weaves multiple reflection insights into a coherent chain, identifying meta-patterns.",
+        "system_prompt": "You are ReflectionChainWeaverAgent. Weave the provided reflection insights into a coherent chain.",
+        "tools": ["link_insights", "identify_meta_patterns", "summarize_chain"],
+        "input_schema": "ReflectionChainRequest",
+        "output_schema": "ReflectionChainResponse",
+        "status": "active",
+        "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
+    }
 }
 
