@@ -31,6 +31,9 @@ from app.utils.snapshot_manager import (
 # Import manifest manager if available
 try:
     from app.utils.manifest_manager import register_route
+from .schemas.snapshotrestore_schemas import SnapshotRestoreRequest
+from .schemas.snapshot_schemas import SnapshotResponse
+from .schemas.snapshotsave_schemas import SnapshotSaveRequest
     manifest_available = True
 except ImportError:
     manifest_available = False

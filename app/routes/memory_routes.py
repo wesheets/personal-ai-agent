@@ -211,7 +211,7 @@ async def get_memory(key: str = Path(..., description="Key to retrieve from memo
         
         raise HTTPException(status_code=500, detail=f"Failed to retrieve memory: {str(e)}")
 
-@router.get("/api/memory/ping")
+@router.get("/ping")
 def memory_ping():
     """
     Ping endpoint to verify memory routes are accessible.
@@ -219,7 +219,7 @@ def memory_ping():
     logger.info("🔍 DEBUG: memory_ping endpoint called")
     return {"status": "Memory router operational", "timestamp": str(datetime.datetime.now())}
 
-@router.post("/api/memory/write")
+@router.post("/write")
 async def memory_write_endpoint(request_data: dict):
     """
     Write content to memory.
@@ -302,7 +302,7 @@ async def memory_write_endpoint(request_data: dict):
         
         raise HTTPException(status_code=500, detail=f"Failed to write memory: {str(e)}")
 
-@router.get("/api/memory/read")
+@router.get("/read")
 async def memory_read_endpoint(project_id: str = Query(..., description="Project identifier")):
     """
     Read content from memory.
