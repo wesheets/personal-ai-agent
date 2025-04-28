@@ -200,7 +200,7 @@ async def monitor_drift(request: DriftMonitorRequest):
         )
 
 # memory_tag: phase4.0_sprint1_post_build_validation_activation_control
-@router.post("/drift/auto-heal", response_model=DriftHealingResult)
+@router.post("/auto-heal", response_model=DriftHealingResult)
 async def auto_heal_drift_endpoint(request: DriftHealingRequest):
     """
     Attempt to automatically heal detected drift.

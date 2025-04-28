@@ -49,13 +49,15 @@
       "name": "app/routes/reflection_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/reflection"
+      "api_surface": "/api/reflection",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
     },
     {
       "name": "app/routes/drift_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/drift"
+      "api_surface": "/api/drift",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
     },
     {
       "name": "app/schemas/drift_schema.py",
@@ -82,23 +84,11 @@
     },
     {
       "name": "api/agent/memory.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/agent"
-    },
-    {
-      "name": "api/agent/memory.py",
       "category": "Reflection/Memory/Core",
       "status": "active"
     },
     {
       "name": "api/agent/ops.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/agent"
-    },
-    {
-      "name": "api/agent/planner.py",
       "category": "API Router",
       "status": "active",
       "api_surface": "/api/agent"
@@ -127,20 +117,8 @@
     },
     {
       "name": "api/delegate_route.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/agent"
-    },
-    {
-      "name": "api/delegate_route.py",
       "category": "Agent Module",
       "status": "active"
-    },
-    {
-      "name": "api/delegate_stream.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/agent"
     },
     {
       "name": "api/delegate_stream.py",
@@ -159,20 +137,8 @@
     },
     {
       "name": "api/memory.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/memory"
-    },
-    {
-      "name": "api/memory.py",
       "category": "Reflection/Memory/Core",
       "status": "active"
-    },
-    {
-      "name": "api/memory_viewer.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/memory"
     },
     {
       "name": "api/memory_viewer.py",
@@ -188,12 +154,6 @@
       "name": "api/modules/agent_context.py",
       "category": "Agent Module",
       "status": "active"
-    },
-    {
-      "name": "api/modules/delegate.py",
-      "category": "API Router",
-      "status": "active",
-      "api_surface": "/api/agent"
     },
     {
       "name": "api/modules/delegate.py",
@@ -229,12 +189,6 @@
     },
     {
       "name": "api/modules/plan.py",
-      "category": "Agent Module",
-      "status": "active",
-      "api_surface": "/api/plan"
-    },
-    {
-      "name": "api/modules/plan.py",
       "category": "Reflection/Memory/Core",
       "status": "active"
     },
@@ -255,21 +209,11 @@
     },
     {
       "name": "api/modules/respond.py",
-      "category": "API Router",
-      "status": "active"
-    },
-    {
-      "name": "api/modules/respond.py",
       "category": "Agent Module",
       "status": "active"
     },
     {
       "name": "api/modules/stream.py",
-      "category": "API Router",
-      "status": "active"
-    },
-    {
-      "name": "api/modules/system.py",
       "category": "API Router",
       "status": "active"
     },
@@ -331,11 +275,6 @@
     },
     {
       "name": "api/streaming_route.py",
-      "category": "API Router",
-      "status": "active"
-    },
-    {
-      "name": "api/streaming_route.py",
       "category": "Agent Module",
       "status": "active"
     },
@@ -353,49 +292,57 @@
       "name": "app/routes/plan_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/plan"
+      "api_surface": "/api/plan",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
     },
     {
       "name": "app/routes/train_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/train"
+      "api_surface": "/api/train",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
     },
     {
       "name": "app/routes/execute_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/execute"
+      "api_surface": "/api/execute",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
     },
     {
       "name": "app/routes/snapshot_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/snapshot"
+      "api_surface": "/api/snapshot",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
     },
     {
       "name": "routes/project_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/project"
+      "api_surface": "/api/project",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
     },
     {
       "name": "app/routes/agent_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/agent"
+      "api_surface": "/api/agent",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
     },
     {
       "name": "app/routes/memory_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/memory"
+      "api_surface": "/api/memory",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
     },
     {
       "name": "app/routes/loop_routes.py",
       "category": "API Router",
       "status": "active",
-      "api_surface": "/api/loop"
+      "api_surface": "/api/loop",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
     },
     {
       "name": "app/schemas/agent/agent_list_schema.py",
@@ -438,8 +385,132 @@
       "category": "Schema Definition",
       "status": "active",
       "api_surface": "/api/loop"
+    },
+    {
+      "name": "app/routes/ash_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/ash",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/routes/debug_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/debug",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/routes/debugger_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/debugger",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/routes/historian_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/api/historian",
+      "memory_tag": "phase4.0_holistic_router_patch_complete"
+    },
+    {
+      "name": "app/routes/upload_file_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/upload",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/memory_api_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/memory_api",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/loop_validation_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/loop_validation",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/plan_generate_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/plan_generate",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/forge_build_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/forge_build",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/critic_review_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/critic_review",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/pessimist_evaluation_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/pessimist_evaluation",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/sage_beliefs_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/sage_beliefs",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/health_monitor_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/health_monitor",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/orchestrator_contract_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/orchestrator_contract",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/forge_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/forge",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/output_policy_routes.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/output_policy",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/main.py",
+      "category": "Core Application",
+      "status": "active",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app/routes/status_debug.py",
+      "category": "API Router",
+      "status": "active",
+      "api_surface": "/debug",
+      "memory_tag": "phase4.0_holistic_router_registry_sync"
     }
   ],
-  "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
+  "memory_tag": "phase4.0_holistic_router_patch_complete"
 }
-
