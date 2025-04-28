@@ -16,7 +16,7 @@ from typing import Dict, List, Any, Optional, Tuple
 from uuid import uuid4
 
 # Import schemas
-from app.schemas.reflection_schemas import ReflectionAnalysisResult, ReflectionInsight, DriftTrigger, RecoveryPath, ReflectionSummary
+from app.schemas.reflection_schemas import Insight, ReflectionAnalysisResult, DriftTrigger, RecoveryPath, ReflectionSummary
 
 # Configure logging
 logger = logging.getLogger(__name__)
