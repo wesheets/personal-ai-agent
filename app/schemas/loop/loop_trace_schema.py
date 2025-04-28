@@ -11,3 +11,17 @@ class LoopTraceQuery(BaseModel):
     limit: Optional[int] = 10
     offset: Optional[int] = 0
     include_metadata: Optional[bool] = False
+
+# Alias LoopTraceQuery as LoopTraceRequest for backward compatibility
+LoopTraceRequest = LoopTraceQuery
+
+class LoopTraceResponse(BaseModel):
+    """
+    Response model for the Loop Trace endpoint.
+    Contains trace information for a loop.
+    """
+    loop_id: str
+    traces: List[Dict[str, Any]]
+    count: int
+    total: int
+    status: str = "success"

@@ -170,27 +170,29 @@ except ImportError as e:
     print(f"⚠️ Failed to load plan generate routes: {e}")
     failed_routes.append("plan_generate")
 
-# Forge build routes
+# Forge build routes (Corrected Mounting)
 try:
-    from app.routes.forge_build_routes import router as forge_build_router
-    forge_build_routes_loaded = True
-    loaded_routes.append("forge_build")
-    print("✅ Forge build routes loaded")
+    from app.routes.forge_routes import router as forge_router # Corrected import
+    app.include_router(forge_router, prefix="/api") # Added /api prefix
+    forge_routes_loaded = True
+    loaded_routes.append("forge")
+    print("✅ Forge routes loaded with /api prefix")
 except ImportError as e:
-    forge_build_routes_loaded = False
-    print(f"⚠️ Failed to load forge build routes: {e}")
-    failed_routes.append("forge_build")
+    forge_routes_loaded = False
+    print(f"⚠️ Failed to load forge routes: {e}")
+    failed_routes.append("forge")
 
-# Critic review routes
+# Critic review routes (Corrected Mounting)
 try:
-    from app.routes.critic_review_routes import router as critic_review_router
-    critic_review_routes_loaded = True
-    loaded_routes.append("critic_review")
-    print("✅ Critic review routes loaded")
+    from app.routes.critic_routes import router as critic_router # Corrected import
+    app.include_router(critic_router, prefix="/api") # Added /api prefix
+    critic_routes_loaded = True
+    loaded_routes.append("critic")
+    print("✅ Critic routes loaded with /api prefix")
 except ImportError as e:
-    critic_review_routes_loaded = False
-    print(f"⚠️ Failed to load critic review routes: {e}")
-    failed_routes.append("critic_review")
+    critic_routes_loaded = False
+    print(f"⚠️ Failed to load critic routes: {e}")
+    failed_routes.append("critic")
 
 # Pessimist evaluation routes
 try:
@@ -334,14 +336,14 @@ if plan_generate_routes_loaded:
     except Exception as e:
         print(f"⚠️ Failed to include plan_generate_router: {e}")
 
-if forge_build_routes_loaded:
+if forge_routes_loaded:
     try:
-        app.include_router(forge_build_router)
-        print("✅ Included forge_build_router")
+        app.include_router(forge_router)
+        print("✅ Included forge_router")
     except Exception as e:
         print(f"⚠️ Failed to include forge_build_router: {e}")
 
-if critic_review_routes_loaded:
+if critic_routes_loaded:
     try:
         app.include_router(critic_review_router)
         print("✅ Included critic_review_router")

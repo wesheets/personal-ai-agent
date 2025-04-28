@@ -6,6 +6,7 @@ This module defines the schemas for CRITIC agent requests and responses.
 
 from typing import Dict, Any, List, Optional, Union
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 
 class CriticReviewRequest(BaseModel):
@@ -144,3 +145,35 @@ class CriticErrorResult(BaseModel):
     tools: Optional[List[str]] = Field(None, description="Tools used")
     project_id: Optional[str] = Field(None, description="Project identifier")
     loop_id: Optional[str] = Field(None, description="Loop identifier if applicable")
+
+
+class LoopSummaryReviewRequest(BaseModel):
+    """
+    Schema for CRITIC loop summary review request.
+    """
+    loop_id: str = Field(..., description="Unique identifier for the loop being reviewed")
+    output_tag: str = Field(..., description="Memory tag where the agent output is stored")
+    agent: str = Field(..., description="Identifier of the agent whose output is being reviewed")
+    schema_hash: Optional[str] = Field(None, description="Optional schema hash for validation")
+
+
+class LoopReflectionRejection(BaseModel):
+    """
+    Schema for CRITIC loop reflection rejection.
+    """
+    loop_id: str = Field(..., description="Unique identifier for the loop")
+    status: str = Field("rejected", description="Status of the reflection (rejected)")
+    reason: str = Field(..., description="Reason for rejection")
+    recommendation: Optional[str] = Field(None, description="Recommended recovery step")
+    timestamp: datetime = Field(..., description="Timestamp of the rejection")
+
+
+class LoopReflectionApproval(BaseModel):
+    """
+    Schema for CRITIC loop reflection approval.
+    """
+    loop_id: str = Field(..., description="Unique identifier for the loop")
+    status: str = Field("approved", description="Status of the reflection (approved)")
+    message: str = Field(..., description="Approval message")
+    timestamp: datetime = Field(..., description="Timestamp of the approval")
+

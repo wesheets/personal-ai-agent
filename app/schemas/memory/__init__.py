@@ -13,5 +13,5 @@ from .memory_create_schema import MemoryCreateRequest, MemoryCreateResponse
 from .memory_delete_schema import MemoryDeleteRequest, MemoryDeleteResponse
 from .memory_get_schema import MemoryGetRequest, MemoryGetResponse
 from .memory_read_schema import MemoryReadRequest, MemoryReadResponse
-from .memory_read_request_schema import MemoryReadRequestSchema
+from .memory_read_request_schema import MemoryReadRequest as MemoryReadRequestSchema
 from .memory_write_schema import MemoryWriteRequest, MemoryWriteResponse

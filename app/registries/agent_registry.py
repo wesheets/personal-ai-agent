@@ -386,6 +386,22 @@ AGENT_REGISTRY = {
         "output_schema": "ReflectionChainResponse",
         "status": "active",
         "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
-    }
+    },
+
+    "forge_agent": {
+        "name": "ForgeAgent",
+        "type": "cognitive",
+        "description": "Agent responsible for building system components, registering routes, and managing project state.",
+        "system_prompt": "You are ForgeAgent. Your role is to build system components based on requests.",
+        "tools": [
+            "build_component",
+            "register_route",
+            "update_state",
+        ],
+        "input_schema": "ForgeBuildRequest",
+        "output_schema": "ForgeBuildResult",
+        "status": "active",
+        "memory_tag": "healed_batch1_20250428"
+    },
 }
 
