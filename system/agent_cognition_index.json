@@ -11,7 +11,8 @@
         "action_plan"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "Ash",
@@ -24,7 +25,8 @@
         "risk_assessment"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "CEOAgent",
@@ -38,7 +40,8 @@
         "satisfaction_trend"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "Core.Forge",
@@ -51,7 +54,8 @@
         "action_plan"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "Critic",
@@ -68,7 +72,8 @@
         "rejection_reason"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "CTO",
@@ -83,7 +88,8 @@
         "summary"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "Debugger",
@@ -101,7 +107,8 @@
         "suggested_fix"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "GUARDIAN",
@@ -117,7 +124,8 @@
         "system_status"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "HAL 9000",
@@ -130,7 +138,8 @@
         "action_plan"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "Historian",
@@ -148,7 +157,8 @@
         "suggestion"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "MemoryAgent",
@@ -161,7 +171,8 @@
         "memory_summary"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/memory"
     },
     {
       "name": "NOVA",
@@ -177,7 +188,8 @@
         "ui_components"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "OBSERVER",
@@ -193,7 +205,8 @@
         "log_path"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "OpsAgent",
@@ -206,7 +219,8 @@
         "action_plan"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "Orchestrator",
@@ -222,7 +236,8 @@
         "decisions"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "Pessimist",
@@ -236,7 +251,8 @@
         "status"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/reflection"
     },
     {
       "name": "Sage",
@@ -252,7 +268,8 @@
         "timestamp"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/reflection"
     },
     {
       "name": "SITEGEN",
@@ -271,7 +288,8 @@
         "recommendations"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
     },
     {
       "name": "TRAINER",
@@ -291,8 +309,42 @@
         "recommendations"
       ],
       "registered_module": "agent_registry.py",
-      "status": "active"
+      "status": "active",
+      "api_surface": "/api/agent"
+    },
+    {
+      "name": "LoopManager",
+      "input_schema": [
+        "loop_id",
+        "action",
+        "parameters"
+      ],
+      "output_schema": [
+        "status",
+        "message",
+        "loop_state"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active",
+      "api_surface": "/api/loop"
+    },
+    {
+      "name": "DriftMonitor",
+      "input_schema": [
+        "system_state",
+        "baseline",
+        "threshold"
+      ],
+      "output_schema": [
+        "status",
+        "drift_detected",
+        "drift_metrics",
+        "recommendations"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active",
+      "api_surface": "/api/drift"
     }
   ],
-  "memory_tag": "aci_snapshot_verified_20250426"
+  "memory_tag": "phase2.6_memory_surface_update_post_batch1.1_1.2"
 }
