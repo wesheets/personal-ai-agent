@@ -141,3 +141,9 @@ def get_system_manifest() -> SystemManifest:
     if _system_manifest is None:
         _system_manifest = SystemManifest()
     return _system_manifest
+
+
+def register_loaded_routes(app):
+    # TODO: Implement route tracking logic later
+    pass
+

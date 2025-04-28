@@ -37,3 +37,12 @@ class MemoryGetByIdResponse(BaseModel):
     """
     memory: MemoryItem = Field(..., description="The requested memory item")
     status: str = Field(..., description="Status of the operation")
+
+
+# memory_tag: phase3.3a_critical_surface_repair
+class MemoryGetRequest(BaseModel):
+    """
+    Schema for memory retrieval request.
+    """
+    memory_id: str
+    include_history: bool = False
