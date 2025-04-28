@@ -69,7 +69,7 @@ class ReflectionResultResponse(BaseModel):
 
 router = APIRouter(tags=["reflection"])
 
-# memory_tag: phase4.0_sprint1_cognitive_reflection_chain_activation
+# memory_tag: phase4.0_sprint1_post_build_validation_activation_control
 @router.post("/reflection/chain", response_model=ReflectionChainResponse)
 async def create_reflection_chain(request: ReflectionChainRequest):
     """
@@ -79,20 +79,21 @@ async def create_reflection_chain(request: ReflectionChainRequest):
     potentially identifying meta-patterns or escalating critical drifts based on combined insights.
     
     Returns a detailed chain result with meta-insights and triggered actions.
-    """
-    logger.info(f"Starting reflection chain weaving for {len(request.reflection_ids)} reflections")
     
-    try:
-        # Call the reflection chain weaver module function
-        chain_result = await weave_reflection_chain(request)
-        
-        logger.info(f"Reflection chain weaving completed successfully with ID: {chain_result.chain_id}")
-        
-        # Return the chain result
-        return chain_result
-    except Exception as e:
-        logger.error(f"Error during reflection chain weaving: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to complete reflection chain weaving: {str(e)}")
+    NOTE: This endpoint is currently frozen as part of controlled activation.
+    """
+    logger.info(f"Received reflection chain weaving request for {len(request.reflection_ids)} reflections, but endpoint is frozen")
+    
+    # Return a controlled response indicating the endpoint is frozen
+    return ReflectionChainResponse(
+        chain_id=f"frozen_chain_{uuid.uuid4().hex[:8]}",
+        reflection_ids=request.reflection_ids,
+        status="frozen",
+        summary="This endpoint is currently frozen as part of controlled activation. The reflection chain weaving functionality is temporarily disabled.",
+        meta_insights=[],
+        triggered_actions=[],
+        created_at=datetime.utcnow()
+    )
 
 @router.post("/reflection/trigger-scan-deep", response_model=ReflectionScanResponse)
 async def trigger_deep_reflection_scan(request: ReflectionScanRequest):
