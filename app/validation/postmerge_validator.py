@@ -245,7 +245,7 @@ def update_system_manifest(memory_tag: str, report: Dict[str, Any]) -> None:
                 "GitHub Action Workflow"
             ],
             "notes": f"Completed with health score: {report['surface_health_score']:.1f}%. " +
-                    (f"Drift detected: {len(report['surface_drift'])} issues." if 'surface_drift' in report and len(report['surface_drift']) > 0 else "No drift detected.")
+                    (f"Drift detected: {len(report.get('surface_drift', []))} issues." if 'surface_drift' in report and len(report.get('surface_drift', [])) > 0 else "No drift detected.")
         }
         
         manifest["system_manifest"]["deployment_phases"]["phase_2"]["subphases"]["phase_2.2"] = phase_2_2
@@ -309,10 +309,20 @@ def main():
             print(f"\n⚠️  POST-MERGE SURFACE DRIFT DETECTED: {report['surface_health_score']:.1f}% health score")
             print(f"⚠️  Report saved to {report_path}")
             print(f"⚠️  Memory tag: {memory_tag}")
-            print(f"⚠️  {len(report['surface_drift'])} drift issues found")
-            print("\nTop 5 drift issues:")
-            for i, issue in enumerate(report['surface_drift'][:5]):
-                print(f"  {i+1}. {issue['type'].upper()}: {issue['path']} - {issue['issue']}")
+            
+            # Defensive check for surface_drift key
+            if 'surface_drift' not in report:
+                logger.warning("Surface drift missing expected key 'surface_drift'")
+                print(f"⚠️  Surface drift missing expected key. See log for details.")
+            else:
+                print(f"⚠️  {len(report['surface_drift'])} drift issues found")
+                print("\nTop 5 drift issues:")
+                for i, issue in enumerate(report['surface_drift'][:5]):
+                    # Defensive check for required issue fields
+                    issue_type = issue.get('type', 'UNKNOWN')
+                    issue_path = issue.get('path', 'unknown_path')
+                    issue_desc = issue.get('issue', 'No description available')
+                    print(f"  {i+1}. {issue_type.upper()}: {issue_path} - {issue_desc}")
             print("\nNo automatic repairs will be performed. Operator intervention required.")
         else:
             logger.info(f"All post-merge surfaces validated. Report saved to {report_path}")
