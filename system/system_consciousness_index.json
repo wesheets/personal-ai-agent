@@ -581,6 +581,20 @@
       "status": "active",
       "api_surface": "/debug",
       "memory_tag": "phase4.0_holistic_router_registry_sync"
+    },
+    {
+      "name": "app.schemas.project_schemas",
+      "type": "schema",
+      "description": "Schema for project_schemas",
+      "memory_tag": "phase4.0_holistic_router_registry_sync",
+      "status": "active"
+    },
+    {
+      "name": "app.registries.endpoint_registry",
+      "type": "registry",
+      "description": "Registry for endpoint_registry",
+      "memory_tag": "phase4.0_holistic_router_registry_sync",
+      "status": "active"
     }
   ],
   "memory_tag": "phase4.0_holistic_router_patch_complete"

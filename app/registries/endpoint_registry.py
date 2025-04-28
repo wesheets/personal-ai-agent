@@ -601,4 +601,262 @@ ENDPOINT_REGISTRY = [
         "status": "active",
         "memory_tag": "phase4.0_holistic_router_registry_sync"
     },
+
+    # memory_tag: phase4.0_holistic_router_registry_sync
+    {
+        "path": "/api/agent/generate-variants",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.agent_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/agent/plan-and-execute",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.agent_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/agent/run-critic",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.agent_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/agent/pessimist-check",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.agent_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/agent/ceo-review",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.agent_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/agent/cto-review",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.agent_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/agent/historian-check",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.agent_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/agent/drift-summary",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.agent_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/agent/generate-weekly-drift-report",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.agent_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/drift/drift/history/{loop_id}",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.drift_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/loop/trace",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.loop_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/memory/ping",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.memory_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/memory/write",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.memory_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/memory/read",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.memory_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/plan/create",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.plan_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/plan/{plan_id}",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.plan_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/plan/update",
+        "method": "PUT",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.plan_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/reflection/reflection/trigger",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.reflection_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/reflection/reflection/{reflection_id}",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.reflection_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/reflection/reflection/{project_id}",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.reflection_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/reflection/reflection/{project_id}",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.reflection_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/reflection/reflection/{project_id}/history",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.reflection_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/reflection/reflection/{project_id}",
+        "method": "DELETE",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.reflection_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/snapshot/list/{loop_id}",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.snapshot_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/snapshot/{loop_id}",
+        "method": "DELETE",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.snapshot_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/execute/execute/{execution_id}",
+        "method": "DELETE",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "app.routes.execute_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/project/test",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "routes.project_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/project/state",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "routes.project_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/project/{project_id}/status",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "routes.project_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/project/status",
+        "method": "GET",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "routes.project_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/project/start",
+        "method": "POST",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "routes.project_routes",
+        "status": "active" # Added during registry sync
+    },
+    {
+        "path": "/api/project/state",
+        "method": "PATCH",
+        "input_schema": "TBD",
+        "output_schema": "TBD",
+        "module_location": "routes.project_routes",
+        "status": "active" # Added during registry sync
+    },
 ]

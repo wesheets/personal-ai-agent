@@ -10,7 +10,7 @@ import datetime
 # Create router
 router = APIRouter(tags=["hal"])
 
-@router.get("/api/hal/health")
+@router.get("/health")
 async def hal_health_check():
     """
     Basic health check endpoint for HAL.
@@ -21,7 +21,7 @@ async def hal_health_check():
         "timestamp": str(datetime.datetime.now())
     }
 
-@router.get("/api/hal/status")
+@router.get("/status")
 async def hal_status():
     """
     Status endpoint for HAL.
@@ -33,7 +33,7 @@ async def hal_status():
         "timestamp": str(datetime.datetime.now())
     }
 
-@router.post("/api/hal/generate")
+@router.post("/generate")
 async def hal_generate(prompt: str = ""):
     """
     Minimal implementation of HAL generation endpoint.
