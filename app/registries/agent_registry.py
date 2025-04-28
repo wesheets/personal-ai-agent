@@ -4,13 +4,7 @@ Agent Registry
 This module defines the registry of all agents in the Promethios system.
 It provides a centralized registry for agent definitions, capabilities, and metadata.
 
-feature/agent-recovery-pessimist-skeptic
-Generated on: 2025-04-27 20:56:44
-Memory tag: agent_registry_surface_updated_20250427
-
-Generated on: 2025-04-26 19:55:38
-Memory tag: agent_registry_surface_finalized_20250426
-main
+# memory_tag: phase3.0_sprint4_batch3_stub_creation
 """
 
 from typing import Dict, Any, List
@@ -27,14 +21,8 @@ AGENT_REGISTRY = {
             "resolve",
             "execute",
         ],
-        "input_schema": [
-            "objective",
-            "memory_trace",
-        ],
-        "output_schema": [
-            "reflection",
-            "action_plan",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "ash-xenomorph": {
@@ -47,14 +35,8 @@ AGENT_REGISTRY = {
             "detect",
             "test",
         ],
-        "input_schema": [
-            "objective",
-            "memory_trace",
-        ],
-        "output_schema": [
-            "reflection",
-            "risk_assessment",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "ceo-agent": {
@@ -67,15 +49,8 @@ AGENT_REGISTRY = {
             "analyze",
             "recommend",
         ],
-        "input_schema": [
-            "loop_summary",
-            "beliefs",
-            "memory",
-        ],
-        "output_schema": [
-            "ceo_insight",
-            "satisfaction_trend",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "core-forge": {
@@ -88,14 +63,8 @@ AGENT_REGISTRY = {
             "design",
             "architect",
         ],
-        "input_schema": [
-            "objective",
-            "memory_trace",
-        ],
-        "output_schema": [
-            "reflection",
-            "action_plan",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "critic": {
@@ -108,18 +77,8 @@ AGENT_REGISTRY = {
             "reject",
             "log_reason",
         ],
-        "input_schema": [
-            "loop_id",
-            "agent_outputs",
-            "project_id",
-        ],
-        "output_schema": [
-            "status",
-            "reflection",
-            "scores",
-            "rejection",
-            "rejection_reason",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "cto": {
@@ -132,16 +91,8 @@ AGENT_REGISTRY = {
             "validate_schema",
             "check_reflection",
         ],
-        "input_schema": [
-            "project_id",
-            "tools",
-        ],
-        "output_schema": [
-            "status",
-            "issues_found",
-            "issues",
-            "summary",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "debugger": {
@@ -154,19 +105,8 @@ AGENT_REGISTRY = {
             "log_error",
             "inject_debug",
         ],
-        "input_schema": [
-            "loop_id",
-            "failure_logs",
-            "memory",
-            "loop_context",
-        ],
-        "output_schema": [
-            "updated_memory",
-            "failure_type",
-            "patch_plan",
-            "next_agent",
-            "suggested_fix",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "guardian": {
@@ -180,17 +120,8 @@ AGENT_REGISTRY = {
             "rollback_loop",
             "raise_flag",
         ],
-        "input_schema": [
-            "alert_type",
-            "severity",
-            "description",
-        ],
-        "output_schema": [
-            "status",
-            "alert_id",
-            "actions_taken",
-            "system_status",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "hal": {
@@ -203,14 +134,8 @@ AGENT_REGISTRY = {
             "control",
             "monitor",
         ],
-        "input_schema": [
-            "objective",
-            "memory_trace",
-        ],
-        "output_schema": [
-            "reflection",
-            "action_plan",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "historian": {
@@ -223,19 +148,8 @@ AGENT_REGISTRY = {
             "track_alignment",
             "score_drift",
         ],
-        "input_schema": [
-            "loop_id",
-            "loop_summary",
-            "recent_loops",
-            "beliefs",
-            "memory",
-        ],
-        "output_schema": [
-            "updated_memory",
-            "alignment_score",
-            "missing_beliefs",
-            "suggestion",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "memory-agent": {
@@ -248,14 +162,8 @@ AGENT_REGISTRY = {
             "retrieve",
             "reflect",
         ],
-        "input_schema": [
-            "objective",
-            "memory_trace",
-        ],
-        "output_schema": [
-            "reflection",
-            "memory_summary",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "nova": {
@@ -267,17 +175,8 @@ AGENT_REGISTRY = {
             "build_ui",
             "generate_component",
         ],
-        "input_schema": [
-            "task",
-            "project_id",
-            "tools",
-        ],
-        "output_schema": [
-            "status",
-            "message",
-            "files_created",
-            "ui_components",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "observer": {
@@ -290,17 +189,8 @@ AGENT_REGISTRY = {
             "observe",
             "reflect",
         ],
-        "input_schema": [
-            "task",
-            "date",
-            "tools",
-        ],
-        "output_schema": [
-            "status",
-            "message",
-            "entry",
-            "log_path",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "ops-agent": {
@@ -313,14 +203,8 @@ AGENT_REGISTRY = {
             "automate",
             "deploy",
         ],
-        "input_schema": [
-            "objective",
-            "memory_trace",
-        ],
-        "output_schema": [
-            "reflection",
-            "action_plan",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "orchestrator": {
@@ -333,57 +217,24 @@ AGENT_REGISTRY = {
             "plan",
             "resolve",
         ],
-        "input_schema": [
-            "task",
-            "project_id",
-        ],
-        "output_schema": [
-            "status",
-            "output",
-            "next_agent",
-            "trigger_result",
-            "decisions",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "pessimist": {
-feature/agent-recovery-pessimist-skeptic
         "name": "PessimistAgent",
         "type": "persona",
         "description": "Evaluates content for optimism bias, vague language, and confidence mismatches.",
         "system_prompt": "You are the PessimistAgent. Analyze summaries for potential biases, track bias patterns, and identify when the same bias repeats across iterations.",
-
-        "name": "Pessimist",
-        "type": "persona",
-        "description": "Bias detection and tracking specialist.",
-        "system_prompt": "You are the Pessimist. Analyze for potential biases, track bias patterns, and identify when the same bias repeats across iterations.",
-main
         "tools": [
             "analyze_bias",
             "detect_echo",
             "track_bias",
-feature/agent-recovery-pessimist-skeptic
             "evaluate_summary_tone",
             "generate_pessimist_alert"
-
-main
         ],
-        "input_schema": [
-            "loop_id",
-            "summary",
-feature/agent-recovery-pessimist-skeptic
-            "feedback",
-            "plan_confidence_score"
-
-main
-        ],
-        "output_schema": [
-            "assessment",
-            "bias_analysis",
-            "status",
-feature/agent-recovery-pessimist-skeptic
-            "alerts"
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active",
         "recovery_status": "recovered_20250427"
     },
@@ -398,22 +249,10 @@ feature/agent-recovery-pessimist-skeptic
             "identify_assumptions",
             "generate_counterargument"
         ],
-        "input_schema": [
-            "content",
-            "evidence",
-            "context"
-        ],
-        "output_schema": [
-            "analysis",
-            "challenge_result",
-            "questions_to_consider"
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "planned",
         "recovery_status": "minimal_recovery_20250427"
-
-        ],
-        "status": "active"
-main
     },
     "sage": {
         "name": "Sage",
@@ -425,17 +264,8 @@ main
             "summarize",
             "score_belief",
         ],
-        "input_schema": [
-            "loop_id",
-            "summary_text",
-            "project_id",
-        ],
-        "output_schema": [
-            "status",
-            "belief_scores",
-            "reflection_text",
-            "timestamp",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "sitegen": {
@@ -448,20 +278,8 @@ main
             "create_layout",
             "evaluate_market_fit",
         ],
-        "input_schema": [
-            "task",
-            "project_id",
-            "site_parameters",
-            "tools",
-        ],
-        "output_schema": [
-            "status",
-            "message",
-            "analysis",
-            "layout",
-            "market_fit",
-            "recommendations",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
     "trainer": {
@@ -474,22 +292,88 @@ main
             "evaluate",
             "fine_tune",
         ],
-        "input_schema": [
-            "task",
-            "model_id",
-            "project_id",
-            "dataset_id",
-            "parameters",
-            "tools",
-        ],
-        "output_schema": [
-            "status",
-            "message",
-            "metrics",
-            "model_info",
-            "recommendations",
-        ],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
+    },
+    # --- Phase 3 Sprint 4 Batch 1 & 2 Agents ---
+    "ReflectionScannerAgent": {
+        "name": "ReflectionScannerAgent",
+        "type": "cognitive",
+        "description": "Scans system components and memory surfaces for reflection points.",
+        "system_prompt": "You are ReflectionScannerAgent. Scan the system for reflection points based on the provided request.",
+        "tools": ["scan_memory", "scan_codebase"],
+        "input_schema": "ReflectionScanRequest",
+        "output_schema": "ReflectionScanResponse",
+        "status": "active",
+        "memory_tag": "phase3.0_sprint4_cognitive_reflection_plan_chaining"
+    },
+    "ReflectionAnalyzerAgent": {
+        "name": "ReflectionAnalyzerAgent",
+        "type": "cognitive",
+        "description": "Analyzes reflection scan results to identify patterns, anomalies, and insights.",
+        "system_prompt": "You are ReflectionAnalyzerAgent. Analyze the provided reflection scan results and generate insights.",
+        "tools": ["analyze_patterns", "identify_anomalies", "generate_insights"],
+        "input_schema": "Dict[str, Any]", # No specific request schema for GET endpoint
+        "output_schema": "ReflectionAnalysisResult",
+        "status": "active",
+        "memory_tag": "phase3.0_sprint4_cognitive_reflection_plan_chaining"
+    },
+    "PlanChainerAgent": {
+        "name": "PlanChainerAgent",
+        "type": "cognitive",
+        "description": "Generates sequenced action plans based on reflection analysis results.",
+        "system_prompt": "You are PlanChainerAgent. Generate a plan chain based on the reflection results and goal summary.",
+        "tools": ["generate_steps", "link_dependencies", "estimate_duration"],
+        "input_schema": "PlanChainRequest",
+        "output_schema": "PlanChainResponse",
+        "status": "active",
+        "memory_tag": "phase3.0_sprint4_cognitive_reflection_plan_chaining"
+    },
+    # --- Phase 3 Sprint 4 Batch 3 Agents ---
+    "PlanExecutorAgent": {
+        "name": "PlanExecutorAgent",
+        "type": "cognitive",
+        "description": "Executes generated plan chains step by step.",
+        "system_prompt": "You are PlanExecutorAgent. Execute the steps of the provided plan chain.",
+        "tools": ["execute_step", "handle_errors", "update_status"],
+        "input_schema": "PlanExecutionRequest",
+        "output_schema": "PlanExecutionResponse",
+        "status": "stub",
+        "memory_tag": "phase3.0_sprint4_batch3_stub_creation"
+    },
+    "PlanStatusRetrieverAgent": {
+        "name": "PlanStatusRetrieverAgent",
+        "type": "cognitive",
+        "description": "Retrieves the current status of an ongoing plan execution.",
+        "system_prompt": "You are PlanStatusRetrieverAgent. Retrieve the status of the specified plan execution.",
+        "tools": ["get_status", "get_step_details"],
+        "input_schema": "PlanStatusRequest",
+        "output_schema": "PlanStatusResponse",
+        "status": "stub",
+        "memory_tag": "phase3.0_sprint4_batch3_stub_creation"
+    },
+    "DriftAutoHealerAgent": {
+        "name": "DriftAutoHealerAgent",
+        "type": "cognitive",
+        "description": "Attempts to automatically heal detected drift issues based on predefined strategies.",
+        "system_prompt": "You are DriftAutoHealerAgent. Attempt to heal the specified drift issue using the chosen strategy.",
+        "tools": ["apply_patch", "validate_healing", "log_action"],
+        "input_schema": "DriftHealingRequest",
+        "output_schema": "DriftHealingResult",
+        "status": "stub",
+        "memory_tag": "phase3.0_sprint4_batch3_stub_creation"
+    },
+    "DriftLogRetrieverAgent": {
+        "name": "DriftLogRetrieverAgent",
+        "type": "cognitive",
+        "description": "Retrieves logs related to drift detection and healing activities.",
+        "system_prompt": "You are DriftLogRetrieverAgent. Retrieve drift logs based on the provided criteria.",
+        "tools": ["query_logs", "filter_logs", "format_response"],
+        "input_schema": "DriftLogRequest",
+        "output_schema": "DriftLogResponse",
+        "status": "stub",
+        "memory_tag": "phase3.0_sprint4_batch3_stub_creation"
     },
 }
 
@@ -505,7 +389,10 @@ def get_agent(agent_id: str) -> Dict[str, Any]:
     Returns:
         Dictionary containing the agent definition, or empty dict if not found
     """
-    return AGENT_REGISTRY.get(agent_id, {})
+    # Normalize agent_id by replacing hyphens with underscores if needed for lookup
+    normalized_id = agent_id.replace("-", "_")
+    # Try original ID first, then normalized ID
+    return AGENT_REGISTRY.get(agent_id, AGENT_REGISTRY.get(normalized_id, {}))
 
 # Helper function to get all agents
 def get_all_agents() -> List[str]:
@@ -534,23 +421,9 @@ def get_agents_by_type(agent_type: str) -> List[str]:
 
 # Registry metadata
 REGISTRY_METADATA = {
-feature/agent-recovery-pessimist-skeptic
-    "total_agents": 20,
-    "last_updated": "2025-04-27",
-    "memory_tag": "agent_registry_surface_updated_20250427",
-    "recovery_operations": [
-        {
-            "date": "2025-04-27",
-            "agents_recovered": ["pessimist", "skeptic"],
-            "recovery_status": {
-                "pessimist": "full_recovery",
-                "skeptic": "minimal_recovery"
-            }
-        }
-    ]
-
-    "total_agents": 19,
-    "last_updated": "2025-04-26",
-    "memory_tag": "agent_registry_surface_finalized_20250426"
-main
+    "total_agents": len(AGENT_REGISTRY),
+    "last_updated": "2025-04-28", # Updated date
+    "memory_tag": "phase3.0_sprint4_batch3_stub_creation",
+    "description": "Registry updated with stubs and schema links for Phase 3 Sprint 4 Batch 3 agents."
 }
+

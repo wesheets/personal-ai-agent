@@ -1,6 +1,26 @@
 {
   "agents": [
     {
+      "name": "PlanChainer",
+      "input_schema": [
+        "reflection_id",
+        "goal",
+        "max_steps",
+        "parameters"
+      ],
+      "output_schema": [
+        "chain_id",
+        "reflection_id",
+        "steps",
+        "estimated_completion_time",
+        "status",
+        "created_at"
+      ],
+      "registered_module": "plan_registry.py",
+      "status": "active",
+      "api_surface": "/api/plan"
+    },
+    {
       "name": "ReflectionScanner",
       "input_schema": [
         "scan_depth",
@@ -26,14 +46,8 @@
         "reflection_id"
       ],
       "output_schema": [
-        "analysis_id",
-        "reflection_id",
-        "timestamp",
-        "status",
-        "insights",
-        "drift_triggers",
-        "recovery_paths",
-        "summary"
+        "ReflectionAnalysisResult",
+        "ReflectionSummary"
       ],
       "registered_module": "reflection_registry.py",
       "status": "active",

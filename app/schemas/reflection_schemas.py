@@ -4,6 +4,7 @@ Reflection Schemas Module
 This module defines the schemas for reflection-related endpoints.
 
 # memory_tag: phase3.0_sprint4_cognitive_reflection_plan_chaining
+# memory_tag: phase3.0_sprint4_batch3_backward_breadcrumb_audit
 """
 
 from pydantic import BaseModel, Field
@@ -164,6 +165,23 @@ class ReflectionScanResponse(BaseModel):
                 }
             }
         }
+
+class ReflectionSummary(BaseModel):
+    """
+    Schema for reflection summary.
+    
+    This schema defines the structure of a reflection summary.
+    """
+    reflection_id: str = Field(
+        description="Reflection ID this summary relates to"
+    )
+    summary: str = Field(
+        description="Summary of the reflection insights"
+    )
+    timestamp: Optional[str] = Field(
+        default=None,
+        description="Timestamp of the summary creation"
+    )
 
 class InsightType(str, Enum):
     """
