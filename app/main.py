@@ -113,6 +113,19 @@ except ImportError as e:
     print(f"⚠️ Failed to load memory utility router: {e}")
     failed_routes.append("snapshot")
 
+# Extended System Router Wiring - Phase 2.6 Batch 1.5 # memory_tag: phase2.6_batch1.5_extended_system_router_wiring
+try:
+    from routes.project_routes import router as project_router
+    
+    # Include extended system router with proper API prefix
+    app.include_router(project_router, prefix="/api/project")
+    
+    loaded_routes.append("project")
+    print("✅ Extended System router (project) loaded with proper API prefix")
+except ImportError as e:
+    print(f"⚠️ Failed to load extended system router: {e}")
+    failed_routes.append("project")
+
 # Upload file routes
 try:
     from app.routes.upload_file_routes import router as upload_file_router
@@ -425,3 +438,4 @@ if __name__ == "__main__":
 # reflection and drift router wiring Mon Apr 28 01:19:45 UTC 2025
 # execution and planning router wiring Mon Apr 28 02:13:00 UTC 2025
 # memory utility router wiring Mon Apr 28 02:30:00 UTC 2025
+# extended system router wiring Mon Apr 28 03:05:00 UTC 2025

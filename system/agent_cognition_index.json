@@ -310,7 +310,7 @@
       ],
       "registered_module": "agent_registry.py",
       "status": "active",
-      "api_surface": "/api/agent"
+      "api_surface": "/api/train"
     },
     {
       "name": "LoopManager",
@@ -344,7 +344,73 @@
       "registered_module": "agent_registry.py",
       "status": "active",
       "api_surface": "/api/drift"
+    },
+    {
+      "name": "PlanManager",
+      "input_schema": [
+        "title",
+        "description",
+        "steps"
+      ],
+      "output_schema": [
+        "status",
+        "plan_id",
+        "message"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active",
+      "api_surface": "/api/plan"
+    },
+    {
+      "name": "ExecutionEngine",
+      "input_schema": [
+        "command",
+        "parameters",
+        "timeout"
+      ],
+      "output_schema": [
+        "status",
+        "execution_id",
+        "message",
+        "progress"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active",
+      "api_surface": "/api/execute"
+    },
+    {
+      "name": "SnapshotManager",
+      "input_schema": [
+        "memory_id",
+        "snapshot_type",
+        "metadata"
+      ],
+      "output_schema": [
+        "status",
+        "snapshot_id",
+        "message",
+        "timestamp"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active",
+      "api_surface": "/api/snapshot"
+    },
+    {
+      "name": "ProjectManager",
+      "input_schema": [
+        "project_id",
+        "action",
+        "parameters"
+      ],
+      "output_schema": [
+        "status",
+        "message",
+        "project_state"
+      ],
+      "registered_module": "agent_registry.py",
+      "status": "active",
+      "api_surface": "/api/project"
     }
   ],
-  "memory_tag": "phase2.6_memory_surface_update_post_batch1.1_1.2"
+  "memory_tag": "phase2.6_memory_surface_update_post_batch1.5"
 }
