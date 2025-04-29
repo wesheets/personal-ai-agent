@@ -19,9 +19,10 @@ from app.schemas.critic_schema import (
     LoopReflectionApproval
 )
 
-# Import memory operations
+# Import memory operations (Corrected import path for read_memory)
 try:
-    from app.modules.memory_writer import write_memory, read_memory
+    from app.modules.memory_writer import write_memory
+    from app.modules.memory_reader import read_memory # Corrected import path
 except ImportError:
     logging.warning("⚠️ Could not import memory operations, using mock implementations")
     # Mock implementations for testing
@@ -29,6 +30,7 @@ except ImportError:
         return {"status": "success", "message": "Mock write successful"}
     
     async def read_memory(project_id, tag):
+        logging.warning(f"Mock read_memory called for {project_id} / {tag}")
         return None
 
 # Import schema integrity utilities if available
@@ -71,8 +73,9 @@ async def critic_review(request: LoopSummaryReviewRequest):
     and returns a rejection payload with reason and recovery step if validation fails.
     """
     try:
-        # Read the output from memory
-        output = await read_memory(request.loop_id, request.output_tag)
+        # Read the output from memory using loop_id as project_id and output_tag as tag
+        # Assuming read_memory signature is read_memory(project_id: str, tag: str)
+        output = await read_memory(project_id=request.loop_id, tag=request.output_tag)
         
         if not output:
             # Memory not found - reject
@@ -169,7 +172,7 @@ async def critic_review(request: LoopSummaryReviewRequest):
         
         # Log the approval to memory
         await write_memory(
-            request.loop_id,
+            request.loop_id, # Assuming loop_id is project_id context
             f"loop_approval_{request.loop_id}_{request.agent}",
             approval.dict() if hasattr(approval, 'dict') else vars(approval)
         )
@@ -223,7 +226,7 @@ async def log_rejection_to_memory(loop_id: str, agent: str, rejection: LoopRefle
         
         # Store in memory under the loop rejection tag
         memory_tag = f"loop_rejection_{loop_id}"
-        result = await write_memory(loop_id, memory_tag, rejection_dict)
+        result = await write_memory(loop_id, memory_tag, rejection_dict) # Assuming loop_id is project_id context
         
         # Log the operation
         if result and result.get("status") == "success":
@@ -236,3 +239,4 @@ async def log_rejection_to_memory(loop_id: str, agent: str, rejection: LoopRefle
     except Exception as e:
         logger.error(f"❌ Error logging rejection: {str(e)}")
         return False
+

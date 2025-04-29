@@ -6,8 +6,10 @@ including the review endpoint for manual SAGE review.
 """
 
 import logging
+import traceback # Added for detailed error logging
 from fastapi import APIRouter, HTTPException, Depends
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional # Added List, Optional
+from pydantic import BaseModel, Field # Added BaseModel, Field
 
 # Import schemas
 from app.schemas.sage_schema import SageReviewRequest, SageReviewResult
@@ -19,6 +21,9 @@ try:
 except ImportError:
     sage_available = False
     logging.warning("⚠️ SAGE agent not available, routes will return errors")
+
+# Configure logging
+logger = logging.getLogger("app.routes.sage_routes")
 
 # Create router
 router = APIRouter(
@@ -61,7 +66,7 @@ async def sage_review(request: SageReviewRequest):
         return result
     
     except Exception as e:
-        logging.error(f"Error in SAGE review endpoint: {str(e)}")
+        logger.error(f"Error in SAGE review endpoint: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Error in SAGE review: {str(e)}"
@@ -95,16 +100,11 @@ async def run_sage(project_id: str, task: str = None):
         return result
     
     except Exception as e:
-        logging.error(f"Error running SAGE agent: {str(e)}")
+        logger.error(f"Error running SAGE agent: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Error running SAGE agent: {str(e)}"
         )
-
-
-
-from pydantic import BaseModel, Field
-from typing import List
 
 # Assuming memory read function is available
 try:
@@ -144,6 +144,7 @@ async def get_sage_beliefs(project_id: str):
         SageBeliefsResponse containing the list of beliefs
     """
     logger.info(f"Received request for SAGE beliefs for project: {project_id}")
+    beliefs_data = None # Initialize beliefs_data
     try:
         # Define the memory tag where SAGE beliefs might be stored
         belief_tag = f"sage_beliefs_{project_id}"
@@ -167,23 +168,31 @@ async def get_sage_beliefs(project_id: str):
         # Validate and format beliefs
         beliefs_list = []
         for belief_item in beliefs_data:
-            if isinstance(belief_item, dict):
-                # Basic validation for required fields
-                if "belief" in belief_item and "confidence" in belief_item:
-                     beliefs_list.append(Belief(**belief_item))
+            try:
+                if isinstance(belief_item, dict):
+                    # Basic validation for required fields using Pydantic model
+                    beliefs_list.append(Belief(**belief_item))
                 else:
-                    logger.warning(f"Skipping invalid belief item for project {project_id}: {belief_item}")
-            else:
-                 logger.warning(f"Skipping non-dict belief item for project {project_id}: {belief_item}")
+                     logger.warning(f"Skipping non-dict belief item for project {project_id}: {belief_item}")
+            except Exception as validation_error: # Catch validation errors during Belief creation
+                logger.warning(f"Skipping invalid belief item due to validation error for project {project_id}: {belief_item}. Error: {validation_error}")
 
         logger.info(f"Successfully retrieved {len(beliefs_list)} SAGE beliefs for project: {project_id}")
         return SageBeliefsResponse(project_id=project_id, beliefs=beliefs_list, status="success")
 
+    except HTTPException as http_exc:
+        # Re-raise HTTP exceptions
+        raise http_exc
     except Exception as e:
+        # Catch other potential errors (e.g., during read_memory)
         logger.error(f"Error retrieving SAGE beliefs for project {project_id}: {str(e)}")
         logger.error(traceback.format_exc())
+        # Include details about the data being processed if available
+        error_detail = f"Error retrieving SAGE beliefs: {str(e)}"
+        if beliefs_data is not None:
+            error_detail += f". Data being processed: {str(beliefs_data)[:200]}..."
         raise HTTPException(
             status_code=500,
-            detail=f"Error retrieving SAGE beliefs: {str(e)}"
+            detail=error_detail
         )
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, HTTPException, Path
+from fastapi import APIRouter, Query, HTTPException, Path, Body
 from typing import Optional, Dict, Any
 from app.modules.project_state import read_project_state, write_project_state
 from app.models.project_state import PatchProjectStateRequest
@@ -130,7 +130,7 @@ async def get_project_status_query(
         raise HTTPException(status_code=500, detail=f"Error getting project status: {str(e)}")
 
 @router.post("/start")
-async def project_start(request: Dict[str, Any]):
+async def project_start(request: Dict[str, Any] = Body(...)):
     """
     Start a new project or resume an existing project.
     
@@ -151,33 +151,16 @@ async def project_start(request: Dict[str, Any]):
     # Add debug logging for project start
     print(f"🧪 Project start triggered: {project_id} {goal} {agent}")
     
-    try:
-        # Validate required parameters
-        if not project_id:
-            return {
-                "status": "error",
-                "message": "project_id is required",
-                "agent": agent or "unknown",
-                "goal": goal or "unknown",
-                "project_id": "missing"
-            }
-        if not goal:
-            return {
-                "status": "error",
-                "message": "goal is required",
-                "agent": agent or "unknown",
-                "goal": "missing",
-                "project_id": project_id
-            }
-        if not agent:
-            return {
-                "status": "error",
-                "message": "agent is required",
-                "agent": "missing",
-                "goal": goal,
-                "project_id": project_id
-            }
+    # Validate required parameters
+    if not project_id:
+        raise HTTPException(status_code=422, detail="project_id is required")
+    if not goal:
+        # Raise 422 Unprocessable Entity if goal is missing (Fix for Batch 1 validation)
+        raise HTTPException(status_code=422, detail="goal is required")
+    if not agent:
+        raise HTTPException(status_code=422, detail="agent is required")
         
+    try:
         # Try to import agent runner
         try:
             from app.api.agent.run import run_agent
@@ -185,13 +168,7 @@ async def project_start(request: Dict[str, Any]):
             
             # Validate agent exists in AGENT_RUNNERS
             if agent not in AGENT_RUNNERS:
-                return {
-                    "status": "error",
-                    "message": f"Unknown agent: {agent}",
-                    "agent": agent,
-                    "goal": goal,
-                    "project_id": project_id
-                }
+                raise HTTPException(status_code=422, detail=f"Unknown agent: {agent}")
             
             # Log orchestrator function call
             print(f"⚙️ Calling orchestrator agent...")
@@ -218,35 +195,17 @@ async def project_start(request: Dict[str, Any]):
                 }
             except Exception as e:
                 print(f"❌ Agent execution failed: {e}")
-                return {
-                    "status": "error",
-                    "message": "Agent execution failed",
-                    "error_details": str(e),
-                    "project_id": project_id,
-                    "agent": agent,
-                    "goal": goal
-                }
+                raise HTTPException(status_code=500, detail=f"Agent execution failed: {str(e)}")
         except ImportError as e:
             print(f"❌ Import error: {e}")
             # Fallback if agent runner is not available
-            return {
-                "status": "error",
-                "message": f"Failed to import agent runner: {str(e)}",
-                "error_details": str(e),
-                "project_id": project_id,
-                "agent": agent,
-                "goal": goal
-            }
+            raise HTTPException(status_code=500, detail=f"Failed to import agent runner: {str(e)}")
+    except HTTPException as http_exc:
+        # Re-raise HTTP exceptions from validation
+        raise http_exc
     except Exception as e:
         print(f"❌ Unexpected error in project_start: {e}")
-        return {
-            "status": "error",
-            "message": f"Failed to start project",
-            "error_details": str(e),
-            "project_id": project_id or "unknown",
-            "agent": agent or "unknown",
-            "goal": goal or "unknown"
-        }
+        raise HTTPException(status_code=500, detail=f"Failed to start project: {str(e)}")
 
 @router.patch("/state")
 async def patch_project_state(payload: PatchProjectStateRequest):
@@ -268,3 +227,4 @@ async def patch_project_state(payload: PatchProjectStateRequest):
         "project_id": project_id,
         "updated_fields": list(patch.keys())
     }
+

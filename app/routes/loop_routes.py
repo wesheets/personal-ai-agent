@@ -27,15 +27,14 @@ from app.modules.memory_writer import write_memory
 from app.api.modules.memory import read_memory
 
 # Import agent modules
-from app.agents.hal import run_hal_agent
-from app.agents.hal_agent import run_hal_agent as run_hal_agent_v2
+from app.agents.hal_agent import HALAgent # Corrected import
 from app.agents.ash import run_ash_agent
 from app.agents.critic import run_critic_agent
 
 # Import code generation module
 from app.modules.code_generation.hal_code_generator import process_build_task
-from .schemas.loopvalidate_schemas import LoopValidateRequest
-from .schemas.loopvalidate_schemas import LoopValidateResponse
+from app.schemas.loopvalidate_schemas import LoopValidateRequest
+from app.schemas.loopvalidate_schemas import LoopValidateResponse
 
 # Configure logging
 logger = logging.getLogger("app.routes.loop_routes")
@@ -435,10 +434,17 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
             else:
                 # Call HAL for other response types
                 try:
-                    agent_result = run_hal_agent_v2(
-                        task=f"Generate {request.response_type} for {prior_memory.get('content', '')}",
-                        project_id=request.project_id
-                    )
+                    # Instantiate HALAgent and create payload
+                    hal_agent_instance = HALAgent()
+                    payload = {
+                        "project_id": request.project_id,
+                        "loop_id": request.loop_id,
+                        "task": f"Generate {request.response_type} for {prior_memory.get('content', '')}",
+                        "details": {},
+                        "source_agent": "loop_respond_endpoint"
+                    }
+                    # Execute HAL agent
+                    agent_result = await hal_agent_instance.execute(payload)
                     agent_response = {
                         "content": agent_result.get("result", ""),
                         "type": request.response_type
