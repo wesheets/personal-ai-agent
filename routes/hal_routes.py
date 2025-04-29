@@ -210,3 +210,48 @@ async def list_constraints():
         "count": len(SAFETY_CONSTRAINTS),
         "status": "success"
     }
+
+
+
+from pydantic import BaseModel, Field
+from app.agents.hal_agent import run_hal_agent
+
+class AgentRunRequest(BaseModel):
+    """Request model for the agent/run endpoint"""
+    project_id: str = Field(..., description="Project identifier")
+    task: str = Field(..., description="Task for the agent to execute")
+
+@router.post("/run", tags=["agent"])
+async def agent_run(request: AgentRunRequest):
+    """
+    Run the HAL agent with a specific task for a project.
+
+    Args:
+        request: AgentRunRequest containing project_id and task
+
+    Returns:
+        Dict containing the execution result from the HAL agent
+    """
+    logger.info(f"Received agent run request for HAL, project: {request.project_id}, task: {request.task}")
+    try:
+        # Call the run_hal_agent function
+        result = await run_hal_agent(task=request.task, project_id=request.project_id)
+        
+        # Check if the agent execution resulted in an error status internally
+        if isinstance(result, dict) and result.get("status") == "error":
+            logger.error(f"HAL agent execution failed internally: {result.get(	message	, 	Unknown error	)}")
+            # Return the error details, potentially raising HTTPException or returning a specific structure
+            # For now, return the agent's error response directly
+            return result 
+            
+        logger.info(f"HAL agent execution successful for project: {request.project_id}")
+        return result
+
+    except Exception as e:
+        logger.error(f"Error running HAL agent via /agent/run: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error running HAL agent: {str(e)}"
+        )
+

@@ -597,5 +597,21 @@
       "status": "active"
     }
   ],
-  "memory_tag": "phase4.0_holistic_router_patch_complete"
+  "memory_tag": "phase4.0_holistic_router_patch_complete",
+  "metadata": {
+    "last_updated": "2025-04-28T21:10:36.249737",
+    "memory_tags": [
+      "phase3.3.1_registry_healing_batch1_complete"
+    ]
+  },
+  "system_components": [
+    {
+      "name": "System Component Map",
+      "path": "/home/ubuntu/personal-ai-agent/system/system_component_map.json",
+      "type": "metadata",
+      "description": "Maps system components and their relationships.",
+      "version_tag": "phase3.3.1_registry_healing_batch1_complete",
+      "last_updated": "2025-04-28T21:10:36.249740"
+    }
+  ]
 }
