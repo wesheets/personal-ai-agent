@@ -8,6 +8,43 @@ from pathlib import Path
 # Ensure the app directory is in the Python path
 sys.path.append(str(Path(__file__).parent.parent))
 
+# --- Import Agent Modules to Trigger Registration --- 
+# This ensures the @register decorators run and populate the registry
+# before the script accesses it.
+print("Importing agent modules for registration...")
+try:
+    import app.agents.forge_agent
+    print("✅ Imported forge_agent")
+except ImportError as e:
+    print(f"⚠️ Failed to import forge_agent: {e}")
+try:
+    import app.agents.orchestrator_agent
+    print("✅ Imported orchestrator_agent")
+except ImportError as e:
+    print(f"⚠️ Failed to import orchestrator_agent: {e}")
+try:
+    import app.agents.hal_agent
+    print("✅ Imported hal_agent")
+except ImportError as e:
+    print(f"⚠️ Failed to import hal_agent: {e}")
+try:
+    import app.agents.nova_agent
+    print("✅ Imported nova_agent")
+except ImportError as e:
+    print(f"⚠️ Failed to import nova_agent: {e}")
+try:
+    import app.agents.critic_agent
+    print("✅ Imported critic_agent")
+except ImportError as e:
+    print(f"⚠️ Failed to import critic_agent: {e}")
+try:
+    import app.agents.sage_agent
+    print("✅ Imported sage_agent")
+except ImportError as e:
+    print(f"⚠️ Failed to import sage_agent: {e}")
+print("Finished importing agent modules.")
+# --- End Agent Module Imports --- 
+
 from app.core.agent_registry import AGENT_REGISTRY
 from app.core.agent_types import AgentCapability
 
@@ -45,6 +82,7 @@ def generate_aci(output_path: str):
                     logger.warning(f"Skipping agent {agent_key}: Registration data is not a dictionary.")
                     continue
                 
+                # Check for the agent class object directly
                 if 'class' not in agent_info or not agent_info['class']:
                     logger.warning(f"Skipping agent {agent_key}: Missing or invalid 'class' in registration data.")
                     continue
@@ -53,9 +91,9 @@ def generate_aci(output_path: str):
                 agent_name = agent_info.get('name', 'Unknown Name')
                 agent_description = agent_info.get('description', 'No description provided.')
                 
-                # Safely get schema objects from agent_info
-                input_schema = agent_info.get('input_schema')
-                output_schema = agent_info.get('output_schema')
+                # Safely get schema objects from the agent class itself
+                input_schema = getattr(agent_class, 'input_schema', None)
+                output_schema = getattr(agent_class, 'output_schema', None)
 
                 # Get schema paths using the helper function
                 input_schema_path = get_schema_path(input_schema)
@@ -122,3 +160,4 @@ if __name__ == "__main__":
     logger.info(f"Starting ACI generation. Output file: {output_file_path}")
     generate_aci(str(output_file_path))
     logger.info("ACI generation process finished.")
+

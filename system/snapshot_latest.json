@@ -1,11 +1,11 @@
 {
-  "timestamp": "20250429_1731",
-  "memory_tag": "healed_batch7_20250429",
+  "timestamp": "20250429_1810",
+  "memory_tag": "healed_batch8_20250429",
   "git_status": {
     "branch": "main",
-    "commit_hash": "998c3559845b3a88c558f965b798a2504eb26448",
-    "commit_message": "Merge pull request #351 from wesheets/batch6-core-stabilization\n\nfeat: Batch 6 Core Stabilization - Imports, Validation, Scaffolding",
-    "timestamp": "2025-04-29T17:31:07.736905"
+    "commit_hash": "0d4dd118e401c4d93d77ee3e034e469ae8761663",
+    "commit_message": "Merge pull request #352 from wesheets/batch7-cognitive-surfaces\n\nfeat: Batch 7 Cognitive Surfaces - AgentResult, ACI/PICE, Permissions\u2026",
+    "timestamp": "2025-04-29T18:10:08.153746"
   },
   "resurrection_status": "partial",
   "endpoint_stats": {
@@ -1044,14 +1044,38 @@
     "critic_schemas": {
       "name": "critic_schemas",
       "file": "app/schemas/agents/critic/critic_schemas.py",
-      "hash": "b71c7d1ac4bdb7a15560d167d5a8d363869714ef4e45e6112a672678da3261fb",
-      "size_bytes": 789
+      "hash": "cee861d2d282ce6830b418d75deaf04bbae0709508cff45ce3ce9440bfaf9652",
+      "size_bytes": 785
     },
     "sage_schemas": {
       "name": "sage_schemas",
       "file": "app/schemas/agents/sage/sage_schemas.py",
-      "hash": "e1a3cadd0ecce5e5243d834945a4e519453f047936f4c11d8e214f48d1ca7a94",
-      "size_bytes": 775
+      "hash": "58d32f43ddd827834612f3d853a9b198465538a70ad73b0caa231b2dc537dcaa",
+      "size_bytes": 771
+    },
+    "forge_schemas": {
+      "name": "forge_schemas",
+      "file": "app/schemas/agents/forge/forge_schemas.py",
+      "hash": "e88f95a5364c98ce3f6b0424bb7ad5a459d12874f191a88793c6a3f6612c39e5",
+      "size_bytes": 327
+    },
+    "orchestrator_schemas": {
+      "name": "orchestrator_schemas",
+      "file": "app/schemas/agents/orchestrator/orchestrator_schemas.py",
+      "hash": "7f72d9963903f7aa788297d9011e3d0c2ee10bae98cad40efaf8f98bfc8a1b39",
+      "size_bytes": 355
+    },
+    "hal_schemas": {
+      "name": "hal_schemas",
+      "file": "app/schemas/agents/hal/hal_schemas.py",
+      "hash": "bc6a1c5bad7603b027c8ff02b35a1bf1728fe7ecd5607c917d8f36db8db2c42b",
+      "size_bytes": 319
+    },
+    "nova_schemas": {
+      "name": "nova_schemas",
+      "file": "app/schemas/agents/nova/nova_schemas.py",
+      "hash": "08aa5ef48ab13fac0940a50ff3b58fb72292293e74259d51a99845bfce89d8db",
+      "size_bytes": 323
     },
     "builder_schema": {
       "name": "builder_schema",
@@ -2574,11 +2598,11 @@
       "size_bytes": 6184
     }
   },
-  "hash": "88b4329be8c12096d1bdbc9c9b44d7486b9e2bf668d9419a448bd220077eb617",
+  "hash": "f9c2481e3de687a5e75c3bdce9b0454decc07b4b6a94ba4676f7e9615916210b",
   "component_hashes": {
     "routes_hash": "13a66c17102d15bba00b20de415d35e19739d55081837799d97e991509ab1e13",
     "agents_hash": "65386a000cff620210dc9b1309f2db2010fec3c6c74c4fde895057e82b1f957c",
-    "schemas_hash": "23a978affcdab8bf76f859025cc177d71d87975c0587c2f00ba6ae0e3515869d",
+    "schemas_hash": "9da4aaaf2a9f73e2390960cf0668e80811fc26fcb0c871da8e588f9ee3d1596d",
     "modules_hash": "f1118dec099973a004de95adebe1b1d8fa059a16fce9658dfd7efe0bc3b80a8c"
   }
 }
