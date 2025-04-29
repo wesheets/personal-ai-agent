@@ -96,7 +96,7 @@ except ImportError as e:
 try:
     # --- Modified: Removed direct agent_routes import, using loop_controller now --- 
     # from app.routes.agent_routes import router as agent_router 
-    from app.routes.memory_routes import router as memory_router
+    # from app.modules.memory_writer import memory_store # Removed - Caused import error, functionality via memory_engine
     from app.routes.loop_routes import router as loop_router
 
     # Include core routers with proper API prefixes

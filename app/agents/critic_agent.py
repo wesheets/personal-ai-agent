@@ -1,7 +1,7 @@
 import logging
 from typing import List, Literal, Optional, Dict
 
-from app.core.agent_registry import register, AgentCapability
+from app.core.registration_utils import register, AgentCapability
 from app.core.base_agent import BaseAgent
 from app.schemas.agents.critic.critic_schemas import CriticReviewRequest, CriticReviewResult
 from app.schemas.core.agent_result import ResultStatus
