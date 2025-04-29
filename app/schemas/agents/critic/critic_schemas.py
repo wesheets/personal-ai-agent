@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional, Dict
 
-from app.schemas.core.agent_result import BaseAgentResult, ResultStatus
+from app.schemas.core.agent_result import AgentResult, ResultStatus
 from app.schemas.core.task_payload import BaseTaskPayload
 
 
