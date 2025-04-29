@@ -270,7 +270,6 @@ AGENT_REGISTRY = {
         "contract_version": "v1.0.0"
     }
 }
-}
 
 AGENT_PERSONALITIES = {
   "core-forge": {

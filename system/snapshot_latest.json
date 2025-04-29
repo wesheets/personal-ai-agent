@@ -1,127 +1,2560 @@
 {
-  "timestamp": "2025-04-26T02:38:03.072705",
-  "tag": "snapshot_after_batch1_loop_fixes",
-  "memory_tag": "batch1_routes_verified_20250426_0238",
-  "system_state": {
-    "total_agents": 6,
-    "total_routes": 11,
-    "operational_routes": 1,
-    "partial_routes": 1,
-    "batch1_status": "partial",
-    "last_updated": "2025-04-26T02:35:52Z"
+  "timestamp": "20250429_1402",
+  "memory_tag": "healed_batch4_20250429",
+  "git_status": {
+    "branch": "main",
+    "commit_hash": "658338a898a0f5cb01316af41b64a66207d85499",
+    "commit_message": "Merge pull request #348 from wesheets/batch3-endpoint-fixes\n\nAdd Batch 3 endpoint fixes and core support agents (Critic, Sage, Nova)",
+    "timestamp": "2025-04-29T14:02:14.469563"
   },
-  "agents": [
-    {
-      "id": "forge",
-      "role": "System Builder",
-      "passes_full_test": false,
-      "routes_count": 1,
-      "last_modified": "2025-04-26T00:28:40Z"
+  "resurrection_status": "partial",
+  "endpoint_stats": {
+    "total": 119,
+    "success": 20,
+    "unprocessable": 15,
+    "not_found": 77,
+    "server_error": 7,
+    "success_rate": 29.4
+  },
+  "reconstruction_stats": {
+    "routers_added": 13,
+    "schemas_connected": 13,
+    "path_operations_added": 33
+  },
+  "routes": {
+    "GET /context/{agent_id}": {
+      "method": "GET",
+      "path": "/context/{agent_id}",
+      "status": "not_found",
+      "status_code": 404
     },
-    {
-      "id": "orchestrator",
-      "role": "Task Delegator",
-      "passes_full_test": false,
-      "routes_count": 4,
-      "last_modified": "2025-04-26T02:35:52Z"
+    "POST /orchestrator/validate_delegation": {
+      "method": "POST",
+      "path": "/orchestrator/validate_delegation",
+      "status": "error",
+      "status_code": 500
     },
-    {
-      "id": "sage",
-      "role": "Strategic Advisor",
-      "passes_full_test": true,
-      "routes_count": 1,
-      "last_modified": "2025-04-26T00:28:40Z"
+    "POST /orchestrator/check_recovery_authorization": {
+      "method": "POST",
+      "path": "/orchestrator/check_recovery_authorization",
+      "status": "error",
+      "status_code": 500
     },
-    {
-      "id": "nova",
-      "role": "Creative Designer",
-      "passes_full_test": false,
-      "routes_count": 2,
-      "last_modified": "2025-04-26T00:28:40Z"
+    "POST /context": {
+      "method": "POST",
+      "path": "/context",
+      "status": "not_found",
+      "status_code": 404
     },
-    {
-      "id": "pessimist",
-      "role": "Risk Analyzer",
-      "passes_full_test": true,
-      "routes_count": 1,
-      "last_modified": "2025-04-26T00:28:40Z"
+    "POST /config": {
+      "method": "POST",
+      "path": "/config",
+      "status": "not_found",
+      "status_code": 404
     },
-    {
-      "id": "hal",
-      "role": "System Core",
-      "passes_full_test": true,
-      "routes_count": 2,
-      "last_modified": "2025-04-26T00:28:40Z"
-    }
-  ],
-  "routes": [
-    {
-      "path": "/api/forge/build",
-      "agent": "forge",
-      "status": "unknown"
+    "GET /config/{agent_id}": {
+      "method": "GET",
+      "path": "/config/{agent_id}",
+      "status": "not_found",
+      "status_code": 404
     },
-    {
-      "path": "/api/orchestrator/delegate",
-      "agent": "orchestrator",
-      "status": "unknown"
+    "DELETE /config/{agent_id}": {
+      "method": "DELETE",
+      "path": "/config/{agent_id}",
+      "status": "not_found",
+      "status_code": 404
     },
-    {
-      "path": "/api/orchestrator/status",
-      "agent": "orchestrator",
-      "status": "unknown"
+    "POST /orchestrator/validate_contract": {
+      "method": "POST",
+      "path": "/orchestrator/validate_contract",
+      "status": "active",
+      "status_code": 422
     },
-    {
-      "path": "/api/plan/generate",
-      "agent": "orchestrator",
-      "status": "partial"
+    "POST /analyze": {
+      "method": "POST",
+      "path": "/analyze",
+      "status": "not_found",
+      "status_code": 404
     },
-    {
+    "POST /orchestrator/handle_violation": {
+      "method": "POST",
+      "path": "/orchestrator/handle_violation",
+      "status": "error",
+      "status_code": 500
+    },
+    "POST /critic/review": {
+      "method": "POST",
+      "path": "/critic/review",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /cto/status": {
+      "method": "GET",
+      "path": "/cto/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "GET /status": {
+      "method": "GET",
+      "path": "/status",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /critic/status": {
+      "method": "GET",
+      "path": "/critic/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /debug/analyze-loop": {
+      "method": "POST",
+      "path": "/debug/analyze-loop",
+      "status": "active",
+      "status_code": 422
+    },
+    "GET /health": {
+      "method": "GET",
+      "path": "/health",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /api/debugger/trace": {
+      "method": "POST",
+      "path": "/api/debugger/trace",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /audit": {
+      "method": "POST",
+      "path": "/audit",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /status": {
+      "method": "POST",
+      "path": "/status",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /test": {
+      "method": "POST",
+      "path": "/test",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /close": {
+      "method": "POST",
+      "path": "/close",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /drift/monitor": {
+      "method": "POST",
+      "path": "/drift/monitor",
+      "status": "active",
+      "status_code": 422
+    },
+    "GET /status/{export_id}": {
+      "method": "GET",
+      "path": "/status/{export_id}",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /status/{stream_id}": {
+      "method": "GET",
+      "path": "/status/{stream_id}",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /debugger/status": {
+      "method": "GET",
+      "path": "/debugger/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "GET /drift/history/{loop_id}": {
+      "method": "GET",
+      "path": "/drift/history/{loop_id}",
+      "status": "active",
+      "status_code": 200
+    },
+    "GET /status/{fix_id}": {
+      "method": "GET",
+      "path": "/status/{fix_id}",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /drift_routes/status": {
+      "method": "GET",
+      "path": "/drift_routes/status",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /rollback": {
+      "method": "POST",
+      "path": "/rollback",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /forge/build": {
+      "method": "POST",
+      "path": "/forge/build",
+      "status": "active",
+      "status_code": 422
+    },
+    "POST /override": {
+      "method": "POST",
+      "path": "/override",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /health/check": {
+      "method": "POST",
+      "path": "/health/check",
+      "status": "active",
+      "status_code": 200
+    },
+    "GET /guardian/status": {
+      "method": "GET",
+      "path": "/guardian/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "GET /health/system": {
+      "method": "GET",
+      "path": "/health/system",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /health/healing": {
+      "method": "POST",
+      "path": "/health/healing",
+      "status": "active",
+      "status_code": 422
+    },
+    "GET /health/config": {
+      "method": "GET",
+      "path": "/health/config",
+      "status": "error",
+      "status_code": 500
+    },
+    "GET /loop/status": {
+      "method": "GET",
+      "path": "/loop/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /health/config": {
+      "method": "POST",
+      "path": "/health/config",
+      "status": "active",
+      "status_code": 200
+    },
+    "GET /historian/status": {
+      "method": "GET",
+      "path": "/historian/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /api/loop/complete": {
+      "method": "POST",
+      "path": "/api/loop/complete",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /api/loop/trace": {
+      "method": "GET",
+      "path": "/api/loop/trace",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /health/maintenance/predict": {
+      "method": "POST",
+      "path": "/health/maintenance/predict",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /api/historian/log": {
+      "method": "POST",
+      "path": "/api/historian/log",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /api/loop/plan": {
+      "method": "POST",
+      "path": "/api/loop/plan",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /api/loop/validate": {
+      "method": "POST",
       "path": "/api/loop/validate",
-      "agent": "orchestrator",
-      "status": "operational"
+      "status": "active",
+      "status_code": 422
     },
-    {
-      "path": "/api/sage/advise",
-      "agent": "sage",
-      "status": "unknown"
+    "POST /api/loop/trace": {
+      "method": "POST",
+      "path": "/api/loop/trace",
+      "status": "not_found",
+      "status_code": 404
     },
-    {
-      "path": "/api/nova/create",
-      "agent": "nova",
-      "status": "unknown"
+    "POST /api/loop/persona-reflect": {
+      "method": "POST",
+      "path": "/api/loop/persona-reflect",
+      "status": "not_found",
+      "status_code": 404
     },
-    {
-      "path": "/api/nova/iterate",
-      "agent": "nova",
-      "status": "unknown"
+    "GET /loop/snapshot/list/{loop_id}": {
+      "method": "GET",
+      "path": "/loop/snapshot/list/{loop_id}",
+      "status": "active",
+      "status_code": 200
     },
-    {
-      "path": "/api/pessimist/analyze",
-      "agent": "pessimist",
-      "status": "unknown"
+    "POST /loop/snapshot/save": {
+      "method": "POST",
+      "path": "/loop/snapshot/save",
+      "status": "active",
+      "status_code": 422
     },
-    {
-      "path": "/api/hal/process",
-      "agent": "hal",
-      "status": "unknown"
+    "POST /api/loop/reset": {
+      "method": "POST",
+      "path": "/api/loop/reset",
+      "status": "not_found",
+      "status_code": 404
     },
-    {
-      "path": "/api/hal/status",
-      "agent": "hal",
-      "status": "unknown"
-    }
-  ],
-  "batch1_validation": {
-    "plan_generate": {
-      "status": "partial",
-      "issue": "Returns 500 for empty goal parameter instead of 422",
-      "fix_status": "Implemented but not deployed"
+    "POST /api/loop/respond": {
+      "method": "POST",
+      "path": "/api/loop/respond",
+      "status": "not_found",
+      "status_code": 404
     },
-    "loop_validate": {
-      "status": "operational",
-      "issue": null,
-      "fix_status": "Completed"
+    "DELETE /loop/snapshot/{loop_id}": {
+      "method": "DELETE",
+      "path": "/loop/snapshot/{loop_id}",
+      "status": "error",
+      "status_code": 500
+    },
+    "POST /validate": {
+      "method": "POST",
+      "path": "/validate",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /loop/snapshot/restore": {
+      "method": "POST",
+      "path": "/loop/snapshot/restore",
+      "status": "active",
+      "status_code": 422
+    },
+    "POST /embed/batch": {
+      "method": "POST",
+      "path": "/embed/batch",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /memory/status": {
+      "method": "GET",
+      "path": "/memory/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "GET /api/memory/ping": {
+      "method": "GET",
+      "path": "/api/memory/ping",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /api/memory/write": {
+      "method": "POST",
+      "path": "/api/memory/write",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /api/memory/read": {
+      "method": "GET",
+      "path": "/api/memory/read",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /nova/status": {
+      "method": "GET",
+      "path": "/nova/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "GET /recall": {
+      "method": "GET",
+      "path": "/recall",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /recall": {
+      "method": "POST",
+      "path": "/recall",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /embed": {
+      "method": "POST",
+      "path": "/embed",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /generate-component": {
+      "method": "POST",
+      "path": "/generate-component",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /observer/status": {
+      "method": "GET",
+      "path": "/observer/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /journal": {
+      "method": "POST",
+      "path": "/journal",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /observe": {
+      "method": "POST",
+      "path": "/observe",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /orchestrator/available-modes": {
+      "method": "GET",
+      "path": "/orchestrator/available-modes",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /build-ui": {
+      "method": "POST",
+      "path": "/build-ui",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /api/orchestrator/status": {
+      "method": "GET",
+      "path": "/api/orchestrator/status",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /orchestrator/inspect-memory": {
+      "method": "POST",
+      "path": "/orchestrator/inspect-memory",
+      "status": "active",
+      "status_code": 422
+    },
+    "POST /orchestrator/visualize-loop": {
+      "method": "POST",
+      "path": "/orchestrator/visualize-loop",
+      "status": "active",
+      "status_code": 422
+    },
+    "POST /orchestrator/loop-complete": {
+      "method": "POST",
+      "path": "/orchestrator/loop-complete",
+      "status": "active",
+      "status_code": 422
+    },
+    "POST /logs": {
+      "method": "POST",
+      "path": "/logs",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /orchestrator/validate-loop": {
+      "method": "POST",
+      "path": "/orchestrator/validate-loop",
+      "status": "active",
+      "status_code": 422
+    },
+    "GET /pessimist/status": {
+      "method": "GET",
+      "path": "/pessimist/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /orchestrator/memory-snapshot": {
+      "method": "POST",
+      "path": "/orchestrator/memory-snapshot",
+      "status": "active",
+      "status_code": 422
+    },
+    "POST /enforce": {
+      "method": "POST",
+      "path": "/enforce",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /generate": {
+      "method": "GET",
+      "path": "/generate",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /sage/status": {
+      "method": "GET",
+      "path": "/sage/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /check": {
+      "method": "POST",
+      "path": "/check",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /generate": {
+      "method": "POST",
+      "path": "/generate",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /reflect": {
+      "method": "POST",
+      "path": "/reflect",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /run": {
+      "method": "POST",
+      "path": "/run",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /review": {
+      "method": "POST",
+      "path": "/review",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /reinforce": {
+      "method": "POST",
+      "path": "/reinforce",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /revise": {
+      "method": "POST",
+      "path": "/revise",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /challenge": {
+      "method": "POST",
+      "path": "/challenge",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /sitegen/status": {
+      "method": "GET",
+      "path": "/sitegen/status",
+      "status": "active",
+      "status_code": 200
+    },
+    "POST /evaluate": {
+      "method": "POST",
+      "path": "/evaluate",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /orchestrator/determine-mode": {
+      "method": "POST",
+      "path": "/orchestrator/determine-mode",
+      "status": "active",
+      "status_code": 422
+    },
+    "GET /status/{model_id}": {
+      "method": "GET",
+      "path": "/status/{model_id}",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "POST /plan": {
+      "method": "POST",
+      "path": "/plan",
+      "status": "not_found",
+      "status_code": 404
+    },
+    "GET /health/check/{component_id}": {
+      "method": "GET",
+      "path": "/health/check/{component_id}",
+      "status": "error",
+      "status_code": 500
+    },
+    "GET /health/maintenance/predict/{component_id}": {
+      "method": "GET",
+      "path": "/health/maintenance/predict/{component_id}",
+      "status": "error",
+      "status_code": 500
     }
   },
-  "hash": "629fc215dbae89b65054a972c425910b4d238259243dbf31a12aae28618d326c"
+  "agents": {
+    "critic": {
+      "name": "critic",
+      "status": "contract_only",
+      "config_file": "unknown"
+    },
+    "forge": {
+      "name": "forge",
+      "status": "contract_only",
+      "config_file": "unknown"
+    },
+    "hal": {
+      "name": "hal",
+      "status": "contract_only",
+      "config_file": "unknown"
+    },
+    "orchestrator": {
+      "name": "orchestrator",
+      "status": "contract_only",
+      "config_file": "unknown"
+    },
+    "sage": {
+      "name": "sage",
+      "status": "contract_only",
+      "config_file": "unknown"
+    }
+  },
+  "schemas": {
+    "__init__": {
+      "name": "__init__",
+      "file": "app/schemas/memory/__init__.py",
+      "hash": "30250a234098403958debe84466991e829b342c3bb1d12c870754646689ac37b",
+      "size_bytes": 789
+    },
+    "agent_cognition_schema": {
+      "name": "agent_cognition_schema",
+      "file": "app/schemas/agent_cognition_schema.json",
+      "hash": "aae954fef7a44fbf838bf717eb53fcd136ed7a1dfff1f1825dd307a2f6b471e5",
+      "size_bytes": 3269
+    },
+    "agent_config_schema": {
+      "name": "agent_config_schema",
+      "file": "app/schemas/agent_config_schema.py",
+      "hash": "dc7361160ca0802baa04d74e7b256ac6253bae2fe0e9de45b93ebeb0e3f5aa84",
+      "size_bytes": 8729
+    },
+    "agent_context_schema": {
+      "name": "agent_context_schema",
+      "file": "app/schemas/agent_context_schema.py",
+      "hash": "29d490578a5ee3884b592d6c289024801f04d7cf20551282f889196e60c2761d",
+      "size_bytes": 6984
+    },
+    "agent_contract_schema": {
+      "name": "agent_contract_schema",
+      "file": "app/schemas/agent_contract_schema.py",
+      "hash": "f6abf1bb337f0d49f35e062a64bef1c97848187a6b979e9c4a667411fa1f0a1f",
+      "size_bytes": 5601
+    },
+    "ash_schema": {
+      "name": "ash_schema",
+      "file": "app/schemas/ash_schema.py",
+      "hash": "ce7dac44bc9bd4d888735d78c81f5b97af71cb4ba0b37c834af627148e611769",
+      "size_bytes": 10493
+    },
+    "ceo_schema": {
+      "name": "ceo_schema",
+      "file": "app/schemas/ceo_schema.py",
+      "hash": "65179f95d662b58e09dabe35fc947518d6be7531ef7c22d5b445a316a4af4d8b",
+      "size_bytes": 5548
+    },
+    "checklist_schema": {
+      "name": "checklist_schema",
+      "file": "app/schemas/checklist_schema.json",
+      "hash": "211313221f656e4b541784595f339e86a5327835696b0cbbba4e74b88da57771",
+      "size_bytes": 5813
+    },
+    "critic_schema": {
+      "name": "critic_schema",
+      "file": "app/schemas/critic_schema.py",
+      "hash": "ab26fe988fa86f37af648c303b19e20f0fe68f82e3318e7d32fb4eb9e0d33d31",
+      "size_bytes": 7035
+    },
+    "cto_schema": {
+      "name": "cto_schema",
+      "file": "app/schemas/cto_schema.py",
+      "hash": "78f8904395d87486e3732f9d1a0b41d156869d1dc714fdb1558ab1b0b8495579",
+      "size_bytes": 3497
+    },
+    "debug_schema": {
+      "name": "debug_schema",
+      "file": "app/schemas/debug_schema.py",
+      "hash": "3c881fcbd63f70e12af49c190f2fa0c115bcf4872bff82933f70ea191aa67ecc",
+      "size_bytes": 6757
+    },
+    "debugger_schema": {
+      "name": "debugger_schema",
+      "file": "app/schemas/debugger_schema.py",
+      "hash": "94b780516bbb2db94d236c9cb635d46806465d25c4362974c8fe7dd9d80f1e5e",
+      "size_bytes": 6448
+    },
+    "delegate_stream_schema": {
+      "name": "delegate_stream_schema",
+      "file": "app/schemas/delegate/delegate_stream_schema.py",
+      "hash": "6ac9c2f7dff0974622091477843012100b54f90166bc358c595fd5ecc9354fec",
+      "size_bytes": 403
+    },
+    "drift_healing_schemas": {
+      "name": "drift_healing_schemas",
+      "file": "app/schemas/drift_healing_schemas.py",
+      "hash": "5fb8b9d2c16a91ff7acf545c458aeb1f2359c7736bcf343c398e424cd54cb004",
+      "size_bytes": 2568
+    },
+    "drift_log_schemas": {
+      "name": "drift_log_schemas",
+      "file": "app/schemas/drift_log_schemas.py",
+      "hash": "952b7f598cc171b6e581e046cdc8bd73e3815e11505b06723eaf8dff7274dda0",
+      "size_bytes": 2745
+    },
+    "drift_schema": {
+      "name": "drift_schema",
+      "file": "app/schemas/drift_schema.py",
+      "hash": "84d7dc6e134f06ace4adb6fecf9ed6b6c75a4ca4e52575fe378f856c69f9ea83",
+      "size_bytes": 9592
+    },
+    "drifthealing_schemas": {
+      "name": "drifthealing_schemas",
+      "file": "app/schemas/drifthealing_schemas.py",
+      "hash": "c4495bb52656aaa4cc00cebafa86568a9399e11586f6d2006c137bf66e5177b4",
+      "size_bytes": 441
+    },
+    "export_schema": {
+      "name": "export_schema",
+      "file": "app/schemas/export_schema.py",
+      "hash": "794d562876af558a298df53b0bc38e7ff827b994fb67a77164e3378ff4e2cb9c",
+      "size_bytes": 8063
+    },
+    "fix_schema": {
+      "name": "fix_schema",
+      "file": "app/schemas/fix_schema.py",
+      "hash": "8d1f87ed74c51df5a06c71cf022a736cd4986fe2df66484195ebbb4361db6707",
+      "size_bytes": 9004
+    },
+    "forge_schema": {
+      "name": "forge_schema",
+      "file": "app/schemas/forge_schema.py",
+      "hash": "b835dcac118d51d36e942c0df2f698df284cbecac8b4faea28164e6a89bf4f21",
+      "size_bytes": 8378
+    },
+    "guardian_schema": {
+      "name": "guardian_schema",
+      "file": "app/schemas/guardian_schema.py",
+      "hash": "09dbb2fadff5dbb2ff4e5379cf4b59aece0f1b62e8a3e7ba05885a2a99e1dc35",
+      "size_bytes": 6804
+    },
+    "hal_agent.schema": {
+      "name": "hal_agent.schema",
+      "file": "app/schemas/schemas/hal_agent.schema.json",
+      "hash": "d5b758ce48c351e2f8594f6779abdb40eba85ba5ad2f632894ccde9a755a447c",
+      "size_bytes": 305
+    },
+    "health_monitor_schema": {
+      "name": "health_monitor_schema",
+      "file": "app/schemas/health_monitor_schema.py",
+      "hash": "c3352eb0df9eaea9e868fe766e8ae3f5641e3db3f6f0e8c3c3d565c47d12b39c",
+      "size_bytes": 11036
+    },
+    "historian_schema": {
+      "name": "historian_schema",
+      "file": "app/schemas/historian_schema.py",
+      "hash": "a5ccc5a78b9bdb8b244e0fdc9ef35b9afec8f0ad2b510ed95469914db78cec50",
+      "size_bytes": 6412
+    },
+    "loop_schema": {
+      "name": "loop_schema",
+      "file": "app/schemas/loop_schema.py",
+      "hash": "87757f997dda85745e47a1a9bf529c02b8110294446ab463d597791849532566",
+      "size_bytes": 670
+    },
+    "loop_snapshot_schema": {
+      "name": "loop_snapshot_schema",
+      "file": "app/schemas/loop_snapshot_schema.py",
+      "hash": "6df19084678b1602e130fe623fd3a9bea3ae73cede81ccd75ef12dc2b0bbc84e",
+      "size_bytes": 3547
+    },
+    "loop_trace": {
+      "name": "loop_trace",
+      "file": "app/schemas/loop_trace.py",
+      "hash": "be6b0754c79f46f3604f26456dccfdfacceee1bcabcf6b8a71f8e80d8a069cfe",
+      "size_bytes": 18612
+    },
+    "loop_validation_schema": {
+      "name": "loop_validation_schema",
+      "file": "app/schemas/loop_validation_schema.py",
+      "hash": "bbcb15eab60130833710c03914791060fa02d261996f6dc1a491a485d47eb72b",
+      "size_bytes": 6860
+    },
+    "loopvalidate_schemas": {
+      "name": "loopvalidate_schemas",
+      "file": "app/schemas/loopvalidate_schemas.py",
+      "hash": "9d24cdae514f4162d27af7f4dc6b6f1e047c3c3a025e9aa421079b39324756b0",
+      "size_bytes": 577
+    },
+    "memory": {
+      "name": "memory",
+      "file": "app/schemas/memory.py",
+      "hash": "5ba61ef70d6837ff19454511d4f654e7b0f8d09da2a4f90db21674729576dd91",
+      "size_bytes": 1671
+    },
+    "memory_embed_schema": {
+      "name": "memory_embed_schema",
+      "file": "app/schemas/memory_embed_schema.py",
+      "hash": "4a6b388db8a3652b3dce7490aed502cbd1caba32581581dc69bee1cb49f78b02",
+      "size_bytes": 7587
+    },
+    "memory_recall_schema": {
+      "name": "memory_recall_schema",
+      "file": "app/schemas/memory_recall_schema.py",
+      "hash": "83fd1df2f5f510c0ee74647975b69cc3970734f4c6c69b2427a327fc26673396",
+      "size_bytes": 6715
+    },
+    "memory_schema": {
+      "name": "memory_schema",
+      "file": "app/schemas/memory_schema.py",
+      "hash": "6f6f7b736869002b5630e27a350a009d43edb08fde8faf12a21b562b9697d97c",
+      "size_bytes": 7183
+    },
+    "nova_schema": {
+      "name": "nova_schema",
+      "file": "app/schemas/nova_schema.py",
+      "hash": "01c3cf174e3c734c99ecbb684bf60bd6730a7ad00906c179b360bfa0ce0770d9",
+      "size_bytes": 4621
+    },
+    "observer_schema": {
+      "name": "observer_schema",
+      "file": "app/schemas/observer_schema.py",
+      "hash": "1a78e7d2eb0f8c2dae0747790adf8d911fd9da82c0fcec3cd0a969cf3bd20736",
+      "size_bytes": 4973
+    },
+    "orchestrator_schema": {
+      "name": "orchestrator_schema",
+      "file": "app/schemas/orchestrator_schema.py",
+      "hash": "d12fdc7221aca1ac586a1c294066f0d7661806b8e05f4f32f6d4dcab67a31c80",
+      "size_bytes": 7430
+    },
+    "output_policy_schema": {
+      "name": "output_policy_schema",
+      "file": "app/schemas/output_policy_schema.py",
+      "hash": "55f6945a03b9ce48ab6a1f5e2412a6eef9066b00311a636c1d64ce54be29cf15",
+      "size_bytes": 5516
+    },
+    "pessimist_evaluation_schema": {
+      "name": "pessimist_evaluation_schema",
+      "file": "app/schemas/pessimist_evaluation_schema.py",
+      "hash": "08a27802a0624a64f2559d7d1c57de23add11adddf83d5b3f148194d5d937a7f",
+      "size_bytes": 1274
+    },
+    "pessimist_schema": {
+      "name": "pessimist_schema",
+      "file": "app/schemas/pessimist_schema.py",
+      "hash": "bbe5037db5b3e1beafcea44a04a623909d9d3e5a33f0f3fa3b74cecfd7bf1499",
+      "size_bytes": 4795
+    },
+    "plan_chain_schemas": {
+      "name": "plan_chain_schemas",
+      "file": "app/schemas/plan_chain_schemas.py",
+      "hash": "7afc396d3dae62f3bed3fb6f49061d4596e1a0384fa8458ffd457e242b59dc96",
+      "size_bytes": 1421
+    },
+    "plan_execution_schemas": {
+      "name": "plan_execution_schemas",
+      "file": "app/schemas/plan_execution_schemas.py",
+      "hash": "0453186fb083dea027174c18d7202ec57ed3e74e44bb5d300d25a5159d7165d8",
+      "size_bytes": 1962
+    },
+    "plan_generate_schema": {
+      "name": "plan_generate_schema",
+      "file": "app/schemas/plan_generate_schema.py",
+      "hash": "87e7aec51a2b020ed64379a450f0b3d6f0da8f157d01ac65723ca295a5820c93",
+      "size_bytes": 6517
+    },
+    "plan_status_schemas": {
+      "name": "plan_status_schemas",
+      "file": "app/schemas/plan_status_schemas.py",
+      "hash": "277546f971558968b50332ac8f578d89e24500d093a55a6441652d85c755b075",
+      "size_bytes": 2739
+    },
+    "planchain_schemas": {
+      "name": "planchain_schemas",
+      "file": "app/schemas/planchain_schemas.py",
+      "hash": "6c814b1bf779784e71675322c2a4a3f53439f4733423f08a63e47fae4af36afe",
+      "size_bytes": 437
+    },
+    "plancreate_schemas": {
+      "name": "plancreate_schemas",
+      "file": "app/schemas/plancreate_schemas.py",
+      "hash": "d05ad1419b9600370ffe4786c0cda09b8986a5d8c6d475b60a3135e13d8a1627",
+      "size_bytes": 218
+    },
+    "planexecution_schemas": {
+      "name": "planexecution_schemas",
+      "file": "app/schemas/planexecution_schemas.py",
+      "hash": "a147cc7b922780d7f71149da37337abb71f133c6688e3f96668f627a6b8ab8ea",
+      "size_bytes": 445
+    },
+    "planupdate_schemas": {
+      "name": "planupdate_schemas",
+      "file": "app/schemas/planupdate_schemas.py",
+      "hash": "7b2685e5d14f2da493712a57826ff50273e61ca1bb93e6d68c9fd08ff8068497",
+      "size_bytes": 218
+    },
+    "project_schemas": {
+      "name": "project_schemas",
+      "file": "app/schemas/project_schemas.py",
+      "hash": "5c8395db1e41fb22aa900e71f256bfecab731a0a6bb061f7dd532cf731e331e6",
+      "size_bytes": 3182
+    },
+    "reflection_chain_schemas": {
+      "name": "reflection_chain_schemas",
+      "file": "app/schemas/reflection_chain_schemas.py",
+      "hash": "0baed4f4c213699d29a11bbc5b34fbaafba470c0ec8afc027d889fcfd702797f",
+      "size_bytes": 2579
+    },
+    "reflection_schemas": {
+      "name": "reflection_schemas",
+      "file": "app/schemas/reflection_schemas.py",
+      "hash": "fb8b57c056f680f2807af78c057491d39ae9d31436528227fce1087ae07db4c7",
+      "size_bytes": 13473
+    },
+    "reflectionchain_schemas": {
+      "name": "reflectionchain_schemas",
+      "file": "app/schemas/reflectionchain_schemas.py",
+      "hash": "72feb4c40903228f1a9502eed5b7420fd2ed4b569e3656bd3f52d74d7c43922e",
+      "size_bytes": 449
+    },
+    "rerun_decision": {
+      "name": "rerun_decision",
+      "file": "app/schemas/rerun_decision.py",
+      "hash": "0166c24d8a44571f1cf37d0a72e941996c3b6555855e1ae7a0a55b761ca87bbd",
+      "size_bytes": 7928
+    },
+    "sage_beliefs_schema": {
+      "name": "sage_beliefs_schema",
+      "file": "app/schemas/sage_beliefs_schema.py",
+      "hash": "99f09cb216e2ba6cf90735c5914b8c9be299b7b1dcf862abb0fc50d9a10a8e68",
+      "size_bytes": 1048
+    },
+    "sage_schema": {
+      "name": "sage_schema",
+      "file": "app/schemas/sage_schema.py",
+      "hash": "0f30574459d3ea48e304dc6f6c5989be154b5698fcc9354ccbec8fb950ab75bb",
+      "size_bytes": 5024
+    },
+    "self_challenge_schema": {
+      "name": "self_challenge_schema",
+      "file": "app/schemas/self_challenge_schema.py",
+      "hash": "01be2608183c67516acb77b5f4c9621430c9a299350e1c33c2bf99d812188361",
+      "size_bytes": 170
+    },
+    "self_reflection_schema": {
+      "name": "self_reflection_schema",
+      "file": "app/schemas/self_reflection_schema.py",
+      "hash": "ee74ec21920709a46c5d977a5f6ac0685c7518acd146c19e05439913ac86eda4",
+      "size_bytes": 141
+    },
+    "self_reinforcement_schema": {
+      "name": "self_reinforcement_schema",
+      "file": "app/schemas/self_reinforcement_schema.py",
+      "hash": "bfd8feee4473dfa9f9b7ce4e28755736468b7ed0369e66266b507e1da1df5279",
+      "size_bytes": 158
+    },
+    "self_revision_schema": {
+      "name": "self_revision_schema",
+      "file": "app/schemas/self_revision_schema.py",
+      "hash": "340dbaad7d8a8734c8f6428b77aaa92feaafa003875fc8b179b07fc5fbed230e",
+      "size_bytes": 166
+    },
+    "sitegen_schema": {
+      "name": "sitegen_schema",
+      "file": "app/schemas/sitegen_schema.py",
+      "hash": "e3c2a6324a54f2fae0dccc7dc893894525107e5cd6d02af2770f2e4c27176b45",
+      "size_bytes": 5558
+    },
+    "snapshot_schemas": {
+      "name": "snapshot_schemas",
+      "file": "app/schemas/snapshot_schemas.py",
+      "hash": "e2bd4c9f626694318f4318f21dd689715189541101ed97d2cf2b0d3ad4479480",
+      "size_bytes": 217
+    },
+    "snapshotrestore_schemas": {
+      "name": "snapshotrestore_schemas",
+      "file": "app/schemas/snapshotrestore_schemas.py",
+      "hash": "b3ba39059aec7e0ddcb6b418118d6f4c0aaf22aae43891883e512bec87288518",
+      "size_bytes": 223
+    },
+    "snapshotsave_schemas": {
+      "name": "snapshotsave_schemas",
+      "file": "app/schemas/snapshotsave_schemas.py",
+      "hash": "a0df6fc736a40ff2611d5ef0050ec8dd2f934393a483239f9880d052094125da",
+      "size_bytes": 220
+    },
+    "train_schema": {
+      "name": "train_schema",
+      "file": "app/schemas/train_schema.py",
+      "hash": "2eed39d478d1c2091827eb0127c3e9c24cd82113b4064773f7b05d3929ad2918",
+      "size_bytes": 9490
+    },
+    "trainer_schema": {
+      "name": "trainer_schema",
+      "file": "app/schemas/trainer_schema.py",
+      "hash": "6965d8a58953ecce676683709cdb9a06bc659ab431bbf1c6343d33b7a0c65882",
+      "size_bytes": 6590
+    },
+    "validate_schema_hash": {
+      "name": "validate_schema_hash",
+      "file": "app/schemas/validate_schema_hash.py",
+      "hash": "f1d9f07bbec54b97efb43712441668d813516975f06ee2bd6c3fcdb9ae41b760",
+      "size_bytes": 217
+    },
+    "agent_list_schema": {
+      "name": "agent_list_schema",
+      "file": "app/schemas/agent/agent_list_schema.py",
+      "hash": "8a69c1b0081481f606c2eed676b625f8a443492f06dd0a1c54e47a09407eddba",
+      "size_bytes": 618
+    },
+    "analyze_prompt_schema": {
+      "name": "analyze_prompt_schema",
+      "file": "app/schemas/utility/analyze_prompt_schema.py",
+      "hash": "22a0dc0041a5830443bc134ca0d7bbb8d1b017f99552c29a10089d51c9d5b3ac",
+      "size_bytes": 1396
+    },
+    "ceo_review_schema": {
+      "name": "ceo_review_schema",
+      "file": "app/schemas/agent/ceo_review_schema.py",
+      "hash": "0b3c59808726b86ebc6c73184f25c39657edbce9a2f33ba55f3eccb4cc94c8a6",
+      "size_bytes": 932
+    },
+    "context_schema": {
+      "name": "context_schema",
+      "file": "app/schemas/agent/context_schema.py",
+      "hash": "ca08051ff4cef77cab3e2ff1b21feffb44245dc523ca7d93eecbb6d5f2b7f3ec",
+      "size_bytes": 1553
+    },
+    "cto_review_schema": {
+      "name": "cto_review_schema",
+      "file": "app/schemas/agent/cto_review_schema.py",
+      "hash": "8508d7008c8587906acdda583fc6037d90325a1613eaa0e9d4198fe519382def",
+      "size_bytes": 1004
+    },
+    "builder_schema": {
+      "name": "builder_schema",
+      "file": "app/schemas/builder/builder_schema.py",
+      "hash": "e05a1185d161a29aa60c59d23e63684249de0a86f13d5339ea62df313b8fbde1",
+      "size_bytes": 307
+    },
+    "edit_prompt_schema": {
+      "name": "edit_prompt_schema",
+      "file": "app/schemas/control/edit_prompt_schema.py",
+      "hash": "4f3c1f4689d5711a3d65f6e7d1d1d15f034c10e45bc26e9c06caeddd070f8980",
+      "size_bytes": 330
+    },
+    "health_schema": {
+      "name": "health_schema",
+      "file": "app/schemas/core/health_schema.py",
+      "hash": "8388e826852ca6c65700c456ad7c9ff79ddeea2edd433a42e5b689a1edef3fec",
+      "size_bytes": 361
+    },
+    "system_status_schema": {
+      "name": "system_status_schema",
+      "file": "app/schemas/core/system_status_schema.py",
+      "hash": "96e9fbd6a0a1d757124cc1027fc77de3d42a0af98cd198976431a8f8aa9ec470",
+      "size_bytes": 627
+    },
+    "input_schema": {
+      "name": "input_schema",
+      "file": "app/schemas/sitegen/input_schema.json",
+      "hash": "f6fc2370037026ace9157d2de92080949fdec41813ecc0d2334d3a89ec6b438a",
+      "size_bytes": 1920
+    },
+    "output_schema": {
+      "name": "output_schema",
+      "file": "app/schemas/sitegen/output_schema.json",
+      "hash": "b690873a4496dbc39456a1e5cf3239ac2d3fbb63aefa9adc25b9b259808eaf5b",
+      "size_bytes": 3776
+    },
+    "delegate_input_schema": {
+      "name": "delegate_input_schema",
+      "file": "app/schemas/delegate/delegate_input_schema.py",
+      "hash": "70c7a6934d791731403f8a379ee246c940b88028e17df6dfb894ad313356b651",
+      "size_bytes": 1109
+    },
+    "delegate_schema": {
+      "name": "delegate_schema",
+      "file": "app/schemas/delegate/delegate_schema.py",
+      "hash": "f25b83c9dbaa3afdc892e55ef72db65d59d61cd3de662c327c0f3ff4645c1cf4",
+      "size_bytes": 383
+    },
+    "drift_summary_schema": {
+      "name": "drift_summary_schema",
+      "file": "app/schemas/drift/drift_summary_schema.py",
+      "hash": "2486901e5edf2687580a4310380497bac4f99a8d193801c0011094c20c6e555a",
+      "size_bytes": 898
+    },
+    "evaluate_schema": {
+      "name": "evaluate_schema",
+      "file": "app/schemas/evaluation/evaluate_schema.py",
+      "hash": "50908b3dbec6c1fe14f8f05f398011557263c6d722b2e71019619e292d6d69aa",
+      "size_bytes": 2376
+    },
+    "execute_schema": {
+      "name": "execute_schema",
+      "file": "app/schemas/execution/execute_schema.py",
+      "hash": "210b2706705d75ca0c094013bf12fe99c33029012e3932c69c6af4b57b7d8b38",
+      "size_bytes": 1239
+    },
+    "goal_schema": {
+      "name": "goal_schema",
+      "file": "app/schemas/goal/goal_schema.py",
+      "hash": "0411b08aa254676325f864be472374f886020906e1415d664053feee938fbcbf",
+      "size_bytes": 1440
+    },
+    "loop_create_schema": {
+      "name": "loop_create_schema",
+      "file": "app/schemas/loop/loop_create_schema.py",
+      "hash": "653fa5d673c0dd525f31c175a43e1b90d13ce5d6c0a57cc7d2fa5ce7c8afbc59",
+      "size_bytes": 691
+    },
+    "loop_reset_schema": {
+      "name": "loop_reset_schema",
+      "file": "app/schemas/loop/loop_reset_schema.py",
+      "hash": "805a0f7d0b4e3baa298554d99acc1b4148eefff3a83345d0d205d88107bc6344",
+      "size_bytes": 739
+    },
+    "loop_trace_schema": {
+      "name": "loop_trace_schema",
+      "file": "app/schemas/loop/loop_trace_schema.py",
+      "hash": "c6034dba12b8d254e04f3df5ee2cfbca6e4a79cf80f8253cf55af7c165d0cd20",
+      "size_bytes": 769
+    },
+    "memory_add_schema": {
+      "name": "memory_add_schema",
+      "file": "app/schemas/memory/memory_add_schema.py",
+      "hash": "1cf752192a8152746b8baac521cbb4b2db3502c859b536079645a180a82bf174",
+      "size_bytes": 625
+    },
+    "memory_create_schema": {
+      "name": "memory_create_schema",
+      "file": "app/schemas/memory/memory_create_schema.py",
+      "hash": "2fe12c408dbe2b38ff28ef3e3e5fc321fe6e993de97abd06754467244f6fcd0f",
+      "size_bytes": 1498
+    },
+    "memory_delete_schema": {
+      "name": "memory_delete_schema",
+      "file": "app/schemas/memory/memory_delete_schema.py",
+      "hash": "cb1830eaa73a1228ae258a5b6b8e746eee7015cba2f22e8623b0c7cf813dc191",
+      "size_bytes": 710
+    },
+    "memory_get_key_schema": {
+      "name": "memory_get_key_schema",
+      "file": "app/schemas/memory/memory_get_key_schema.py",
+      "hash": "0627a0c08ca0f115fef4b43d963573ecc6167ae476864d1fdac4879c77fc625a",
+      "size_bytes": 484
+    },
+    "memory_get_schema": {
+      "name": "memory_get_schema",
+      "file": "app/schemas/memory/memory_get_schema.py",
+      "hash": "2e807e2da7a0b47a673f300179c3bf607da32a8db387b2b480bbeb258d6a6c1b",
+      "size_bytes": 1875
+    },
+    "memory_read_request_schema": {
+      "name": "memory_read_request_schema",
+      "file": "app/schemas/memory/memory_read_request_schema.py",
+      "hash": "341861ba335db28326b705c171ced6c006b22ad9720c4efb723c22327ea06291",
+      "size_bytes": 374
+    },
+    "memory_read_schema": {
+      "name": "memory_read_schema",
+      "file": "app/schemas/memory/memory_read_schema.py",
+      "hash": "283e93629fbea4015897f48a7039fd393af25e2ba2b59af84d3a5b8cb36ba2f9",
+      "size_bytes": 2155
+    },
+    "memory_write_schema": {
+      "name": "memory_write_schema",
+      "file": "app/schemas/memory/memory_write_schema.py",
+      "hash": "942f0f260e27761a950bc502f6368e7f3f9fc447ab7b8434fe128df0f59c335f",
+      "size_bytes": 1512
+    },
+    "step_type_enum": {
+      "name": "step_type_enum",
+      "file": "app/schemas/memory/step_type_enum.py",
+      "hash": "61fd42c923d6a9149172459309b4b82e219131f51b4fde002bda728aac0c8ac0",
+      "size_bytes": 206
+    },
+    "thread_request_schema": {
+      "name": "thread_request_schema",
+      "file": "app/schemas/memory/thread_request_schema.py",
+      "hash": "103565f5d3c24f393a00addf95820f1599162778b61402341eb7de67641e5430",
+      "size_bytes": 329
+    },
+    "send_schema": {
+      "name": "send_schema",
+      "file": "app/schemas/message/send_schema.py",
+      "hash": "2974c3b70d7c9c9f4904a8ca7a9eb280039af9252d09f498d5e427d4d43c5563",
+      "size_bytes": 1444
+    },
+    "chain_schema": {
+      "name": "chain_schema",
+      "file": "app/schemas/orchestrator/chain_schema.py",
+      "hash": "fdecf640cc120eb8dd3e473bfa59625798f086fbb7fc4bf5334f991f8e8fe64b",
+      "size_bytes": 2200
+    },
+    "project_schema": {
+      "name": "project_schema",
+      "file": "app/schemas/project/project_schema.py",
+      "hash": "9a51812859704e0a91240c186d8486def086590d0ff6e12ec93c121d0efb994b",
+      "size_bytes": 2334
+    },
+    "projects_schema": {
+      "name": "projects_schema",
+      "file": "app/schemas/projects/projects_schema.py",
+      "hash": "7ad7042d263cc2c65ad2d54f97691ff3ad9ab61df6c8bf140d8ab3173b1249c4",
+      "size_bytes": 1450
+    },
+    "root_schema": {
+      "name": "root_schema",
+      "file": "app/schemas/root/root_schema.py",
+      "hash": "0bc5d2e21ac1731a45be8584e0a22d6171f607b30af2d269b8633e89c09e5ff4",
+      "size_bytes": 750
+    },
+    "delegate_stream_output_schema": {
+      "name": "delegate_stream_output_schema",
+      "file": "app/schemas/streaming/delegate_stream_output_schema.py",
+      "hash": "b6bb8e94a7505d746c79d4e12bb7bfd2df8c6ae867c9887db0a4adb59be2452c",
+      "size_bytes": 1009
+    },
+    "task_create_schema": {
+      "name": "task_create_schema",
+      "file": "app/schemas/task/task_create_schema.py",
+      "hash": "4b6cebc940635ff09e0862b4f3502e5ee514e1cd69f792b61e226aa3f2db1d20",
+      "size_bytes": 1490
+    },
+    "task_list_schema": {
+      "name": "task_list_schema",
+      "file": "app/schemas/task/task_list_schema.py",
+      "hash": "dec5baf3277a59691881004ca97500b98ab692fceac7174268f9198fbdb50042",
+      "size_bytes": 1534
+    },
+    "init_schema": {
+      "name": "init_schema",
+      "file": "app/schemas/utility/init_schema.py",
+      "hash": "5d665dc6377222742571097be3cbfb05796beef1d83d3cd7b054af84be35cf59",
+      "size_bytes": 1254
+    },
+    "critic_schemas": {
+      "name": "critic_schemas",
+      "file": "app/schemas/agents/critic/critic_schemas.py",
+      "hash": "b71c7d1ac4bdb7a15560d167d5a8d363869714ef4e45e6112a672678da3261fb",
+      "size_bytes": 789
+    },
+    "sage_schemas": {
+      "name": "sage_schemas",
+      "file": "app/schemas/agents/sage/sage_schemas.py",
+      "hash": "e1a3cadd0ecce5e5243d834945a4e519453f047936f4c11d8e214f48d1ca7a94",
+      "size_bytes": 775
+    }
+  },
+  "modules": {
+    "__init__": {
+      "name": "__init__",
+      "file": "app/tools/__init__.py",
+      "hash": "c586aa8792babdcf349681e4d064d5763d9114d9fc8e40151be5413006ff17ef",
+      "size_bytes": 2857
+    },
+    "agent_coordinator": {
+      "name": "agent_coordinator",
+      "file": "app/core/agent_coordinator.py",
+      "hash": "3309c8b3f9f1e2c306f978e23facfc22e26a59894993174536424c33849de6f4",
+      "size_bytes": 16852
+    },
+    "agent_loader": {
+      "name": "agent_loader",
+      "file": "app/core/agent_loader.py",
+      "hash": "01b823b5572da3714fb482de23edb316b623b0a817f39dc8a9edf707d4af0a57",
+      "size_bytes": 5774
+    },
+    "agent_registry": {
+      "name": "agent_registry",
+      "file": "app/modules/agent_registry.py",
+      "hash": "29b9b269f98cbfba0e3317c65fcccf11e93fb184f35293df8de18a934cfc6f5c",
+      "size_bytes": 1182
+    },
+    "agent_registry_enhanced": {
+      "name": "agent_registry_enhanced",
+      "file": "app/core/agent_registry_enhanced.py",
+      "hash": "55ca9a9e53e9ea9ff28235df827ed12473564bffb59df5314f8573ef54f5da0a",
+      "size_bytes": 16551
+    },
+    "agent_router": {
+      "name": "agent_router",
+      "file": "app/core/agent_router.py",
+      "hash": "4dbdf541d0e9f06b1f079c72089c319a6c2ad4251881c7741c9968d29dead10e",
+      "size_bytes": 12761
+    },
+    "behavior_manager": {
+      "name": "behavior_manager",
+      "file": "app/core/behavior_manager.py",
+      "hash": "efc571d0c3c9e119e0be1b0d5ed0e15ef9165d1eebe293a362791520d7bdf1eb",
+      "size_bytes": 8028
+    },
+    "boot": {
+      "name": "boot",
+      "file": "app/core/boot.py",
+      "hash": "4fb2cf60ec109729f1535b2fc8efaf9f1e63602c66768d2be9094ded639167d0",
+      "size_bytes": 2596
+    },
+    "confidence_retry": {
+      "name": "confidence_retry",
+      "file": "app/core/confidence_retry.py",
+      "hash": "f9855d7ffe5d8cd8d25e9f549a9783c20bbbac57824ab3669d79dac9a57e655c",
+      "size_bytes": 7727
+    },
+    "delegate": {
+      "name": "delegate",
+      "file": "app/modules/delegate.py",
+      "hash": "441405bddd6c68be1a7f849ead829a626f3302c461b2006bdddcbbd310ab5603",
+      "size_bytes": 8264
+    },
+    "error_logger": {
+      "name": "error_logger",
+      "file": "app/core/error_logger.py",
+      "hash": "e1551073b7b490524b4bf106b631175be1b64d5399c69b84a515647b0004d53d",
+      "size_bytes": 1805
+    },
+    "escalation_manager": {
+      "name": "escalation_manager",
+      "file": "app/core/escalation_manager.py",
+      "hash": "aba7acddefc051331ea27df9145a431f4e64f6b76236c023be1a8dcacfa1e44a",
+      "size_bytes": 12922
+    },
+    "execution_chain_logger": {
+      "name": "execution_chain_logger",
+      "file": "app/core/execution_chain_logger.py",
+      "hash": "c26ad9925faf415d00b4ec3b56b0ae6fe26fcb039fc8cbbd8b16feb980d3828d",
+      "size_bytes": 8154
+    },
+    "execution_logger": {
+      "name": "execution_logger",
+      "file": "app/core/execution_logger.py",
+      "hash": "771cee08855b485b3e2703797bd13133ce431c36f2887cefa224316d7689316a",
+      "size_bytes": 4273
+    },
+    "forge": {
+      "name": "forge",
+      "file": "app/core/forge.py",
+      "hash": "5a1054beda431e2d6531b4e944480568b83feb21fcfa9f069a415b7f0c539de6",
+      "size_bytes": 23060
+    },
+    "input_gateway": {
+      "name": "input_gateway",
+      "file": "app/core/input_gateway.py",
+      "hash": "764bbe0c770ceda3d9f4bc3f5db46a5eb55707b0f34faa5cb4e2e7d3d5b21af6",
+      "size_bytes": 10604
+    },
+    "input_router": {
+      "name": "input_router",
+      "file": "app/core/input_router.py",
+      "hash": "127fdd079106697e7f2ee8cc07c066eb3acbb78a5a6a4765d0656875ea9fdf13",
+      "size_bytes": 19318
+    },
+    "main_update": {
+      "name": "main_update",
+      "file": "app/core/main_update.py",
+      "hash": "b9d29f6bb7351074b6622c9e0ce1c25c2989d1102d76d6c7473083b4f5743eac",
+      "size_bytes": 872
+    },
+    "memory_api_quota_guard": {
+      "name": "memory_api_quota_guard",
+      "file": "app/core/memory_api_quota_guard.py",
+      "hash": "e76ce09aa2029a6d829e07ec8567593b3d3d30ef43b01a42adbaf82823c8df4c",
+      "size_bytes": 4645
+    },
+    "memory_context_reviewer": {
+      "name": "memory_context_reviewer",
+      "file": "app/core/memory_context_reviewer.py",
+      "hash": "9aa85e29adf1106f164f188f0095b7f1ccf99cbb64f09d8beca5854f0cd58b76",
+      "size_bytes": 4895
+    },
+    "memory_manager": {
+      "name": "memory_manager",
+      "file": "app/core/memory_manager.py",
+      "hash": "fd2befce5da1a44413d78a945870c1912ad50e0433baabbc3799bc464ef554c2",
+      "size_bytes": 4727
+    },
+    "nudge_manager": {
+      "name": "nudge_manager",
+      "file": "app/core/nudge_manager.py",
+      "hash": "f295b887737612b6ed168e71fd31e8a2eda961307ac1f62a0a6bef7e18093eff",
+      "size_bytes": 13378
+    },
+    "openai_client": {
+      "name": "openai_client",
+      "file": "app/core/openai_client.py",
+      "hash": "ba26ca8e313c82d2d6015947d2322390adf26a5e7a832ff0685ef6b8d85920f1",
+      "size_bytes": 3434
+    },
+    "openai_provider": {
+      "name": "openai_provider",
+      "file": "app/core/openai_provider.py",
+      "hash": "707a345d87c5bbd951fa1a25b548c1c821fe0376127f97c9574eabbceb5a15a1",
+      "size_bytes": 737
+    },
+    "orchestrator": {
+      "name": "orchestrator",
+      "file": "app/core/orchestrator.py",
+      "hash": "4226925afe70239247794f37e35ae40dd6221b268c9aa18e1e306be824c11a1a",
+      "size_bytes": 17084
+    },
+    "planner_agent_enhancer": {
+      "name": "planner_agent_enhancer",
+      "file": "app/core/planner_agent_enhancer.py",
+      "hash": "83490e06a5a33a12d6328904b592e59842e6be0ddcd6d4945680a433a56747bb",
+      "size_bytes": 17586
+    },
+    "planner_orchestrator": {
+      "name": "planner_orchestrator",
+      "file": "app/core/planner_orchestrator.py",
+      "hash": "7d58af0e19b3c21dac8201161f8b1351f639902cc7db6c2642d75e442b1aff64",
+      "size_bytes": 14119
+    },
+    "prompt_manager": {
+      "name": "prompt_manager",
+      "file": "app/core/prompt_manager.py",
+      "hash": "8199d05acf5971db3584e524be58d06e484cc35ee31ef318cbc3547506e7fa78",
+      "size_bytes": 9239
+    },
+    "rationale_logger": {
+      "name": "rationale_logger",
+      "file": "app/core/rationale_logger.py",
+      "hash": "01fcd8edb7de450bf9e5d0e9b3c1e3ae65fb967593ef54dbed09fd6461e3b8ab",
+      "size_bytes": 5753
+    },
+    "run": {
+      "name": "run",
+      "file": "app/core/run.py",
+      "hash": "4140e9978557bcd740c2815f637ddf52bdb03a45fac348da0c325f7587adc4f1",
+      "size_bytes": 4000
+    },
+    "schema_validation_integration": {
+      "name": "schema_validation_integration",
+      "file": "app/core/schema_validation_integration.py",
+      "hash": "71e203179d819348afee1d7254f116388947a309238a8f39d25c86870a2a5673",
+      "size_bytes": 1121
+    },
+    "seeding": {
+      "name": "seeding",
+      "file": "app/core/seeding.py",
+      "hash": "8a61b90be7e79045664e3d7a9d3ae1ea4e0bd89a16f7399d5172cbefd7809a26",
+      "size_bytes": 6536
+    },
+    "self_evaluation": {
+      "name": "self_evaluation",
+      "file": "app/core/self_evaluation.py",
+      "hash": "eb1bb9da262473cab757eb0cdb4fac24f0cb8d8302a4643681664693a8ed539c",
+      "size_bytes": 6708
+    },
+    "shared_memory": {
+      "name": "shared_memory",
+      "file": "app/core/shared_memory.py",
+      "hash": "3a1c80ae0cc353e763c414838dccb746ac625576b29996fb8e733926f3588d44",
+      "size_bytes": 4572
+    },
+    "system_manifest": {
+      "name": "system_manifest",
+      "file": "app/core/system_manifest.py",
+      "hash": "0e3dd02051b709a233eea3b980c8a6792fca5db08df9e09c9b45a84d1abb771b",
+      "size_bytes": 4156
+    },
+    "task_persistence": {
+      "name": "task_persistence",
+      "file": "app/core/task_persistence.py",
+      "hash": "ae2f9b85a32e9b1d3363121f32087d81e8ec919e167e2dde695e919224e444ea",
+      "size_bytes": 9424
+    },
+    "task_state_manager": {
+      "name": "task_state_manager",
+      "file": "app/core/task_state_manager.py",
+      "hash": "9054a9adb3beea59b80d09f68344d3ccf1ba1e222dfc4bc18946f149466333ec",
+      "size_bytes": 17776
+    },
+    "task_tagger": {
+      "name": "task_tagger",
+      "file": "app/core/task_tagger.py",
+      "hash": "e5ac30f61f3ca485a75fe34c4d8eac713e4de39009b1f0e737f3630dbc63910d",
+      "size_bytes": 4724
+    },
+    "tool_router": {
+      "name": "tool_router",
+      "file": "app/core/tool_router.py",
+      "hash": "fe30d72a85cec728158b3c071122bc6a0d4585c0b4015c2f16057b9e46ba4c94",
+      "size_bytes": 10092
+    },
+    "vector_memory": {
+      "name": "vector_memory",
+      "file": "app/core/vector_memory.py",
+      "hash": "3438a2a3dd51d752c70ccf067f1088831eaab1c1d84d0c3e6bf7eddbb0d722dd",
+      "size_bytes": 13622
+    },
+    "loop_controller": {
+      "name": "loop_controller",
+      "file": "app/core/loop_controller.py",
+      "hash": "c2d4ae8bf3178c4e239a99311cb634922de085da7b9339477961c027fd94d64d",
+      "size_bytes": 10408
+    },
+    "cors": {
+      "name": "cors",
+      "file": "app/core/middleware/cors.py",
+      "hash": "c73c4b3a01dcfdc38f2e4cf31ec2d46595f073399eb1f5ce1af9678982917d41",
+      "size_bytes": 10123
+    },
+    "agent_config": {
+      "name": "agent_config",
+      "file": "app/modules/agent_config.py",
+      "hash": "0e73d25742ddb48439c21c4aa5bae5cd232296ed1b22ef12dbe7cc92129d0dca",
+      "size_bytes": 7093
+    },
+    "agent_context": {
+      "name": "agent_context",
+      "file": "app/modules/agent_context.py",
+      "hash": "faa2d69864cb5a82590e910200d144ce7a072615d2ca97d3e1c3f85d995bb355",
+      "size_bytes": 8385
+    },
+    "agent_create": {
+      "name": "agent_create",
+      "file": "app/modules/agent_create.py",
+      "hash": "ec74df7cdb9583cc70d19cd9acf65263ff26dd7490e2b575d1227927aedde5c6",
+      "size_bytes": 5192
+    },
+    "agent_dispatch": {
+      "name": "agent_dispatch",
+      "file": "app/modules/agent_dispatch.py",
+      "hash": "bda41344065b8bf1803530f6ea75f0100f93767693382ff3383d59a53940cf1d",
+      "size_bytes": 4100
+    },
+    "agent_fallback": {
+      "name": "agent_fallback",
+      "file": "app/modules/agent_fallback.py",
+      "hash": "1c16b1dd136d7efea7ae29147219c179926e431bc3739f03de7b940eecae072c",
+      "size_bytes": 9437
+    },
+    "agent_loop_trigger": {
+      "name": "agent_loop_trigger",
+      "file": "app/modules/agent_loop_trigger.py",
+      "hash": "82f04515e4cc9334d067a983f0d77cb1c7474ab72f0f6add3d8657486ff2c3c9",
+      "size_bytes": 21278
+    },
+    "agent_permission_validator": {
+      "name": "agent_permission_validator",
+      "file": "app/modules/agent_permission_validator.py",
+      "hash": "10d2687e7b1bd6f47fa5bac728a317ab53b8637c5c54835bc52ecb4594f74806",
+      "size_bytes": 10602
+    },
+    "agent_present": {
+      "name": "agent_present",
+      "file": "app/modules/agent_present.py",
+      "hash": "39062995964b1fde61fe8fa356daea1221e95a6c5f0c9564f08304e5c99bf64e",
+      "size_bytes": 13152
+    },
+    "agent_reflect": {
+      "name": "agent_reflect",
+      "file": "app/modules/agent_reflect.py",
+      "hash": "74268d82640e1e6ec12b8404df6ca4c95ae6cac1f3b22196cadc8ad78cb316f1",
+      "size_bytes": 6084
+    },
+    "agent_reflection": {
+      "name": "agent_reflection",
+      "file": "app/modules/agent_reflection.py",
+      "hash": "970ba967f3c9b1c8af9d281af4bc19903d9a33e66f52cb220ecba82065dd1839",
+      "size_bytes": 3834
+    },
+    "agent_retry": {
+      "name": "agent_retry",
+      "file": "app/modules/agent_retry.py",
+      "hash": "89ed1996d196ec2b2a779defd9ac28d720ebc90ce99a6064832aaea0c3a14057",
+      "size_bytes": 14307
+    },
+    "agent_runner": {
+      "name": "agent_runner",
+      "file": "app/modules/agent_runner.py",
+      "hash": "08380f792488db272e9e48f6013c0fcc3abc3f8d691fb839cfe279b49580efd8",
+      "size_bytes": 6594
+    },
+    "agent_runner_retry_integration": {
+      "name": "agent_runner_retry_integration",
+      "file": "app/modules/agent_runner_retry_integration.py",
+      "hash": "d11d0c4bb52c28d536bad5926426a2541f2ff648041bce406498329bba07a2af",
+      "size_bytes": 5473
+    },
+    "agent_tool_runner": {
+      "name": "agent_tool_runner",
+      "file": "app/modules/agent_tool_runner.py",
+      "hash": "3b4445e57d3fa88ad4d7d86377a86c3d72f3cb790a269369e0b0a6f522f8e8bf",
+      "size_bytes": 6338
+    },
+    "agent_trust_delta_monitoring": {
+      "name": "agent_trust_delta_monitoring",
+      "file": "app/modules/agent_trust_delta_monitoring.py",
+      "hash": "763873d6405df0d9af2ceab646400bd993bc9e282a61e488fbc5184b98995f29",
+      "size_bytes": 14155
+    },
+    "agent_verify": {
+      "name": "agent_verify",
+      "file": "app/modules/agent_verify.py",
+      "hash": "989099a73568ad70470afd5d6d517861c4a3f1cd2fca3a37713f46e5d2c81de9",
+      "size_bytes": 11489
+    },
+    "ash_agent": {
+      "name": "ash_agent",
+      "file": "app/modules/ash_agent.py",
+      "hash": "b06467826c5ee5611834ea10c9fd28b4591df4ca3a9d12f7ac52a96fcfe5360b",
+      "size_bytes": 2577
+    },
+    "auditor_agent": {
+      "name": "auditor_agent",
+      "file": "app/modules/auditor_agent.py",
+      "hash": "36894742e563916cf695456239f352c90e6b730777403170c41f776339638fe8",
+      "size_bytes": 65917
+    },
+    "belief_versioning": {
+      "name": "belief_versioning",
+      "file": "app/modules/belief_versioning.py",
+      "hash": "0475b6277415cc3832f32c64ec0c0c2e3518c84ae4021ab5356f52f2eefa1b84",
+      "size_bytes": 54779
+    },
+    "cognitive_continuity_integration": {
+      "name": "cognitive_continuity_integration",
+      "file": "app/modules/cognitive_continuity_integration.py",
+      "hash": "321654122e1eb13443d543e2c9baec2810737d6d8beeb74aba897f597f123060",
+      "size_bytes": 30148
+    },
+    "core_beliefs_integration": {
+      "name": "core_beliefs_integration",
+      "file": "app/modules/core_beliefs_integration.py",
+      "hash": "46d1bba27be93859dce9d0aa149c8400a24603235587d3f92fd9ca02305bd911",
+      "size_bytes": 21536
+    },
+    "critic_agent": {
+      "name": "critic_agent",
+      "file": "app/modules/review/critic_agent.py",
+      "hash": "08819f1b95ec213ee3da6e381616c882fc53847267c6ff7e84727ced74c3b42f",
+      "size_bytes": 9147
+    },
+    "delegate_stream": {
+      "name": "delegate_stream",
+      "file": "app/modules/delegate_stream.py",
+      "hash": "722213c5fd4614b7d842471f8be1ab4d12df7427cc0d5c546ed438066ed2bd49",
+      "size_bytes": 16400
+    },
+    "depth_controller": {
+      "name": "depth_controller",
+      "file": "app/modules/depth_controller.py",
+      "hash": "2eb40aeab3948a4c702ccf8d2fe54e7395046bfa5e234ab56eeaba670f2a21eb",
+      "size_bytes": 16620
+    },
+    "domain_sensitivity_flagging": {
+      "name": "domain_sensitivity_flagging",
+      "file": "app/modules/domain_sensitivity_flagging.py",
+      "hash": "a40311b78307b615ffa59f79e9645c20138757545944c90f99762fdf238a092d",
+      "size_bytes": 12653
+    },
+    "drift_auto_healer": {
+      "name": "drift_auto_healer",
+      "file": "app/modules/drift_auto_healer.py",
+      "hash": "0f78f1cd6fba7d6ca07f690e4e9f51fe492c414149a22c9033e0aced84d42b9e",
+      "size_bytes": 2561
+    },
+    "drift_monitor": {
+      "name": "drift_monitor",
+      "file": "app/modules/drift_monitor.py",
+      "hash": "cb87014124ddb0758273b06a8694a24dff601829382ecf932ad252f38413f31d",
+      "size_bytes": 23727
+    },
+    "export": {
+      "name": "export",
+      "file": "app/modules/export.py",
+      "hash": "6f0f63aea6ff9d155dd113736efe25b4bdfdbd65fa7004fbf93a34438252c6b8",
+      "size_bytes": 14667
+    },
+    "fix": {
+      "name": "fix",
+      "file": "app/modules/fix.py",
+      "hash": "5d60ad7b761b3f48570e54fe105a0743b6a75e65a6f07247af524db58ce660c9",
+      "size_bytes": 16061
+    },
+    "freeze_controller": {
+      "name": "freeze_controller",
+      "file": "app/modules/freeze_controller.py",
+      "hash": "57b25b38c70098862e6d8f4ff74425e98f35ec036779494381730a76b539da3a",
+      "size_bytes": 7469
+    },
+    "hal_memory": {
+      "name": "hal_memory",
+      "file": "app/modules/hal_memory.py",
+      "hash": "582a4762f9398689cc30f2f4c5f896bccc55bbf02f2289a58944ff4784000f62",
+      "size_bytes": 5073
+    },
+    "hal_memory_patch": {
+      "name": "hal_memory_patch",
+      "file": "app/modules/hal_memory_patch.py",
+      "hash": "4a9e546d7d25b4eec4db3db9da8001b36a558b0b3371769a18362e91d2bb16b6",
+      "size_bytes": 3482
+    },
+    "hal_openai": {
+      "name": "hal_openai",
+      "file": "app/modules/hal_openai.py",
+      "hash": "1346389b697b39baec72e71199a3c1830c648c4376d0a4d20ad3b67ef2e15ce9",
+      "size_bytes": 6526
+    },
+    "hal_openai_enhanced": {
+      "name": "hal_openai_enhanced",
+      "file": "app/modules/hal_openai_enhanced.py",
+      "hash": "7b7f5c3f4de4015e3e15feecfc20af69b4fda5f0ed2e158b2cd8011d5a50b56d",
+      "size_bytes": 10119
+    },
+    "health_monitor": {
+      "name": "health_monitor",
+      "file": "app/modules/health_monitor.py",
+      "hash": "c30faff73c5486863649bfc22e2519a50eeb8f84b5b5c9b1c1735c9d8cc30abc",
+      "size_bytes": 75170
+    },
+    "historian_drift_report": {
+      "name": "historian_drift_report",
+      "file": "app/modules/historian_drift_report.py",
+      "hash": "e06a084c06b1da7db25adefd0124fbfc1978f8110fb1aaeabe8cd47f7326a910",
+      "size_bytes": 14346
+    },
+    "instruction_validator": {
+      "name": "instruction_validator",
+      "file": "app/modules/instruction_validator.py",
+      "hash": "0af9472a7b1bb9ed8c1013e50215887669445ebfc3ad01e7b13d7580269fb868",
+      "size_bytes": 5711
+    },
+    "ip_violation_scanner": {
+      "name": "ip_violation_scanner",
+      "file": "app/modules/ip_violation_scanner.py",
+      "hash": "fa2e1808304d7d86147931a448c4b7fb05650141777a9d9f0063793ec67a59b0",
+      "size_bytes": 12105
+    },
+    "live_memory_inspection": {
+      "name": "live_memory_inspection",
+      "file": "app/modules/live_memory_inspection.py",
+      "hash": "e24b66254ffacfdf6d03588b6c7ba497bb92be8bc09dbbee83c581bf07a23f2a",
+      "size_bytes": 45054
+    },
+    "llm_infer": {
+      "name": "llm_infer",
+      "file": "app/modules/llm_infer.py",
+      "hash": "2f7153918a774ee23371dfc6af6f13d159298f7c592215cd3a97fa987d2141ab",
+      "size_bytes": 3943
+    },
+    "logic_loader": {
+      "name": "logic_loader",
+      "file": "app/modules/logic_loader.py",
+      "hash": "524e403ed07eb5cc3296ce5511eab08e2069341bb3f481db7a6ec1a8285fc6d6",
+      "size_bytes": 8482
+    },
+    "logic_registry_validator": {
+      "name": "logic_registry_validator",
+      "file": "app/modules/logic_registry_validator.py",
+      "hash": "21d02a3fdbe8f541bdbe1f5979184c54b5063db966931d9fbc93fb0de5683358",
+      "size_bytes": 3339
+    },
+    "loop": {
+      "name": "loop",
+      "file": "app/modules/loop.py",
+      "hash": "2cc67b17e1e490b72b6e18c621e279fde28ac612487ccaff8a966bcfc687ebfe",
+      "size_bytes": 30736
+    },
+    "loop_ci_test_runner": {
+      "name": "loop_ci_test_runner",
+      "file": "app/modules/loop_ci_test_runner.py",
+      "hash": "c80b186ca1d3f025dfed93917b9f2e93b95b49908e88aa4ce267a0f2639f0751",
+      "size_bytes": 18182
+    },
+    "loop_execution_guard": {
+      "name": "loop_execution_guard",
+      "file": "app/modules/loop_execution_guard.py",
+      "hash": "f49958f662b363b3875ad5743858b10445904dff648d4c1bb92df78cde030476",
+      "size_bytes": 9833
+    },
+    "loop_hardening_integration": {
+      "name": "loop_hardening_integration",
+      "file": "app/modules/loop_hardening_integration.py",
+      "hash": "037afe19b8744bf3af41e72960e6d8a4809bcbb35c73079e8d13fd53f9de0b16",
+      "size_bytes": 18125
+    },
+    "loop_intent_sanitizer": {
+      "name": "loop_intent_sanitizer",
+      "file": "app/modules/loop_intent_sanitizer.py",
+      "hash": "cceedd4cea6a35e9af71f852274a6cb5c496e5493b8770d157e97263693227df",
+      "size_bytes": 10889
+    },
+    "loop_lineage_export_system": {
+      "name": "loop_lineage_export_system",
+      "file": "app/modules/loop_lineage_export_system.py",
+      "hash": "ff4367c51f84fe7c863e9ef6465e1d57e6b4a3a4a60885ddef5651488371438d",
+      "size_bytes": 25035
+    },
+    "loop_map_visualizer": {
+      "name": "loop_map_visualizer",
+      "file": "app/modules/loop_map_visualizer.py",
+      "hash": "16eee71bc7515683c02709eacda5e64e38ce790b105a7e327041f7c6614ee2ad",
+      "size_bytes": 35672
+    },
+    "loop_monitor": {
+      "name": "loop_monitor",
+      "file": "app/modules/loop_monitor.py",
+      "hash": "fc77dd12658add27bf08f7a3159894b95acbd2956cd3f510505ee48f0877656f",
+      "size_bytes": 12797
+    },
+    "loop_resume_engine": {
+      "name": "loop_resume_engine",
+      "file": "app/modules/loop_resume_engine.py",
+      "hash": "b4c0fcc70a750d3dc596949e28724c08402b1309e9173c5399f6488e8d39cc46",
+      "size_bytes": 12191
+    },
+    "loop_summary_validator": {
+      "name": "loop_summary_validator",
+      "file": "app/modules/loop_summary_validator.py",
+      "hash": "db13df7fab163f26b77256a7c0b8ee4d148af3866beb9cbaeb690f4ca010e80f",
+      "size_bytes": 8910
+    },
+    "loop_validation": {
+      "name": "loop_validation",
+      "file": "app/modules/loop_validation.py",
+      "hash": "b677e481c22c5b3bed98ca4c1530a7c2163416905c60e0170cd2b3ba437b8a9e",
+      "size_bytes": 17858
+    },
+    "loop_validator": {
+      "name": "loop_validator",
+      "file": "app/modules/loop_validator.py",
+      "hash": "655dd4b1e226c611b96a8547a0e563657bcb03ae1559c5d176338a99c7db8445",
+      "size_bytes": 9851
+    },
+    "memory_block_writer": {
+      "name": "memory_block_writer",
+      "file": "app/modules/memory_block_writer.py",
+      "hash": "48c4e0d12ea5bd95e4f94cbb299c564aa2a951ad95555c5a0193606e154a53eb",
+      "size_bytes": 7129
+    },
+    "memory_embed": {
+      "name": "memory_embed",
+      "file": "app/modules/memory_embed.py",
+      "hash": "ab3e488b6a8a5f8a55e44db4778c181cac836654eb5358826f8f874f7cc4d846",
+      "size_bytes": 8288
+    },
+    "memory_recall": {
+      "name": "memory_recall",
+      "file": "app/modules/memory_recall.py",
+      "hash": "5cce0ee97e0cfd1120bdcb5112d617a5e4dcc46127e3b91920b1d2208e3c27a8",
+      "size_bytes": 11749
+    },
+    "memory_summarize": {
+      "name": "memory_summarize",
+      "file": "app/modules/memory_summarize.py",
+      "hash": "b7187e3acdac41102ef354812f180408b2dc96cac1eddd33c1ec135ee4cb84df",
+      "size_bytes": 4987
+    },
+    "memory_summarizer": {
+      "name": "memory_summarizer",
+      "file": "app/modules/memory_summarizer.py",
+      "hash": "514dc8d8c3f482399e2c473dde512119f06eb8ff65e9a59a3ec20b34bebefc53",
+      "size_bytes": 4443
+    },
+    "memory_summarizer_project": {
+      "name": "memory_summarizer_project",
+      "file": "app/modules/memory_summarizer_project.py",
+      "hash": "636a1cc44a32a0a22d832d5546cf69c07b6f59e9a18faa5b69d27c1c828006d2",
+      "size_bytes": 1412
+    },
+    "memory_thread": {
+      "name": "memory_thread",
+      "file": "app/modules/memory_thread.py",
+      "hash": "cfd6b30d243ff4b61f345f3f3b21113897c7c5baa2ba37b62558add9272c2b28",
+      "size_bytes": 5760
+    },
+    "memory_writer": {
+      "name": "memory_writer",
+      "file": "app/modules/memory_writer.py",
+      "hash": "a8a1e7ab0e1b883d50a8393ad8551ef45634adc4b3b4abc2a4d4b7aa3c9ad99f",
+      "size_bytes": 6369
+    },
+    "nova_agent": {
+      "name": "nova_agent",
+      "file": "app/modules/nova_agent.py",
+      "hash": "7990701590aee3187c32eea4740c25c7c7728eee098ce51e10c88976b3940043",
+      "size_bytes": 6120
+    },
+    "operator_alignment_profile_tracking": {
+      "name": "operator_alignment_profile_tracking",
+      "file": "app/modules/operator_alignment_profile_tracking.py",
+      "hash": "e6b4d0125a338cce9bfe347fdf69b7b6b34824d1c69e461913f8e75113dd8861",
+      "size_bytes": 16695
+    },
+    "orchestrator_build": {
+      "name": "orchestrator_build",
+      "file": "app/modules/orchestrator_build.py",
+      "hash": "fe3f749c20cfe9c42056b0e54ef898782ec0b94536dc622fb3a30ab619104600",
+      "size_bytes": 8647
+    },
+    "orchestrator_contract_integration": {
+      "name": "orchestrator_contract_integration",
+      "file": "app/modules/orchestrator_contract_integration.py",
+      "hash": "4bc3f071bfbbbd78369a51a39bd5df04f294faf70868dc192df28d68fd190190",
+      "size_bytes": 9148
+    },
+    "orchestrator_critic_integration": {
+      "name": "orchestrator_critic_integration",
+      "file": "app/modules/orchestrator_critic_integration.py",
+      "hash": "c85fe7ffd77b951a9f5215b68fd2879c8943387f5c70cd56f187aa1813e51860",
+      "size_bytes": 4331
+    },
+    "orchestrator_drift_integration": {
+      "name": "orchestrator_drift_integration",
+      "file": "app/modules/orchestrator_drift_integration.py",
+      "hash": "81b175edf9538661284a5651688f60926a65fd564eb274096b2459f935ad1022",
+      "size_bytes": 7426
+    },
+    "orchestrator_integration": {
+      "name": "orchestrator_integration",
+      "file": "app/modules/orchestrator_integration.py",
+      "hash": "dae378ccb3184c4e8f8f8c20f4378655fb7e9df57b2ef0645211474436cec882",
+      "size_bytes": 22200
+    },
+    "orchestrator_logic": {
+      "name": "orchestrator_logic",
+      "file": "app/modules/orchestrator_logic.py",
+      "hash": "c3cac0f25e48219216e0e614ec9e11b2495b2d331c59586a2d40774bce0671be",
+      "size_bytes": 34124
+    },
+    "orchestrator_memory": {
+      "name": "orchestrator_memory",
+      "file": "app/modules/orchestrator_memory.py",
+      "hash": "a2c54c533e324beb493ceabea09f5f3fa0fec2854251478c9b00b1894a43f1e1",
+      "size_bytes": 11119
+    },
+    "orchestrator_memory_enhanced": {
+      "name": "orchestrator_memory_enhanced",
+      "file": "app/modules/orchestrator_memory_enhanced.py",
+      "hash": "47ede783f429c4c6b9a1d36a8d2cb5b4b0eca565e02e7f4dd87ee67e0d86829b",
+      "size_bytes": 25311
+    },
+    "orchestrator_present": {
+      "name": "orchestrator_present",
+      "file": "app/modules/orchestrator_present.py",
+      "hash": "6d467e4035e22781e11e35455b8eb9b257858fffd934d95cf73a0148e87fff21",
+      "size_bytes": 9956
+    },
+    "orchestrator_rewind": {
+      "name": "orchestrator_rewind",
+      "file": "app/modules/orchestrator_rewind.py",
+      "hash": "1865caa7d7016ca939e261ca055239671eeaef26f1b31929d990ec5d24ef4afa",
+      "size_bytes": 10603
+    },
+    "orchestrator_scope": {
+      "name": "orchestrator_scope",
+      "file": "app/modules/orchestrator_scope.py",
+      "hash": "18ea5ff5c1afdd448f6611955ef75b82e31646244427268bc358179d454c31dd",
+      "size_bytes": 32598
+    },
+    "output_policy_enforcer": {
+      "name": "output_policy_enforcer",
+      "file": "app/modules/output_policy_enforcer.py",
+      "hash": "1735fe5226c35ce8b80a0276ca7403080f72bafc80aa0d8d0987cba82e072409",
+      "size_bytes": 23900
+    },
+    "passive_reflection": {
+      "name": "passive_reflection",
+      "file": "app/modules/passive_reflection.py",
+      "hash": "84f0950983d93875455ce61f2c772e94b01a4217826acd5b80968abd8872337c",
+      "size_bytes": 12760
+    },
+    "pessimist_agent": {
+      "name": "pessimist_agent",
+      "file": "app/modules/pessimist_agent.py",
+      "hash": "0892009b69693abb025e703480dd218df16c177ce83a99e979c17033b1d4fcb2",
+      "size_bytes": 8262
+    },
+    "pessimist_bias_tracking": {
+      "name": "pessimist_bias_tracking",
+      "file": "app/modules/pessimist_bias_tracking.py",
+      "hash": "c88e3040552c56946f223d44baeb64758ee5467b1e21931b646acdd6e5e13fbd",
+      "size_bytes": 10524
+    },
+    "pessimist_evaluation": {
+      "name": "pessimist_evaluation",
+      "file": "app/modules/pessimist_evaluation.py",
+      "hash": "1b743655e8301d4dcedc92041743517d5a7f7be6ed6337065eb5c4fc40a29adb",
+      "size_bytes": 24689
+    },
+    "plan_chainer": {
+      "name": "plan_chainer",
+      "file": "app/modules/plan_chainer.py",
+      "hash": "00bb3c00072a66338f572729f49bad135d52943cffa79c7719ec89015d166659",
+      "size_bytes": 3974
+    },
+    "plan_executor": {
+      "name": "plan_executor",
+      "file": "app/modules/plan_executor.py",
+      "hash": "c8fab7030d132e8e484d6b0faf24fcbb92a98040c474936899b9ff921b22686f",
+      "size_bytes": 4895
+    },
+    "plan_generate": {
+      "name": "plan_generate",
+      "file": "app/modules/plan_generate.py",
+      "hash": "35a728c9cfad3dcaed31a7fb26bcfe572bef1cbd682ca8674f19282229b0c641",
+      "size_bytes": 14974
+    },
+    "planning_logic_integration": {
+      "name": "planning_logic_integration",
+      "file": "app/modules/planning_logic_integration.py",
+      "hash": "1223160c29bd348f665ccf62116c8b04c488343138cf36d0f4a88eaeba80f702",
+      "size_bytes": 13837
+    },
+    "post_loop_summary_handler": {
+      "name": "post_loop_summary_handler",
+      "file": "app/modules/post_loop_summary_handler.py",
+      "hash": "f1b892ee7d16850ae70fee23e082ec7fa7231d575c8b02139b130fc2763932a9",
+      "size_bytes": 12875
+    },
+    "project_manifest": {
+      "name": "project_manifest",
+      "file": "app/modules/project_manifest.py",
+      "hash": "a4175bfa13c6483feeed9ba88c54a3a9f4a5854457ce19742af04faca9b665a0",
+      "size_bytes": 21054
+    },
+    "project_state": {
+      "name": "project_state",
+      "file": "app/modules/project_state.py",
+      "hash": "238769829168f486b15e7d6b855ec6e08e3985005ff95949a02657bf44c3b62f",
+      "size_bytes": 17248
+    },
+    "project_state_watch": {
+      "name": "project_state_watch",
+      "file": "app/modules/project_state_watch.py",
+      "hash": "2deca0616b09d5259dd5ed8cd8147921afaa4f268df6ced8bce475c0eb2b78df",
+      "size_bytes": 18966
+    },
+    "public_use_transparency_layer": {
+      "name": "public_use_transparency_layer",
+      "file": "app/modules/public_use_transparency_layer.py",
+      "hash": "f7578ef8cddde0f876f943317321c46e7f92507006ad734136bb1d2e4a2a97f1",
+      "size_bytes": 52011
+    },
+    "recursive_reflection_engine": {
+      "name": "recursive_reflection_engine",
+      "file": "app/modules/recursive_reflection_engine.py",
+      "hash": "407ea52c53e7c15540f1d5964f10285b99bb78ec348adf1ce45e6d7e4f65d1ba",
+      "size_bytes": 6765
+    },
+    "reflect": {
+      "name": "reflect",
+      "file": "app/modules/reflect.py",
+      "hash": "0412ab5aaae40d0f0ac98049b322da3f31eb09eea4503c1b40cd82b560e02b5b",
+      "size_bytes": 7492
+    },
+    "reflection_analyzer": {
+      "name": "reflection_analyzer",
+      "file": "app/modules/reflection_analyzer.py",
+      "hash": "755fdd4a541bea3a3fa5d3ea555aa54973d50b7147d4bb98926c9c2902128fba",
+      "size_bytes": 21934
+    },
+    "reflection_chain_weaver": {
+      "name": "reflection_chain_weaver",
+      "file": "app/modules/reflection_chain_weaver.py",
+      "hash": "7e00e635006037052df7e61303774c09c002065c03e9f68c0f02b75aec2d78f0",
+      "size_bytes": 3651
+    },
+    "reflection_fatigue_scoring": {
+      "name": "reflection_fatigue_scoring",
+      "file": "app/modules/reflection_fatigue_scoring.py",
+      "hash": "29effdbfede5ee587ee163934fcda010ac2ef769810842f9ba5a542dd7d4b57f",
+      "size_bytes": 10205
+    },
+    "reflection_grader": {
+      "name": "reflection_grader",
+      "file": "app/modules/reflection_grader.py",
+      "hash": "00bbe93e5f7e7c896fd4ca51109a5be9eac7dc9b0d4a83ff0671379d7d1ac57f",
+      "size_bytes": 6693
+    },
+    "reflection_guardrails": {
+      "name": "reflection_guardrails",
+      "file": "app/modules/reflection_guardrails.py",
+      "hash": "f1d0e7112e27a18f750ca38484e5a82381d5e45e72e2c6fea3f0284bea72a8c0",
+      "size_bytes": 9454
+    },
+    "reflection_scanner": {
+      "name": "reflection_scanner",
+      "file": "app/modules/reflection_scanner.py",
+      "hash": "a9bf8b1f381be834e5448f0603dbd6bef477ee548c8b05932883658853e16102",
+      "size_bytes": 10828
+    },
+    "reflection_styler": {
+      "name": "reflection_styler",
+      "file": "app/modules/reflection_styler.py",
+      "hash": "4140cfa780477cb67ed4078212f8ed69b566ae373f684b56336642052b4faafe",
+      "size_bytes": 5638
+    },
+    "register_all_agents": {
+      "name": "register_all_agents",
+      "file": "app/modules/register_all_agents.py",
+      "hash": "5e1682dfb72108548e9ac53c7840401a20ae6b6475a31919b2583b95a3a898b9",
+      "size_bytes": 1206
+    },
+    "rerun_decision_engine": {
+      "name": "rerun_decision_engine",
+      "file": "app/modules/rerun_decision_engine.py",
+      "hash": "2245f2ee8583e147c5c08b09f31f10113e579436a36014e524986f6f8ca6e464",
+      "size_bytes": 21776
+    },
+    "rerun_reasoning_logger": {
+      "name": "rerun_reasoning_logger",
+      "file": "app/modules/rerun_reasoning_logger.py",
+      "hash": "6e61f9f5bc0ba9af2bbb9433afca45c336dd94ec7c3d7de4515f9f10dda6e1d9",
+      "size_bytes": 6994
+    },
+    "reset_flags": {
+      "name": "reset_flags",
+      "file": "app/modules/reset_flags.py",
+      "hash": "b94279283d8a79cef0cbdcae540924b120392e9000fcbb61dac496b549132ef3",
+      "size_bytes": 10442
+    },
+    "safety_integration": {
+      "name": "safety_integration",
+      "file": "app/modules/safety_integration.py",
+      "hash": "2c99df37a813d83a02d6af5aef6594b31128058aeac56b5c814fb4cf422dc521",
+      "size_bytes": 17506
+    },
+    "safety_loop_summary": {
+      "name": "safety_loop_summary",
+      "file": "app/modules/safety_loop_summary.py",
+      "hash": "f24f90262485ad8ed10078e9f58f3635e7595ceeb18ef47a9682c4ba214f6448",
+      "size_bytes": 14821
+    },
+    "schema_validation": {
+      "name": "schema_validation",
+      "file": "app/modules/schema_compliance/schema_validation.py",
+      "hash": "769f39ffc9ddc9cb8e7b5c8b8a735cba7fdff2aa7a9991309782a16fcf6f2ec7",
+      "size_bytes": 4346
+    },
+    "summary_realism_scorer": {
+      "name": "summary_realism_scorer",
+      "file": "app/modules/summary_realism_scorer.py",
+      "hash": "06c9e61e2311cfe56e5e5be8c2f5c815f9ee43c040bc38441a95f542f3bbeb88",
+      "size_bytes": 49655
+    },
+    "symbolic_memory_encoder": {
+      "name": "symbolic_memory_encoder",
+      "file": "app/modules/symbolic_memory_encoder.py",
+      "hash": "183d0dbbcd392c46299595131f3ba462a7d42601f48ccde7275db16f0db6f71f",
+      "size_bytes": 29208
+    },
+    "synthetic_identity_checker": {
+      "name": "synthetic_identity_checker",
+      "file": "app/modules/synthetic_identity_checker.py",
+      "hash": "b389b68b2c34fed60b6306afca8bf6a6ff0bcc30db7e52d41a59f97c439a7d41",
+      "size_bytes": 9945
+    },
+    "task_result": {
+      "name": "task_result",
+      "file": "app/modules/task_result.py",
+      "hash": "8a94af8a1cc7aa56bd83befe11aa0c2cb2bf25635c1f6194e2a8b19422c9171f",
+      "size_bytes": 4555
+    },
+    "task_supervisor": {
+      "name": "task_supervisor",
+      "file": "app/modules/task_supervisor.py",
+      "hash": "018ab1a43913c89e7a1505bfbf94c5851bf78a285780e5a55ca6902eba1c51b8",
+      "size_bytes": 17775
+    },
+    "test_llm_infer": {
+      "name": "test_llm_infer",
+      "file": "app/modules/test_llm_infer.py",
+      "hash": "ec069976fcbf70f0a2a9ff0e8772785208e560ea89021d9056c4861b9782376b",
+      "size_bytes": 4177
+    },
+    "test_memory_summarize": {
+      "name": "test_memory_summarize",
+      "file": "app/modules/test_memory_summarize.py",
+      "hash": "fd79aeaf4cd4d9a7fb68a59e149c3efadaad63fd1f4975fa2849f026a6444cf7",
+      "size_bytes": 8553
+    },
+    "test_memory_thread": {
+      "name": "test_memory_thread",
+      "file": "app/modules/test_memory_thread.py",
+      "hash": "880d2541a0d155c493e56431e6f0576aecc46c37485489679e94d9ae292a93e1",
+      "size_bytes": 8648
+    },
+    "tiered_orchestrator": {
+      "name": "tiered_orchestrator",
+      "file": "app/modules/tiered_orchestrator.py",
+      "hash": "ba8d22a954072e5811cec0754994dc5fccb3cd7c5bf83b7a613dacbdcd0d00fa",
+      "size_bytes": 22031
+    },
+    "train": {
+      "name": "train",
+      "file": "app/modules/train.py",
+      "hash": "37012a8a920117c06815a90312d13f1b820085a1f9e383cae862c80c02761d27",
+      "size_bytes": 14293
+    },
+    "trust_score_evaluator": {
+      "name": "trust_score_evaluator",
+      "file": "app/modules/trust_score_evaluator.py",
+      "hash": "8a872413cc9bb924ad657628f1683bc90143971d005e54c58665504ea7ac589b",
+      "size_bytes": 7888
+    },
+    "hal_code_generator": {
+      "name": "hal_code_generator",
+      "file": "app/modules/code_generation/hal_code_generator.py",
+      "hash": "20690386daff91cd4886fa1ec6033b6215eb189eff2f1892763d9420b3162357",
+      "size_bytes": 5348
+    },
+    "react_generator": {
+      "name": "react_generator",
+      "file": "app/modules/code_generation/react_generator.py",
+      "hash": "b315f587a0dc50156c254ed5cdb5186e0afa878ccc012ceed6ef694f3abd782a",
+      "size_bytes": 82192
+    },
+    "review": {
+      "name": "review",
+      "file": "app/modules/critic/review.py",
+      "hash": "31f478d6cfb10e23d73e97823badcc7950751839a5bc45f58db10cfcac1133e9",
+      "size_bytes": 8820
+    },
+    "nova_strategy_default": {
+      "name": "nova_strategy_default",
+      "file": "app/modules/logic/nova_strategy_default.py",
+      "hash": "3dcb0253efa97d3fa3259313c089b86ace6b51118ee134dffb074208de4d2386",
+      "size_bytes": 2758
+    },
+    "nova_test_strategy": {
+      "name": "nova_test_strategy",
+      "file": "app/modules/logic/test/nova_test_strategy.py",
+      "hash": "eec051e8085170e2b14de1d3d0d9bfad60cb33baa211774e65830d02f73a7391",
+      "size_bytes": 2951
+    },
+    "execute_chain": {
+      "name": "execute_chain",
+      "file": "app/modules/plan/execute_chain.py",
+      "hash": "15911267471609b217abd5a693cc5cec5562838cd9b04e793da0a79822e6f785",
+      "size_bytes": 7082
+    },
+    "scope": {
+      "name": "scope",
+      "file": "app/modules/plan/scope.py",
+      "hash": "ddb1c926e25009d4e568b21c8ecf9abb2e37c3f0556bc167057e669f43e55b56",
+      "size_bytes": 4423
+    },
+    "task": {
+      "name": "task",
+      "file": "app/modules/review/task.py",
+      "hash": "db3c9071af378464b9e8f0db859227ec6763f6e320c729eaeb27c6b5db5b7084",
+      "size_bytes": 1769
+    },
+    "html_export_validator": {
+      "name": "html_export_validator",
+      "file": "app/modules/schema_compliance/html_export_validator.py",
+      "hash": "94f605d5dfdc02560f9413f118d7485060adab583901dac75d5f4daa2e1373be",
+      "size_bytes": 5786
+    },
+    "md_export_validator": {
+      "name": "md_export_validator",
+      "file": "app/modules/schema_compliance/md_export_validator.py",
+      "hash": "9d1cb93b273d837f579c147ad0ae7e030986d543d5c54ee52168522bbf69ab35",
+      "size_bytes": 4587
+    },
+    "visual_settings_validator": {
+      "name": "visual_settings_validator",
+      "file": "app/modules/schema_compliance/visual_settings_validator.py",
+      "hash": "6412f4d08a68f37fceae38759065dce889492527f0bc1c942d1695d8338483b7",
+      "size_bytes": 5839
+    },
+    "agent_builder": {
+      "name": "agent_builder",
+      "file": "app/tools/agent_builder.py",
+      "hash": "f4ff1c332d5d2812861d1eba2be035a0bc935101dfdbeae7f9a119caed7833ea",
+      "size_bytes": 20004
+    },
+    "api_request": {
+      "name": "api_request",
+      "file": "app/tools/api_request.py",
+      "hash": "7f974aa99d88eff1bd246eb242c7f86548d052166e2f964b97986df44fac18b1",
+      "size_bytes": 8742
+    },
+    "architecture_validator": {
+      "name": "architecture_validator",
+      "file": "app/tools/architecture_validator.py",
+      "hash": "6266187efcddcf785303a67631e5f0d5851477d013b9c204adadddfb57d640ba",
+      "size_bytes": 48986
+    },
+    "audio_input_handler": {
+      "name": "audio_input_handler",
+      "file": "app/tools/audio_input_handler.py",
+      "hash": "01eadabd8f986bab18e69d098447ac316c631c5a5e9b7fded49f813e503153de",
+      "size_bytes": 7878
+    },
+    "audio_transcriber": {
+      "name": "audio_transcriber",
+      "file": "app/tools/audio_transcriber.py",
+      "hash": "0174cdde96766cf4e88fea59f46a1ef54f93221c0ca7c274185d7964352bc24d",
+      "size_bytes": 40081
+    },
+    "autonomous_research_chain": {
+      "name": "autonomous_research_chain",
+      "file": "app/tools/autonomous_research_chain.py",
+      "hash": "9716df3353cc6710d869ae78e163632cf734eb3028a76a409034e3303df1f199",
+      "size_bytes": 30995
+    },
+    "belief_calibrator": {
+      "name": "belief_calibrator",
+      "file": "app/tools/belief_calibrator.py",
+      "hash": "3f253331e80f772c736a820f05f95fec4dc7b12ea87758bcc3c08a136db06064",
+      "size_bytes": 36120
+    },
+    "calendar_scheduler": {
+      "name": "calendar_scheduler",
+      "file": "app/tools/calendar_scheduler.py",
+      "hash": "a45554e91b2fc05903f16cf5e3b68fdf000fb2e2c6f1fa581163bc563c54966f",
+      "size_bytes": 22724
+    },
+    "code_executor": {
+      "name": "code_executor",
+      "file": "app/tools/code_executor.py",
+      "hash": "2fcac14b24efe6df69421d444c9d33984a9986b6a86284b68efdb4613f135bdc",
+      "size_bytes": 13515
+    },
+    "code_explainer": {
+      "name": "code_explainer",
+      "file": "app/tools/code_explainer.py",
+      "hash": "2e4231d65050d4e0108afa164bb2205bd8b717976fc18452c20d2c622da76733",
+      "size_bytes": 34793
+    },
+    "dns_tools": {
+      "name": "dns_tools",
+      "file": "app/tools/dns_tools.py",
+      "hash": "08ff71b72959a6c638a90ed8746aacbea19d161416c7b4a41f529fd08544490d",
+      "size_bytes": 5475
+    },
+    "email_drafter": {
+      "name": "email_drafter",
+      "file": "app/tools/email_drafter.py",
+      "hash": "b8a811b1996b7a503d04daea3fad424dae74d13e4fc6cc7a2cc654dcfc179879",
+      "size_bytes": 50499
+    },
+    "event_tracker": {
+      "name": "event_tracker",
+      "file": "app/tools/event_tracker.py",
+      "hash": "706fe108a3dcfb983026606b9228662bcedf11bcca8d3a4c893b01eaf7c87254",
+      "size_bytes": 28609
+    },
+    "file_reader": {
+      "name": "file_reader",
+      "file": "app/tools/file_reader.py",
+      "hash": "c407b4398062cf2cf9b2a7a7b7e3efdaff9f4320d8aacb78be929c996e0f0874",
+      "size_bytes": 4100
+    },
+    "file_writer": {
+      "name": "file_writer",
+      "file": "app/tools/file_writer.py",
+      "hash": "30a3940f528364310906f7e56985a926fb5cfbf3887bf73715328e4bb2815be1",
+      "size_bytes": 10010
+    },
+    "git_utils": {
+      "name": "git_utils",
+      "file": "app/tools/git_utils.py",
+      "hash": "6d9b83af8eaa1d77512af84f5a760c27df4a0343206111a573115d48090ec7b1",
+      "size_bytes": 5525
+    },
+    "github_commit": {
+      "name": "github_commit",
+      "file": "app/tools/github_commit.py",
+      "hash": "ce0db85e0a75fc2e92159e222ba0c083c192b3f399907860c4fcecf2e2a164cb",
+      "size_bytes": 6854
+    },
+    "image_caption": {
+      "name": "image_caption",
+      "file": "app/tools/image_caption.py",
+      "hash": "833369cf866955ad5d26a06d44d139a6ce64150e5eaf2c6ea04cfea135a9c8cd",
+      "size_bytes": 22438
+    },
+    "lint_utils": {
+      "name": "lint_utils",
+      "file": "app/tools/lint_utils.py",
+      "hash": "d13045deb14115d070417720e4eb99c54d9e031ba56dbdcb3b882011c2921fbf",
+      "size_bytes": 8744
+    },
+    "multi_agent_debater": {
+      "name": "multi_agent_debater",
+      "file": "app/tools/multi_agent_debater.py",
+      "hash": "5ee23f908e3a818446c160cd7cd4aa923b61503f8092eab8e5dc717d453ff03b",
+      "size_bytes": 70017
+    },
+    "multi_file_editor": {
+      "name": "multi_file_editor",
+      "file": "app/tools/multi_file_editor.py",
+      "hash": "ec1100f97e0abd277d3c7f2d431d2bd8dc38dfa9f4b0bcc1e129132d41458284",
+      "size_bytes": 21638
+    },
+    "news_fetcher": {
+      "name": "news_fetcher",
+      "file": "app/tools/news_fetcher.py",
+      "hash": "5b19426ed1903d8ce410570a51392851e474d830d53db84325b716ae2cb79d57",
+      "size_bytes": 6825
+    },
+    "notion_writer": {
+      "name": "notion_writer",
+      "file": "app/tools/notion_writer.py",
+      "hash": "748e139e0ac20f80599b88d84fd3ccb8f35b71e3b447051dbb3439fd95ce9583",
+      "size_bytes": 16076
+    },
+    "package_installer": {
+      "name": "package_installer",
+      "file": "app/tools/package_installer.py",
+      "hash": "8c21c61b5a9dcc8855afbbeb40f66b54dffdf553ef32ae0c7363b8fcc10d1d27",
+      "size_bytes": 16727
+    },
+    "pdf_ingest": {
+      "name": "pdf_ingest",
+      "file": "app/tools/pdf_ingest.py",
+      "hash": "ed5d8637f3c8d19339aef341e78a2683b6c3a19188048aa508d595068252fb47",
+      "size_bytes": 9445
+    },
+    "pitch_optimizer": {
+      "name": "pitch_optimizer",
+      "file": "app/tools/pitch_optimizer.py",
+      "hash": "1e1360fd262b927c2de3bfaac06726f87759d9e2f81ed4f5f9b863961fda74d4",
+      "size_bytes": 74194
+    },
+    "refactor_suggester": {
+      "name": "refactor_suggester",
+      "file": "app/tools/refactor_suggester.py",
+      "hash": "3bb8717b2a86cfe8616e845b6628783f7812676ee17ed8fa07b82641f5434dce",
+      "size_bytes": 26814
+    },
+    "repo_loader": {
+      "name": "repo_loader",
+      "file": "app/tools/repo_loader.py",
+      "hash": "724aa121657f8ffa4f9aa7e186b1cef5dafd8f2c2f42b06c064b590eb2fcc55c",
+      "size_bytes": 9383
+    },
+    "repo_tools": {
+      "name": "repo_tools",
+      "file": "app/tools/repo_tools.py",
+      "hash": "ccc0c65004367750b85b971f56c0432885522ca6c517a59e8b6e6a3bdf19ff24",
+      "size_bytes": 8201
+    },
+    "resume_parser": {
+      "name": "resume_parser",
+      "file": "app/tools/resume_parser.py",
+      "hash": "6ed53aeb014f826a7a3a14b2f00eab9844ec0ab455e22ba9ed54eb083fa1b6d6",
+      "size_bytes": 32134
+    },
+    "screenshot_reader": {
+      "name": "screenshot_reader",
+      "file": "app/tools/screenshot_reader.py",
+      "hash": "ef7fad7ce0ea79af678cf751c98be40b4e8ec6a4bb37400de263aded5ac51413",
+      "size_bytes": 43654
+    },
+    "search_google": {
+      "name": "search_google",
+      "file": "app/tools/search_google.py",
+      "hash": "af6976361355584854300b1f026c7d593f96a2937106c4b049cdec9046178ab8",
+      "size_bytes": 2908
+    },
+    "slack_messenger": {
+      "name": "slack_messenger",
+      "file": "app/tools/slack_messenger.py",
+      "hash": "7c2f3843ca497dca169c16a284d53438c39035a9b05da2df850b4b3dbfdf0d78",
+      "size_bytes": 22998
+    },
+    "snapshot": {
+      "name": "snapshot",
+      "file": "app/tools/snapshot.py",
+      "hash": "7b0b24ef96d3aadc0b1c1b3e0e607958257ced27ef3a6bd87cce685c45952c88",
+      "size_bytes": 8871
+    },
+    "spreadsheet_analyzer": {
+      "name": "spreadsheet_analyzer",
+      "file": "app/tools/spreadsheet_analyzer.py",
+      "hash": "b6c1c3372301fdd2243dd04e07c9498712c37f2d0ab34cc17d1ab0d464444d53",
+      "size_bytes": 34862
+    },
+    "status_tracker": {
+      "name": "status_tracker",
+      "file": "app/tools/status_tracker.py",
+      "hash": "4bbed8fe217a1020eab8403a7608aa184e3e2daec1485dcd9ab80b26308f23e8",
+      "size_bytes": 19610
+    },
+    "stock_checker": {
+      "name": "stock_checker",
+      "file": "app/tools/stock_checker.py",
+      "hash": "2bf357ebb6b5c6ce9e20fd2f3a29cacebb7cf3cccfa2257cd58b8ded25be8433",
+      "size_bytes": 25914
+    },
+    "test_runner": {
+      "name": "test_runner",
+      "file": "app/tools/test_runner.py",
+      "hash": "24855bacbcd9184f398ed5870740f5cdd8e13c9a2f2a41e4493848f2bafcbccd",
+      "size_bytes": 8821
+    },
+    "tone_converter": {
+      "name": "tone_converter",
+      "file": "app/tools/tone_converter.py",
+      "hash": "e532bd387694734ac6f3de5edc95ee6ba007ffe817b889fc7003e446a847c1bf",
+      "size_bytes": 72388
+    },
+    "unit_test_writer": {
+      "name": "unit_test_writer",
+      "file": "app/tools/unit_test_writer.py",
+      "hash": "e2b59b1f42949031e8985814fe5d6271aade2b099ee1698fa926d3001e8bfd46",
+      "size_bytes": 27441
+    },
+    "update_checklist": {
+      "name": "update_checklist",
+      "file": "app/tools/update_checklist.py",
+      "hash": "763de58945039c4c0a0c7a2d12f336d851d1ba3dd82d47370acb7bdca2255ed1",
+      "size_bytes": 3951
+    },
+    "url_summarizer": {
+      "name": "url_summarizer",
+      "file": "app/tools/url_summarizer.py",
+      "hash": "f642c3d232a43dc263e109a8bc4cfb8615eaa94f23eb9d5c2ee59792543de975",
+      "size_bytes": 10070
+    },
+    "vercel_deploy": {
+      "name": "vercel_deploy",
+      "file": "app/tools/vercel_deploy.py",
+      "hash": "401694d8f2a0f92f3df4b7413fb97cf6ef65f4e2f78830f62c178e7e17eb3add",
+      "size_bytes": 4369
+    },
+    "video_summarizer": {
+      "name": "video_summarizer",
+      "file": "app/tools/video_summarizer.py",
+      "hash": "644005769b19cc29b8256530ed5f994d18bc9c68e2b0506ac10dd2ee17c94b0e",
+      "size_bytes": 61756
+    },
+    "weather_checker": {
+      "name": "weather_checker",
+      "file": "app/tools/weather_checker.py",
+      "hash": "3d1bcf579382d29230155d695aed1ff7fe5dd08ce0c8111fc01f59b1281cd819",
+      "size_bytes": 22209
+    },
+    "web_search": {
+      "name": "web_search",
+      "file": "app/tools/web_search.py",
+      "hash": "db6f82c3b37ef38ff179f6d6feee14acceb61e246bb8c8b98f5a7a0584775f6c",
+      "size_bytes": 6184
+    }
+  },
+  "hash": "74d893a1cdce0d52f95ad09e6a5ce64df31942ebe41ee8b588947f2124655f1b",
+  "component_hashes": {
+    "routes_hash": "13a66c17102d15bba00b20de415d35e19739d55081837799d97e991509ab1e13",
+    "agents_hash": "65386a000cff620210dc9b1309f2db2010fec3c6c74c4fde895057e82b1f957c",
+    "schemas_hash": "a91bd56d9691dec164a09e29fcbed9cc013d998f3cbdb6750c1877756ce395e6",
+    "modules_hash": "45ff7d06ae2bad1d7f625255f58978f92a52647e29bcabbe80771bd5d951b70a"
+  }
 }
