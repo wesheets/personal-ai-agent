@@ -1,0 +1,1168 @@
+{
+  "sweep_start_time": "2025-04-28T14:40:09.053365",
+  "target_url": "https://personal-ai-agent-ji4s.onrender.com",
+  "total_endpoints_tested": 71,
+  "summary": {
+    "total_endpoints": 71,
+    "successful_endpoints": 4,
+    "success_rate": "5.63%",
+    "status_code_distribution": {
+      "200": 4,
+      "404": 55,
+      "422": 9,
+      "500": 3,
+      "other": 0,
+      "error": 0
+    }
+  },
+  "grouped_results": {
+    "200_OK": [
+      {
+        "endpoint_hit": "/api/plan/status/{execution_id}",
+        "method": "GET",
+        "status_code": 200,
+        "success": true,
+        "payload_validation": "JSON OK",
+        "notes": "Path parameters ['execution_id'] replaced with 'test_id'. OK."
+      },
+      {
+        "endpoint_hit": "/api/plan/{plan_id}",
+        "method": "GET",
+        "status_code": 200,
+        "success": true,
+        "payload_validation": "JSON OK",
+        "notes": "Path parameters ['plan_id'] replaced with 'test_id'. OK."
+      },
+      {
+        "endpoint_hit": "/api/snapshot/list/{loop_id}",
+        "method": "GET",
+        "status_code": 200,
+        "success": true,
+        "payload_validation": "JSON OK",
+        "notes": "Path parameters ['loop_id'] replaced with 'test_id'. OK."
+      },
+      {
+        "endpoint_hit": "/diagnostics/routes",
+        "method": "GET",
+        "status_code": 200,
+        "success": true,
+        "payload_validation": "JSON OK",
+        "notes": "OK."
+      }
+    ],
+    "404_Not_Found": [
+      {
+        "endpoint_hit": "/api/agent/analyze-prompt",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/agent/ceo-review",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/agent/cto-review",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/agent/delegate",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/agent/generate-code",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/agent/list",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/agent/loop",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/agent/ping",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/agent/run",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/ash/analyze",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/ash/execute",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/debug/analyze-loop",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/debugger/trace",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/drift/history/{loop_id}",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Path parameters ['loop_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/drift/log",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/drift/monitor",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/drift/report",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/execute/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/historian/log",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/loop/complete",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/loop/debug",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/loop/persona-reflect",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/loop/plan",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/loop/reset",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/loop/respond",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/loop/start",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/loop/trace",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/loop/trace",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/memory/ping",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/memory/read",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/memory/thread",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/memory/write",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/project/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/reflection/result/{reflection_id}",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Path parameters ['reflection_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/reflection/trigger",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/reflection/trigger-scan",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/reflection/{project_id}",
+        "method": "DELETE",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Path parameters ['project_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/reflection/{project_id}",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Path parameters ['project_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/reflection/{project_id}",
+        "method": "POST",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Path parameters ['project_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/reflection/{project_id}/history",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Path parameters ['project_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/reflection/{reflection_id}",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Path parameters ['reflection_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/api/train/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/critic_review/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/debug_analyzer/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/forge/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/forge_build/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/health_monitor/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/loop_validation/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/memory_api/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/orchestrator_contract/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/output_policy/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/pessimist_evaluation/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/plan_generate/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/sage_beliefs/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      },
+      {
+        "endpoint_hit": "/upload/placeholder",
+        "method": "GET",
+        "status_code": 404,
+        "success": false,
+        "payload_validation": "Endpoint Not Found",
+        "notes": "Endpoint not found. Not Found."
+      }
+    ],
+    "422_Validation_Error": [
+      {
+        "endpoint_hit": "/api/drift/auto-heal",
+        "method": "POST",
+        "status_code": 422,
+        "success": false,
+        "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'drift_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+        "notes": "Validation error. Unprocessable Entity."
+      },
+      {
+        "endpoint_hit": "/api/loop/validate",
+        "method": "POST",
+        "status_code": 422,
+        "success": false,
+        "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'project_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}, {'type': 'missing', 'loc': ['body', 'loop_id'], 'msg': 'Field required',",
+        "notes": "Validation error. Unprocessable Entity."
+      },
+      {
+        "endpoint_hit": "/api/plan/chain",
+        "method": "POST",
+        "status_code": 422,
+        "success": false,
+        "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'reflection_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+        "notes": "Validation error. Unprocessable Entity."
+      },
+      {
+        "endpoint_hit": "/api/plan/create",
+        "method": "POST",
+        "status_code": 422,
+        "success": false,
+        "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'title'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}, {'type': 'missing', 'loc': ['body', 'steps'], 'msg': 'Field required', 'input",
+        "notes": "Validation error. Unprocessable Entity."
+      },
+      {
+        "endpoint_hit": "/api/plan/execute",
+        "method": "POST",
+        "status_code": 422,
+        "success": false,
+        "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'plan_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+        "notes": "Validation error. Unprocessable Entity."
+      },
+      {
+        "endpoint_hit": "/api/plan/update",
+        "method": "PUT",
+        "status_code": 422,
+        "success": false,
+        "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'plan_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+        "notes": "Validation error. Unprocessable Entity."
+      },
+      {
+        "endpoint_hit": "/api/reflection/chain",
+        "method": "POST",
+        "status_code": 422,
+        "success": false,
+        "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'reflection_ids'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+        "notes": "Validation error. Unprocessable Entity."
+      },
+      {
+        "endpoint_hit": "/api/snapshot/restore",
+        "method": "POST",
+        "status_code": 422,
+        "success": false,
+        "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'loop_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+        "notes": "Validation error. Unprocessable Entity."
+      },
+      {
+        "endpoint_hit": "/api/snapshot/save",
+        "method": "POST",
+        "status_code": 422,
+        "success": false,
+        "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'loop_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+        "notes": "Validation error. Unprocessable Entity."
+      }
+    ],
+    "500_Server_Error": [
+      {
+        "endpoint_hit": "/api/reflection/analyze/{reflection_id}",
+        "method": "GET",
+        "status_code": 500,
+        "success": false,
+        "payload_validation": "Internal Server Error",
+        "notes": "Path parameters ['reflection_id'] replaced with 'test_id'. Internal server error. Internal Server Error."
+      },
+      {
+        "endpoint_hit": "/api/reflection/trigger-scan-deep",
+        "method": "POST",
+        "status_code": 500,
+        "success": false,
+        "payload_validation": "Internal Server Error",
+        "notes": "Internal server error. Internal Server Error."
+      },
+      {
+        "endpoint_hit": "/api/snapshot/{loop_id}",
+        "method": "DELETE",
+        "status_code": 500,
+        "success": false,
+        "payload_validation": "Internal Server Error",
+        "notes": "Path parameters ['loop_id'] replaced with 'test_id'. Internal server error. Internal Server Error."
+      }
+    ],
+    "other_status_codes": [],
+    "errors": []
+  },
+  "all_results": [
+    {
+      "endpoint_hit": "/api/agent/analyze-prompt",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/agent/ceo-review",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/agent/cto-review",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/agent/delegate",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/agent/generate-code",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/agent/list",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/agent/loop",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/agent/ping",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/agent/run",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/ash/analyze",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/ash/execute",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/debug/analyze-loop",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/debugger/trace",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/drift/auto-heal",
+      "method": "POST",
+      "status_code": 422,
+      "success": false,
+      "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'drift_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+      "notes": "Validation error. Unprocessable Entity."
+    },
+    {
+      "endpoint_hit": "/api/drift/history/{loop_id}",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Path parameters ['loop_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/drift/log",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/drift/monitor",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/drift/report",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/execute/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/historian/log",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/complete",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/debug",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/persona-reflect",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/plan",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/reset",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/respond",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/start",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/trace",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/trace",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/loop/validate",
+      "method": "POST",
+      "status_code": 422,
+      "success": false,
+      "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'project_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}, {'type': 'missing', 'loc': ['body', 'loop_id'], 'msg': 'Field required',",
+      "notes": "Validation error. Unprocessable Entity."
+    },
+    {
+      "endpoint_hit": "/api/memory/ping",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/memory/read",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/memory/thread",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/memory/write",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/plan/chain",
+      "method": "POST",
+      "status_code": 422,
+      "success": false,
+      "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'reflection_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+      "notes": "Validation error. Unprocessable Entity."
+    },
+    {
+      "endpoint_hit": "/api/plan/create",
+      "method": "POST",
+      "status_code": 422,
+      "success": false,
+      "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'title'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}, {'type': 'missing', 'loc': ['body', 'steps'], 'msg': 'Field required', 'input",
+      "notes": "Validation error. Unprocessable Entity."
+    },
+    {
+      "endpoint_hit": "/api/plan/execute",
+      "method": "POST",
+      "status_code": 422,
+      "success": false,
+      "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'plan_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+      "notes": "Validation error. Unprocessable Entity."
+    },
+    {
+      "endpoint_hit": "/api/plan/status/{execution_id}",
+      "method": "GET",
+      "status_code": 200,
+      "success": true,
+      "payload_validation": "JSON OK",
+      "notes": "Path parameters ['execution_id'] replaced with 'test_id'. OK."
+    },
+    {
+      "endpoint_hit": "/api/plan/update",
+      "method": "PUT",
+      "status_code": 422,
+      "success": false,
+      "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'plan_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+      "notes": "Validation error. Unprocessable Entity."
+    },
+    {
+      "endpoint_hit": "/api/plan/{plan_id}",
+      "method": "GET",
+      "status_code": 200,
+      "success": true,
+      "payload_validation": "JSON OK",
+      "notes": "Path parameters ['plan_id'] replaced with 'test_id'. OK."
+    },
+    {
+      "endpoint_hit": "/api/project/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/reflection/analyze/{reflection_id}",
+      "method": "GET",
+      "status_code": 500,
+      "success": false,
+      "payload_validation": "Internal Server Error",
+      "notes": "Path parameters ['reflection_id'] replaced with 'test_id'. Internal server error. Internal Server Error."
+    },
+    {
+      "endpoint_hit": "/api/reflection/chain",
+      "method": "POST",
+      "status_code": 422,
+      "success": false,
+      "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'reflection_ids'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+      "notes": "Validation error. Unprocessable Entity."
+    },
+    {
+      "endpoint_hit": "/api/reflection/result/{reflection_id}",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Path parameters ['reflection_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/reflection/trigger",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/reflection/trigger-scan",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/reflection/trigger-scan-deep",
+      "method": "POST",
+      "status_code": 500,
+      "success": false,
+      "payload_validation": "Internal Server Error",
+      "notes": "Internal server error. Internal Server Error."
+    },
+    {
+      "endpoint_hit": "/api/reflection/{project_id}",
+      "method": "DELETE",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Path parameters ['project_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/reflection/{project_id}",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Path parameters ['project_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/reflection/{project_id}",
+      "method": "POST",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Path parameters ['project_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/reflection/{project_id}/history",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Path parameters ['project_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/reflection/{reflection_id}",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Path parameters ['reflection_id'] replaced with 'test_id'. Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/api/snapshot/list/{loop_id}",
+      "method": "GET",
+      "status_code": 200,
+      "success": true,
+      "payload_validation": "JSON OK",
+      "notes": "Path parameters ['loop_id'] replaced with 'test_id'. OK."
+    },
+    {
+      "endpoint_hit": "/api/snapshot/restore",
+      "method": "POST",
+      "status_code": 422,
+      "success": false,
+      "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'loop_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+      "notes": "Validation error. Unprocessable Entity."
+    },
+    {
+      "endpoint_hit": "/api/snapshot/save",
+      "method": "POST",
+      "status_code": 422,
+      "success": false,
+      "payload_validation": "Validation Error: {'detail': [{'type': 'missing', 'loc': ['body', 'loop_id'], 'msg': 'Field required', 'input': {'test_param': 'test_value'}}]}",
+      "notes": "Validation error. Unprocessable Entity."
+    },
+    {
+      "endpoint_hit": "/api/snapshot/{loop_id}",
+      "method": "DELETE",
+      "status_code": 500,
+      "success": false,
+      "payload_validation": "Internal Server Error",
+      "notes": "Path parameters ['loop_id'] replaced with 'test_id'. Internal server error. Internal Server Error."
+    },
+    {
+      "endpoint_hit": "/api/train/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/critic_review/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/debug_analyzer/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/diagnostics/routes",
+      "method": "GET",
+      "status_code": 200,
+      "success": true,
+      "payload_validation": "JSON OK",
+      "notes": "OK."
+    },
+    {
+      "endpoint_hit": "/forge/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/forge_build/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/health_monitor/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/loop_validation/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/memory_api/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/orchestrator_contract/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/output_policy/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/pessimist_evaluation/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/plan_generate/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/sage_beliefs/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    },
+    {
+      "endpoint_hit": "/upload/placeholder",
+      "method": "GET",
+      "status_code": 404,
+      "success": false,
+      "payload_validation": "Endpoint Not Found",
+      "notes": "Endpoint not found. Not Found."
+    }
+  ]
+}

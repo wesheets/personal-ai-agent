@@ -4,7 +4,7 @@ from fastapi import APIRouter
 router = APIRouter(tags=["file_upload"])
 
 # Simple test endpoint to verify the router is working
-@router.get("/api/upload/status")
+@router.get("/status")
 async def get_upload_status():
     """
     Check if the upload service is operational.

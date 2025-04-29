@@ -1,0 +1,91 @@
+{
+  "timestamp": "2025-04-28T18:44:52.567101",
+  "system_health": {
+    "boot_status": "OK with warnings",
+    "routes_loaded": 22,
+    "routes_failed": 3,
+    "warnings": [
+      "Cannot import 'memory_store' from 'app.modules.memory_writer'",
+      "Schema validation not available",
+      "Failed to include critic_review_router: name 'critic_review_router' is not defined"
+    ]
+  },
+  "endpoints": [
+    {
+      "name": "Project Start",
+      "url": "/api/project/start",
+      "method": "POST",
+      "status_code": 200,
+      "validation_status": "Success",
+      "response": {
+        "status": "error",
+        "message": "goal is required",
+        "agent": "unknown",
+        "goal": "missing",
+        "project_id": "test_project_123"
+      }
+    },
+    {
+      "name": "Agent Run",
+      "url": "/api/agent/run",
+      "method": "POST",
+      "status_code": 404,
+      "validation_status": "Endpoint Not Found",
+      "response": {
+        "detail": "Not Found"
+      }
+    },
+    {
+      "name": "Critic Review",
+      "url": "/api/critic/review",
+      "method": "POST",
+      "status_code": 200,
+      "validation_status": "Success",
+      "response": {
+        "loop_id": "test_loop_123",
+        "status": "rejected",
+        "reason": "Error during review: read_memory() missing 1 required positional argument: 'tag'",
+        "recommendation": "Check system logs and retry",
+        "timestamp": "2025-04-28T22:44:52.946710"
+      }
+    },
+    {
+      "name": "Sage Beliefs",
+      "url": "/api/sage/beliefs",
+      "method": "GET",
+      "status_code": 500,
+      "validation_status": "Server Error",
+      "response": {
+        "error": "Failed to parse JSON response",
+        "text": "Internal Server Error"
+      }
+    },
+    {
+      "name": "Forge Build",
+      "url": "/api/forge/build",
+      "method": "POST",
+      "status_code": 422,
+      "validation_status": "Validation Error",
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "loop_id"
+            ],
+            "msg": "Field required",
+            "input": {
+              "project_id": "test_project_123",
+              "blueprint": "test_blueprint",
+              "components": [
+                "component1",
+                "component2"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

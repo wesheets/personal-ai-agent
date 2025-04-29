@@ -182,6 +182,66 @@
       "schema": "None",
       "status": "pending_deployment",
       "errors": []
+    },
+    "/drift/report": {
+      "method": "POST",
+      "schema": "DriftMonitorRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/drift/auto-heal": {
+      "method": "POST",
+      "schema": "DriftHealingRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/drift/log": {
+      "method": "GET",
+      "schema": "DriftLogResponse",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/create": {
+      "method": "POST",
+      "schema": "PlanCreateRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/{plan_id}": {
+      "method": "GET",
+      "schema": "PlanGetRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/update": {
+      "method": "PUT",
+      "schema": "PlanUpdateRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/execute": {
+      "method": "POST",
+      "schema": "PlanExecutionRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/status/{execution_id}": {
+      "method": "GET",
+      "schema": "PlanStatusRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/chain": {
+      "method": "POST",
+      "schema": "PlanChainRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/critic/review": {
+      "method": "POST",
+      "schema": "LoopSummaryReviewRequest",
+      "status": "active",
+      "errors": []
     }
   },
   "modules": {
@@ -230,12 +290,13 @@
     "memory_engine_fallback": true,
     "diagnostics_endpoint": true,
     "sandbox_behavior_override": true,
-    "path_resolution_hardening": true
+    "path_resolution_hardening": true,
+    "loop_rejection_enabled": true
   },
   "manifest_meta": {
     "version": "1.0.0",
     "created_at": "2025-04-24T23:47:07.446977",
-    "last_updated": "2025-04-25T15:26:30.000000",
+    "last_updated": "2025-04-28T22:44:00.469277",
     "boot_events": [
       {
         "timestamp": "2025-04-24T23:47:07.816573",
