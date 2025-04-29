@@ -1,16 +1,21 @@
-
+# Minimal stub for loop validation schemas
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Dict, Any, Optional
 
-# Placeholder schema - Define actual fields based on requirements
 class LoopValidateRequest(BaseModel):
-    placeholder: Optional[Any] = None
+    loop_id: str
+    loop_data: Dict[str, Any]
+    mode: Optional[str] = None
+    complexity: Optional[float] = None
+    sensitivity: Optional[float] = None
+    time_constraint: Optional[float] = None
+    user_preference: Optional[str] = None
 
-
-
-from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
-
-# Placeholder schema - Define actual fields based on requirements
 class LoopValidateResponse(BaseModel):
-    placeholder: Optional[Any] = None
+    status: str
+    loop_id: str
+    mode: str
+    validation_result: Dict[str, Any]
+    prepared_loop: Dict[str, Any]
+    processed_by: str
+

@@ -112,7 +112,8 @@ class OrchestratorAgent(Agent):
             "source_agent": self.name
         }
         # Tag convention: agentname_task_payload_loopid
-        tag = f"{agent_name.lower().replace("-agent", "")}_task_payload_{loop_id}" # Simplified tag
+        base_agent_name = agent_name.lower().replace("-agent", "")
+        tag = f"{base_agent_name}_task_payload_{loop_id}" # Simplified tag
         await write_memory(
             project_id=project_id,
             agent_id=self.name,

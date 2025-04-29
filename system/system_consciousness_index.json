@@ -602,7 +602,9 @@
     "last_updated": "2025-04-28T21:10:36.249737",
     "memory_tags": [
       "phase3.3.1_registry_healing_batch1_complete"
-    ]
+    ],
+    "last_update_tag": "batch1_cleanup_20250429",
+    "last_update_timestamp": "2025-04-29T00:54:45.389775"
   },
   "system_components": [
     {
@@ -613,5 +615,43 @@
       "version_tag": "phase3.3.1_registry_healing_batch1_complete",
       "last_updated": "2025-04-28T21:10:36.249740"
     }
-  ]
+  ],
+  "index": {
+    "app/main.py": {
+      "status": "indexed",
+      "tags": [
+        "batch1_cleanup_20250429"
+      ]
+    },
+    "routes/project_routes.py": {
+      "status": "indexed",
+      "tags": [
+        "batch1_cleanup_20250429"
+      ]
+    },
+    "app/routes/hal_routes.py": {
+      "status": "indexed",
+      "tags": [
+        "batch1_cleanup_20250429"
+      ]
+    },
+    "app/routes/critic_routes.py": {
+      "status": "indexed",
+      "tags": [
+        "batch1_cleanup_20250429"
+      ]
+    },
+    "app/routes/sage_routes.py": {
+      "status": "indexed",
+      "tags": [
+        "batch1_cleanup_20250429"
+      ]
+    },
+    "app/routes/forge_routes.py": {
+      "status": "indexed",
+      "tags": [
+        "batch1_cleanup_20250429"
+      ]
+    }
+  }
 }
