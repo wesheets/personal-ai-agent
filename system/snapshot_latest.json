@@ -1,11 +1,11 @@
 {
-  "timestamp": "20250429_1402",
-  "memory_tag": "healed_batch4_20250429",
+  "timestamp": "20250429_1547",
+  "memory_tag": "healed_batch5_20250429",
   "git_status": {
     "branch": "main",
-    "commit_hash": "658338a898a0f5cb01316af41b64a66207d85499",
-    "commit_message": "Merge pull request #348 from wesheets/batch3-endpoint-fixes\n\nAdd Batch 3 endpoint fixes and core support agents (Critic, Sage, Nova)",
-    "timestamp": "2025-04-29T14:02:14.469563"
+    "commit_hash": "657f0bc48a5d9078d8dd08b8fb6b7140abe77465",
+    "commit_message": "Merge pull request #349 from wesheets/batch4-foundational-healing\n\nfeat: Batch 4 Foundational Healing - Agent Interfaces & Registry",
+    "timestamp": "2025-04-29T15:47:08.353344"
   },
   "resurrection_status": "partial",
   "endpoint_stats": {
@@ -1041,6 +1041,18 @@
       "hash": "8508d7008c8587906acdda583fc6037d90325a1613eaa0e9d4198fe519382def",
       "size_bytes": 1004
     },
+    "critic_schemas": {
+      "name": "critic_schemas",
+      "file": "app/schemas/agents/critic/critic_schemas.py",
+      "hash": "b71c7d1ac4bdb7a15560d167d5a8d363869714ef4e45e6112a672678da3261fb",
+      "size_bytes": 789
+    },
+    "sage_schemas": {
+      "name": "sage_schemas",
+      "file": "app/schemas/agents/sage/sage_schemas.py",
+      "hash": "e1a3cadd0ecce5e5243d834945a4e519453f047936f4c11d8e214f48d1ca7a94",
+      "size_bytes": 775
+    },
     "builder_schema": {
       "name": "builder_schema",
       "file": "app/schemas/builder/builder_schema.py",
@@ -1244,18 +1256,6 @@
       "file": "app/schemas/utility/init_schema.py",
       "hash": "5d665dc6377222742571097be3cbfb05796beef1d83d3cd7b054af84be35cf59",
       "size_bytes": 1254
-    },
-    "critic_schemas": {
-      "name": "critic_schemas",
-      "file": "app/schemas/agents/critic/critic_schemas.py",
-      "hash": "b71c7d1ac4bdb7a15560d167d5a8d363869714ef4e45e6112a672678da3261fb",
-      "size_bytes": 789
-    },
-    "sage_schemas": {
-      "name": "sage_schemas",
-      "file": "app/schemas/agents/sage/sage_schemas.py",
-      "hash": "e1a3cadd0ecce5e5243d834945a4e519453f047936f4c11d8e214f48d1ca7a94",
-      "size_bytes": 775
     }
   },
   "modules": {
@@ -1360,6 +1360,12 @@
       "file": "app/core/input_router.py",
       "hash": "127fdd079106697e7f2ee8cc07c066eb3acbb78a5a6a4765d0656875ea9fdf13",
       "size_bytes": 19318
+    },
+    "loop_controller": {
+      "name": "loop_controller",
+      "file": "app/core/loop_controller.py",
+      "hash": "395632918ba540b2e01dc482c4c771a54bea68ae298038955a7fb40f132963ca",
+      "size_bytes": 14371
     },
     "main_update": {
       "name": "main_update",
@@ -1499,11 +1505,17 @@
       "hash": "3438a2a3dd51d752c70ccf067f1088831eaab1c1d84d0c3e6bf7eddbb0d722dd",
       "size_bytes": 13622
     },
-    "loop_controller": {
-      "name": "loop_controller",
-      "file": "app/core/loop_controller.py",
-      "hash": "c2d4ae8bf3178c4e239a99311cb634922de085da7b9339477961c027fd94d64d",
-      "size_bytes": 10408
+    "registration_utils": {
+      "name": "registration_utils",
+      "file": "app/core/registration_utils.py",
+      "hash": "7e1fe5962b022a1c001252c7437b173627a6e5c408e1f9a0365e4a3d792b9dd3",
+      "size_bytes": 1601
+    },
+    "base_agent": {
+      "name": "base_agent",
+      "file": "app/core/base_agent.py",
+      "hash": "b36bf3e47d9d4c62f5d35ebb1da7a63e56b06689d20a8a4f79bf30987e58cc1f",
+      "size_bytes": 9225
     },
     "cors": {
       "name": "cors",
@@ -2550,11 +2562,11 @@
       "size_bytes": 6184
     }
   },
-  "hash": "74d893a1cdce0d52f95ad09e6a5ce64df31942ebe41ee8b588947f2124655f1b",
+  "hash": "643713aae94f4bbc75886c1b342af13baddac35e4378c6ddc12793ea39e35db7",
   "component_hashes": {
     "routes_hash": "13a66c17102d15bba00b20de415d35e19739d55081837799d97e991509ab1e13",
     "agents_hash": "65386a000cff620210dc9b1309f2db2010fec3c6c74c4fde895057e82b1f957c",
     "schemas_hash": "a91bd56d9691dec164a09e29fcbed9cc013d998f3cbdb6750c1877756ce395e6",
-    "modules_hash": "45ff7d06ae2bad1d7f625255f58978f92a52647e29bcabbe80771bd5d951b70a"
+    "modules_hash": "c742eb632a7bf6cd7a7b7968bb521b30cdf37912f3011823ad2d211514f746ec"
   }
 }

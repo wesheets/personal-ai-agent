@@ -1,7 +1,7 @@
 import logging
 from typing import List, Literal, Optional
 
-from app.core.agent_registry import register, AgentCapability
+from app.core.registration_utils import register, AgentCapability
 from app.core.base_agent import BaseAgent
 from app.schemas.agents.hal.hal_schemas import HALInstruction, HALResult
 from app.schemas.core.agent_result import ResultStatus
