@@ -8,18 +8,104 @@ including schema definition, validation, and basic memory logging.
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Type, Optional, Any # Added Any
+from typing import Type, Optional, Any
 from pydantic import BaseModel, ValidationError
+import json
+import os
 
 # Assuming AgentResult is correctly defined elsewhere
 from app.schemas.core.agent_result import AgentResult, ResultStatus
 
 logger = logging.getLogger(__name__)
 
+# --- Configuration Paths ---
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # Project root
+TOOL_PERMISSIONS_PATH = os.path.join(BASE_DIR, "config", "tool_permissions.json")
+PICE_PATH = os.path.join(BASE_DIR, "memory", "platform_integration_component_encyclopedia.json")
+# --------------------------
+
 class BaseAgent(ABC):
     """Abstract base class for all agents."""
     input_schema: Optional[Type[BaseModel]] = None
     output_schema: Optional[Type[AgentResult]] = None # Ensure this is AgentResult or a subclass
+    _tool_permissions: Optional[dict] = None # Class variable to cache permissions
+    _pice_data: Optional[dict] = None # Class variable to cache PICE data
+
+    def __init__(self):
+        # Load permissions and PICE data on initialization
+        self._load_tool_permissions()
+        self._load_pice_data()
+
+    @classmethod
+    def _load_tool_permissions(cls):
+        """Loads tool permissions from the config file."""
+        if cls._tool_permissions is not None:
+            return # Already loaded
+        
+        try:
+            if os.path.exists(TOOL_PERMISSIONS_PATH):
+                with open(TOOL_PERMISSIONS_PATH, "r") as f:
+                    cls._tool_permissions = json.load(f)
+                logger.info(f"Successfully loaded tool permissions from {TOOL_PERMISSIONS_PATH}")
+            else:
+                logger.warning(f"Tool permissions file not found at {TOOL_PERMISSIONS_PATH}. Using default deny policy.")
+                cls._tool_permissions = {"agent_permissions": {}, "default_policy": "deny"}
+        except Exception as e:
+            logger.error(f"Failed to load or parse tool permissions file {TOOL_PERMISSIONS_PATH}: {e}", exc_info=True)
+            cls._tool_permissions = {"agent_permissions": {}, "default_policy": "deny"} # Default to deny on error
+
+    @classmethod
+    def _load_pice_data(cls):
+        """Loads PICE data from the memory file."""
+        if cls._pice_data is not None:
+            return # Already loaded
+        
+        try:
+            if os.path.exists(PICE_PATH):
+                with open(PICE_PATH, "r") as f:
+                    cls._pice_data = json.load(f)
+                logger.info(f"Successfully loaded PICE data from {PICE_PATH}")
+            else:
+                logger.warning(f"PICE file not found at {PICE_PATH}. Tool existence validation will be skipped.")
+                cls._pice_data = {"tools": {}} # Empty PICE if file not found
+        except Exception as e:
+            logger.error(f"Failed to load or parse PICE file {PICE_PATH}: {e}", exc_info=True)
+            cls._pice_data = {"tools": {}} # Empty PICE on error
+
+    def _check_tool_permission(self, tool_name: str) -> bool:
+        """Checks if the tool exists in PICE and if the current agent has permission to use it."""
+        agent_name = self.__class__.__name__
+
+        # 1. Check if tool exists in PICE
+        if self._pice_data is None:
+            logger.error("PICE data not loaded. Denying tool use by default.")
+            return False
+        
+        if tool_name not in self._pice_data.get("tools", {}):
+            logger.warning(f"TOOL_NOT_FOUND_IN_PICE: Agent ", agent_name, " attempted to use unregistered tool ", tool_name, ". Denying.")
+            return False
+        # else: logger.debug(f"Tool ", tool_name, " found in PICE.") # Optional: Log success
+
+        # 2. Check permissions from tool_permissions.json
+        if self._tool_permissions is None:
+            logger.error("Tool permissions not loaded. Denying tool use by default.")
+            return False
+
+        agent_perms = self._tool_permissions.get("agent_permissions", {}).get(agent_name)
+        default_policy = self._tool_permissions.get("default_policy", "deny")
+
+        if agent_perms is None: # Agent not listed in permissions
+            allowed = default_policy == "allow"
+            logger.warning(f"Agent '{agent_name}' not found in tool_permissions.json. Applying default policy ('{default_policy}'): {'Allow' if allowed else 'Deny'} tool '{tool_name}'.")
+            return allowed
+        
+        # Agent is listed, check if tool is in their allowed list
+        allowed = tool_name in agent_perms
+        if not allowed:
+             logger.warning(f"PERMISSION_DENIED: Agent ", agent_name, " attempted to use disallowed tool ", tool_name, ".")
+        # else: logger.debug(f"Permission granted for agent {agent_name} to use tool {tool_name}.") # Optional: Log success
+        
+        return allowed
 
     @abstractmethod
     async def run(self, payload: BaseModel) -> AgentResult:
@@ -34,8 +120,8 @@ class BaseAgent(ABC):
         """
         agent_name = self.__class__.__name__
         # Attempt to get task_id and project_id from payload, provide defaults if not found
-        task_id = getattr(payload, 'task_id', 'unknown_task')
-        project_id = getattr(payload, 'project_id', None)
+        task_id = getattr(payload, "task_id", "unknown_task")
+        project_id = getattr(payload, "project_id", None)
 
         # --- Input Validation (Basic Check) ---
         if self.input_schema and not isinstance(payload, self.input_schema):
@@ -64,7 +150,7 @@ class BaseAgent(ABC):
                     return AgentResult(status=ResultStatus.ERROR, errors=[error_msg], task_id=task_id)
 
             # Ensure task_id is set on the result
-            if not getattr(result, 'task_id', None) and task_id != 'unknown_task':
+            if not getattr(result, "task_id", None) and task_id != "unknown_task":
                 result.task_id = task_id
 
         except Exception as e:
@@ -110,7 +196,7 @@ class BaseAgent(ABC):
                 # Simple check: are there any errors? Is there content in common fields?
                 result_dict = validated_result.model_dump(exclude_defaults=True, exclude_none=True) # Exclude defaults and None
                 for field, value in result_dict.items():
-                    if field not in ['status', 'task_id', 'timestamp', 'errors']: # Ignore basic fields and errors
+                    if field not in ["status", "task_id", "timestamp", "errors"]: # Ignore basic fields and errors
                          meaningful_output = True
                          break
                 # Also consider errors as a mutation (even if status is SUCCESS, errors might indicate partial work)
@@ -180,79 +266,9 @@ class BaseAgent(ABC):
             result_str = "[Result could not be serialized]"
 
         log_message = (
-            f"TOOL_EXEC_LOG: Agent=\'{agent_name}\' Tool=\'{tool_name}\' Status=\'{tool_status}\'. "
+            f"TOOL_EXEC_LOG: Agent=\"{agent_name}\" Tool=\"{tool_name}\" Status=\"{tool_status}\". "
             f"Args: {args_str}... Result: {result_str}..."
         )
         logger.info(log_message)
         # In future, this could write to a dedicated trace log or memory surface.
 
-
-
-
-import json
-import os
-
-# Assuming AgentResult is correctly defined elsewhere
-from app.schemas.core.agent_result import AgentResult, ResultStatus
-
-logger = logging.getLogger(__name__)
-
-# --- Tool Permissions Config Path ---
-TOOL_PERMISSIONS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "config", "tool_permissions.json")
-# ----------------------------------
-
-class BaseAgent(ABC):
-    """Abstract base class for all agents."""
-    input_schema: Optional[Type[BaseModel]] = None
-    output_schema: Optional[Type[AgentResult]] = None # Ensure this is AgentResult or a subclass
-    _tool_permissions: Optional[dict] = None # Class variable to cache permissions
-
-    def __init__(self):
-        # Load permissions on initialization (stub)
-        self._load_tool_permissions()
-
-    @classmethod
-    def _load_tool_permissions(cls):
-        """Loads tool permissions from the config file (stub)."""
-        if cls._tool_permissions is not None:
-            return # Already loaded
-        
-        try:
-            if os.path.exists(TOOL_PERMISSIONS_PATH):
-                with open(TOOL_PERMISSIONS_PATH, 'r') as f:
-                    cls._tool_permissions = json.load(f)
-                logger.info(f"Successfully loaded tool permissions from {TOOL_PERMISSIONS_PATH}")
-            else:
-                logger.warning(f"Tool permissions file not found at {TOOL_PERMISSIONS_PATH}. Using default deny policy.")
-                cls._tool_permissions = {"agent_permissions": {}, "default_policy": "deny"}
-        except Exception as e:
-            logger.error(f"Failed to load or parse tool permissions file {TOOL_PERMISSIONS_PATH}: {e}", exc_info=True)
-            cls._tool_permissions = {"agent_permissions": {}, "default_policy": "deny"} # Default to deny on error
-
-    def _check_tool_permission(self, tool_name: str) -> bool:
-        """Checks if the current agent has permission to use the specified tool (stub)."""
-        agent_name = self.__class__.__name__
-        if self._tool_permissions is None:
-            logger.error("Tool permissions not loaded. Denying tool use by default.")
-            return False
-
-        agent_perms = self._tool_permissions.get("agent_permissions", {}).get(agent_name)
-        default_policy = self._tool_permissions.get("default_policy", "deny")
-
-        if agent_perms is None: # Agent not listed
-            allowed = default_policy == "allow"
-            # Corrected first warning to single line
-            logger.warning(f"Agent '{agent_name}' not found in tool_permissions.json. Applying default policy ('{default_policy}'): {'Allow' if allowed else 'Deny'} tool '{tool_name}'.")
-            return allowed
-        
-        allowed = tool_name in agent_perms
-        if not allowed:
-             # Corrected second warning to single line
-             logger.warning(f"PERMISSION_DENIED: Agent '{agent_name}' attempted to use disallowed tool '{tool_name}'.")
-        # else: logger.debug(f"Permission granted for agent {agent_name} to use tool {tool_name}.") # Optional: Log success
-        return allowed
-
-    @abstractmethod
-    async def run(self, payload: BaseModel) -> AgentResult:
-        """Main execution method for the agent."""
-        pass
