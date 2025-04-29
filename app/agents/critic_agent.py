@@ -1,11 +1,13 @@
+# app/agents/critic_agent.py
 import logging
+import uuid # Import uuid for unique IDs
 from typing import List, Literal, Optional, Dict
 
 from app.core.registration_utils import register
 from app.core.agent_types import AgentCapability
 from app.core.base_agent import BaseAgent
 from app.schemas.agents.critic.critic_schemas import CriticReviewRequest, CriticReviewResult
-from app.schemas.core.agent_result import ResultStatus
+from app.schemas.core.agent_result import ResultStatus, AgentResult
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +46,11 @@ class CriticAgent(BaseAgent):
         issues_detected = []
         reroute_recommended = None
         status = ResultStatus.SUCCESS
-        reflection_id = f"reflect_{payload.task_id}" # Example reflection ID
+        
+        # Generate a more structured reflection ID including loop and step info
+        # Assuming step_index might be available in payload or context in future
+        step_index = getattr(payload, "step_index", "unknown_step") 
+        reflection_id = f"reflect_critic_{payload.loop_id}_{step_index}_{payload.task_id}_{uuid.uuid4().hex[:8]}"
 
         try:
             # --- Placeholder Logic --- 
@@ -89,15 +95,20 @@ class CriticAgent(BaseAgent):
             review_notes=review_notes,
             issues_detected=issues_detected,
             reroute_recommended=reroute_recommended,
-            reflection_id=reflection_id
+            reflection_id=reflection_id # Pass the structured ID
         )
 
-        # Log reflection memory
+        # Log reflection memory with enhanced context
+        log_value = result.model_dump(exclude_none=True)
+        log_value["loop_id"] = payload.loop_id # Explicitly add loop_id to logged value
+        log_value["step_index"] = step_index # Explicitly add step_index
+        log_value["source_agent"] = payload.source_agent # Add source agent for context
+
         await self.log_memory(
             agent_id="critic",
             memory_type="reflection_critic",
             tag=f"review_{payload.source_agent}",
-            value=result.model_dump(exclude_none=True),
+            value=log_value, # Log the enhanced value dictionary
             project_id=payload.project_id,
             reflection_id=reflection_id
         )

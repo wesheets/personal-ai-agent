@@ -1,11 +1,11 @@
 {
-  "timestamp": "20250429_1641",
-  "memory_tag": "healed_batch6_20250429",
+  "timestamp": "20250429_1731",
+  "memory_tag": "healed_batch7_20250429",
   "git_status": {
     "branch": "main",
-    "commit_hash": "b55066dd787592eb97b5d2c86df9f95bc7d99dec",
-    "commit_message": "Merge pull request #350 from wesheets/batch5-core-hardening\n\nfeat: Batch 5 Core Hardening - Validation, Memory, Reflection",
-    "timestamp": "2025-04-29T16:41:37.020747"
+    "commit_hash": "998c3559845b3a88c558f965b798a2504eb26448",
+    "commit_message": "Merge pull request #351 from wesheets/batch6-core-stabilization\n\nfeat: Batch 6 Core Stabilization - Imports, Validation, Scaffolding",
+    "timestamp": "2025-04-29T17:31:07.736905"
   },
   "resurrection_status": "partial",
   "endpoint_stats": {
@@ -1077,6 +1077,12 @@
       "hash": "96e9fbd6a0a1d757124cc1027fc77de3d42a0af98cd198976431a8f8aa9ec470",
       "size_bytes": 627
     },
+    "agent_result": {
+      "name": "agent_result",
+      "file": "app/schemas/core/agent_result.py",
+      "hash": "02b2e2fc70d993ea96902042b1ec2f89d63f675cb16032442b97bb631a4280b7",
+      "size_bytes": 1500
+    },
     "input_schema": {
       "name": "input_schema",
       "file": "app/schemas/sitegen/input_schema.json",
@@ -1295,11 +1301,17 @@
       "hash": "4dbdf541d0e9f06b1f079c72089c319a6c2ad4251881c7741c9968d29dead10e",
       "size_bytes": 12761
     },
+    "agent_types": {
+      "name": "agent_types",
+      "file": "app/core/agent_types.py",
+      "hash": "64f8f55d438d34c024014afc445efa7a4eed60fe2587bd8198500581f0a9a52a",
+      "size_bytes": 973
+    },
     "base_agent": {
       "name": "base_agent",
       "file": "app/core/base_agent.py",
-      "hash": "fb02fab5a73f0cb3d0be76f2f611d6782f929fa451214c5cf8b378ff50472fdb",
-      "size_bytes": 13516
+      "hash": "391f81db4c0920314871cf962e4c606c2992d43b41b6db67df890cd61f7e4635",
+      "size_bytes": 14618
     },
     "behavior_manager": {
       "name": "behavior_manager",
@@ -1516,12 +1528,6 @@
       "file": "app/core/vector_memory.py",
       "hash": "3438a2a3dd51d752c70ccf067f1088831eaab1c1d84d0c3e6bf7eddbb0d722dd",
       "size_bytes": 13622
-    },
-    "agent_types": {
-      "name": "agent_types",
-      "file": "app/core/agent_types.py",
-      "hash": "64f8f55d438d34c024014afc445efa7a4eed60fe2587bd8198500581f0a9a52a",
-      "size_bytes": 973
     },
     "cors": {
       "name": "cors",
@@ -2568,11 +2574,11 @@
       "size_bytes": 6184
     }
   },
-  "hash": "0689120bcae7013f9483ac22692f5feab610f552eb9c1f1d1ca2c17c8744ce73",
+  "hash": "88b4329be8c12096d1bdbc9c9b44d7486b9e2bf668d9419a448bd220077eb617",
   "component_hashes": {
     "routes_hash": "13a66c17102d15bba00b20de415d35e19739d55081837799d97e991509ab1e13",
     "agents_hash": "65386a000cff620210dc9b1309f2db2010fec3c6c74c4fde895057e82b1f957c",
-    "schemas_hash": "a91bd56d9691dec164a09e29fcbed9cc013d998f3cbdb6750c1877756ce395e6",
-    "modules_hash": "32587f5f00a5286ded894bc2247d93cbd480658d1bae9bdfae67938515afda16"
+    "schemas_hash": "23a978affcdab8bf76f859025cc177d71d87975c0587c2f00ba6ae0e3515869d",
+    "modules_hash": "f1118dec099973a004de95adebe1b1d8fa059a16fce9658dfd7efe0bc3b80a8c"
   }
 }

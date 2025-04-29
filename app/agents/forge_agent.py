@@ -5,7 +5,7 @@ from app.core.registration_utils import register
 from app.core.agent_types import AgentCapability
 from app.core.base_agent import BaseAgent
 from app.schemas.agents.forge.forge_schemas import ForgeBuildSpec, ForgeBuildResult
-from app.schemas.core.agent_result import ResultStatus
+from app.schemas.core.agent_result import ResultStatus, AgentResult
 
 logger = logging.getLogger(__name__)
 
