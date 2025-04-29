@@ -55,6 +55,22 @@ class LoopController:
 
     async def _run_step(self, agent_key: str, payload: BaseTaskPayload) -> BaseAgentResult:
         """Runs a single step in the loop by invoking an agent."""
+
+        # --- Loop Trace Validation ---
+        if hasattr(payload, "loop_id") and payload.loop_id and self.current_loop_id and payload.loop_id != self.current_loop_id:
+            error_msg = f"Loop Trace Mismatch! Payload loop_id ({payload.loop_id}) does not match controller's current_loop_id ({self.current_loop_id}). Halting loop."
+            logger.critical(error_msg)
+            self.current_state = LoopState.ERROR
+            error_result = BaseAgentResult(
+                task_id=payload.task_id,
+                status=ResultStatus.ERROR,
+                errors=[error_msg]
+            )
+            # Add to history before returning
+            self.history.append({"agent": agent_key, "payload": payload.model_dump(), "result": error_result.model_dump()})
+            return error_result
+        # --- End Loop Trace Validation ---
+
         self.history.append({"agent": agent_key, "payload": payload.model_dump()})
         logger.info(f"Loop {self.current_loop_id}: Running agent {agent_key} with task {payload.task_id}")
 
@@ -109,12 +125,32 @@ class LoopController:
             next_agent_key = getattr(result, "delegated_to", None)
             next_payload_dict = getattr(result, "next_task_payload", None)
 
-            if not next_agent_key or not next_payload_dict:
-                logger.error(f"Loop {self.current_loop_id}: Agent {current_agent_key} delegated but missing next agent key or payload.")
+            # --- Delegation Validation ---
+            if not next_agent_key or not isinstance(next_agent_key, str):
+                error_msg = f"Delegation failed: Invalid or missing 'delegated_to' key: {next_agent_key}"
+                logger.error(f"Loop {self.current_loop_id}: {error_msg}")
                 self.current_state = LoopState.ERROR
                 result.status = ResultStatus.ERROR
-                result.errors = (result.errors or []) + ["Delegation failed: Missing next agent key or payload."]
+                result.errors = (result.errors or []) + [error_msg]
                 return result
+
+            if not next_payload_dict or not isinstance(next_payload_dict, dict):
+                error_msg = f"Delegation failed: Invalid or missing 'next_task_payload' dictionary for agent {next_agent_key}"
+                logger.error(f"Loop {self.current_loop_id}: {error_msg}")
+                self.current_state = LoopState.ERROR
+                result.status = ResultStatus.ERROR
+                result.errors = (result.errors or []) + [error_msg]
+                return result
+
+            # Check if target agent exists in registry
+            if not agent_registry.get_agent_class(next_agent_key):
+                error_msg = f"Delegation failed: Target agent '{next_agent_key}' not found in registry."
+                logger.error(f"Loop {self.current_loop_id}: {error_msg}")
+                self.current_state = LoopState.ERROR
+                result.status = ResultStatus.ERROR
+                result.errors = (result.errors or []) + [error_msg]
+                return result
+            # --- End Delegation Validation ---
 
             # Update state based on agent type (example)
             self._update_loop_state(next_agent_key)

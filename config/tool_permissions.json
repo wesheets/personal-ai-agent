@@ -1,0 +1,30 @@
+{
+  "agent_permissions": {
+    "ForgeAgent": [
+      "file_write",
+      "shell_exec",
+      "info_search_web"
+    ],
+    "HalAgent": [
+      "browser_navigate",
+      "browser_click",
+      "browser_input",
+      "browser_scroll_down",
+      "info_search_web"
+    ],
+    "NovaAgent": [
+      "deploy_apply_deployment",
+      "deploy_expose_port",
+      "shell_exec"
+    ],
+    "CriticAgent": [
+      "file_read" 
+    ],
+    "SageAgent": [
+      "file_read"
+    ],
+    "OrchestratorAgent": [] 
+  },
+  "default_policy": "deny" 
+}
+

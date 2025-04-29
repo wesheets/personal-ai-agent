@@ -4,7 +4,8 @@ import logging
 from typing import List, Type
 
 # Import the registry dictionary from the main registry file
-from app.core.agent_registry import AGENT_REGISTRY, AgentCapability
+from app.core.agent_registry import AGENT_REGISTRY
+from app.core.agent_types import AgentCapability
 from app.core.base_agent import BaseAgent
 
 logger = logging.getLogger(__name__)

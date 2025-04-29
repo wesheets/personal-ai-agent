@@ -1,7 +1,8 @@
 import logging
 from typing import List, Literal, Optional
 
-from app.core.registration_utils import register, AgentCapability
+from app.core.registration_utils import register
+from app.core.agent_types import AgentCapability
 from app.core.base_agent import BaseAgent
 from app.schemas.agents.forge.forge_schemas import ForgeBuildSpec, ForgeBuildResult
 from app.schemas.core.agent_result import ResultStatus
