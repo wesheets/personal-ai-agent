@@ -1,7 +1,8 @@
 import logging
 from typing import List, Literal, Optional, Dict
 
-from app.core.registration_utils import register, AgentCapability
+from app.core.registration_utils import register
+from app.core.agent_types import AgentCapability
 from app.core.base_agent import BaseAgent
 from app.schemas.agents.critic.critic_schemas import CriticReviewRequest, CriticReviewResult
 from app.schemas.core.agent_result import ResultStatus
@@ -91,8 +92,15 @@ class CriticAgent(BaseAgent):
             reflection_id=reflection_id
         )
 
-        # Placeholder for memory logging
-        # await self.log_memory(result, reflection_id=reflection_id)
+        # Log reflection memory
+        await self.log_memory(
+            agent_id="critic",
+            memory_type="reflection_critic",
+            tag=f"review_{payload.source_agent}",
+            value=result.model_dump(exclude_none=True),
+            project_id=payload.project_id,
+            reflection_id=reflection_id
+        )
 
         logger.info(f"Critic agent finished task: {payload.task_id} with status {status}, Passed: {passed}")
         return result

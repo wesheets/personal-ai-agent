@@ -22,9 +22,8 @@ from app.schemas.loop.loop_reset_schema import LoopResetRequest, LoopResetRespon
 from app.schemas.loop.loop_trace_schema import LoopTraceRequest, LoopTraceResponse
 from app.schemas.loop.loop_create_schema import LoopCreateRequest, LoopCreateResponse
 
-# Import memory operations
-from app.modules.memory_writer import write_memory
-from app.api.modules.memory import read_memory
+# from app.modules.memory_writer import write_memory # Removed - Use memory_engine
+# from app.api.modules.memory import read_memory # Removed - Use memory_engine
 
 # Import agent modules
 from app.agents.hal_agent import HALAgent # Corrected import
@@ -378,21 +377,27 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
         raise HTTPException(status_code=400, detail="target_file is required when response_type is 'code'")
     
     try:
+        # --- Refactored: Use memory_engine ---
+        from app.api.modules.memory_engine import get_memory_engine
+        memory_engine = get_memory_engine()
+        # --- End Refactor ---
+
         # Retrieve prior memory using memory.read
         try:
             # Modified to use agent_id instead of project_id and loop_id
             # Using the loop_id as the agent_id for compatibility
-            prior_memory = await read_memory(
-                agent_id=request.loop_id,
+            prior_memory_result = await memory_engine.read_memory(
+                agent_id=request.loop_id, # Using loop_id as agent_id for this context
                 memory_type="loop",
                 tag=request.input_key
             )
             
-            if not prior_memory:
+            if not prior_memory_result or prior_memory_result.get("status") != "success" or not prior_memory_result.get("value"):
                 raise HTTPException(
                     status_code=404, 
-                    detail=f"Memory not found for key: {request.input_key} in loop: {request.loop_id}"
+                    detail=f"Memory not found or failed to read for key: {request.input_key} in loop: {request.loop_id}"
                 )
+            prior_memory = prior_memory_result.get("value") # Extract the actual value
                 
         except Exception as e:
             logger.error(f"Error reading memory: {str(e)}")
@@ -501,8 +506,8 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
             "timestamp": timestamp
         }
         
-        # Write to memory
-        memory_result = write_memory(memory_data)
+        # Write to memory using memory_engine
+        memory_result = await memory_engine.write_memory(memory_data)
         
         # Return success response
         return {

@@ -142,7 +142,7 @@ class BaseAgent(ABC):
 
         return validated_result # Return the final result, potentially modified by validation
 
-    async def log_memory(self, agent_id: str, memory_type: str, tag: str, value: Any, project_id: Optional[str] = None):
+    async def log_memory(self, agent_id: str, memory_type: str, tag: str, value: Any, project_id: Optional[str] = None, reflection_id: Optional[str] = None):
         """
         Logs a memory entry. (Stub implementation for Batch 5)
         This acts as a placeholder for actual memory writing and serves as an agent heartbeat.
@@ -155,11 +155,104 @@ class BaseAgent(ABC):
             log_value_str = "[Value could not be serialized for log]"
 
         log_message = (
-            f"HEARTBEAT/MEMORY_LOG_STUB: Agent='{agent_id}' Task='{getattr(value, 'task_id', 'unknown')}' "
-            f"Project='{project_id}' Type='{memory_type}' Tag='{tag}'. "
-            f"Status='{getattr(value, 'status', 'unknown')}'. Value Snippet: {log_value_str}..."
+            f"HEARTBEAT/MEMORY_LOG_STUB: Agent=\"{agent_id}\" Task=\"{getattr(value, 'task_id', 'unknown')}\" "
+            f"Project=\"{project_id}\" Type=\"{memory_type}\" Tag=\"{tag}\" "
+            f"ReflectionID=\"{reflection_id}\". " # Added ReflectionID
+            f"Status=\"{getattr(value, 'status', 'unknown')}\". Value Snippet: {log_value_str}..."
         )
         logger.info(log_message)
         # Simulate success for now
         return {"status": "success_stub", "message": "Memory log stub executed."}
 
+
+    async def _log_tool_use(self, tool_name: str, tool_args: dict, tool_status: str, tool_result: Any):
+        """
+        Logs the usage of a tool by the agent. (Scaffolding for Batch 6)
+        Specific agents should call this method after using a tool.
+        """
+        agent_name = self.__class__.__name__
+        try:
+            # Basic serialization for logging
+            args_str = str(tool_args)[:150] # Limit arg length
+            result_str = str(tool_result)[:150] # Limit result length
+        except Exception:
+            args_str = "[Args could not be serialized]"
+            result_str = "[Result could not be serialized]"
+
+        log_message = (
+            f"TOOL_EXEC_LOG: Agent=\'{agent_name}\' Tool=\'{tool_name}\' Status=\'{tool_status}\'. "
+            f"Args: {args_str}... Result: {result_str}..."
+        )
+        logger.info(log_message)
+        # In future, this could write to a dedicated trace log or memory surface.
+
+
+
+
+import json
+import os
+
+# Assuming AgentResult is correctly defined elsewhere
+from app.schemas.core.agent_result import AgentResult, ResultStatus
+
+logger = logging.getLogger(__name__)
+
+# --- Tool Permissions Config Path ---
+TOOL_PERMISSIONS_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "config", "tool_permissions.json")
+# ----------------------------------
+
+class BaseAgent(ABC):
+    """Abstract base class for all agents."""
+    input_schema: Optional[Type[BaseModel]] = None
+    output_schema: Optional[Type[AgentResult]] = None # Ensure this is AgentResult or a subclass
+    _tool_permissions: Optional[dict] = None # Class variable to cache permissions
+
+    def __init__(self):
+        # Load permissions on initialization (stub)
+        self._load_tool_permissions()
+
+    @classmethod
+    def _load_tool_permissions(cls):
+        """Loads tool permissions from the config file (stub)."""
+        if cls._tool_permissions is not None:
+            return # Already loaded
+        
+        try:
+            if os.path.exists(TOOL_PERMISSIONS_PATH):
+                with open(TOOL_PERMISSIONS_PATH, 'r') as f:
+                    cls._tool_permissions = json.load(f)
+                logger.info(f"Successfully loaded tool permissions from {TOOL_PERMISSIONS_PATH}")
+            else:
+                logger.warning(f"Tool permissions file not found at {TOOL_PERMISSIONS_PATH}. Using default deny policy.")
+                cls._tool_permissions = {"agent_permissions": {}, "default_policy": "deny"}
+        except Exception as e:
+            logger.error(f"Failed to load or parse tool permissions file {TOOL_PERMISSIONS_PATH}: {e}", exc_info=True)
+            cls._tool_permissions = {"agent_permissions": {}, "default_policy": "deny"} # Default to deny on error
+
+    def _check_tool_permission(self, tool_name: str) -> bool:
+        """Checks if the current agent has permission to use the specified tool (stub)."""
+        agent_name = self.__class__.__name__
+        if self._tool_permissions is None:
+            logger.error("Tool permissions not loaded. Denying tool use by default.")
+            return False
+
+        agent_perms = self._tool_permissions.get("agent_permissions", {}).get(agent_name)
+        default_policy = self._tool_permissions.get("default_policy", "deny")
+
+        if agent_perms is None: # Agent not listed
+            allowed = default_policy == "allow"
+            # Corrected first warning to single line
+            logger.warning(f"Agent '{agent_name}' not found in tool_permissions.json. Applying default policy ('{default_policy}'): {'Allow' if allowed else 'Deny'} tool '{tool_name}'.")
+            return allowed
+        
+        allowed = tool_name in agent_perms
+        if not allowed:
+             # Corrected second warning to single line
+             logger.warning(f"PERMISSION_DENIED: Agent '{agent_name}' attempted to use disallowed tool '{tool_name}'.")
+        # else: logger.debug(f"Permission granted for agent {agent_name} to use tool {tool_name}.") # Optional: Log success
+        return allowed
+
+    @abstractmethod
+    async def run(self, payload: BaseModel) -> AgentResult:
+        """Main execution method for the agent."""
+        pass

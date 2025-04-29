@@ -1,7 +1,8 @@
 import logging
 from typing import List, Literal, Optional
 
-from app.core.registration_utils import register, AgentCapability
+from app.core.registration_utils import register
+from app.core.agent_types import AgentCapability
 from app.core.base_agent import BaseAgent
 from app.schemas.agents.sage.sage_schemas import SageReflectionRequest, SageReflectionResult
 from app.schemas.core.agent_result import ResultStatus
@@ -84,8 +85,15 @@ class SageAgent(BaseAgent):
             reflection_id=reflection_id
         )
 
-        # Placeholder for memory logging
-        # await self.log_memory(result, reflection_id=reflection_id)
+        # Log reflection memory
+        await self.log_memory(
+            agent_id="sage",
+            memory_type="reflection_sage",
+            tag=f"reflection_{payload.operator_persona}",
+            value=result.model_dump(exclude_none=True),
+            project_id=payload.project_id,
+            reflection_id=reflection_id
+        )
 
         logger.info(f"Sage agent finished task: {payload.task_id} with status {status}, Passed: {passed}")
         return result
