@@ -1,300 +1,159 @@
+# agent_runner.py
 """
 AgentRunner Module
 
-This module provides isolated agent execution functionality, allowing agents to run
-independently from the central agent registry, UI, or delegate-stream system.
-
-MODIFIED: Added full runtime logging and error protection to prevent 502 errors
-MODIFIED: Added memory thread logging for agent steps
-MODIFIED: Added enhanced logging for debugging memory thread issues
-MODIFIED: Added toolkit registry integration for specialized agent tools
-MODIFIED: Added product strategist logic for HAL in saas domain
-MODIFIED: Added structured output for ASH documentation and onboarding
-MODIFIED: Added AGENT_RUNNERS mapping for direct agent execution
-MODIFIED: Added run_hal_agent function with file_writer integration
-MODIFIED: Updated run_hal_agent with real execution logic and memory logging
-MODIFIED: Added project_state integration for tracking project status
-MODIFIED: Updated run_nova_agent with file creation and memory logging functionality
-MODIFIED: Standardized output format across all agents
-MODIFIED: Added memory logging for CRITIC and ASH agents
-MODIFIED: Added agent retry and recovery flow for blocked agents
-MODIFIED: Added retry_hooks integration with proper error handling
-MODIFIED: Fixed add_memory_thread invocation to use correct parameter format
-MODIFIED: Fixed AGENT_RUNNERS dictionary definition for /api/agent/run endpoint
-MODIFIED: Added try/except block for importing agent modules to handle missing modules
+Provides functionality to dynamically load and execute agents using the AgentRegistry.
 """
 
 import logging
-import os
-from typing import List, Dict, Any, Optional
-import time
-import traceback
-import sys
 import uuid
 import asyncio
-import json
-from fastapi.responses import JSONResponse
+import traceback
+from typing import Any
 
-# Import OpenAI client
-try:
-    from openai import OpenAI
-    OPENAI_AVAILABLE = True
-except ImportError:
-    OPENAI_AVAILABLE = False
-    print("❌ OpenAI client import failed")
-
-# Import agent modules with try/except block to handle missing modules
-try:
-    from app.agents.hal import run_hal_agent
-    from app.agents.nova import run_nova_agent
-    from app.agents.ash import run_ash_agent
-    from app.agents.critic import run_critic_agent
-    from app.agents.orchestrator import run_orchestrator_agent
-    from app.agents.sage import run_sage_agent
-
-    AGENT_RUNNERS = {
-        "hal": run_hal_agent,
-        "nova": run_nova_agent,
-        "ash": run_ash_agent,
-        "critic": run_critic_agent,
-        "orchestrator": run_orchestrator_agent,
-        "sage": run_sage_agent
-    }
-    print(f"✅ AGENT_RUNNERS initialized with: {list(AGENT_RUNNERS.keys())}")
-except Exception as e:
-    print(f"❌ Failed to load AGENT_RUNNERS: {e}")
-    AGENT_RUNNERS = {}
-
-# Import memory thread module
-from app.modules.memory_thread import add_memory_thread
-
-# Create a safe wrapper for add_memory_thread to ensure correct parameter format
-def safe_add_memory_thread(project_id=None, chain_id=None, agent=None, role=None, content=None, step_type=None, **kwargs):
-    """
-    Safe wrapper for add_memory_thread that ensures correct parameter format.
-    
-    This function accepts both positional and keyword arguments and converts them
-    to the correct single dictionary format expected by add_memory_thread.
-    
-    Args:
-        project_id: The project identifier
-        chain_id: The chain identifier
-        agent: The agent identifier
-        role: The role of the agent
-        content: The content of the memory
-        step_type: The type of step (e.g., "log", "reflection", "action")
-        **kwargs: Additional keyword arguments to include in the memory entry
-        
-    Returns:
-        Result from add_memory_thread
-    """
-    try:
-        # Check if first argument is already a dictionary (correct usage)
-        if len(kwargs) == 0 and isinstance(project_id, dict) and project_id is not None:
-            memory_entry = project_id
-            print("✅ Using provided dictionary format for add_memory_thread")
-        else:
-            # Convert positional/keyword arguments to dictionary format
-            memory_entry = {
-                "project_id": project_id or kwargs.get("project_id", "unknown"),
-                "chain_id": chain_id or kwargs.get("chain_id", "main"),
-                "agent": agent or kwargs.get("agent", "unknown"),
-                "role": role or kwargs.get("role", "system"),
-                "content": content or kwargs.get("content", ""),
-                "step_type": step_type or kwargs.get("step_type", "log")
-            }
-            
-            # Add any additional kwargs to the dictionary
-            for key, value in kwargs.items():
-                if key not in memory_entry:
-                    memory_entry[key] = value
-            
-            print(f"⚠️ Converting arguments to dictionary format for add_memory_thread: {memory_entry}")
-        
-        # Validate required fields
-        required_fields = ["project_id", "chain_id", "agent", "role", "content", "step_type"]
-        missing_fields = [field for field in required_fields if field not in memory_entry or not memory_entry[field]]
-        
-        if missing_fields:
-            print(f"❌ Missing required fields for add_memory_thread: {missing_fields}")
-            memory_entry.update({field: "unknown" for field in missing_fields if field not in memory_entry or not memory_entry[field]})
-        
-        # Call add_memory_thread with the properly formatted dictionary
-        print("✅ HAL memory thread written")
-        return add_memory_thread(memory_entry)
-    except Exception as e:
-        print(f"❌ Error in safe_add_memory_thread: {str(e)}")
-        print(traceback.format_exc())
-        # Return a dummy response to prevent further errors
-        return {"status": "error", "message": f"Error in safe_add_memory_thread: {str(e)}"}
-
-# Import toolkit registry
-try:
-    from toolkit.registry import get_toolkit, get_agent_role, format_tools_prompt, format_nova_prompt, get_agent_themes
-    TOOLKIT_AVAILABLE = True
-except ImportError:
-    TOOLKIT_AVAILABLE = False
-    print("❌ toolkit.registry import failed, creating fallback functions")
-    # Create fallback functions
-    def get_toolkit(agent_id, domain):
-        print(f"⚠️ Using fallback get_toolkit for {agent_id} in {domain} domain")
-        return []
-    
-    def get_agent_role(agent_id):
-        print(f"⚠️ Using fallback get_agent_role for {agent_id}")
-        roles = {
-            "hal": "Product Strategist",
-            "nova": "UI Designer",
-            "ash": "Documentation Specialist",
-            "critic": "Quality Assurance Specialist",
-            "sage": "System Narrator"
-        }
-        return roles.get(agent_id, "AI Assistant")
-    
-    def format_tools_prompt(tools):
-        print("⚠️ Using fallback format_tools_prompt")
-        return "You have access to specialized tools, but they are currently unavailable."
-    
-    def format_nova_prompt(tools, themes):
-        print("⚠️ Using fallback format_nova_prompt")
-        return "You are a UI designer with design themes, but they are currently unavailable."
-    
-    def get_agent_themes(agent_id):
-        print(f"⚠️ Using fallback get_agent_themes for {agent_id}")
-        return []
-
-# Import retry hooks for agent retry status checking
-try:
-    from utils.retry_hooks import get_retry_status, log_retry_action
-    RETRY_HOOKS_AVAILABLE = True
-    print("✅ retry_hooks import successful")
-except ImportError:
-    RETRY_HOOKS_AVAILABLE = False
-    print("❌ retry_hooks import failed")
-
-# Import file_writer for HAL agent
-try:
-    from toolkit.file_writer import write_file
-    FILE_WRITER_AVAILABLE = True
-except ImportError:
-    FILE_WRITER_AVAILABLE = False
-    print("❌ file_writer import failed")
-
-# Import memory_writer for logging agent actions
-try:
-    from app.modules.memory_writer import write_memory
-    MEMORY_WRITER_AVAILABLE = True
-except ImportError:
-    MEMORY_WRITER_AVAILABLE = False
-    print("❌ memory_writer import failed")
-
-# Import project_state for tracking project status
-try:
-    from app.modules.project_state import update_project_state, read_project_state
-    PROJECT_STATE_AVAILABLE = True
-except ImportError:
-    PROJECT_STATE_AVAILABLE = False
-    print("❌ project_state import failed")
-
-# Import agent_retry for retry and recovery flow
-try:
-    from app.modules.agent_retry import register_blocked_agent, check_for_unblocked_agents, mark_agent_retry_attempted
-    AGENT_RETRY_AVAILABLE = True
-except ImportError:
-    AGENT_RETRY_AVAILABLE = False
-    print("❌ agent_retry import failed")
-
-# Import memory_block_writer for logging block information
-try:
-    from app.modules.memory_block_writer import write_block_memory, write_unblock_memory
-    MEMORY_BLOCK_WRITER_AVAILABLE = True
-except ImportError:
-    MEMORY_BLOCK_WRITER_AVAILABLE = False
-    print("❌ memory_block_writer import failed")
-
-# Import passive_reflection for re-evaluating tasks
-try:
-    from app.modules.passive_reflection import re_evaluate_task, start_reflection
-    PASSIVE_REFLECTION_AVAILABLE = True
-except ImportError:
-    PASSIVE_REFLECTION_AVAILABLE = False
-    print("❌ passive_reflection import failed")
-
-try:
-    from app.modules.ash_agent import run_ash_agent as ash_agent_impl
-    ASH_AGENT_AVAILABLE = True
-except ImportError:
-    ASH_AGENT_AVAILABLE = False
-    print("❌ ash_agent import failed")
-
-try:
-    from app.modules.critic_agent import run_critic_agent as critic_agent_impl
-    CRITIC_AGENT_AVAILABLE = True
-except ImportError:
-    CRITIC_AGENT_AVAILABLE = False
-    print("❌ critic_agent import failed")
+from app.core.agent_registry import agent_registry
+from app.schemas.core.agent_result import BaseAgentResult, ResultStatus
+from app.schemas.core.task_payload import BaseTaskPayload
 
 # Configure logging
-logger = logging.getLogger("agent_runner")
+logger = logging.getLogger(__name__)
 
-# Define memory store fallback if needed
-memory_store = {}
+# --- Removed direct agent imports and AGENT_RUNNERS dictionary --- 
 
-# Helper function to safely get retry status with fallback
-def safe_get_retry_status(project_id: str, agent_id: str) -> Dict[str, Any]:
+# --- Keep necessary helper functions if needed, review later --- 
+# Example: safe_add_memory_thread might be refactored or moved to BaseAgent
+# For now, keep it if other parts of the system rely on it directly.
+
+# Import memory thread module (assuming it's still needed externally)
+try:
+    from app.modules.memory_thread import add_memory_thread
+    MEMORY_THREAD_AVAILABLE = True
+except ImportError:
+    MEMORY_THREAD_AVAILABLE = False
+    logger.warning("❌ memory_thread module import failed")
+    # Define a fallback if necessary
+    def add_memory_thread(*args, **kwargs):
+        logger.error("add_memory_thread called but module is unavailable.")
+        return {"status": "error", "message": "Memory thread module unavailable"}
+
+def safe_add_memory_thread(*args, **kwargs):
     """
-    Safely get retry status with fallback if the retry_hooks module is not available
-    or if an error occurs during the call.
-    
-    Args:
-        project_id: The project identifier
-        agent_id: The agent identifier
-        
-    Returns:
-        Dict containing retry status information with safe defaults
+    Safe wrapper for add_memory_thread that ensures correct parameter format.
+    (Keep this function if external calls to agent_runner might use it,
+     otherwise, prefer memory logging via BaseAgent methods)
     """
     try:
-        if RETRY_HOOKS_AVAILABLE:
-            return get_retry_status(project_id, agent_id)
-        else:
-            logger.warning(f"Retry hooks not available for {agent_id} in project {project_id}")
-            return {
-                "should_retry": False,
-                "unblock_condition": None,
-                "last_block_reason": None
+        if not MEMORY_THREAD_AVAILABLE:
+             raise ImportError("memory_thread module is not available")
+             
+        # Check if first argument is already a dictionary (correct usage)
+        if len(args) == 1 and isinstance(args[0], dict):
+            memory_entry = args[0]
+        elif len(args) > 0 and isinstance(args[0], str): # Assuming positional args if first is string
+             memory_entry = {
+                "project_id": args[0] if len(args) > 0 else kwargs.get("project_id", "unknown"),
+                "chain_id": args[1] if len(args) > 1 else kwargs.get("chain_id", "main"),
+                "agent": args[2] if len(args) > 2 else kwargs.get("agent", "unknown"),
+                "role": args[3] if len(args) > 3 else kwargs.get("role", "system"),
+                "content": args[4] if len(args) > 4 else kwargs.get("content", ""),
+                "step_type": args[5] if len(args) > 5 else kwargs.get("step_type", "log")
             }
+             memory_entry.update(kwargs)
+        else: # Assume keyword args only
+            memory_entry = {
+                "project_id": kwargs.get("project_id", "unknown"),
+                "chain_id": kwargs.get("chain_id", "main"),
+                "agent": kwargs.get("agent", "unknown"),
+                "role": kwargs.get("role", "system"),
+                "content": kwargs.get("content", ""),
+                "step_type": kwargs.get("step_type", "log")
+            }
+            memory_entry.update(kwargs)
+            
+        logger.debug(f"Calling add_memory_thread with: {memory_entry}")
+        return add_memory_thread(memory_entry)
     except Exception as e:
-        logger.error(f"Error getting retry status: {str(e)}")
-        return {
-            "should_retry": False,
-            "unblock_condition": None,
-            "last_block_reason": None
-        }
+        logger.error(f"❌ Error in safe_add_memory_thread: {str(e)}\n{traceback.format_exc()}")
+        return {"status": "error", "message": f"Error in safe_add_memory_thread: {str(e)}"}
 
-# Helper function to safely log retry actions with fallback
-def safe_log_retry_action(agent_id: str, project_id: str, action: str) -> None:
+# --- End Helper Functions --- 
+
+async def run_agent(agent_key: str, payload: BaseTaskPayload) -> BaseAgentResult:
     """
-    Safely log retry actions with fallback if the retry_hooks module is not available
-    or if an error occurs during the call.
-    
+    Dynamically loads and executes the specified agent using the AgentRegistry.
+
     Args:
-        agent_id: The agent identifier
-        project_id: The project identifier
-        action: Description of the retry action
+        agent_key: The registry key of the agent to run.
+        payload: The input payload for the agent, conforming to BaseTaskPayload.
+
+    Returns:
+        The result from the agent execution, conforming to BaseAgentResult.
     """
+    if not payload.task_id:
+        payload.task_id = f"task_{uuid.uuid4()}"
+        logger.warning(f"Task payload missing task_id, generated: {payload.task_id}")
+
+    logger.info(f"Attempting to run agent 
+{agent_key}
+ for task {payload.task_id}")
+
     try:
-        if RETRY_HOOKS_AVAILABLE:
-            log_retry_action(agent_id, project_id, action)
-        else:
-            logger.warning(f"Retry hooks not available for logging action: {action}")
-            # Fallback to standard memory logging if available
-            if MEMORY_WRITER_AVAILABLE:
-                write_memory({
-                    "agent": agent_id,
-                    "project_id": project_id,
-                    "tool_used": "retry_hook_fallback",
-                    "action": action
-                })
+        # Get agent instance from the registry
+        agent_instance = agent_registry.get_agent_instance(agent_key)
+
+        if agent_instance is None:
+            logger.error(f"Agent with key 
+{agent_key}
+ not found in registry.")
+            return BaseAgentResult(
+                task_id=payload.task_id,
+                status=ResultStatus.ERROR,
+                details=f"Agent 
+{agent_key}
+ not found."
+            )
+
+        # Validate payload against agent's input schema (Pydantic handles this on method call)
+        # logger.debug(f"Payload for {agent_key}: {payload.dict()}")
+
+        # Execute the agent's run method
+        result: BaseAgentResult = await agent_instance.run(payload)
+
+        # Optional: Validate result against agent's output schema
+        if not isinstance(result, agent_instance.output_schema):
+             logger.warning(f"Agent {agent_key} returned result of type {type(result).__name__}, expected {agent_instance.output_schema.__name__}. Attempting conversion.")
+             try:
+                 # Try to cast/validate
+                 result = agent_instance.output_schema(**result.dict())
+             except Exception as validation_error:
+                  logger.error(f"Failed to validate/convert result from {agent_key} to {agent_instance.output_schema.__name__}: {validation_error}")
+                  # Keep original result but log error
+
+        logger.info(f"Agent {agent_key} completed task {payload.task_id} with status: {result.status}")
+        return result
+
     except Exception as e:
-        logger.error(f"Error logging retry action: {str(e)}")
-        # No further fallback needed as this is already a fallback function
+        logger.error(f"Error during execution of agent {agent_key} for task {payload.task_id}: {e}", exc_info=True)
+        return BaseAgentResult(
+            task_id=payload.task_id,
+            status=ResultStatus.ERROR,
+            details=f"An unexpected error occurred while running agent {agent_key}: {str(e)}"
+        )
+
+# Example usage (for testing purposes, remove in production):
+# async def main():
+#     from app.schemas.agents.orchestrator.orchestrator_schemas import OrchestratorInstruction
+#     # Need to ensure agents are imported somewhere to trigger registration
+#     import app.agents.orchestrator_agent 
+#     
+#     test_payload = OrchestratorInstruction(
+#         operator_input="Plan a simple website",
+#         operator_persona="medium",
+#         project_id="test_project_123"
+#     )
+#     result = await run_agent("orchestrator", test_payload)
+#     print(result)
+# 
+# if __name__ == "__main__":
+#     asyncio.run(main())
+
