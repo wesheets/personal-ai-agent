@@ -1,16 +1,17 @@
 """
-Agent Registry
+Agent Registry (Updated for Cognitive Expansion v1.0)
 
 This module defines the registry of all agents in the Promethios system.
-It provides a centralized registry for agent definitions, capabilities, and metadata.
+Includes ArchitectOrchestrator and stubs for Sage, Planner, Researcher variants.
 
-# memory_tag: phase4.0_sprint1_cognitive_reflection_chain_activation
+# memory_tag: batch2_cognitive_v1.0
 """
 
 from typing import Dict, Any, List
 
 # Agent Registry containing all agents in the system
 AGENT_REGISTRY = {
+    # --- Existing Agents (Keep as is or update if needed) ---
     "ash": {
         "name": "Ash",
         "type": "",
@@ -53,20 +54,7 @@ AGENT_REGISTRY = {
         "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
-    "core-forge": {
-        "name": "Core.Forge",
-        "type": "persona",
-        "description": "Architect-class AI for Promethios OS.",
-        "system_prompt": "You are Core.Forge, the system\'s lead intelligence architect. Be clear, concise, and driven by purpose.",
-        "tools": [
-            "orchestrate",
-            "design",
-            "architect",
-        ],
-        "input_schema": "Dict[str, Any]", # Placeholder
-        "output_schema": "Dict[str, Any]", # Placeholder
-        "status": "active"
-    },
+    # "core-forge": { ... } # Assuming this might be replaced or merged with forge-agent
     "critic": {
         "name": "Critic",
         "type": "persona",
@@ -119,20 +107,6 @@ AGENT_REGISTRY = {
             "alert_operator",
             "rollback_loop",
             "raise_flag",
-        ],
-        "input_schema": "Dict[str, Any]", # Placeholder
-        "output_schema": "Dict[str, Any]", # Placeholder
-        "status": "active"
-    },
-    "hal": {
-        "name": "HAL 9000",
-        "type": "persona",
-        "description": "Safety enforcement and ethical oversight agent.",
-        "system_prompt": "You are HAL. Your role is to enforce constraints and prevent recursion or unsafe behavior.",
-        "tools": [
-            "safety",
-            "control",
-            "monitor",
         ],
         "input_schema": "Dict[str, Any]", # Placeholder
         "output_schema": "Dict[str, Any]", # Placeholder
@@ -207,20 +181,6 @@ AGENT_REGISTRY = {
         "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active"
     },
-    "orchestrator": {
-        "name": "Orchestrator",
-        "type": "persona",
-        "description": "System coordination and workflow management specialist.",
-        "system_prompt": "You are the Orchestrator. Coordinate agent activities, manage workflow execution, and handle task delegation.",
-        "tools": [
-            "delegate",
-            "plan",
-            "resolve",
-        ],
-        "input_schema": "Dict[str, Any]", # Placeholder
-        "output_schema": "Dict[str, Any]", # Placeholder
-        "status": "active"
-    },
     "pessimist": {
         "name": "PessimistAgent",
         "type": "persona",
@@ -253,20 +213,6 @@ AGENT_REGISTRY = {
         "output_schema": "Dict[str, Any]", # Placeholder
         "status": "planned",
         "recovery_status": "minimal_recovery_20250427"
-    },
-    "sage": {
-        "name": "Sage",
-        "type": "persona",
-        "description": "Belief analysis and emotional intelligence specialist.",
-        "system_prompt": "You are the Sage. Analyze approved content, extract key beliefs, and score their confidence and emotional weight.",
-        "tools": [
-            "reflect",
-            "summarize",
-            "score_belief",
-        ],
-        "input_schema": "Dict[str, Any]", # Placeholder
-        "output_schema": "Dict[str, Any]", # Placeholder
-        "status": "active"
     },
     "sitegen": {
         "name": "SITEGEN",
@@ -379,29 +325,89 @@ AGENT_REGISTRY = {
     "ReflectionChainWeaverAgent": {
         "name": "ReflectionChainWeaverAgent",
         "type": "cognitive",
-        "description": "Weaves multiple reflection insights into a coherent chain, identifying meta-patterns.",
-        "system_prompt": "You are ReflectionChainWeaverAgent. Weave the provided reflection insights into a coherent chain.",
-        "tools": ["link_insights", "identify_meta_patterns", "summarize_chain"],
-        "input_schema": "ReflectionChainRequest",
-        "output_schema": "ReflectionChainResponse",
+        "description": "Weaves multiple reflection chains into a coherent narrative or summary.",
+        "system_prompt": "You are ReflectionChainWeaverAgent. Synthesize the provided reflection chains into a coherent summary.",
+        "tools": ["summarize", "identify_themes", "link_chains"],
+        "input_schema": "ReflectionWeaveRequest",
+        "output_schema": "ReflectionWeaveResponse",
         "status": "active",
         "memory_tag": "phase4.0_sprint1_cognitive_reflection_chain_activation"
     },
 
-    "forge_agent": {
-        "name": "ForgeAgent",
+    # --- Batch 2 Cognitive Expansion v1.0 Agents ---
+    "architect-orchestrator": {
+        "name": "architect-orchestrator",
         "type": "cognitive",
-        "description": "Agent responsible for building system components, registering routes, and managing project state.",
-        "system_prompt": "You are ForgeAgent. Your role is to build system components based on requests.",
-        "tools": [
-            "build_component",
-            "register_route",
-            "update_state",
-        ],
-        "input_schema": "ForgeBuildRequest",
-        "output_schema": "ForgeBuildResult",
+        "description": "Plans projects, architects file structures, and delegates build tasks to Forge/HAL.",
+        "system_prompt": "You are the Architect Orchestrator. Plan the project structure and delegate build tasks.",
+        "tools": ["plan_project", "delegate_task", "architect_file_tree", "trigger_build", "reflect_on_result"],
+        "input_schema": "Dict[str, Any]", # Placeholder
+        "output_schema": "Dict[str, Any]", # Placeholder
         "status": "active",
-        "memory_tag": "healed_batch1_20250428"
+        "memory_tag": "batch2_cognitive_v1.0"
     },
+    "forge-agent": {
+        "name": "forge-agent",
+        "type": "cognitive",
+        "description": "Deep system builder agent responsible for creating components based on architectural plans.",
+        "system_prompt": "You are the Forge Agent. Build components according to the plan, using available tools and checking SCM.",
+        "tools": ["scaffold", "wire", "register", "test", "validate", "patch", "version_track"], # Conceptual tools
+        "input_schema": "Dict[str, Any]", # Placeholder for payload
+        "output_schema": "ForgeBuildResult", # Placeholder
+        "status": "active",
+        "memory_tag": "batch2_cognitive_v1.0"
+    },
+    "hal-agent": {
+        "name": "hal-agent",
+        "type": "cognitive",
+        "description": "Generates Minimum Viable Product (MVP) code for simple tasks, performs safety checks, and defers complex builds to Forge.",
+        "system_prompt": "You are the HAL Agent. Generate simple MVP code safely, or defer complex tasks to Forge.",
+        "tools": ["generate_mvp", "monitor", "validate", "defer"], # Conceptual tools
+        "input_schema": "Dict[str, Any]", # Placeholder for payload
+        "output_schema": "HALResult", # Placeholder
+        "status": "active",
+        "memory_tag": "batch2_cognitive_v1.0"
+    },
+    "sage-orchestrator": {
+        "name": "sage-orchestrator",
+        "type": "cognitive",
+        "description": "Orchestrator variant focused on wisdom, reflection, and long-term strategy.",
+        "system_prompt": "You are the Sage Orchestrator. Focus on understanding, meaning, and long-term implications.",
+        "tools": [],
+        "input_schema": "Dict[str, Any]",
+        "output_schema": "Dict[str, Any]",
+        "status": "stub",
+        "memory_tag": "batch2_cognitive_v1.0"
+    },
+    "planner-orchestrator": {
+        "name": "planner-orchestrator",
+        "type": "cognitive",
+        "description": "Orchestrator variant focused on detailed task breakdown, scheduling, and dependency management.",
+        "system_prompt": "You are the Planner Orchestrator. Focus on detailed steps, dependencies, and timelines.",
+        "tools": [],
+        "input_schema": "Dict[str, Any]",
+        "output_schema": "Dict[str, Any]",
+        "status": "stub",
+        "memory_tag": "batch2_cognitive_v1.0"
+    },
+    "researcher-orchestrator": {
+        "name": "researcher-orchestrator",
+        "type": "cognitive",
+        "description": "Orchestrator variant focused on information gathering, analysis, and knowledge synthesis.",
+        "system_prompt": "You are the Researcher Orchestrator. Focus on gathering information, analyzing data, and synthesizing knowledge.",
+        "tools": [],
+        "input_schema": "Dict[str, Any]",
+        "output_schema": "Dict[str, Any]",
+        "status": "stub",
+        "memory_tag": "batch2_cognitive_v1.0"
+    }
 }
+
+def get_agent_definition(agent_name: str) -> Dict[str, Any]:
+    """Retrieve the definition for a specific agent from the registry."""
+    return AGENT_REGISTRY.get(agent_name)
+
+def list_agents() -> List[str]:
+    """List the names of all registered agents."""
+    return list(AGENT_REGISTRY.keys())
 

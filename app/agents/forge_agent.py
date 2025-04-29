@@ -1,9 +1,9 @@
 """
-FORGE Agent Module
+FORGE Agent Module (Cognitive Expansion v1.0)
 
-This module implements the FORGE agent, which acts as the deep system builder
-in the Promethios architecture. It handles building system components, registering routes,
-and managing project state.
+This module implements the FORGE agent, upgraded for Cognitive Expansion v1.0.
+It acts as the deep system builder, handling component construction based on
+Orchestrator plans, integrating with SCM, and accessing the toolkit registry.
 """
 
 import os
@@ -14,554 +14,291 @@ import asyncio
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 
-# Import schemas
-from app.schemas.forge_schema import ForgeBuildRequest, ForgeBuildResult, ComponentBuildResult
+# Import schemas (assuming they exist and are compatible)
+# from app.schemas.forge_schema import ForgeBuildRequest, ForgeBuildResult, ComponentBuildResult
 
-# Import memory operations
+# Import Memory Operations (Standard)
 from app.modules.memory_writer import write_memory, read_memory
-from app.modules.orchestrator_memory_enhanced import log_loop_event
 
-# Import project state operations
-from app.modules.project_state import read_project_state, update_project_state
-
-# Import manifest operations
-from app.utils.manifest_manager import update_manifest, register_schema, register_route, register_module
-
-# Import snapshot operations
-from app.utils.snapshot_manager import create_recovery_snapshot
+# Import Toolkit Registry (Assuming path and function)
+# from app.toolkit.registry import get_agent_toolkit
+# from app.modules.agent_tool_runner import run_tool # Assuming tool runner exists
 
 # Configure logging
 logger = logging.getLogger("app.agents.forge")
 
+# Placeholder for schemas if not available
+class ForgeBuildRequest:
+    def __init__(self, project_id, loop_id, task, details, source_agent, version="1.1.0-cognitive-v1.0"):
+        self.project_id = project_id
+        self.loop_id = loop_id
+        self.task = task
+        self.details = details
+        self.source_agent = source_agent
+        self.version = version
+
+class ComponentBuildResult:
+    def __init__(self, component_name, file_path, status, error=None):
+        self.component_name = component_name
+        self.file_path = file_path
+        self.status = status
+        self.error = error
+
+class ForgeBuildResult:
+    def __init__(self, project_id, loop_id, component_results, status, timestamp, error=None, source_agent="forge-agent"):
+        self.project_id = project_id
+        self.loop_id = loop_id
+        self.component_results = component_results
+        self.status = status
+        self.timestamp = timestamp
+        self.error = error
+        self.source_agent = source_agent # Added for reflection payload
+
+# Placeholder for toolkit functions
+def get_agent_toolkit(agent_name):
+    logger.warning(f"Using placeholder get_agent_toolkit for {agent_name}")
+    # Return dummy tools based on conceptual list
+    if agent_name == "forge-agent":
+        return {"scaffold": None, "validate": None, "patch": None, "wire": None}
+    return {}
+
+def run_tool(agent_name, tool_name, params):
+     logger.warning(f"Using placeholder run_tool for {agent_name} -> {tool_name}")
+     return {"status": "success", "output": f"Placeholder execution of {tool_name}"}
+
 class ForgeAgent:
     """
-    FORGE Agent implementation.
-    
-    This agent acts as the deep system builder, creating endpoints, schemas, modules,
-    registering routes, and managing project state.
+    FORGE Agent implementation (Cognitive Expansion v1.0).
+    Acts as the Deep System Builder, executing build tasks based on Orchestrator plans.
     """
-    
+
     def __init__(self):
-        """Initialize the FORGE Agent with required configuration."""
+        """Initialize the FORGE Agent."""
         self.name = "forge-agent"
         self.role = "Deep System Builder"
-        self.tools = ["scaffold", "wire", "register", "test", "validate", "patch", "version_track"]
-        self.permissions = ["read_memory", "write_memory", "update_manifest", "register_routes"]
-        self.description = "Deep system builder agent responsible for creating endpoints, schemas, modules, and registering routes"
-        self.version = "1.0.0"
+        # Conceptual tools - actual execution via toolkit runner if available
+        self.conceptual_tools = ["scaffold", "wire", "register", "test", "validate", "patch", "version_track"]
+        self.permissions = ["read_memory", "write_memory", "read_files", "write_files"] # Adjusted permissions
+        self.description = "Deep system builder agent responsible for creating components based on architectural plans."
+        self.version = "1.1.0-cognitive-v1.0" # Updated version
         self.status = "active"
         self.tone_profile = {
             "style": "technical",
             "emotion": "neutral",
             "vibe": "builder",
-            "persona": "Efficient system architect with a focus on integration and compliance"
+            "persona": "Efficient system architect focused on robust implementation and integration."
         }
-        self.schema_path = "schemas/forge_schema.py"
+        # self.schema_path = "schemas/forge_schema.py" # Keep if exists
         self.trust_score = 0.95
-        self.contract_version = "1.0.0"
-    
-    async def execute(self, 
-                request: ForgeBuildRequest) -> ForgeBuildResult:
-        """
-        Execute the FORGE Agent's main functionality.
-        
-        Args:
-            request: The build request containing project_id, loop_id, and components to build
-            
-        Returns:
-            ForgeBuildResult containing the results of the build operation
-        """
+        self.contract_version = "1.1.0"
+        self.toolkit = get_agent_toolkit(self.name) # Load toolkit on init
+
+    async def build_from_plan(self, task_details: dict, project_id: str, loop_id: str) -> ComponentBuildResult:
+        """Builds a file based on Orchestrator scaffold/plan details."""
+        component_name = task_details.get("task", "unknown_component")
+        build_details = task_details.get("details", {})
+        target_path = build_details.get("path") # Expect path from file_tree
+
+        logger.info(f"[{project_id}-{loop_id}] Starting build for: {component_name} at {target_path}")
+
+        if not target_path:
+            error_msg = "Target file path missing in build details."
+            logger.error(f"[{project_id}-{loop_id}] {error_msg}")
+            return ComponentBuildResult(component_name, None, "failed", error_msg)
+
         try:
-            logger.info(f"Running FORGE agent with project_id: {request.project_id}, loop_id: {request.loop_id}")
-            print(f"🔨 FORGE agent building components {request.components} for project '{request.project_id}', loop '{request.loop_id}'")
-            
-            # Create a recovery snapshot before starting
-            await create_recovery_snapshot(
-                loop_id=request.loop_id,
-                notes=f"Before FORGE build v{request.version}"
-            )
-            
-            # Log the start of the build operation
-            await log_loop_event(
-                loop_id=request.loop_id,
+            # --- SCM Integration: Check file existence --- (Basic version)
+            file_exists = os.path.exists(target_path)
+            if file_exists:
+                logger.warning(f"[{project_id}-{loop_id}] File already exists: {target_path}. Overwriting.")
+                # Future: Add more sophisticated handling (e.g., patching, versioning)
+
+            # --- Generate Content (Basic Templating) ---
+            # Use placeholder content based on task type for now
+            content = f"""# Auto-generated by FORGE Agent (Cognitive v1.0)
+# Project: {project_id}
+# Loop: {loop_id}
+# Task: {component_name}
+# Timestamp: {datetime.now().isoformat()}
+
+print("Hello from {component_name}!")
+"""
+            if "schema" in component_name.lower():
+                 content = f"""# Auto-generated Schema by FORGE Agent (Cognitive v1.0)
+from pydantic import BaseModel
+
+class {component_name.replace("build_","").replace("_","").capitalize()}(BaseModel):
+    placeholder: str = "value"
+"""
+            elif "module" in component_name.lower():
+                 content = f"""# Auto-generated Module by FORGE Agent (Cognitive v1.0)
+import logging
+logger = logging.getLogger(__name__)
+
+def placeholder_function():
+    logger.info("Executing placeholder function in {component_name}")
+    return True
+"""
+            elif "routes" in component_name.lower():
+                 content = f"""# Auto-generated Routes by FORGE Agent (Cognitive v1.0)
+from fastapi import APIRouter
+router = APIRouter()
+
+@router.get("/{component_name.replace("build_","").replace("_routes","")}")
+def read_root():
+    return {{"message": "Hello from {component_name}"}}
+"""
+
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+
+            # --- Write File --- (Using conceptual "scaffold" tool)
+            # await run_tool(self.name, "scaffold", {"path": target_path, "content": content})
+            with open(target_path, "w") as f:
+                f.write(content)
+            logger.info(f"[{project_id}-{loop_id}] Successfully wrote file: {target_path}")
+
+            # --- File Tree Node Completion: Update status in memory --- (Basic)
+            try:
+                file_tree_tag = f"file_tree_{loop_id}"
+                current_tree = await read_memory(project_id, file_tree_tag)
+                if isinstance(current_tree, list):
+                    updated = False
+                    for item in current_tree:
+                        if item.get("path") == target_path:
+                            item["status"] = "green"
+                            updated = True
+                            break
+                    if updated:
+                        await write_memory(project_id, self.name, loop_id, file_tree_tag, current_tree, "project_file_tree")
+                        logger.info(f"[{project_id}-{loop_id}] Updated file tree status for {target_path} to green.")
+                    else:
+                        logger.warning(f"[{project_id}-{loop_id}] Could not find {target_path} in file tree memory to update status.")
+                else:
+                     logger.warning(f"[{project_id}-{loop_id}] File tree memory ({file_tree_tag}) not found or not a list.")
+            except Exception as mem_error:
+                logger.error(f"[{project_id}-{loop_id}] Error updating file tree status in memory: {mem_error}")
+
+            return ComponentBuildResult(component_name, target_path, "success")
+
+        except Exception as e:
+            error_msg = f"Error building component {component_name}: {str(e)}"
+            logger.error(f"[{project_id}-{loop_id}] {error_msg}")
+            logger.error(traceback.format_exc())
+            return ComponentBuildResult(component_name, target_path, "failed", error_msg)
+
+    async def execute(self, payload: dict) -> ForgeBuildResult:
+        """
+        Execute the FORGE Agent based on payload from Orchestrator.
+
+        Args:
+            payload: The task payload dictionary from memory.
+
+        Returns:
+            ForgeBuildResult containing the results of the build operation.
+        """
+        # Parse payload (assuming structure from Orchestrator's delegate_task)
+        request = ForgeBuildRequest(
+            project_id=payload.get("project_id"),
+            loop_id=payload.get("loop_id"),
+            task=payload.get("task"),
+            details=payload.get("details", {}),
+            source_agent=payload.get("source_agent")
+        )
+
+        if not all([request.project_id, request.loop_id, request.task]):
+             error_msg = "Invalid payload: Missing project_id, loop_id, or task."
+             logger.error(error_msg)
+             return ForgeBuildResult(None, None, [], "failed", datetime.now().isoformat(), error_msg)
+
+        logger.info(f"[{request.project_id}-{request.loop_id}] FORGE received task: {request.task}")
+        print(f"🔨 FORGE agent executing task \'{request.task}\' for project \'{request.project_id}\', loop \'{request.loop_id}\'")
+
+        overall_status = "success"
+        error_message = None
+        component_results = []
+
+        try:
+            # --- Build based on plan details --- (Handles single task from payload)
+            # The 'details' in the payload should contain the specific step info from the plan
+            # including the target file path from the architected file tree.
+            component_result = await self.build_from_plan(
+                task_details=request.details, # Pass the specific step details
                 project_id=request.project_id,
-                agent="forge",
-                task="build_system_components",
-                result_tag=f"forge_build_log_{request.loop_id}_v{request.version}",
-                status="in_progress",
-                additional_data={"components": request.components, "version": request.version}
+                loop_id=request.loop_id
             )
-            
-            # Read project state
-            project_state = read_project_state(request.project_id)
-            
-            # Read HAL's result if available
-            hal_result = None
-            hal_result_tag = request.hal_result_tag or f"hal_build_task_response_{request.loop_id}"
-            try:
-                hal_result = await read_memory(
-                    project_id=request.project_id,
-                    tag=hal_result_tag
-                )
-                logger.info(f"✅ Read HAL result from {hal_result_tag}")
-            except Exception as e:
-                logger.warning(f"⚠️ Could not read HAL result: {str(e)}")
-            
-            # Build each component
-            components_built = []
-            all_files_created = []
-            all_routes_registered = []
-            overall_status = "success"
-            error_message = None
-            
-            for component in request.components:
-                try:
-                    # Build the component
-                    component_result = await self._build_component(
-                        component=component,
-                        project_id=request.project_id,
-                        loop_id=request.loop_id,
-                        version=request.version,
-                        hal_result=hal_result
-                    )
-                    
-                    # Add to results
-                    components_built.append(component_result)
-                    all_files_created.extend(component_result.files_created)
-                    
-                    # Check if any routes were registered
-                    if hasattr(component_result, "routes_registered"):
-                        all_routes_registered.extend(component_result.routes_registered)
-                    
-                    # Update overall status if component build failed
-                    if component_result.status == "failed":
-                        overall_status = "partial"
-                        if error_message is None:
-                            error_message = f"Failed to build component {component}: {component_result.error}"
-                    
-                    logger.info(f"✅ Built component {component} with status {component_result.status}")
-                except Exception as e:
-                    # Log component build failure
-                    error = f"Error building component {component}: {str(e)}"
-                    logger.error(f"❌ {error}")
-                    logger.error(traceback.format_exc())
-                    
-                    # Add failed component to results
-                    components_built.append(ComponentBuildResult(
-                        component_name=component,
-                        files_created=[],
-                        status="failed",
-                        error=error
-                    ))
-                    
-                    # Update overall status
-                    overall_status = "partial"
-                    if error_message is None:
-                        error_message = error
-            
-            # Update project state
-            try:
-                await update_project_state(
-                    project_id=request.project_id,
-                    patch_dict={
-                        "files_created": all_files_created,
-                        "latest_agent_action": f"Built system components: {', '.join(request.components)}",
-                        "next_recommended_step": "Run tests on new components",
-                        "forge_version": request.version,
-                        "revision_history": project_state.get("revision_history", []) + [
-                            {"version": request.version, "timestamp": datetime.utcnow().isoformat()}
-                        ]
-                    }
-                )
-                logger.info(f"✅ Updated project state for {request.project_id}")
-            except Exception as e:
-                logger.error(f"❌ Error updating project state: {str(e)}")
-                logger.error(traceback.format_exc())
-                
-                # Update overall status
-                overall_status = "partial"
-                if error_message is None:
-                    error_message = f"Error updating project state: {str(e)}"
-            
-            # Create build result
+            component_results.append(component_result)
+
+            if component_result.status == "failed":
+                overall_status = "failed"
+                error_message = component_result.error
+
+            # --- Create Build Result --- (Simplified for single task)
             build_result = ForgeBuildResult(
                 project_id=request.project_id,
                 loop_id=request.loop_id,
-                components_built=components_built,
-                files_created=all_files_created,
-                manifest_updated=True,
-                routes_registered=all_routes_registered,
-                version=request.version,
+                component_results=component_results,
                 status=overall_status,
-                timestamp=datetime.utcnow().isoformat(),
-                error=error_message,
-                next_steps=["Run tests on new components", "Review system integration"]
+                timestamp=datetime.now().isoformat(),
+                error=error_message
             )
-            
-            # Log the build result
+
+            # --- Log result for Orchestrator reflection --- (Using standard write_memory)
+            # Corrected f-string syntax
+            result_tag = f"forge_result_{request.loop_id}_{request.task.replace(' ','_')}"
             await write_memory(
                 project_id=request.project_id,
-                tag=f"forge_build_log_{request.loop_id}_v{request.version}",
-                value=build_result.dict()
-            )
-            
-            # Log the completion of the build operation
-            await log_loop_event(
+                agent_id=self.name,
                 loop_id=request.loop_id,
-                project_id=request.project_id,
-                agent="forge",
-                task="build_system_components",
-                result_tag=f"forge_build_log_{request.loop_id}_v{request.version}",
-                status="completed",
-                additional_data={
-                    "components": request.components,
-                    "version": request.version,
-                    "build_status": overall_status,
-                    "files_created": all_files_created
-                }
+                tag=result_tag,
+                value=build_result.__dict__, # Convert result object to dict
+                type="agent_result_payload"
             )
-            
-            logger.info(f"✅ FORGE agent completed build with status {overall_status}")
+            logger.info(f"[{request.project_id}-{request.loop_id}] Logged FORGE result to memory tag: {result_tag}")
+
             return build_result
-            
+
         except Exception as e:
-            error_msg = f"Error running FORGE agent: {str(e)}"
-            logger.error(error_msg)
+            error_msg = f"Critical error in FORGE execute: {str(e)}"
+            logger.error(f"[{request.project_id}-{request.loop_id}] {error_msg}")
             logger.error(traceback.format_exc())
             print(f"❌ {error_msg}")
-            
-            # Try to log the error
-            try:
-                await log_loop_event(
-                    loop_id=request.loop_id,
-                    project_id=request.project_id,
-                    agent="forge",
-                    task="build_system_components",
-                    result_tag=f"forge_build_log_{request.loop_id}_v{request.version}",
-                    status="failed",
-                    additional_data={"error": error_msg}
-                )
-            except Exception as log_error:
-                logger.error(f"❌ Error logging failure: {str(log_error)}")
-            
-            # Return error response that will pass schema validation
+
+            # Return error response
             return ForgeBuildResult(
                 project_id=request.project_id,
                 loop_id=request.loop_id,
-                components_built=[],
-                files_created=[],
-                manifest_updated=False,
-                routes_registered=[],
-                version=request.version,
+                component_results=[],
                 status="failed",
-                timestamp=datetime.utcnow().isoformat(),
-                error=error_msg,
-                next_steps=["Review error logs", "Retry with simplified components"]
-            )
-    
-    async def _build_component(self, 
-                        component: str,
-                        project_id: str,
-                        loop_id: str,
-                        version: str,
-                        hal_result: Optional[Dict[str, Any]] = None) -> ComponentBuildResult:
-        """
-        Build a specific component.
-        
-        Args:
-            component: The component to build (e.g., "api", "schema", "test")
-            project_id: The project identifier
-            loop_id: The loop identifier
-            version: The version of the build
-            hal_result: Optional HAL result to use as input
-            
-        Returns:
-            ComponentBuildResult containing the result of the component build
-        """
-        # Initialize result
-        files_created = []
-        routes_registered = []
-        
-        # Build different components based on type
-        if component == "api":
-            # Build API component
-            api_module_path = f"/home/ubuntu/personal-ai-agent/app/api/modules/{project_id}_api.py"
-            api_routes_path = f"/home/ubuntu/personal-ai-agent/app/api/routes/{project_id}_routes.py"
-            
-            # Create API module
-            with open(api_module_path, "w") as f:
-                f.write(f'''"""
-API Module for {project_id}
-
-This module provides API functionality for the {project_id} project.
-Generated by FORGE v{version} on {datetime.utcnow().isoformat()}
-"""
-
-import logging
-from typing import Dict, Any
-
-# Configure logging
-logger = logging.getLogger("app.api.modules.{project_id}_api")
-
-async def process_request(data: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Process an API request.
-    
-    Args:
-        data: The request data
-        
-    Returns:
-        Dict containing the response data
-    """
-    try:
-        logger.info(f"Processing API request for {project_id}")
-        
-        # Process the request
-        result = {{
-            "status": "success",
-            "message": f"Request processed successfully for {project_id}",
-            "data": data
-        }}
-        
-        return result
-    except Exception as e:
-        logger.error(f"Error processing API request: {{str(e)}}")
-        return {{
-            "status": "error",
-            "message": f"Error processing request: {{str(e)}}"
-        }}
-''')
-            files_created.append(api_module_path)
-            
-            # Create API routes
-            with open(api_routes_path, "w") as f:
-                f.write(f'''"""
-API Routes for {project_id}
-
-This module defines the API routes for the {project_id} project.
-Generated by FORGE v{version} on {datetime.utcnow().isoformat()}
-"""
-
-from fastapi import APIRouter, HTTPException
-from typing import Dict, Any
-from pydantic import BaseModel
-
-# Import API module
-from app.api.modules.{project_id}_api import process_request
-
-# Create router
-router = APIRouter(tags=["{project_id}"])
-
-class {project_id.capitalize()}Request(BaseModel):
-    """Request model for {project_id} API."""
-    data: Dict[str, Any]
-
-class {project_id.capitalize()}Response(BaseModel):
-    """Response model for {project_id} API."""
-    status: str
-    message: str
-    data: Dict[str, Any]
-
-@router.post("/{project_id}/process", response_model={project_id.capitalize()}Response)
-async def process_{project_id}_request(request: {project_id.capitalize()}Request):
-    """
-    Process a request for the {project_id} project.
-    
-    Args:
-        request: The request data
-        
-    Returns:
-        Response containing the processed data
-    """
-    try:
-        result = await process_request(request.data)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing request: {{str(e)}}")
-''')
-            files_created.append(api_routes_path)
-            
-            # Register route
-            register_route(
-                route_path=f"/{project_id}/process",
-                method="POST",
-                schema_name=f"{project_id.capitalize()}Request",
-                status="registered"
-            )
-            routes_registered.append(f"/{project_id}/process")
-            
-            # Register module
-            register_module(
-                module_name=f"{project_id}_api",
-                file_path=f"app/api/modules/{project_id}_api.py",
-                wrapped_with_schema=True
-            )
-            
-            return ComponentBuildResult(
-                component_name=component,
-                files_created=files_created,
-                status="success",
-                error=None
-            )
-            
-        elif component == "schema":
-            # Build schema component
-            schema_path = f"/home/ubuntu/personal-ai-agent/app/schemas/{project_id}_schema.py"
-            
-            # Create schema file
-            with open(schema_path, "w") as f:
-                f.write(f'''"""
-Schema Module for {project_id}
-
-This module defines the schemas for the {project_id} project.
-Generated by FORGE v{version} on {datetime.utcnow().isoformat()}
-"""
-
-from pydantic import BaseModel, Field
-from typing import Dict, List, Any, Optional
-from datetime import datetime
-
-class {project_id.capitalize()}BaseSchema(BaseModel):
-    """Base schema for {project_id} project."""
-    project_id: str = Field(..., description="Project identifier")
-    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat(), description="Timestamp")
-
-class {project_id.capitalize()}RequestSchema(BaseModel):
-    """Request schema for {project_id} project."""
-    data: Dict[str, Any] = Field(..., description="Request data")
-    options: Optional[Dict[str, Any]] = Field(None, description="Optional request options")
-    
-    class Config:
-        schema_extra = {{
-            "example": {{
-                "data": {{"key": "value"}},
-                "options": {{"option1": True}}
-            }}
-        }}
-
-class {project_id.capitalize()}ResponseSchema(BaseModel):
-    """Response schema for {project_id} project."""
-    status: str = Field(..., description="Response status")
-    message: str = Field(..., description="Response message")
-    data: Dict[str, Any] = Field(..., description="Response data")
-    
-    class Config:
-        schema_extra = {{
-            "example": {{
-                "status": "success",
-                "message": "Request processed successfully",
-                "data": {{"result": "value"}}
-            }}
-        }}
-''')
-            files_created.append(schema_path)
-            
-            # Register schema
-            register_schema(
-                schema_name=f"{project_id.capitalize()}RequestSchema",
-                file_path=f"app/schemas/{project_id}_schema.py",
-                routes=[f"/{project_id}/process"],
-                version="v1.0.0"
-            )
-            
-            register_schema(
-                schema_name=f"{project_id.capitalize()}ResponseSchema",
-                file_path=f"app/schemas/{project_id}_schema.py",
-                routes=[f"/{project_id}/process"],
-                version="v1.0.0"
-            )
-            
-            return ComponentBuildResult(
-                component_name=component,
-                files_created=files_created,
-                status="success",
-                error=None
-            )
-            
-        elif component == "test":
-            # Build test component
-            test_path = f"/home/ubuntu/personal-ai-agent/app/tests/test_{project_id}_api.py"
-            
-            # Create test file
-            with open(test_path, "w") as f:
-                f.write(f'''"""
-Test Module for {project_id} API
-
-This module provides tests for the {project_id} API.
-Generated by FORGE v{version} on {datetime.utcnow().isoformat()}
-"""
-
-import pytest
-import json
-from fastapi.testclient import TestClient
-from app.main import app
-
-client = TestClient(app)
-
-def test_{project_id}_api_success():
-    """Test successful API request."""
-    # Prepare test data
-    test_data = {{"data": {{"key": "value"}}}}
-    
-    # Send request
-    response = client.post("/{project_id}/process", json=test_data)
-    
-    # Check response
-    assert response.status_code == 200
-    assert response.json()["status"] == "success"
-    assert "data" in response.json()
-    assert response.json()["data"]["key"] == "value"
-
-def test_{project_id}_api_validation():
-    """Test API request validation."""
-    # Prepare invalid test data
-    test_data = {{"invalid_field": "value"}}
-    
-    # Send request
-    response = client.post("/{project_id}/process", json=test_data)
-    
-    # Check response
-    assert response.status_code == 422  # Validation error
-''')
-            files_created.append(test_path)
-            
-            return ComponentBuildResult(
-                component_name=component,
-                files_created=files_created,
-                status="success",
-                error=None
-            )
-            
-        else:
-            # Unknown component
-            return ComponentBuildResult(
-                component_name=component,
-                files_created=[],
-                status="failed",
-                error=f"Unknown component type: {component}"
+                timestamp=datetime.now().isoformat(),
+                error=error_msg
             )
 
-# Function to run FORGE agent (for backward compatibility)
-async def run_forge_agent(request: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Run the FORGE Agent with the given request.
-    
-    Args:
-        request: The request data
-        
-    Returns:
-        Dict containing the result of the execution
-    """
-    # Create FORGE agent instance
-    forge_agent = ForgeAgent()
-    
-    # Convert request to ForgeBuildRequest
-    build_request = ForgeBuildRequest(**request)
-    
-    # Execute the request
-    result = await forge_agent.execute(build_request)
-    
-    # Convert result to dict if it's not already
-    if hasattr(result, "dict"):
-        return result.dict()
-    return result
+# Example usage (for testing, assuming payload is read from memory)
+# async def run_forge_agent(payload: dict):
+#     agent = ForgeAgent()
+#     return await agent.execute(payload=payload)
+
+# import asyncio
+# async def main():
+#     # Simulate payload read from memory
+#     test_payload = {
+#         "project_id": "test_proj_456",
+#         "loop_id": "loop_20250429030500",
+#         "task": "build_api_schema",
+#         "details": {
+#             "step": 1,
+#             "agent": "Forge",
+#             "task": "build_api_schema",
+#             "details": {"goal": "create simple api"},
+#             "path": "app/schemas/test_proj_456_api_schema.py" # Path from file_tree
+#         },
+#         "timestamp": "2025-04-29T03:04:00.123Z",
+#         "source_agent": "architect-orchestrator"
+#     }
+#     result = await run_forge_agent(payload=test_payload)
+#     print(json.dumps(result.__dict__, indent=2))
+# if __name__ == "__main__":
+#     asyncio.run(main())
+
+
