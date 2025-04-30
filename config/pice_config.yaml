@@ -1,0 +1,20 @@
+# Payload Information and Context Exchange (PICE) - Batch 12.3
+# Defines payload structures and tools relevant to loop execution.
+
+payloads:
+  - endpoint: /api/loop/create
+    method: POST
+    description: Initiates a cognitive loop execution.
+    structure:
+      plan_id: string (optional, default: "unknown_plan")
+      loop_type: string (optional)
+      instructions: string (optional, default: "No instructions provided.")
+      context: object (optional, default: {})
+      metadata: object (optional, default: {})
+
+tools:
+  - name: mock_tool_v1
+    description: Placeholder tool used by the mock HAL agent.
+    status: mock # Indicates this is not a real, functional tool yet.
+    used_by: [HAL]
+

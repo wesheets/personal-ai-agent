@@ -1,0 +1,25 @@
+# Agent Capability Inventory (ACI) - Batch 12.3
+# Lists agents currently involved in the rebuilt loop execution.
+
+agents:
+  - name: Orchestrator
+    type: mock # Currently a placeholder in loop_routes.py
+    description: Plans the steps for loop execution.
+    capabilities: [plan_generation]
+
+  - name: HAL
+    type: mock # Currently a placeholder in loop_routes.py
+    description: Executes planned steps, potentially using tools.
+    capabilities: [step_execution, tool_use]
+    tools_used: [mock_tool_v1] # Based on mock implementation
+
+  - name: Critic
+    type: mock # Currently a placeholder in loop_routes.py
+    description: Reflects on the execution and provides feedback.
+    capabilities: [reflection, critique]
+
+  - name: Sage
+    type: mock # Currently a placeholder in loop_routes.py
+    description: Summarizes the loop execution and reflections.
+    capabilities: [summary, synthesis]
+

@@ -1,0 +1,7 @@
+{"module": "app.routes.loop_routes.mock_orchestrator", "status": "placeholder", "issue": "Function is a mock implementation, needs replacement with real agent call."}
+
+{"module": "app.routes.loop_routes.mock_hal", "status": "placeholder", "issue": "Function is a mock implementation, needs replacement with real agent call."}
+
+{"module": "app.routes.loop_routes.mock_critic", "status": "placeholder", "issue": "Function is a mock implementation, needs replacement with real agent call."}
+
+{"module": "app.routes.loop_routes.mock_sage", "status": "placeholder", "issue": "Function is a mock implementation, needs replacement with real agent call."}
