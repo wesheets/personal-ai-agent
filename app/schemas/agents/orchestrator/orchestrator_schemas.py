@@ -11,3 +11,17 @@ class OrchestratorOutput(AgentResult):
     # Minimal placeholder
     pass
 
+# Added missing class definition
+class OrchestratorInstruction(BaseModel):
+    """Placeholder for Orchestrator instructions."""
+    # Define fields later as needed
+    pass
+
+
+
+# Added missing result class definition
+class OrchestratorPlanResult(AgentResult):
+    """Placeholder for Orchestrator plan results."""
+    # Define fields later as needed
+    pass
+

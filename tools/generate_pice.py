@@ -30,12 +30,14 @@ def generate_pice(permissions_path: str, output_path: str):
 
     # Extract unique tool names from permissions
     known_tools = set()
-    if isinstance(permissions_data, dict):
-        for agent_permissions in permissions_data.values():
-            if isinstance(agent_permissions, list):
-                for tool_name in agent_permissions:
-                    if isinstance(tool_name, str):
-                        known_tools.add(tool_name)
+    if isinstance(permissions_data, dict) and "agent_permissions" in permissions_data:
+        agent_perms_dict = permissions_data["agent_permissions"]
+        if isinstance(agent_perms_dict, dict):
+            for agent_permissions in agent_perms_dict.values():
+                if isinstance(agent_permissions, list):
+                    for tool_name in agent_permissions:
+                        if isinstance(tool_name, str):
+                            known_tools.add(tool_name)
 
     logger.info(f"Found {len(known_tools)} unique tool names from permissions file.")
 

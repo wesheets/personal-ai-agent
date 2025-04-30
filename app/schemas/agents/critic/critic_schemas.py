@@ -13,7 +13,7 @@ class CriticReviewRequest(BaseTaskPayload):
     project_id: Optional[str] = None
 
 
-class CriticReviewResult(BaseAgentResult):
+class CriticReviewResult(AgentResult):
     """Output schema for the Critic agent."""
     passed: bool
     review_notes: List[str] = []
