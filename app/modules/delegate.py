@@ -16,7 +16,7 @@ import json
 import logging
 
 # Import memory-related functions
-from app.modules.memory_writer import write_memory
+from app.api.modules.memory import write_memory
 # Import task supervisor
 from app.modules.task_supervisor import monitor_delegation, halt_task
 

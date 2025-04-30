@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from app.modules.memory_writer import memory_store
+from app.modules.memory_writer import MEMORY_STORE
 from typing import Optional
 from datetime import datetime
 
@@ -15,7 +15,7 @@ async def stream_memories(
 ):
     try:
         # Start with all memories
-        filtered_memories = memory_store.copy()
+        filtered_memories = MEMORY_STORE.copy()
         
         # Filter memories by agent_id if provided
         if agent_id:

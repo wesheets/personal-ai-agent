@@ -16,7 +16,7 @@ import logging
 import asyncio
 
 # Import memory-related functions
-from app.modules.memory_writer import write_memory
+from app.api.modules.memory import write_memory
 
 # Import agent verification function
 from app.modules.agent_verify import verify_task as verify_agent_for_task

@@ -18,7 +18,7 @@ from datetime import datetime
 
 # Import agent registry and memory-related functions
 from app.api.modules.agent import agent_registry, ensure_core_agents_exist
-from app.modules.memory_writer import memory_store
+from app.modules.memory_writer import MEMORY_STORE
 
 # Import context models
 from app.api.modules.agent_context_models import (
@@ -78,7 +78,7 @@ async def get_agent_context(request: Request):
         last_active = agent_data.get("last_active", datetime.utcnow().isoformat())
         
         # Get all memories for this agent
-        agent_memories = [m for m in memory_store if m["agent_id"] == context_request.agent_id]
+        agent_memories = [m for m in MEMORY_STORE if m["agent_id"] == context_request.agent_id]
         
         # Group memories by project_id
         project_memories = {}

@@ -201,7 +201,7 @@ def _log_to_memory(operation: str, content: str, status: str):
         status (str): Status of the operation (success, error)
     """
     try:
-        from app.modules.memory_writer import write_memory
+        from app.api.modules.memory import write_memory
         
         write_memory(
             agent_id="system",
@@ -223,7 +223,7 @@ def log_installation():
     This function should be called when the module is first imported.
     """
     try:
-        from app.modules.memory_writer import write_memory
+        from app.api.modules.memory import write_memory
         
         write_memory(
             agent_id="system",

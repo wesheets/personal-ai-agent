@@ -193,19 +193,19 @@ async def trigger_reflection(agent_id: str, memory_type: str = "training", limit
     
     try:
         # Import memory module to access memory_store
-        from app.modules.memory_writer import memory_store, write_memory
+        from app.modules.memory_writer import MEMORY_STORE, write_memory
         
         # Check if memory_store is a list or a dictionary
-        if isinstance(memory_store, list):
+        if isinstance(MEMORY_STORE, list):
             # If it's a list, filter directly
             filtered_memories = [
-                memory for memory in memory_store
+                memory for memory in MEMORY_STORE
                 if memory["agent_id"] == agent_id and memory["type"] == memory_type
             ]
         else:
             # If it's a dictionary, use values() method
             filtered_memories = [
-                memory for memory in memory_store.values()
+                memory for memory in MEMORY_STORE.values()
                 if memory["agent_id"] == agent_id and memory["type"] == memory_type
             ]
         

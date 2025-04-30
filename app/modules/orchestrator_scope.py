@@ -16,7 +16,7 @@ import json
 import os
 
 # Import memory-related functions
-from app.modules.memory_writer import write_memory
+from app.api.modules.memory import write_memory
 
 # Create router
 router = APIRouter()

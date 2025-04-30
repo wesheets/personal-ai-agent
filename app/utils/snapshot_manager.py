@@ -12,7 +12,7 @@ from datetime import datetime
 
 # Import memory operations
 try:
-    from app.modules.memory_writer import write_memory, read_memory
+    from app.api.modules.memory import write_memory, read_memory
 except ImportError:
     logging.warning("⚠️ Could not import memory operations, using mock implementations")
     # Mock implementations for testing

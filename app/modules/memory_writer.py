@@ -1,192 +1,113 @@
-"""
-Memory writer module for writing and reading memory entries
+# /home/ubuntu/personal-ai-agent/app/modules/memory_writer.py
 
-This module provides functions for writing and reading memory entries,
-with support for different agent types and memory categories.
-"""
 import logging
 import datetime
-from typing import Dict, Any, Optional, List, Union
+from typing import Dict, Any, Optional, List
 
-# Configure logging
-logger = logging.getLogger("app.modules.memory_writer")
+# Import the actual memory store configuration
+from app.modules.memory_config import MEMORY_STORE
+# Alias for lowercase import compatibility
+memory_store = MEMORY_STORE
 
-# In-memory storage for testing
-MEMORY_STORE = {}
+# Import the actual write_memory function from its new location
+try:
+    from app.api.modules.memory import write_memory as actual_write_memory
+    ACTUAL_WRITE_MEMORY_AVAILABLE = True
+except ImportError:
+    logging.error("❌ Failed to import actual write_memory from app.api.modules.memory")
+    ACTUAL_WRITE_MEMORY_AVAILABLE = False
+    # Define a mock if the real one isn't available to prevent further import errors downstream
+    async def actual_write_memory(memory_data: Dict[str, Any]) -> Dict[str, Any]:
+        logging.warning("⚠️ Using mock actual_write_memory due to import failure.")
+        return {"status": "mock_error", "message": "Actual write_memory unavailable"}
 
+logger = logging.getLogger(__name__)
+
+# Compatibility layer for write_memory
 async def write_memory(
     agent_id: str,
-    memory_type: str,
-    tag: str,
-    value: Any,
-    project_id: Optional[str] = None
+    memory_type: Optional[str] = None, # 'type' in new signature
+    tag: Optional[str] = None, # Part of 'tags' in new signature
+    value: Optional[Any] = None, # 'content' in new signature
+    content: Optional[Any] = None, # Allow 'content' directly too
+    tags: Optional[List[str]] = None, # Allow 'tags' directly
+    project_id: Optional[str] = None, # Not directly used in new signature, maybe add to tags?
+    status: Optional[str] = None, # Not directly used in new signature, maybe add to tags?
+    task_id: Optional[str] = None, # Not directly used in new signature, maybe add to tags?
+    task_type: Optional[str] = None, # Not directly used in new signature, maybe add to tags?
+    target_agent_id: Optional[str] = None, # Not directly used in new signature, maybe add to tags?
+    **kwargs: Any # Catch any other arguments
 ) -> Dict[str, Any]:
     """
-    Write a memory entry to the memory system.
-    
-    Args:
-        agent_id: The agent identifier
-        memory_type: Type of memory (e.g., "loop", "state", "reflection")
-        tag: The memory tag
-        value: The memory value to store
-        project_id: Optional project identifier
-            
-    Returns:
-        Dict containing status and memory entry details
+    Compatibility wrapper for write_memory.
+    Accepts the old signature with individual arguments and calls the
+    new write_memory function (expecting a dictionary) from app.api.modules.memory.
     """
+    if not ACTUAL_WRITE_MEMORY_AVAILABLE:
+        logger.error("Cannot execute write_memory compatibility wrapper: Actual function unavailable.")
+        return {"status": "error", "message": "Actual write_memory function failed to import."}
+
+    logger.warning(f"⚠️ Using compatibility wrapper for write_memory call from agent {agent_id}")
+
+    # Construct the dictionary for the new function signature
+    memory_data: Dict[str, Any] = {
+        "agent_id": agent_id,
+        # Map old 'memory_type' or 'type' kwarg to new 'type'
+        "type": memory_type or kwargs.get("type", "unknown"),
+        # Map old 'value' or 'content' to new 'content'
+        "content": value if value is not None else content,
+        # Combine 'tag' and 'tags' into the new 'tags' list
+        "tags": tags or [],
+    }
+    if tag:
+        memory_data["tags"].append(tag)
+    
+    # Add other common optional fields as tags if provided
+    if project_id:
+        memory_data["tags"].append(f"project:{project_id}")
+    if status:
+        memory_data["tags"].append(f"status:{status}")
+    if task_id:
+        memory_data["tags"].append(f"task:{task_id}")
+    if task_type:
+         memory_data["tags"].append(f"task_type:{task_type}")
+    if target_agent_id:
+         memory_data["tags"].append(f"target_agent:{target_agent_id}")
+
+    # Log any unexpected kwargs
+    if kwargs:
+        logger.warning(f"Compatibility write_memory received unexpected arguments: {kwargs}")
+        # Add unexpected kwargs as tags too, prefixed
+        for k, v in kwargs.items():
+            if k not in ["agent_id", "memory_type", "tag", "value", "content", "tags", "project_id", "status", "task_id", "task_type", "target_agent_id"]:
+                 memory_data["tags"].append(f"kwarg_{k}:{v}")
+
     try:
-        logger.info(f"Writing memory for agent: {agent_id}, type: {memory_type}, tag: {tag}")
-        
-        # Use agent_id as key if project_id not provided
-        store_key = project_id if project_id else agent_id
-        
-        # Store in memory dictionary for testing
-        if store_key not in MEMORY_STORE:
-            MEMORY_STORE[store_key] = {}
-            
-        if memory_type not in MEMORY_STORE[store_key]:
-            MEMORY_STORE[store_key][memory_type] = {}
-            
-        MEMORY_STORE[store_key][memory_type][tag] = value
-        
-        # Return success response
-        return {
-            "status": "success",
-            "message": "Memory write successful",
-            "agent_id": agent_id,
-            "memory_type": memory_type,
-            "tag": tag,
-            "project_id": project_id,
-            "timestamp": datetime.datetime.now().isoformat()
-        }
+        # Call the actual write_memory function
+        result = await actual_write_memory(memory_data=memory_data)
+        return result
     except Exception as e:
-        logger.error(f"Error writing memory: {str(e)}")
+        logger.error(f"Error calling actual_write_memory via compatibility wrapper: {str(e)}")
         return {
             "status": "error",
-            "message": f"Failed to write memory: {str(e)}",
+            "message": f"Failed to execute actual write_memory via wrapper: {str(e)}",
             "timestamp": datetime.datetime.now().isoformat()
         }
 
-async def read_memory(
-    agent_id: str,
-    memory_type: str,
-    tag: str,
-    project_id: Optional[str] = None
-) -> Dict[str, Any]:
-    """
-    Read a memory entry from the memory system.
-    
-    Args:
-        agent_id: The agent identifier
-        memory_type: Type of memory (e.g., "loop", "state", "reflection")
-        tag: The memory tag
-        project_id: Optional project identifier
-            
-    Returns:
-        Dict containing status and memory value if found
-    """
-    try:
-        logger.info(f"Reading memory for agent: {agent_id}, type: {memory_type}, tag: {tag}")
-        
-        # Use agent_id as key if project_id not provided
-        store_key = project_id if project_id else agent_id
-        
-        # Read from memory dictionary for testing
-        if (store_key in MEMORY_STORE and 
-            memory_type in MEMORY_STORE[store_key] and 
-            tag in MEMORY_STORE[store_key][memory_type]):
-            
-            return {
-                "status": "success",
-                "value": MEMORY_STORE[store_key][memory_type][tag],
-                "agent_id": agent_id,
-                "memory_type": memory_type,
-                "tag": tag,
-                "project_id": project_id,
-                "timestamp": datetime.datetime.now().isoformat()
-            }
-        
-        logger.warning(f"Memory not found for agent: {agent_id}, type: {memory_type}, tag: {tag}")
-        return {
-            "status": "not_found",
-            "message": "Memory entry not found",
-            "agent_id": agent_id,
-            "memory_type": memory_type,
-            "tag": tag,
-            "project_id": project_id,
-            "timestamp": datetime.datetime.now().isoformat()
-        }
-    except Exception as e:
-        logger.error(f"Error reading memory: {str(e)}")
-        return {
-            "status": "error",
-            "message": f"Failed to read memory: {str(e)}",
-            "timestamp": datetime.datetime.now().isoformat()
-        }
+# Ensure MEMORY_STORE is still available for direct import if needed elsewhere
+# (Though ideally, direct access should be minimized)
+__all__ = ["write_memory", "MEMORY_STORE", "memory_store", "generate_reflection"]
 
-async def list_memories(
-    agent_id: str,
-    memory_type: str,
-    tag_prefix: Optional[str] = None,
-    project_id: Optional[str] = None
-) -> Dict[str, Any]:
-    """
-    List memory entries matching the specified criteria.
-    
-    Args:
-        agent_id: The agent identifier
-        memory_type: Type of memory (e.g., "loop", "state", "reflection")
-        tag_prefix: Optional prefix to filter tags
-        project_id: Optional project identifier
-            
-    Returns:
-        Dict containing status and list of matching memory entries
-    """
-    try:
-        logger.info(f"Listing memories for agent: {agent_id}, type: {memory_type}")
-        
-        # Use agent_id as key if project_id not provided
-        store_key = project_id if project_id else agent_id
-        
-        # Initialize empty result
-        memories = []
-        
-        # Check if the store key and memory type exist
-        if (store_key in MEMORY_STORE and 
-            memory_type in MEMORY_STORE[store_key]):
-            
-            # Get all tags for this memory type
-            tags = MEMORY_STORE[store_key][memory_type].keys()
-            
-            # Filter by tag prefix if specified
-            if tag_prefix:
-                tags = [tag for tag in tags if tag.startswith(tag_prefix)]
-                
-            # Build memory entries list
-            for tag in tags:
-                memories.append({
-                    "agent_id": agent_id,
-                    "memory_type": memory_type,
-                    "tag": tag,
-                    "project_id": project_id
-                })
-        
-        return {
-            "status": "success",
-            "memories": memories,
-            "count": len(memories),
-            "agent_id": agent_id,
-            "memory_type": memory_type,
-            "tag_prefix": tag_prefix,
-            "project_id": project_id,
-            "timestamp": datetime.datetime.now().isoformat()
-        }
-    except Exception as e:
-        logger.error(f"Error listing memories: {str(e)}")
-        return {
-            "status": "error",
-            "message": f"Failed to list memories: {str(e)}",
-            "memories": [],
-            "count": 0,
-            "timestamp": datetime.datetime.now().isoformat()
-        }
+
+# Import the actual generate_reflection function from its location
+try:
+    from app.modules.reflect import generate_reflection
+    GENERATE_REFLECTION_AVAILABLE = True
+except ImportError:
+    logging.error("❌ Failed to import generate_reflection from app.modules.reflect")
+    GENERATE_REFLECTION_AVAILABLE = False
+    # Define a mock if the real one isn't available
+    def generate_reflection(*args, **kwargs):
+        logging.warning("⚠️ Using mock generate_reflection due to import failure.")
+        return "Mock reflection due to import error"
+

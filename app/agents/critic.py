@@ -28,7 +28,7 @@ except ImportError:
 
 # Import memory functions if available
 try:
-    from app.modules.memory_api import write_memory
+    from app.api.modules.memory import write_memory
     memory_available = True
 except ImportError:
     memory_available = False
@@ -202,12 +202,13 @@ If the output has critical flaws that require rejection, set "rejection" to true
                 # Write to memory if available
                 if memory_available:
                     memory_tag = f"critic_review_{loop_id}"
-                    await write_memory(
-                        agent_id=self.agent_id,
-                        memory_type="loop",
-                        tag=memory_tag,
-                        value=json.dumps(review_result)
-                    )
+                    memory_data = {
+                        "agent_id": self.agent_id,
+                        "type": "loop",
+                        "tag": memory_tag,
+                        "content": json.dumps(review_result)
+                    }
+                    await write_memory(memory_data)
                 
                 return review_result
                 
@@ -272,12 +273,13 @@ If the output has critical flaws that require rejection, set "rejection" to true
             # Write to memory if available
             if memory_available:
                 memory_tag = f"critic_rejection_{loop_id}"
-                await write_memory(
-                    agent_id=self.agent_id,
-                    memory_type="loop",
-                    tag=memory_tag,
-                    value=json.dumps(rejection_result)
-                )
+                memory_data = {
+                    "agent_id": self.agent_id,
+                    "type": "loop",
+                    "tag": memory_tag,
+                    "content": json.dumps(rejection_result)
+                }
+                await write_memory(memory_data)
             
             return rejection_result
             
@@ -322,12 +324,13 @@ If the output has critical flaws that require rejection, set "rejection" to true
             # Write to memory if available
             if memory_available:
                 memory_tag = f"critic_reason_{loop_id}_{reason_type}"
-                await write_memory(
-                    agent_id=self.agent_id,
-                    memory_type="loop",
-                    tag=memory_tag,
-                    value=json.dumps(log_result)
-                )
+                memory_data = {
+                    "agent_id": self.agent_id,
+                    "type": "loop",
+                    "tag": memory_tag,
+                    "content": json.dumps(log_result)
+                }
+                await write_memory(memory_data)
             
             return log_result
             

@@ -22,16 +22,16 @@ from app.modules.reflection_fatigue_scoring import process_reflection_fatigue
 from app.modules.rerun_decision_engine import make_rerun_decision
 
 # Mock memory storage for testing
-memory_store = {}
+mock_memory_store = {}
 
 # Override the read_from_memory and write_to_memory functions for testing
 async def read_from_memory(key: str) -> Optional[Any]:
     """Read data from memory storage."""
-    return memory_store.get(key)
+    return mock_memory_store.get(key)
 
 async def write_to_memory(key: str, value: Any) -> bool:
     """Write data to memory storage."""
-    memory_store[key] = value
+    mock_memory_store[key] = value
     print(f"Writing to memory: {key} = {json.dumps(value, indent=2)}")
     return True
 
@@ -59,7 +59,7 @@ test_persona = "SAGE"
 def initialize_test_data():
     """Initialize test data in memory."""
     # Create a loop trace
-    memory_store[f"loop_trace[{test_loop_id}]"] = {
+    mock_memory_store[f"loop_trace[{test_loop_id}]"] = {
         "loop_id": test_loop_id,
         "status": "completed",
         "timestamp": datetime.utcnow().isoformat(),
@@ -70,10 +70,10 @@ def initialize_test_data():
     }
     
     # Create a loop summary text
-    memory_store[f"loop_summary_text[{test_loop_id}]"] = "This is a test summary for loop 005."
+    mock_memory_store[f"loop_summary_text[{test_loop_id}]"] = "This is a test summary for loop 005."
     
     # Create a loop summary with alignment and drift scores
-    memory_store[f"loop_summary[{test_loop_id}]"] = {
+    mock_memory_store[f"loop_summary[{test_loop_id}]"] = {
         "alignment_score": 0.72,
         "drift_score": 0.28,
         "summary_valid": True,
@@ -102,7 +102,7 @@ async def test_reflection_fatigue_scoring():
     
     # Test with float input (simulating the error condition)
     # This should not crash with our type safety fixes
-    memory_store[f"loop_trace[{test_loop_id}]"] = 0.5  # Simulate a float instead of a dictionary
+    mock_memory_store[f"loop_trace[{test_loop_id}]"] = 0.5  # Simulate a float instead of a dictionary
     
     try:
         fatigue_result = await process_reflection_fatigue(
@@ -134,12 +134,11 @@ async def test_bias_echo_detection():
     )
     
     print(f"Reflection result: {reflection_result}")
-    assert isinstance(reflection_result, dict), "Reflection result should be a dictionary"
-    assert "bias_echo" in reflection_result, "Reflection result should contain bias_echo"
-    
+    assert isinstance(reflection_result, dict), "Reflection result should be a dictionary"    assert "bias_echo" in reflection_result, "Reflection result should contain bias_echo"
+
     # Test with float input (simulating the error condition)
-    memory_store[f"loop_summary[{test_loop_id}]"] = 0.5  # Simulate a float instead of a dictionary
-    
+    mock_memory_store[f"loop_summary[{test_loop_id}]"] = 0.5  # Simulate a float instead of a dictionary
+
     try:
         reflection_result = await process_loop_reflection(
             test_loop_id,
@@ -170,12 +169,11 @@ async def test_rerun_decision_logic():
     )
     
     print(f"Decision result: {decision_result}")
-    assert isinstance(decision_result, dict), "Decision result should be a dictionary"
-    assert "decision" in decision_result, "Decision result should contain decision"
-    
+    assert isinstance(decision_result, dict), "Decision result should be a dictionary"    assert "decision" in decision_result, "Decision result should contain decision"
+
     # Test with float input (simulating the error condition)
-    memory_store[f"loop_summary[{test_loop_id}]"] = 0.5  # Simulate a float instead of a dictionary
-    
+    mock_memory_store[f"loop_summary[{test_loop_id}]"] = 0.5  # Simulate a float instead of a dictionary
+
     try:
         decision_result = await make_rerun_decision(
             test_loop_id,
@@ -215,7 +213,7 @@ async def test_complete_reflection_flow():
     # This tests all the type safety fixes together
     
     # 1. Float in loop trace
-    memory_store[f"loop_trace[{test_loop_id}]"] = 0.5
+    mock_memory_store[f"loop_trace[{test_loop_id}]"] = 0.5
     
     try:
         completion_result = await process_loop_completion(
@@ -233,7 +231,7 @@ async def test_complete_reflection_flow():
     initialize_test_data()
     
     # 2. Float in loop summary
-    memory_store[f"loop_summary[{test_loop_id}]"] = 0.5
+    mock_memory_store[f"loop_summary[{test_loop_id}]"] = 0.5
     
     try:
         completion_result = await process_loop_completion(
@@ -258,7 +256,7 @@ async def test_loop_005_reflection():
     print("\n=== Testing Loop 005 Reflection ===")
     
     # Set up Loop 005 with the exact conditions that caused the error
-    memory_store[f"loop_trace[loop_005]"] = {
+    mock_memory_store[f"loop_trace[loop_005]"] = {
         "loop_id": "loop_005",
         "status": "completed",
         "timestamp": datetime.utcnow().isoformat(),
@@ -268,10 +266,10 @@ async def test_loop_005_reflection():
         "reflection_fatigue": 0.0
     }
     
-    memory_store[f"loop_summary_text[loop_005]"] = "This is the summary for Loop 005."
+    mock_memory_store[f"loop_summary_text[loop_005]"] = "This is the summary for Loop 005."
     
     # The key issue: loop_summary is a float instead of a dictionary
-    memory_store[f"loop_summary[loop_005]"] = 0.5
+    mock_memory_store[f"loop_summary[loop_005]"] = 0.5
     
     try:
         # Process loop completion

@@ -21,7 +21,7 @@ except ImportError:
 
 # Import memory operations if available
 try:
-    from app.modules.memory_writer import write_memory
+    from app.api.modules.memory import write_memory
     memory_available = True
 except ImportError:
     memory_available = False

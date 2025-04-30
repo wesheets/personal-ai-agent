@@ -104,47 +104,18 @@ def get_routes_info(verification_results):
     return routes
 
 def get_agents_info():
-    """Extract agents information from agent registry"""
+    """Extract agents information from the enhanced agent registry."""
     agents = {}
     
-    # Try to find agent registry file
-    agent_registry_path = os.path.join(APP_DIR, "core", "agent_registry_enhanced.py")
-    if not os.path.exists(agent_registry_path):
-        agent_registry_path = os.path.join(APP_DIR, "core", "agent_registry.py")
-    
-    if os.path.exists(agent_registry_path):
-        # Read agent registry file
-        with open(agent_registry_path, "r") as f:
-            content = f.read()
+    # Iterate through the imported AGENT_REGISTRY from the enhanced module
+    for agent_id, agent_data in AGENT_REGISTRY.items():
+        agents[agent_id] = {
+            "name": agent_data.get("name", agent_id), # Use name from registry data if available
+            "status": "registered"
+            # Add other relevant info from agent_data if needed in the future
+        }
         
-        # Extract agent names (simple approach)
-        import re
-        agent_matches = re.findall(r'register_agent\(["\']([^"\']+)["\']', content)
-        
-        for agent_name in agent_matches:
-            agents[agent_name] = {
-                "name": agent_name,
-                "status": "registered",
-                "config_file": f"prompts/{agent_name}.json"
-            }
-    
-    # Add additional known agents from contracts
-    contracts_path = os.path.join(APP_DIR, "contracts", "agent_contracts.json")
-    if os.path.exists(contracts_path):
-        try:
-            with open(contracts_path, "r") as f:
-                contracts = json.load(f)
-            
-            for agent_name, contract in contracts.items():
-                if agent_name not in agents:
-                    agents[agent_name] = {
-                        "name": agent_name,
-                        "status": "contract_only",
-                        "config_file": contract.get("config_file", "unknown")
-                    }
-        except:
-            pass
-    
+    print(f"Found {len(agents)} agents in the enhanced registry.")
     return agents
 
 def get_schemas_info():
@@ -338,3 +309,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+import sys
+sys.path.append("/home/ubuntu/personal-ai-agent") # Add project root to path
+from app.core.agent_registry_enhanced import AGENT_REGISTRY
+

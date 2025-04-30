@@ -97,13 +97,13 @@ try:
     # --- Modified: Removed direct agent_routes import, using loop_controller now --- 
     # from app.routes.agent_routes import router as agent_router 
     # from app.modules.memory_writer import memory_store # Removed - Caused import error, functionality via memory_engine
-    from app.routes.memory_routes import router as memory_router
     from app.routes.loop_routes import router as loop_router
+    from app.routes.memory_routes import router as memory_router
 
     # Include core routers with proper API prefixes
     # app.include_router(agent_router, prefix="/api/agent") # Replaced by loop_router or specific agent endpoints
-    app.include_router(memory_router, prefix="/api/memory")
     app.include_router(loop_router, prefix="/api/loop") # Assuming loop_routes handles loop initiation
+    app.include_router(memory_router, prefix="/api/memory")
 
     loaded_routes.extend(["memory", "loop"])
     print("✅ Core routers (memory, loop) loaded with proper API prefixes")
@@ -260,7 +260,7 @@ except ImportError as e:
 # Orchestrator contract routes
 try:
     from app.routes.orchestrator_contract_routes import router as orchestrator_contract_router
-    app.include_router(orchestrator_contract_router, prefix="/api/orchestrator/contract")
+    app.include_router(orchestrator_contract_router)
     loaded_routes.append("orchestrator_contract")
     print("✅ Orchestrator contract routes loaded with /api/orchestrator/contract prefix")
 except ImportError as e:
@@ -353,4 +353,5 @@ if __name__ == "__main__":
     logger.info("Starting Personal AI Agent API...")
     
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=False) # Use string format for uvicorn
+
 
