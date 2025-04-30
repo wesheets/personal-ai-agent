@@ -21,7 +21,7 @@ from app.schemas.critic_schema import (
 
 # Import memory operations (Corrected import path for read_memory)
 try:
-    from app.modules.memory_writer import write_memory
+    from app.api.modules.memory import write_memory
     from app.modules.memory_reader import read_memory # Corrected import path
 except ImportError:
     logging.warning("⚠️ Could not import memory operations, using mock implementations")

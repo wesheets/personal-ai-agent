@@ -75,11 +75,24 @@ async def validate_contract(request: ContractValidationRequest if schema_availab
     
     try:
         # Extract request parameters
-        agent_id = request.agent_id if hasattr(request, "agent_id") else request.get("agent_id")
-        input_schema = request.input_schema if hasattr(request, "input_schema") else request.get("input_schema")
-        output_schema = request.output_schema if hasattr(request, "output_schema") else request.get("output_schema")
-        tool_used = request.tool_used if hasattr(request, "tool_used") else request.get("tool_used")
-        loop_id = request.loop_id if hasattr(request, "loop_id") else request.get("loop_id")
+        if schema_available:
+            # Use getattr for safe access to potentially optional fields in Pydantic model
+            agent_id = getattr(request, "agent_id", None)
+            input_schema = getattr(request, "input_schema", None)
+            output_schema = getattr(request, "output_schema", None)
+            tool_used = getattr(request, "tool_used", None)
+            loop_id = getattr(request, "loop_id", None)
+        else:
+            # Fallback for when schema is not available (request is Dict)
+            agent_id = request.get("agent_id")
+            input_schema = request.get("input_schema")
+            output_schema = request.get("output_schema")
+            tool_used = request.get("tool_used")
+            loop_id = request.get("loop_id")
+
+        # Ensure required fields are present even in Dict case
+        if not agent_id:
+             raise HTTPException(status_code=400, detail="Missing required field: agent_id")
         
         # Determine operation type
         operation_type = None

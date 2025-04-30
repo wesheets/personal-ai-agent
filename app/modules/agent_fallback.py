@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 import asyncio
 
 # Import memory-related functions
-from app.modules.memory_writer import write_memory
+from app.api.modules.memory import write_memory
 
 # Import delegate_task function directly instead of using HTTP requests
 from app.modules.delegate import delegate_task, AgentDelegateRequest

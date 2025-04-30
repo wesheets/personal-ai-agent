@@ -402,9 +402,7 @@ def halt_task(task_id_or_agent: str, reason: str) -> Dict[str, Any]:
     # Log the halt event
     log_supervision_event(event)
     
-    # Write to memory store if available
-    try:
-        from app.modules.memory_writer import write_memory
+        from app.api.modules.memory import write_memory
         
         memory = write_memory(
             agent_id="system",  # System is the agent recording this
@@ -463,10 +461,7 @@ def log_supervision_event(event: Dict[str, Any]) -> None:
     except Exception as e:
         logger.error(f"Failed to write to task log file: {str(e)}")
     
-    # Write to memory store if available and event is medium risk or higher
-    if event.get("risk_level") in ["medium", "high", "critical"]:
-        try:
-            from app.modules.memory_writer import write_memory
+        from app.api.modules.memory import write_memory
             
             memory = write_memory(
                 agent_id="system",  # System is the agent recording this

@@ -113,7 +113,7 @@ async def clear_rejection(loop_id: str) -> bool:
     """
     try:
         # Import write_memory here to avoid circular imports
-        from app.modules.memory_writer import write_memory
+        from app.api.modules.memory import write_memory
         
         # Write empty value to effectively delete
         memory_tag = f"loop_rejection_{loop_id}"

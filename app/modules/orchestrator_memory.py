@@ -13,7 +13,7 @@ from typing import Dict, Any, List, Optional, Union
 
 # Import memory utilities
 from app.memory.project_memory import PROJECT_MEMORY
-from app.modules.memory_writer import write_memory, read_memory
+from app.api.modules.memory import write_memory, read_memory
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

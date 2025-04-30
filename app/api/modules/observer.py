@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
-from app.modules.memory_writer import memory_store
+from app.modules.memory_writer import MEMORY_STORE
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime
@@ -72,7 +72,7 @@ def get_agent_actions(agent_id: str, limit: int, project_id: Optional[str] = Non
         raise HTTPException(status_code=400, detail="agent_id is required")
     
     # Filter memories by agent_id
-    agent_memories = [m for m in memory_store if m["agent_id"] == agent_id]
+    agent_memories = [m for m in MEMORY_STORE if m["agent_id"] == agent_id]
     
     # Apply project_id filter if provided
     if project_id:

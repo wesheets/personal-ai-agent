@@ -62,20 +62,20 @@ async def add_memory(request: MemoryAddRequest):
             # Read existing memory entries
             try:
                 with open(memory_file, 'r') as f:
-                    memory_store = json.load(f)
-                    if not isinstance(memory_store, dict):
-                        memory_store = {}
+                    MEMORY_STORE = json.load(f)
+                    if not isinstance(MEMORY_STORE, dict):
+                        MEMORY_STORE = {}
             except json.JSONDecodeError:
-                memory_store = {}
+                MEMORY_STORE = {}
         else:
-            memory_store = {}
+            MEMORY_STORE = {}
         
         # Add new memory entry
-        memory_store[request.key] = memory_entry
+        MEMORY_STORE[request.key] = memory_entry
         
         # Write updated memory store
         with open(memory_file, 'w') as f:
-            json.dump(memory_store, f, indent=2)
+            json.dump(MEMORY_STORE, f, indent=2)
         
         logger.info(f"✅ Successfully added memory with key: {request.key}")
         return MemoryAddResponse(
@@ -149,16 +149,16 @@ async def get_memory(key: str = Path(..., description="Key to retrieve from memo
         # Read memory entries
         try:
             with open(memory_file, 'r') as f:
-                memory_store = json.load(f)
+                MEMORY_STORE = json.load(f)
         except json.JSONDecodeError:
             raise HTTPException(status_code=500, detail="Failed to read memory store")
         
         # Check if key exists
-        if key not in memory_store:
+        if key not in MEMORY_STORE:
             raise HTTPException(status_code=404, detail=f"Memory key not found: {key}")
         
         # Get memory entry
-        memory_entry = memory_store[key]
+        memory_entry = MEMORY_STORE[key]
         
         logger.info(f"✅ Successfully retrieved memory with key: {key}")
         return MemoryGetResponse(

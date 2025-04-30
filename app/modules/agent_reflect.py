@@ -16,7 +16,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 # Import memory-related functions
-from app.modules.memory_writer import write_memory, generate_reflection
+from app.api.modules.memory import write_memory
+from app.modules.reflect import generate_reflection
 
 # Configure logging
 logger = logging.getLogger("api.modules.agent_reflect")

@@ -4,7 +4,7 @@ from typing import Dict, List, Any
 
 # Import memory_writer for logging agent actions
 try:
-    from app.modules.memory_writer import write_memory
+    from app.api.modules.memory import write_memory
     MEMORY_WRITER_AVAILABLE = True
 except ImportError:
     MEMORY_WRITER_AVAILABLE = False

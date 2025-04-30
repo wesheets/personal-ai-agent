@@ -99,12 +99,13 @@ async def process_build_task(loop_id: str, input_key: str, target_file: str) -> 
         # Write the generated code to memory
         output_key = f"hal_{input_key}_response"
         
-        memory_write_result = await write_memory(
-            agent_id=loop_id,
-            memory_type="loop",
-            tag=output_key,
-            value=response_data
-        )
+        memory_data = {
+            "agent_id": loop_id,
+            "type": "loop",
+            "tag": output_key,
+            "content": response_data
+        }
+        memory_write_result = await write_memory(memory_data)
         
         if not memory_write_result or memory_write_result.get("status") != "ok":
             error_msg = f"Failed to write generated code to memory: {memory_write_result.get('message', 'Unknown error')}"

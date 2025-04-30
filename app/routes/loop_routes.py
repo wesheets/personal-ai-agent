@@ -107,7 +107,9 @@ async def create_loop(request: LoopCreateRequest):
     Returns:
         LoopCreateResponse containing status and loop_id
     """
-    logger.info(f"🔍 DEBUG: loop_create endpoint called with plan_id: {request.plan_id}")
+    logger.info(f"➡️ Entering create_loop endpoint for plan_id: {request.plan_id}")
+    loop_id = str(uuid.uuid4())
+    logger.info(f"Generated loop_id: {loop_id}")
     
     try:
         # In a real implementation, this would store the data in a database
@@ -129,26 +131,41 @@ async def create_loop(request: LoopCreateRequest):
         }
         
         # Check if loop file exists
+        logger.info(f"Checking for loop store file: {loop_file}")
         if os.path.exists(loop_file):
             # Read existing loop entries
+            logger.info(f"Reading existing loop store from {loop_file}")
             try:
                 with open(loop_file, 'r') as f:
                     loop_store = json.load(f)
                     if not isinstance(loop_store, dict):
+                        logger.warning("Loop store file content is not a dictionary, initializing as empty.")
                         loop_store = {}
+                    else:
+                        logger.info(f"Successfully loaded {len(loop_store)} existing loop entries.")
             except json.JSONDecodeError:
+                logger.warning(f"Failed to decode JSON from {loop_file}, initializing as empty.")
                 loop_store = {}
         else:
+            logger.info(f"Loop store file {loop_file} not found, initializing as empty.")
             loop_store = {}
         
         # Add new loop entry
+        logger.info(f"Adding new loop entry for loop_id: {loop_id}")
         loop_store[loop_id] = loop_entry
         
         # Write updated loop store
-        with open(loop_file, 'w') as f:
-            json.dump(loop_store, f, indent=2)
+        logger.info(f"Writing updated loop store ({len(loop_store)} entries) to {loop_file}")
+        try:
+            with open(loop_file, 'w') as f:
+                json.dump(loop_store, f, indent=2)
+            logger.info(f"Successfully wrote updated loop store to {loop_file}")
+        except Exception as write_error:
+            logger.error(f"❌ Failed to write loop store to {loop_file}: {str(write_error)}")
+            # Optionally re-raise or handle this critical error
+            raise HTTPException(status_code=500, detail=f"Failed to save loop data: {str(write_error)}")
         
-        logger.info(f"✅ Successfully created loop with ID: {loop_id}")
+        logger.info(f"✅ Successfully created loop with ID: {loop_id}. Exiting create_loop endpoint.")
         return LoopCreateResponse(
             loop_id=loop_id,
             plan_id=request.plan_id,
@@ -158,7 +175,8 @@ async def create_loop(request: LoopCreateRequest):
             metadata=request.metadata
         )
     except Exception as e:
-        logger.error(f"❌ Error creating loop with plan_id {request.plan_id}: {str(e)}")
+        logger.error(f"❌ Error in create_loop for plan_id {request.plan_id}: {str(e)}")
+        logger.error(traceback.format_exc()) # Log full traceback
         
         # Log the error to loop_fallback.json
         try:
@@ -207,7 +225,7 @@ async def get_loop(loop_id: str = Path(..., description="Loop ID to retrieve")):
     Returns:
         LoopCreateResponse containing the loop metadata
     """
-    logger.info(f"🔍 DEBUG: loop_get endpoint called with loop_id: {loop_id}")
+    logger.info(f"➡️ Entering get_loop endpoint for loop_id: {loop_id}")
     
     try:
         # In a real implementation, this would retrieve data from a database
@@ -216,21 +234,32 @@ async def get_loop(loop_id: str = Path(..., description="Loop ID to retrieve")):
         loop_file = "/home/ubuntu/personal-ai-agent/logs/simple_loop_store.json"
         
         # Check if loop file exists
+        logger.info(f"Checking for loop store file: {loop_file}")
         if not os.path.exists(loop_file):
+            logger.warning(f"Loop store file {loop_file} not found for loop_id: {loop_id}")
             raise HTTPException(status_code=404, detail=f"Loop ID not found: {loop_id}")
         
         # Read loop entries
+        logger.info(f"Reading loop store from {loop_file}")
         try:
             with open(loop_file, 'r') as f:
                 loop_store = json.load(f)
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=500, detail="Failed to read loop store")
+            logger.info(f"Successfully loaded loop store data.")
+        except json.JSONDecodeError as json_err:
+            logger.error(f"❌ Failed to decode JSON from {loop_file}: {str(json_err)}")
+            raise HTTPException(status_code=500, detail=f"Failed to read loop store: {str(json_err)}")
+        except Exception as read_err:
+            logger.error(f"❌ Failed to read loop store file {loop_file}: {str(read_err)}")
+            raise HTTPException(status_code=500, detail=f"Failed to read loop store: {str(read_err)}")
         
         # Check if loop_id exists
+        logger.info(f"Checking if loop_id {loop_id} exists in the store.")
         if loop_id not in loop_store:
+            logger.warning(f"Loop ID {loop_id} not found in loop store.")
             raise HTTPException(status_code=404, detail=f"Loop ID not found: {loop_id}")
         
         # Get loop entry
+        logger.info(f"Retrieving loop entry for loop_id: {loop_id}")
         loop_entry = loop_store[loop_id]
         
         logger.info(f"✅ Successfully retrieved loop with ID: {loop_id}")
@@ -243,10 +272,12 @@ async def get_loop(loop_id: str = Path(..., description="Loop ID to retrieve")):
             metadata=loop_entry.get("metadata")
         )
     except HTTPException:
-        # Re-raise HTTP exceptions
+        # Re-raise HTTP exceptions after logging
+        logger.warning(f"HTTPException encountered in get_loop for loop_id {loop_id}: {traceback.format_exc()}")
         raise
     except Exception as e:
-        logger.error(f"❌ Error retrieving loop with ID {loop_id}: {str(e)}")
+        logger.error(f"❌ Unhandled error in get_loop for loop_id {loop_id}: {str(e)}")
+        logger.error(traceback.format_exc()) # Log full traceback
         
         # Log the error to loop_fallback.json
         try:
@@ -284,13 +315,15 @@ async def get_loop(loop_id: str = Path(..., description="Loop ID to retrieve")):
         
         raise HTTPException(status_code=500, detail=f"Failed to retrieve loop: {str(e)}")
 
-@router.post("/api/loop/plan", response_model=LoopPlanResponse)
+@router.post("/plan", response_model=LoopPlanResponse)
 async def plan_loop(request: LoopPlanRequest):
     """
     Create execution plan for a loop.
     """
+    logger.info(f"➡️ Entering plan_loop endpoint for loop_id: {request.loop_id}")
     # This would normally create a plan based on the prompt
     # For now, return a mock response
+    logger.info(f"✅ Mock plan generated for loop_id: {request.loop_id}. Exiting plan_loop endpoint.")
     return {
         "plan": {
             "steps": [
@@ -304,7 +337,7 @@ async def plan_loop(request: LoopPlanRequest):
         "status": "success"
     }
 
-@router.post("/api/loop/complete", response_model=LoopCompletionResponse)
+@router.post("/complete", response_model=LoopCompletionResponse)
 async def loop_complete_endpoint(request: LoopCompletionRequest):
     """
     Handle loop completion and initiate loop execution.
@@ -314,12 +347,17 @@ async def loop_complete_endpoint(request: LoopCompletionRequest):
     - Memory state activation
     - Orchestration delegation to HAL/NOVA/CRITIC
     """
+    logger.info(f"➡️ Entering loop_complete_endpoint for loop_id: {request.loop_id}, project_id: {request.project_id}, executor: {request.executor}")
+    
     # Validate required fields
     if not request.loop_id or not request.project_id or not request.executor:
+        logger.error(f"❌ Validation failed: loop_id, project_id, and executor are required. loop_id={request.loop_id}, project_id={request.project_id}, executor={request.executor}")
         raise HTTPException(status_code=400, detail="loop_id, project_id, and executor are required")
+    logger.info("Request validation successful.")
     
     try:
-        # Write to loop log
+        # Write to loop log (Mock)
+        logger.info(f"Attempting to write loop log entry for loop_id: {request.loop_id}")
         # This would normally write to a persistent storage
         loop_log_entry = {
             "loop_id": request.loop_id,
@@ -329,24 +367,30 @@ async def loop_complete_endpoint(request: LoopCompletionRequest):
             "status": "activated",
             "timestamp": datetime.now().isoformat()
         }
+        logger.info("Mock loop log entry created.")
         
-        # Activate memory state
+        # Activate memory state (Mock)
+        logger.info(f"Attempting to activate memory state for loop_id: {request.loop_id}")
         # This would normally update the memory state in a database
         memory_activation_result = {
             "status": "success",
             "loop_id": request.loop_id,
             "memory_state": "active"
         }
+        logger.info("Mock memory state activation completed.")
         
-        # Delegate to orchestration systems
+        # Delegate to orchestration systems (Mock)
+        logger.info(f"Attempting to delegate orchestration for loop_id: {request.loop_id}")
         # This would normally trigger the orchestration systems
         orchestration_result = {
             "status": "delegated",
             "systems": ["HAL", "NOVA", "CRITIC"],
             "loop_id": request.loop_id
         }
+        logger.info("Mock orchestration delegation completed.")
         
         # Return success response
+        logger.info(f"✅ Successfully activated loop {request.loop_id}. Exiting loop_complete_endpoint.")
         return {
             "status": "activated",
             "loop_id": request.loop_id,
@@ -357,9 +401,11 @@ async def loop_complete_endpoint(request: LoopCompletionRequest):
         }
     except Exception as e:
         # Log the error and return an error response
+        logger.error(f"❌ Error activating loop {request.loop_id}: {str(e)}")
+        logger.error(traceback.format_exc()) # Log full traceback
         raise HTTPException(status_code=500, detail=f"Failed to activate loop: {str(e)}")
 
-@router.post("/api/loop/respond", response_model=LoopResponseResult)
+@router.post("/respond", response_model=LoopResponseResult)
 async def loop_respond_endpoint(request: LoopResponseRequest):
     """
     Handle agent responses to memory within a loop.
@@ -527,7 +573,7 @@ async def loop_respond_endpoint(request: LoopResponseRequest):
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Failed to generate response: {str(e)}")
 
-@router.post("/api/loop/validate", response_model=LoopValidateResponse)
+@router.post("/validate", response_model=LoopValidateResponse)
 async def validate_loop(request: LoopValidateRequest):
     """
     Validate a loop against core requirements and enrich with cognitive controls.
@@ -547,7 +593,7 @@ async def validate_loop(request: LoopValidateRequest):
         "processed_by": "cognitive_control_layer"
     }
 
-@router.get("/api/loop/trace", response_model=LoopTraceResponse)
+@router.get("/trace/{loop_id}", response_model=LoopTraceResponse)
 async def get_loop_trace(project_id: Optional[str] = None):
     """
     Get loop memory trace log.
@@ -584,7 +630,7 @@ async def add_loop_trace(data: LoopTraceRequest):
         "message": f"Loop trace for {data.loop_id} added successfully"
     }
 
-@router.post("/api/loop/reset", response_model=LoopResetResponse)
+@router.post("/reset", response_model=LoopResetResponse)
 async def reset_loop(request: LoopResetRequest = None):
     """
     Memory reset for clean test runs.
@@ -597,7 +643,7 @@ async def reset_loop(request: LoopResetRequest = None):
         timestamp=datetime.now().isoformat()
     )
 
-@router.post("/api/loop/persona-reflect", response_model=PersonaReflectResponse)
+@router.post("/persona-reflect", response_model=PersonaReflectResponse)
 async def persona_reflect(data: PersonaReflectRequest):
     """
     Inject mode-aligned reflection trace.
@@ -610,3 +656,32 @@ async def persona_reflect(data: PersonaReflectRequest):
         "loop_id": data.loop_id,
         "message": f"Reflection for {data.loop_id} with persona {data.persona} added successfully"
     }
+
+
+# Added placeholder for missing /start route
+from app.models.loop import StartLoopRequest # Ensure schema is imported
+
+@router.post("/start", tags=["loop"])
+async def start_loop(request: StartLoopRequest):
+    """
+    Placeholder for starting a loop execution.
+    
+    Args:
+        request: StartLoopRequest containing project_id and optional agent_name/parameters
+            
+    Returns:
+        Simple success message.
+    """
+    logger.info(f"Received request to start loop for project_id: {request.project_id}")
+    logger.info(f"Agent name: {request.agent_name}, Parameters: {request.parameters}")
+    
+    # In a real implementation, this would trigger the loop controller/orchestrator
+    # For now, just return a placeholder success response
+    loop_id = str(uuid.uuid4()) # Generate a dummy ID for the response
+    return {
+        "status": "success", 
+        "message": f"Placeholder: Loop start initiated for project {request.project_id}",
+        "loop_id": loop_id
+    }
+
+

@@ -19,21 +19,21 @@ class DBVerifier:
     """Utility class for verifying database operations and connections"""
     
     @staticmethod
-    def verify_write_operation(memory_id: str, db_instance, memory_store: List[Dict[str, Any]]) -> Dict[str, bool]:
+    def verify_write_operation(memory_id: str, db_instance, in_memory_store: List[Dict[str, Any]]) -> Dict[str, bool]:
         """
-        Verify that a memory was successfully written to both the database and memory_store
+        Verify that a memory was successfully written to both the database and in_memory_store
         
         Args:
             memory_id: The ID of the memory to verify
             db_instance: The database instance to use for verification
-            memory_store: The in-memory store to check
+            in_memory_store: The in-memory store to check
             
         Returns:
             Dictionary with verification results
         """
         results = {
             "db_verification": False,
-            "memory_store_verification": False,
+            "in_memory_store_verification": False,
             "overall_success": False
         }
         
@@ -51,22 +51,22 @@ class DBVerifier:
             logger.error(f"❌ DB VERIFICATION ERROR: {str(e)}")
             print(f"❌ [VERIFY] DB verification error: {str(e)}")
         
-        # Verify in memory_store
+        # Verify in in_memory_store
         try:
-            memory_store_found = any(m.get("memory_id") == memory_id for m in memory_store)
+            memory_store_found = any(m.get("memory_id") == memory_id for m in in_memory_store)
             if memory_store_found:
-                results["memory_store_verification"] = True
-                logger.info(f"✅ MEMORY_STORE VERIFICATION: Memory {memory_id} found in memory_store")
-                print(f"✅ [VERIFY] Memory {memory_id} found in memory_store")
+                results["in_memory_store_verification"] = True
+                logger.info(f"✅ IN_MEMORY_STORE VERIFICATION: Memory {memory_id} found in in_memory_store")
+                print(f"✅ [VERIFY] Memory {memory_id} found in in_memory_store")
             else:
-                logger.warning(f"⚠️ MEMORY_STORE VERIFICATION FAILED: Memory {memory_id} not found in memory_store")
-                print(f"⚠️ [VERIFY] Memory {memory_id} not found in memory_store")
+                logger.warning(f"⚠️ IN_MEMORY_STORE VERIFICATION FAILED: Memory {memory_id} not found in in_memory_store")
+                print(f"⚠️ [VERIFY] Memory {memory_id} not found in in_memory_store")
         except Exception as e:
-            logger.error(f"❌ MEMORY_STORE VERIFICATION ERROR: {str(e)}")
-            print(f"❌ [VERIFY] Memory store verification error: {str(e)}")
+            logger.error(f"❌ IN_MEMORY_STORE VERIFICATION ERROR: {str(e)}")
+            print(f"❌ [VERIFY] In-memory store verification error: {str(e)}")
         
         # Overall success
-        results["overall_success"] = results["db_verification"] and results["memory_store_verification"]
+        results["overall_success"] = results["db_verification"] and results["in_memory_store_verification"]
         
         return results
     

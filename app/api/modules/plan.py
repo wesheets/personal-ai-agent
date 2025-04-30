@@ -19,7 +19,7 @@ from datetime import datetime
 # Import agent registry and memory-related functions
 from app.api.modules.agent import agent_registry, ensure_core_agents_exist, LLMEngine
 from app.api.modules.memory import write_memory
-from app.modules.memory_writer import memory_store
+from app.modules.memory_writer import MEMORY_STORE
 from app.api.modules.user_context import read_user_context
 
 # Import plan models

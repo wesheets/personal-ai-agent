@@ -24,7 +24,7 @@ from src.utils.debug_logger import log_test_result
 from app.api.modules.agent import agent_registry
 
 # Import memory store
-from app.modules.memory_writer import memory_store
+from app.modules.memory_writer import MEMORY_STORE
 
 # Configure logging
 logger = logging.getLogger("api.modules.system")
@@ -114,7 +114,7 @@ def get_memory_store_size():
     Returns:
         int: Total number of memory entries
     """
-    return len(memory_store)
+    return len(MEMORY_STORE)
 
 def get_modules_loaded():
     """
