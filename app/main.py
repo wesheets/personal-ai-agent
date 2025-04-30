@@ -3,6 +3,7 @@ import logging
 
 # Import routers
 from app.routes import loop_routes
+from app.routes import debug_routes
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +17,7 @@ app = FastAPI(
 
 # Include routers
 app.include_router(loop_routes.router, prefix="/api/loop", tags=["Loop Execution"])
+app.include_router(debug_routes.router, prefix="/debug", tags=["Debug"])
 
 @app.get("/healthz", tags=["System"])
 async def health_check():
@@ -23,4 +25,5 @@ async def health_check():
 
 logger.info("✅ FastAPI application initialized.")
 logger.info("✅ Loop routes loaded.")
+logger.info("✅ Debug routes loaded.")
 
