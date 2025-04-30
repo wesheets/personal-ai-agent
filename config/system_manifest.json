@@ -1,8 +1,8 @@
 {
   "manifest_version": "1.0",
   "batch_id": "12.3",
-  "timestamp": "2025-04-30T13:41:00Z", // Approximate time of generation
-  "description": "System manifest reflecting rebuilt cognition modules and trustable memory surfaces after Batch 12.2.",
+  "timestamp": "2025-04-30T15:11:00Z", // Approximate time of generation
+  "description": "System manifest reflecting rebuilt cognition modules and trustable memory surfaces after Batch 12.2, plus debug routes.",
   "rebuilt_modules": [
     {
       "path": "app/api/modules/memory.py",
@@ -15,8 +15,13 @@
       "status": "functional_with_mocks"
     },
     {
+      "path": "app/routes/debug_routes.py",
+      "description": "Added debug routes including /debug/status for healthcheck safety.",
+      "status": "functional"
+    },
+    {
       "path": "app/main.py",
-      "description": "Minimal FastAPI application setup including loop_routes.",
+      "description": "Minimal FastAPI application setup including loop_routes and debug_routes.",
       "status": "functional"
     }
   ],
