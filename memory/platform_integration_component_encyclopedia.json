@@ -1,3 +1,328 @@
 {
-    "tools": {}
+    "tools": {
+        "browser_move_mouse": {
+            "name": "browser_move_mouse",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_console_exec": {
+            "name": "browser_console_exec",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_scroll_down": {
+            "name": "browser_scroll_down",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "message_notify_user": {
+            "name": "message_notify_user",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "deploy_expose_port": {
+            "name": "deploy_expose_port",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "shell_kill_process": {
+            "name": "shell_kill_process",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_scroll_up": {
+            "name": "browser_scroll_up",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "shell_wait": {
+            "name": "shell_wait",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "file_str_replace": {
+            "name": "file_str_replace",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "info_search_web": {
+            "name": "info_search_web",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_navigate": {
+            "name": "browser_navigate",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_input": {
+            "name": "browser_input",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_press_key": {
+            "name": "browser_press_key",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "file_write": {
+            "name": "file_write",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_view": {
+            "name": "browser_view",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_save_image": {
+            "name": "browser_save_image",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "message_ask_user": {
+            "name": "message_ask_user",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "deploy_apply_deployment": {
+            "name": "deploy_apply_deployment",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_console_view": {
+            "name": "browser_console_view",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "shell_view": {
+            "name": "shell_view",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "idle": {
+            "name": "idle",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_click": {
+            "name": "browser_click",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "image_view": {
+            "name": "image_view",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "shell_exec": {
+            "name": "shell_exec",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "shell_write_to_process": {
+            "name": "shell_write_to_process",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "browser_select_option": {
+            "name": "browser_select_option",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        },
+        "file_read": {
+            "name": "file_read",
+            "description": "Placeholder description - needs manual update or discovery.",
+            "type": "ExternalTool",
+            "source": "/home/ubuntu/personal-ai-agent/config/tool_permissions.json",
+            "version": "N/A",
+            "dependencies": [],
+            "schemas": {
+                "input": "N/A",
+                "output": "N/A"
+            }
+        }
+    }
 }

@@ -11,3 +11,17 @@ class ForgeOutput(AgentResult):
     # Minimal placeholder
     pass
 
+# Added missing class definition
+class ForgeBuildSpec(BaseModel):
+    """Placeholder for Forge build specifications."""
+    # Define fields later as needed
+    pass
+
+
+
+# Added missing result class definition
+class ForgeBuildResult(AgentResult):
+    """Placeholder for Forge build results."""
+    # Define fields later as needed
+    pass
+

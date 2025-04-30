@@ -13,7 +13,7 @@ class SageReflectionRequest(BaseTaskPayload):
     operator_persona: Optional[Literal["light", "medium", "deep"]] = "medium"
 
 
-class SageReflectionResult(BaseAgentResult):
+class SageReflectionResult(AgentResult):
     """Output schema for the Sage agent."""
     passed: bool
     tone_summary: Optional[str] = None

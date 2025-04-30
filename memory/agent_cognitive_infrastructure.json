@@ -1,3 +1,94 @@
 {
-    "agents": {}
+    "agents": {
+        "forge": {
+            "key": "forge",
+            "name": "Forge",
+            "class_path": "app.agents.forge_agent.ForgeAgent",
+            "description": "Forge is the master builder of Promethios. It handles complex technical builds...",
+            "capabilities": [
+                "CODE_GENERATION",
+                "DEBUGGING",
+                "BUILD_AUTONOMY",
+                "MEMORY_WRITE",
+                "MEMORY_READ"
+            ],
+            "input_schema_path": "app.schemas.agents.forge.forge_schemas.ForgeBuildSpec",
+            "output_schema_path": "app.schemas.agents.forge.forge_schemas.ForgeBuildResult"
+        },
+        "orchestrator": {
+            "key": "orchestrator",
+            "name": "Orchestrator",
+            "class_path": "app.agents.orchestrator_agent.OrchestratorAgent",
+            "description": "Orchestrator is the primary cognitive interface and architectural strategist...",
+            "capabilities": [
+                "PLANNING",
+                "ARCHITECTURE",
+                "MEMORY_READ",
+                "MEMORY_WRITE",
+                "REFLECTION",
+                "PROMPTING"
+            ],
+            "input_schema_path": "app.schemas.agents.orchestrator.orchestrator_schemas.OrchestratorInstruction",
+            "output_schema_path": "app.schemas.agents.orchestrator.orchestrator_schemas.OrchestratorPlanResult"
+        },
+        "hal": {
+            "key": "hal",
+            "name": "HAL",
+            "class_path": "app.agents.hal_agent.HALAgent",
+            "description": "HAL is the minimum viable builder and researcher...",
+            "capabilities": [
+                "CODE_GENERATION",
+                "RESEARCH",
+                "LIGHT_BUILD",
+                "MEMORY_WRITE",
+                "MEMORY_READ"
+            ],
+            "input_schema_path": "app.schemas.agents.hal.hal_schemas.HALInstruction",
+            "output_schema_path": "app.schemas.agents.hal.hal_schemas.HALResult"
+        },
+        "nova": {
+            "key": "nova",
+            "name": "Nova",
+            "class_path": "app.agents.nova_agent.NovaAgent",
+            "description": "Nova is the UX/UI specialist of the Promethios system...",
+            "capabilities": [
+                "UI_GENERATION",
+                "UX_PLANNING",
+                "MEMORY_WRITE",
+                "MEMORY_READ"
+            ],
+            "input_schema_path": "app.schemas.agents.nova.nova_schemas.NovaInstruction",
+            "output_schema_path": "app.schemas.agents.nova.nova_schemas.NovaResult"
+        },
+        "critic": {
+            "key": "critic",
+            "name": "Critic",
+            "class_path": "app.agents.critic_agent.CriticAgent",
+            "description": "Critic is the cognitive validation layer of Promethios...",
+            "capabilities": [
+                "VALIDATION",
+                "REFLECTION",
+                "MEMORY_WRITE",
+                "MEMORY_READ",
+                "REJECTION"
+            ],
+            "input_schema_path": "app.schemas.agents.critic.critic_schemas.CriticReviewRequest",
+            "output_schema_path": "app.schemas.agents.critic.critic_schemas.CriticReviewResult"
+        },
+        "sage": {
+            "key": "sage",
+            "name": "Sage",
+            "class_path": "app.agents.sage_agent.SageAgent",
+            "description": "Sage is the philosophical and emotional validator of Promethios...",
+            "capabilities": [
+                "REFLECTION",
+                "TONE_ANALYSIS",
+                "MEMORY_READ",
+                "MEMORY_WRITE",
+                "INTENT_ALIGNMENT"
+            ],
+            "input_schema_path": "app.schemas.agents.sage.sage_schemas.SageReflectionRequest",
+            "output_schema_path": "app.schemas.agents.sage.sage_schemas.SageReflectionResult"
+        }
+    }
 }

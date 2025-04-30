@@ -11,3 +11,19 @@ class NovaOutput(AgentResult):
     # Minimal placeholder
     pass
 
+
+
+# Added missing class definition
+class NovaInstruction(BaseModel):
+    """Placeholder for Nova instructions."""
+    # Define fields later as needed
+    pass
+
+
+
+# Added missing result class definition
+class NovaResult(AgentResult):
+    """Placeholder for Nova results."""
+    # Define fields later as needed
+    pass
+

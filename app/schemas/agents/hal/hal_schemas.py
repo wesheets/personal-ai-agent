@@ -11,3 +11,17 @@ class HalOutput(AgentResult):
     # Minimal placeholder
     pass
 
+# Added missing class definition
+class HALInstruction(BaseModel):
+    """Placeholder for HAL instructions."""
+    # Define fields later as needed
+    pass
+
+
+
+# Added missing result class definition
+class HALResult(AgentResult):
+    """Placeholder for HAL results."""
+    # Define fields later as needed
+    pass
+

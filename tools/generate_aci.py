@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import re # Import re for parsing error messages
 from pathlib import Path
 
 # Ensure the app directory is in the Python path
@@ -12,41 +13,68 @@ sys.path.append(str(Path(__file__).parent.parent))
 # This ensures the @register decorators run and populate the registry
 # before the script accesses it.
 print("Importing agent modules for registration...")
-try:
-    import app.agents.forge_agent
-    print("✅ Imported forge_agent")
-except ImportError as e:
-    print(f"⚠️ Failed to import forge_agent: {e}")
-try:
-    import app.agents.orchestrator_agent
-    print("✅ Imported orchestrator_agent")
-except ImportError as e:
-    print(f"⚠️ Failed to import orchestrator_agent: {e}")
-try:
-    import app.agents.hal_agent
-    print("✅ Imported hal_agent")
-except ImportError as e:
-    print(f"⚠️ Failed to import hal_agent: {e}")
-try:
-    import app.agents.nova_agent
-    print("✅ Imported nova_agent")
-except ImportError as e:
-    print(f"⚠️ Failed to import nova_agent: {e}")
-try:
-    import app.agents.critic_agent
-    print("✅ Imported critic_agent")
-except ImportError as e:
-    print(f"⚠️ Failed to import critic_agent: {e}")
-try:
-    import app.agents.sage_agent
-    print("✅ Imported sage_agent")
-except ImportError as e:
-    print(f"⚠️ Failed to import sage_agent: {e}")
+missing_capabilities = set()
+agent_import_errors = {}
+
+agent_modules = [
+    "app.agents.forge_agent",
+    "app.agents.orchestrator_agent",
+    "app.agents.hal_agent",
+    "app.agents.nova_agent",
+    "app.agents.critic_agent",
+    "app.agents.sage_agent"
+]
+
+for module_name in agent_modules:
+    agent_key = module_name.split('.')[-1]
+    try:
+        __import__(module_name)
+        print(f"✅ Imported {agent_key}")
+    except ImportError as e:
+        err_msg = f"Failed to import {agent_key} (ImportError): {e}"
+        print(f"⚠️ {err_msg}")
+        agent_import_errors[agent_key] = err_msg
+    except AttributeError as e:
+        # Check if it's the expected enum error
+        error_str = str(e)
+        # Use regex to find potential missing capability (assuming format like "AttributeError: FOO")
+        match = re.search(r"AttributeError: ([A-Z_]+)$", error_str)
+        if match:
+            missing_name = match.group(1)
+            missing_capabilities.add(missing_name)
+            err_msg = f"Failed to import {agent_key} due to missing capability: {missing_name}"
+            print(f"⚠️ {err_msg}")
+            # Store specific capability error, but allow script to continue
+            if agent_key not in agent_import_errors:
+                 agent_import_errors[agent_key] = []
+            if isinstance(agent_import_errors[agent_key], list):
+                 agent_import_errors[agent_key].append(err_msg)
+        else:
+            err_msg = f"Failed to import {agent_key} (AttributeError): {e}"
+            print(f"⚠️ {err_msg}")
+            agent_import_errors[agent_key] = err_msg # Overwrite if a non-capability error occurs
+    except Exception as e:
+        err_msg = f"Failed to import {agent_key} (Other Exception): {type(e).__name__}: {e}"
+        print(f"⚠️ {err_msg}")
+        agent_import_errors[agent_key] = err_msg
+
 print("Finished importing agent modules.")
+
+# Print summary of missing capabilities found during imports
+if missing_capabilities:
+    print("\n--- Discovered Missing Agent Capabilities During Import --- ")
+    for cap in sorted(list(missing_capabilities)):
+        print(f"- {cap}")
+    print("--------------------------------------------------------\n")
 # --- End Agent Module Imports --- 
 
-from app.core.agent_registry import AGENT_REGISTRY
-from app.core.agent_types import AgentCapability
+# Import necessary components after attempting agent imports
+try:
+    from app.core.agent_registry import AGENT_REGISTRY
+    from app.core.agent_types import AgentCapability
+except Exception as e:
+    print(f"FATAL: Could not import core components (AGENT_REGISTRY, AgentCapability): {e}")
+    sys.exit(1) # Cannot proceed without these
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -55,12 +83,10 @@ logger = logging.getLogger(__name__)
 def get_schema_path(schema_obj):
     """Helper function to safely get the full path of a schema object."""
     if schema_obj and hasattr(schema_obj, '__module__') and hasattr(schema_obj, '__name__'):
-        # Attempt to construct path relative to 'app' assuming standard structure
         module_parts = schema_obj.__module__.split('.')
         if module_parts[0] == 'app':
              return f"{schema_obj.__module__}.{schema_obj.__name__}"
         else:
-            # Fallback if module is not directly under 'app' (might need adjustment)
             logger.warning(f"Schema module '{schema_obj.__module__}' not directly under 'app'. Path might be incorrect.")
             return f"{schema_obj.__module__}.{schema_obj.__name__}"
     return "N/A"
@@ -71,18 +97,16 @@ def generate_aci(output_path: str):
     logger.info(f"Scanning AGENT_REGISTRY for agents...")
 
     if not AGENT_REGISTRY:
-        logger.warning("AGENT_REGISTRY is empty. No agents to add to ACI.")
+        logger.warning("AGENT_REGISTRY is empty. No agents to add to ACI. Check import errors above.")
     else:
         logger.info(f"Found {len(AGENT_REGISTRY)} potential agent registrations.")
         for agent_key, agent_info in AGENT_REGISTRY.items():
             logger.info(f"Processing agent registration: {agent_key}")
             try:
-                # Validate the structure of agent_info
                 if not isinstance(agent_info, dict):
                     logger.warning(f"Skipping agent {agent_key}: Registration data is not a dictionary.")
                     continue
                 
-                # Check for the agent class object directly
                 if 'class' not in agent_info or not agent_info['class']:
                     logger.warning(f"Skipping agent {agent_key}: Missing or invalid 'class' in registration data.")
                     continue
@@ -91,15 +115,12 @@ def generate_aci(output_path: str):
                 agent_name = agent_info.get('name', 'Unknown Name')
                 agent_description = agent_info.get('description', 'No description provided.')
                 
-                # Safely get schema objects from the agent class itself
                 input_schema = getattr(agent_class, 'input_schema', None)
                 output_schema = getattr(agent_class, 'output_schema', None)
 
-                # Get schema paths using the helper function
                 input_schema_path = get_schema_path(input_schema)
                 output_schema_path = get_schema_path(output_schema)
 
-                # Extract capabilities (assuming they are AgentCapability enums)
                 capabilities_raw = agent_info.get('capabilities', [])
                 capabilities = []
                 if isinstance(capabilities_raw, list):
@@ -107,13 +128,16 @@ def generate_aci(output_path: str):
                         if isinstance(cap, AgentCapability):
                             capabilities.append(cap.name)
                         elif isinstance(cap, str):
-                             capabilities.append(cap) # Allow strings if needed
+                             capabilities.append(cap) 
+                        # Check if it's a missing capability identified earlier
+                        elif isinstance(cap, str) and cap in missing_capabilities:
+                             capabilities.append(f"MISSING_ENUM: {cap}") # Mark as missing
+                             logger.warning(f"Agent {agent_key} references missing capability '{cap}' in its registration.")
                         else:
                             logger.warning(f"Invalid capability type for agent {agent_key}: {type(cap)}")
                 else:
                      logger.warning(f"Capabilities for agent {agent_key} is not a list.")
 
-                # Construct class path
                 class_path = f"{agent_class.__module__}.{agent_class.__name__}"
 
                 aci_data["agents"][agent_key] = {
@@ -124,20 +148,20 @@ def generate_aci(output_path: str):
                     "capabilities": capabilities,
                     "input_schema_path": input_schema_path,
                     "output_schema_path": output_schema_path,
-                    # Add other relevant details later (e.g., version, dependencies)
                 }
                 logger.info(f"Successfully added {agent_name} ({agent_key}) to ACI data.")
 
             except Exception as e:
-                # Log specific errors during processing of an agent
                 logger.error(f"Error processing agent {agent_key}: {e}", exc_info=True)
 
-    # Ensure the output directory exists
+    # Add import errors to the ACI data for visibility
+    if agent_import_errors:
+        aci_data['import_errors'] = agent_import_errors
+
     output_dir = os.path.dirname(output_path)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
 
-    # Write the ACI data to the specified JSON file
     try:
         with open(output_path, 'w') as f:
             json.dump(aci_data, f, indent=4)
@@ -148,16 +172,11 @@ def generate_aci(output_path: str):
         logger.error(f"Failed to serialize ACI data to JSON: {e}")
 
 if __name__ == "__main__":
-    # Determine the project root directory (assuming tools/ is one level down)
     project_root = Path(__file__).parent.parent
     default_output = project_root / "memory" / "agent_cognitive_infrastructure.json"
     
     output_file_path = default_output
-    # Allow overriding output path via command-line argument if needed later
-    # if len(sys.argv) > 1:
-    #     output_file_path = sys.argv[1]
-
-    logger.info(f"Starting ACI generation. Output file: {output_file_path}")
+    logger.info(f"Starting ACI generation (Discovery Mode). Output file: {output_file_path}")
     generate_aci(str(output_file_path))
     logger.info("ACI generation process finished.")
 
