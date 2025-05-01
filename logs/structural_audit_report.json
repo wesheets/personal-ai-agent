@@ -1,0 +1,346 @@
+{
+  "audit_target": "/home/ubuntu/promethios_file_tree_plan.v2.8_ui_patched.json",
+  "summary": {
+    "total_entries_analyzed": 631,
+    "missing_schemas_count": 3,
+    "missing_routes_count": 0,
+    "missing_handlers_count": 0,
+    "to_be_built_count": 31,
+    "dependency_issues_count": 33
+  },
+  "details": {
+    "missing_schemas": [
+      "app/schemas/memory/file_tree.schema.json",
+      "app/schemas/loop/build_module.schema.json",
+      "app/schemas/memory/task_log.schema.json"
+    ],
+    "missing_routes": [],
+    "missing_handlers": [],
+    "to_be_built_components": {
+      "agent": [
+        {
+          "path": "app/agents/architect_agent.py",
+          "dependencies": [
+            "app/memory/file_tree.json",
+            "config/final_truth_surface_manifest.json"
+          ]
+        },
+        {
+          "path": "app/agents/build_error_handler.py",
+          "dependencies": [
+            "logs/build_plan_history.json",
+            "app/memory/task_log.json"
+          ]
+        }
+      ],
+      "planner_logic": [
+        {
+          "path": "app/modules/prompt_template_engine.py",
+          "dependencies": []
+        }
+      ],
+      "cognitive_log": [
+        {
+          "path": "app/memory/reflection_thread.json",
+          "dependencies": []
+        }
+      ],
+      "memory_surface": [
+        {
+          "path": "app/memory/conversation_memory.json",
+          "dependencies": []
+        },
+        {
+          "path": "app/memory/file_tree.json",
+          "dependencies": []
+        }
+      ],
+      "nlp_tool": [
+        {
+          "path": "app/modules/emotion_context_extractor.py",
+          "dependencies": []
+        }
+      ],
+      "schema": [
+        {
+          "path": "app/schemas/comments/nested_comment.schema.json",
+          "dependencies": []
+        }
+      ],
+      "meta_log": [
+        {
+          "path": "app/memory/prompt_memory_plan.json",
+          "dependencies": []
+        }
+      ],
+      "log": [
+        {
+          "path": "logs/build_plan_history.json",
+          "dependencies": []
+        }
+      ],
+      "module": [
+        {
+          "path": "app/modules/dependency_analyzer.py",
+          "dependencies": [
+            "app/memory/file_tree.json"
+          ]
+        },
+        {
+          "path": "app/modules/resource_monitor.py",
+          "dependencies": []
+        }
+      ],
+      "ui_component": [
+        {
+          "path": "app/ui/components/CoreBeliefsViewer.jsx",
+          "dependencies": [
+            "app/memory/core_beliefs.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/AgentLoopDebugLogViewer.jsx",
+          "dependencies": [
+            "app/memory/agent_loop_debug_log.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/SystemManifestViewer.jsx",
+          "dependencies": [
+            "system/system_manifest.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/ConversationMemoryViewer.jsx",
+          "dependencies": [
+            "app/memory/conversation_memory.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/SnapshotLatestViewer.jsx",
+          "dependencies": [
+            "system/snapshot_latest.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/SaasComponentManifestViewer.jsx",
+          "dependencies": [
+            "app/memory/saas_component_manifest.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/AgentCognitionIndexViewer.jsx",
+          "dependencies": [
+            "system/agent_cognition_index.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/BeliefIdentityCheckpointViewer.jsx",
+          "dependencies": [
+            "app/memory/belief_identity_checkpoint.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/OperatorUnlockTrackerViewer.jsx",
+          "dependencies": [
+            "app/memory/operator_unlock_tracker.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/RepairTriggerQueueViewer.jsx",
+          "dependencies": [
+            "app/memory/repair_trigger_queue.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/ScmSnapshotBatch2Start20250429Viewer.jsx",
+          "dependencies": [
+            "system/scm_snapshot_batch2_start_20250429.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/SystemConsciousnessIndexViewer.jsx",
+          "dependencies": [
+            "system/system_consciousness_index.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/ReflectionThreadViewer.jsx",
+          "dependencies": [
+            "app/memory/reflection_thread.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/LoopBeliefUnlockRequestViewer.jsx",
+          "dependencies": [
+            "app/memory/loop_belief_unlock_request.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/LoopSummaryDriftReportViewer.jsx",
+          "dependencies": [
+            "app/memory/loop_summary_drift_report.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/SystemComponentMapViewer.jsx",
+          "dependencies": [
+            "system/system_component_map.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/SystemAcknowledgmentsViewer.jsx",
+          "dependencies": [
+            "app/memory/system_acknowledgments.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/PromptMemoryPlanViewer.jsx",
+          "dependencies": [
+            "app/memory/prompt_memory_plan.json"
+          ]
+        },
+        {
+          "path": "app/ui/components/StatusViewer.jsx",
+          "dependencies": [
+            "system/status.json"
+          ]
+        }
+      ]
+    },
+    "dependency_issues": [
+      {
+        "component": "app/memory/belief_identity_checkpoint.json",
+        "missing_dependency": "app/schemas/self/belief_state.schema.json"
+      },
+      {
+        "component": "app/validators/loop_drift_analyzer.py",
+        "missing_dependency": "app/memory/loop_summary.json"
+      },
+      {
+        "component": "app/validators/loop_drift_analyzer.py",
+        "missing_dependency": "app/validators/mutation_verification.py"
+      },
+      {
+        "component": "app/memory/operator_unlock_tracker.json",
+        "missing_dependency": "app/tools/truth_guard.py"
+      },
+      {
+        "component": "app/memory/operator_unlock_tracker.json",
+        "missing_dependency": "app/config/final_truth_surface_manifest.json"
+      },
+      {
+        "component": "app/memory/loop_summary_drift_report.json",
+        "missing_dependency": "app/memory/loop_trace.json"
+      },
+      {
+        "component": "tools/validate_snapshot_before_build.py",
+        "missing_dependency": "acknowledged_snapshot_hash.txt"
+      },
+      {
+        "component": "app/memory/system_acknowledgments.json",
+        "missing_dependency": "agent_snapshot_guard.py"
+      },
+      {
+        "component": "app/memory/system_acknowledgments.json",
+        "missing_dependency": "validate_snapshot_before_build.py"
+      },
+      {
+        "component": "tools/endpoint_200_ok_checker.py",
+        "missing_dependency": "app/registries/endpoint_registry.py"
+      },
+      {
+        "component": "app/agents/orchestrator.py",
+        "missing_dependency": "app/memory/task_log.json"
+      },
+      {
+        "component": "app/agents/hal.py",
+        "missing_dependency": "app/memory/project_scope.json"
+      },
+      {
+        "component": "app/agents/critic.py",
+        "missing_dependency": "app/memory/task_log.json"
+      },
+      {
+        "component": "app/agents/ash.py",
+        "missing_dependency": "app/memory/task_log.json"
+      },
+      {
+        "component": "app/agents/sage.py",
+        "missing_dependency": "app/memory/loop_summary.md"
+      },
+      {
+        "component": "app/schemas/loop/build_module.schema.json",
+        "missing_dependency": "app/memory/task_log.json"
+      },
+      {
+        "component": "app/schemas/memory/task_log.schema.json",
+        "missing_dependency": "app/memory/task_log.json"
+      },
+      {
+        "component": "app/ui/components/LoopRunnerPanel.jsx",
+        "missing_dependency": "app/memory/task_log.json"
+      },
+      {
+        "component": "app/ui/components/LoopRunnerPanel.jsx",
+        "missing_dependency": "app/memory/loop_summary.md"
+      },
+      {
+        "component": "app/ui/components/AgentLogViewer.jsx",
+        "missing_dependency": "app/memory/task_log.json"
+      },
+      {
+        "component": "plugins/agents/skeptic/skeptic_agent.py",
+        "missing_dependency": "agent_plugin_storage.json"
+      },
+      {
+        "component": "plugins/agents/skeptic/skeptic_agent.py",
+        "missing_dependency": "loop_summary.py"
+      },
+      {
+        "component": "plugins/agents/philosopher/philosopher_agent.py",
+        "missing_dependency": "PROMETHIOS_CORE.md"
+      },
+      {
+        "component": "plugins/agents/philosopher/philosopher_agent.py",
+        "missing_dependency": "belief_volatility_tracker.py"
+      },
+      {
+        "component": "plugins/agents/reconciler/reconciler_agent.py",
+        "missing_dependency": "loop_summary_drift_report.json"
+      },
+      {
+        "component": "plugins/agents/reconciler/reconciler_agent.py",
+        "missing_dependency": "loop_trace.schema.json"
+      },
+      {
+        "component": "plugins/agents/trust_score_manager/trust_score_manager.py",
+        "missing_dependency": "loop_trace.json"
+      },
+      {
+        "component": "plugins/agents/trust_score_manager/trust_score_manager.py",
+        "missing_dependency": "agent_plugin_storage.json"
+      },
+      {
+        "component": "plugins/agents/symbolist/symbolist_agent.py",
+        "missing_dependency": "symbolic_classifier.py"
+      },
+      {
+        "component": "plugins/agents/symbolist/symbolist_agent.py",
+        "missing_dependency": "loop_summary.py"
+      },
+      {
+        "component": "app/validators/agent_reflection_injector.py",
+        "missing_dependency": "app/memory/loop_summary.md"
+      },
+      {
+        "component": "app/agents/architect_agent.py",
+        "missing_dependency": "config/final_truth_surface_manifest.json"
+      },
+      {
+        "component": "app/agents/build_error_handler.py",
+        "missing_dependency": "app/memory/task_log.json"
+      }
+    ]
+  }
+}
