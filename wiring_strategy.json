@@ -1,0 +1,46 @@
+{
+  "strategy_name": "Core Infrastructure -> Agents -> UI Components",
+  "description": "Defines the build order for Promethios components based on dependency and stability. Core infrastructure is built first, followed by agents, and finally UI components.",
+  "build_phases": [
+    {
+      "phase_name": "Phase 1: Core Infrastructure",
+      "description": "Build and validate foundational components: schemas (including missing ones identified in audit), registries, core memory surfaces, validation tools, and essential modules.",
+      "priority_components": [
+        "app/schemas/memory/file_tree.schema.json",
+        "app/schemas/loop/build_module.schema.json",
+        "app/schemas/memory/task_log.schema.json",
+        "app/registries/*",
+        "app/validators/*",
+        "tools/validate_truth_surface.py",
+        "tools/validate_functional_surface.py",
+        "app/memory/file_tree.json",
+        "app/memory/task_log.json",
+        "app/modules/dependency_analyzer.py",
+        "app/modules/resource_monitor.py",
+        "app/modules/prompt_template_engine.py"
+      ],
+      "rationale": "Ensures a stable foundation of contracts, discovery mechanisms, validation, and core memory before building dependent components like agents."
+    },
+    {
+      "phase_name": "Phase 2: Agents",
+      "description": "Build and validate agents marked 'to_be_built', ensuring they integrate with the core infrastructure.",
+      "priority_components": [
+        "app/agents/architect_agent.py",
+        "app/agents/build_error_handler.py",
+        "app/modules/emotion_context_extractor.py" 
+      ],
+      "rationale": "Agents rely on core infrastructure (schemas, memory). Building them after the foundation is stable minimizes integration issues."
+    },
+    {
+      "phase_name": "Phase 3: UI Components",
+      "description": "Build and validate UI components marked 'to_be_built', linking them to their respective memory surfaces.",
+      "priority_components": [
+        "app/ui/components/*"
+      ],
+      "rationale": "UI components are primarily for visualization and interaction with existing memory surfaces and agent states. Building them last ensures the underlying data and logic they depend on are already functional."
+    }
+  ],
+  "general_rationale": "This phased approach minimizes circular dependencies during the initial build, allows for integration validation at key stages, and prioritizes core functionality before presentation layers.",
+  "audit_reference": "/home/ubuntu/logs/structural_audit_report.json"
+}
+

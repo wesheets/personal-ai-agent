@@ -1,0 +1,25 @@
+{
+  "strategy_name": "Execution Plan Verification Tracking with Dedicated Validation Tool",
+  "adopted_options": [
+    "Option B (verified: true/false/pending flag in batch_15_execution_plan.json)",
+    "Option C (Implement validate_functional_surface.py)"
+  ],
+  "reasoning": "This combined approach offers the best balance of robustness, clarity, and practicality. Option C provides a dedicated, reusable tool for performing the actual functional checks (schema, syntax, route registration, mock memory interaction). Option B provides a clear, persistent, and memory-loss-resilient audit trail by tracking the verification status (`verified: true/false/pending`) directly within the `batch_15_execution_plan.json`. This avoids frequent modifications to the core file tree plan (unlike Option A), keeping it as a stable target architecture definition, while the execution plan reflects the dynamic state of the build, including verification progress. Batch prompts will explicitly require updating this status after validation steps using the Option C tool.",
+  "enhancements": [
+    {
+      "name": "Configurable Validation Depth",
+      "description": "The `validate_functional_surface.py` tool should allow configuration of validation depth (e.g., basic syntax/import check early, full route/memory check later) depending on the build stage."
+    },
+    {
+      "name": "Explicit Linking in Execution Plan",
+      "description": "The `batch_15_execution_plan.json` must clearly link components to their `verified` status and the specific batch/step where validation occurred or failed."
+    }
+  ],
+  "additional_fail_safe": {
+    "name": "Cross-Batch Dependency Verification Check",
+    "description": "Before starting any batch, implement an automated check within the build runner/orchestrator. This check verifies if all explicit dependencies listed for the components targeted in the *current* batch have `verified: true` status in the `batch_15_execution_plan.json` from *previous* batches. If any dependency is missing or not verified, the current batch is blocked, an error is logged, and a potential repair/validation sub-task is flagged. This prevents building components on unverified foundations across batch boundaries."
+  },
+  "validation_scope": "Validation must be performed for all components, including stubs, recovered files, and files marked `found_in_repo` or `discovered_in_archive`. Presence does not imply function.",
+  "memory_resilience": "Tracking verification status within the persisted `batch_15_execution_plan.json` ensures this critical information survives memory loss and allows recovery by consulting the plan."
+}
+
