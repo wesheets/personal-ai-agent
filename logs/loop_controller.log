@@ -1,0 +1,94 @@
+2025-05-02 09:58:42,536 - INFO - Running loop_controller.py directly (skeleton test).
+2025-05-02 09:58:42,536 - INFO - LoopController initialized.
+2025-05-02 09:58:42,536 - INFO - Starting loop controller skeleton execution.
+2025-05-02 09:58:42,538 - INFO - Successfully loaded execution plan from /home/ubuntu/personal-ai-agent/batch_15_execution_plan.json
+2025-05-02 09:58:42,538 - INFO - Plan contains 37 batches (assuming list format).
+2025-05-02 09:58:42,538 - INFO - Iterating through batches (placeholder - no execution logic implemented).
+2025-05-02 09:58:42,538 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,538 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,538 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,538 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,539 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,540 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,540 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,540 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,540 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,540 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,540 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,540 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,540 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,540 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,541 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,542 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,542 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,542 - INFO - Processing batch N/A with status N/A (Placeholder - no action taken).
+2025-05-02 09:58:42,542 - INFO - Loop controller skeleton execution finished.
+2025-05-02 09:58:42,542 - INFO - Finished running loop_controller.py directly.
+2025-05-02 10:18:21,041 - INFO - Running loop_controller.py directly (Scaffold Test - Phase 4.0).
+2025-05-02 10:18:21,041 - INFO - LoopController initialized (Phase 4.0 Scaffold).
+2025-05-02 10:18:21,041 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.041701", "event_type": "loop_scaffold_start", "details": {}}
+2025-05-02 10:18:21,041 - INFO - Starting loop controller scaffold execution (Phase 4.0).
+2025-05-02 10:18:21,041 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.041918", "event_type": "load_plan_start", "details": {"path": "/home/ubuntu/personal-ai-agent/batch_15_execution_plan.json"}}
+2025-05-02 10:18:21,042 - INFO - Successfully loaded execution plan from /home/ubuntu/personal-ai-agent/batch_15_execution_plan.json
+2025-05-02 10:18:21,042 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.042700", "event_type": "load_plan_success", "details": {"plan_info": {"type": "list", "num_batches": 37}}}
+2025-05-02 10:18:21,043 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.043056", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,043 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.043267", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,043 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.043383", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,043 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.043477", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,043 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.043571", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,043 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.043685", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,043 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.043767", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,043 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.043841", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,043 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.043919", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044062", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044151", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044220", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044302", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044390", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044471", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044549", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044645", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044724", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044793", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,044 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.044874", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,045 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.045072", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,045 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.045169", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,045 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.045268", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,045 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.045366", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,045 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.045462", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,045 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.045560", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,045 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.045661", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,045 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.045762", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,045 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.045857", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,046 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.046014", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,046 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.046132", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,046 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.046238", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,046 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.046332", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,046 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.046406", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,046 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.046497", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,046 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.046602", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,046 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.046678", "event_type": "batch_skipped", "details": {"batch_id": "N/A"}}
+2025-05-02 10:18:21,046 - WARNING - Target batch 15.27 not found in the execution plan.
+2025-05-02 10:18:21,046 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.046819", "event_type": "target_batch_not_found", "details": {"batch_id": "15.27"}}
+2025-05-02 10:18:21,046 - INFO - Loop controller scaffold execution finished.
+2025-05-02 10:18:21,047 - INFO - LOOP_TRACE: {"timestamp": "2025-05-02T14:18:21.047003", "event_type": "loop_scaffold_end", "details": {}}
+2025-05-02 10:18:21,047 - INFO - Finished running loop_controller.py directly.
