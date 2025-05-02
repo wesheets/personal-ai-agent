@@ -53,19 +53,18 @@ Phase 2 reconciliation is complete. The `promethios_file_tree_plan.v2.9_runtime_
 
 ---
 
-## Phase 3: Operator Injection – Governance Layer (Post-Reconciliation)
+## Phase 4.1 Final Governance Injection – File Path Adjustments
 
-**Date:** Auto-appended
+The following Operator-injected files were added to the system to enforce structural trust, schema validation, and agent/tool permissions during recursive cognition. Names were updated or adjusted to avoid conflict with prior files:
 
-The following files were injected directly by Operator following structural reconciliation (v2.9):
+| File | Path | Purpose |
+|------|------|---------|
+| `agent_governance.json` | `app/config/` | Defines tools and schemas per agent under governance |
+| `agent_governance.schema.json` | `app/schemas/config/` | Schema-bound validator for governance file |
+| `loop_controller_post_hook.py` | `app/core/` | Logs memory output after loop execution for prompt recovery |
+| `system_manifest.runtime.json` | `config/` | Runtime-accurate manifest with `plan_reference` key added |
 
-- `app/registries/toolkit_registry.py`
-- `app/config/agent_registry.json`
-- `app/schemas/loop/loop_trace.guard.json`
-- `config/system_manifest.json`
-- `docs/PHASE_4_OPERATOR_ALIGNMENT.md` (this file)
-
-**Status Annotation:** All files were added to the architectural plan as `source: "Operator"` and `status: "injected_by_operator"` to prevent drift misclassification and ensure auditable memory alignment during Phase 4.1 cognition.
-
-These files represent governance scaffolds that lock in trust boundaries for recursive loop activation and future memory mutation.
+- These were added in addition to previously aligned files (`toolkit_registry.py`, `loop_trace.guard.json`, etc.).
+- `agent_registry.json`, `agent_permissions.json`, and `agent_contracts.json` were preserved and not modified.
+- All files now reflected in the finalized architecture plan `promethios_file_tree_plan.v2.9.2_final.json`.
 
