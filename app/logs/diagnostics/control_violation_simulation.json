@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-03-29T20:25:50.253640",
+  "simulation_details": {
+    "restricted_tool": "github_commit",
+    "unauthorized_agent": "research",
+    "action_blocked": True,
+    "violation_logged": True,
+    "override_suggested": True
+  },
+  "status": "success",
+  "errors": []
+}

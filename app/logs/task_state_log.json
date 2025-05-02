@@ -1,0 +1,89 @@
+{
+  "tasks": [
+    {
+      "id": "61c02672-f1be-4d6b-809b-749c41135989",
+      "goal": "Create a product pitch deck from a text file",
+      "status": "completed",
+      "created_at": "2025-03-29T20:28:15.581605",
+      "completed_at": "2025-03-29T20:43:15.581674",
+      "subtasks": [
+        {
+          "id": "subtask-1444dd1e",
+          "name": "Extract key information from text file",
+          "agent": "research",
+          "status": "completed",
+          "created_at": "2025-03-29T20:28:15.581605",
+          "completed_at": "2025-03-29T20:30:15.581616",
+          "attempts": 1,
+          "result": {
+            "status": "success",
+            "output": "Extracted key product information: features, benefits, target market"
+          }
+        },
+        {
+          "id": "subtask-a5beea33",
+          "name": "Create slide outline",
+          "agent": "builder",
+          "status": "completed",
+          "created_at": "2025-03-29T20:28:15.581605",
+          "completed_at": "2025-03-29T20:32:15.581637",
+          "attempts": 1,
+          "result": {
+            "status": "success",
+            "output": "Created slide outline with 10 slides"
+          }
+        },
+        {
+          "id": "subtask-80fd8940",
+          "name": "Generate compelling visuals",
+          "agent": "ops",
+          "status": "failed_retry",
+          "created_at": "2025-03-29T20:28:15.581605",
+          "completed_at": null,
+          "attempts": 1,
+          "result": {
+            "status": "error",
+            "error": "API rate limit exceeded",
+            "retry_scheduled": True
+          }
+        },
+        {
+          "id": "subtask-24a1e15c",
+          "name": "Generate compelling visuals (retry)",
+          "agent": "ops",
+          "status": "completed",
+          "created_at": "2025-03-29T20:34:15.581652",
+          "completed_at": "2025-03-29T20:36:15.581655",
+          "attempts": 1,
+          "result": {
+            "status": "success",
+            "output": "Generated 5 custom visuals for the pitch deck"
+          }
+        },
+        {
+          "id": "subtask-7ba69948",
+          "name": "Assemble final pitch deck",
+          "agent": "builder",
+          "status": "completed",
+          "created_at": "2025-03-29T20:37:15.581668",
+          "completed_at": "2025-03-29T20:40:15.581670",
+          "attempts": 1,
+          "result": {
+            "status": "success",
+            "output": "Assembled final pitch deck with 10 slides and 5 custom visuals"
+          }
+        }
+      ],
+      "memory_references": [
+        "memory-9a73c0bf",
+        "memory-8cd80643",
+        "memory-45015c9a"
+      ],
+      "metadata": {
+        "user_id": "test-user",
+        "priority": "high",
+        "source": "diagnostic_test"
+      }
+    }
+  ]
+}

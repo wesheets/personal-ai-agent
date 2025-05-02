@@ -1,0 +1,790 @@
+[
+  {
+    "batch": "15.0",
+    "title": "Setup, Initial Validation & Checksum Generation",
+    "phase": "Setup",
+    "prompt": "Objective: Prepare the environment, perform initial validations, and generate checksums for critical planning files.\n1. Ensure all necessary tools (e.g., python3.11, git) are available.\n2. Run `tools/validate_truth_surface.py` to confirm baseline alignment.\n3. Run `tools/validate_functional_surface.py --init` to establish the initial functional state baseline.\n4. Generate checksums (e.g., sha256sum) for `/home/ubuntu/batch_15_execution_plan.json`, `/home/ubuntu/wiring_strategy.json`, `/home/ubuntu/functional_verification_strategy.json`, and `/home/ubuntu/personal-ai-agent/config/final_truth_surface_manifest.json`. Store these securely (e.g., in a new `plan_checksums.json` file or add to truth manifest if possible).\n5. Update this batch entry (`batch_15_execution_plan.json`) status to 'complete'.\nRecovery: If validation fails, analyze logs and attempt fixes. If checksum generation fails, check file paths and permissions.",
+    "components_to_build_or_verify": [
+      "tools/validate_truth_surface.py",
+      "tools/validate_functional_surface.py",
+      "/home/ubuntu/batch_15_execution_plan.json",
+      "/home/ubuntu/wiring_strategy.json",
+      "/home/ubuntu/functional_verification_strategy.json",
+      "/home/ubuntu/personal-ai-agent/config/final_truth_surface_manifest.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/logs/truth_surface_validation.log",
+      "/home/ubuntu/logs/functional_surface_validation.log",
+      "/home/ubuntu/plan_checksums.json"
+    ],
+    "verification_steps": [
+      "Confirm `validate_truth_surface.py` ran successfully.",
+      "Confirm `validate_functional_surface.py --init` ran successfully.",
+      "Confirm checksums were generated and stored.",
+      "Update `verified` status for this batch to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [],
+    "verified": false
+  },
+  {
+    "batch": "15.1",
+    "title": "Build & Verify: conversation_memory.json",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/memory/conversation_memory.json`.\n1. **Dependency Check:** Ensure all prerequisite batches (None) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/memory/conversation_memory.json` based on its purpose, dependencies (None), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/memory/conversation_memory.json`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/memory/conversation_memory.json`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/memory/conversation_memory.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/memory/conversation_memory.json"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/memory/conversation_memory.json`.",
+      "Confirm `tools/validate_functional_surface.py --component app/memory/conversation_memory.json` ran successfully.",
+      "Update `verified` status for batch 15.1 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [],
+    "verified": true
+  },
+  {
+    "batch": "15.2",
+    "title": "Build & Verify: file_tree.json",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/memory/file_tree.json`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.1) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/memory/file_tree.json` based on its purpose, dependencies (None), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/memory/file_tree.json`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/memory/file_tree.json`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/memory/file_tree.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/memory/file_tree.json"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/memory/file_tree.json`.",
+      "Confirm `tools/validate_functional_surface.py --component app/memory/file_tree.json` ran successfully.",
+      "Update `verified` status for batch 15.2 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.1"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.3",
+    "title": "Build & Verify: prompt_memory_plan.json",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/memory/prompt_memory_plan.json`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.2) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/memory/prompt_memory_plan.json` based on its purpose, dependencies (None), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/memory/prompt_memory_plan.json`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/memory/prompt_memory_plan.json`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/memory/prompt_memory_plan.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/memory/prompt_memory_plan.json"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/memory/prompt_memory_plan.json`.",
+      "Confirm `tools/validate_functional_surface.py --component app/memory/prompt_memory_plan.json` ran successfully.",
+      "Update `verified` status for batch 15.3 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.2"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.4",
+    "title": "Build & Verify: reflection_thread.json",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/memory/reflection_thread.json`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.3) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/memory/reflection_thread.json` based on its purpose, dependencies (None), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/memory/reflection_thread.json`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/memory/reflection_thread.json`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/memory/reflection_thread.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/memory/reflection_thread.json"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/memory/reflection_thread.json`.",
+      "Confirm `tools/validate_functional_surface.py --component app/memory/reflection_thread.json` ran successfully.",
+      "Update `verified` status for batch 15.4 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.3"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.5",
+    "title": "Build & Verify: dependency_analyzer.py",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/modules/dependency_analyzer.py`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.2, 15.4) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/modules/dependency_analyzer.py` based on its purpose, dependencies (app/memory/file_tree.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/modules/dependency_analyzer.py`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/modules/dependency_analyzer.py`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/modules/dependency_analyzer.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/modules/dependency_analyzer.py"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/modules/dependency_analyzer.py`.",
+      "Confirm `tools/validate_functional_surface.py --component app/modules/dependency_analyzer.py` ran successfully.",
+      "Update `verified` status for batch 15.5 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.2",
+      "15.4"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.6",
+    "title": "Build & Verify: prompt_template_engine.py",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/modules/prompt_template_engine.py`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.5) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/modules/prompt_template_engine.py` based on its purpose, dependencies (None), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/modules/prompt_template_engine.py`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/modules/prompt_template_engine.py`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/modules/prompt_template_engine.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/modules/prompt_template_engine.py"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/modules/prompt_template_engine.py`.",
+      "Confirm `tools/validate_functional_surface.py --component app/modules/prompt_template_engine.py` ran successfully.",
+      "Update `verified` status for batch 15.6 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.5"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.7",
+    "title": "Build & Verify: resource_monitor.py",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/modules/resource_monitor.py`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.6) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/modules/resource_monitor.py` based on its purpose, dependencies (None), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/modules/resource_monitor.py`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/modules/resource_monitor.py`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/modules/resource_monitor.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/modules/resource_monitor.py"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/modules/resource_monitor.py`.",
+      "Confirm `tools/validate_functional_surface.py --component app/modules/resource_monitor.py` ran successfully.",
+      "Update `verified` status for batch 15.7 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.6"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.8",
+    "title": "Build & Verify: nested_comment.schema.json",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/schemas/comments/nested_comment.schema.json`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.7) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/schemas/comments/nested_comment.schema.json` based on its purpose, dependencies (None), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/schemas/comments/nested_comment.schema.json`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/schemas/comments/nested_comment.schema.json`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/schemas/comments/nested_comment.schema.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/schemas/comments/nested_comment.schema.json"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/schemas/comments/nested_comment.schema.json`.",
+      "Confirm `tools/validate_functional_surface.py --component app/schemas/comments/nested_comment.schema.json` ran successfully.",
+      "Update `verified` status for batch 15.8 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.7"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.9",
+    "title": "Build & Verify: build_module.schema.json",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/schemas/loop/build_module.schema.json`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.8) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/schemas/loop/build_module.schema.json` based on its purpose, dependencies (app/memory/task_log.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/schemas/loop/build_module.schema.json`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/schemas/loop/build_module.schema.json`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/schemas/loop/build_module.schema.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/schemas/loop/build_module.schema.json"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/schemas/loop/build_module.schema.json`.",
+      "Confirm `tools/validate_functional_surface.py --component app/schemas/loop/build_module.schema.json` ran successfully.",
+      "Update `verified` status for batch 15.9 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.8"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.10",
+    "title": "Build & Verify: file_tree.schema.json",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/schemas/memory/file_tree.schema.json`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.2, 15.9) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/schemas/memory/file_tree.schema.json` based on its purpose, dependencies (app/memory/file_tree.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/schemas/memory/file_tree.schema.json`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/schemas/memory/file_tree.schema.json`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/schemas/memory/file_tree.schema.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/schemas/memory/file_tree.schema.json"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/schemas/memory/file_tree.schema.json`.",
+      "Confirm `tools/validate_functional_surface.py --component app/schemas/memory/file_tree.schema.json` ran successfully.",
+      "Update `verified` status for batch 15.10 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.2",
+      "15.9"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.11",
+    "title": "Build & Verify: task_log.schema.json",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `app/schemas/memory/task_log.schema.json`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.10) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/schemas/memory/task_log.schema.json` based on its purpose, dependencies (app/memory/task_log.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/schemas/memory/task_log.schema.json`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/schemas/memory/task_log.schema.json`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/schemas/memory/task_log.schema.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/schemas/memory/task_log.schema.json"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/schemas/memory/task_log.schema.json`.",
+      "Confirm `tools/validate_functional_surface.py --component app/schemas/memory/task_log.schema.json` ran successfully.",
+      "Update `verified` status for batch 15.11 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.10"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.12",
+    "title": "Build & Verify: build_plan_history.json",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Build or verify the component `logs/build_plan_history.json`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.11) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `logs/build_plan_history.json` based on its purpose, dependencies (None), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/logs/build_plan_history.json`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component logs/build_plan_history.json`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "logs/build_plan_history.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/logs/build_plan_history.json"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/logs/build_plan_history.json`.",
+      "Confirm `tools/validate_functional_surface.py --component logs/build_plan_history.json` ran successfully.",
+      "Update `verified` status for batch 15.12 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.11"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.13",
+    "title": "Integration Validation: Phase 1: Core Infrastructure",
+    "phase": "Phase 1: Core Infrastructure",
+    "prompt": "Objective: Perform integration validation for all components built/verified in Phase 1: Core Infrastructure.\n1. **Dependency Check:** Ensure batch 15.12 is marked 'verified: true'.\n2. **Run Comprehensive Validation:** Execute `tools/validate_functional_surface.py --phase \"Phase 1: Core Infrastructure\"` (or similar comprehensive check targeting the phase's scope). Consider running `tools/validate_truth_surface.py` again as well.\n3. **Analyze Results:** Check logs for any errors or inconsistencies.\n4. **Update Status:** If all checks pass, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If validation fails, analyze logs, identify the failing component(s) or integration points, potentially revert the relevant component batch(es) to 'verified: false', fix the issues, re-verify the component batches, and then re-run this integration batch.",
+    "components_to_build_or_verify": [
+      "Integration check for Phase 1: Core Infrastructure"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/logs/functional_surface_validation.log",
+      "/home/ubuntu/logs/truth_surface_validation.log"
+    ],
+    "verification_steps": [
+      "Confirm comprehensive validation scripts ran successfully for Phase 1: Core Infrastructure.",
+      "Update `verified` status for batch 15.13 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.12"
+    ],
+    "verified": true
+  },
+  {
+    "batch": "15.14",
+    "title": "Build & Verify: architect_agent.py",
+    "phase": "Phase 2: Agents",
+    "prompt": "Objective: Build or verify the component `app/agents/architect_agent.py`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.2, 15.13) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/agents/architect_agent.py` based on its purpose, dependencies (app/memory/file_tree.json, config/final_truth_surface_manifest.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/agents/architect_agent.py`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/agents/architect_agent.py`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/agents/architect_agent.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/agents/architect_agent.py"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/agents/architect_agent.py`.",
+      "Confirm `tools/validate_functional_surface.py --component app/agents/architect_agent.py` ran successfully.",
+      "Update `verified` status for batch 15.14 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.13",
+      "15.2"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.15",
+    "title": "Build & Verify: build_error_handler.py",
+    "phase": "Phase 2: Agents",
+    "prompt": "Objective: Build or verify the component `app/agents/build_error_handler.py`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.12, 15.14) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/agents/build_error_handler.py` based on its purpose, dependencies (logs/build_plan_history.json, app/memory/task_log.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/agents/build_error_handler.py`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/agents/build_error_handler.py`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/agents/build_error_handler.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/agents/build_error_handler.py"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/agents/build_error_handler.py`.",
+      "Confirm `tools/validate_functional_surface.py --component app/agents/build_error_handler.py` ran successfully.",
+      "Update `verified` status for batch 15.15 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.12",
+      "15.14"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.16",
+    "title": "Integration Validation: Phase 2: Agents",
+    "phase": "Phase 2: Agents",
+    "prompt": "Objective: Perform integration validation for all components built/verified in Phase 2: Agents.\n1. **Dependency Check:** Ensure batch 15.15 is marked 'verified: true'.\n2. **Run Comprehensive Validation:** Execute `tools/validate_functional_surface.py --phase \"Phase 2: Agents\"` (or similar comprehensive check targeting the phase's scope). Consider running `tools/validate_truth_surface.py` again as well.\n3. **Analyze Results:** Check logs for any errors or inconsistencies.\n4. **Update Status:** If all checks pass, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If validation fails, analyze logs, identify the failing component(s) or integration points, potentially revert the relevant component batch(es) to 'verified: false', fix the issues, re-verify the component batches, and then re-run this integration batch.",
+    "components_to_build_or_verify": [
+      "Integration check for Phase 2: Agents"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/logs/functional_surface_validation.log",
+      "/home/ubuntu/logs/truth_surface_validation.log"
+    ],
+    "verification_steps": [
+      "Confirm comprehensive validation scripts ran successfully for Phase 2: Agents.",
+      "Update `verified` status for batch 15.16 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.15"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.17",
+    "title": "Build & Verify: AgentCognitionIndexViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/AgentCognitionIndexViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.16) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/AgentCognitionIndexViewer.jsx` based on its purpose, dependencies (system/agent_cognition_index.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/AgentCognitionIndexViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/AgentCognitionIndexViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/AgentCognitionIndexViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/AgentCognitionIndexViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/AgentCognitionIndexViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/AgentCognitionIndexViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.17 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.16"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.18",
+    "title": "Build & Verify: AgentLoopDebugLogViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/AgentLoopDebugLogViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.17) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/AgentLoopDebugLogViewer.jsx` based on its purpose, dependencies (app/memory/agent_loop_debug_log.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/AgentLoopDebugLogViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/AgentLoopDebugLogViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/AgentLoopDebugLogViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/AgentLoopDebugLogViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/AgentLoopDebugLogViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/AgentLoopDebugLogViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.18 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.17"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.19",
+    "title": "Build & Verify: BeliefIdentityCheckpointViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/BeliefIdentityCheckpointViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.18) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/BeliefIdentityCheckpointViewer.jsx` based on its purpose, dependencies (app/memory/belief_identity_checkpoint.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/BeliefIdentityCheckpointViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/BeliefIdentityCheckpointViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/BeliefIdentityCheckpointViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/BeliefIdentityCheckpointViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/BeliefIdentityCheckpointViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/BeliefIdentityCheckpointViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.19 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.18"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.20",
+    "title": "Build & Verify: ConversationMemoryViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/ConversationMemoryViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.1, 15.19) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/ConversationMemoryViewer.jsx` based on its purpose, dependencies (app/memory/conversation_memory.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/ConversationMemoryViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/ConversationMemoryViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/ConversationMemoryViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/ConversationMemoryViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/ConversationMemoryViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/ConversationMemoryViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.20 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.1",
+      "15.19"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.21",
+    "title": "Build & Verify: CoreBeliefsViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/CoreBeliefsViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.20) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/CoreBeliefsViewer.jsx` based on its purpose, dependencies (app/memory/core_beliefs.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/CoreBeliefsViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/CoreBeliefsViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/CoreBeliefsViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/CoreBeliefsViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/CoreBeliefsViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/CoreBeliefsViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.21 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.20"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.22",
+    "title": "Build & Verify: LoopBeliefUnlockRequestViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/LoopBeliefUnlockRequestViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.21) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/LoopBeliefUnlockRequestViewer.jsx` based on its purpose, dependencies (app/memory/loop_belief_unlock_request.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/LoopBeliefUnlockRequestViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/LoopBeliefUnlockRequestViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/LoopBeliefUnlockRequestViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/LoopBeliefUnlockRequestViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/LoopBeliefUnlockRequestViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/LoopBeliefUnlockRequestViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.22 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.21"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.23",
+    "title": "Build & Verify: LoopSummaryDriftReportViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/LoopSummaryDriftReportViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.22) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/LoopSummaryDriftReportViewer.jsx` based on its purpose, dependencies (app/memory/loop_summary_drift_report.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/LoopSummaryDriftReportViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/LoopSummaryDriftReportViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/LoopSummaryDriftReportViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/LoopSummaryDriftReportViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/LoopSummaryDriftReportViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/LoopSummaryDriftReportViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.23 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.22"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.24",
+    "title": "Build & Verify: OperatorUnlockTrackerViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/OperatorUnlockTrackerViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.23) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/OperatorUnlockTrackerViewer.jsx` based on its purpose, dependencies (app/memory/operator_unlock_tracker.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/OperatorUnlockTrackerViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/OperatorUnlockTrackerViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/OperatorUnlockTrackerViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/OperatorUnlockTrackerViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/OperatorUnlockTrackerViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/OperatorUnlockTrackerViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.24 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.23"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.25",
+    "title": "Build & Verify: PromptMemoryPlanViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/PromptMemoryPlanViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.3, 15.24) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/PromptMemoryPlanViewer.jsx` based on its purpose, dependencies (app/memory/prompt_memory_plan.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/PromptMemoryPlanViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/PromptMemoryPlanViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/PromptMemoryPlanViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/PromptMemoryPlanViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/PromptMemoryPlanViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/PromptMemoryPlanViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.25 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.24",
+      "15.3"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.26",
+    "title": "Build & Verify: ReflectionThreadViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/ReflectionThreadViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.4, 15.25) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/ReflectionThreadViewer.jsx` based on its purpose, dependencies (app/memory/reflection_thread.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/ReflectionThreadViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/ReflectionThreadViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/ReflectionThreadViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/ReflectionThreadViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/ReflectionThreadViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/ReflectionThreadViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.26 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.25",
+      "15.4"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.27",
+    "title": "Build & Verify: RepairTriggerQueueViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/RepairTriggerQueueViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.26) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/RepairTriggerQueueViewer.jsx` based on its purpose, dependencies (app/memory/repair_trigger_queue.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/RepairTriggerQueueViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/RepairTriggerQueueViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/RepairTriggerQueueViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/RepairTriggerQueueViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/RepairTriggerQueueViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/RepairTriggerQueueViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.27 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.26"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.28",
+    "title": "Build & Verify: SaasComponentManifestViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/SaasComponentManifestViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.27) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/SaasComponentManifestViewer.jsx` based on its purpose, dependencies (app/memory/saas_component_manifest.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/SaasComponentManifestViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/SaasComponentManifestViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/SaasComponentManifestViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/SaasComponentManifestViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/SaasComponentManifestViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/SaasComponentManifestViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.28 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.27"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.29",
+    "title": "Build & Verify: ScmSnapshotBatch2Start20250429Viewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/ScmSnapshotBatch2Start20250429Viewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.28) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/ScmSnapshotBatch2Start20250429Viewer.jsx` based on its purpose, dependencies (system/scm_snapshot_batch2_start_20250429.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/ScmSnapshotBatch2Start20250429Viewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/ScmSnapshotBatch2Start20250429Viewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/ScmSnapshotBatch2Start20250429Viewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/ScmSnapshotBatch2Start20250429Viewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/ScmSnapshotBatch2Start20250429Viewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/ScmSnapshotBatch2Start20250429Viewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.29 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.28"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.30",
+    "title": "Build & Verify: SnapshotLatestViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/SnapshotLatestViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.29) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/SnapshotLatestViewer.jsx` based on its purpose, dependencies (system/snapshot_latest.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/SnapshotLatestViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/SnapshotLatestViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/SnapshotLatestViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/SnapshotLatestViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/SnapshotLatestViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/SnapshotLatestViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.30 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.29"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.31",
+    "title": "Build & Verify: StatusViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/StatusViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.30) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/StatusViewer.jsx` based on its purpose, dependencies (system/status.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/StatusViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/StatusViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/StatusViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/StatusViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/StatusViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/StatusViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.31 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.30"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.32",
+    "title": "Build & Verify: SystemAcknowledgmentsViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/SystemAcknowledgmentsViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.31) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/SystemAcknowledgmentsViewer.jsx` based on its purpose, dependencies (app/memory/system_acknowledgments.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemAcknowledgmentsViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/SystemAcknowledgmentsViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/SystemAcknowledgmentsViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemAcknowledgmentsViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemAcknowledgmentsViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/SystemAcknowledgmentsViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.32 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.31"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.33",
+    "title": "Build & Verify: SystemComponentMapViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/SystemComponentMapViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.32) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/SystemComponentMapViewer.jsx` based on its purpose, dependencies (system/system_component_map.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemComponentMapViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/SystemComponentMapViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/SystemComponentMapViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemComponentMapViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemComponentMapViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/SystemComponentMapViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.33 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.32"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.34",
+    "title": "Build & Verify: SystemConsciousnessIndexViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/SystemConsciousnessIndexViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.33) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/SystemConsciousnessIndexViewer.jsx` based on its purpose, dependencies (system/system_consciousness_index.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemConsciousnessIndexViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/SystemConsciousnessIndexViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/SystemConsciousnessIndexViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemConsciousnessIndexViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemConsciousnessIndexViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/SystemConsciousnessIndexViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.34 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.33"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.35",
+    "title": "Build & Verify: SystemManifestViewer.jsx",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Build or verify the component `app/ui/components/SystemManifestViewer.jsx`.\n1. **Dependency Check:** Ensure all prerequisite batches (15.34) are marked as 'verified: true'. If not, STOP and report the issue.\n2. **Build/Fetch:** If status is 'to_be_built' or 'missing_*', generate the code/content for `app/ui/components/SystemManifestViewer.jsx` based on its purpose, dependencies (system/system_manifest.json), and overall architecture. Place the file correctly in the repository structure (`/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemManifestViewer.jsx`). If status is 'found_*' or 'discovered_*', ensure the file exists at the correct path.\n3. **Static Validation:** Perform basic checks (e.g., linting for code, JSON validation for data files).\n4. **Functional Validation:** Run `tools/validate_functional_surface.py --component app/ui/components/SystemManifestViewer.jsx`. Analyze the output.\n5. **Update Status:** If validation succeeds, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If build fails, analyze errors, attempt fixes, or use `architect_agent.py` for suggestions. If validation fails, analyze `validate_functional_surface.py` logs, fix the component, and re-run validation. Document steps taken in logs.",
+    "components_to_build_or_verify": [
+      "app/ui/components/SystemManifestViewer.jsx"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemManifestViewer.jsx"
+    ],
+    "verification_steps": [
+      "Confirm component file exists at `/home/ubuntu/repo/personal-ai-agent/app/ui/components/SystemManifestViewer.jsx`.",
+      "Confirm `tools/validate_functional_surface.py --component app/ui/components/SystemManifestViewer.jsx` ran successfully.",
+      "Update `verified` status for batch 15.35 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.34"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "15.36",
+    "title": "Integration Validation: Phase 3: UI Components",
+    "phase": "Phase 3: UI Components",
+    "prompt": "Objective: Perform integration validation for all components built/verified in Phase 3: UI Components.\n1. **Dependency Check:** Ensure batch 15.35 is marked 'verified: true'.\n2. **Run Comprehensive Validation:** Execute `tools/validate_functional_surface.py --phase \"Phase 3: UI Components\"` (or similar comprehensive check targeting the phase's scope). Consider running `tools/validate_truth_surface.py` again as well.\n3. **Analyze Results:** Check logs for any errors or inconsistencies.\n4. **Update Status:** If all checks pass, update this batch entry (`batch_15_execution_plan.json`) to set `verified: true`.\nRecovery: If validation fails, analyze logs, identify the failing component(s) or integration points, potentially revert the relevant component batch(es) to 'verified: false', fix the issues, re-verify the component batches, and then re-run this integration batch.",
+    "components_to_build_or_verify": [
+      "Integration check for Phase 3: UI Components"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/logs/functional_surface_validation.log",
+      "/home/ubuntu/logs/truth_surface_validation.log"
+    ],
+    "verification_steps": [
+      "Confirm comprehensive validation scripts ran successfully for Phase 3: UI Components.",
+      "Update `verified` status for batch 15.36 to `true` in `batch_15_execution_plan.json`."
+    ],
+    "dependencies": [
+      "15.35"
+    ],
+    "verified": false
+  }
+]

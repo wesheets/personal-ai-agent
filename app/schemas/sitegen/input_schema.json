@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SiteGenAgentInputSchema",
+  "description": "Schema for validating input to the SiteGen Agent",
+  "type": "object",
+  "properties": {
+    "task": {
+      "type": "string",
+      "description": "Task to be performed by the SiteGen agent"
+    },
+    "project_id": {
+      "type": ["string", "null"],
+      "description": "Unique identifier for the project"
+    },
+    "tools": {
+      "type": "array",
+      "description": "List of tools to use for the task",
+      "items": {
+        "type": "string",
+        "enum": ["analyze_zoning", "create_layout", "evaluate_market_fit"]
+      }
+    },
+    "site_parameters": {
+      "type": "object",
+      "description": "Parameters for site generation",
+      "properties": {
+        "site_type": {
+          "type": "string",
+          "description": "Type of site to generate",
+          "enum": ["commercial", "residential", "industrial", "mixed"]
+        },
+        "dimensions": {
+          "type": "object",
+          "description": "Dimensions of the site",
+          "properties": {
+            "width": {
+              "type": "number",
+              "description": "Width of the site in meters"
+            },
+            "depth": {
+              "type": "number",
+              "description": "Depth of the site in meters"
+            },
+            "height": {
+              "type": "number",
+              "description": "Height of the site in meters"
+            }
+          }
+        },
+        "zoning_requirements": {
+          "type": "array",
+          "description": "List of zoning requirements",
+          "items": {
+            "type": "string"
+          }
+        },
+        "features": {
+          "type": "array",
+          "description": "List of required features",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": ["task"]
+}

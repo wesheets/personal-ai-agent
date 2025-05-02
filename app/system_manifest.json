@@ -1,0 +1,482 @@
+{
+  "agents": {
+    "hal": {
+      "tools": [
+        "openai_generate_code",
+        "memory_read",
+        "memory_write"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "openai_fallback",
+        "schema_fallback"
+      ],
+      "checksum": "initial"
+    },
+    "orchestrator": {
+      "tools": [
+        "memory_read",
+        "memory_write",
+        "plan_next_agent"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "schema_fallback"
+      ],
+      "checksum": "initial"
+    },
+    "ash": {
+      "tools": [
+        "memory_read",
+        "memory_write"
+      ],
+      "schema_wrapped": true,
+      "fallbacks": [
+        "schema_fallback"
+      ],
+      "checksum": "initial"
+    }
+  },
+  "schemas": {
+    "LoopResponseRequest": {
+      "file": "app/schemas/loop_schema.py",
+      "bound_to_routes": [
+        "/loop/respond"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "LoopResponseResult": {
+      "file": "app/schemas/loop_schema.py",
+      "bound_to_routes": [
+        "/loop/respond"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "HalSafetyCheck": {
+      "file": "schemas/agent_output/hal_safety_check.schema.json",
+      "bound_to_routes": [
+        "/hal/safety_check"
+      ],
+      "version": "v1.0.0",
+      "checksum": "fixed"
+    },
+    "AshAgentSchema": {
+      "file": "schemas/ash_agent.schema.json",
+      "bound_to_routes": [
+        "/ash/process"
+      ],
+      "version": "v1.0.0",
+      "checksum": "fixed"
+    },
+    "DiagnosticsRouteResponse": {
+      "file": "app/routes/diagnostics_routes.py",
+      "bound_to_routes": [
+        "/diagnostics/routes"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial"
+    },
+    "HalAgentContract": {
+      "file": "app/schemas/schemas/hal_agent.schema.json",
+      "bound_to_routes": [
+        "/hal/process"
+      ],
+      "version": "v1.0.0",
+      "checksum": "initial",
+      "expected_runtime_path": "app/schemas/hal_agent.schema.json",
+      "actual_path": "app/schemas/schemas/hal_agent.schema.json",
+      "path_mismatch": true,
+      "path_resolution_implemented": true,
+      "resolution_method": "dynamic_multi_path_search"
+    }
+  },
+  "routes": {
+    "/loop/respond": {
+      "method": "POST",
+      "schema": "LoopResponseRequest",
+      "status": "registered",
+      "errors": []
+    },
+    "/loop/snapshot/save": {
+      "method": "POST",
+      "schema": "SnapshotSaveRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/loop/snapshot/restore": {
+      "method": "POST",
+      "schema": "SnapshotRestoreRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/loop/snapshot/list": {
+      "method": "GET",
+      "schema": "None",
+      "status": "active",
+      "errors": []
+    },
+    "/orchestrator/plan": {
+      "method": "POST",
+      "schema": "OrchestratorPlanRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/orchestrator/validate_contract": {
+      "method": "POST",
+      "schema": "ContractValidationRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/orchestrator/validate_delegation": {
+      "method": "POST",
+      "schema": "DelegationValidationRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/policy/enforce": {
+      "method": "POST",
+      "schema": "OutputPolicyRequest",
+      "status": "tested",
+      "errors": []
+    },
+    "/policy/logs": {
+      "method": "POST",
+      "schema": "PolicyLogRequest",
+      "status": "tested",
+      "errors": []
+    },
+    "/drift/monitor": {
+      "method": "POST",
+      "schema": "DriftMonitorRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/hal/safety_check": {
+      "method": "POST",
+      "schema": "HalSafetyCheck",
+      "status": "active",
+      "errors": []
+    },
+    "/memory/add": {
+      "method": "POST",
+      "schema": "MemoryAddRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/memory/search": {
+      "method": "POST",
+      "schema": "MemorySearchRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/diagnostics/routes": {
+      "method": "GET",
+      "schema": "DiagnosticsRouteResponse",
+      "status": "active",
+      "errors": []
+    },
+    "/debug/hal-schema": {
+      "method": "GET",
+      "schema": "None",
+      "status": "pending_deployment",
+      "errors": []
+    },
+    "/drift/report": {
+      "method": "POST",
+      "schema": "DriftMonitorRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/drift/auto-heal": {
+      "method": "POST",
+      "schema": "DriftHealingRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/drift/log": {
+      "method": "GET",
+      "schema": "DriftLogResponse",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/create": {
+      "method": "POST",
+      "schema": "PlanCreateRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/{plan_id}": {
+      "method": "GET",
+      "schema": "PlanGetRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/update": {
+      "method": "PUT",
+      "schema": "PlanUpdateRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/execute": {
+      "method": "POST",
+      "schema": "PlanExecutionRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/status/{execution_id}": {
+      "method": "GET",
+      "schema": "PlanStatusRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/plan/chain": {
+      "method": "POST",
+      "schema": "PlanChainRequest",
+      "status": "active",
+      "errors": []
+    },
+    "/critic/review": {
+      "method": "POST",
+      "schema": "LoopSummaryReviewRequest",
+      "status": "active",
+      "errors": []
+    }
+  },
+  "modules": {
+    "hal_openai": {
+      "file": "app/modules/hal_openai.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-24T23:47:07.446977"
+    },
+    "drift_monitor": {
+      "file": "app/modules/drift_monitor.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-25T04:07:21.158701"
+    },
+    "memory_writer": {
+      "file": "app/modules/memory_writer.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-25T04:07:21.158701"
+    },
+    "memory_engine": {
+      "file": "app/api/modules/memory_engine.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-25T12:11:27.000000"
+    },
+    "hal_routes_fallback": {
+      "file": "app/fallbacks/fix_hal_routes.py",
+      "wrapped_with_schema": true,
+      "last_updated": "2025-04-25T15:25:22.000000"
+    },
+    "debug_hal_schema": {
+      "file": "app/routes/debug_hal_schema.py",
+      "wrapped_with_schema": false,
+      "last_updated": "2025-04-25T14:54:53.000000"
+    }
+  },
+  "memory": {
+    "schema_hashes": {},
+    "fallback_logging_enabled": true
+  },
+  "hardening_layers": {
+    "schema_checksum_tracking": true,
+    "schema_discovery_fallback": true,
+    "test_route_integrity": false,
+    "agent_contract_enforcement": true,
+    "drift_monitor_enabled": true,
+    "hal_routes_fallback": true,
+    "memory_engine_fallback": true,
+    "diagnostics_endpoint": true,
+    "sandbox_behavior_override": true,
+    "path_resolution_hardening": true,
+    "loop_rejection_enabled": true
+  },
+  "manifest_meta": {
+    "version": "1.0.0",
+    "created_at": "2025-04-24T23:47:07.446977",
+    "last_updated": "2025-04-28T22:44:00.469277",
+    "boot_events": [
+      {
+        "timestamp": "2025-04-24T23:47:07.816573",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-24T23:47:07.897987",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:43:23.598692",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:43:23.690521",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:43:53.666756",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:43:53.747494",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:44:24.105969",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:44:24.182356",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:48:27.094642",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:48:27.181190",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:50:28.653609",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T11:50:28.737195",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T12:14:15.445492",
+        "version": "1.0.0"
+      },
+      {
+        "timestamp": "2025-04-25T13:08:41.901721",
+        "version": "1.0.0"
+      }
+    ],
+    "loaded_routes": [
+      "agent_config_routes",
+      "agent_context_routes",
+      "memory_recall_routes",
+      "memory_embed_routes",
+      "plan_generate_routes",
+      "train_routes",
+      "export_routes",
+      "fix_routes",
+      "delegate_stream_routes",
+      "hal_routes_fallback",
+      "memory_routes",
+      "app_memory_routes",
+      "loop_routes",
+      "routes_orchestrator_routes",
+      "core_routes",
+      "agent_routes",
+      "persona_routes",
+      "debug_routes",
+      "historian_routes",
+      "debugger_routes",
+      "critic_routes",
+      "sage_routes",
+      "guardian_routes",
+      "pessimist_routes",
+      "nova_routes",
+      "cto_routes",
+      "observer_routes",
+      "sitegen_routes",
+      "reflection_routes",
+      "trust_routes",
+      "snapshot_routes",
+      "orchestrator_plan_routes",
+      "health_monitor_routes",
+      "self_routes",
+      "orchestrator_contract_routes",
+      "dashboard_routes",
+      "drift_routes",
+      "forge_routes",
+      "loop_validation_routes",
+      "output_policy_routes",
+      "pessimist_evaluation_routes",
+      "debug_analyzer",
+      "diagnostics_routes",
+      "debug_hal_schema"
+    ],
+    "memory_tag": "hal_path_resolution_fix_20250425_152630"
+  },
+  "diagnostics": {
+    "enabled": true,
+    "endpoints": [
+      {
+        "path": "/diagnostics/routes",
+        "description": "Provides information about loaded and failed routes, and fallbacks triggered",
+        "category": "diagnostics"
+      },
+      {
+        "path": "/debug/hal-schema",
+        "description": "Verifies if the HAL schema file exists at runtime and returns detailed filesystem information",
+        "category": "debug"
+      }
+    ],
+    "log_files": [
+      "logs/hal_route_failures.json",
+      "logs/memory_fallback.json",
+      "logs/final_route_status.json",
+      "logs/hal_schema_verification_20250425_130919.json",
+      "logs/hal_sandbox_bypass.json",
+      "logs/hal_deploy_fs_trace_20250425_145630.json",
+      "logs/hal_path_resolution_fix_20250425_152530.json"
+    ]
+  },
+  "hal_schema_verification": {
+    "last_check": "2025-04-25T15:26:30.000000",
+    "status": "FIXED",
+    "issue": "Path mismatch between repository and runtime expectations",
+    "resolution": "Implemented dynamic path resolution that checks multiple locations",
+    "log_file": "logs/hal_path_resolution_fix_20250425_152530.json",
+    "previous_status": "DEGRADED"
+  },
+  "hal_schema_deployment_status": {
+    "debug_endpoint_added": "2025-04-25T14:54:53.000000",
+    "verification_pending": false,
+    "local_verification": {
+      "expected_runtime_path_exists": true,
+      "repository_path_exists": true,
+      "both_paths_exist": true
+    },
+    "path_resolution_implemented": {
+      "timestamp": "2025-04-25T15:25:22.000000",
+      "method": "dynamic_multi_path_search",
+      "paths_checked": [
+        "app/schemas/hal_agent.schema.json",
+        "app/schemas/schemas/hal_agent.schema.json",
+        "/app/schemas/hal_agent.schema.json",
+        "/app/schemas/schemas/hal_agent.schema.json",
+        "/home/ubuntu/personal-ai-agent/app/schemas/hal_agent.schema.json",
+        "/home/ubuntu/personal-ai-agent/app/schemas/schemas/hal_agent.schema.json",
+        "{module_dir}/../schemas/hal_agent.schema.json",
+        "{module_dir}/../schemas/schemas/hal_agent.schema.json"
+      ]
+    },
+    "log_file": "logs/hal_path_resolution_fix_20250425_152530.json",
+    "next_steps": "Deploy fix and verify HAL routes load directly instead of via fallback"
+  },
+  "sandbox_behavior_override": {
+    "hal_schema_validation": {
+      "enabled": true,
+      "description": "HAL schema validation bypassed in sandbox mode",
+      "detection_method": "MANUS_SANDBOX environment variable or hostname check",
+      "log_file": "logs/hal_sandbox_bypass.json",
+      "last_updated": "2025-04-25T13:25:23.000000"
+    }
+  },
+  "path_resolution_hardening": {
+    "enabled": true,
+    "description": "Dynamic path resolution for cross-environment compatibility",
+    "implemented_for": [
+      "hal_schema",
+      "agent_registration"
+    ],
+    "last_updated": "2025-04-25T15:26:30.000000",
+    "log_file": "logs/hal_path_resolution_fix_20250425_152530.json"
+  }
+}

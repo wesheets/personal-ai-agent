@@ -1,0 +1,77 @@
+{
+  "SAGE": [
+    "reflect",
+    "question",
+    "analyze_prompt",
+    "generate_plan",
+    "evaluate_alignment",
+    "review_output",
+    "detect_bias",
+    "provide_guidance"
+  ],
+  "HAL": [
+    "generate_code",
+    "debug_code",
+    "explain_code",
+    "optimize_code",
+    "analyze_technical_requirements",
+    "implement_solution"
+  ],
+  "PESSIMIST": [
+    "analyze_summary",
+    "tag_tone",
+    "identify_bias",
+    "flag_risks",
+    "challenge_assumptions",
+    "detect_hallucination"
+  ],
+  "CRITIC": [
+    "score_summary",
+    "evaluate_quality",
+    "provide_feedback",
+    "suggest_improvements",
+    "identify_weaknesses"
+  ],
+  "CEO": [
+    "evaluate_alignment",
+    "assess_business_impact",
+    "review_strategy",
+    "prioritize_objectives",
+    "make_executive_decision"
+  ],
+  "ARCHITECT": [
+    "design_system",
+    "evaluate_architecture",
+    "identify_patterns",
+    "optimize_structure",
+    "ensure_scalability"
+  ],
+  "RESEARCHER": [
+    "gather_information",
+    "analyze_data",
+    "synthesize_findings",
+    "identify_gaps",
+    "propose_hypotheses"
+  ],
+  "RITUALIST": [
+    "establish_process",
+    "enforce_consistency",
+    "maintain_standards",
+    "document_procedures",
+    "ensure_compliance"
+  ],
+  "INVENTOR": [
+    "generate_ideas",
+    "propose_solutions",
+    "identify_opportunities",
+    "create_prototypes",
+    "test_concepts"
+  ],
+  "NOVA": [
+    "execute_task",
+    "follow_instructions",
+    "implement_plan",
+    "report_results",
+    "request_clarification"
+  ]
+}

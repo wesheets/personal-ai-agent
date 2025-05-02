@@ -1,0 +1,70 @@
+{
+  "manifest_version": "1.0",
+  "batch_id": "12.3",
+  "timestamp": "2025-04-30T15:11:00Z", // Approximate time of generation
+  "description": "System manifest reflecting rebuilt cognition modules and trustable memory surfaces after Batch 12.2, plus debug routes.",
+  "rebuilt_modules": [
+    {
+      "path": "app/api/modules/memory.py",
+      "description": "Rebuilt memory module with real file-writing logic for write_memory.",
+      "status": "functional"
+    },
+    {
+      "path": "app/routes/loop_routes.py",
+      "description": "Rebuilt loop routes with create_loop endpoint, mock agent sequence, and integration with real memory logging.",
+      "status": "functional_with_mocks"
+    },
+    {
+      "path": "app/routes/debug_routes.py",
+      "description": "Added debug routes including /debug/status for healthcheck safety.",
+      "status": "functional"
+    },
+    {
+      "path": "app/main.py",
+      "description": "Minimal FastAPI application setup including loop_routes and debug_routes.",
+      "status": "functional"
+    }
+  ],
+  "trustable_memory_surfaces": [
+    {
+      "path": "/logs/loop_trace.json",
+      "type": "jsonl",
+      "description": "Logs HAL agent output and tool usage during loop execution.",
+      "schema": {
+        "timestamp": "string (ISO 8601)",
+        "agent_id": "string",
+        "type": "string (loop_trace)",
+        "tags": "array[string]",
+        "loop_id": "string (uuid)",
+        "plan": "object",
+        "agent_output": "string",
+        "tool_used": "string"
+      }
+    },
+    {
+      "path": "/logs/reflection_thread.json",
+      "type": "jsonl",
+      "description": "Logs reflections and summaries from Critic and Sage agents.",
+      "schema": {
+        "timestamp": "string (ISO 8601)",
+        "agent_id": "string",
+        "type": "string (reflection_thread)",
+        "tags": "array[string]",
+        "loop_id": "string (uuid)",
+        "agent": "string (Critic/Sage)",
+        "text": "string"
+      }
+    },
+    {
+      "path": "/logs/module_drift.json",
+      "type": "jsonl",
+      "description": "Logs modules identified as placeholders or incomplete (hallucination detection).",
+      "schema": {
+        "module": "string (path)",
+        "status": "string (placeholder/incomplete)",
+        "issue": "string (description)"
+      }
+    }
+  ]
+}
+

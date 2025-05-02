@@ -1,0 +1,15 @@
+{
+  "hal": {
+    "agent_id": "hal",
+    "accepted_input_schema": "LoopResponseRequest",
+    "expected_output_schema": "LoopResponseResult",
+    "description": "HAL is a code generation and reasoning agent",
+    "capabilities": [
+      "code_generation",
+      "reasoning",
+      "problem_solving"
+    ],
+    "version": "1.0.0",
+    "status": "active"
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "tours": {
+    "main": {
+      "title": "Welcome to Promethios",
+      "description": "Let's explore the key features of your cognitive system",
+      "steps": [
+        {
+          "target": "#OperatorHUDBar",
+          "title": "Operator HUD",
+          "content": "This is your control center. Monitor system status, alerts, and access settings from here.",
+          "position": "bottom",
+          "sageQuote": "The interface between mind and machine begins with awareness of system state."
+        },
+        {
+          "target": "#ProjectContextSwitcher",
+          "title": "Project Context",
+          "content": "Switch between different projects to focus Promethios on specific domains or tasks.",
+          "position": "bottom",
+          "sageQuote": "Context shapes understanding. Choose wisely to direct cognitive resources."
+        },
+        {
+          "target": "#OrchestratorModePanel",
+          "title": "Orchestrator Modes",
+          "content": "Control how Promethios thinks by switching between FAST, BALANCED, and RESEARCH modes.",
+          "position": "right",
+          "sageQuote": "Balance speed and depth according to your needs. Each mode offers different cognitive trade-offs."
+        },
+        {
+          "target": "#AgentPanel",
+          "title": "Agent Delegation",
+          "content": "Delegate specific tasks to specialized agents for optimal performance.",
+          "position": "right",
+          "sageQuote": "Specialized minds for specialized tasks. Choose the right tool for your cognitive journey."
+        },
+        {
+          "target": "#AgentChatConsole",
+          "title": "Agent Chat",
+          "content": "Communicate directly with Promethios agents through this conversational interface.",
+          "position": "right",
+          "sageQuote": "Through dialogue, we bridge the gap between human intention and machine understanding."
+        },
+        {
+          "target": "#GoalLoopVisualization",
+          "title": "Goal Loop Visualization",
+          "content": "See how Promethios breaks down complex tasks into manageable cognitive loops.",
+          "position": "left",
+          "sageQuote": "The path of thought becomes visible when we map the journey of understanding."
+        },
+        {
+          "target": "#MemoryViewer",
+          "title": "Memory System",
+          "content": "Explore what Promethios remembers and how it organizes information.",
+          "position": "left",
+          "sageQuote": "Memory is not just storage, but the foundation of understanding and growth."
+        },
+        {
+          "target": "#RightPanelContainer",
+          "title": "System Diagnostics",
+          "content": "Monitor system health, trust scores, and cognitive metrics in real-time.",
+          "position": "left",
+          "sageQuote": "True understanding requires transparency. These diagnostics reveal the inner workings of the cognitive system."
+        }
+      ]
+    },
+    "newUser": {
+      "title": "Getting Started with Promethios",
+      "description": "Learn the basics of working with your cognitive assistant",
+      "steps": [
+        {
+          "target": "#OperatorHUDBar",
+          "title": "Welcome, Operator",
+          "content": "This is your personal control center for Promethios. You'll find system alerts and settings here.",
+          "position": "bottom",
+          "sageQuote": "The journey of a thousand insights begins with a single interface."
+        },
+        {
+          "target": "#AgentChatConsole",
+          "title": "Start a Conversation",
+          "content": "The quickest way to begin is by asking a question here in the chat console.",
+          "position": "right",
+          "sageQuote": "Words are the bridge between minds - speak, and I shall listen."
+        },
+        {
+          "target": "#OrchestratorModePanel",
+          "title": "Choose Your Thinking Mode",
+          "content": "Select how deeply Promethios should think about your questions.",
+          "position": "right",
+          "sageQuote": "Different questions require different depths of thought."
+        }
+      ]
+    },
+    "advancedFeatures": {
+      "title": "Advanced Promethios Features",
+      "description": "Discover powerful capabilities for experienced operators",
+      "steps": [
+        {
+          "target": "#LoopDebugger",
+          "title": "Loop Debugging",
+          "content": "Examine and modify cognitive loops in real-time to improve reasoning.",
+          "position": "left",
+          "sageQuote": "To understand thought, we must sometimes pause it mid-stream and examine its course."
+        },
+        {
+          "target": "#WhatIfSimulator",
+          "title": "What-If Simulation",
+          "content": "Test alternative approaches without committing to them.",
+          "position": "left",
+          "sageQuote": "The multiverse of possibility exists in simulation before reality."
+        },
+        {
+          "target": "#BeliefsExplorer",
+          "title": "Beliefs Explorer",
+          "content": "Understand the core beliefs that shape Promethios' reasoning.",
+          "position": "left",
+          "sageQuote": "At the foundation of all reasoning lie the axioms we hold to be true."
+        }
+      ]
+    }
+  },
+  "tooltips": {
+    "OperatorHUDBar": {
+      "title": "Operator HUD",
+      "content": "Your control center for Promethios. Check system status and alerts here.",
+      "sageQuote": "reflective"
+    },
+    "ProjectContextSwitcher": {
+      "title": "Project Context",
+      "content": "Switch between different projects to focus Promethios on specific domains.",
+      "sageQuote": "reflective"
+    },
+    "OrchestratorModePanel": {
+      "title": "Thinking Modes",
+      "content": "Control the depth vs. speed trade-off in Promethios' thinking process.",
+      "sageQuote": "wise"
+    },
+    "AgentPanel": {
+      "title": "Agent Delegation",
+      "content": "Assign tasks to specialized cognitive agents for optimal results.",
+      "sageQuote": "confident"
+    },
+    "AgentChatConsole": {
+      "title": "Agent Chat",
+      "content": "Communicate directly with Promethios through natural conversation.",
+      "sageQuote": "confident"
+    },
+    "GoalLoopVisualization": {
+      "title": "Goal Loops",
+      "content": "Visualize how Promethios breaks down complex tasks into cognitive steps.",
+      "sageQuote": "wise"
+    },
+    "MemoryViewer": {
+      "title": "Memory System",
+      "content": "Explore what Promethios remembers and how information is organized.",
+      "sageQuote": "reflective"
+    },
+    "LoopDebugger": {
+      "title": "Loop Debugger",
+      "content": "Examine and modify cognitive loops to improve reasoning.",
+      "sageQuote": "wise"
+    },
+    "WhatIfSimulator": {
+      "title": "What-If Simulator",
+      "content": "Test alternative approaches without committing to them.",
+      "sageQuote": "reflective"
+    },
+    "BeliefsExplorer": {
+      "title": "Beliefs Explorer",
+      "content": "Understand the core beliefs that shape Promethios' reasoning.",
+      "sageQuote": "wise"
+    },
+    "RightPanelContainer": {
+      "title": "System Diagnostics",
+      "content": "Monitor system health, trust scores, and cognitive metrics.",
+      "sageQuote": "confident"
+    }
+  }
+}

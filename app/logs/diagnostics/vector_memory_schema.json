@@ -1,0 +1,175 @@
+{
+  "timestamp": "2025-03-29T20:26:31.069099",
+  "test_memory_items": [
+    {
+      "id": "8c42711c-aff5-418b-a9c4-0022017cc17f",
+      "agent": "builder",
+      "goal_id": "goal-8fe9e164",
+      "timestamp": "2025-03-29T20:26:31.069981",
+      "content": "Test memory for builder agent",
+      "tags": [
+        "builder",
+        "test",
+        "diagnostic"
+      ],
+      "embedding": "[0.1, 0.2, 0.3, ...]",
+      "metadata": {
+        "source": "diagnostic_test",
+        "priority": "normal"
+      }
+    },
+    {
+      "id": "a5550590-0144-4e74-8fd8-16ee1d630d45",
+      "agent": "research",
+      "goal_id": "goal-5a37a83b",
+      "timestamp": "2025-03-29T20:26:31.070004",
+      "content": "Test memory for research agent",
+      "tags": [
+        "research",
+        "test",
+        "diagnostic"
+      ],
+      "embedding": "[0.4, 0.5, 0.6, ...]",
+      "metadata": {
+        "source": "diagnostic_test",
+        "priority": "high"
+      }
+    },
+    {
+      "id": "adca7c98-b24d-404f-85ff-1506ec81e3a6",
+      "agent": "memory",
+      "goal_id": "goal-5ebedb9f",
+      "timestamp": "2025-03-29T20:26:31.070018",
+      "content": "Test memory for memory agent",
+      "tags": [
+        "memory",
+        "test",
+        "diagnostic"
+      ],
+      "embedding": "[0.7, 0.8, 0.9, ...]",
+      "metadata": {
+        "source": "diagnostic_test",
+        "priority": "low"
+      }
+    }
+  ],
+  "retrieval_tests": [
+    {
+      "query": "test diagnostic",
+      "tags": [
+        "test",
+        "diagnostic"
+      ],
+      "limit": 5,
+      "results": [
+        {
+          "id": "8c42711c-aff5-418b-a9c4-0022017cc17f",
+          "agent": "builder",
+          "goal_id": "goal-8fe9e164",
+          "timestamp": "2025-03-29T20:26:31.069981",
+          "content": "Test memory for builder agent",
+          "tags": [
+            "builder",
+            "test",
+            "diagnostic"
+          ],
+          "embedding": "[0.1, 0.2, 0.3, ...]",
+          "metadata": {
+            "source": "diagnostic_test",
+            "priority": "normal"
+          }
+        },
+        {
+          "id": "a5550590-0144-4e74-8fd8-16ee1d630d45",
+          "agent": "research",
+          "goal_id": "goal-5a37a83b",
+          "timestamp": "2025-03-29T20:26:31.070004",
+          "content": "Test memory for research agent",
+          "tags": [
+            "research",
+            "test",
+            "diagnostic"
+          ],
+          "embedding": "[0.4, 0.5, 0.6, ...]",
+          "metadata": {
+            "source": "diagnostic_test",
+            "priority": "high"
+          }
+        },
+        {
+          "id": "adca7c98-b24d-404f-85ff-1506ec81e3a6",
+          "agent": "memory",
+          "goal_id": "goal-5ebedb9f",
+          "timestamp": "2025-03-29T20:26:31.070018",
+          "content": "Test memory for memory agent",
+          "tags": [
+            "memory",
+            "test",
+            "diagnostic"
+          ],
+          "embedding": "[0.7, 0.8, 0.9, ...]",
+          "metadata": {
+            "source": "diagnostic_test",
+            "priority": "low"
+          }
+        }
+      ]
+    },
+    {
+      "query": "builder test",
+      "tags": [
+        "builder",
+        "test"
+      ],
+      "limit": 2,
+      "results": [
+        {
+          "id": "8c42711c-aff5-418b-a9c4-0022017cc17f",
+          "agent": "builder",
+          "goal_id": "goal-8fe9e164",
+          "timestamp": "2025-03-29T20:26:31.069981",
+          "content": "Test memory for builder agent",
+          "tags": [
+            "builder",
+            "test",
+            "diagnostic"
+          ],
+          "embedding": "[0.1, 0.2, 0.3, ...]",
+          "metadata": {
+            "source": "diagnostic_test",
+            "priority": "normal"
+          }
+        }
+      ]
+    }
+  ],
+  "schema_validation": {
+    "required_fields": [
+      "agent",
+      "goal_id",
+      "timestamp",
+      "content",
+      "tags"
+    ],
+    "fields_present": [
+      "agent",
+      "goal_id",
+      "timestamp",
+      "content",
+      "tags"
+    ],
+    "fields_missing": [],
+    "schema_valid": True
+  },
+  "status": "success",
+  "errors": [],
+  "memory_files_found": [
+    "/home/ubuntu/personal-ai-agent/app/api/memory.py",
+    "/home/ubuntu/personal-ai-agent/app/api/agent/memory.py",
+    "/home/ubuntu/personal-ai-agent/app/core/memory_context_reviewer.py",
+    "/home/ubuntu/personal-ai-agent/app/core/memory_manager.py",
+    "/home/ubuntu/personal-ai-agent/app/core/shared_memory.py",
+    "/home/ubuntu/personal-ai-agent/app/core/vector_memory.py",
+    "/home/ubuntu/personal-ai-agent/app/validators/memory_retry_logic_checker.py"
+  ]
+}

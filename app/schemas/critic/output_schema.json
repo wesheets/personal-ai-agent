@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CriticAgentOutputSchema",
+  "description": "Schema for validating output from the Critic Agent",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "description": "Status of the operation",
+      "enum": ["success", "error"]
+    },
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier for the loop being evaluated"
+    },
+    "timestamp": {
+      "type": "number",
+      "description": "Unix timestamp of when the operation was performed"
+    },
+    "message": {
+      "type": "string",
+      "description": "Error message if status is error"
+    },
+    "reflection": {
+      "type": "string",
+      "description": "Overall analysis and suggestions for improvement"
+    },
+    "scores": {
+      "type": "object",
+      "description": "Evaluation scores for different criteria",
+      "properties": {
+        "technical_accuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "ux_clarity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "visual_design": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "monetization_strategy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        }
+      }
+    },
+    "rejection": {
+      "type": "boolean",
+      "description": "Whether the output is rejected"
+    },
+    "rejection_reason": {
+      "type": ["string", "null"],
+      "description": "Reason for rejection if rejected"
+    },
+    "reason_type": {
+      "type": "string",
+      "description": "Type of reason being logged"
+    },
+    "reason_text": {
+      "type": "string",
+      "description": "Detailed explanation for the reason"
+    },
+    "usage": {
+      "type": "object",
+      "description": "Token usage information",
+      "properties": {
+        "prompt_tokens": {
+          "type": "number"
+        },
+        "completion_tokens": {
+          "type": "number"
+        },
+        "total_tokens": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "required": ["status", "loop_id", "timestamp"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "enum": ["error"] }
+        }
+      },
+      "then": {
+        "required": ["message"]
+      }
+    }
+  ],
+  "oneOf": [
+    {
+      "properties": {
+        "reflection": { "type": "string" },
+        "scores": { "type": "object" }
+      },
+      "required": ["reflection", "scores"]
+    },
+    {
+      "properties": {
+        "rejection": { "enum": [true] },
+        "rejection_reason": { "type": "string" }
+      },
+      "required": ["rejection", "rejection_reason"]
+    },
+    {
+      "properties": {
+        "reason_type": { "type": "string" },
+        "reason_text": { "type": "string" }
+      },
+      "required": ["reason_type", "reason_text"]
+    }
+  ]
+}

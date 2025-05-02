@@ -1,0 +1,27 @@
+{
+  "manifest_version": "1.1",
+  "validated_in_batches": ["12.3.1", "14.0"],
+  "scm_path": "config/system_manifest.json",
+  "aci_path": "config/aci_config.yaml",
+  "pice_path": "config/pice_config.yaml",
+  "loop_surface_map_path": "config/loop_surface_map.json",
+  "agent_truth": [
+    "Orchestrator",
+    "HAL",
+    "Critic",
+    "Sage"
+  ],
+  "canonical_routes": [
+    "/api/loop/create",
+    "/debug/status",
+    "/healthz"
+  ],
+  "memory_surfaces": [
+    "/logs/loop_trace.json",
+    "/logs/reflection_thread.json",
+    "/logs/module_drift.json"
+  ],
+  "schema_integrity_status": "validated",
+  "notes": "Truth manifest reflecting Batch 12.3.1 state, with Batch 14.0 implementing validation script, startup integration, and dynamic agent loading in loop_routes. This file is the last known full-system truth. All future actions must align with this or trigger re-audit."
+}
+

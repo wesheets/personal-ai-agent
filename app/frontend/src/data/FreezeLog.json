@@ -1,0 +1,144 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "Append-only log of all loop freezes and resolutions",
+    "last_updated": "2025-04-22T21:57:22.000Z"
+  },
+  "events": [
+    {
+      "id": "freeze_1650389421000_1234",
+      "loop_id": "loop_291",
+      "status": "frozen",
+      "reason": "low confidence and unresolved contradiction",
+      "reasons": ["low_confidence", "unresolved_contradiction"],
+      "timestamp": "2025-04-22T14:30:21.000Z",
+      "required_action": "re-reflect",
+      "agent": "SAGE",
+      "project_id": "life_tree",
+      "original_state": {
+        "confidence_score": 0.48,
+        "trust_score": 0.65,
+        "reflection_depth": 2,
+        "contradictions_unresolved": 1,
+        "manual_override": false
+      }
+    },
+    {
+      "id": "freeze_1650389421000_1234",
+      "loop_id": "loop_291",
+      "status": "unfrozen",
+      "reason": "low confidence and unresolved contradiction",
+      "reasons": ["low_confidence", "unresolved_contradiction"],
+      "timestamp": "2025-04-22T14:30:21.000Z",
+      "required_action": "re-reflect",
+      "agent": "SAGE",
+      "project_id": "life_tree",
+      "unfrozen_at": "2025-04-22T14:35:42.000Z",
+      "unfreeze_reason": "reflection_completed",
+      "manual_override": false,
+      "original_state": {
+        "confidence_score": 0.48,
+        "trust_score": 0.65,
+        "reflection_depth": 2,
+        "contradictions_unresolved": 1,
+        "manual_override": false
+      }
+    },
+    {
+      "id": "freeze_1650389500000_5678",
+      "loop_id": "loop_292",
+      "status": "frozen",
+      "reason": "low trust",
+      "reasons": ["low_trust"],
+      "timestamp": "2025-04-22T15:45:00.000Z",
+      "required_action": "operator_override",
+      "agent": "CRITIC",
+      "project_id": "life_tree",
+      "original_state": {
+        "confidence_score": 0.72,
+        "trust_score": 0.38,
+        "reflection_depth": 1,
+        "contradictions_unresolved": 0,
+        "manual_override": false
+      }
+    },
+    {
+      "id": "freeze_1650389500000_5678",
+      "loop_id": "loop_292",
+      "status": "unfrozen",
+      "reason": "low trust",
+      "reasons": ["low_trust"],
+      "timestamp": "2025-04-22T15:45:00.000Z",
+      "required_action": "operator_override",
+      "agent": "CRITIC",
+      "project_id": "life_tree",
+      "unfrozen_at": "2025-04-22T15:50:30.000Z",
+      "unfreeze_reason": "manual_operator_override",
+      "manual_override": true,
+      "original_state": {
+        "confidence_score": 0.72,
+        "trust_score": 0.38,
+        "reflection_depth": 1,
+        "contradictions_unresolved": 0,
+        "manual_override": false
+      }
+    },
+    {
+      "id": "freeze_1650390000000_9012",
+      "loop_id": "loop_293",
+      "status": "frozen",
+      "reason": "unresolved contradiction",
+      "reasons": ["unresolved_contradiction"],
+      "timestamp": "2025-04-22T16:20:00.000Z",
+      "required_action": "re-reflect",
+      "agent": "SAGE",
+      "project_id": "life_tree",
+      "original_state": {
+        "confidence_score": 0.65,
+        "trust_score": 0.70,
+        "reflection_depth": 1,
+        "contradictions_unresolved": 2,
+        "manual_override": false
+      }
+    },
+    {
+      "id": "freeze_1650390000000_9012",
+      "loop_id": "loop_293",
+      "status": "unfrozen",
+      "reason": "unresolved contradiction",
+      "reasons": ["unresolved_contradiction"],
+      "timestamp": "2025-04-22T16:20:00.000Z",
+      "required_action": "re-reflect",
+      "agent": "SAGE",
+      "project_id": "life_tree",
+      "unfrozen_at": "2025-04-22T16:25:45.000Z",
+      "unfreeze_reason": "contradiction_resolved",
+      "manual_override": false,
+      "original_state": {
+        "confidence_score": 0.65,
+        "trust_score": 0.70,
+        "reflection_depth": 1,
+        "contradictions_unresolved": 2,
+        "manual_override": false
+      }
+    },
+    {
+      "id": "freeze_1650390500000_3456",
+      "loop_id": "loop_294",
+      "status": "frozen",
+      "reason": "no manual override",
+      "reasons": ["no_manual_override"],
+      "timestamp": "2025-04-22T17:10:00.000Z",
+      "required_action": "operator_override",
+      "agent": "SAGE",
+      "project_id": "life_tree",
+      "original_state": {
+        "confidence_score": 0.82,
+        "trust_score": 0.75,
+        "reflection_depth": 0,
+        "contradictions_unresolved": 0,
+        "manual_override": false
+      }
+    }
+  ]
+}

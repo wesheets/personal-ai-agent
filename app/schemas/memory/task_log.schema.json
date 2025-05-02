@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Task Log Schema (Stub)",
+  "description": "Stub schema for the task log memory component. Created during Batch 15.11 validation.",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "const": "to_be_built",
+      "description": "Indicates this is a stub file."
+    }
+  },
+  "required": ["status"]
+}

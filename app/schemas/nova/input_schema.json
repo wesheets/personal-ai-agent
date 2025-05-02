@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NovaAgentInputSchema",
+  "description": "Schema for validating input to the Nova Agent",
+  "type": "object",
+  "properties": {
+    "task": {
+      "type": "string",
+      "description": "Task to be performed by the Nova agent"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Unique identifier for the project"
+    },
+    "tools": {
+      "type": "array",
+      "description": "List of tools to use for the task",
+      "items": {
+        "type": "string",
+        "enum": ["design_ui", "ab_test", "generate_component", "build_ui"]
+      }
+    },
+    "ui_requirements": {
+      "type": "object",
+      "description": "Specific UI requirements for the project",
+      "properties": {
+        "style": {
+          "type": "string",
+          "description": "Style guide for the UI"
+        },
+        "components": {
+          "type": "array",
+          "description": "List of components to generate",
+          "items": {
+            "type": "string"
+          }
+        },
+        "theme": {
+          "type": "object",
+          "description": "Theme configuration",
+          "properties": {
+            "primary_color": {
+              "type": "string"
+            },
+            "secondary_color": {
+              "type": "string"
+            },
+            "font_family": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["task", "project_id"]
+}

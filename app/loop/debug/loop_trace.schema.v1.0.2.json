@@ -1,0 +1,582 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loop Trace Schema",
+  "description": "Schema for loop execution trace data with cognitive stability enhancements",
+  "type": "object",
+  "required": ["loop_id", "project_id", "timestamp", "status"],
+  "properties": {
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier for the loop execution"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Identifier for the project this loop belongs to"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of loop execution"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "running", "completed", "failed", "aborted"],
+      "description": "Current status of the loop execution"
+    },
+    "orchestrator_mode": {
+      "type": "string",
+      "enum": ["FAST", "BALANCED", "THOROUGH", "RESEARCH"],
+      "description": "Mode of the orchestrator for this loop execution"
+    },
+    "agents": {
+      "type": "array",
+      "description": "List of agents involved in the loop execution",
+      "items": {
+        "type": "object",
+        "required": ["agent_id", "timestamp", "status"],
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "description": "Identifier for the agent"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of agent execution"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "running", "completed", "failed", "aborted"],
+            "description": "Status of the agent execution"
+          },
+          "result": {
+            "type": "object",
+            "description": "Result of the agent execution"
+          },
+          "execution_time": {
+            "type": "number",
+            "description": "Execution time in seconds"
+          },
+          "memory_usage": {
+            "type": "number",
+            "description": "Memory usage in MB"
+          },
+          "belief_references": {
+            "type": "array",
+            "description": "List of beliefs referenced by the agent",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "beliefs": {
+      "type": "object",
+      "description": "Beliefs used or updated in this loop",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Content of the belief"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the belief"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Confidence score for the belief"
+          },
+          "last_updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp when the belief was last updated"
+          },
+          "references": {
+            "type": "array",
+            "description": "References supporting the belief",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Summary of the loop execution",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Summary content"
+        },
+        "realism_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Realism score for the summary"
+        },
+        "factual_accuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Factual accuracy score for the summary"
+        },
+        "logical_consistency": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Logical consistency score for the summary"
+        },
+        "emotional_congruence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Emotional congruence score for the summary"
+        },
+        "temporal_coherence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Temporal coherence score for the summary"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence score for the summary"
+        }
+      }
+    },
+    "execution_metrics": {
+      "type": "object",
+      "description": "Metrics for the loop execution",
+      "properties": {
+        "total_execution_time": {
+          "type": "number",
+          "description": "Total execution time in seconds"
+        },
+        "peak_memory_usage": {
+          "type": "number",
+          "description": "Peak memory usage in MB"
+        },
+        "agent_count": {
+          "type": "integer",
+          "description": "Number of agents involved"
+        },
+        "belief_reference_count": {
+          "type": "integer",
+          "description": "Number of belief references"
+        },
+        "belief_update_count": {
+          "type": "integer",
+          "description": "Number of belief updates"
+        }
+      }
+    },
+    "audit_results": {
+      "type": "object",
+      "description": "Results of the auditor agent",
+      "properties": {
+        "belief_consistency_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Score for belief consistency"
+        },
+        "memory_integrity_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Score for memory integrity"
+        },
+        "execution_anomaly_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Score for execution anomalies"
+        },
+        "security_concern_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Score for security concerns"
+        },
+        "issues": {
+          "type": "array",
+          "description": "List of issues found by the auditor",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Type of issue"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high"],
+                "description": "Severity of the issue"
+              },
+              "message": {
+                "type": "string",
+                "description": "Description of the issue"
+              },
+              "impact": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Impact of the issue"
+              },
+              "likelihood": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Likelihood of the issue"
+              },
+              "risk_level": {
+                "type": "string",
+                "enum": ["low", "medium", "high"],
+                "description": "Risk level of the issue"
+              },
+              "recommendation": {
+                "type": "string",
+                "description": "Recommendation for addressing the issue"
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["low", "medium", "high"],
+                "description": "Priority for addressing the issue"
+              }
+            }
+          }
+        },
+        "correlations": {
+          "type": "array",
+          "description": "List of correlations between issues",
+          "items": {
+            "type": "object",
+            "properties": {
+              "issue_types": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Types of issues involved in the correlation"
+              },
+              "correlation_strength": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Strength of the correlation"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the correlation"
+              }
+            }
+          }
+        }
+      }
+    },
+    "belief_versions": {
+      "type": "object",
+      "description": "Version information for beliefs",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "current_version": {
+            "type": "string",
+            "description": "Current semantic version of the belief"
+          },
+          "previous_version": {
+            "type": "string",
+            "description": "Previous semantic version of the belief"
+          },
+          "version_history": {
+            "type": "array",
+            "description": "History of versions for this belief",
+            "items": {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "description": "Semantic version"
+                },
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "ISO 8601 timestamp of version creation"
+                },
+                "change_type": {
+                  "type": "string",
+                  "enum": ["major", "minor", "patch"],
+                  "description": "Type of change in this version"
+                },
+                "change_description": {
+                  "type": "string",
+                  "description": "Description of changes in this version"
+                },
+                "loop_id": {
+                  "type": "string",
+                  "description": "ID of the loop that created this version"
+                }
+              }
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "description": "Other beliefs this belief depends on",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dependents": {
+            "type": "array",
+            "description": "Other beliefs that depend on this belief",
+            "items": {
+              "type": "string"
+            }
+          },
+          "change_impact": {
+            "type": "object",
+            "description": "Impact of changes to this belief",
+            "properties": {
+              "impact_level": {
+                "type": "string",
+                "enum": ["low", "medium", "high"],
+                "description": "Level of impact"
+              },
+              "affected_beliefs": {
+                "type": "array",
+                "description": "Beliefs affected by changes to this belief",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "affected_modules": {
+                "type": "array",
+                "description": "Modules affected by changes to this belief",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "branch_info": {
+            "type": "object",
+            "description": "Information about branches of this belief",
+            "properties": {
+              "current_branch": {
+                "type": "string",
+                "description": "Current branch name"
+              },
+              "branches": {
+                "type": "array",
+                "description": "List of branches",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Branch name"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "ISO 8601 timestamp of branch creation"
+                    },
+                    "last_updated": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "ISO 8601 timestamp of last update to this branch"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["active", "merged", "abandoned"],
+                      "description": "Status of the branch"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "rebuild_events": {
+      "type": "array",
+      "description": "Events related to system rebuilds",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of rebuild event"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of the event"
+          },
+          "stability_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Stability score at the time of the event"
+          },
+          "threshold": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Threshold that triggered the event"
+          },
+          "orchestrator_mode": {
+            "type": "string",
+            "enum": ["FAST", "BALANCED", "THOROUGH", "RESEARCH"],
+            "description": "Orchestrator mode at the time of the event"
+          },
+          "message": {
+            "type": "string",
+            "description": "Description of the event"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Severity of the event"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional details about the event"
+          }
+        }
+      }
+    },
+    "ci_results": {
+      "type": "object",
+      "description": "Results of CI tests",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["passed", "failed", "error"],
+          "description": "Overall status of CI tests"
+        },
+        "ci_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Overall CI score"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of CI test execution"
+        },
+        "total_modules": {
+          "type": "integer",
+          "description": "Total number of modules tested"
+        },
+        "passed_modules": {
+          "type": "integer",
+          "description": "Number of modules that passed tests"
+        },
+        "failed_modules": {
+          "type": "integer",
+          "description": "Number of modules that failed tests"
+        },
+        "module_results": {
+          "type": "array",
+          "description": "Results for individual modules",
+          "items": {
+            "type": "object",
+            "properties": {
+              "module_name": {
+                "type": "string",
+                "description": "Name of the module"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["passed", "failed", "error"],
+                "description": "Status of tests for this module"
+              },
+              "ci_score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "CI score for this module"
+              },
+              "total_tests": {
+                "type": "integer",
+                "description": "Total number of tests for this module"
+              },
+              "passed_tests": {
+                "type": "integer",
+                "description": "Number of tests that passed"
+              },
+              "failed_tests": {
+                "type": "integer",
+                "description": "Number of tests that failed"
+              },
+              "failure_reason": {
+                "type": "string",
+                "description": "Reason for failure, if applicable"
+              }
+            }
+          }
+        }
+      }
+    },
+    "project_manifest_summary": {
+      "type": "object",
+      "description": "Summary of the project manifest",
+      "properties": {
+        "total_modules": {
+          "type": "integer",
+          "description": "Total number of modules in the project"
+        },
+        "module_counts": {
+          "type": "object",
+          "description": "Counts of modules by type",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "belief_versions": {
+          "type": "array",
+          "description": "List of belief versions used in the project",
+          "items": {
+            "type": "string"
+          }
+        },
+        "modules_needing_rebuild": {
+          "type": "array",
+          "description": "List of modules that need rebuilding",
+          "items": {
+            "type": "string"
+          }
+        },
+        "modules_with_failed_ci": {
+          "type": "array",
+          "description": "List of modules with failed CI tests",
+          "items": {
+            "type": "string"
+          }
+        },
+        "last_stability_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Last stability score for the project"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of last update to the project manifest"
+        }
+      }
+    }
+  }
+}

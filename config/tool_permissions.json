@@ -1,0 +1,79 @@
+{
+  "default_policy": "deny",
+  "agent_permissions": {
+    "OrchestratorAgent": [
+      "message_notify_user",
+      "message_ask_user",
+      "shell_exec",
+      "shell_view",
+      "shell_wait",
+      "shell_write_to_process",
+      "shell_kill_process",
+      "file_read",
+      "file_write",
+      "file_str_replace",
+      "image_view",
+      "info_search_web",
+      "browser_view",
+      "browser_navigate",
+      "browser_click",
+      "browser_input",
+      "browser_move_mouse",
+      "browser_press_key",
+      "browser_select_option",
+      "browser_scroll_up",
+      "browser_scroll_down",
+      "browser_console_exec",
+      "browser_console_view",
+      "browser_save_image",
+      "deploy_expose_port",
+      "deploy_apply_deployment",
+      "idle"
+    ],
+    "ForgeAgent": [
+      "message_notify_user",
+      "shell_exec",
+      "file_read",
+      "file_write",
+      "file_str_replace",
+      "info_search_web",
+      "browser_navigate",
+      "idle"
+    ],
+    "HalAgent": [
+      "message_notify_user",
+      "message_ask_user",
+      "info_search_web",
+      "browser_navigate",
+      "browser_click",
+      "browser_input",
+      "browser_scroll_down",
+      "browser_scroll_up",
+      "idle"
+    ],
+    "NovaAgent": [
+      "message_notify_user",
+      "info_search_web",
+      "browser_navigate",
+      "browser_click",
+      "browser_input",
+      "browser_scroll_down",
+      "browser_scroll_up",
+      "file_write",
+      "file_read",
+      "image_view",
+      "browser_save_image",
+      "idle"
+    ],
+    "CriticAgent": [
+      "message_notify_user",
+      "file_read",
+      "idle"
+    ],
+    "SageAgent": [
+      "message_notify_user",
+      "idle"
+    ]
+  }
+}
+

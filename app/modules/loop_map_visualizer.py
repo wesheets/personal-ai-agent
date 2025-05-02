@@ -1,0 +1,828 @@
+"""
+Loop Map Visualizer Module
+
+This module implements the Loop Map Visualizer functionality, which provides
+a visual representation of loop execution paths, agent interactions, and
+memory state transitions. It generates both JSON data structures for API
+consumption and HTML/SVG visualizations for human viewing.
+"""
+
+import os
+import json
+import logging
+from typing import Dict, List, Any, Optional, Tuple
+from datetime import datetime
+import base64
+from enum import Enum
+import sys
+
+# Import schema validation module
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from app.modules.schema_validation import validate_schema, validate_before_export
+except ImportError:
+    # Fallback if direct import fails
+    try:
+        from schema_validation import validate_schema, validate_before_export
+    except ImportError:
+        # Final fallback with stub functions
+        def validate_schema(*args, **kwargs): return True, None
+        def validate_before_export(*args, **kwargs): return True, None
+
+# Configure logging
+try:
+    log_dir = '/tmp'
+    logging.basicConfig(
+        filename=f'{log_dir}/schema_trace.log',
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+except Exception:
+    # Fallback to console logging if file logging fails
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+logger = logging.getLogger(__name__)
+
+class VisualizationFormat(str, Enum):
+    """Enum for visualization output formats"""
+    JSON = "json"
+    HTML = "html"
+    SVG = "svg"
+    PNG = "png"
+    DOT = "dot"  # GraphViz dot format
+
+class NodeType(str, Enum):
+    """Enum for node types in the visualization"""
+    AGENT = "agent"
+    MEMORY = "memory"
+    DECISION = "decision"
+    REFLECTION = "reflection"
+    LOOP_START = "loop_start"
+    LOOP_END = "loop_end"
+    RERUN = "rerun"
+    OPERATOR = "operator"
+    MODE_CHANGE = "mode_change"
+    DEPTH_CHANGE = "depth_change"
+
+class EdgeType(str, Enum):
+    """Enum for edge types in the visualization"""
+    EXECUTION = "execution"
+    MEMORY_ACCESS = "memory_access"
+    DECISION = "decision"
+    REFLECTION = "reflection"
+    RERUN = "rerun"
+    OPERATOR = "operator"
+    MODE_TRANSITION = "mode_transition"
+    DEPTH_TRANSITION = "depth_transition"
+
+# Color schemes for different visualization elements
+COLOR_SCHEMES = {
+    "default": {
+        NodeType.AGENT: "#4285F4",  # Google Blue
+        NodeType.MEMORY: "#34A853",  # Google Green
+        NodeType.DECISION: "#FBBC05",  # Google Yellow
+        NodeType.REFLECTION: "#EA4335",  # Google Red
+        NodeType.LOOP_START: "#9C27B0",  # Purple
+        NodeType.LOOP_END: "#9C27B0",  # Purple
+        NodeType.RERUN: "#FF9800",  # Orange
+        NodeType.OPERATOR: "#607D8B",  # Blue Grey
+        NodeType.MODE_CHANGE: "#00BCD4",  # Cyan
+        NodeType.DEPTH_CHANGE: "#3F51B5",  # Indigo
+        
+        EdgeType.EXECUTION: "#4285F4",  # Google Blue
+        EdgeType.MEMORY_ACCESS: "#34A853",  # Google Green
+        EdgeType.DECISION: "#FBBC05",  # Google Yellow
+        EdgeType.REFLECTION: "#EA4335",  # Google Red
+        EdgeType.RERUN: "#FF9800",  # Orange
+        EdgeType.OPERATOR: "#607D8B",  # Blue Grey
+        EdgeType.MODE_TRANSITION: "#00BCD4",  # Cyan
+        EdgeType.DEPTH_TRANSITION: "#3F51B5",  # Indigo
+    },
+    "dark": {
+        NodeType.AGENT: "#8AB4F8",  # Light Blue
+        NodeType.MEMORY: "#81C995",  # Light Green
+        NodeType.DECISION: "#FDD663",  # Light Yellow
+        NodeType.REFLECTION: "#F28B82",  # Light Red
+        NodeType.LOOP_START: "#D1A7F1",  # Light Purple
+        NodeType.LOOP_END: "#D1A7F1",  # Light Purple
+        NodeType.RERUN: "#FFBD45",  # Light Orange
+        NodeType.OPERATOR: "#9AA0A6",  # Light Grey
+        NodeType.MODE_CHANGE: "#80DEEA",  # Light Cyan
+        NodeType.DEPTH_CHANGE: "#9FA8DA",  # Light Indigo
+        
+        EdgeType.EXECUTION: "#8AB4F8",  # Light Blue
+        EdgeType.MEMORY_ACCESS: "#81C995",  # Light Green
+        EdgeType.DECISION: "#FDD663",  # Light Yellow
+        EdgeType.REFLECTION: "#F28B82",  # Light Red
+        EdgeType.RERUN: "#FFBD45",  # Light Orange
+        EdgeType.OPERATOR: "#9AA0A6",  # Light Grey
+        EdgeType.MODE_TRANSITION: "#80DEEA",  # Light Cyan
+        EdgeType.DEPTH_TRANSITION: "#9FA8DA",  # Light Indigo
+    },
+    "accessibility": {
+        NodeType.AGENT: "#1A73E8",  # Accessible Blue
+        NodeType.MEMORY: "#188038",  # Accessible Green
+        NodeType.DECISION: "#E37400",  # Accessible Yellow
+        NodeType.REFLECTION: "#D93025",  # Accessible Red
+        NodeType.LOOP_START: "#7B1FA2",  # Accessible Purple
+        NodeType.LOOP_END: "#7B1FA2",  # Accessible Purple
+        NodeType.RERUN: "#E65100",  # Accessible Orange
+        NodeType.OPERATOR: "#455A64",  # Accessible Blue Grey
+        NodeType.MODE_CHANGE: "#0097A7",  # Accessible Cyan
+        NodeType.DEPTH_CHANGE: "#303F9F",  # Accessible Indigo
+        
+        EdgeType.EXECUTION: "#1A73E8",  # Accessible Blue
+        EdgeType.MEMORY_ACCESS: "#188038",  # Accessible Green
+        EdgeType.DECISION: "#E37400",  # Accessible Yellow
+        EdgeType.REFLECTION: "#D93025",  # Accessible Red
+        EdgeType.RERUN: "#E65100",  # Accessible Orange
+        EdgeType.OPERATOR: "#455A64",  # Accessible Blue Grey
+        EdgeType.MODE_TRANSITION: "#0097A7",  # Accessible Cyan
+        EdgeType.DEPTH_TRANSITION: "#303F9F",  # Accessible Indigo
+    }
+}
+
+def create_visualizer(*args, **kwargs):
+    """
+    Create a visualizer instance for loop visualization.
+    
+    This is a stub implementation that returns a placeholder response.
+    """
+    logger.info("Creating visualizer (stub implementation)")
+    return {"status": "Visualizer not implemented. Stub function active."}
+
+def visualize_loop(loop_id, loop_trace, output_format="html", output_file=None):
+    """
+    Generate a visualization of a loop execution.
+    
+    This is a stub implementation that returns a placeholder response.
+    """
+    logger.info(f"Visualizing loop {loop_id} (stub implementation)")
+    return {
+        "status": "success",
+        "visualization": {
+            "type": output_format,
+            "content": "Visualization not implemented. Stub function active."
+        },
+        "output_file": output_file
+    }
+
+# Load visual settings schema
+def load_visual_settings(mode: str) -> Dict[str, Any]:
+    """
+    Load visual settings for the specified mode from schema.
+    
+    Args:
+        mode: The orchestrator mode (fast, balanced, thorough, research)
+        
+    Returns:
+        Dictionary containing the visual settings
+    """
+    # Default settings if schema validation fails
+    default_settings = {
+        "detail_level": "standard",
+        "node_types_to_show": [
+            "agent", "memory", "decision", "reflection", 
+            "loop_start", "loop_end", "rerun", "mode_change", "depth_change"
+        ],
+        "edge_types_to_show": [
+            "execution", "memory_access", "decision", "reflection", 
+            "rerun", "mode_transition", "depth_transition"
+        ],
+        "include_timestamps": True,
+        "include_memory_details": True,
+        "include_agent_details": True,
+        "include_decision_details": True,
+        "update_frequency": "agent_completion"
+    }
+    
+    # Define settings based on mode
+    if mode == "fast":
+        settings = {
+            "detail_level": "minimal",
+            "node_types_to_show": [
+                "agent", "loop_start", "loop_end", "rerun", "mode_change"
+            ],
+            "edge_types_to_show": [
+                "execution", "rerun", "mode_transition"
+            ],
+            "include_timestamps": False,
+            "include_memory_details": False,
+            "include_agent_details": False,
+            "include_decision_details": False,
+            "update_frequency": "end_only"
+        }
+    elif mode == "balanced":
+        settings = default_settings
+    elif mode == "thorough":
+        settings = {
+            "detail_level": "detailed",
+            "node_types_to_show": [
+                "agent", "memory", "decision", "reflection", 
+                "loop_start", "loop_end", "rerun", "operator",
+                "mode_change", "depth_change"
+            ],
+            "edge_types_to_show": [
+                "execution", "memory_access", "decision", "reflection", 
+                "rerun", "operator", "mode_transition", "depth_transition"
+            ],
+            "include_timestamps": True,
+            "include_memory_details": True,
+            "include_agent_details": True,
+            "include_decision_details": True,
+            "update_frequency": "real_time"
+        }
+    elif mode == "research":
+        settings = {
+            "detail_level": "comprehensive",
+            "node_types_to_show": [
+                "agent", "memory", "decision", "reflection", 
+                "loop_start", "loop_end", "rerun", "operator",
+                "mode_change", "depth_change"
+            ],
+            "edge_types_to_show": [
+                "execution", "memory_access", "decision", "reflection", 
+                "rerun", "operator", "mode_transition", "depth_transition"
+            ],
+            "include_timestamps": True,
+            "include_memory_details": True,
+            "include_agent_details": True,
+            "include_decision_details": True,
+            "include_uncertainty": True,
+            "track_alternatives": True,
+            "update_frequency": "real_time"
+        }
+    else:
+        settings = default_settings
+    
+    # Validate settings against schema
+    is_valid, error = validate_schema(settings, 'visual_settings')
+    if not is_valid:
+        logger.error(f"Invalid visual settings for mode {mode}: {error}")
+        logger.warning(f"Using default visual settings for mode {mode}")
+        return default_settings
+    
+    logger.info(f"Visual settings for mode {mode} validated successfully")
+    return settings
+
+class LoopMapVisualizer:
+    """
+    Class for generating visualizations of loop execution paths.
+    """
+    
+    def __init__(self, loop_id: str, mode: str = "balanced", color_scheme: str = "default"):
+        """
+        Initialize the loop map visualizer.
+        
+        Args:
+            loop_id: The ID of the loop to visualize
+            mode: The orchestrator mode (fast, balanced, thorough, research)
+            color_scheme: The color scheme to use for visualization (default, dark, accessibility)
+        """
+        self.loop_id = loop_id
+        self.mode = mode.lower() if mode else "balanced"
+        self.color_scheme = color_scheme if color_scheme in COLOR_SCHEMES else "default"
+        self.nodes = []
+        self.edges = []
+        self.metadata = {
+            "loop_id": loop_id,
+            "mode": self.mode,
+            "generated_at": datetime.utcnow().isoformat(),
+            "version": "1.0"
+        }
+        
+        # Load visualization settings based on mode from schema
+        self.settings = load_visual_settings(self.mode)
+        
+        logger.info(f"Initialized LoopMapVisualizer for loop {loop_id} with {self.mode} mode and {color_scheme} color scheme")
+    
+    def add_node(self, node_id: str, node_type: NodeType, label: str, data: Dict[str, Any]) -> None:
+        """
+        Add a node to the visualization.
+        
+        Args:
+            node_id: Unique identifier for the node
+            node_type: Type of the node
+            label: Display label for the node
+            data: Node-specific data
+        """
+        self.nodes.append({
+            "id": node_id,
+            "type": node_type,
+            "label": label,
+            "data": data
+        })
+    
+    def add_edge(self, source: str, target: str, edge_type: EdgeType, label: str, data: Dict[str, Any]) -> None:
+        """
+        Add an edge to the visualization.
+        
+        Args:
+            source: ID of the source node
+            target: ID of the target node
+            edge_type: Type of the edge
+            label: Display label for the edge
+            data: Edge-specific data
+        """
+        self.edges.append({
+            "source": source,
+            "target": target,
+            "type": edge_type,
+            "label": label,
+            "data": data
+        })
+    
+    def generate_map_from_trace(self, loop_trace: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate a loop map from a loop trace.
+        
+        Args:
+            loop_trace: The loop trace data
+            
+        Returns:
+            Dictionary containing the loop map data
+        """
+        logger.info(f"Generating loop map for loop {self.loop_id} in {self.mode} mode")
+        
+        try:
+            # Reset nodes and edges
+            self.nodes = []
+            self.edges = []
+            
+            # Extract loop data
+            loop_count = loop_trace.get("loop_count", 1)
+            trace_items = loop_trace.get("trace", [])
+            current_mode = loop_trace.get("mode", self.mode)
+            
+            # Update mode if different from initialization
+            if current_mode != self.mode:
+                self.mode = current_mode
+                self.settings = load_visual_settings(self.mode)
+                self.metadata["mode"] = self.mode
+            
+            # Add loop start node
+            start_node_id = f"loop_start_{self.loop_id}"
+            self.add_node(
+                node_id=start_node_id,
+                node_type=NodeType.LOOP_START,
+                label=f"Loop {self.loop_id} Start",
+                data={
+                    "loop_id": self.loop_id,
+                    "timestamp": loop_trace.get("start_time", datetime.utcnow().isoformat()),
+                    "loop_count": loop_count,
+                    "mode": current_mode
+                }
+            )
+            
+            # Track the last node ID for connecting edges
+            last_node_id = start_node_id
+            
+            # Process trace items
+            for item in trace_items:
+                item_type = item.get("type")
+                timestamp = item.get("timestamp", datetime.utcnow().isoformat())
+                
+                if item_type == "agent_execution":
+                    # Add agent node
+                    agent_name = item.get("agent_name")
+                    agent_node_id = f"agent_{agent_name}_{timestamp}"
+                    
+                    # Only add if this node type should be shown in current mode
+                    if "agent" in self.settings["node_types_to_show"]:
+                        agent_data = {
+                            "agent_name": agent_name,
+                            "timestamp": timestamp,
+                            "status": item.get("status"),
+                            "mode": item.get("mode", current_mode)
+                        }
+                        
+                        # Add additional details if enabled for this mode
+                        if self.settings["include_agent_details"]:
+                            agent_data["duration"] = item.get("duration")
+                            agent_data["depth"] = item.get("depth")
+                            agent_data["reflection_intensity"] = item.get("reflection_intensity")
+                        
+                        self.add_node(
+                            node_id=agent_node_id,
+                            node_type=NodeType.AGENT,
+                            label=f"Agent: {agent_name}",
+                            data=agent_data
+                        )
+                        
+                        # Connect from last node
+                        if "execution" in self.settings["edge_types_to_show"]:
+                            self.add_edge(
+                                source=last_node_id,
+                                target=agent_node_id,
+                                edge_type=EdgeType.EXECUTION,
+                                label="Executes",
+                                data={"timestamp": timestamp}
+                            )
+                        
+                        # Update last node
+                        last_node_id = agent_node_id
+                    
+                    # If agent accessed memory, add memory node and edge
+                    if "memory_access" in item and "memory" in self.settings["node_types_to_show"]:
+                        memory_access = item.get("memory_access", [])
+                        for memory_item in memory_access:
+                            memory_type = memory_item.get("type")
+                            memory_id = memory_item.get("id")
+                            memory_node_id = f"memory_{memory_type}_{memory_id}_{timestamp}"
+                            
+                            memory_data = {
+                                "memory_type": memory_type,
+                                "memory_id": memory_id,
+                                "timestamp": timestamp,
+                                "access_type": memory_item.get("access_type")
+                            }
+                            
+                            # Add additional details if enabled for this mode
+                            if self.settings["include_memory_details"]:
+                                memory_data["content"] = memory_item.get("content")
+                                memory_data["metadata"] = memory_item.get("metadata")
+                            
+                            self.add_node(
+                                node_id=memory_node_id,
+                                node_type=NodeType.MEMORY,
+                                label=f"Memory: {memory_type}",
+                                data=memory_data
+                            )
+                            
+                            # Connect from agent node
+                            if "memory_access" in self.settings["edge_types_to_show"]:
+                                self.add_edge(
+                                    source=agent_node_id,
+                                    target=memory_node_id,
+                                    edge_type=EdgeType.MEMORY_ACCESS,
+                                    label=memory_item.get("access_type", "Accesses"),
+                                    data={"timestamp": timestamp}
+                                )
+                
+                elif item_type == "decision":
+                    # Add decision node
+                    decision_id = item.get("decision_id")
+                    decision_node_id = f"decision_{decision_id}_{timestamp}"
+                    
+                    # Only add if this node type should be shown in current mode
+                    if "decision" in self.settings["node_types_to_show"]:
+                        decision_data = {
+                            "decision_id": decision_id,
+                            "timestamp": timestamp,
+                            "decision_type": item.get("decision_type"),
+                            "outcome": item.get("outcome")
+                        }
+                        
+                        # Add additional details if enabled for this mode
+                        if self.settings["include_decision_details"]:
+                            decision_data["options"] = item.get("options")
+                            decision_data["reasoning"] = item.get("reasoning")
+                            decision_data["confidence"] = item.get("confidence")
+                        
+                        self.add_node(
+                            node_id=decision_node_id,
+                            node_type=NodeType.DECISION,
+                            label=f"Decision: {item.get('decision_type')}",
+                            data=decision_data
+                        )
+                        
+                        # Connect from last node
+                        if "decision" in self.settings["edge_types_to_show"]:
+                            self.add_edge(
+                                source=last_node_id,
+                                target=decision_node_id,
+                                edge_type=EdgeType.DECISION,
+                                label="Decides",
+                                data={"timestamp": timestamp}
+                            )
+                        
+                        # Update last node
+                        last_node_id = decision_node_id
+                
+                elif item_type == "reflection":
+                    # Add reflection node
+                    reflection_id = item.get("reflection_id")
+                    reflection_node_id = f"reflection_{reflection_id}_{timestamp}"
+                    
+                    # Only add if this node type should be shown in current mode
+                    if "reflection" in self.settings["node_types_to_show"]:
+                        reflection_data = {
+                            "reflection_id": reflection_id,
+                            "timestamp": timestamp,
+                            "reflection_type": item.get("reflection_type"),
+                            "intensity": item.get("intensity")
+                        }
+                        
+                        # Add additional details if enabled for this mode
+                        if self.settings.get("include_uncertainty", False):
+                            reflection_data["uncertainty"] = item.get("uncertainty")
+                            reflection_data["contradictions"] = item.get("contradictions")
+                        
+                        self.add_node(
+                            node_id=reflection_node_id,
+                            node_type=NodeType.REFLECTION,
+                            label=f"Reflection: {item.get('reflection_type')}",
+                            data=reflection_data
+                        )
+                        
+                        # Connect from last node
+                        if "reflection" in self.settings["edge_types_to_show"]:
+                            self.add_edge(
+                                source=last_node_id,
+                                target=reflection_node_id,
+                                edge_type=EdgeType.REFLECTION,
+                                label="Reflects",
+                                data={"timestamp": timestamp}
+                            )
+                        
+                        # Update last node
+                        last_node_id = reflection_node_id
+                
+                elif item_type == "rerun":
+                    # Add rerun node
+                    rerun_id = item.get("rerun_id")
+                    rerun_node_id = f"rerun_{rerun_id}_{timestamp}"
+                    
+                    # Only add if this node type should be shown in current mode
+                    if "rerun" in self.settings["node_types_to_show"]:
+                        rerun_data = {
+                            "rerun_id": rerun_id,
+                            "timestamp": timestamp,
+                            "reason": item.get("reason"),
+                            "rerun_count": item.get("rerun_count", 1)
+                        }
+                        
+                        self.add_node(
+                            node_id=rerun_node_id,
+                            node_type=NodeType.RERUN,
+                            label=f"Rerun: {item.get('reason')}",
+                            data=rerun_data
+                        )
+                        
+                        # Connect from last node
+                        if "rerun" in self.settings["edge_types_to_show"]:
+                            self.add_edge(
+                                source=last_node_id,
+                                target=rerun_node_id,
+                                edge_type=EdgeType.RERUN,
+                                label="Reruns",
+                                data={"timestamp": timestamp}
+                            )
+                        
+                        # Update last node
+                        last_node_id = rerun_node_id
+                
+                elif item_type == "mode_change":
+                    # Add mode change node
+                    old_mode = item.get("old_mode")
+                    new_mode = item.get("new_mode")
+                    mode_change_node_id = f"mode_change_{old_mode}_to_{new_mode}_{timestamp}"
+                    
+                    # Only add if this node type should be shown in current mode
+                    if "mode_change" in self.settings["node_types_to_show"]:
+                        mode_change_data = {
+                            "timestamp": timestamp,
+                            "old_mode": old_mode,
+                            "new_mode": new_mode,
+                            "reason": item.get("reason")
+                        }
+                        
+                        self.add_node(
+                            node_id=mode_change_node_id,
+                            node_type=NodeType.MODE_CHANGE,
+                            label=f"Mode Change: {old_mode} → {new_mode}",
+                            data=mode_change_data
+                        )
+                        
+                        # Connect from last node
+                        if "mode_transition" in self.settings["edge_types_to_show"]:
+                            self.add_edge(
+                                source=last_node_id,
+                                target=mode_change_node_id,
+                                edge_type=EdgeType.MODE_TRANSITION,
+                                label="Changes Mode",
+                                data={"timestamp": timestamp}
+                            )
+                        
+                        # Update last node
+                        last_node_id = mode_change_node_id
+                
+                elif item_type == "depth_change":
+                    # Add depth change node
+                    old_depth = item.get("old_depth")
+                    new_depth = item.get("new_depth")
+                    depth_change_node_id = f"depth_change_{old_depth}_to_{new_depth}_{timestamp}"
+                    
+                    # Only add if this node type should be shown in current mode
+                    if "depth_change" in self.settings["node_types_to_show"]:
+                        depth_change_data = {
+                            "timestamp": timestamp,
+                            "old_depth": old_depth,
+                            "new_depth": new_depth,
+                            "reason": item.get("reason")
+                        }
+                        
+                        self.add_node(
+                            node_id=depth_change_node_id,
+                            node_type=NodeType.DEPTH_CHANGE,
+                            label=f"Depth Change: {old_depth} → {new_depth}",
+                            data=depth_change_data
+                        )
+                        
+                        # Connect from last node
+                        if "depth_transition" in self.settings["edge_types_to_show"]:
+                            self.add_edge(
+                                source=last_node_id,
+                                target=depth_change_node_id,
+                                edge_type=EdgeType.DEPTH_TRANSITION,
+                                label="Changes Depth",
+                                data={"timestamp": timestamp}
+                            )
+                        
+                        # Update last node
+                        last_node_id = depth_change_node_id
+                
+                elif item_type == "operator_intervention":
+                    # Add operator intervention node
+                    intervention_id = item.get("intervention_id")
+                    intervention_node_id = f"operator_{intervention_id}_{timestamp}"
+                    
+                    # Only add if this node type should be shown in current mode
+                    if "operator" in self.settings["node_types_to_show"]:
+                        intervention_data = {
+                            "intervention_id": intervention_id,
+                            "timestamp": timestamp,
+                            "intervention_type": item.get("intervention_type"),
+                            "message": item.get("message")
+                        }
+                        
+                        self.add_node(
+                            node_id=intervention_node_id,
+                            node_type=NodeType.OPERATOR,
+                            label=f"Operator: {item.get('intervention_type')}",
+                            data=intervention_data
+                        )
+                        
+                        # Connect from last node
+                        if "operator" in self.settings["edge_types_to_show"]:
+                            self.add_edge(
+                                source=last_node_id,
+                                target=intervention_node_id,
+                                edge_type=EdgeType.OPERATOR,
+                                label="Intervenes",
+                                data={"timestamp": timestamp}
+                            )
+                        
+                        # Update last node
+                        last_node_id = intervention_node_id
+            
+            # Add loop end node
+            end_node_id = f"loop_end_{self.loop_id}"
+            self.add_node(
+                node_id=end_node_id,
+                node_type=NodeType.LOOP_END,
+                label=f"Loop {self.loop_id} End",
+                data={
+                    "loop_id": self.loop_id,
+                    "timestamp": loop_trace.get("end_time", datetime.utcnow().isoformat()),
+                    "status": loop_trace.get("status"),
+                    "mode": current_mode
+                }
+            )
+            
+            # Connect from last node
+            self.add_edge(
+                source=last_node_id,
+                target=end_node_id,
+                edge_type=EdgeType.EXECUTION,
+                label="Completes",
+                data={"timestamp": loop_trace.get("end_time", datetime.utcnow().isoformat())}
+            )
+            
+            # Prepare the final map data
+            map_data = {
+                "metadata": self.metadata,
+                "nodes": self.nodes,
+                "edges": self.edges
+            }
+            
+            # Validate the map data before export
+            is_valid, error = validate_before_export(map_data)
+            if not is_valid:
+                logger.error(f"Invalid loop map data: {error}")
+                return {"error": f"Failed to generate valid loop map: {error}"}
+            
+            logger.info(f"Successfully generated loop map for loop {self.loop_id} with {len(self.nodes)} nodes and {len(self.edges)} edges")
+            return map_data
+            
+        except Exception as e:
+            logger.error(f"Error generating loop map: {str(e)}")
+            return {"error": f"Failed to generate loop map: {str(e)}"}
+    
+    def export_map(self, output_format: VisualizationFormat = VisualizationFormat.JSON, output_file: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Export the loop map in the specified format.
+        
+        Args:
+            output_format: The output format (JSON, HTML, SVG, PNG, DOT)
+            output_file: Optional file path to save the output
+            
+        Returns:
+            Dictionary containing the export result
+        """
+        logger.info(f"Exporting loop map for loop {self.loop_id} in {output_format} format")
+        
+        try:
+            if output_format == VisualizationFormat.JSON:
+                # Export as JSON
+                map_data = {
+                    "metadata": self.metadata,
+                    "nodes": self.nodes,
+                    "edges": self.edges
+                }
+                
+                if output_file:
+                    with open(output_file, 'w') as f:
+                        json.dump(map_data, f, indent=2)
+                
+                return {
+                    "status": "success",
+                    "format": output_format,
+                    "data": map_data,
+                    "output_file": output_file
+                }
+            
+            elif output_format == VisualizationFormat.HTML:
+                # Generate HTML visualization
+                # This is a placeholder for the actual HTML generation
+                html_content = f"""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Loop Map Visualization - {self.loop_id}</title>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <style>
+                        body {{ font-family: Arial, sans-serif; margin: 0; padding: 20px; }}
+                        h1 {{ color: #333; }}
+                        .visualization-container {{ 
+                            border: 1px solid #ddd; 
+                            padding: 20px; 
+                            border-radius: 5px;
+                            margin-top: 20px;
+                        }}
+                        .node {{ 
+                            display: inline-block;
+                            padding: 10px;
+                            margin: 5px;
+                            border-radius: 5px;
+                            color: white;
+                        }}
+                        .edge {{
+                            margin: 2px 0;
+                            padding: 5px;
+                            border-left: 3px solid #ccc;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <h1>Loop Map Visualization</h1>
+                    <div>
+                        <p><strong>Loop ID:</strong> {self.loop_id}</p>
+                        <p><strong>Mode:</strong> {self.mode}</p>
+                        <p><strong>Generated:</strong> {self.metadata["generated_at"]}</p>
+                    </div>
+                    <div class="visualization-container">
+                        <p>This is a placeholder for the actual visualization.</p>
+                        <p>The loop map contains {len(self.nodes)} nodes and {len(self.edges)} edges.</p>
+                    </div>
+                </body>
+                </html>
+                """
+                
+                if output_file:
+                    with open(output_file, 'w') as f:
+                        f.write(html_content)
+                
+                return {
+                    "status": "success",
+                    "format": output_format,
+                    "data": html_content,
+                    "output_file": output_file
+                }
+            
+            else:
+                # Other formats are not implemented yet
+                logger.warning(f"Export format {output_format} not fully implemented")
+                return {
+                    "status": "warning",
+                    "message": f"Export format {output_format} not fully implemented",
+                    "format": output_format,
+                    "output_file": output_file
+                }
+                
+        except Exception as e:
+            logger.error(f"Error exporting loop map: {str(e)}")
+            return {"error": f"Failed to export loop map: {str(e)}"}

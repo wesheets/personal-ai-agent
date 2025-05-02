@@ -1,0 +1,15 @@
+{
+  "event_type": "endpoint_verification",
+  "timestamp": "20250425_2309",
+  "tag": "endpoint_verification_20250425_2309",
+  "success_rate": 29.4,
+  "fixed_endpoints_success_rate": 0.0,
+  "status_breakdown": {
+    "404": 77,
+    "500": 7,
+    "422": 15,
+    "200": 20
+  },
+  "critical_failures_count": 14,
+  "next_steps": "Deploy local fixes to server and continue fixing remaining endpoints"
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ObserverAgentInputSchema",
+  "description": "Schema for validating input to the Observer Agent",
+  "type": "object",
+  "properties": {
+    "task": {
+      "type": "string",
+      "description": "Task to be performed by the Observer agent",
+      "enum": ["journal", "observe", "reflect"]
+    },
+    "date": {
+      "type": "string",
+      "description": "Date for the observation entry in YYYY-MM-DD format",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "tools": {
+      "type": "array",
+      "description": "List of tools to use for the task",
+      "items": {
+        "type": "string",
+        "enum": ["journal", "observe", "reflect"]
+      }
+    },
+    "project_id": {
+      "type": ["string", "null"],
+      "description": "Optional project identifier"
+    }
+  },
+  "required": ["task"]
+}

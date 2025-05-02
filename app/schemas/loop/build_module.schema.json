@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Build Module Schema (Stub)",
+  "description": "Stub schema for the build module. Created during Batch 15.9 validation.",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "const": "to_be_built",
+      "description": "Indicates this is a stub file."
+    }
+  },
+  "required": ["status"]
+}

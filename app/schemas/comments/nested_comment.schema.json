@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Nested Comment Schema (Stub)",
+  "description": "Stub schema for nested comments. Created during Batch 15.8 validation.",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "const": "to_be_built",
+      "description": "Indicates this is a stub file."
+    }
+  },
+  "required": ["status"]
+}
