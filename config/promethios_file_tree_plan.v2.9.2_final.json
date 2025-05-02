@@ -1,0 +1,74 @@
+[
+  {
+    "file": "toolkit_registry.py",
+    "path": "app/registries/toolkit_registry.py",
+    "type": "registry",
+    "purpose": "Lists available tools callable by agents, with schema enforcement.",
+    "status": "injected_by_operator",
+    "source": "Operator"
+  },
+  {
+    "file": "agent_registry.json",
+    "path": "app/config/agent_registry.json",
+    "type": "registry",
+    "purpose": "Previously existing agent metadata. Retained and unmodified.",
+    "status": "found_in_repo",
+    "source": "repo"
+  },
+  {
+    "file": "loop_trace.guard.json",
+    "path": "app/schemas/loop/loop_trace.guard.json",
+    "type": "schema",
+    "purpose": "Defines loop trace contract for safe execution reflection.",
+    "status": "injected_by_operator",
+    "source": "Operator"
+  },
+  {
+    "file": "system_manifest.json",
+    "path": "config/system_manifest.json",
+    "type": "manifest",
+    "purpose": "Previous system snapshot. Retained for backward compatibility.",
+    "status": "found_in_repo",
+    "source": "repo"
+  },
+  {
+    "file": "PHASE_4_OPERATOR_ALIGNMENT.md",
+    "path": "docs/PHASE_4_OPERATOR_ALIGNMENT.md",
+    "type": "alignment_log",
+    "purpose": "Human-readable record of governance file injection and structural rationale.",
+    "status": "operator_alignment_record",
+    "source": "Operator"
+  },
+  {
+    "file": "agent_governance.json",
+    "path": "app/config/agent_governance.json",
+    "type": "governance_registry",
+    "purpose": "Defines tools and schemas per agent under runtime governance for Phase 4.1.",
+    "status": "injected_by_operator",
+    "source": "Operator"
+  },
+  {
+    "file": "agent_governance.schema.json",
+    "path": "app/schemas/config/agent_governance.schema.json",
+    "type": "schema",
+    "purpose": "Schema definition for validating agent governance structure.",
+    "status": "injected_by_operator",
+    "source": "Operator"
+  },
+  {
+    "file": "loop_controller_post_hook.py",
+    "path": "app/core/loop_controller_post_hook.py",
+    "type": "post_execution_hook",
+    "purpose": "Logs prompt/memory trace after loop execution for reflection or recovery.",
+    "status": "injected_by_operator",
+    "source": "Operator"
+  },
+  {
+    "file": "system_manifest.runtime.json",
+    "path": "config/system_manifest.runtime.json",
+    "type": "manifest",
+    "purpose": "Runtime manifest snapshot used to declare loop agents, tools, and belief structure at Phase 4.1 start.",
+    "status": "injected_by_operator",
+    "source": "Operator"
+  }
+]
