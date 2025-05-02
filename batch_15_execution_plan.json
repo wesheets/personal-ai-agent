@@ -43,7 +43,7 @@
       "Update `verified` status for batch 15.1 to `true` in `batch_15_execution_plan.json`."
     ],
     "dependencies": [],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.2",
@@ -64,7 +64,7 @@
     "dependencies": [
       "15.1"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.3",
@@ -85,7 +85,7 @@
     "dependencies": [
       "15.2"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.4",
@@ -106,7 +106,7 @@
     "dependencies": [
       "15.3"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.5",
@@ -128,7 +128,7 @@
       "15.2",
       "15.4"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.6",
@@ -149,7 +149,7 @@
     "dependencies": [
       "15.5"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.7",
@@ -170,7 +170,7 @@
     "dependencies": [
       "15.6"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.8",
@@ -191,7 +191,7 @@
     "dependencies": [
       "15.7"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.9",
@@ -212,7 +212,7 @@
     "dependencies": [
       "15.8"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.10",
@@ -234,7 +234,7 @@
       "15.2",
       "15.9"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.11",
@@ -255,7 +255,7 @@
     "dependencies": [
       "15.10"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.12",
@@ -276,7 +276,7 @@
     "dependencies": [
       "15.11"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.13",
@@ -297,7 +297,7 @@
     "dependencies": [
       "15.12"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "15.14",

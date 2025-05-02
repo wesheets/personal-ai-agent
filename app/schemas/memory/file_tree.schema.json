@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "File Tree Schema (Stub)",
+  "description": "Stub schema for the file tree memory component. Created during Batch 15.10 validation. Depends on app/memory/file_tree.json.",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "const": "to_be_built",
+      "description": "Indicates this is a stub file."
+    }
+  },
+  "required": ["status"]
+}

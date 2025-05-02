@@ -1,0 +1,45 @@
+{
+  "policy_name": "Pre-Commit/Pre-Push Validation Policy (Draft)",
+  "version": "0.1.0",
+  "description": "Defines standard validation steps to be executed before committing or pushing code generated/modified during high-risk bootstrap batches.",
+  "phases": {
+    "pre_commit": [
+      {
+        "step": "syntax_check",
+        "description": "Validate basic syntax correctness.",
+        "tools": {
+          "python": "python3.11 -m py_compile <file>",
+          "json": "python3.11 -m json.tool <file> > /dev/null"
+        }
+      },
+      {
+        "step": "linting",
+        "description": "Check for style guide adherence and potential errors (requires linters like flake8/pylint to be installed).",
+        "tools": {
+          "python": "flake8 <file>" 
+        },
+        "optional": true 
+      }
+    ],
+    "pre_push": [
+      {
+        "step": "stub_validation",
+        "description": "Run the standard functional surface validation against the component.",
+        "tool": "python3.11 tools/validate_functional_surface.py --component <component_path>"
+      },
+      {
+        "step": "unit_tests",
+        "description": "Execute component-specific unit tests if available (requires test framework and tests).",
+        "tool": "pytest <test_directory_or_file>",
+        "optional": true
+      }
+      
+    ]
+  },
+  "notes": [
+    "This is a draft policy and requires refinement.",
+    "Specific tools (linters, test frameworks) need to be installed in the environment.",
+    "The execution plan batches should reference steps from this policy."
+  ]
+}
+
