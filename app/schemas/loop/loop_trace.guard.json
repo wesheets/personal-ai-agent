@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LoopTraceGuard",
+  "type": "object",
+  "properties": {
+    "loop_id": {
+      "type": "string"
+    },
+    "executed_by": {
+      "type": "string"
+    },
+    "tool": {
+      "type": "string"
+    },
+    "input": {
+      "type": "object"
+    },
+    "output": {
+      "type": "object"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failure",
+        "unknown"
+      ]
+    }
+  },
+  "required": [
+    "loop_id",
+    "executed_by",
+    "tool",
+    "status"
+  ]
+}
