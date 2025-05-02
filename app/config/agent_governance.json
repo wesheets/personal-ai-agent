@@ -1,0 +1,23 @@
+{
+  "agents": [
+    {
+      "id": "architect",
+      "tools": [
+        "file_tree_updater",
+        "plan_auditor"
+      ],
+      "schemas": [
+        "file_tree.schema.json"
+      ],
+      "status": "enabled"
+    },
+    {
+      "id": "executor",
+      "tools": [
+        "loop_controller"
+      ],
+      "schemas": [],
+      "status": "enabled"
+    }
+  ]
+}
