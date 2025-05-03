@@ -1,0 +1,5 @@
+{
+  "validation_tools": [
+    "tools/validate_file_tree_truth_v2.py"
+  ]
+}
