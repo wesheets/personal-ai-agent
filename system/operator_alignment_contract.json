@@ -9,7 +9,8 @@
         "schema_integrity_guard.py",
         "loop_execution_mode_enforcer.py",
         "wiring_scout_manus.py",
-        "loop_intent.json"
+        "loop_intent.json",
+        "tools/validate_file_tree_truth_v2.py"
       ],
       "creed_compliant": true
     }
