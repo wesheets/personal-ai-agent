@@ -1,4 +1,3 @@
-# Operator patch: loop routes verified from local test
 from fastapi import FastAPI
 import logging
 
