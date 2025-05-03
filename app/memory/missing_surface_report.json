@@ -1,0 +1,345 @@
+{
+  "summary": {
+    "total_missing": 43,
+    "grouped_by_type": {
+      "control_log": 3,
+      "agent": 9,
+      "agent_output": 1,
+      "loop_orchestration": 1,
+      "memory_template": 1,
+      "agent_logic": 1,
+      "validator": 5,
+      "cognitive_log": 1,
+      "config": 1,
+      "tool": 2,
+      "confirmation_token": 1,
+      "firewall_logic": 1,
+      "hook": 1,
+      "drift_log": 2,
+      "maintenance_plan": 1,
+      "recovery_log": 1,
+      "repair_engine": 1,
+      "ui_component": 3,
+      "bootloader": 1,
+      "execution_log": 1,
+      "registry_snapshot": 1,
+      "test_tool": 1,
+      "python_script": 1,
+      "nlp_tool": 1,
+      "log": 1
+    }
+  },
+  "targets": {
+    "control_log": [
+      {
+        "file": "belief_identity_checkpoint.json",
+        "path": "app/memory/belief_identity_checkpoint.json",
+        "type": "control_log",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "operator_unlock_tracker.json",
+        "path": "app/memory/operator_unlock_tracker.json",
+        "type": "control_log",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "system_acknowledgments.json",
+        "path": "app/memory/system_acknowledgments.json",
+        "type": "control_log",
+        "status": "missing_from_repo"
+      }
+    ],
+    "agent": [
+      {
+        "file": "auto_unlock_proposal_monitor.py",
+        "path": "app/agents/auto_unlock_proposal_monitor.py",
+        "type": "agent",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "insight_loop_saas_agent.py",
+        "path": "app/agents/insight_loop_saas_agent.py",
+        "type": "agent",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "orchestrator.py",
+        "path": "app/agents/orchestrator.py",
+        "type": "agent",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "hal.py",
+        "path": "app/agents/hal.py",
+        "type": "agent",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "skeptic_agent.py",
+        "path": "plugins/agents/skeptic/skeptic_agent.py",
+        "type": "agent",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "philosopher_agent.py",
+        "path": "plugins/agents/philosopher/philosopher_agent.py",
+        "type": "agent",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "reconciler_agent.py",
+        "path": "plugins/agents/reconciler/reconciler_agent.py",
+        "type": "agent",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "trust_score_manager.py",
+        "path": "plugins/agents/trust_score_manager/trust_score_manager.py",
+        "type": "agent",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "symbolist_agent.py",
+        "path": "plugins/agents/symbolist/symbolist_agent.py",
+        "type": "agent",
+        "status": "missing_from_repo"
+      }
+    ],
+    "agent_output": [
+      {
+        "file": "loop_belief_unlock_request.json",
+        "path": "app/memory/loop_belief_unlock_request.json",
+        "type": "agent_output",
+        "status": "missing_from_repo"
+      }
+    ],
+    "loop_orchestration": [
+      {
+        "file": "vertical_loop_initializer.py",
+        "path": "app/loop/vertical_loop_initializer.py",
+        "type": "loop_orchestration",
+        "status": "missing_from_repo"
+      }
+    ],
+    "memory_template": [
+      {
+        "file": "saas_component_manifest.json",
+        "path": "app/memory/saas_component_manifest.json",
+        "type": "memory_template",
+        "status": "missing_from_repo"
+      }
+    ],
+    "agent_logic": [
+      {
+        "file": "hal_code_generator.py",
+        "path": "app/agents/hal_code_generator.py",
+        "type": "agent_logic",
+        "status": "missing_from_repo"
+      }
+    ],
+    "validator": [
+      {
+        "file": "loop_drift_analyzer.py",
+        "path": "app/validators/loop_drift_analyzer.py",
+        "type": "validator",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "agent_drift_reconciler.py",
+        "path": "app/validators/agent_drift_reconciler.py",
+        "type": "validator",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "startup_surface_validator.py",
+        "path": "app/validators/startup_surface_validator.py",
+        "type": "validator",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "postman_sweep_controller.py",
+        "path": "app/validators/postman_sweep_controller.py",
+        "type": "validator",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "agent_reflection_injector.py",
+        "path": "app/validators/agent_reflection_injector.py",
+        "type": "validator",
+        "status": "missing_from_repo"
+      }
+    ],
+    "cognitive_log": [
+      {
+        "file": "loop_summary_drift_report.json",
+        "path": "app/memory/loop_summary_drift_report.json",
+        "type": "cognitive_log",
+        "status": "missing_from_repo"
+      }
+    ],
+    "config": [
+      {
+        "file": "vertical_registry.json",
+        "path": "app/config/vertical_registry.json",
+        "type": "config",
+        "status": "missing_from_repo"
+      }
+    ],
+    "tool": [
+      {
+        "file": "validate_snapshot_before_build.py",
+        "path": "tools/validate_snapshot_before_build.py",
+        "type": "tool",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "endpoint_200_ok_checker.py",
+        "path": "tools/endpoint_200_ok_checker.py",
+        "type": "tool",
+        "status": "missing_from_repo"
+      }
+    ],
+    "confirmation_token": [
+      {
+        "file": "acknowledged_snapshot_hash.txt",
+        "path": "system/acknowledged_snapshot_hash.txt",
+        "type": "confirmation_token",
+        "status": "missing_from_repo"
+      }
+    ],
+    "firewall_logic": [
+      {
+        "file": "agent_snapshot_guard.py",
+        "path": "app/guardrails/agent_snapshot_guard.py",
+        "type": "firewall_logic",
+        "status": "missing_from_repo"
+      }
+    ],
+    "hook": [
+      {
+        "file": "pre-commit",
+        "path": ".git/hooks/pre-commit",
+        "type": "hook",
+        "status": "missing_from_repo"
+      }
+    ],
+    "drift_log": [
+      {
+        "file": "drift_surface_report.json",
+        "path": "logs/drift_surface_report.json",
+        "type": "drift_log",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "endpoint_health_report.json",
+        "path": "logs/endpoint_health_report.json",
+        "type": "drift_log",
+        "status": "missing_from_repo"
+      }
+    ],
+    "maintenance_plan": [
+      {
+        "file": "agent_deduplication_plan.json",
+        "path": "app/maintenance/agent_deduplication_plan.json",
+        "type": "maintenance_plan",
+        "status": "missing_from_repo"
+      }
+    ],
+    "recovery_log": [
+      {
+        "file": "repair_trigger_queue.json",
+        "path": "app/memory/repair_trigger_queue.json",
+        "type": "recovery_log",
+        "status": "missing_from_repo"
+      }
+    ],
+    "repair_engine": [
+      {
+        "file": "repair_executor.py",
+        "path": "app/repair/repair_executor.py",
+        "type": "repair_engine",
+        "status": "missing_from_repo"
+      }
+    ],
+    "ui_component": [
+      {
+        "file": "FileTreeView.jsx",
+        "path": "app/ui/components/FileTreeView.jsx",
+        "type": "ui_component",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "LoopRunnerPanel.jsx",
+        "path": "app/ui/components/LoopRunnerPanel.jsx",
+        "type": "ui_component",
+        "status": "missing_from_repo"
+      },
+      {
+        "file": "AgentLogViewer.jsx",
+        "path": "app/ui/components/AgentLogViewer.jsx",
+        "type": "ui_component",
+        "status": "missing_from_repo"
+      }
+    ],
+    "bootloader": [
+      {
+        "file": "agent_registry_bootstrap.py",
+        "path": "app/modules/agent_registry_bootstrap.py",
+        "type": "bootloader",
+        "status": "missing_from_repo"
+      }
+    ],
+    "execution_log": [
+      {
+        "file": "agent_loop_debug_log.json",
+        "path": "app/memory/agent_loop_debug_log.json",
+        "type": "execution_log",
+        "status": "missing_from_repo"
+      }
+    ],
+    "registry_snapshot": [
+      {
+        "file": "agent_registry_status.json",
+        "path": "logs/agent_registry_status.json",
+        "type": "registry_snapshot",
+        "status": "missing_from_repo"
+      }
+    ],
+    "test_tool": [
+      {
+        "file": "agent_registry_verification_test.py",
+        "path": "tools/agent_registry_verification_test.py",
+        "type": "test_tool",
+        "status": "missing_from_repo"
+      }
+    ],
+    "python_script": [
+      {
+        "file": "validate_truth_surface.py",
+        "path": "tools/validate_truth_surface.py",
+        "type": "python_script",
+        "status": "missing_from_repo"
+      }
+    ],
+    "nlp_tool": [
+      {
+        "file": "emotion_context_extractor.py",
+        "path": "app/modules/emotion_context_extractor.py",
+        "type": "nlp_tool",
+        "status": "missing_from_repo"
+      }
+    ],
+    "log": [
+      {
+        "file": "build_plan_history.json",
+        "path": "logs/build_plan_history.json",
+        "type": "log",
+        "status": "missing_from_repo"
+      }
+    ]
+  },
+  "source": "file_tree.json derived from promethios_file_tree_plan.v3.1.4_runtime_synced.json",
+  "tagged_by": "Operator (via Pessimist reflection)",
+  "target_phase": "Phase 16.x backlog"
+}
