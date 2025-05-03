@@ -85,7 +85,10 @@
     "dependencies": [
       "15.2"
     ],
-    "verified": false
+    "verified": false,
+    "post_execution_steps": [
+      "After successful wiring, call `log_wiring_to_manifest()` to register the action. This helper will validate that the file exists, is listed in `file_tree.json`, and only logs safe, verified patches. This step replaces manual prompt-level logging instructions."
+    ]
   },
   {
     "batch": "15.4",
@@ -659,7 +662,10 @@
     "dependencies": [
       "15.29"
     ],
-    "verified": false
+    "verified": false,
+    "post_execution_steps": [
+      "After successful wiring, call `log_wiring_to_manifest()` to register the action. This helper will validate that the file exists, is listed in `file_tree.json`, and only logs safe, verified patches. This step replaces manual prompt-level logging instructions."
+    ]
   },
   {
     "batch": "15.31",
@@ -680,7 +686,10 @@
     "dependencies": [
       "15.30"
     ],
-    "verified": false
+    "verified": false,
+    "post_execution_steps": [
+      "After successful wiring, call `log_wiring_to_manifest()` to register the action. This helper will validate that the file exists, is listed in `file_tree.json`, and only logs safe, verified patches. This step replaces manual prompt-level logging instructions."
+    ]
   },
   {
     "batch": "15.32",
@@ -701,7 +710,10 @@
     "dependencies": [
       "15.31"
     ],
-    "verified": false
+    "verified": false,
+    "post_execution_steps": [
+      "After successful wiring, call `log_wiring_to_manifest()` to register the action. This helper will validate that the file exists, is listed in `file_tree.json`, and only logs safe, verified patches. This step replaces manual prompt-level logging instructions."
+    ]
   },
   {
     "batch": "15.33",
@@ -722,7 +734,10 @@
     "dependencies": [
       "15.32"
     ],
-    "verified": false
+    "verified": false,
+    "post_execution_steps": [
+      "After successful wiring, call `log_wiring_to_manifest()` to register the action. This helper will validate that the file exists, is listed in `file_tree.json`, and only logs safe, verified patches. This step replaces manual prompt-level logging instructions."
+    ]
   },
   {
     "batch": "15.34",
@@ -743,7 +758,10 @@
     "dependencies": [
       "15.33"
     ],
-    "verified": false
+    "verified": false,
+    "post_execution_steps": [
+      "After successful wiring, call `log_wiring_to_manifest()` to register the action. This helper will validate that the file exists, is listed in `file_tree.json`, and only logs safe, verified patches. This step replaces manual prompt-level logging instructions."
+    ]
   },
   {
     "batch": "15.35",
@@ -764,7 +782,10 @@
     "dependencies": [
       "15.34"
     ],
-    "verified": false
+    "verified": false,
+    "post_execution_steps": [
+      "After successful wiring, call `log_wiring_to_manifest()` to register the action. This helper will validate that the file exists, is listed in `file_tree.json`, and only logs safe, verified patches. This step replaces manual prompt-level logging instructions."
+    ]
   },
   {
     "batch": "15.36",
@@ -785,6 +806,9 @@
     "dependencies": [
       "15.35"
     ],
-    "verified": false
+    "verified": false,
+    "post_execution_steps": [
+      "After successful wiring, call `log_wiring_to_manifest()` to register the action. This helper will validate that the file exists, is listed in `file_tree.json`, and only logs safe, verified patches. This step replaces manual prompt-level logging instructions."
+    ]
   }
 ]
