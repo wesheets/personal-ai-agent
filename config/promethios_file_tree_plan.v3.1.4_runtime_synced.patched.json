@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "path": "app/main.py",
+      "type": "runtime_entrypoint",
+      "status": "declared"
+    }
+  ],
+  "metadata": {
+    "version": "v3.1.4",
+    "source": "runtime_synced"
+  }
+}
