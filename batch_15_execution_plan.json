@@ -1,3 +1,10 @@
+// 📌 Operator Note:
+// log_wiring_to_manifest() is now available for use during 15.31–15.36.
+// Manus should invoke this helper after each successful wiring, provided:
+// - File exists
+// - File is listed in file_tree.json
+// - Patch passed all safety constraints
+
 [
   {
     "batch": "15.0",
