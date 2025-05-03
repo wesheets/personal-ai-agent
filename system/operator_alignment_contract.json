@@ -1,0 +1,17 @@
+{
+  "operator_overrides": {
+    "phase_15_36_override": {
+      "approved": true,
+      "origin": "manual injection of safety scaffolds",
+      "added_files": [
+        "loop_controller_dryrun.py",
+        "stub_audit_executor.py",
+        "schema_integrity_guard.py",
+        "loop_execution_mode_enforcer.py",
+        "wiring_scout_manus.py",
+        "loop_intent.json"
+      ],
+      "creed_compliant": true
+    }
+  }
+}
