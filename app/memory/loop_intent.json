@@ -1,0 +1,9 @@
+{
+  "loop_id": "loop_0001",
+  "reason": "Verify dryrun, wiring safety, and alignment.",
+  "initiated_by": "Operator",
+  "expected_validation_surface": "system_manifest.json",
+  "role": "read_only",
+  "epistemic_anchor": "system status = stable",
+  "schema_version": "1.0"
+}
