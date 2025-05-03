@@ -6,6 +6,11 @@
     "status": "missing_from_repo"
   },
   {
+    "path": "app/main.py",
+    "type": "runtime_entrypoint",
+    "status": "declared"
+  },
+  {
     "file": "auto_unlock_proposal_monitor.py",
     "path": "app/agents/auto_unlock_proposal_monitor.py",
     "type": "agent",
