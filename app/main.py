@@ -27,3 +27,15 @@ logger.info("✅ FastAPI application initialized.")
 logger.info("✅ Loop routes loaded.")
 logger.info("✅ Debug routes loaded.")
 
+
+from app.core.loop_controller import LoopController
+
+
+# Placeholder for LoopController instantiation (Batch 15.31)
+controller = LoopController()
+logger.info("✅ LoopController scaffold instantiated (Placeholder).")
+
+
+# Placeholder for LoopController invocation (Batch 15.31)
+# controller.start_loop() # Commented out for safety in zero-drift phase
+logger.info("ℹ️ LoopController.start_loop() placeholder invocation skipped (Zero-Drift Phase).")
