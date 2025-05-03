@@ -7,9 +7,9 @@
 
 This reconciliation task was performed by a clean instance of Manus, focusing solely on structural verification without cognitive processing or file mutation.
 
-1.  **Input Plan:** The architectural plan provided in ``promethios_file_tree_plan.v2.8_candidate.json` was loaded by Reconciler Manus` was read and parsed.
-2.  **Live Repository Scan:** The `personal-ai-agent` repository was cloned, and its file structure was scanned to create a live inventory (``live_repo_files.txt` (generated inventory of repository state)`).
-3.  **Reconciliation:** A Python script (``reconcile.py` (executed by Reconciler Manus)`) was executed to compare the planned file structure against the live inventory. This identified files that were present, missing, extra, or potentially stubbed compared to the plan.
+1.  **Input Plan:** The architectural plan provided in `//promethios_file_tree_plan.v2.8_candidate.json` was read and parsed.
+2.  **Live Repository Scan:** The `personal-ai-agent` repository was cloned, and its file structure was scanned to create a live inventory (`/live_repo_files.txt`).
+3.  **Reconciliation:** A Python script (`/reconcile.py`) was executed to compare the planned file structure against the live inventory. This identified files that were present, missing, extra, or potentially stubbed compared to the plan.
 4.  **Output Generation:** Based on the reconciliation results and direct repository scans, the following output files were generated:
     *   `reconciled_file_tree.json`: Reflects the actual files found in the repository, annotated with purpose/type where available from the plan.
     *   `drift_log.json`: Documents discrepancies between the planned and actual file structures (missing, extra, stubbed files).
@@ -19,7 +19,7 @@ This reconciliation task was performed by a clean instance of Manus, focusing so
 
 *   **Reconciliation Successful:** The core reconciliation process completed successfully, generating the `reconciled_file_tree.json` and `drift_log.json` files.
 *   **Toolkit Registry Generated:** The `toolkit_registry.py` was generated based on a direct scan of the `/tools` directory.
-*   **Agent Registry Generation Failed:** The optional generation of `agent_registry.json` failed. The script (``generate_agent_registry.py` (sandbox utility script)`) encountered errors while attempting to parse the `AGENT_REGISTRY` dictionary from `/home/ubuntu/personal-ai-agent/app/registries/agent_registry.py`. The error message indicated `'{' was never closed`, suggesting complex syntax (potentially multi-line strings, comments, or other constructs) that `ast.literal_eval` could not handle safely. As this output was optional, generation was skipped.
+*   **Agent Registry Generation Failed:** The optional generation of `agent_registry.json` failed. The script (`/generate_agent_registry.py`) encountered errors while attempting to parse the `AGENT_REGISTRY` dictionary from `/personal-ai-agent/app/registries/agent_registry.py`. The error message indicated `'{' was never closed`, suggesting complex syntax (potentially multi-line strings, comments, or other constructs) that `ast.literal_eval` could not handle safely. As this output was optional, generation was skipped.
 *   **Drift Detected:** The `drift_log.json` file contains details of files that were planned but missing, files found that were not in the plan, and files potentially marked as stubbed. Reviewing this log is crucial for understanding the current state versus the intended architecture.
 
 ## Conclusion
@@ -62,4 +62,29 @@ Phase 2 reconciliation is complete. The `promethios_file_tree_plan.v2.9_runtime_
 - New runtime tracking layer: `logs/drift_surface_report.json`
 
 This file becomes the trusted foundation for executor validation and agent cognition post-Batch 15. It fully reflects current architectural memory and injected belief structure.
+---
 
+## 🔄 Operator Injection Acknowledgment – Phase 15.36
+
+As of Phase 15.36, the following system safety and execution boundary components were manually injected and approved by the Operator:
+
+### Injected Files:
+- `app/core/loop_controller_dryrun.py`
+- `app/core/stub_audit_executor.py`
+- `app/core/schema_integrity_guard.py`
+- `app/core/loop_execution_mode_enforcer.py`
+- `app/tools/wiring_scout_manus.py`
+- `app/schemas/loop/loop_intent.schema.json`
+- `app/memory/loop_intent.json`
+
+These files have been incorporated into `promethios_file_tree_plan.v3.1_prewiring_locked.json` and are required for any future loop execution, patch application, or system cognition.
+
+**Purpose of Injection:**
+- Establish non-hallucinated execution preconditions
+- Enforce role-based loop operation
+- Freeze schema trust boundaries prior to mutation
+- Validate loop trace alignment before cognitive activation
+
+**Status:** Canonical  
+**Authorized by:** Operator  
+**Cited in:** `PHASE_5.5_EXECUTION_ROADMAP.md` and `promethios_file_tree_plan.v3.1_prewiring_locked.json`
