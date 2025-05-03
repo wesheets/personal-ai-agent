@@ -25582,7 +25582,18 @@
       "type": "log_file",
       "status": "undeclared",
       "operator_added": true
-    }
+    },
+   {
+      "path": "app/main.py",
+      "type": "runtime_entrypoint",
+      "status": "declared"
+     "operator_added": true
+    },
+  ],
+  "metadata": {
+    "version": "v3.1.4",
+    "source": "runtime_synced"
+  }
   ],
   "metadata": {
     "source": "undeclared_surface_audit",
