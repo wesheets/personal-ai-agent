@@ -89,7 +89,7 @@ def main():
         errors.append(f"Schema validation failed: {e.message}")
 
     # --- 2. Surface Integrity Checks ---
-    declared_surfaces = set(file_tree_data.get("files", [])) if file_tree_data else set()
+    declared_surfaces = set(item.get("path", item.get("file")) for item in file_tree_data.get("files", []) if item.get("path") or item.get("file")) if file_tree_data else set()
     missing_surfaces = set(missing_surface_report.get("missing_files", [])) if missing_surface_report else set()
     intent_targets = set(loop_intent_data.get("target_components", [])) if loop_intent_data else set()
 
