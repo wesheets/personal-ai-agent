@@ -1,0 +1,105 @@
+[
+  {
+    "batch": "19.0",
+    "title": "Enable Guarded Mutation Execution",
+    "phase": "Phase 19: Guarded Mutation and Regret Scoring",
+    "prompt": "Objective: Enable the mutation guard to execute mutations if basic checks pass.\n1. **Dependency Check:** Ensure batches 18.1, 18.2, 18.3 are `verified: true`. Ensure Critic and Pessimist agents are active (even with basic logic).\n2. **Enhance Mutation Guard (Enable Execution):** Modify `app/validators/mutation_guard.py`. If a plan passes Critic review (checked by controller in 18.2) and Pessimist risk assessment (placeholder logic for now, no halting yet), the guard should now *attempt* to execute the file modifications specified in the plan. Basic role checks might be added here (e.g., only specific agents can trigger mutation). **Crucially, implement basic error handling for file operations.**\n3. **Integration & Test (Success):** Run a loop (`loop_0012`) designed to pass Architect, Critic, and Pessimist (basic) review, triggering a simple, safe mutation (e.g., adding a comment to a test file).\n4. **Integration & Test (Failure - Guard Rejection):** Run a loop (`loop_0013`) where the mutation guard itself should reject based on a simple rule (e.g., invalid role). Verify rejection logged in `mutation_guard.log`.\n5. **Functional Validation:** For `loop_0012`, verify the mutation guard attempted execution (check logs). Verify the target file was successfully modified. For `loop_0013`, verify rejection and no mutation.\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug mutation guard execution logic and error handling. Debug role checks if implemented. Ensure Critic/Pessimist reviews are happening before the guard is called for execution.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.\n8. **Log Wiring:** Append an entry to `/home/ubuntu/personal-ai-agent/logs/wiring_manifest.json` detailing the batch_id, loop_id, agent(s) involved, memory surfaces written, controller invoked, timestamp, schema_version ('v1.0'), git_commit_hash (placeholder 'TBD_COMMIT'), and pr_id (placeholder 'null'). Set verification_status to 'pending'.9. **Validate Wiring:** Execute the centralized validation script: `python3.11 /home/ubuntu/personal-ai-agent/app/validators/validate_wiring.py --batch 19.0 --loop loop_execution`. 10. **Handle Validation Result:** If the validation script exits with status 0 (success), proceed. If it exits with status 1 (failure), halt execution immediately, report the failure logged in `/home/ubuntu/personal-ai-agent/logs/validation_failures/`, and do *not* mark the batch as verified. The wiring summary will be generated automatically by the script on success.\nUpdate Status: If validation succeeds, update this batch entry to set `verified: true`.",
+    "components_to_build_or_verify": [
+      "app/validators/mutation_guard.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/logs/loop_0012_execution.log",
+      "/home/ubuntu/logs/loop_0013_execution.log",
+      "/home/ubuntu/personal-ai-agent/app/logs/mutation_guard.log",
+      "/home/ubuntu/test_file_modified.txt"
+    ],
+    "verification_steps": [
+      "Confirm mutation executed successfully for `loop_0012` (check file system).",
+      "Confirm mutation rejected by guard for `loop_0013` (check guard log).",
+      "Update `verified` status for batch 19.0 to `true`."
+    ],
+    "dependencies": [
+      "18.1",
+      "18.2",
+      "18.3"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "19.1",
+    "title": "Implement Post-Write Validation",
+    "phase": "Phase 19: Guarded Mutation and Regret Scoring",
+    "prompt": "Objective: Implement basic validation checks after a mutation is executed.\n1. **Dependency Check:** Ensure batch 19.0 is `verified: true`.\n2. **Implement Validation Logic:** Create `app/validators/post_mutation_validator.py`. Implement basic checks, e.g., file existence check for modified file, basic syntax check if it's code (e.g., using `python -m py_compile` for Python files). Log validation results (pass/fail, reason).\n3. **Enhance Controller:** Modify `loop_controller.py` to call `post_mutation_validator.py` immediately after the mutation guard successfully executes a mutation.\n4. **Integration & Test (Success):** Run `loop_0012` again (successful simple mutation). Verify the post-mutation validator runs and logs success.\n5. **Integration & Test (Failure):** Run a loop (`loop_0014`) designed to execute a mutation that results in invalid syntax in a Python file. Verify the post-mutation validator runs, detects the syntax error, and logs failure.\n6. **Functional Validation:** Check logs for `post_mutation_validator.py` execution and correct pass/fail logging in both scenarios.\n7. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug validator logic or controller integration. Refine syntax checks as needed.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.\n8. **Log Wiring:** Append an entry to `/home/ubuntu/personal-ai-agent/logs/wiring_manifest.json` detailing the batch_id, loop_id, agent(s) involved, memory surfaces written, controller invoked, timestamp, schema_version ('v1.0'), git_commit_hash (placeholder 'TBD_COMMIT'), and pr_id (placeholder 'null'). Set verification_status to 'pending'.9. **Validate Wiring:** Execute the centralized validation script: `python3.11 /home/ubuntu/personal-ai-agent/app/validators/validate_wiring.py --batch 19.1 --loop loop_execution`. 10. **Handle Validation Result:** If the validation script exits with status 0 (success), proceed. If it exits with status 1 (failure), halt execution immediately, report the failure logged in `/home/ubuntu/personal-ai-agent/logs/validation_failures/`, and do *not* mark the batch as verified. The wiring summary will be generated automatically by the script on success.\nUpdate Status: If validation succeeds, update this batch entry to set `verified: true`.",
+    "components_to_build_or_verify": [
+      "app/validators/post_mutation_validator.py",
+      "app/controllers/loop_controller.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/validators/post_mutation_validator.py",
+      "/home/ubuntu/logs/loop_0012_execution.log",
+      "/home/ubuntu/logs/loop_0014_execution.log",
+      "/home/ubuntu/logs/post_mutation_validator.log"
+    ],
+    "verification_steps": [
+      "Confirm validator logged success for `loop_0012`.",
+      "Confirm validator logged failure (syntax error) for `loop_0014`.",
+      "Update `verified` status for batch 19.1 to `true`."
+    ],
+    "dependencies": [
+      "19.0"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "19.2",
+    "title": "Implement Mutation Log Status Update",
+    "phase": "Phase 19: Guarded Mutation and Regret Scoring",
+    "prompt": "Objective: Update the mutation log with the final status of the mutation attempt.\n1. **Dependency Check:** Ensure batch 19.1 is `verified: true`. Ensure `mutation_log.json` exists.\n2. **Enhance Controller/Guard:** Modify `loop_controller.py` or `mutation_guard.py`. After a mutation attempt (whether successful or failed execution/validation), update the corresponding entry in `mutation_log.json` from status 'intended' to 'executed' (if successful and validated) or 'failed' (if execution failed or post-validation failed). Include failure reason if applicable.\n3. **Integration & Test:** Run `loop_0012` (success) and `loop_0014` (validation failure) again.\n4. **Functional Validation:** Check `mutation_log.json`. Verify the entry for `loop_0012` has status 'executed'. Verify the entry for `loop_0014` has status 'failed' with a reason related to post-validation failure.\n5. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug logic responsible for updating `mutation_log.json`. Ensure correct status and reason are logged.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.\n8. **Log Wiring:** Append an entry to `/home/ubuntu/personal-ai-agent/logs/wiring_manifest.json` detailing the batch_id, loop_id, agent(s) involved, memory surfaces written, controller invoked, timestamp, schema_version ('v1.0'), git_commit_hash (placeholder 'TBD_COMMIT'), and pr_id (placeholder 'null'). Set verification_status to 'pending'.9. **Validate Wiring:** Execute the centralized validation script: `python3.11 /home/ubuntu/personal-ai-agent/app/validators/validate_wiring.py --batch 19.2 --loop loop_execution`. 10. **Handle Validation Result:** If the validation script exits with status 0 (success), proceed. If it exits with status 1 (failure), halt execution immediately, report the failure logged in `/home/ubuntu/personal-ai-agent/logs/validation_failures/`, and do *not* mark the batch as verified. The wiring summary will be generated automatically by the script on success.\nUpdate Status: If validation succeeds, update this batch entry to set `verified: true`.",
+    "components_to_build_or_verify": [
+      "app/controllers/loop_controller.py",
+      "app/validators/mutation_guard.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/memory/mutation_log.json",
+      "/home/ubuntu/logs/loop_0012_execution.log",
+      "/home/ubuntu/logs/loop_0014_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm `mutation_log.json` shows status 'executed' for `loop_0012`.",
+      "Confirm `mutation_log.json` shows status 'failed' for `loop_0014` with reason.",
+      "Update `verified` status for batch 19.2 to `true`."
+    ],
+    "dependencies": [
+      "19.1",
+      "18.3"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "19.3",
+    "title": "Implement Basic Regret Scoring",
+    "phase": "Phase 19: Guarded Mutation and Regret Scoring",
+    "prompt": "Objective: Implement basic scoring of 'regret' based on loop outcomes versus initial confidence/risk.\n1. **Dependency Check:** Ensure batch 19.2 is `verified: true`. Ensure `loop_summary.json`, `loop_summary_rejection_log.json`, and `loop_justification_log.json` (with confidence/risk scores) exist.\n2. **Build Regret Surface:** Create empty file `/home/ubuntu/personal-ai-agent/app/memory/loop_regret_score.json`. Define schema (e.g., loop_id, final_status, initial_confidence/risk, regret_score, reason).\n3. **Implement Regret Scorer:** Create `app/validators/regret_scorer.py`. Implement basic logic: If loop failed/rejected despite high initial confidence/low risk -> high regret. If loop succeeded despite low initial confidence/high risk -> low regret (or even negative regret/surprise). Log score and reason to `loop_regret_score.json`. This can run at the end of the loop or as a separate analysis step.\n4. **Integration & Test:** Run loops designed to produce different outcomes vs. expectations: `loop_0015` (high confidence plan fails), `loop_0016` (low confidence plan succeeds).\n5. **Functional Validation:** Verify `regret_scorer.py` executed. Verify `loop_regret_score.json` contains entries for the test loops with appropriate regret scores and reasons based on the outcomes vs. initial assessments.\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug regret scoring logic in `regret_scorer.py`. Ensure it correctly reads initial confidence/risk and final outcomes.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.\n8. **Log Wiring:** Append an entry to `/home/ubuntu/personal-ai-agent/logs/wiring_manifest.json` detailing the batch_id, loop_id, agent(s) involved, memory surfaces written, controller invoked, timestamp, schema_version ('v1.0'), git_commit_hash (placeholder 'TBD_COMMIT'), and pr_id (placeholder 'null'). Set verification_status to 'pending'.9. **Validate Wiring:** Execute the centralized validation script: `python3.11 /home/ubuntu/personal-ai-agent/app/validators/validate_wiring.py --batch 19.3 --loop loop_execution`. 10. **Handle Validation Result:** If the validation script exits with status 0 (success), proceed. If it exits with status 1 (failure), halt execution immediately, report the failure logged in `/home/ubuntu/personal-ai-agent/logs/validation_failures/`, and do *not* mark the batch as verified. The wiring summary will be generated automatically by the script on success.\nUpdate Status: If validation succeeds, update this batch entry to set `verified: true`.",
+    "components_to_build_or_verify": [
+      "app/memory/loop_regret_score.json",
+      "app/validators/regret_scorer.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/memory/loop_regret_score.json",
+      "/home/ubuntu/personal-ai-agent/app/validators/regret_scorer.py",
+      "/home/ubuntu/logs/loop_0015_execution.log",
+      "/home/ubuntu/logs/loop_0016_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm `loop_regret_score.json` contains entries for test loops.",
+      "Verify regret scores align with outcome vs. initial assessment.",
+      "Update `verified` status for batch 19.3 to `true`."
+    ],
+    "dependencies": [
+      "19.2",
+      "18.1",
+      "17.1"
+    ],
+    "verified": false
+  }
+]

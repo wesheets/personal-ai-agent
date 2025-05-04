@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Wiring Manifest Entry Schema",
+  "description": "Defines the structure for an entry in the wiring_manifest.json log.",
+  "type": "object",
+  "properties": {
+    "batch_id": {
+      "description": "The batch identifier (e.g., 16.0, 17.1)",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "loop_id": {
+      "description": "The unique identifier for the loop that performed the wiring.",
+      "type": "string",
+      "pattern": "^loop_[0-9]+[a-z]?$"
+    },
+    "agent_id": {
+      "description": "The identifier(s) of the agent(s) primarily responsible for the wiring action.",
+      "type": ["string", "array"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "memory_surfaces_written": {
+      "description": "List of memory surface file paths modified or created.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^/home/ubuntu/personal-ai-agent/app/memory/.*\\.json$"
+      }
+    },
+    "controller_invoked": {
+      "description": "The controller script invoked for the loop.",
+      "type": "string",
+      "pattern": "^/home/ubuntu/personal-ai-agent/app/controllers/.*\\.py$"
+    },
+    "verification_status": {
+      "description": "Status of the wiring validation checks for this entry.",
+      "type": "string",
+      "enum": ["passed", "failed", "pending"]
+    },
+    "timestamp": {
+      "description": "ISO 8601 timestamp of when the wiring entry was logged.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "schema_version": {
+      "description": "Version of the wiring_manifest.schema.json this entry conforms to.",
+      "type": "string",
+      "const": "v1.0"
+    },
+    "git_commit_hash": {
+      "description": "The Git commit hash associated with the completion of the batch.",
+      "type": "string"
+    },
+    "pr_id": {
+      "description": "The Pull Request ID associated with the completion of the batch.",
+      "type": ["string", "integer", "null"]
+    }
+  },
+  "required": [
+    "batch_id",
+    "loop_id",
+    "agent_id",
+    "memory_surfaces_written",
+    "controller_invoked",
+    "verification_status",
+    "timestamp",
+    "schema_version",
+    "git_commit_hash",
+    "pr_id"
+  ],
+  "additionalProperties": false
+}
+
