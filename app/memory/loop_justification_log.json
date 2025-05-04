@@ -1,0 +1,22 @@
+[
+  {
+    "loop_id": "loop_0001",
+    "intent": "Basic Test Loop",
+    "justification": "Initial bootstrap test loop for Batch 16.0.",
+    "components_involved": [
+      "loop_controller.py",
+      "loop_summary.json"
+    ],
+    "timestamp": "2025-05-04T14:23:41.965134"
+  },
+  {
+    "loop_id": "loop_0002",
+    "intent": "Manual Rejection Test",
+    "justification": "Test loop for rejection logging in Batch 16.0.",
+    "components_involved": [
+      "loop_controller.py",
+      "loop_summary_rejection_log.json"
+    ],
+    "timestamp": "2025-05-04T14:24:48.138053"
+  }
+]
