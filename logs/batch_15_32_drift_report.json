@@ -1,0 +1,21 @@
+{
+  "batch": "15.32",
+  "issues": [
+    {
+      "type": "Validation Script Error",
+      "details": "Initial run of fallback validation script `validate_file_tree_truth_v2.py` failed due to SyntaxError: unterminated string literal on line 25.",
+      "resolution": "Corrected the string replacement line 25 from `replace("\", "/")` to `replace("\\", "/")`."
+    },
+    {
+      "type": "Static Validation Dependency Error",
+      "details": "ESLint validation failed repeatedly with `ERR_MODULE_NOT_FOUND: Cannot find package \'@eslint/js\'`.",
+      "resolution": "Troubleshooting revealed the dependency was installed in `/app/frontend/node_modules` but ESLint expected it in the root `/node_modules`. Installed `@eslint/js` and related plugins (`eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`) at the repository root using `pnpm add -D`."
+    },
+    {
+      "type": "Untracked Files Warning",
+      "details": "Truth validation (`validate_file_tree_truth_v2.py`) reported 1003 files found on disk (primarily in `app/frontend/node_modules`) that are not tracked in the canonical plan (`config/promethios_file_tree_plan.v3.0_canonical.json`).",
+      "resolution": "Acknowledged. No action taken as these are expected untracked build artifacts."
+    }
+  ],
+  "overall_drift_assessment": "Minor drift encountered due to validation script error and ESLint configuration issues, both resolved during the batch execution. Significant number of untracked files noted, consistent with previous validations."
+}
