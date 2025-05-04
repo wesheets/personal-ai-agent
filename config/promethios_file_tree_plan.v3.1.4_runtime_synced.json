@@ -25380,224 +25380,234 @@
     "source_archive_hint": "Injected during Phase 15.36 to expose validation_tools for loop prep"
   },
   {
-      "path": "app/frontend/.env",
-      "type": "unknown",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/memory/conversation_memory.json",
-      "type": "data_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/memory/file_tree.json",
-      "type": "data_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/memory/missing_surface_report.json",
-      "type": "data_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/memory/prompt_memory_plan.json",
-      "type": "data_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/memory/reflection_thread.json",
-      "type": "data_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/memory/truth_diff_log.json",
-      "type": "log_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/modules/trace_filter.py",
-      "type": "python_module",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/modules/trace_reader.py",
-      "type": "python_module",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/modules/trace_summarizer.py",
-      "type": "python_module",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/schemas/agent_governance.schema.json",
-      "type": "agent",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/schemas/agent_registry.schema.json",
-      "type": "agent",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/schemas/system_manifest.schema.json",
-      "type": "schema",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "app/schemas/toolkit_registry.schema.json",
-      "type": "schema",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "config/promethios_file_tree_plan.v2.9.1_final.json",
-      "type": "config",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "config/promethios_file_tree_plan.v2.9.2_final.json",
-      "type": "config",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "config/promethios_file_tree_plan.v3.0_canonical.json",
-      "type": "config",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "config/promethios_file_tree_plan.v3.1.3_governance_synced.json",
-      "type": "config",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "config/promethios_file_tree_plan.v3.1.4_runtime_synced.json",
-      "type": "config",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "config/promethios_file_tree_plan.v3.1.4_runtime_synced.patched.json",
-      "type": "config",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "deployment-package/.env.production.example",
-      "type": "unknown",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "docs/PHASE_4_OPERATOR_ALIGNMENT.md",
-      "type": "documentation",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "frontend-operator-dashboard/.env",
-      "type": "unknown",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "frontend-operator-dashboard/.env.example",
-      "type": "unknown",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "frontend-operator-dashboard/.env.production",
-      "type": "unknown",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "frontend-operator-dashboard/app/frontend/.env",
-      "type": "unknown",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "frontend-operator-dashboard/deployment-package/.env.production.example",
-      "type": "unknown",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "frontend-operator-dashboard/frontend-ui-v2/.env.example",
-      "type": "ui_component",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "frontend-ui-v2/.env.example",
-      "type": "ui_component",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "logs/loop_controller.log",
-      "type": "log_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "logs/wiring_manifest.json",
-      "type": "log_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "system/system_manifest.runtime.json",
-      "type": "data_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "tools/__init__.py",
-      "type": "python_module",
-      "status": "undeclared",
-      "operator_added": true
-    },
-    {
-      "path": "tools/log_wiring_to_manifest.py",
-      "type": "log_file",
-      "status": "undeclared",
-      "operator_added": true
-    },
-   {
-      "path": "app/main.py",
-      "type": "runtime_entrypoint",
-      "status": "declared"
-     "operator_added": true
-    },
-  ],
-  "metadata": {
-    "version": "v3.1.4",
-    "source": "runtime_synced"
-  }
-  ],
-  "metadata": {
-    "source": "undeclared_surface_audit",
-    "classification": "operator_added_patch",
-    "generated_by": "manus_auditor"
+    "path": "app/frontend/.env",
+    "type": "unknown",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/memory/conversation_memory.json",
+    "type": "data_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/memory/file_tree.json",
+    "type": "data_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/memory/missing_surface_report.json",
+    "type": "data_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/memory/prompt_memory_plan.json",
+    "type": "data_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/memory/reflection_thread.json",
+    "type": "data_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/memory/truth_diff_log.json",
+    "type": "log_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/modules/trace_filter.py",
+    "type": "python_module",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/modules/trace_reader.py",
+    "type": "python_module",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/modules/trace_summarizer.py",
+    "type": "python_module",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/schemas/agent_governance.schema.json",
+    "type": "agent",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/schemas/agent_registry.schema.json",
+    "type": "agent",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/schemas/system_manifest.schema.json",
+    "type": "schema",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/schemas/toolkit_registry.schema.json",
+    "type": "schema",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "config/promethios_file_tree_plan.v2.9.1_final.json",
+    "type": "config",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "config/promethios_file_tree_plan.v2.9.2_final.json",
+    "type": "config",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "config/promethios_file_tree_plan.v3.0_canonical.json",
+    "type": "config",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "config/promethios_file_tree_plan.v3.1.3_governance_synced.json",
+    "type": "config",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "config/promethios_file_tree_plan.v3.1.4_runtime_synced.json",
+    "type": "config",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "config/promethios_file_tree_plan.v3.1.4_runtime_synced.patched.json",
+    "type": "config",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "deployment-package/.env.production.example",
+    "type": "unknown",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "docs/PHASE_4_OPERATOR_ALIGNMENT.md",
+    "type": "documentation",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "frontend-operator-dashboard/.env",
+    "type": "unknown",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "frontend-operator-dashboard/.env.example",
+    "type": "unknown",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "frontend-operator-dashboard/.env.production",
+    "type": "unknown",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "frontend-operator-dashboard/app/frontend/.env",
+    "type": "unknown",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "frontend-operator-dashboard/deployment-package/.env.production.example",
+    "type": "unknown",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "frontend-operator-dashboard/frontend-ui-v2/.env.example",
+    "type": "ui_component",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "frontend-ui-v2/.env.example",
+    "type": "ui_component",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "logs/loop_controller.log",
+    "type": "log_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "logs/wiring_manifest.json",
+    "type": "log_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "system/system_manifest.runtime.json",
+    "type": "data_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "tools/__init__.py",
+    "type": "python_module",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "tools/log_wiring_to_manifest.py",
+    "type": "log_file",
+    "status": "undeclared",
+    "operator_added": true
+  },
+  {
+    "path": "app/main.py",
+    "type": "runtime_entrypoint",
+    "status": "declared",
+    "operator_added": true
+  },
+  {
+    "file": "app/memory/loop_summary.json",
+    "type": "memory_surface",
+    "description": "Logs the output, intent, and execution result of each loop.",
+    "added_by": "operator",
+    "source": "operator_directive_phase_16"
+  },
+  {
+    "file": "app/memory/loop_summary_rejection_log.json",
+    "type": "memory_surface",
+    "description": "Logs rejection events, causes, and justification when a loop fails execution.",
+    "added_by": "operator",
+    "source": "operator_directive_phase_16"
+  },
+  {
+    "file": "app/memory/loop_justification_log.json",
+    "type": "memory_surface",
+    "description": "Stores agent justifications, confidence levels, and belief references per loop.",
+    "added_by": "operator",
+    "source": "operator_directive_phase_16"
   }
 ]

@@ -1,1 +1,34 @@
-[]
+[][
+  {
+    "batch_id": "16.0",
+    "loop_id": "loop_0001",
+    "agent_id": [
+      "Manus"
+    ],
+    "memory_surfaces_written": [
+      "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json"
+    ],
+    "controller_invoked": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+    "verification_status": "failed",
+    "timestamp": "2025-05-04T14:24:16.000049",
+    "schema_version": "v1.0",
+    "git_commit_hash": "TBD_COMMIT",
+    "pr_id": null
+  },
+  {
+    "batch_id": "16.0",
+    "loop_id": "loop_0002",
+    "agent_id": [
+      "Manus"
+    ],
+    "memory_surfaces_written": [
+      "/home/ubuntu/personal-ai-agent/app/memory/loop_summary_rejection_log.json"
+    ],
+    "controller_invoked": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+    "verification_status": "pending",
+    "timestamp": "2025-05-04T14:25:21.356443",
+    "schema_version": "v1.0",
+    "git_commit_hash": "TBD_COMMIT",
+    "pr_id": null
+  }
+]
