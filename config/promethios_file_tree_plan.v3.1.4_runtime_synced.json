@@ -25609,5 +25609,83 @@
     "description": "Stores agent justifications, confidence levels, and belief references per loop.",
     "added_by": "operator",
     "source": "operator_directive_phase_16"
-  }
+  },
+  {
+      "file": "app/controllers/loop_controller.py",
+      "description": "Main loop controller, enhanced for intent reading, memory reflection, and mutation guard integration.",
+      "status": "modified",
+      "operator_added": true
+    },
+    {
+      "file": "app/memory/loop_summary.json",
+      "description": "Logs summary of successful loop executions.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "app/memory/loop_summary_rejection_log.json",
+      "description": "Logs summary of rejected loop executions.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "app/validators/mutation_guard.py",
+      "description": "Scaffold for mutation guard, currently logs and rejects all mutations (dry run).",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "app/memory/loop_intent_loop_0003.json",
+      "description": "Test intent file for Batch 16.1.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "app/memory/loop_intent_loop_0005.json",
+      "description": "Test intent file with mutation parameters for Batch 16.3.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "app/memory/belief_surface.json",
+      "description": "Placeholder memory surface for agent beliefs.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "app/memory/promethios_creed.json",
+      "description": "Placeholder memory surface for agent creed/core principles.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "app/logs/mutation_guard.log",
+      "description": "Log file for mutation guard attempts and rejections.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "app/memory/loop_justification_log.json",
+      "description": "Placeholder for loop justification log.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "logs/loop_0003_execution.log",
+      "description": "Placeholder for loop 0003 execution log.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "logs/loop_0004_execution.log",
+      "description": "Placeholder for loop 0004 execution log.",
+      "status": "created",
+      "operator_added": true
+    },
+    {
+      "file": "logs/loop_0005_execution.log",
+      "description": "Placeholder for loop 0005 execution log.",
+      "status": "created",
+      "operator_added": true
+    }
 ]
