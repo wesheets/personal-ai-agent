@@ -1,786 +1,796 @@
 {
   "files": [
-  {
-    "file": "belief_identity_checkpoint.json",
-    "path": "app/memory/belief_identity_checkpoint.json",
-    "type": "control_log",
-    "status": "missing_from_repo"
-  },
-  {
-    "path": "app/main.py",
-    "type": "runtime_entrypoint",
-    "status": "declared"
-  },
-  {
-    "file": "auto_unlock_proposal_monitor.py",
-    "path": "app/agents/auto_unlock_proposal_monitor.py",
-    "type": "agent",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "loop_belief_unlock_request.json",
-    "path": "app/memory/loop_belief_unlock_request.json",
-    "type": "agent_output",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "vertical_loop_initializer.py",
-    "path": "app/loop/vertical_loop_initializer.py",
-    "type": "loop_orchestration",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "saas_component_manifest.json",
-    "path": "app/memory/saas_component_manifest.json",
-    "type": "memory_template",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "hal_code_generator.py",
-    "path": "app/agents/hal_code_generator.py",
-    "type": "agent_logic",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "loop_drift_analyzer.py",
-    "path": "app/validators/loop_drift_analyzer.py",
-    "type": "validator",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "operator_unlock_tracker.json",
-    "path": "app/memory/operator_unlock_tracker.json",
-    "type": "control_log",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "loop_summary_drift_report.json",
-    "path": "app/memory/loop_summary_drift_report.json",
-    "type": "cognitive_log",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "vertical_registry.json",
-    "path": "app/config/vertical_registry.json",
-    "type": "config",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "insight_loop_saas_agent.py",
-    "path": "app/agents/insight_loop_saas_agent.py",
-    "type": "agent",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "validate_snapshot_before_build.py",
-    "path": "tools/validate_snapshot_before_build.py",
-    "type": "tool",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "acknowledged_snapshot_hash.txt",
-    "path": "system/acknowledged_snapshot_hash.txt",
-    "type": "confirmation_token",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "agent_snapshot_guard.py",
-    "path": "app/guardrails/agent_snapshot_guard.py",
-    "type": "firewall_logic",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "system_acknowledgments.json",
-    "path": "app/memory/system_acknowledgments.json",
-    "type": "control_log",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "print_system_snapshot.py",
-    "path": "tools/print_system_snapshot.py",
-    "type": "tool",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "pre-commit",
-    "path": ".git/hooks/pre-commit",
-    "type": "hook",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "agent_drift_reconciler.py",
-    "path": "app/validators/agent_drift_reconciler.py",
-    "type": "validator",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "drift_surface_report.json",
-    "path": "logs/drift_surface_report.json",
-    "type": "drift_log",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "agent_deduplication_plan.json",
-    "path": "app/maintenance/agent_deduplication_plan.json",
-    "type": "maintenance_plan",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "startup_surface_validator.py",
-    "path": "app/validators/startup_surface_validator.py",
-    "type": "validator",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "repair_trigger_queue.json",
-    "path": "app/memory/repair_trigger_queue.json",
-    "type": "recovery_log",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "repair_executor.py",
-    "path": "app/repair/repair_executor.py",
-    "type": "repair_engine",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "endpoint_200_ok_checker.py",
-    "path": "tools/endpoint_200_ok_checker.py",
-    "type": "tool",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "endpoint_health_report.json",
-    "path": "logs/endpoint_health_report.json",
-    "type": "drift_log",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "postman_sweep_controller.py",
-    "path": "app/validators/postman_sweep_controller.py",
-    "type": "validator",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "orchestrator.py",
-    "path": "app/agents/orchestrator.py",
-    "type": "agent",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "hal.py",
-    "path": "app/agents/hal.py",
-    "type": "agent",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "nova.py",
-    "path": "app/agents/nova.py",
-    "type": "agent",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "critic.py",
-    "path": "app/agents/critic.py",
-    "type": "agent",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "ash.py",
-    "path": "app/agents/ash.py",
-    "type": "agent",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "sage.py",
-    "path": "app/agents/sage.py",
-    "type": "agent",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "file_tree.schema.json",
-    "path": "app/schemas/memory/file_tree.schema.json",
-    "type": "schema",
-    "status": "stubbed_in_repo"
-  },
-  {
-    "file": "build_module.schema.json",
-    "path": "app/schemas/loop/build_module.schema.json",
-    "type": "schema",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "task_log.schema.json",
-    "path": "app/schemas/memory/task_log.schema.json",
-    "type": "schema",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "FileTreeView.jsx",
-    "path": "app/ui/components/FileTreeView.jsx",
-    "type": "ui_component",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "LoopRunnerPanel.jsx",
-    "path": "app/ui/components/LoopRunnerPanel.jsx",
-    "type": "ui_component",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "AgentLogViewer.jsx",
-    "path": "app/ui/components/AgentLogViewer.jsx",
-    "type": "ui_component",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "skeptic_agent.py",
-    "path": "plugins/agents/skeptic/skeptic_agent.py",
-    "type": "agent",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "philosopher_agent.py",
-    "path": "plugins/agents/philosopher/philosopher_agent.py",
-    "type": "agent",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "reconciler_agent.py",
-    "path": "plugins/agents/reconciler/reconciler_agent.py",
-    "type": "agent",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "trust_score_manager.py",
-    "path": "plugins/agents/trust_score_manager/trust_score_manager.py",
-    "type": "agent",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "symbolist_agent.py",
-    "path": "plugins/agents/symbolist/symbolist_agent.py",
-    "type": "agent",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "agent_registry_bootstrap.py",
-    "path": "app/modules/agent_registry_bootstrap.py",
-    "type": "bootloader",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "agent_loop_debug_log.json",
-    "path": "app/memory/agent_loop_debug_log.json",
-    "type": "execution_log",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "agent_registry_status.json",
-    "path": "logs/agent_registry_status.json",
-    "type": "registry_snapshot",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "agent_reflection_injector.py",
-    "path": "app/validators/agent_reflection_injector.py",
-    "type": "validator",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "agent_registry_verification_test.py",
-    "path": "tools/agent_registry_verification_test.py",
-    "type": "test_tool",
-    "status": "missing_from_repo"
-  },
-  {
-    "file": "orchestrator_schemas.py",
-    "path": "app/schemas/agents/orchestrator/orchestrator_schemas.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "sage_schemas.py",
-    "path": "app/schemas/agents/sage/sage_schemas.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "agent_result.py",
-    "path": "app/schemas/core/agent_result.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "agent_registry.py",
-    "path": "app/core/agent_registry.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "sage_agent.py",
-    "path": "app/agents/sage_agent.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "agent_types.py",
-    "path": "app/core/agent_types.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "task_payload.py",
-    "path": "app/schemas/core/task_payload.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "nova_agent.py",
-    "path": "app/agents/nova_agent.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "forge_schemas.py",
-    "path": "app/schemas/agents/forge/forge_schemas.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "registration_utils.py",
-    "path": "app/core/registration_utils.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "forge_agent.py",
-    "path": "app/agents/forge_agent.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "hal_agent.py",
-    "path": "app/agents/hal_agent.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "base_agent.py",
-    "path": "app/core/base_agent.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "critic_schemas.py",
-    "path": "app/schemas/agents/critic/critic_schemas.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "hal_schemas.py",
-    "path": "app/schemas/agents/hal/hal_schemas.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "nova_schemas.py",
-    "path": "app/schemas/agents/nova/nova_schemas.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "orchestrator_agent.py",
-    "path": "app/agents/orchestrator_agent.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "critic_agent.py",
-    "path": "app/agents/critic_agent.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_controller.py",
-    "path": "app/core/loop_controller.py",
-    "type": "discovered_archive",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_create_schema.py",
-    "path": "app/schemas/loop/loop_create_schema.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "trainer_schema.py",
-    "path": "app/schemas/trainer_schema.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "pessimist_router.py",
-    "path": "app/routes/pessimist_router.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "module_audit_report.json",
-    "path": "logs/module_audit_report.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "memory_recall_routes.py",
-    "path": "app/routes/memory_recall_routes.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "historian_schema.py",
-    "path": "app/schemas/historian_schema.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "orchestrator_memory_enhanced.py",
-    "path": "app/modules/orchestrator_memory_enhanced.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "identify_remaining_endpoints.py",
-    "path": "tools/identify_remaining_endpoints.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "memory_fallback.json",
-    "path": "logs/memory_fallback.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "sage_endpoint_test.py",
-    "path": "tools/sage_endpoint_test.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "train_schema.py",
-    "path": "app/schemas/train_schema.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "agent_permissions.json",
-    "path": "app/config/agent_permissions.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "ip_violation_scanner.py",
-    "path": "app/modules/ip_violation_scanner.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "run_fresh_postman_sweep.py",
-    "path": "tools/run_fresh_postman_sweep.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "direct_endpoint_fixer.py",
-    "path": "tools/direct_endpoint_fixer.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "project_state_watch.py",
-    "path": "app/modules/project_state_watch.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "postman_sweep_20250428_initial_backup.md",
-    "path": "logs/postman_sweep_20250428_initial_backup.md",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "hal_openai_enhanced.py",
-    "path": "app/modules/hal_openai_enhanced.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "final_deploy_debug.md",
-    "path": "logs/deploy/final_deploy_debug.md",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "live_memory_inspection.py",
-    "path": "app/modules/live_memory_inspection.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_execution_guard.py",
-    "path": "app/modules/loop_execution_guard.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "agent_routes.py",
-    "path": "app/routes/agent_routes.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "delegate.py",
-    "path": "app/modules/delegate.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "plan_chainer.py",
-    "path": "app/modules/plan_chainer.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "output_schema.json",
-    "path": "app/schemas/debug_analyzer/output_schema.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "agent_registry.py",
-    "path": "app/modules/agent_registry.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_resume_engine.py",
-    "path": "app/modules/loop_resume_engine.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "task_tagger.py",
-    "path": "app/core/task_tagger.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "reflection_chain_weaver.py",
-    "path": "app/modules/reflection_chain_weaver.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "hal_agent_registration_fix_20250425_155230.json",
-    "path": "logs/hal_agent_registration_fix_20250425_155230.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "delegate_schema.py",
-    "path": "app/schemas/delegate/delegate_schema.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_routes.py",
-    "path": "app/routes/loop_routes.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "forge_build_20250426_0154.json",
-    "path": "logs/postman_sweeps/forge_build_20250426_0154.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "agent_verify.py",
-    "path": "app/modules/agent_verify.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "self_router.py",
-    "path": "app/routes/self_router.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_execution_log.json",
-    "path": "app/memory/loop_execution_log.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_summary_rejection_log.json",
-    "path": "app/memory/loop_summary_rejection_log.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_summary.json",
-    "path": "app/memory/loop_summary.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_intent.json",
-    "path": "app/memory/loop_intent.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_justification_log.json",
-    "path": "app/memory/loop_justification_log.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "file_tree.json",
-    "path": "app/memory/file_tree.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "belief_surface.json",
-    "path": "app/memory/belief_surface.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "promethios_creed.json",
-    "path": "app/memory/promethios_creed.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "mutation_guard.log",
-    "path": "app/logs/mutation_guard.log",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "wiring_manifest.json",
-    "path": "logs/wiring_manifest.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "wiring_manifest.schema.json",
-    "path": "app/schemas/wiring_manifest.schema.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "validate_wiring.py",
-    "path": "app/validators/validate_wiring.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "mutation_guard.py",
-    "path": "app/validators/mutation_guard.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_controller.py",
-    "path": "app/controllers/loop_controller.py",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "batch_16_execution_plan.locked.json",
-    "path": "batches/batch_16_execution_plan.locked.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "batch_17_execution_plan.locked.json",
-    "path": "batches/batch_17_execution_plan.locked.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "batch_18_execution_plan.locked.json",
-    "path": "batches/batch_18_execution_plan.locked.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "batch_19_execution_plan.locked.json",
-    "path": "batches/batch_19_execution_plan.locked.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "batch_20_execution_plan.locked.json",
-    "path": "batches/batch_20_execution_plan.locked.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "batch_21_execution_plan.locked.json",
-    "path": "batches/batch_21_execution_plan.locked.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "batch_22_execution_plan.locked.json",
-    "path": "batches/batch_22_execution_plan.locked.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "batch_23_execution_plan.locked.json",
-    "path": "batches/batch_23_execution_plan.locked.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "batch_24_execution_plan.locked.json",
-    "path": "batches/batch_24_execution_plan.locked.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "loop_intent_loop_0001.json",
-    "path": "app/memory/loop_intent_loop_0001.json",
-    "type": "discovered_repo",
-    "status": "found_in_repo"
-  },
-  {
-    "file": "app/memory/loop_summary.json",
-    "type": "memory_surface",
-    "description": "Logs the output, intent, and execution result of each loop.",
-    "added_by": "operator",
-    "source": "operator_directive_phase_16"
-  },
-  {
-    "file": "app/memory/loop_summary_rejection_log.json",
-    "type": "memory_surface",
-    "description": "Logs rejection events, causes, and justification when a loop fails execution.",
-    "added_by": "operator",
-    "source": "operator_directive_phase_16"
-  },
-  {
-    "file": "app/memory/loop_justification_log.json",
-    "type": "memory_surface",
-    "description": "Stores agent justifications, confidence levels, and belief references per loop.",
-    "added_by": "operator",
-    "source": "operator_directive_phase_16"
-  }
-]
+    {
+      "file": "belief_identity_checkpoint.json",
+      "path": "app/memory/belief_identity_checkpoint.json",
+      "type": "control_log",
+      "status": "missing_from_repo"
+    },
+    {
+      "path": "app/main.py",
+      "type": "runtime_entrypoint",
+      "status": "declared"
+    },
+    {
+      "file": "auto_unlock_proposal_monitor.py",
+      "path": "app/agents/auto_unlock_proposal_monitor.py",
+      "type": "agent",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "loop_belief_unlock_request.json",
+      "path": "app/memory/loop_belief_unlock_request.json",
+      "type": "agent_output",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "vertical_loop_initializer.py",
+      "path": "app/loop/vertical_loop_initializer.py",
+      "type": "loop_orchestration",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "saas_component_manifest.json",
+      "path": "app/memory/saas_component_manifest.json",
+      "type": "memory_template",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "hal_code_generator.py",
+      "path": "app/agents/hal_code_generator.py",
+      "type": "agent_logic",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "loop_drift_analyzer.py",
+      "path": "app/validators/loop_drift_analyzer.py",
+      "type": "validator",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "operator_unlock_tracker.json",
+      "path": "app/memory/operator_unlock_tracker.json",
+      "type": "control_log",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "loop_summary_drift_report.json",
+      "path": "app/memory/loop_summary_drift_report.json",
+      "type": "cognitive_log",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "vertical_registry.json",
+      "path": "app/config/vertical_registry.json",
+      "type": "config",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "insight_loop_saas_agent.py",
+      "path": "app/agents/insight_loop_saas_agent.py",
+      "type": "agent",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "validate_snapshot_before_build.py",
+      "path": "tools/validate_snapshot_before_build.py",
+      "type": "tool",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "acknowledged_snapshot_hash.txt",
+      "path": "system/acknowledged_snapshot_hash.txt",
+      "type": "confirmation_token",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "agent_snapshot_guard.py",
+      "path": "app/guardrails/agent_snapshot_guard.py",
+      "type": "firewall_logic",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "system_acknowledgments.json",
+      "path": "app/memory/system_acknowledgments.json",
+      "type": "control_log",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "print_system_snapshot.py",
+      "path": "tools/print_system_snapshot.py",
+      "type": "tool",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "pre-commit",
+      "path": ".git/hooks/pre-commit",
+      "type": "hook",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "agent_drift_reconciler.py",
+      "path": "app/validators/agent_drift_reconciler.py",
+      "type": "validator",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "drift_surface_report.json",
+      "path": "logs/drift_surface_report.json",
+      "type": "drift_log",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "agent_deduplication_plan.json",
+      "path": "app/maintenance/agent_deduplication_plan.json",
+      "type": "maintenance_plan",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "startup_surface_validator.py",
+      "path": "app/validators/startup_surface_validator.py",
+      "type": "validator",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "repair_trigger_queue.json",
+      "path": "app/memory/repair_trigger_queue.json",
+      "type": "recovery_log",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "repair_executor.py",
+      "path": "app/repair/repair_executor.py",
+      "type": "repair_engine",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "endpoint_200_ok_checker.py",
+      "path": "tools/endpoint_200_ok_checker.py",
+      "type": "tool",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "endpoint_health_report.json",
+      "path": "logs/endpoint_health_report.json",
+      "type": "drift_log",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "postman_sweep_controller.py",
+      "path": "app/validators/postman_sweep_controller.py",
+      "type": "validator",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "orchestrator.py",
+      "path": "app/agents/orchestrator.py",
+      "type": "agent",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "hal.py",
+      "path": "app/agents/hal.py",
+      "type": "agent",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "nova.py",
+      "path": "app/agents/nova.py",
+      "type": "agent",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "critic.py",
+      "path": "app/agents/critic.py",
+      "type": "agent",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "ash.py",
+      "path": "app/agents/ash.py",
+      "type": "agent",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "sage.py",
+      "path": "app/agents/sage.py",
+      "type": "agent",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "file_tree.schema.json",
+      "path": "app/schemas/memory/file_tree.schema.json",
+      "type": "schema",
+      "status": "stubbed_in_repo"
+    },
+    {
+      "file": "build_module.schema.json",
+      "path": "app/schemas/loop/build_module.schema.json",
+      "type": "schema",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "task_log.schema.json",
+      "path": "app/schemas/memory/task_log.schema.json",
+      "type": "schema",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "FileTreeView.jsx",
+      "path": "app/ui/components/FileTreeView.jsx",
+      "type": "ui_component",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "LoopRunnerPanel.jsx",
+      "path": "app/ui/components/LoopRunnerPanel.jsx",
+      "type": "ui_component",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "AgentLogViewer.jsx",
+      "path": "app/ui/components/AgentLogViewer.jsx",
+      "type": "ui_component",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "skeptic_agent.py",
+      "path": "plugins/agents/skeptic/skeptic_agent.py",
+      "type": "agent",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "philosopher_agent.py",
+      "path": "plugins/agents/philosopher/philosopher_agent.py",
+      "type": "agent",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "reconciler_agent.py",
+      "path": "plugins/agents/reconciler/reconciler_agent.py",
+      "type": "agent",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "trust_score_manager.py",
+      "path": "plugins/agents/trust_score_manager/trust_score_manager.py",
+      "type": "agent",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "symbolist_agent.py",
+      "path": "plugins/agents/symbolist/symbolist_agent.py",
+      "type": "agent",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "agent_registry_bootstrap.py",
+      "path": "app/modules/agent_registry_bootstrap.py",
+      "type": "bootloader",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "agent_loop_debug_log.json",
+      "path": "app/memory/agent_loop_debug_log.json",
+      "type": "execution_log",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "agent_registry_status.json",
+      "path": "logs/agent_registry_status.json",
+      "type": "registry_snapshot",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "agent_reflection_injector.py",
+      "path": "app/validators/agent_reflection_injector.py",
+      "type": "validator",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "agent_registry_verification_test.py",
+      "path": "tools/agent_registry_verification_test.py",
+      "type": "test_tool",
+      "status": "missing_from_repo"
+    },
+    {
+      "file": "orchestrator_schemas.py",
+      "path": "app/schemas/agents/orchestrator/orchestrator_schemas.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "sage_schemas.py",
+      "path": "app/schemas/agents/sage/sage_schemas.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "agent_result.py",
+      "path": "app/schemas/core/agent_result.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "agent_registry.py",
+      "path": "app/core/agent_registry.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "sage_agent.py",
+      "path": "app/agents/sage_agent.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "agent_types.py",
+      "path": "app/core/agent_types.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "task_payload.py",
+      "path": "app/schemas/core/task_payload.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "nova_agent.py",
+      "path": "app/agents/nova_agent.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "forge_schemas.py",
+      "path": "app/schemas/agents/forge/forge_schemas.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "registration_utils.py",
+      "path": "app/core/registration_utils.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "forge_agent.py",
+      "path": "app/agents/forge_agent.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "hal_agent.py",
+      "path": "app/agents/hal_agent.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "base_agent.py",
+      "path": "app/core/base_agent.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "critic_schemas.py",
+      "path": "app/schemas/agents/critic/critic_schemas.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "hal_schemas.py",
+      "path": "app/schemas/agents/hal/hal_schemas.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "nova_schemas.py",
+      "path": "app/schemas/agents/nova/nova_schemas.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "orchestrator_agent.py",
+      "path": "app/agents/orchestrator_agent.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "critic_agent.py",
+      "path": "app/agents/critic_agent.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_controller.py",
+      "path": "app/core/loop_controller.py",
+      "type": "discovered_archive",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_create_schema.py",
+      "path": "app/schemas/loop/loop_create_schema.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "trainer_schema.py",
+      "path": "app/schemas/trainer_schema.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "pessimist_router.py",
+      "path": "app/routes/pessimist_router.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "module_audit_report.json",
+      "path": "logs/module_audit_report.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "memory_recall_routes.py",
+      "path": "app/routes/memory_recall_routes.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "historian_schema.py",
+      "path": "app/schemas/historian_schema.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "orchestrator_memory_enhanced.py",
+      "path": "app/modules/orchestrator_memory_enhanced.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "identify_remaining_endpoints.py",
+      "path": "tools/identify_remaining_endpoints.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "memory_fallback.json",
+      "path": "logs/memory_fallback.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "sage_endpoint_test.py",
+      "path": "tools/sage_endpoint_test.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "train_schema.py",
+      "path": "app/schemas/train_schema.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "agent_permissions.json",
+      "path": "app/config/agent_permissions.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "ip_violation_scanner.py",
+      "path": "app/modules/ip_violation_scanner.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "run_fresh_postman_sweep.py",
+      "path": "tools/run_fresh_postman_sweep.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "direct_endpoint_fixer.py",
+      "path": "tools/direct_endpoint_fixer.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "project_state_watch.py",
+      "path": "app/modules/project_state_watch.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "postman_sweep_20250428_initial_backup.md",
+      "path": "logs/postman_sweep_20250428_initial_backup.md",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "hal_openai_enhanced.py",
+      "path": "app/modules/hal_openai_enhanced.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "final_deploy_debug.md",
+      "path": "logs/deploy/final_deploy_debug.md",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "live_memory_inspection.py",
+      "path": "app/modules/live_memory_inspection.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_execution_guard.py",
+      "path": "app/modules/loop_execution_guard.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "agent_routes.py",
+      "path": "app/routes/agent_routes.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "delegate.py",
+      "path": "app/modules/delegate.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "plan_chainer.py",
+      "path": "app/modules/plan_chainer.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "output_schema.json",
+      "path": "app/schemas/debug_analyzer/output_schema.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "agent_registry.py",
+      "path": "app/modules/agent_registry.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_resume_engine.py",
+      "path": "app/modules/loop_resume_engine.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "task_tagger.py",
+      "path": "app/core/task_tagger.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "reflection_chain_weaver.py",
+      "path": "app/modules/reflection_chain_weaver.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "hal_agent_registration_fix_20250425_155230.json",
+      "path": "logs/hal_agent_registration_fix_20250425_155230.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "delegate_schema.py",
+      "path": "app/schemas/delegate/delegate_schema.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_routes.py",
+      "path": "app/routes/loop_routes.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "forge_build_20250426_0154.json",
+      "path": "logs/postman_sweeps/forge_build_20250426_0154.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "agent_verify.py",
+      "path": "app/modules/agent_verify.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "self_router.py",
+      "path": "app/routes/self_router.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_execution_log.json",
+      "path": "app/memory/loop_execution_log.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_summary_rejection_log.json",
+      "path": "app/memory/loop_summary_rejection_log.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_summary.json",
+      "path": "app/memory/loop_summary.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_intent.json",
+      "path": "app/memory/loop_intent.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_justification_log.json",
+      "path": "app/memory/loop_justification_log.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "file_tree.json",
+      "path": "app/memory/file_tree.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "belief_surface.json",
+      "path": "app/memory/belief_surface.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "promethios_creed.json",
+      "path": "app/memory/promethios_creed.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "mutation_guard.log",
+      "path": "app/logs/mutation_guard.log",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "wiring_manifest.json",
+      "path": "logs/wiring_manifest.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "wiring_manifest.schema.json",
+      "path": "app/schemas/wiring_manifest.schema.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "validate_wiring.py",
+      "path": "app/validators/validate_wiring.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "mutation_guard.py",
+      "path": "app/validators/mutation_guard.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_controller.py",
+      "path": "app/controllers/loop_controller.py",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "batch_16_execution_plan.locked.json",
+      "path": "batches/batch_16_execution_plan.locked.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "batch_17_execution_plan.locked.json",
+      "path": "batches/batch_17_execution_plan.locked.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "batch_18_execution_plan.locked.json",
+      "path": "batches/batch_18_execution_plan.locked.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "batch_19_execution_plan.locked.json",
+      "path": "batches/batch_19_execution_plan.locked.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "batch_20_execution_plan.locked.json",
+      "path": "batches/batch_20_execution_plan.locked.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "batch_21_execution_plan.locked.json",
+      "path": "batches/batch_21_execution_plan.locked.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "batch_22_execution_plan.locked.json",
+      "path": "batches/batch_22_execution_plan.locked.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "batch_23_execution_plan.locked.json",
+      "path": "batches/batch_23_execution_plan.locked.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "batch_24_execution_plan.locked.json",
+      "path": "batches/batch_24_execution_plan.locked.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "loop_intent_loop_0001.json",
+      "path": "app/memory/loop_intent_loop_0001.json",
+      "type": "discovered_repo",
+      "status": "found_in_repo"
+    },
+    {
+      "file": "app/memory/loop_summary.json",
+      "type": "memory_surface",
+      "description": "Logs the output, intent, and execution result of each loop.",
+      "added_by": "operator",
+      "source": "operator_directive_phase_16"
+    },
+    {
+      "file": "app/memory/loop_summary_rejection_log.json",
+      "type": "memory_surface",
+      "description": "Logs rejection events, causes, and justification when a loop fails execution.",
+      "added_by": "operator",
+      "source": "operator_directive_phase_16"
+    },
+    {
+      "file": "app/memory/loop_justification_log.json",
+      "type": "memory_surface",
+      "description": "Stores agent justifications, confidence levels, and belief references per loop.",
+      "added_by": "operator",
+      "source": "operator_directive_phase_16"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0003.json",
+      "description": "Test intent file for Batch 16.1.",
+      "status": "created"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0005.json",
+      "description": "Test intent file with mutation parameters for Batch 16.3.",
+      "status": "created"
+    }
+  ]
 }
