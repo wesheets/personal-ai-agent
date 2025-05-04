@@ -1,0 +1,95 @@
+[
+  {
+    "batch": "16.0",
+    "title": "Bootstrap Loop Controller and Basic Logging",
+    "phase": "Phase 16: Loop Bootstrap and Memory Reflection",
+    "prompt": "Objective: Establish the core loop controller and basic logging surfaces.\n1. **Dependency Check:** Ensure Phase 15 is complete.\n2. **Build Controller:** Create `app/controllers/loop_controller.py` with basic structure: initialize, run loop steps (placeholder), finalize. No complex logic yet.\n3. **Build Basic Logs:** Create empty files: `app/memory/loop_summary.json` (schema: loop_id, timestamp, intent, status), `app/memory/loop_summary_rejection_log.json` (schema: loop_id, timestamp, reason).\n4. **Static Validation:** Lint `loop_controller.py`. Validate JSON files are empty lists or valid empty JSON.\n5. **Integration & Test:** Run a simple loop (`loop_0001`) that only logs start/end to `loop_summary.json`. Run another loop (`loop_0002`) designed to be manually rejected, logging to `loop_summary_rejection_log.json`.\n6. **Functional Validation:** Verify `loop_controller.py` executed. Verify logs contain entries for `loop_0001` (success) and `loop_0002` (rejected).\n7. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug controller logic or logging calls.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/controllers/loop_controller.py",
+      "app/memory/loop_summary.json",
+      "app/memory/loop_summary_rejection_log.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+      "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+      "/home/ubuntu/personal-ai-agent/app/memory/loop_summary_rejection_log.json",
+      "/home/ubuntu/logs/loop_0001_execution.log",
+      "/home/ubuntu/logs/loop_0002_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm controller executed.",
+      "Confirm logs contain expected entries.",
+      "Update `verified` status for batch 16.0 to `true`."
+    ],
+    "dependencies": [],
+    "verified": false
+  },
+  {
+    "batch": "16.1",
+    "title": "Implement Loop Intent Surface",
+    "phase": "Phase 16: Loop Bootstrap and Memory Reflection",
+    "prompt": "Objective: Implement reading and logging of loop intent.\n1. **Dependency Check:** Ensure batch 16.0 is `verified: true`.\n2. **Build Intent Surface:** Create `app/memory/loop_intent.json` (schema: loop_id, intent_description, target_components, parameters).\n3. **Enhance Controller:** Modify `loop_controller.py` to read intent from `loop_intent.json` at the start of a loop and log the intent description to `loop_summary.json`.\n4. **Integration & Test:** Create a sample `loop_intent_0003.json`. Run `loop_0003`.\n5. **Functional Validation:** Verify `loop_summary.json` entry for `loop_0003` includes the intent description read from the file.\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug controller logic for reading intent or logging.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/memory/loop_intent.json",
+      "app/controllers/loop_controller.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/memory/loop_intent.json",
+      "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+      "/home/ubuntu/logs/loop_0003_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm `loop_summary.json` for `loop_0003` contains intent.",
+      "Update `verified` status for batch 16.1 to `true`."
+    ],
+    "dependencies": [
+      "16.0"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "16.2",
+    "title": "Implement Basic Memory Reflection (Read Only)",
+    "phase": "Phase 16: Loop Bootstrap and Memory Reflection",
+    "prompt": "Objective: Enable the loop controller to read from existing memory surfaces.\n1. **Dependency Check:** Ensure batch 16.1 is `verified: true`. Ensure core memory surfaces like `belief_surface.json`, `promethios_creed.json` exist (even if basic).\n2. **Enhance Controller:** Modify `loop_controller.py` to include a step that reads data from a specified memory surface (e.g., `belief_surface.json`) and logs that it read the data (content logging not required yet).\n3. **Integration & Test:** Run a loop (`loop_0004`) configured to read `belief_surface.json`.\n4. **Functional Validation:** Verify logs for `loop_0004` show the memory read step was executed successfully.\n5. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug controller logic for file reading or logging.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/controllers/loop_controller.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/logs/loop_0004_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm logs show successful memory read step.",
+      "Update `verified` status for batch 16.2 to `true`."
+    ],
+    "dependencies": [
+      "16.1"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "16.3",
+    "title": "Implement Mutation Guard Scaffold (Dry Run Only)",
+    "phase": "Phase 16: Loop Bootstrap and Memory Reflection",
+    "prompt": "Objective: Create the mutation guard component but disable actual mutations.\n1. **Dependency Check:** Ensure batch 16.2 is `verified: true`.\n2. **Build Guard Scaffold:** Create `app/validators/mutation_guard.py` with placeholder logic. It should accept mutation requests but **always reject them** or simply log the request without performing any file changes. Create `app/logs/mutation_guard.log`.\n3. **Integrate Guard Call:** Modify `loop_controller.py` to include a placeholder step that calls `mutation_guard.py` if the loop intent involves mutation.\n4. **Integration & Test:** Run a loop (`loop_0005`) with an intent indicating mutation. \n5. **Functional Validation:** Verify `loop_controller.py` called the mutation guard. Verify `mutation_guard.log` shows the mutation request was received and rejected (or logged as dry run). **Crucially, verify no actual file system changes occurred.**\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug guard logic or controller integration. Ensure guard correctly blocks mutations.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/validators/mutation_guard.py",
+      "app/controllers/loop_controller.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/validators/mutation_guard.py",
+      "/home/ubuntu/personal-ai-agent/app/logs/mutation_guard.log",
+      "/home/ubuntu/logs/loop_0005_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm mutation guard was called.",
+      "Confirm guard log shows rejection/dry run.",
+      "**Verify no file system mutations occurred.**",
+      "Update `verified` status for batch 16.3 to `true`."
+    ],
+    "dependencies": [
+      "16.2"
+    ],
+    "verified": false
+  }
+]

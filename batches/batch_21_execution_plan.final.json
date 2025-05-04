@@ -1,0 +1,78 @@
+[
+  {
+    "batch": "21.0",
+    "title": "Implement Belief Surface Editing Mechanism",
+    "phase": "Phase 21: Belief Introspection",
+    "prompt": "Objective: Allow controlled modification of the belief surface, requiring Operator approval.\n1. **Dependency Check:** Ensure Phase 20 (batch 20.5) is `verified: true`. Ensure `belief_surface.json` exists.\n2. **Implement Belief Change Proposal:** Modify Architect or create `belief_manager_agent.py`. Enable proposal of changes (add, modify, deprecate beliefs) to `belief_surface.json` based on analysis (e.g., recurring conflicts, new insights). Proposals must include justification and be saved (e.g., `proposed_belief_change_0025.json`).\n3. **Integrate with Operator Review:** Modify `loop_controller.py` to route belief change proposals through the Operator Review Gate (from 20.4). Operator approval is required.\n4. **Implement Belief Update Logic:** Create `belief_updater.py`. If Operator approves, this script applies the change to `belief_surface.json`. Log the change details (old/new belief, justification, loop_id, operator_approval_ref) to `legacy_alignment_tracker.json` (see 21.2).\n5. **Integration & Test:** Run loop (`loop_0025`) proposing a belief change. Provide Operator approval. Verify `belief_surface.json` is updated. Verify `legacy_alignment_tracker.json` logs the change.\n6. **Functional Validation:** Confirm belief change proposals require and respect Operator approval. Confirm updates are applied correctly and logged to the legacy tracker.\n7. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug proposal generation, review gate integration, or update logic. Ensure legacy tracking occurs.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/agents/belief_manager_agent.py",
+      "app/controllers/loop_controller.py",
+      "app/validators/belief_updater.py",
+      "app/memory/belief_surface.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/memory/proposed_belief_change_0025.json",
+      "/home/ubuntu/personal-ai-agent/app/memory/belief_surface.json",
+      "/home/ubuntu/personal-ai-agent/app/memory/legacy_alignment_tracker.json",
+      "/home/ubuntu/logs/loop_0025_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm belief change required Operator approval.",
+      "Confirm approved change updated `belief_surface.json`.",
+      "Confirm change logged in `legacy_alignment_tracker.json`.",
+      "Update `verified` status for batch 21.0 to `true`."
+    ],
+    "dependencies": [
+      "20.4",
+      "21.2"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "21.1",
+    "title": "Implement Belief Conflict Logging",
+    "phase": "Phase 21: Belief Introspection",
+    "prompt": "Objective: Detect and log conflicts between proposed plans/actions and the current belief surface.\n1. **Dependency Check:** Ensure batch 18.0 is `verified: true`. Ensure `belief_surface.json` exists.\n2. **Build Conflict Log:** Create empty file `/home/ubuntu/personal-ai-agent/app/memory/belief_conflict_log.json`. Define schema (e.g., loop_id, timestamp, conflicting_plan_step, belief_id, belief_content, agent_id).\n3. **Implement Conflict Detection:** Modify `critic_agent.py` (or create `belief_checker.py` called by Critic/Controller). During plan review, check proposed actions against beliefs in `belief_surface.json`. If a conflict is detected, log details to `belief_conflict_log.json`. This detection should influence Critic's decision (likely leading to rejection).\n4. **Integration & Test:** Run a loop (`loop_0026`) where Architect proposes a plan conflicting with a known belief.\n5. **Functional Validation:** Verify Critic detected the conflict. Verify details logged to `belief_conflict_log.json`. Verify Critic rejected the plan (check justification log / rejection log).\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug conflict detection logic in Critic/checker. Ensure logging occurs correctly.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/memory/belief_conflict_log.json",
+      "app/agents/critic_agent.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/memory/belief_conflict_log.json",
+      "/home/ubuntu/logs/loop_0026_execution.log",
+      "/home/ubuntu/personal-ai-agent/app/memory/loop_summary_rejection_log.json"
+    ],
+    "verification_steps": [
+      "Confirm conflict detected and logged in `belief_conflict_log.json`.",
+      "Confirm Critic rejected the plan due to conflict.",
+      "Update `verified` status for batch 21.1 to `true`."
+    ],
+    "dependencies": [
+      "18.0"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "21.2",
+    "title": "Implement Legacy Alignment Tracking",
+    "phase": "Phase 21: Belief Introspection",
+    "prompt": "Objective: Track the history of belief changes for transparency and drift analysis.\n1. **Dependency Check:** Ensure Phase 17.1 is `verified: true`. \n2. **Build Legacy Tracker:** Create empty file `/home/ubuntu/personal-ai-agent/app/memory/legacy_alignment_tracker.json`. Define schema (e.g., change_id, timestamp, belief_id, old_belief_content, new_belief_content, justification_ref [loop_id], operator_approval_ref).\n3. **Integrate Logging:** Ensure the `belief_updater.py` (from 21.0) logs all applied belief changes to this tracker, including linking to the justification and Operator approval.\n4. **Integration & Test:** Run `loop_0025` again (proposing and approving a belief change).\n5. **Functional Validation:** Verify `legacy_alignment_tracker.json` contains a detailed entry for the belief change applied in `loop_0025`, linking to justification and approval.\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug logging integration within `belief_updater.py`. Ensure all schema fields are populated.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/memory/legacy_alignment_tracker.json",
+      "app/validators/belief_updater.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/memory/legacy_alignment_tracker.json",
+      "/home/ubuntu/logs/loop_0025_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm belief change logged in detail in `legacy_alignment_tracker.json`.",
+      "Update `verified` status for batch 21.2 to `true`."
+    ],
+    "dependencies": [
+      "17.1",
+      "21.0"
+    ],
+    "verified": false
+  }
+]

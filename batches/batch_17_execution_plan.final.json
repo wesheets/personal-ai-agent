@@ -1,0 +1,50 @@
+[
+  {
+    "batch": "17.0",
+    "title": "Activate Architect Agent (Planning Only)",
+    "phase": "Phase 17: Planning Agents and Justification",
+    "prompt": "Objective: Activate the Architect agent to generate plans based on loop intent, without executing them.\n1. **Dependency Check:** Ensure batch 16.3 is `verified: true`. Confirm `app/agents/architect_agent.py` exists.\n2. **Enhance Controller:** Modify `loop_controller.py` to invoke `architect_agent.py` after reading intent. Architect should generate a plan based on the intent and save it to a temporary file (e.g., `app/memory/proposed_plan_0006.json`). **Crucially, the controller should NOT execute this plan.**\n3. **Integration & Test:** Run a loop (`loop_0006`) with a defined intent requiring planning.\n4. **Functional Validation:** Verify `architect_agent.py` was invoked (check logs). Verify a plan file was generated. **Verify no actions from the plan (e.g., mutations) were executed.**\n5. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug controller integration or Architect agent logic. Ensure plan execution is blocked.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/agents/architect_agent.py",
+      "app/controllers/loop_controller.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/logs/loop_0006_execution.log",
+      "/home/ubuntu/personal-ai-agent/app/memory/proposed_plan_0006.json"
+    ],
+    "verification_steps": [
+      "Confirm Architect agent executed and generated a plan file.",
+      "**Verify no plan actions were executed.**",
+      "Update `verified` status for batch 17.0 to `true`."
+    ],
+    "dependencies": [
+      "16.3"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "17.1",
+    "title": "Implement Justification Logging",
+    "phase": "Phase 17: Planning Agents and Justification",
+    "prompt": "Objective: Implement logging of justifications for agent actions and decisions.\n1. **Dependency Check:** Ensure batch 17.0 is `verified: true`.\n2. **Build Justification Log:** Create `app/memory/loop_justification_log.json` (schema: loop_id, timestamp, agent_id, action/decision, justification_text, confidence_score). Use the schema defined in 20.6 previously (`app/schemas/justification_object.schema.json`).\n3. **Enhance Agents/Controller:** Modify core agents (Architect initially) and `loop_controller.py` to log their key decisions (e.g., plan generation, step execution) and justifications to `loop_justification_log.json`, conforming to the schema.\n4. **Integration & Test:** Run a loop (`loop_0007`) involving the Architect agent generating a plan.\n5. **Functional Validation:** Verify `loop_justification_log.json` contains entries from the Architect agent regarding plan generation, including justification text and confidence, conforming to the schema.\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug logging calls in agents/controller. Ensure schema conformance.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/memory/loop_justification_log.json",
+      "app/schemas/justification_object.schema.json",
+      "app/agents/architect_agent.py",
+      "app/controllers/loop_controller.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json",
+      "/home/ubuntu/logs/loop_0007_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm justification log contains relevant entries from Architect.",
+      "Confirm entries conform to `justification_object.schema.json`.",
+      "Update `verified` status for batch 17.1 to `true`."
+    ],
+    "dependencies": [
+      "17.0"
+    ],
+    "verified": false
+  }
+]

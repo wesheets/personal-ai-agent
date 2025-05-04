@@ -1,0 +1,151 @@
+[
+  {
+    "batch": "20.0",
+    "title": "Implement Agent Trust Score Calculation",
+    "phase": "Phase 20: Trust Scoring and Override Enforcement",
+    "prompt": "Objective: Implement logic to calculate and store agent trust scores based on verified performance history.\n1. **Dependency Check:** Ensure Phase 19 (batch 19.3) is `verified: true`. Confirm relevant history logs exist (`loop_summary.json`, `loop_regret_score.json`, `loop_justification_log.json`).\n2. **Build Surface:** Create `app/memory/agent_trust_score.json` (schema: agent_id, score, last_updated, data_points_used, contributing_factors_summary).\n3. **Implement Scoring Logic:** Create `app/validators/trust_evaluator.py`. Implement logic to analyze agent performance based *only* on logged outcomes, regret scores, and justifications. Calculate score and update `agent_trust_score.json`. Handle insufficient history.\n4. **Integration & Test:** Seed logs with verifiable agent performance data. Run trust calculation (`loop_0017`).\n5. **Functional Validation:** Verify `agent_trust_score.json` populated with scores reflecting seeded data. Verify data points used are recorded.\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug scoring logic, ensure it reads from history logs.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/memory/agent_trust_score.json",
+      "app/validators/trust_evaluator.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/memory/agent_trust_score.json",
+      "/home/ubuntu/personal-ai-agent/app/validators/trust_evaluator.py",
+      "/home/ubuntu/logs/loop_0017_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm scores in `agent_trust_score.json` reflect seeded history.",
+      "Confirm data points used are recorded.",
+      "Update `verified` status for batch 20.0 to `true`."
+    ],
+    "dependencies": [
+      "19.3"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "20.1",
+    "title": "Implement Trust Rehabilitation Pathways",
+    "phase": "Phase 20: Trust Scoring and Override Enforcement",
+    "prompt": "Objective: Implement logic for agents with low trust scores to regain trust.\n1. **Dependency Check:** Ensure batch 20.0 is `verified: true`.\n2. **Build Pathways Surface:** Create `app/memory/trust_rehabilitation_pathways.json`. Define pathways requiring verified successful execution of specific loop types.\n3. **Implement Rehabilitation Logic:** Modify `trust_evaluator.py` or controller to recognize pathway completion (verified via logs) and positively influence score update.\n4. **Integration & Test:** Simulate low-trust agent. Run pathway loop (`loop_0018`). Run trust calculation (`loop_0017`).\n5. **Functional Validation:** Verify agent score improved based on logged success in pathway loop.\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug pathway definition or rehabilitation logic in evaluator.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/memory/trust_rehabilitation_pathways.json",
+      "app/validators/trust_evaluator.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/memory/trust_rehabilitation_pathways.json",
+      "/home/ubuntu/personal-ai-agent/app/memory/agent_trust_score.json",
+      "/home/ubuntu/logs/loop_0018_execution.log",
+      "/home/ubuntu/logs/loop_0017_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm score improved based on logged pathway success.",
+      "Update `verified` status for batch 20.1 to `true`."
+    ],
+    "dependencies": [
+      "20.0"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "20.2",
+    "title": "Enhance Mutation Guard with Trust Score Check",
+    "phase": "Phase 20: Trust Scoring and Override Enforcement",
+    "prompt": "Objective: Enhance `mutation_guard.py` to require minimum verified trust score.\n1. **Dependency Check:** Ensure batches 19.0, 20.1 are `verified: true`.\n2. **Enhance Guard Logic:** Modify `mutation_guard.py` to check `agent_trust_score.json` for responsible agent. Require score > threshold AND based on sufficient data points. Reject mutation if check fails, logging reason.\n3. **Integration & Test:** Test rejection (low score `loop_0019a`, insufficient data `loop_0019b`) and approval (high score `loop_0019c`).\n4. **Functional Validation:** Check `mutation_guard.log` confirms correct blocking/allowing based on verified trust score and data sufficiency.\n5. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug guard logic, trust score fetching, or data sufficiency check.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/validators/mutation_guard.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/logs/mutation_guard.log",
+      "/home/ubuntu/logs/loop_0019a_execution.log",
+      "/home/ubuntu/logs/loop_0019b_execution.log",
+      "/home/ubuntu/logs/loop_0019c_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm guard log shows rejection for low score/insufficient data.",
+      "Confirm guard log shows approval for high score.",
+      "Update `verified` status for batch 20.2 to `true`."
+    ],
+    "dependencies": [
+      "19.0",
+      "20.1"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "20.3",
+    "title": "Implement Critic Co-Approval Check in Mutation Guard",
+    "phase": "Phase 20: Trust Scoring and Override Enforcement",
+    "prompt": "Objective: Require Critic approval logged in justifications before mutation.\n1. **Dependency Check:** Ensure batches 18.0, 19.0 are `verified: true`. Ensure `loop_justification_log.json` includes Critic decisions.\n2. **Enhance Mutation Guard:** Modify `mutation_guard.py`. Add check requiring Critic approval entry in `loop_justification_log.json` for the current loop before allowing mutation. Reject if missing.\n3. **Integration & Test (Success):** Run loop (`loop_0020`) where Critic approves.\n4. **Integration & Test (Failure):** Run loop (`loop_0021`) where Critic rejects (or approval is missing). \n5. **Functional Validation:** Verify `mutation_guard.py` allows mutation for `loop_0020` and rejects for `loop_0021` based on Critic approval check. Check `mutation_guard.log`.\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug guard logic for checking justification log.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/validators/mutation_guard.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/logs/mutation_guard.log",
+      "/home/ubuntu/logs/loop_0020_execution.log",
+      "/home/ubuntu/logs/loop_0021_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm guard allowed mutation when Critic approved.",
+      "Confirm guard rejected mutation when Critic rejected/missing.",
+      "Update `verified` status for batch 20.3 to `true`."
+    ],
+    "dependencies": [
+      "18.0",
+      "19.0",
+      "17.1"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "20.4",
+    "title": "Implement Blocking Operator Review Gate",
+    "phase": "Phase 20: Trust Scoring and Override Enforcement",
+    "prompt": "Objective: Implement a blocking mechanism for Operator review of specific plan types (e.g., high-risk mutations, architect-proposed rewiring).\n1. **Dependency Check:** Ensure batch 17.0 is `verified: true`. \n2. **Implement Blocking Review Step:** Modify `loop_controller.py`. For designated plan types, block execution, write plan/context to review queue (`/home/ubuntu/review_queue/plan_0022.json`), poll input source (`/home/ubuntu/operator_input/plan_0022_decision.txt`) for explicit approve/reject. Default to reject on timeout/invalid input.\n3. **Implement Override Logging:** Create `app/memory/operator_override_log.json`. Log Operator decision, timestamp, plan ID, reason.\n4. **Integration & Test (Approval):** Run loop (`loop_0022a`) requiring review. Provide 'approve'. Verify loop resumes, logs approval.\n5. **Integration & Test (Rejection):** Run loop (`loop_0022b`) requiring review. Provide 'reject'. Verify loop halts, logs rejection.\n6. **Functional Validation:** Confirm blocking behavior, input handling, logging, and continuation/halting work correctly.\n7. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug controller logic for blocking, polling, input handling, or logging.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/controllers/loop_controller.py",
+      "app/memory/operator_override_log.json"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/logs/loop_0022a_execution.log",
+      "/home/ubuntu/logs/loop_0022b_execution.log",
+      "/home/ubuntu/review_queue/plan_0022.json",
+      "/home/ubuntu/operator_input/plan_0022_decision.txt",
+      "/home/ubuntu/personal-ai-agent/app/memory/operator_override_log.json"
+    ],
+    "verification_steps": [
+      "Confirm loop blocked pending Operator input.",
+      "Confirm 'approve' allowed continuation and was logged.",
+      "Confirm 'reject' halted loop and was logged.",
+      "Update `verified` status for batch 20.4 to `true`."
+    ],
+    "dependencies": [
+      "17.0"
+    ],
+    "verified": false
+  },
+  {
+    "batch": "20.5",
+    "title": "Enhance Mutation Guard with Operator Approval Check",
+    "phase": "Phase 20: Trust Scoring and Override Enforcement",
+    "prompt": "Objective: Ensure mutation guard checks for Operator approval if the loop required it.\n1. **Dependency Check:** Ensure batches 20.3, 20.4 are `verified: true`.\n2. **Enhance Mutation Guard:** Modify `mutation_guard.py`. If the plan type required Operator review, add check requiring Operator 'approve' entry in `operator_override_log.json` for the current loop. Reject if missing or 'reject'.\n3. **Integration & Test (Success):** Run loop (`loop_0023`) requiring Operator review, provide 'approve', ensure it passes other guard checks (trust, Critic). Verify mutation executes.\n4. **Integration & Test (Failure):** Run loop (`loop_0024`) requiring Operator review, provide 'reject'. Verify mutation guard blocks mutation due to Operator rejection.\n5. **Functional Validation:** Verify `mutation_guard.py` allows/rejects based on Operator approval status logged in `operator_override_log.json`. Check `mutation_guard.log`.\n6. **Update Status:** If validation succeeds, update this batch entry to set `verified: true`.\nRecovery: Debug guard logic for checking operator log.Repo Sync Protocol Note:Before executing this batch, check whether the previous batch prompt resulted in a merged PR.  If no PR was created or merged, do not run `git pull` or reset the local repo.  Proceed with the current workspace state to preserve continuity of in-progress execution.",
+    "components_to_build_or_verify": [
+      "app/validators/mutation_guard.py"
+    ],
+    "expected_artifacts": [
+      "/home/ubuntu/personal-ai-agent/app/logs/mutation_guard.log",
+      "/home/ubuntu/logs/loop_0023_execution.log",
+      "/home/ubuntu/logs/loop_0024_execution.log"
+    ],
+    "verification_steps": [
+      "Confirm guard allowed mutation when Operator approved.",
+      "Confirm guard rejected mutation when Operator rejected.",
+      "Update `verified` status for batch 20.5 to `true`."
+    ],
+    "dependencies": [
+      "20.3",
+      "20.4"
+    ],
+    "verified": false
+  }
+]
