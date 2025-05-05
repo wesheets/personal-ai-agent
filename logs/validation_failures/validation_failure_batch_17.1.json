@@ -1,0 +1,8 @@
+{
+  "batch_id": "17.1",
+  "loop_id": "loop_0007",
+  "timestamp": "2025-05-05T00:47:31.420115",
+  "errors": [
+    "No wiring manifest entry found for batch 17.1 and loop loop_0007."
+  ]
+}
