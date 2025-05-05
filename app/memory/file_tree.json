@@ -16795,69 +16795,257 @@
       "status": "implemented"
     },
     {
-      "file": "system_manifest.runtime.json",
-      "path": "config/system_manifest.runtime.json",
-      "type": "runtime_manifest",
-      "status": "implemented"
+      "file": "reflection_thread.json",
+      "path": "app/memory/reflection_thread.json",
+      "type": "cognitive_log",
+      "purpose": "Stores high-level reflections across loop cycles for recursive context chaining and belief evolution.",
+      "status": "declared_from_historical_plan",
+      "dependencies": [],
+      "source": "file_tree_audit_phase_16"
     },
     {
-      "file": "app/controllers/loop_controller.py",
-      "type": "controller",
-      "status": "created",
-      "added_by": "operator",
-      "source": "operator_directive_phase_16"
-    },
-    {
-      "file": "app/validators/mutation_guard.py",
-      "type": "validator",
-      "status": "created",
-      "added_by": "operator",
-      "source": "operator_directive_phase_16"
-    },
-    {
-      "file": "app/memory/loop_summary.json",
+      "file": "conversation_memory.json",
+      "path": "app/memory/conversation_memory.json",
       "type": "memory_surface",
-      "status": "created",
-      "added_by": "operator",
-      "source": "operator_directive_phase_16"
+      "purpose": "Stores ongoing interaction history between Operator and Orchestrator to inform suggestion logic.",
+      "status": "declared_from_historical_plan",
+      "dependencies": [],
+      "source": "file_tree_audit_phase_16"
     },
     {
-      "file": "app/memory/loop_summary_rejection_log.json",
+      "file": "prompt_memory_plan.json",
+      "path": "app/memory/prompt_memory_plan.json",
+      "type": "meta_log",
+      "purpose": "Maps past prompt chains to their resulting outputs to enable plan recovery and reusability.",
+      "status": "declared_from_historical_plan",
+      "dependencies": [],
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "file": "file_tree.json",
+      "path": "app/memory/file_tree.json",
       "type": "memory_surface",
-      "status": "created",
-      "added_by": "operator",
-      "source": "operator_directive_phase_16"
+      "purpose": "Identified as missing during Batch 14.6 audit for recursive capabilities: Core memory surface representing the build plan.",
+      "status": "declared_from_historical_plan",
+      "dependencies": [],
+      "source_archive_hint": null,
+      "source": "file_tree_audit_phase_16"
     },
     {
-      "file": "app/memory/loop_justification_log.json",
-      "type": "memory_surface",
-      "status": "created",
-      "added_by": "operator",
-      "source": "operator_directive_phase_16"
+      "path": "app/frontend/.env",
+      "type": "unknown",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
     },
     {
-      "file": "app/logs/loop_0003_execution.log",
+      "path": "app/memory/missing_surface_report.json",
+      "type": "data_file",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "app/memory/truth_diff_log.json",
       "type": "log_file",
-      "status": "created",
-      "operator_added": true
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
     },
     {
-      "file": "app/logs/loop_0004_execution.log",
-      "type": "log_file",
-      "status": "created",
-      "operator_added": true
+      "path": "app/modules/trace_filter.py",
+      "type": "python_module",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
     },
     {
-      "file": "app/logs/loop_0005_execution.log",
-      "type": "log_file",
-      "status": "created",
-      "operator_added": true
+      "path": "app/modules/trace_reader.py",
+      "type": "python_module",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
     },
     {
-      "file": "app/logs/mutation_guard.log",
+      "path": "app/modules/trace_summarizer.py",
+      "type": "python_module",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "app/schemas/agent_governance.schema.json",
+      "type": "agent",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "app/schemas/agent_registry.schema.json",
+      "type": "agent",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "app/schemas/system_manifest.schema.json",
+      "type": "schema",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "app/schemas/toolkit_registry.schema.json",
+      "type": "schema",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "config/promethios_file_tree_plan.v2.9.1_final.json",
+      "type": "config",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "config/promethios_file_tree_plan.v2.9.2_final.json",
+      "type": "config",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "config/promethios_file_tree_plan.v3.0_canonical.json",
+      "type": "config",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "config/promethios_file_tree_plan.v3.1.3_governance_synced.json",
+      "type": "config",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "config/promethios_file_tree_plan.v3.1.4_runtime_synced.json",
+      "type": "config",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "config/promethios_file_tree_plan.v3.1.4_runtime_synced.patched.json",
+      "type": "config",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "deployment-package/.env.production.example",
+      "type": "unknown",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "docs/PHASE_4_OPERATOR_ALIGNMENT.md",
+      "type": "documentation",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "frontend-operator-dashboard/.env",
+      "type": "unknown",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "frontend-operator-dashboard/.env.example",
+      "type": "unknown",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "frontend-operator-dashboard/.env.production",
+      "type": "unknown",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "frontend-operator-dashboard/app/frontend/.env",
+      "type": "unknown",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "frontend-operator-dashboard/deployment-package/.env.production.example",
+      "type": "unknown",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "frontend-operator-dashboard/frontend-ui-v2/.env.example",
+      "type": "ui_component",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "frontend-ui-v2/.env.example",
+      "type": "ui_component",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "logs/loop_controller.log",
       "type": "log_file",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "logs/wiring_manifest.json",
+      "type": "log_file",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "system/system_manifest.runtime.json",
+      "type": "data_file",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "tools/__init__.py",
+      "type": "python_module",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "tools/log_wiring_to_manifest.py",
+      "type": "log_file",
+      "status": "declared_from_historical_plan",
+      "operator_added": true,
+      "source": "file_tree_audit_phase_16"
+    },
+    {
+      "path": "app/memory/proposed_plan_loop_0007.json",
+      "type": "agent_output",
       "status": "created",
-      "operator_added": true
+      "operator_added": true,
+      "source": "operator_directive_phase_17"
     }
   ]
-}
