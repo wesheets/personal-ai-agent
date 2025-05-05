@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Justification Object",
+  "description": "Schema for logging agent actions and decisions with justifications.",
+  "type": "object",
+  "properties": {
+    "loop_id": {
+      "description": "The unique identifier for the loop during which the justification was logged.",
+      "type": "string"
+    },
+    "timestamp": {
+      "description": "ISO 8601 timestamp of when the justification was logged.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "agent_id": {
+      "description": "The identifier of the agent logging the justification.",
+      "type": "string"
+    },
+    "action_decision": {
+      "description": "A description of the action taken or decision made by the agent.",
+      "type": "string"
+    },
+    "justification_text": {
+      "description": "The reasoning or justification provided by the agent for the action/decision.",
+      "type": "string"
+    },
+    "confidence_score": {
+      "description": "A numerical score (0.0 to 1.0) indicating the agent's confidence in the justification.",
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    }
+  },
+  "required": [
+    "loop_id",
+    "timestamp",
+    "agent_id",
+    "action_decision",
+    "justification_text"
+  ]
+}
