@@ -346,5 +346,29 @@
     "action_decision": "Loop Finalization (Rejected)",
     "justification_text": "Loop loop_0010 rejected. Reason: Error invoking Critic agent: ERROR",
     "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0015",
+    "timestamp": "2025-05-05T06:25:00.000000Z",
+    "agent_id": "architect",
+    "action_decision": "Generated plan for loop loop_0015 based on intent.",
+    "justification_text": "Dummy entry: Created a plan with high confidence.",
+    "confidence_score": 0.95
+  },
+  {
+    "loop_id": "loop_0016",
+    "timestamp": "2025-05-05T06:25:00.000000Z",
+    "agent_id": "architect",
+    "action_decision": "Generated plan for loop loop_0016 based on intent.",
+    "justification_text": "Dummy entry: Created a plan with low confidence.",
+    "confidence_score": 0.3
+  },
+  {
+    "loop_id": "loop_0016",
+    "timestamp": "2025-05-05T06:25:01.000000Z",
+    "agent_id": "pessimist",
+    "action_decision": "Assessed risk for plan.",
+    "justification_text": "Dummy entry: Assessed plan as high risk.",
+    "risk_score": 0.8
   }
 ]

@@ -36,7 +36,7 @@ def log_failure(batch_id, loop_id, errors):
         "timestamp": datetime.utcnow().isoformat(),
         "errors": errors
     }
-    failure_path = os.path.join(VALIDATION_FAILURE_DIR, f"validation_failure_batch_{batch_id}.json")
+    failure_path = os.path.join(VALIDATION_FAILURE_DIR, f"validation_failure_batch_{batch_id}_loop_{loop_id}.json")
     save_json(failure_data, failure_path)
     print(f"Validation failed. Details logged to {failure_path}")
 
@@ -89,7 +89,7 @@ def main():
         errors.append(f"Schema validation failed: {e.message}")
 
     # --- 2. Surface Integrity Checks ---
-    declared_surfaces = set(item.get("path", item.get("file")) for item in file_tree_data.get("files", []) if item.get("path") or item.get("file")) if file_tree_data else set()
+    declared_surfaces = set(item.get("path", item.get("file")) for item in file_tree_data if isinstance(item, dict) and (item.get("path") or item.get("file"))) if isinstance(file_tree_data, list) else set()
     missing_surfaces = set(missing_surface_report.get("missing_files", [])) if missing_surface_report else set()
     intent_targets = set(loop_intent_data.get("target_components", [])) if loop_intent_data else set()
 

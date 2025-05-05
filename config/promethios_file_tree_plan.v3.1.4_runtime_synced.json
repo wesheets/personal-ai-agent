@@ -25807,5 +25807,112 @@
       "path": "logs/validation_failures/validation_failure_batch_18.1.json",
       "status": "added",
       "batch": "18.1"
+    },
+    {
+      "path": "/home/ubuntu/personal-ai-agent/app/validators/mutation_guard.py",
+      "status": "modified",
+      "source": "19.0",
+      "operator_added": false,
+      "description": "Enhanced to log intended mutations to mutation_log.json before execution attempt.",
+      "last_modified_batch": "19.2"
+    },
+    {
+      "path": "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0012.json",
+        "status": "created",
+      "source": "19.0",
+      "operator_added": false
+    },
+    {
+      "path": "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0013.json",
+      "status": "created",
+      "source": "19.0",
+      "operator_added": false
+    },
+    {
+      "path": "/home/ubuntu/personal-ai-agent/app/logs/mutation_guard.log",
+      "status": "created",
+      "source": "19.0",
+      "operator_added": false
+    },
+    {
+      "path": "/home/ubuntu/personal-ai-agent/app/memory/proposed_plan_loop_0012.json",
+      "status": "created",
+      "source": "19.0",
+      "operator_added": false
+    },
+    {
+      "path": "/home/ubuntu/personal-ai-agent/app/memory/proposed_plan_loop_0013.json",
+      "status": "created",
+      "source": "19.0",
+      "operator_added": false
+    },
+    {
+      "status": "modified",
+      "description": "Added helper function update_mutation_log_status and integrated calls to update mutation log after execution/validation.",
+      "dependencies": [],
+      "schemas": [],
+      "created_batch": "19.1",
+      "last_modified_batch": "19.2",
+      "file": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py"
+    },
+    {
+      "status": "modified",
+      "description": "Fixed syntax error in logging configuration.",
+      "dependencies": [],
+      "schemas": [],
+      "created_batch": "19.1",
+      "last_modified_batch": "19.1",
+      "file": "/home/ubuntu/personal-ai-agent/app/validators/post_mutation_validator.py"
+    },
+    {
+      "status": "created",
+      "description": "Test intent for post-mutation validation failure (invalid syntax).",
+      "dependencies": [],
+      "schemas": [],
+      "created_batch": "19.1",
+      "last_modified_batch": "19.1",
+      "file": "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0014.json"
+    },
+    {
+      "status": "created",
+      "description": "Log file for the post-mutation validator.",
+      "dependencies": [],
+      "schemas": [],
+      "created_batch": "19.1",
+      "last_modified_batch": "19.1",
+      "file": "/home/ubuntu/personal-ai-agent/app/logs/post_mutation_validator.log"
+    },
+    {
+      "status": "created",
+      "description": "Log file for tracking the status of mutation attempts (intended, executed, failed).",
+      "dependencies": [],
+      "schemas": [],
+      "created_batch": "19.2",
+      "last_modified_batch": "19.2",
+      "file": "/home/ubuntu/personal-ai-agent/app/memory/mutation_log.json"
+    },
+    {
+      "status": "created",
+      "description": "Log file storing regret scores calculated for completed loops.",
+      "dependencies": [],
+      "schemas": [],
+      "created_batch": "19.3",
+      "last_modified_batch": "19.3",
+      "type": "log_file",
+      "operator_added": true,
+      "source": "operator_directive_phase_19",
+      "file": "/home/ubuntu/personal-ai-agent/app/memory/loop_regret_score.json"
+    },
+    {
+      "status": "created",
+      "description": "Script to calculate regret scores based on loop outcomes vs. initial confidence/risk.",
+      "dependencies": [],
+      "schemas": [],
+      "created_batch": "19.3",
+      "last_modified_batch": "19.3",
+      "type": "validator",
+      "operator_added": true,
+      "source": "operator_directive_phase_19",
+      "file": "/home/ubuntu/personal-ai-agent/app/validators/regret_scorer.py"
     }
 }

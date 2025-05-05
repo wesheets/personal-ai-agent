@@ -1,0 +1,47 @@
+[
+  {
+    "loop_id": "loop_0015",
+    "timestamp": "2025-05-05T06:26:16.512528",
+    "final_status": "rejected",
+    "initial_confidence": null,
+    "initial_risk": null,
+    "regret_score": 0.5,
+    "reason": "Loop rejected with expectation score 0.50 (Confidence: None, Risk: None). Moderate regret due to failure with moderate/high expectation."
+  },
+  {
+    "loop_id": "loop_0015",
+    "timestamp": "2025-05-05T06:26:39.901782",
+    "final_status": "rejected",
+    "initial_confidence": null,
+    "initial_risk": null,
+    "regret_score": 0.5,
+    "reason": "Loop rejected with expectation score 0.50 (Confidence: None, Risk: None). Moderate regret due to failure with moderate/high expectation."
+  },
+  {
+    "loop_id": "loop_0015",
+    "timestamp": "2025-05-05T06:27:07.183207",
+    "final_status": "rejected",
+    "initial_confidence": null,
+    "initial_risk": null,
+    "regret_score": 0.5,
+    "reason": "Loop rejected with expectation score 0.50 (Confidence: None, Risk: None). Moderate regret due to failure with moderate/high expectation."
+  },
+  {
+    "loop_id": "loop_0015",
+    "timestamp": "2025-05-05T06:27:39.646776",
+    "final_status": "rejected",
+    "initial_confidence": 0.95,
+    "initial_risk": null,
+    "regret_score": 0.95,
+    "reason": "Loop rejected with expectation score 0.95 (Confidence: 0.95, Risk: None). High regret due to failure despite high expectation."
+  },
+  {
+    "loop_id": "loop_0016",
+    "timestamp": "2025-05-05T06:27:47.581254",
+    "final_status": "success",
+    "initial_confidence": 0.3,
+    "initial_risk": 0.8,
+    "regret_score": -0.94,
+    "reason": "Loop success with expectation score 0.06 (Confidence: 0.3, Risk: 0.8). Pleasant surprise, success occurred despite very low expectation."
+  }
+]
