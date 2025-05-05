@@ -1,0 +1,93 @@
+{
+  "phase_id": 36,
+  "batch_id": "36.0",
+  "title": "Phase 36.0: Explain Replay & Cognitive Polish",
+  "description": "Adds features for replaying and explaining past cognitive loop executions, annotates the generated file tree with cognitive lineage, and applies final polish to the UI/UX for the investor showcase. Builds upon Phases 33-35.",
+  "prompt": "Operator Directive: Execute Phase 36.0. Implement the 'Explain This Build' replay functionality and enhance narrative synthesis. Annotate the file tree to show cognitive origins. Apply final polish to the UI/UX to maximize the impact of the cognitive demonstration. Integrate seamlessly with Phases 33-35. Goal: Deliver a polished, compelling showcase where Promethios can not only act but also reflect upon and explain its actions.",
+  "components": [
+    {
+      "id": "36.0.1",
+      "task": "Implement Loop Replay Data Backend",
+      "details": "Develop API endpoints to retrieve historical loop data (specific loop ID) including trace, justifications, reflections (if Phase 34 approved), and emotional context (if Phase 35 implemented). Structure data for step-by-step replay visualization.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py"
+      ]
+    },
+    {
+      "id": "36.0.2",
+      "task": "Implement Loop Replay UI Component",
+      "details": "Develop or adapt a UI component (e.g., 
+'/src/components/replay/LoopReplayViewer.jsx
+') to fetch historical loop data and visualize the execution step-by-step. Allow user controls (play, pause, step). Highlight active agent, display associated justification/emotion/metrics for each step.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/src/components/replay/LoopReplayViewer.jsx",
+        "/home/ubuntu/personal-ai-agent/src/pages/LoopHistoryView.jsx"
+      ]
+    },
+    {
+      "id": "36.0.3",
+      "task": "Implement Narrative Synthesis Agent Logic",
+      "details": "Enhance Sage or Orchestrator agent logic to generate a concise narrative summary ('Explain This Build') of a selected loop execution. This logic should process the loop's trace, justification log, and reflection thread (if available) to synthesize a coherent explanation of the goals, key decisions, and outcomes.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/agents/sage_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/orchestrator_agent.py"
+      ]
+    },
+    {
+      "id": "36.0.4",
+      "task": "Integrate 'Explain This Build' into UI",
+      "details": "Add UI elements (e.g., a button in the LoopHistoryView or LiveCognitionView) to trigger the narrative synthesis agent logic via an API call. Display the generated explanation in a dedicated panel or modal (
+'/src/components/narrative/ExplanationViewer.jsx
+').",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/src/pages/LoopHistoryView.jsx",
+        "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx",
+        "/home/ubuntu/personal-ai-agent/src/components/narrative/ExplanationViewer.jsx",
+        "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py"
+      ]
+    },
+    {
+      "id": "36.0.5",
+      "task": "Implement File Tree Annotation Backend & UI",
+      "details": "Modify Forge/HAL logging to include file path/line number information alongside justifications. Update the backend API to provide this lineage data. Enhance 
+'/src/components/FileTreePanel.jsx
+' or create a detail view to display the associated agent action and justification when a file/code block is selected.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/agents/forge_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/hal_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
+        "/home/ubuntu/personal-ai-agent/src/components/FileTreePanel.jsx"
+      ]
+    },
+    {
+      "id": "36.0.6",
+      "task": "Cognitive Polish & UI/UX Refinements",
+      "details": "Review and refine UI component interactions, data visualizations (justification graph, emotion viewer), and overall flow based on cognitive review feedback. Ensure smooth transitions, clear information hierarchy, and highlight potential 'signature moments' identified in the review. Address any minor bugs or inconsistencies.",
+      "artifacts": [
+        "Various UI components in /src/",
+        "Updated CSS/styling files"
+      ]
+    }
+  ],
+  "expected_artifacts": [
+    "Updated /home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
+    "/home/ubuntu/personal-ai-agent/src/components/replay/LoopReplayViewer.jsx",
+    "/home/ubuntu/personal-ai-agent/src/pages/LoopHistoryView.jsx",
+    "Updated agent logic in /app/agents/ (Sage, Orchestrator, Forge, HAL)",
+    "/home/ubuntu/personal-ai-agent/src/components/narrative/ExplanationViewer.jsx",
+    "Updated /home/ubuntu/personal-ai-agent/src/components/FileTreePanel.jsx",
+    "Various polished UI components and styling files"
+  ],
+  "validation_criteria": [
+    "Loop replay functionality accurately visualizes past executions step-by-step using logged data.",
+    "'Explain This Build' feature generates a coherent narrative summary of a selected loop.",
+    "File tree UI allows viewing the cognitive lineage (agent action, justification) for generated files/code.",
+    "UI/UX is polished, clear, and effectively showcases the cognitive processes (reasoning, emotion, reflection).",
+    "Integration with Phases 33-35 is seamless.",
+    "Strict adherence to drift-lock for all modifications."
+  ],
+  "dependencies": [
+    "Completion of Phase 33.0, 34.0 (*if approved*), 35.0"
+  ]
+}
+

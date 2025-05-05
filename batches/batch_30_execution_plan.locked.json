@@ -1,0 +1,55 @@
+{
+  "phase_id": 30,
+  "phase_title": "Phase 30: Error Handling and Recovery Systems",
+  "batches": [
+    {
+      "batch_id": "30.0",
+      "title": "Error Handling Framework & Logging",
+      "prompt": "Implement the core error detection framework within the `loop_controller.py` (or relevant error handling module). Define error categories (e.g., ToolFailure, ValidationError, MemoryAccessError). Implement standardized error logging to `/home/ubuntu/personal-ai-agent/app/memory/runtime_error_log.json`, ensuring conformance to `/home/ubuntu/personal-ai-agent/app/schemas/runtime_error_log.schema.json` (v1.0). Ensure schema exists. Initialize the log file. Consider how error frequency might inform governance metrics (e.g., trust, complexity) in later phases.\n\nRepo Sync Protocol Note: Assume current local repo state.",
+      "expected_output": "Updated `loop_controller.py` with error detection. `/home/ubuntu/personal-ai-agent/app/memory/runtime_error_log.json` initialized and logging implemented according to schema.",
+      "verified": false,
+      "git_commit_hash": "placeholder",
+      "pr_id": "placeholder",
+      "dependencies": [
+        "29.3"
+      ]
+    },
+    {
+      "batch_id": "30.1",
+      "title": "Implement Basic Recovery Strategies",
+      "prompt": "Enhance the error handling framework in `loop_controller.py` to include basic recovery strategies for specific, non-critical error categories. Implement 'safe halt' and 'retry N times'. Configure error type triggers. Log recovery attempts and outcomes in `runtime_error_log.json`.\n\nRepo Sync Protocol Note: Assume current local repo state.",
+      "expected_output": "Updated `loop_controller.py` with basic recovery logic (safe halt, retry). `runtime_error_log.json` updated with recovery attempt details.",
+      "verified": false,
+      "git_commit_hash": "placeholder",
+      "pr_id": "placeholder",
+      "dependencies": [
+        "30.0"
+      ]
+    },
+    {
+      "batch_id": "30.2",
+      "title": "Implement Advanced Recovery & Escalation",
+      "prompt": "Further enhance `loop_controller.py` for critical errors or basic recovery failures. Implement 'retry with modification' and 'escalate to Operator'. For escalation, log to `/home/ubuntu/personal-ai-agent/app/memory/operator_escalation_queue.json` conforming to `/home/ubuntu/personal-ai-agent/app/schemas/operator_escalation_queue.schema.json` (v1.0) and pause loop awaiting Operator input (mechanism defined in Phase 32). Ensure schema exists. Initialize the queue file.\n\nRepo Sync Protocol Note: Assume current local repo state.",
+      "expected_output": "Updated `loop_controller.py` with advanced recovery and Operator escalation logic. `/home/ubuntu/personal-ai-agent/app/memory/operator_escalation_queue.json` initialized and used for escalations.",
+      "verified": false,
+      "git_commit_hash": "placeholder",
+      "pr_id": "placeholder",
+      "dependencies": [
+        "30.1"
+      ]
+    },
+    {
+      "batch_id": "30.3",
+      "title": "Test Error Handling Scenarios",
+      "prompt": "Develop and execute test scenarios to trigger implemented error handling and recovery mechanisms. Inject simulated errors during runs of a subset of Phase 29 scenarios. Verify correct error detection, logging, recovery strategies (basic/advanced), and escalations. Document test results. Update `runtime_error_log.json` and `operator_escalation_queue.json` as expected.\n\nRepo Sync Protocol Note: Assume current local repo state.",
+      "expected_output": "Test execution logs demonstrating successful triggering/execution of error handling/recovery. Updated `runtime_error_log.json` and `operator_escalation_queue.json`. Summary report (`/home/ubuntu/personal-ai-agent/reports/phase_30_error_handling_test_summary.md`).",
+      "verified": false,
+      "git_commit_hash": "placeholder",
+      "pr_id": "placeholder",
+      "dependencies": [
+        "30.2"
+      ]
+    }
+  ]
+}
+

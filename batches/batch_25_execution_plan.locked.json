@@ -1,0 +1,149 @@
+{
+  "phase_id": 25,
+  "phase_title": "Phase 25: Emotion Profiles, Simplification Agent & Active Invariant Checks",
+  "batches": [
+    {
+      "batch_id": "25.0",
+      "title": "Bootstrap Emotion Surfaces & Simplification Agent Scaffold",
+      "prompt": "Objective: Initialize emotion surfaces and create scaffold for Simplification Agent.\n1. **Dependency Check:** Ensure Phase 24 is complete.\n2. **Build Emotion Surfaces:** Create initial placeholder entries in `app/memory/agent_emotion_profile.json` and `app/memory/agent_emotion_state.json` for core agents. Ensure conformance to schemas.\n3. **Build Simplification Agent Scaffold:** Create `app/agents/simplification_agent.py` (placeholder/scaffold). Create `app/memory/simplification_agent_profile.json` and schema defining its basic parameters.\n4. **Functional Validation:** Verify emotion surfaces/schemas created/populated. Verify simplification agent file/profile/schema created.\n5. **Log Wiring & Validate:** Follow standard procedures.\n6. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug surface/schema/scaffold creation.",
+      "components_to_build_or_verify": [
+        "app/memory/agent_emotion_profile.json",
+        "app/schemas/agent_emotion_profile.schema.json",
+        "app/memory/agent_emotion_state.json",
+        "app/schemas/agent_emotion_state.schema.json",
+        "app/agents/simplification_agent.py",
+        "app/memory/simplification_agent_profile.json",
+        "app/schemas/simplification_agent_profile.schema.json"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/memory/agent_emotion_profile.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/agent_emotion_state.json",
+        "/home/ubuntu/personal-ai-agent/app/agents/simplification_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/memory/simplification_agent_profile.json",
+        "/home/ubuntu/personal-ai-agent/app/schemas/simplification_agent_profile.schema.json"
+      ],
+      "verification_steps": [
+        "Verify emotion surfaces/schemas created and populated.",
+        "Verify simplification agent scaffold/profile/schema created.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 25.0 to `true`."
+      ],
+      "dependencies": [
+        "24.x"
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "25.1",
+      "title": "Activate Emotion Influence & Basic Simplification Agent Logic",
+      "prompt": "Objective: Activate emotion influence on agent behavior and implement basic simplification agent functionality.\n1. **Dependency Check:** Ensure batch 25.0 is `verified: true`. Ensure `apply_emotion_profile.py` exists. Ensure complexity audit outputs (24.1) and threshold mechanisms (22.3) exist.\n2. **Activate Emotion Influence:** Modify core agents (Architect, Critic, Pessimist) to import and call `apply_emotion_profile.py`. Ensure the applied emotion *actively modifies* agent parameters (e.g., risk tolerance, critique level) or decision logic. Log the specific influence (e.g., 'Pessimist risk score increased due to high caution state').\n3. **Implement Basic Simplification Logic:** Enhance `simplification_agent.py`. Implement basic logic to consume complexity audit reports or respond to threshold breaches. Initially, log finding or propose refactor task to `mutation_backlog.json` or Operator queue.\n4. **Integration & Test:** Run loop (`loop_0040a`) involving core agents to test active emotion influence logging. Run loop (`loop_0040b`) simulating high complexity to test simplification agent response.\n5. **Functional Validation:** Verify justification logs clearly state how emotion actively influenced parameters/decisions. Verify simplification agent responds to complexity triggers.\n6. **Log Wiring & Validate:** Follow standard procedures.\n7. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug emotion activation logic or simplification agent logic.",
+      "components_to_build_or_verify": [
+        "app/agents/architect_agent.py",
+        "app/agents/critic_agent.py",
+        "app/agents/pessimist_agent.py",
+        "app/validators/apply_emotion_profile.py",
+        "app/agents/simplification_agent.py"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json",
+        "Logs demonstrating active emotion influence on agent parameters/decisions",
+        "/home/ubuntu/personal-ai-agent/app/memory/mutation_backlog.json",
+        "/home/ubuntu/logs/loop_0040a_execution.log",
+        "/home/ubuntu/logs/loop_0040b_execution.log"
+      ],
+      "verification_steps": [
+        "Confirm justifications log active emotion influence.",
+        "Confirm simplification agent responds to complexity triggers.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 25.1 to `true`."
+      ],
+      "dependencies": [
+        "25.0",
+        "24.1",
+        "22.3",
+        "20.0"
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "25.2",
+      "title": "Validate Active Emotion Profile Influence",
+      "prompt": "Objective: Validate that emotion profiles actively and correctly influence agent behavior as implemented in 25.1.\n1. **Dependency Check:** Ensure batch 25.1 is `verified: true`.\n2. **Design Validation Scenarios:** Define scenarios testing how different emotion profiles (high caution vs. high optimism) affect agent decisions under similar inputs.\n3. **Integration & Test:** Execute validation scenarios (`loop_0041a`, `loop_0041b`) by setting specific emotion profiles/states.\n4. **Functional Validation:** Analyze agent outputs and justification logs. Verify that decisions and reasoning demonstrably shift *and* logs explicitly state the emotion-driven influence, consistent with the applied profile.\n5. **Log Wiring & Validate:** Follow standard procedures.\n6. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug emotion activation logic in agents (25.1) if influence is incorrect or not logged.",
+      "components_to_build_or_verify": [
+        "app/agents/architect_agent.py",
+        "app/agents/critic_agent.py",
+        "app/agents/pessimist_agent.py"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json",
+        "Logs explicitly confirming emotion-driven influence consistent with profile",
+        "/home/ubuntu/logs/loop_0041a_execution.log",
+        "/home/ubuntu/logs/loop_0041b_execution.log"
+      ],
+      "verification_steps": [
+        "Confirm agent decisions/reasoning actively reflect applied emotion profiles and logs state this influence.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 25.2 to `true`."
+      ],
+      "dependencies": [
+        "25.1"
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "25.3",
+      "title": "Implement & Activate Cognitive Invariant Checks (Logging)",
+      "prompt": "Objective: Integrate active checks against defined cognitive invariants into key system components, logging violations.\n1. **Dependency Check:** Ensure batches 23.3, 25.1 are `verified: true`.\n2. **Implement Invariant Checks:** Modify key components (`mutation_guard.py`, `loop_controller.py`). Add logic to read relevant invariants from `promethios_invariants.json` and *actively check* if the current action/state would violate them.\n3. **Implement Violation Logging:** If a check detects a potential violation, log details to `invariant_violation_log.json`. Ensure the check is performed even if only logging occurs initially.\n4. **Integration & Test:** Run loops (`loop_0042a`, `loop_0042b`) designed to trigger violations of initial invariants (e.g., complexity budget adherence).\n5. **Functional Validation:** Verify invariant checks are actively performed. Verify `invariant_violation_log.json` is populated correctly when violations are detected.\n6. **Log Wiring & Validate:** Follow standard procedures.\n7. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug invariant checking logic or violation logging.",
+      "components_to_build_or_verify": [
+        "app/validators/mutation_guard.py",
+        "app/controllers/loop_controller.py",
+        "app/memory/promethios_invariants.json",
+        "app/memory/invariant_violation_log.json"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/memory/invariant_violation_log.json",
+        "Logs confirming invariant checks were performed",
+        "/home/ubuntu/logs/loop_0042a_execution.log",
+        "/home/ubuntu/logs/loop_0042b_execution.log"
+      ],
+      "verification_steps": [
+        "Confirm invariant checks are actively performed.",
+        "Confirm invariant violations are detected and logged correctly.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 25.3 to `true`."
+      ],
+      "dependencies": [
+        "23.3",
+        "25.1"
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "25.4",
+      "title": "Phase 25 Mini-Validation: Active Emotion Influence & Invariant Checks",
+      "prompt": "Objective: Validate the *active influence* of Emotion Profiles (25.1/25.2) and the *active checking* of Invariants (25.3).\n1. **Dependency Check:** Ensure batches 25.2, 25.3 are `verified: true`.\n2. **Define Scenario:** Create a test loop scenario (`loop_0043`) designed to: a) run with a specific emotion profile (e.g., high caution), b) attempt an action that should trigger an invariant check (e.g., related to complexity budget).\n3. **Execute Scenario:** Run `loop_0043`.\n4. **Functional Validation:** Analyze logs (`loop_0043_execution.log`, `loop_justification_log.json`, `invariant_violation_log.json`). Verify that: a) agent decisions/parameters were actively influenced by the emotion profile and logs state this, b) the invariant check was actively performed, c) if a violation occurred, it was logged correctly.\n5. **Log Wiring & Validate:** Follow standard procedures.\n6. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug emotion activation (25.1), invariant checking (25.3), or scenario design.",
+      "components_to_build_or_verify": [
+        "Loop execution environment",
+        "Logging surfaces",
+        "Active emotion influence logic",
+        "Active invariant checking logic"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/logs/loop_0043_execution.log",
+        "Logs clearly demonstrating active emotion influence and active invariant checking (with violation logging if applicable)."
+      ],
+      "verification_steps": [
+        "Confirm loop scenario executed.",
+        "Confirm logs show active emotion influence and active invariant checking.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 25.4 to `true`."
+      ],
+      "dependencies": [
+        "25.2",
+        "25.3"
+      ],
+      "verified": false
+    }
+  ]
+}
+

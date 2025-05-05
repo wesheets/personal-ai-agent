@@ -1,0 +1,55 @@
+{
+  "phase_id": 31,
+  "phase_title": "Phase 31: Performance Profiling and Optimization",
+  "batches": [
+    {
+      "batch_id": "31.0",
+      "title": "Profiling Tool Integration & Baseline",
+      "prompt": "Integrate the reusable profiling tool (`/home/ubuntu/personal-ai-agent/app/tools/performance_profiler.py`) into key components (controller, agents, validators). Ensure profiling data is logged to `/home/ubuntu/personal-ai-agent/app/memory/performance_profile_log.json` conforming to `/home/ubuntu/personal-ai-agent/app/schemas/performance_profile_log.schema.json` (v1.0). Ensure schema exists. Initialize the log file. Establish baseline performance metrics by re-running a representative subset of Phase 29 functional test scenarios (from the revised Phase 29 plan) with profiling enabled.\n\nRepo Sync Protocol Note: Assume current local repo state.",
+      "expected_output": "Profiling tool integrated. `/home/ubuntu/personal-ai-agent/app/memory/performance_profile_log.json` initialized and populated with baseline data.",
+      "verified": false,
+      "git_commit_hash": "placeholder",
+      "pr_id": "placeholder",
+      "dependencies": [
+        "30.3"
+      ]
+    },
+    {
+      "batch_id": "31.1",
+      "title": "Bottleneck Analysis",
+      "prompt": "Analyze the baseline performance data from `performance_profile_log.json`. Identify potential bottlenecks (high execution time, call counts, memory usage). Document findings in `/home/ubuntu/personal-ai-agent/reports/performance_bottleneck_report.md`.\n\nRepo Sync Protocol Note: Assume current local repo state.",
+      "expected_output": "`/home/ubuntu/personal-ai-agent/reports/performance_bottleneck_report.md` created with bottleneck analysis.",
+      "verified": false,
+      "git_commit_hash": "placeholder",
+      "pr_id": "placeholder",
+      "dependencies": [
+        "31.0"
+      ]
+    },
+    {
+      "batch_id": "31.2",
+      "title": "Implement Targeted Optimizations",
+      "prompt": "Based on the bottleneck report, implement targeted optimizations (algorithm refinement, caching, reducing redundancy, memory optimization). Document optimizations applied.\n\nRepo Sync Protocol Note: Assume current local repo state.",
+      "expected_output": "Relevant code components updated with optimizations. Documentation provided.",
+      "verified": false,
+      "git_commit_hash": "placeholder",
+      "pr_id": "placeholder",
+      "dependencies": [
+        "31.1"
+      ]
+    },
+    {
+      "batch_id": "31.3",
+      "title": "Post-Optimization Benchmarking",
+      "prompt": "Re-run the same subset of Phase 29 scenarios used for baseline (31.0) with profiling enabled. Collect new performance data in `performance_profile_log.json`. Compare post-optimization metrics against baseline. Summarize findings in `/home/ubuntu/personal-ai-agent/reports/optimization_impact_report.md`.\n\nRepo Sync Protocol Note: Assume current local repo state.",
+      "expected_output": "`performance_profile_log.json` updated with post-optimization data. `/home/ubuntu/personal-ai-agent/reports/optimization_impact_report.md` created.",
+      "verified": false,
+      "git_commit_hash": "placeholder",
+      "pr_id": "placeholder",
+      "dependencies": [
+        "31.2"
+      ]
+    }
+  ]
+}
+
