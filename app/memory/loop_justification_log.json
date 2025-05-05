@@ -106,5 +106,245 @@
     "action_decision": "Loop Finalization (Success)",
     "justification_text": "Loop loop_0007 completed successfully.",
     "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.358976Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0008",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.537586Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0008.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.538114Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0008",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.538950Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Attempt",
+    "justification_text": "Attempting to invoke agent: architect_agent",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.539852Z",
+    "agent_id": "architect",
+    "action_decision": "Generated plan for loop loop_0008 based on intent.",
+    "justification_text": "Created a 4-step plan to address the intent: \t'Generate a plan to refactor the logging utility and have it reviewed by the Critic.\t'. Plan involves creating agent file, implementing capability, registering agent, and updating schemas.",
+    "confidence_score": 0.95
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.540885Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Success (Architect)",
+    "justification_text": "Agent architect_agent completed successfully. Plan saved to /home/ubuntu/personal-ai-agent/app/memory/proposed_plan_loop_0008.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.541443Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Attempt (Critic)",
+    "justification_text": "Attempting to invoke Critic agent to review plan: /home/ubuntu/personal-ai-agent/app/memory/proposed_plan_loop_0008.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.542178Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Error (Critic)",
+    "justification_text": "Exception during Critic invocation: ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.542683Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0008. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0008",
+    "timestamp": "2025-05-05T02:03:07.543669Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Rejected)",
+    "justification_text": "Loop loop_0008 rejected. Reason: Error invoking Critic agent: ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.105745Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0009",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.276800Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0009.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.277589Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0009",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.278245Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Attempt",
+    "justification_text": "Attempting to invoke agent: architect_agent",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.279251Z",
+    "agent_id": "architect",
+    "action_decision": "Generated plan for loop loop_0009 based on intent.",
+    "justification_text": "Created a 4-step plan to address the intent: \t'Test Batch 18.1: Architect generates plan, Critic approves, Pessimist assesses risk.\t'. Plan involves creating agent file, implementing capability, registering agent, and updating schemas.",
+    "confidence_score": 0.95
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.279928Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Success (Architect)",
+    "justification_text": "Agent architect_agent completed successfully. Plan saved to /home/ubuntu/personal-ai-agent/app/memory/proposed_plan_loop_0009.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.280640Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Attempt (Critic)",
+    "justification_text": "Attempting to invoke Critic agent to review plan: /home/ubuntu/personal-ai-agent/app/memory/proposed_plan_loop_0009.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.281615Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Error (Critic)",
+    "justification_text": "Exception during Critic invocation: ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.282244Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0009. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0009",
+    "timestamp": "2025-05-05T02:24:03.283694Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Rejected)",
+    "justification_text": "Loop loop_0009 rejected. Reason: Error invoking Critic agent: ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.100968Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0010",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.256299Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0010.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.257045Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0010",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.257900Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Attempt",
+    "justification_text": "Attempting to invoke agent: architect_agent",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.259231Z",
+    "agent_id": "architect",
+    "action_decision": "Generated plan for loop loop_0010 based on intent.",
+    "justification_text": "Created a 4-step plan to address the intent: \t'Test Batch 18.2: Critic Rejection. Architect generates a plan, Critic is expected to reject it.\t'. Plan involves creating agent file, implementing capability, registering agent, and updating schemas.",
+    "confidence_score": 0.95
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.259985Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Success (Architect)",
+    "justification_text": "Agent architect_agent completed successfully. Plan saved to /home/ubuntu/personal-ai-agent/app/memory/proposed_plan_loop_0010.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.260747Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Attempt (Critic)",
+    "justification_text": "Attempting to invoke Critic agent to review plan: /home/ubuntu/personal-ai-agent/app/memory/proposed_plan_loop_0010.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.261897Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Error (Critic)",
+    "justification_text": "Exception during Critic invocation: ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.262687Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0010. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0010",
+    "timestamp": "2025-05-05T02:32:06.264215Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Rejected)",
+    "justification_text": "Loop loop_0010 rejected. Reason: Error invoking Critic agent: ERROR",
+    "confidence_score": 1.0
   }
 ]
