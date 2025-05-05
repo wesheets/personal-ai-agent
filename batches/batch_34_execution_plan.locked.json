@@ -1,0 +1,78 @@
+{
+  "phase_id": 34,
+  "batch_id": "34.0",
+  "title": "Phase 34.0: Justification Graph Visualization & Reflection Thread",
+  "description": "Enhances cognitive visibility by implementing a graphical representation of the justification chain derived from agent logs and introducing a reflection thread for narrative synthesis. Builds upon Phase 33's activated loop and UI integration.",
+  "prompt": "Operator Directive: Execute Phase 34.0. Enhance the cognitive showcase by visualizing the justification chain and implementing a reflection thread. Leverage existing UI components and memory surfaces where possible. Integrate with the Phase 33 loop controller and logging mechanisms. Goal: Make the system's reasoning process visually explicit and demonstrate self-reflection capabilities through narrative synthesis.",
+  "components": [
+    {
+      "id": "34.0.1",
+      "task": "Develop Justification Graph Data Generation",
+      "details": "Modify 'vertical_loop_controller.py' or create a dedicated utility to process 'agent_justification_log.json'. Structure the data into a format suitable for graph visualization (nodes: agent actions/decisions; edges: sequential/causal links; attributes: key metrics like trust, complexity, emotion). Consider creating a derived data structure or endpoint if direct processing is inefficient. Ensure cross-loop links are included if available.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+        "/home/ubuntu/personal-ai-agent/app/utils/justification_graph_generator.py",
+        "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py" 
+      ]
+    },
+    {
+      "id": "34.0.2",
+      "task": "Implement Justification Graph UI Component",
+      "details": "Develop or adapt an existing UI component (e.g., '/src/components/visualization/JustificationGraphViewer.jsx') using a suitable library (e.g., react-flow, d3) to render the graph data fetched from the backend API. Implement basic interactions like zoom, pan, and potentially node inspection.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/src/components/visualization/JustificationGraphViewer.jsx",
+        "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx" 
+      ]
+    },
+    {
+      "id": "34.0.3",
+      "task": "Define reflection_thread.json Schema & Surface (*Requires Approval*)",
+      "details": "Define the JSON schema for 'reflection_thread.json' to capture structured narrative summaries (e.g., loop phase, key decision, primary justification, emotional context shift, outcome summary). Create the corresponding memory surface file. *This step requires explicit Operator approval before creating new schema/surface files.*",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/schemas/reflection_thread.schema.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json"
+      ]
+    },
+    {
+      "id": "34.0.4",
+      "task": "Implement Reflection Thread Population (*Requires Approval*)",
+      "details": "Modify 'vertical_loop_controller.py' to generate and append structured summary entries to 'reflection_thread.json' at significant points in the loop (e.g., after Orchestrator planning, post-governance checks, after Forge/HAL execution, loop completion). *Depends on approval and creation in 34.0.3.*",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py"
+      ]
+    },
+    {
+      "id": "34.0.5",
+      "task": "Implement Reflection Thread UI Display (*Requires Approval*)",
+      "details": "Develop or adapt a UI component (e.g., '/src/components/narrative/ReflectionThreadViewer.jsx') to fetch and display the content of 'reflection_thread.json' in a clear, chronological, narrative format. Integrate this component into the main UI view. *Depends on approval and creation in 34.0.3.*",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/src/components/narrative/ReflectionThreadViewer.jsx",
+        "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx"
+      ]
+    }
+  ],
+  "expected_artifacts": [
+    "Updated /home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+    "/home/ubuntu/personal-ai-agent/app/utils/justification_graph_generator.py",
+    "Updated /home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
+    "/home/ubuntu/personal-ai-agent/src/components/visualization/JustificationGraphViewer.jsx",
+    "/home/ubuntu/personal-ai-agent/app/schemas/reflection_thread.schema.json (*if approved*)",
+    "/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json (*if approved*)",
+    "/home/ubuntu/personal-ai-agent/src/components/narrative/ReflectionThreadViewer.jsx (*if approved*)",
+    "Updated /home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx"
+  ],
+  "validation_criteria": [
+    "Justification graph accurately visualizes decision flow and key metrics derived from agent logs.",
+    "UI component renders the justification graph interactively.",
+    "*If approved:* 'reflection_thread.json' schema is defined and the surface is created.",
+    "*If approved:* 'reflection_thread.json' is populated with structured narrative summaries during loop execution.",
+    "*If approved:* UI component displays the reflection thread clearly.",
+    "All components integrate seamlessly with the Phase 33 loop controller and UI infrastructure.",
+    "Adherence to drift-lock for modifications to existing components; explicit approval sought for new schema/surface."
+  ],
+  "dependencies": [
+    "Completion of Phase 33.0",
+    "Operator approval for creation of 'reflection_thread.json' schema and surface (for components 34.0.3, 34.0.4, 34.0.5)"
+  ]
+}
+

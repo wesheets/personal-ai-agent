@@ -1,0 +1,210 @@
+{
+  "phase_id": 21,
+  "phase_title": "Phase 21: Belief Introspection, Cost/Budget & Early Readiness Checks",
+  "batches": [
+    {
+      "batch_id": "21.0",
+      "title": "Early Agent & LLM Interface Validation",
+      "prompt": "Objective: Validate core agent implementations and LLM interface readiness early in Phase 21, implementing minimal functionality if needed. Update file trees.\n1. **Dependency Check:** Ensure Phase 20 is complete.\n2. **Audit Agent Implementations:** Review code for Orchestrator, Forge, HAL, Nova, Sage, Critic, Pessimist in `/app/agents/`. Verify functional `run()` methods exist beyond stubs. Document status (functional, partial, stub) in `/home/ubuntu/agent_audit_21.0.md`.\n3. **Audit LLM Interface:** Check for `/app/llm/llm_interface.py` or similar. Perform basic functionality test/review. Document status in `/home/ubuntu/llm_audit_21.0.md`.\n4. **Remediate Critical Stubs (If Necessary):** Implement minimal functional logic for critical agent/LLM stubs required for basic loop flow, focusing on enabling future phases. Flag extensive remediation needs.\n5. **Update File Trees:** Update `file_tree.json` and `promethios_file_tree_plan.*` to reflect validated agent/LLM status and locations.\n6. **Functional Validation:** Verify audit reports created, critical stubs remediated (if applicable), and file trees updated accurately.\n7. **Log Wiring & Validate:** Follow standard procedures.\n8. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug remediation or file tree updates.",
+      "components_to_build_or_verify": [
+        "Agent implementation files in /app/agents/",
+        "Potential LLM interface file in /app/llm/",
+        "/app/memory/file_tree.json",
+        "Relevant promethios_file_tree_plan.* files"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/agent_audit_21.0.md",
+        "/home/ubuntu/llm_audit_21.0.md",
+        "Updated agent/LLM implementation files (if remediated)",
+        "Updated /home/ubuntu/personal-ai-agent/app/memory/file_tree.json",
+        "Updated relevant promethios_file_tree_plan.* files"
+      ],
+      "verification_steps": [
+        "Confirm agent/LLM audits completed.",
+        "Confirm critical stubs remediated or status documented.",
+        "Confirm file trees updated accurately.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 21.0 to `true`."
+      ],
+      "dependencies": [
+        "20.x"
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "21.1",
+      "title": "Setup Belief, Complexity & Legacy Surfaces",
+      "prompt": "Objective: Initialize surfaces for belief management, complexity tracking, and legacy alignment.\n1. **Dependency Check:** Ensure batch 21.0 is `verified: true`. Confirm `belief_surface.json` exists or create if needed.\n2. **Build Complexity Surface:** Create `app/memory/complexity_metrics.json` and schema (`app/schemas/complexity_metrics.schema.json`). Define initial metrics.\n3. **Build Legacy Tracker Surface:** Create `app/memory/legacy_alignment_tracker.json` and schema (`app/schemas/legacy_alignment_tracker.schema.json`) for logging belief changes.\n4. **Functional Validation:** Verify surfaces/schemas created and initialized.\n5. **Log Wiring & Validate:** Follow standard procedures.\n6. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug surface/schema creation.",
+      "components_to_build_or_verify": [
+        "app/memory/belief_surface.json",
+        "app/memory/complexity_metrics.json",
+        "app/schemas/complexity_metrics.schema.json",
+        "app/memory/legacy_alignment_tracker.json",
+        "app/schemas/legacy_alignment_tracker.schema.json"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/memory/complexity_metrics.json",
+        "/home/ubuntu/personal-ai-agent/app/schemas/complexity_metrics.schema.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/legacy_alignment_tracker.json",
+        "/home/ubuntu/personal-ai-agent/app/schemas/legacy_alignment_tracker.schema.json"
+      ],
+      "verification_steps": [
+        "Confirm surfaces and schemas created and initialized.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 21.1 to `true`."
+      ],
+      "dependencies": [
+        "21.0"
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "21.2",
+      "title": "Belief Introspection, Complexity Quantification & Justification Linking",
+      "prompt": "Objective: Implement belief introspection, basic complexity quantification, cross-loop justification linking, and belief conflict logging.\n1. **Dependency Check:** Ensure batch 21.1 is `verified: true`.\n2. **Implement Introspection Agent:** Create/modify `belief_introspection_agent.py` (validated in 21.0) to analyze `belief_surface.json`.\n3. **Implement Complexity Quantification:** Implement basic logic (e.g., in controller or validator) to calculate initial complexity metrics and log to `complexity_metrics.json`.\n4. **Implement Justification Linking:** Update `loop_justification_log.schema.json` for `linked_justification_refs`. Modify logging logic to populate.\n5. **Implement Belief Conflict Logging:** Create `app/memory/belief_conflict_log.json` (+schema). Modify Critic/Introspection agent to detect/log conflicts.\n6. **Integration & Test:** Run loops (`loop_0023`-`loop_0026`) demonstrating introspection, complexity logging, justification linking, and belief conflict logging.\n7. **Functional Validation:** Verify agents run, logs/surfaces populated correctly.\n8. **Log Wiring & Validate:** Follow standard procedures.\n9. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug logic or logging.",
+      "components_to_build_or_verify": [
+        "app/agents/belief_introspection_agent.py",
+        "app/controllers/loop_controller.py",
+        "app/schemas/loop_justification_log.schema.json",
+        "app/memory/belief_conflict_log.json",
+        "app/schemas/belief_conflict_log.schema.json",
+        "app/agents/critic_agent.py"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/memory/complexity_metrics.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/belief_conflict_log.json",
+        "/home/ubuntu/logs/loop_0023_execution.log",
+        "/home/ubuntu/logs/loop_0024_execution.log",
+        "/home/ubuntu/logs/loop_0025_execution.log",
+        "/home/ubuntu/logs/loop_0026_execution.log"
+      ],
+      "verification_steps": [
+        "Confirm introspection occurred.",
+        "Confirm complexity metrics logged.",
+        "Confirm justification links logged.",
+        "Confirm belief conflict logged.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 21.2 to `true`."
+      ],
+      "dependencies": [
+        "21.1"
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "21.3",
+      "title": "Implement Belief Cost Weighting & Activate Influence",
+      "prompt": "Objective: Assign cognitive cost/weight to beliefs and activate its influence in validation/guards.\n1. **Dependency Check:** Ensure batch 21.2 is `verified: true`.\n2. **Build Belief Weight Surface:** Create `app/memory/belief_weight_index.json` and schema.\n3. **Implement Weighting Logic:** Implement logic to calculate/assign belief weights and populate `belief_weight_index.json`.\n4. **Activate Validation/Guard Influence:** Modify justification validation and `mutation_guard.py` to *actively* require stronger justification or *block/escalate* overrides/mutations of high-cost beliefs based on thresholds. Log the influence.\n5. **Integration & Test:** Run weighting logic. Run loop (`loop_0027a`) overriding low-cost belief. Run loop (`loop_0027b`) attempting to override high-cost belief (should be blocked/escalated or require significantly more justification). \n6. **Functional Validation:** Verify weights populated. Verify validation/guards *actively* block/escalate based on belief cost and log this influence.\n7. **Log Wiring & Validate:** Follow standard procedures.\n8. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug weighting logic or guard activation.",
+      "components_to_build_or_verify": [
+        "app/memory/belief_weight_index.json",
+        "app/schemas/belief_weight_index.schema.json",
+        "app/agents/belief_introspection_agent.py",
+        "app/validators/mutation_guard.py",
+        "Justification validation logic"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/memory/belief_weight_index.json",
+        "Logs demonstrating active blocking/escalation based on belief cost",
+        "/home/ubuntu/logs/loop_0027a_execution.log",
+        "/home/ubuntu/logs/loop_0027b_execution.log"
+      ],
+      "verification_steps": [
+        "Confirm belief weights calculated.",
+        "Confirm validation/guards actively influenced execution based on cost.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 21.3 to `true`."
+      ],
+      "dependencies": [
+        "21.2"
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "21.4",
+      "title": "Implement Agent Cognitive Budget & Activate Influence",
+      "prompt": "Objective: Track agent cognitive usage and activate its influence on trust/evaluation.\n1. **Dependency Check:** Ensure batches 20.0, 21.3 are `verified: true`.\n2. **Build Budget Surface:** Create `app/memory/agent_cognitive_budget.json` and schema.\n3. **Implement Budget Tracking Logic:** Modify controller/agents to log usage/spending to `agent_cognitive_budget.json`.\n4. **Implement Penalties/Rewards:** Implement logic to adjust budget based on performance/efficiency.\n5. **Activate Trust Link:** Modify `trust_evaluator.py` (Phase 20) to *actively* adjust trust scores based on budget adherence. Consider adding logic to gate agents with critically low trust/budget.\n6. **Integration & Test:** Run loops (`loop_0028a`, `loop_0028b`) with varying efficiency. Run trust calculation (`loop_0017`) after loops.\n7. **Functional Validation:** Verify budget updated. Verify trust scores *actively reflect* budget adherence. Verify agent gating based on trust/budget works if implemented.\n8. **Log Wiring & Validate:** Follow standard procedures.\n9. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug tracking, trust integration, or gating logic.",
+      "components_to_build_or_verify": [
+        "app/memory/agent_cognitive_budget.json",
+        "app/schemas/agent_cognitive_budget.schema.json",
+        "app/controllers/loop_controller.py",
+        "app/validators/trust_evaluator.py"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/memory/agent_cognitive_budget.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/agent_trust_score.json",
+        "Logs demonstrating trust score changes based on budget",
+        "/home/ubuntu/logs/loop_0028a_execution.log",
+        "/home/ubuntu/logs/loop_0028b_execution.log",
+        "/home/ubuntu/logs/loop_0017_execution.log"
+      ],
+      "verification_steps": [
+        "Confirm budget tracking functional.",
+        "Confirm trust scores actively reflect budget adherence.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 21.4 to `true`."
+      ],
+      "dependencies": [
+        "20.0",
+        "21.3"
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "21.5",
+      "title": "Implement Belief Editing Mechanism",
+      "prompt": "Objective: Allow controlled modification of the belief surface via Operator approval, logging changes.\n1. **Dependency Check:** Ensure batches 20.3, 21.1 are `verified: true`.\n2. **Implement Belief Change Proposal:** Modify Architect or create `belief_manager_agent.py`. Enable proposal of changes to `belief_surface.json`. Proposals must include justification and be saved.\n3. **Integrate with Operator Review:** Modify `loop_controller.py` to route proposals through Operator Review Gate (20.3).\n4. **Implement Belief Update Logic:** Create `belief_updater.py`. If Operator approves, apply change to `belief_surface.json` and log to `legacy_alignment_tracker.json` (21.1).\n5. **Integration & Test:** Run loop (`loop_0029`) proposing change. Provide Operator approval. Verify update and logging.\n6. **Functional Validation:** Confirm proposals require/respect approval. Confirm updates applied and logged.\n7. **Log Wiring & Validate:** Follow standard procedures.\n8. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug proposal, gate integration, or update/logging logic.",
+      "components_to_build_or_verify": [
+        "app/agents/belief_manager_agent.py",
+        "app/controllers/loop_controller.py",
+        "app/validators/belief_updater.py",
+        "app/memory/belief_surface.json"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/memory/proposed_belief_change_0029.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/belief_surface.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/legacy_alignment_tracker.json",
+        "/home/ubuntu/logs/loop_0029_execution.log"
+      ],
+      "verification_steps": [
+        "Confirm belief change required Operator approval.",
+        "Confirm approved change updated `belief_surface.json`.",
+        "Confirm change logged in `legacy_alignment_tracker.json`.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 21.5 to `true`."
+      ],
+      "dependencies": [
+        "20.3",
+        "21.1",
+        "21.2" 
+      ],
+      "verified": false
+    },
+    {
+      "batch_id": "21.6",
+      "title": "Phase 21 Mini-Validation: Active Governance Influence",
+      "prompt": "Objective: Validate the *active influence* of governance mechanisms implemented/activated in Phase 21 (Belief Cost, Cognitive Budget/Trust).\n1. **Dependency Check:** Ensure batches 21.3, 21.4, 21.5 are `verified: true`.\n2. **Define Scenario:** Create a test loop scenario (`loop_0030`) designed to trigger governance checks: a) attempt mutation of a high-cost belief, b) involve an agent with borderline trust/budget.\n3. **Execute Scenario:** Run `loop_0030`.\n4. **Functional Validation:** Analyze logs (`loop_0030_execution.log`, `agent_justification_log.json`). Verify that: a) the high-cost belief mutation was actively blocked/escalated by the guard, b) the agent's low trust/budget influenced its selection/gating or the loop's progression, c) the logs clearly state the governance reason for the influence.\n5. **Log Wiring & Validate:** Follow standard procedures.\n6. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug governance activation logic in 21.3/21.4 or scenario design.",
+      "components_to_build_or_verify": [
+        "Loop execution environment",
+        "Logging surfaces"
+      ],
+      "expected_artifacts": [
+        "/home/ubuntu/logs/loop_0030_execution.log",
+        "Logs clearly demonstrating active governance influence (blocking/gating/parameter adjustment)"
+      ],
+      "verification_steps": [
+        "Confirm loop scenario executed.",
+        "Confirm logs show active influence from Belief Cost and Cognitive Budget/Trust checks.",
+        "Confirm wiring validation passed.",
+        "Update `verified` status for batch 21.6 to `true`."
+      ],
+      "dependencies": [
+        "21.3",
+        "21.4",
+        "21.5"
+      ],
+      "verified": false
+    }
+  ]
+}
+

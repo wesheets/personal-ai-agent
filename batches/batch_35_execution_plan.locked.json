@@ -1,0 +1,80 @@
+{
+  "phase_id": 35,
+  "batch_id": "35.0",
+  "title": "Phase 35.0: Emotion-Aware Tone & Reasoning Integration",
+  "description": "Integrates the system's emotional state (from existing surfaces like agent_emotion_state.json) into the cognitive loop, influencing agent communication tone and potentially reasoning parameters (e.g., risk tolerance). Enhances the UI to visualize emotional context. Builds upon Phase 33/34.",
+  "prompt": "Operator Directive: Execute Phase 35.0. Make the system's emotional state a tangible factor in the cognitive loop. Influence agent communication tone based on current emotion. Explore influencing reasoning parameters (e.g., risk tolerance). Visualize emotional context in the UI. Leverage existing emotion surfaces and governance established in Phases 16-32. Integrate with Phase 33/34 components. Goal: Demonstrate that Promethios's cognition and interaction style are influenced by its internal emotional state.",
+  "components": [
+    {
+      "id": "35.0.1",
+      "task": "Enhance Loop Controller to Read & Propagate Emotion State",
+      "details": "Modify 'vertical_loop_controller.py' to read relevant emotional metrics (e.g., valence, arousal, dominant emotion) from the canonical emotion surface (e.g., 'agent_emotion_state.json') at appropriate loop stages. Pass this emotional context object to invoked agents.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py"
+      ]
+    },
+    {
+      "id": "35.0.2",
+      "task": "Implement Emotion-Aware Agent Communication Wrapper/Logic",
+      "details": "Modify agent wrappers or core logic for key interacting agents (e.g., Orchestrator, Sage, potentially Critic/Pessimist for reporting tone) to adjust communication style/tone based on the emotional context received from the controller. For example, use more cautious phrasing if fear/anxiety is high, or more expansive language if joy/optimism is high. This might involve conditional logic in text generation or selecting pre-defined tone modifiers.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/agents/orchestrator_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/sage_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/critic_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/pessimist_agent.py"
+      ]
+    },
+    {
+      "id": "35.0.3",
+      "task": "Explore Emotion Influence on Reasoning Parameters",
+      "details": "Modify the controller or specific agents (e.g., Orchestrator, Pessimist) to adjust internal parameters based on emotion. Examples: slightly lower risk acceptance threshold for Pessimist if fear is high; potentially broader plan exploration or higher creativity parameter for Orchestrator if curiosity/optimism is high. Log these adjustments clearly in justification logs.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/orchestrator_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/pessimist_agent.py"
+      ]
+    },
+    {
+      "id": "35.0.4",
+      "task": "Implement Emotion Visualization in UI",
+      "details": "Develop or adapt an existing UI component (e.g., '/src/components/visualization/EmotionStateViewer.jsx') to fetch the current system/agent emotional state from the backend API (leveraging Phase 33 infrastructure) and display it graphically (e.g., using gauges, color coding, or a valence-arousal chart). Integrate this component into the main UI view ('/src/pages/LiveCognitionView.jsx').",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/src/components/visualization/EmotionStateViewer.jsx",
+        "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx",
+        "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py"
+      ]
+    },
+    {
+      "id": "35.0.5",
+      "task": "Integrate Emotion Data into Logs",
+      "details": "Ensure that the specific emotional state (e.g., dominant emotion, valence/arousal scores) influencing a decision or communication tone is explicitly logged alongside the action in 'agent_justification_log.json'. If Phase 34 is approved/implemented, summarize significant emotional shifts or influences in 'reflection_thread.json'.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+        "Updated agent wrappers/logic logging calls"
+      ]
+    }
+  ],
+  "expected_artifacts": [
+    "Updated /home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+    "Updated agent logic/wrappers in /app/agents/ (Orchestrator, Sage, Critic, Pessimist)",
+    "/home/ubuntu/personal-ai-agent/src/components/visualization/EmotionStateViewer.jsx",
+    "Updated /home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx",
+    "Updated /home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
+    "Updated agent_justification_log.json entries reflecting emotional context",
+    "Updated reflection_thread.json entries reflecting emotional context (if Phase 34 approved)"
+  ],
+  "validation_criteria": [
+    "Agent communication tone demonstrably changes based on the emotional state read from memory surfaces.",
+    "Adjustments to reasoning parameters based on emotion (if implemented) are logged and potentially observable in agent behavior.",
+    "UI component accurately visualizes the current emotional state fetched from the backend.",
+    "Emotional context is clearly logged alongside corresponding agent actions and justifications.",
+    "Integration with Phase 33/34 components (controller, UI, logging) is seamless.",
+    "Strict adherence to drift-lock: modifications use existing emotion surfaces and schemas."
+  ],
+  "dependencies": [
+    "Completion of Phase 33.0",
+    "Existence of canonical emotion memory surface (e.g., 'agent_emotion_state.json') from Phases 16-32",
+    "Potentially Phase 34.0 (for reflection thread logging integration)"
+  ]
+}
+
