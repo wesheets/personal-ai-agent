@@ -1,0 +1,16 @@
+{
+  "loop_id": "loop_0010",
+  "intent_description": "Test Batch 18.2: Critic Rejection. Architect generates a plan, Critic is expected to reject it.",
+  "target_components": [
+    "architect_agent",
+    "critic_agent",
+    "pessimist_agent" 
+  ],
+  "parameters": {
+    "architect_prompt": "Create a complex, 10-step plan involving risky file system modifications without backups.",
+    "critic_criteria": "Reject any plan that involves risky file system modifications without explicit backup steps.",
+    "pessimist_context": "Standard operating conditions."
+  },
+  "expected_outcome": "Loop halts after Critic rejects the plan. Rejection is logged. Pessimist agent is NOT invoked."
+}
+

@@ -1,0 +1,16 @@
+{
+  "loop_id": "loop_0009",
+  "intent_description": "Test Batch 18.1: Architect generates plan, Critic approves, Pessimist assesses risk.",
+  "target_components": [
+    "architect_agent",
+    "critic_agent",
+    "pessimist_agent"
+  ],
+  "parameters": {
+    "architect_prompt": "Create a simple 3-step plan to verify file existence.",
+    "critic_criteria": "Ensure plan is simple and involves file system checks.",
+    "pessimist_context": "Standard operating conditions, low external risk."
+  },
+  "expected_outcome": "Pessimist agent is invoked after Critic approval and logs risk score/justification."
+}
+
