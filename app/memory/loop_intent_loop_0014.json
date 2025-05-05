@@ -1,0 +1,24 @@
+{
+  "loop_id": "loop_0014",
+  "description": "Test loop for post-mutation validation failure (Batch 19.1). Architect generates plan, Critic/Pessimist approve, Mutation Guard executes write, Post-Mutation Validator detects syntax error.",
+  "agents_involved": [
+    "architect",
+    "critic",
+    "pessimist"
+  ],
+  "target_components": [
+    "architect_agent",
+    "critic_agent",
+    "pessimist_agent",
+    "mutation_guard"
+  ],
+  "initial_goal": "Create a Python file with invalid syntax via mutation to test post-mutation validation.",
+  "parameters": { 
+    "mutation_request": {
+        "action": "write",
+        "file_path": "/home/ubuntu/invalid_syntax_test.py",
+        "content": "def invalid_func():\nprint(\"This has bad indentation\")\ninvalid_func()\n"
+    }
+  }
+}
+

@@ -1,0 +1,20 @@
+[
+  {
+    "loop_id": "direct_test_exec_001",
+    "timestamp_intended": "2025-05-05T06:19:38.025004",
+    "timestamp_finalized": "2025-05-05T06:19:38.025459",
+    "component_modified": "/home/ubuntu/test_exec.py",
+    "diff_summary": "Write operation intended",
+    "status": "executed",
+    "reason": null
+  },
+  {
+    "loop_id": "direct_test_fail_002",
+    "timestamp_intended": "2025-05-05T06:19:38.026298",
+    "timestamp_finalized": "2025-05-05T06:19:38.026647",
+    "component_modified": "/home/ubuntu/test_fail.py",
+    "diff_summary": "Write operation intended",
+    "status": "failed",
+    "reason": "Syntax error detected during validation."
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "loop_id": "loop_0015",
+  "description": "Test loop for high regret scenario (Batch 19.3). Architect generates plan (high confidence assumed), but Critic rejects it.",
+  "agents_involved": [
+    "architect",
+    "critic"
+  ],
+  "target_components": [
+    "architect_agent",
+    "critic_agent"
+  ],
+  "initial_goal": "Generate a plan that the Critic agent is likely to reject, simulating a high-confidence failure.",
+  "parameters": {
+    "simulated_critic_rejection_reason": "Plan deemed too risky or misaligned with core objectives."
+  }
+}
+
