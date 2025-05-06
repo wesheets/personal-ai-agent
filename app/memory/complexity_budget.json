@@ -1,0 +1,62 @@
+{
+  "global_budget": {
+    "total_allocated": 10000,
+    "total_spent": 0,
+    "remaining_budget": 10000
+  },
+  "per_archetype_budget": {
+    "Explore": {
+      "allocated": 2000,
+      "spent": 0,
+      "remaining": 2000
+    },
+    "Optimize": {
+      "allocated": 1500,
+      "spent": 0,
+      "remaining": 1500
+    },
+    "Refactor": {
+      "allocated": 1500,
+      "spent": 0,
+      "remaining": 1500
+    },
+    "Implement": {
+      "allocated": 3000,
+      "spent": 0,
+      "remaining": 3000
+    },
+    "Validate_Verify": {
+      "allocated": 1000,
+      "spent": 0,
+      "remaining": 1000
+    },
+    "Debug_Remediate": {
+      "allocated": 1000,
+      "spent": 0,
+      "remaining": 1000
+    }
+  },
+  "per_domain_budget": {
+    "coding": {
+      "allocated": 4000,
+      "spent": 0,
+      "remaining": 4000
+    },
+    "research": {
+      "allocated": 3000,
+      "spent": 0,
+      "remaining": 3000
+    },
+    "planning": {
+      "allocated": 1500,
+      "spent": 0,
+      "remaining": 1500
+    },
+    "documentation": {
+      "allocated": 1500,
+      "spent": 0,
+      "remaining": 1500
+    }
+  },
+  "last_updated": "2025-05-06T18:53:00Z"
+}
