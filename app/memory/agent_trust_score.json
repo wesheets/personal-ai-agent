@@ -1,0 +1,23 @@
+[
+  {
+    "agent_id": "loop_controller",
+    "score": 0.647,
+    "last_updated": "2025-05-05T21:10:48.439152Z",
+    "data_points_used": 94,
+    "contributing_factors_summary": "Conf: 0.99 (n=94) | Regret: N/A (n=0) | Blame: 0"
+  },
+  {
+    "agent_id": "architect",
+    "score": 0.253,
+    "last_updated": "2025-05-05T21:10:48.439152Z",
+    "data_points_used": 21,
+    "contributing_factors_summary": "Conf: 0.75 (n=12) | Regret: 0.18 (n=6) | Blame: 3 | Rehab: +0.05 (successful_loop_high_confidence)"
+  },
+  {
+    "agent_id": "critic",
+    "score": 0.59,
+    "last_updated": "2025-05-05T21:10:48.439152Z",
+    "data_points_used": 4,
+    "contributing_factors_summary": "Conf: 0.80 (n=4) | Regret: N/A (n=0) | Blame: 0"
+  }
+]
