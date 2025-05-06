@@ -1,0 +1,14 @@
+{
+  "proposal_id": "1efee077-56cd-42b4-97cc-54e826338fbe",
+  "timestamp": "2025-05-06T04:35:42.814146",
+  "loop_id": "loop_0029",
+  "proposing_agent_id": "belief_manager",
+  "target_belief_key": "system_status_test_0029",
+  "proposed_change_type": "added",
+  "current_value": null,
+  "proposed_value": "nominal",
+  "justification": "Adding system status belief for operational monitoring as part of Batch 21.5 testing.",
+  "status": "approved",
+  "operator_review_ref": "op_loop_0029_20250506043542910317",
+  "rejection_reason": null
+}
