@@ -26070,5 +26070,641 @@
       "review_queue/review_request_loop_0022d.json": {
       "status": "created",
       "source": "20.4"
+    },
+    {
+  "plan_id": "promethios_v3.1.4_runtime_synced",
+  "version": "3.1.4",
+  "description": "Runtime synced Promethios file tree plan, tracking key project files and their roles.",
+  "file_manifest": [
+    {
+      "path": "app/schemas/belief_weight_index.schema.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/belief_weight_index.schema.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391117+00:00",
+      "source_last_modified": "2025-05-06T03:47:34.670798+00:00"
+    },
+    {
+      "path": "app/memory/belief_weight_index.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/belief_weight_index.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391159+00:00",
+      "source_last_modified": "2025-05-06T03:52:08.184625+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0027a.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0027a.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391174+00:00",
+      "source_last_modified": "2025-05-06T03:50:29.449118+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0027b.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0027b.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391185+00:00",
+      "source_last_modified": "2025-05-06T03:50:38.883415+00:00"
+    },
+    {
+      "path": "app/agents/belief_introspection_agent.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/belief_introspection_agent.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391198+00:00",
+      "source_last_modified": "2025-05-06T03:48:30.576234+00:00"
+    },
+    {
+      "path": "app/validators/mutation_guard.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/validators/mutation_guard.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391211+00:00",
+      "source_last_modified": "2025-05-06T03:51:25.642290+00:00"
+    },
+    {
+      "path": "app/memory/mutation_log.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/mutation_log.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391232+00:00",
+      "source_last_modified": "2025-05-06T03:52:19.808136+00:00"
+    },
+    {
+      "path": "app/memory/mutation_backlog.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/mutation_backlog.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391257+00:00",
+      "source_last_modified": "2025-05-06T12:44:45.810414+00:00"
+    },
+    {
+      "path": "app/memory/loop_justification_log.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/loop_justification_log.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391266+00:00",
+      "source_last_modified": "2025-05-06T12:44:45.898432+00:00"
+    },
+    {
+      "path": "app/memory/complexity_metrics.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/complexity_metrics.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391274+00:00",
+      "source_last_modified": "2025-05-06T12:44:45.902432+00:00"
+    },
+    {
+      "path": "app/logs/mutation_guard.log",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/logs/mutation_guard.log",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391282+00:00",
+      "source_last_modified": "2025-05-06T12:44:45.810414+00:00"
+    },
+    {
+      "path": "app/schemas/agent_cognitive_budget.schema.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agent_cognitive_budget.schema.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391290+00:00",
+      "source_last_modified": "2025-05-06T03:57:20.900675+00:00"
+    },
+    {
+      "path": "app/memory/agent_cognitive_budget.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/agent_cognitive_budget.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391297+00:00",
+      "source_last_modified": "2025-05-06T12:42:15.151623+00:00"
+    },
+    {
+      "path": "app/controllers/loop_controller.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/controllers/loop_controller.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391305+00:00",
+      "source_last_modified": "2025-05-06T12:44:37.705971+00:00"
+    },
+    {
+      "path": "app/schemas/agent_trust_score.schema.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agent_trust_score.schema.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391312+00:00",
+      "source_last_modified": "2025-05-06T04:00:02.365954+00:00"
+    },
+    {
+      "path": "app/validators/trust_evaluator.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/validators/trust_evaluator.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391319+00:00",
+      "source_last_modified": "2025-05-06T04:00:45.646909+00:00"
+    },
+    {
+      "path": "app/schemas/agents/minimal_test/minimal_test_schemas.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agents/minimal_test/minimal_test_schemas.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391326+00:00",
+      "source_last_modified": "2025-05-06T04:11:03.892450+00:00"
+    },
+    {
+      "path": "app/agents/minimal_test_agent.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/minimal_test_agent.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391333+00:00",
+      "source_last_modified": "2025-05-06T04:11:12.883328+00:00"
+    },
+    {
+      "path": "app/agents/__init__.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/__init__.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391340+00:00",
+      "source_last_modified": "2025-05-06T04:29:41.934603+00:00"
+    },
+    {
+      "path": "app/agents/architect_agent.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/architect_agent.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391347+00:00",
+      "source_last_modified": "2025-05-06T04:05:53.233853+00:00"
+    },
+    {
+      "path": "app/schemas/agents/critic/critic_schemas.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agents/critic/critic_schemas.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391353+00:00",
+      "source_last_modified": "2025-05-06T04:18:06.366936+00:00"
+    },
+    {
+      "path": "app/agents/critic_agent.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/critic_agent.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391360+00:00",
+      "source_last_modified": "2025-05-06T04:18:20.202422+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0028a.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0028a.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391367+00:00",
+      "source_last_modified": "2025-05-06T04:00:56.402479+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0028b.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0028b.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391374+00:00",
+      "source_last_modified": "2025-05-06T04:01:09.089338+00:00"
+    },
+    {
+      "path": "app/schemas/belief_change_proposal.schema.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/belief_change_proposal.schema.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391381+00:00",
+      "source_last_modified": "2025-05-06T04:25:13.988239+00:00"
+    },
+    {
+      "path": "app/schemas/agents/belief_manager/belief_manager_schemas.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agents/belief_manager/belief_manager_schemas.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391387+00:00",
+      "source_last_modified": "2025-05-06T04:25:25.622587+00:00"
+    },
+    {
+      "path": "app/validators/belief_updater.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/validators/belief_updater.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391395+00:00",
+      "source_last_modified": "2025-05-06T04:25:43.507754+00:00"
+    },
+    {
+      "path": "app/agents/belief_manager_agent.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/belief_manager_agent.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391401+00:00",
+      "source_last_modified": "2025-05-06T04:34:06.308536+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0029.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0029.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391407+00:00",
+      "source_last_modified": "2025-05-06T04:26:16.478069+00:00"
+    },
+    {
+      "path": "external/todo_21_6.md",
+      "role": "Todo list for a Phase 21 batch: todo_21_6.md",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391414+00:00",
+      "source_last_modified": "2025-05-06T12:48:25.278053+00:00"
+    },
+    {
+      "path": "external/update_batch_verification_21_6.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_batch_verification_21_6.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391420+00:00",
+      "source_last_modified": "2025-05-06T12:40:08.478201+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0030.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0030.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391427+00:00",
+      "source_last_modified": "2025-05-06T12:41:15.839469+00:00"
+    },
+    {
+      "path": "logs/loop_0030_execution.log",
+      "role": "Execution log for a Phase 21 test loop: loop_0030_execution.log",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391434+00:00",
+      "source_last_modified": "2025-05-06T12:44:45.902432+00:00"
+    },
+    {
+      "path": "external/todo_21_5.md",
+      "role": "Todo list for a Phase 21 batch: todo_21_5.md",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391440+00:00",
+      "source_last_modified": "2025-05-06T04:36:51.213706+00:00"
+    },
+    {
+      "path": "external/update_file_tree_21_1.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_1.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391447+00:00",
+      "source_last_modified": "2025-05-06T02:59:38.574586+00:00"
+    },
+    {
+      "path": "external/update_wiring_21_1.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_1.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391453+00:00",
+      "source_last_modified": "2025-05-06T03:00:23.915215+00:00"
+    },
+    {
+      "path": "external/update_file_tree_21_2.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_2.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391459+00:00",
+      "source_last_modified": "2025-05-06T03:43:20.720300+00:00"
+    },
+    {
+      "path": "external/update_wiring_21_2.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_2.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391466+00:00",
+      "source_last_modified": "2025-05-06T03:44:33.166688+00:00"
+    },
+    {
+      "path": "external/update_promethios_plan_21_2.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_promethios_plan_21_2.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391472+00:00",
+      "source_last_modified": "2025-05-06T03:44:00.337807+00:00"
+    },
+    {
+      "path": "external/update_batch_plan_21_2_verified.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_batch_plan_21_2_verified.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391478+00:00",
+      "source_last_modified": "2025-05-06T03:45:21.976255+00:00"
+    },
+    {
+      "path": "external/update_file_tree_21_3.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_3.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391484+00:00",
+      "source_last_modified": "2025-05-06T03:53:39.167598+00:00"
+    },
+    {
+      "path": "external/update_wiring_21_3.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_3.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391491+00:00",
+      "source_last_modified": "2025-05-06T03:54:41.538251+00:00"
+    },
+    {
+      "path": "external/update_promethios_plan_21_3.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_promethios_plan_21_3.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391497+00:00",
+      "source_last_modified": "2025-05-06T03:54:03.429980+00:00"
+    },
+    {
+      "path": "external/update_batch_plan_21_3_verified.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_batch_plan_21_3_verified.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391505+00:00",
+      "source_last_modified": "2025-05-06T03:55:17.784701+00:00"
+    },
+    {
+      "path": "external/update_file_tree_21_4.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_4.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391511+00:00",
+      "source_last_modified": "2025-05-06T04:19:08.712342+00:00"
+    },
+    {
+      "path": "external/update_wiring_21_4.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_4.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391517+00:00",
+      "source_last_modified": "2025-05-06T04:20:11.895812+00:00"
+    },
+    {
+      "path": "external/update_promethios_plan_21_4.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_promethios_plan_21_4.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391523+00:00",
+      "source_last_modified": "2025-05-06T04:19:49.475416+00:00"
+    },
+    {
+      "path": "external/update_batch_plan_21_4_verified.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_batch_plan_21_4_verified.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391530+00:00",
+      "source_last_modified": "2025-05-06T04:20:52.900974+00:00"
+    },
+    {
+      "path": "external/update_file_tree_21_5.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_5.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391536+00:00",
+      "source_last_modified": "2025-05-06T04:27:46.296042+00:00"
+    },
+    {
+      "path": "external/update_wiring_21_5.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_5.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391542+00:00",
+      "source_last_modified": "2025-05-06T04:28:02.913842+00:00"
+    },
+    {
+      "path": "external/update_file_tree_21_6.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_6.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391548+00:00",
+      "source_last_modified": "2025-05-06T12:47:02.945932+00:00"
+    },
+    {
+      "path": "external/update_wiring_21_6.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_6.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391554+00:00",
+      "source_last_modified": "2025-05-06T12:47:54.079324+00:00"
+    },
+    {
+      "path": "external/phase21_summary.md",
+      "role": "Overall summary of Phase 21 achievements.",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391561+00:00",
+      "source_last_modified": "2025-05-06T12:54:19.532216+00:00"
+    },
+    {
+      "path": "external/phase21_changed_files.txt",
+      "role": "List of changed files during Phase 21, used for PR packaging.",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391567+00:00",
+      "source_last_modified": "2025-05-06T12:55:23.421583+00:00"
+    },
+    {
+      "path": "app/memory/belief_surface.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/belief_surface.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391573+00:00",
+      "source_last_modified": "2025-05-06T04:35:42.923017+00:00"
+    },
+    {
+      "path": "app/schemas/legacy_alignment_tracker.schema.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/legacy_alignment_tracker.schema.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391579+00:00",
+      "source_last_modified": "2025-05-06T02:59:26.243000+00:00"
+    },
+    {
+      "path": "app/memory/legacy_alignment_tracker.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/legacy_alignment_tracker.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391586+00:00",
+      "source_last_modified": "2025-05-06T04:35:42.923017+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0023.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0023.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391592+00:00",
+      "source_last_modified": "2025-05-06T07:19:34+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0024.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0024.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391598+00:00",
+      "source_last_modified": "2025-05-06T07:19:34+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0025.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0025.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391604+00:00",
+      "source_last_modified": "2025-05-06T07:19:34+00:00"
+    },
+    {
+      "path": "app/memory/loop_intent_loop_0026.json",
+      "role": "Loop intent file for Phase 21: loop_intent_loop_0026.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391611+00:00",
+      "source_last_modified": "2025-05-06T03:41:20.955826+00:00"
+    },
+    {
+      "path": "promethios_file_tree_plan.v21.2_introspection_update.json",
+      "role": "Promethios plan for a Phase 21 batch: promethios_file_tree_plan.v21.2_introspection_update.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391617+00:00",
+      "source_last_modified": "2025-05-06T03:44:18.671576+00:00"
+    },
+    {
+      "path": "promethios_file_tree_plan.v21.3_belief_cost.json",
+      "role": "Promethios plan for a Phase 21 batch: promethios_file_tree_plan.v21.3_belief_cost.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391623+00:00",
+      "source_last_modified": "2025-05-06T03:54:09.779245+00:00"
+    },
+    {
+      "path": "promethios_file_tree_plan.v21.4_budget_trust.json",
+      "role": "Promethios plan for a Phase 21 batch: promethios_file_tree_plan.v21.4_budget_trust.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391630+00:00",
+      "source_last_modified": "2025-05-06T04:19:57.384868+00:00"
+    },
+    {
+      "path": "promethios_file_tree_plan.v21.6_active_governance_validation.json",
+      "role": "Promethios plan for a Phase 21 batch: promethios_file_tree_plan.v21.6_active_governance_validation.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391637+00:00",
+      "source_last_modified": "2025-05-06T12:47:34.700350+00:00"
+    },
+    {
+      "path": "app/memory/belief_conflict_log.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/belief_conflict_log.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391644+00:00",
+      "source_last_modified": "2025-05-06T03:42:58.929532+00:00"
+    },
+    {
+      "path": "app/schemas/belief_conflict_log.schema.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/belief_conflict_log.schema.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391650+00:00",
+      "source_last_modified": "2025-05-06T03:04:19.960099+00:00"
+    },
+    {
+      "path": "app/schemas/loop_justification_log.schema.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/loop_justification_log.schema.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391656+00:00",
+      "source_last_modified": "2025-05-06T03:04:00.694286+00:00"
+    },
+    {
+      "path": "app/core/agent_registry.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/core/agent_registry.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391663+00:00",
+      "source_last_modified": "2025-05-06T03:39:05.255769+00:00"
+    },
+    {
+      "path": "app/memory/agent_trust_score.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/agent_trust_score.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391670+00:00",
+      "source_last_modified": "2025-05-06T01:36:53.361610+00:00"
+    },
+    {
+      "path": "app/schemas/core/agent_result.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/core/agent_result.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391676+00:00",
+      "source_last_modified": "2025-05-06T01:36:53.413620+00:00"
+    },
+    {
+      "path": "app/core/base_agent.py",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/core/base_agent.py",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391683+00:00",
+      "source_last_modified": "2025-05-06T01:36:51.302456+00:00"
+    },
+    {
+      "path": "app/memory/proposed_belief_changes/proposed_belief_change_loop_0029.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/proposed_belief_changes/proposed_belief_change_loop_0029.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391689+00:00",
+      "source_last_modified": "2025-05-06T04:35:42.947022+00:00"
+    },
+    {
+      "path": "app/memory/operator_override_log.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/operator_override_log.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391696+00:00",
+      "source_last_modified": "2025-05-06T04:35:42.907014+00:00"
+    },
+    {
+      "path": "file_tree.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/file_tree.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391702+00:00",
+      "source_last_modified": "2025-05-06T12:47:15.378388+00:00"
+    },
+    {
+      "path": "logs/wiring_manifest.json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/logs/wiring_manifest.json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391709+00:00",
+      "source_last_modified": "2025-05-06T12:48:03.707301+00:00"
+    },
+    {
+      "path": "batches/batch_21_execution_plan.locked (1).json",
+      "role": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/batches/batch_21_execution_plan.locked (1).json",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391716+00:00",
+      "source_last_modified": "2025-05-06T12:40:30.592699+00:00"
+    },
+    {
+      "path": "logs/loop_0029_execution.log",
+      "role": "Execution log for a Phase 21 test loop: loop_0029_execution.log",
+      "status": "updated",
+      "batch_info": "Phase 21",
+      "last_synced": "2025-05-06T12:57:11.391722+00:00",
+      "source_last_modified": "2025-05-06T04:35:43.019036+00:00"
     }
+  ],
+  "last_updated": "2025-05-06T12:57:11.391731+00:00",
+  "metadata": {
+    "last_phase_21_sync": "2025-05-06T12:57:11.391734+00:00"
+  }
+}
+
 }
