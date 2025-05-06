@@ -61010,5 +61010,82 @@
     "type": "schema",
     "added_by": "operator",
     "schema_version": "v1.0"
+  },
+  {
+    "path": "app/validators/archetype_classifier.py",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/schemas/loop_summary.schema.json",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/loop_intent_loop_0030a.json",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/loop_intent_loop_0030b.json",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "/home/ubuntu/logs/loop_0030a_execution.log",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "/home/ubuntu/logs/loop_0030b_execution.log",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/complexity_budget.json",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/agent_cognitive_budget.json",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/operator_override_log.json",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "/home/ubuntu/update_wiring_manifest_batch22_1.py",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "/home/ubuntu/wiring_manifest.updated_phase22_batch22_1.json",
+    "status": "verified",
+    "type": "unknown",
+    "added_by": "Manus",
+    "schema_version": "v1.0"
   }
 ]
