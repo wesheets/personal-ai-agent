@@ -1,0 +1,401 @@
+{
+  "wiring_entries": {
+    "loop_entry_0030a_20250506192240424295": {
+      "loop_id": "0030a",
+      "phase_id": "22",
+      "batch_id": "22.1",
+      "timestamp": "2025-05-06T19:22:40.424367+00:00",
+      "intent_file": "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0030a.json",
+      "execution_log": "/home/ubuntu/logs/loop_0030a_execution.log",
+      "input_files": [
+        "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0030a.json"
+      ],
+      "output_files": [
+        "/home/ubuntu/personal-ai-agent/app/validators/archetype_classifier.py",
+        "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+        "/home/ubuntu/personal-ai-agent/app/schemas/loop_summary.schema.json",
+        "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+        "/home/ubuntu/personal-ai-agent/app/memory/complexity_budget.json",
+        "/home/ubuntu/logs/loop_0030a_execution.log",
+        "/home/ubuntu/personal-ai-agent/app/memory/agent_cognitive_budget.json"
+      ],
+      "description": "Integration test for archetype classification and complexity budget tracking (within budget).",
+      "status": "completed"
+    },
+    "loop_entry_0030b_20250506192240424399": {
+      "loop_id": "0030b",
+      "phase_id": "22",
+      "batch_id": "22.1",
+      "timestamp": "2025-05-06T19:22:40.424405+00:00",
+      "intent_file": "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0030b.json",
+      "execution_log": "/home/ubuntu/logs/loop_0030b_execution.log",
+      "input_files": [
+        "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0030b.json"
+      ],
+      "output_files": [
+        "/home/ubuntu/personal-ai-agent/app/validators/archetype_classifier.py",
+        "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+        "/home/ubuntu/personal-ai-agent/app/schemas/loop_summary.schema.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/complexity_budget.json",
+        "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+        "/home/ubuntu/personal-ai-agent/app/memory/operator_override_log.json",
+        "/home/ubuntu/logs/loop_0030b_execution.log",
+        "/home/ubuntu/personal-ai-agent/app/memory/agent_cognitive_budget.json"
+      ],
+      "description": "Integration test for archetype classification and complexity budget influence (designed for over-budget, expecting gating/escalation).",
+      "status": "completed"
+    }
+  },
+  "last_updated": "2025-05-06T19:22:40.424410+00:00",
+  "updated_by": "update_wiring_manifest_batch22_1.py",
+  "description": "Wiring manifest updated after Phase 22, Batch 22.1. Includes archetype classifier and complexity budget implementation and tests.",
+  "execution_logs": [
+    {
+      "loop_id": "0031a",
+      "timestamp": "2025-05-06T19:43:49.478690+00:00",
+      "execution_log_path": "/home/ubuntu/logs/loop_0031a_execution.log",
+      "intent_file_path": "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0031a.json",
+      "output_artifacts": {
+        "loop_summary_entry": "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json"
+      },
+      "batch_id": "22.2"
+    },
+    {
+      "loop_id": "0031b",
+      "timestamp": "2025-05-06T19:43:49.478767+00:00",
+      "execution_log_path": "/home/ubuntu/logs/loop_0031b_execution.log",
+      "intent_file_path": "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0031b.json",
+      "output_artifacts": {
+        "loop_summary_entry": "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+        "loop_summary_rejection_log_entry": "/home/ubuntu/personal-ai-agent/app/memory/loop_summary_rejection_log.json"
+      },
+      "batch_id": "22.2"
+    },
+    {
+      "loop_id": "0031c",
+      "timestamp": "2025-05-06T19:43:49.478788+00:00",
+      "execution_log_path": "/home/ubuntu/logs/loop_0031c_execution.log",
+      "intent_file_path": "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0031c.json",
+      "output_artifacts": {
+        "loop_summary_entry": "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+        "drift_violation_log_entry": "/home/ubuntu/drift_violation_log.json"
+      },
+      "batch_id": "22.2"
+    }
+  ],
+  "critical_file_versions": {
+    "app/controllers/loop_controller.py": {
+      "path": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+      "version": "2025-05-06T19:40:44.486965+00:00",
+      "batch_updated": "22.2"
+    },
+    "app/schemas/loop_summary.schema.json": {
+      "path": "/home/ubuntu/personal-ai-agent/app/schemas/loop_summary.schema.json",
+      "version": "2025-05-06T19:41:08.552163+00:00",
+      "batch_updated": "22.2"
+    },
+    "app/memory/loop_summary_rejection_log.json": {
+      "path": "/home/ubuntu/personal-ai-agent/app/memory/loop_summary_rejection_log.json",
+      "version": "2025-05-06T18:40:02.954291+00:00",
+      "batch_updated": "22.2"
+    },
+    "/home/ubuntu/drift_violation_log.json": {
+      "path": "/home/ubuntu/drift_violation_log.json",
+      "version": "2025-05-06T19:32:37.926039+00:00",
+      "batch_updated": "22.2"
+    }
+  },
+  "files": {
+    "app/validators/schema_updater.py": {
+      "description": "Handles the application of schema changes to schema files (simulated).",
+      "tags": [
+        "validator",
+        "schema_management",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T19:53:15.964612+00:00",
+      "created_timestamp_utc": "2025-05-06T19:53:15.964612+00:00",
+      "size_bytes": 7325,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/schemas/schema_change_request.schema.json": {
+      "description": "JSON schema for schema change proposals.",
+      "tags": [
+        "schema",
+        "schema_management",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T19:56:02.609352+00:00",
+      "created_timestamp_utc": "2025-05-06T19:56:02.609352+00:00",
+      "size_bytes": 3115,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/memory/schema_change_request.json": {
+      "description": "Memory surface for storing schema change proposals.",
+      "tags": [
+        "memory_surface",
+        "schema_management",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T19:57:02.235730+00:00",
+      "created_timestamp_utc": "2025-05-06T19:57:02.235730+00:00",
+      "size_bytes": 1427,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/memory/loop_intent_loop_0032a.json": {
+      "description": "Test loop intent for Batch 22.3 (schema change approval scenario).",
+      "tags": [
+        "test_data",
+        "loop_intent",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T19:56:38.271296+00:00",
+      "created_timestamp_utc": "2025-05-06T19:56:38.271296+00:00",
+      "size_bytes": 491,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/memory/loop_intent_loop_0032b.json": {
+      "description": "Test loop intent for Batch 22.3 (schema change rejection scenario).",
+      "tags": [
+        "test_data",
+        "loop_intent",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T19:56:47.781897+00:00",
+      "created_timestamp_utc": "2025-05-06T19:56:47.781897+00:00",
+      "size_bytes": 485,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/controllers/loop_controller.py": {
+      "description": "Main loop controller, modified to integrate schema change proposal review and application logic, and robust agent_trust_score loading.",
+      "tags": [
+        "controller",
+        "orchestration",
+        "batch_22.3_modified"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T20:04:14.402126+00:00",
+      "created_timestamp_utc": "2025-05-06T20:04:14.402126+00:00",
+      "size_bytes": 38269,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/core/agent_registry.py": {
+      "description": "Agent registry, modified to include SchemaManagerAgent import.",
+      "tags": [
+        "core",
+        "agent_management",
+        "batch_22.3_modified"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T19:58:31.149260+00:00",
+      "created_timestamp_utc": "2025-05-06T19:58:31.149260+00:00",
+      "size_bytes": 5149,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "/home/ubuntu/operator_input/review_decision_loop_0032a_schema_change_proposal_0032a_test.json": {
+      "description": "Simulated operator decision for schema change proposal in loop 0032a.",
+      "tags": [
+        "operator_input",
+        "test_data",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T19:57:16.177257+00:00",
+      "created_timestamp_utc": "2025-05-06T19:57:16.177257+00:00",
+      "size_bytes": 226,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "/home/ubuntu/operator_input/review_decision_loop_0032b_schema_change_proposal_0032b_test.json": {
+      "description": "Simulated operator decision for schema change proposal in loop 0032b.",
+      "tags": [
+        "operator_input",
+        "test_data",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T19:57:34.070778+00:00",
+      "created_timestamp_utc": "2025-05-06T19:57:34.070778+00:00",
+      "size_bytes": 242,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "/home/ubuntu/logs/loop_0032a_execution.log": {
+      "description": "Execution log for test loop 0032a (Batch 22.3).",
+      "tags": [
+        "log",
+        "execution_trace",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T20:04:23.791251+00:00",
+      "created_timestamp_utc": "2025-05-06T20:04:23.791251+00:00",
+      "size_bytes": 4986,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "/home/ubuntu/logs/loop_0032b_execution.log": {
+      "description": "Execution log for test loop 0032b (Batch 22.3).",
+      "tags": [
+        "log",
+        "execution_trace",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T20:04:33.904139+00:00",
+      "created_timestamp_utc": "2025-05-06T20:04:33.904139+00:00",
+      "size_bytes": 4986,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/memory/loop_summary.json": {
+      "description": "Log of loop summaries, updated by Batch 22.3 test loops.",
+      "tags": [
+        "memory_surface",
+        "log",
+        "batch_22.3_updated"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T20:04:33.900138+00:00",
+      "created_timestamp_utc": "2025-05-06T20:04:33.900138+00:00",
+      "size_bytes": 6193,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/memory/operator_override_log.json": {
+      "description": "Log of operator overrides/decisions, updated by Batch 22.3 schema review simulation.",
+      "tags": [
+        "memory_surface",
+        "log",
+        "batch_22.3_updated"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T18:40:02.954291+00:00",
+      "created_timestamp_utc": "2025-05-06T18:40:02.954291+00:00",
+      "size_bytes": 809,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "/home/ubuntu/drift_violation_log.json": {
+      "description": "Log of agent/schema drift violations, potentially updated if new drifts occurred.",
+      "tags": [
+        "log",
+        "drift_tracking",
+        "batch_22.3_updated"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T20:04:33.900138+00:00",
+      "created_timestamp_utc": "2025-05-06T20:04:33.900138+00:00",
+      "size_bytes": 4837,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/memory/complexity_budget.json": {
+      "description": "Complexity budget data, updated by Batch 22.3 test loops.",
+      "tags": [
+        "memory_surface",
+        "resource_management",
+        "batch_22.3_updated"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T18:53:11.430911+00:00",
+      "created_timestamp_utc": "2025-05-06T18:53:11.430911+00:00",
+      "size_bytes": 1151,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/memory/agent_cognitive_budget.json": {
+      "description": "Agent cognitive budget data, potentially updated by Batch 22.3 test loops.",
+      "tags": [
+        "memory_surface",
+        "resource_management",
+        "batch_22.3_updated"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T18:40:02.934287+00:00",
+      "created_timestamp_utc": "2025-05-06T18:40:02.934287+00:00",
+      "size_bytes": 5999,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "app/memory/loop_summary_rejection_log.json": {
+      "description": "Log of loop summary rejections, updated by Batch 22.3 test loops.",
+      "tags": [
+        "memory_surface",
+        "log",
+        "batch_22.3_updated"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T20:04:33.900138+00:00",
+      "created_timestamp_utc": "2025-05-06T20:04:33.900138+00:00",
+      "size_bytes": 1513,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    },
+    "/home/ubuntu/personal-ai-agent/phase22_batch22_3_schema_memory_requirements.md": {
+      "description": "Documentation for schema and memory requirements for Batch 22.3.",
+      "tags": [
+        "documentation",
+        "requirements",
+        "batch_22.3"
+      ],
+      "version": 1,
+      "last_modified_timestamp_utc": "2025-05-06T19:52:37.743632+00:00",
+      "created_timestamp_utc": "2025-05-06T19:52:37.743632+00:00",
+      "size_bytes": 8376,
+      "phase_introduced": "Phase 22",
+      "batch_introduced_or_modified": "22.3",
+      "dependencies": [],
+      "status": "active"
+    }
+  },
+  "last_updated_timestamp_utc": "2025-05-06T20:06:11.369042+00:00",
+  "last_updated_by_script": "update_wiring_manifest_batch22_3.py",
+  "last_updated_for_batch": "22.3"
+}
