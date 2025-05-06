@@ -17394,5 +17394,817 @@
       "review_queue/review_request_loop_0022d.json": {
       "status": "created",
       "source": "20.4"
-  }
+    },
+    "files": {
+    "app/schemas/belief_weight_index.schema.json": {
+      "size_bytes": 1747,
+      "last_modified": "2025-05-06T03:47:34.670798+00:00",
+      "created": "2025-05-06T03:47:34.670798+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/belief_weight_index.schema.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/memory/belief_weight_index.json": {
+      "size_bytes": 422,
+      "last_modified": "2025-05-06T03:52:08.184625+00:00",
+      "created": "2025-05-06T03:52:08.184625+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/belief_weight_index.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/memory/loop_intent_loop_0027a.json": {
+      "size_bytes": 773,
+      "last_modified": "2025-05-06T03:50:29.449118+00:00",
+      "created": "2025-05-06T03:50:29.449118+00:00",
+      "type": "file",
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0027a.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/memory/loop_intent_loop_0027b.json": {
+      "size_bytes": 853,
+      "last_modified": "2025-05-06T03:50:38.883415+00:00",
+      "created": "2025-05-06T03:50:38.883415+00:00",
+      "type": "file",
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0027b.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/agents/belief_introspection_agent.py": {
+      "size_bytes": 15469,
+      "last_modified": "2025-05-06T03:48:30.576234+00:00",
+      "created": "2025-05-06T03:48:30.576234+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/belief_introspection_agent.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/validators/mutation_guard.py": {
+      "size_bytes": 25337,
+      "last_modified": "2025-05-06T03:51:25.642290+00:00",
+      "created": "2025-05-06T03:51:25.642290+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/validators/mutation_guard.py",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/memory/mutation_log.json": {
+      "size_bytes": 1957,
+      "last_modified": "2025-05-06T03:52:19.808136+00:00",
+      "created": "2025-05-06T03:52:19.808136+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/mutation_log.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/memory/mutation_backlog.json": {
+      "size_bytes": 1714,
+      "last_modified": "2025-05-06T12:44:45.810414+00:00",
+      "created": "2025-05-06T12:44:45.810414+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/mutation_backlog.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/memory/loop_justification_log.json": {
+      "size_bytes": 403182,
+      "last_modified": "2025-05-06T12:44:45.898432+00:00",
+      "created": "2025-05-06T12:44:45.898432+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/loop_justification_log.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/memory/complexity_metrics.json": {
+      "size_bytes": 253,
+      "last_modified": "2025-05-06T12:44:45.902432+00:00",
+      "created": "2025-05-06T12:44:45.902432+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/complexity_metrics.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/logs/mutation_guard.log": {
+      "size_bytes": 14653,
+      "last_modified": "2025-05-06T12:44:45.810414+00:00",
+      "created": "2025-05-06T12:44:45.810414+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/logs/mutation_guard.log",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000
+    },
+    "app/schemas/agent_cognitive_budget.schema.json": {
+      "sha256": "7e9e68bfec19b955e1fe65e50f7e5076af540b13bb37dc327068fc9502809e5f",
+      "last_modified": "2025-05-06T03:57:20.900675+00:00",
+      "size_bytes": 2761,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agent_cognitive_budget.schema.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:57:20.900675+00:00"
+    },
+    "app/memory/agent_cognitive_budget.json": {
+      "sha256": "a9e5634af6400c0e2290452ee112387fdc35a7e5db09b3d98642d29508bc2cff",
+      "last_modified": "2025-05-06T12:42:15.151623+00:00",
+      "size_bytes": 5999,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/agent_cognitive_budget.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:42:15.151623+00:00"
+    },
+    "app/controllers/loop_controller.py": {
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/controllers/loop_controller.py",
+      "version": "v21.5",
+      "last_modified": "2025-05-06T12:44:37.705971+00:00",
+      "status": "updated",
+      "size_bytes": 37084,
+      "type": "file",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:44:37.705971+00:00"
+    },
+    "app/schemas/agent_trust_score.schema.json": {
+      "sha256": "ac65259a650046103b8919b3f497174a37a5fc71fcde163fcbaf0a9e7abce0cc",
+      "last_modified": "2025-05-06T04:00:02.365954+00:00",
+      "size_bytes": 1268,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agent_trust_score.schema.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:00:02.365954+00:00"
+    },
+    "app/validators/trust_evaluator.py": {
+      "sha256": "292fadadd0c3c953513d43bc02c9466ea6c15de807d27741f776679409535e77",
+      "last_modified": "2025-05-06T04:00:45.646909+00:00",
+      "size_bytes": 12691,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/validators/trust_evaluator.py",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:00:45.646909+00:00"
+    },
+    "app/schemas/agents/minimal_test/minimal_test_schemas.py": {
+      "sha256": "f496a4472af03c934f931ca5cc5326296d3b80b9f0f95e2a411b016525a3f6ea",
+      "last_modified": "2025-05-06T04:11:03.892450+00:00",
+      "size_bytes": 142,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agents/minimal_test/minimal_test_schemas.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:11:03.892450+00:00"
+    },
+    "app/agents/minimal_test_agent.py": {
+      "sha256": "bd57bfe3c62017961717e1547b49e4e60351836abee4f90047faeb52910fa933",
+      "last_modified": "2025-05-06T04:11:12.883328+00:00",
+      "size_bytes": 917,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/minimal_test_agent.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:11:12.883328+00:00"
+    },
+    "app/agents/__init__.py": {
+      "sha256": "30933672525bb022e3eae6aab7bfb19f0a6afaed3c5d718c754283330db32f18",
+      "last_modified": "2025-05-06T04:29:41.934603+00:00",
+      "size_bytes": 1616,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/__init__.py",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:29:41.934603+00:00"
+    },
+    "app/agents/architect_agent.py": {
+      "sha256": "dd0312d20ccd9d8da14427343da35a5fff0da42eaf12a7c356461065abb8aa9a",
+      "last_modified": "2025-05-06T04:05:53.233853+00:00",
+      "size_bytes": 6109,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/architect_agent.py",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:05:53.233853+00:00"
+    },
+    "app/schemas/agents/critic/critic_schemas.py": {
+      "sha256": "f9e178252cd1361231d3cd21ec3d4c820ae0c0cdc4230ab4b444c702ffd46645",
+      "last_modified": "2025-05-06T04:18:06.366936+00:00",
+      "size_bytes": 1094,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agents/critic/critic_schemas.py",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:18:06.366936+00:00"
+    },
+    "app/agents/critic_agent.py": {
+      "sha256": "8089b6da22c1c56f208bc4201dfb8477a9810601d0dffc629174f1dcfa6f5e2e",
+      "last_modified": "2025-05-06T04:18:20.202422+00:00",
+      "size_bytes": 1852,
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/critic_agent.py",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:18:20.202422+00:00"
+    },
+    "app/memory/loop_intent_loop_0028a.json": {
+      "sha256": "172bdfbf47f9e4fc451ee51ae03733c8d217d4e9454409de78fa4be6b52048f0",
+      "last_modified": "2025-05-06T04:00:56.402479+00:00",
+      "size_bytes": 353,
+      "type": "file",
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0028a.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:00:56.402479+00:00"
+    },
+    "app/memory/loop_intent_loop_0028b.json": {
+      "sha256": "f9e2b58b9eb48813c9b57a3f3ae6bcbae492e1f9caa9e597f022fdce48ff5009",
+      "last_modified": "2025-05-06T04:01:09.089338+00:00",
+      "size_bytes": 493,
+      "type": "file",
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0028b.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:01:09.089338+00:00"
+    },
+    "app/schemas/belief_change_proposal.schema.json": {
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/belief_change_proposal.schema.json",
+      "version": "v21.5",
+      "last_modified": "2025-05-06T04:25:13.988239+00:00",
+      "status": "created",
+      "size_bytes": 2513,
+      "type": "file",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:25:13.988239+00:00"
+    },
+    "app/schemas/agents/belief_manager/belief_manager_schemas.py": {
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/agents/belief_manager/belief_manager_schemas.py",
+      "version": "v21.5",
+      "last_modified": "2025-05-06T04:25:25.622587+00:00",
+      "status": "created",
+      "size_bytes": 2364,
+      "type": "file",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:25:25.622587+00:00"
+    },
+    "app/validators/belief_updater.py": {
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/validators/belief_updater.py",
+      "version": "v21.5",
+      "last_modified": "2025-05-06T04:25:43.507754+00:00",
+      "status": "created",
+      "size_bytes": 5709,
+      "type": "file",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:25:43.507754+00:00"
+    },
+    "app/agents/belief_manager_agent.py": {
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/agents/belief_manager_agent.py",
+      "version": "v21.5",
+      "last_modified": "2025-05-06T04:34:06.308536+00:00",
+      "status": "created",
+      "size_bytes": 3171,
+      "type": "file",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:34:06.308536+00:00"
+    },
+    "app/memory/loop_intent_loop_0029.json": {
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0029.json",
+      "version": "v21.5",
+      "last_modified": "2025-05-06T04:26:16.478069+00:00",
+      "status": "created",
+      "size_bytes": 1126,
+      "type": "file",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:26:16.478069+00:00"
+    },
+    "external/todo_21_6.md": {
+      "size_bytes": 2551,
+      "last_modified": "2025-05-06T12:48:25.278053+00:00",
+      "type": "file",
+      "description": "Todo list for a Phase 21 batch: todo_21_6.md",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:48:25.278053+00:00"
+    },
+    "external/update_batch_verification_21_6.py": {
+      "size_bytes": 2687,
+      "last_modified": "2025-05-06T12:40:08.478201+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_batch_verification_21_6.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:40:08.478201+00:00"
+    },
+    "app/memory/loop_intent_loop_0030.json": {
+      "size_bytes": 1646,
+      "last_modified": "2025-05-06T12:41:15.839469+00:00",
+      "type": "file",
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0030.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:41:15.839469+00:00"
+    },
+    "logs/loop_0030_execution.log": {
+      "size_bytes": 9144,
+      "last_modified": "2025-05-06T12:44:45.902432+00:00",
+      "type": "file",
+      "description": "Execution log for a Phase 21 test loop: loop_0030_execution.log",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:44:45.902432+00:00"
+    },
+    "external/todo_21_5.md": {
+      "size_bytes": 2249,
+      "last_modified": "2025-05-06T04:36:51.213706+00:00",
+      "type": "file",
+      "description": "Todo list for a Phase 21 batch: todo_21_5.md",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:36:51.213706+00:00"
+    },
+    "external/update_file_tree_21_1.py": {
+      "size_bytes": 1696,
+      "last_modified": "2025-05-06T02:59:38.574586+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_1.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T02:59:38.574586+00:00"
+    },
+    "external/update_wiring_21_1.py": {
+      "size_bytes": 2801,
+      "last_modified": "2025-05-06T03:00:23.915215+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_1.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:00:23.915215+00:00"
+    },
+    "external/update_file_tree_21_2.py": {
+      "size_bytes": 1326,
+      "last_modified": "2025-05-06T03:43:20.720300+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_2.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:43:20.720300+00:00"
+    },
+    "external/update_wiring_21_2.py": {
+      "size_bytes": 4836,
+      "last_modified": "2025-05-06T03:44:33.166688+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_2.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:44:33.166688+00:00"
+    },
+    "external/update_promethios_plan_21_2.py": {
+      "size_bytes": 3237,
+      "last_modified": "2025-05-06T03:44:00.337807+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_promethios_plan_21_2.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:44:00.337807+00:00"
+    },
+    "external/update_batch_plan_21_2_verified.py": {
+      "size_bytes": 1827,
+      "last_modified": "2025-05-06T03:45:21.976255+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_batch_plan_21_2_verified.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:45:21.976255+00:00"
+    },
+    "external/update_file_tree_21_3.py": {
+      "size_bytes": 2903,
+      "last_modified": "2025-05-06T03:53:39.167598+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_3.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:53:39.167598+00:00"
+    },
+    "external/update_wiring_21_3.py": {
+      "size_bytes": 3102,
+      "last_modified": "2025-05-06T03:54:41.538251+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_3.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:54:41.538251+00:00"
+    },
+    "external/update_promethios_plan_21_3.py": {
+      "size_bytes": 4894,
+      "last_modified": "2025-05-06T03:54:03.429980+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_promethios_plan_21_3.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:54:03.429980+00:00"
+    },
+    "external/update_batch_plan_21_3_verified.py": {
+      "size_bytes": 1911,
+      "last_modified": "2025-05-06T03:55:17.784701+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_batch_plan_21_3_verified.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:55:17.784701+00:00"
+    },
+    "external/update_file_tree_21_4.py": {
+      "size_bytes": 3206,
+      "last_modified": "2025-05-06T04:19:08.712342+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_4.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:19:08.712342+00:00"
+    },
+    "external/update_wiring_21_4.py": {
+      "size_bytes": 2769,
+      "last_modified": "2025-05-06T04:20:11.895812+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_4.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:20:11.895812+00:00"
+    },
+    "external/update_promethios_plan_21_4.py": {
+      "size_bytes": 3430,
+      "last_modified": "2025-05-06T04:19:49.475416+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_promethios_plan_21_4.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:19:49.475416+00:00"
+    },
+    "external/update_batch_plan_21_4_verified.py": {
+      "size_bytes": 1727,
+      "last_modified": "2025-05-06T04:20:52.900974+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_batch_plan_21_4_verified.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:20:52.900974+00:00"
+    },
+    "external/update_file_tree_21_5.py": {
+      "size_bytes": 3364,
+      "last_modified": "2025-05-06T04:27:46.296042+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_5.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:27:46.296042+00:00"
+    },
+    "external/update_wiring_21_5.py": {
+      "size_bytes": 3474,
+      "last_modified": "2025-05-06T04:28:02.913842+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_5.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:28:02.913842+00:00"
+    },
+    "external/update_file_tree_21_6.py": {
+      "size_bytes": 5225,
+      "last_modified": "2025-05-06T12:47:02.945932+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_file_tree_21_6.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:47:02.945932+00:00"
+    },
+    "external/update_wiring_21_6.py": {
+      "size_bytes": 5401,
+      "last_modified": "2025-05-06T12:47:54.079324+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/update_wiring_21_6.py",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:47:54.079324+00:00"
+    },
+    "external/phase21_summary.md": {
+      "size_bytes": 4498,
+      "last_modified": "2025-05-06T12:54:19.532216+00:00",
+      "type": "file",
+      "description": "Overall summary of Phase 21 achievements.",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:54:19.532216+00:00"
+    },
+    "external/phase21_changed_files.txt": {
+      "size_bytes": 5874,
+      "last_modified": "2025-05-06T12:55:23.421583+00:00",
+      "type": "file",
+      "description": "List of changed files during Phase 21, used for PR packaging.",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:55:23.421583+00:00"
+    },
+    "app/memory/belief_surface.json": {
+      "size_bytes": 209,
+      "last_modified": "2025-05-06T04:35:42.923017+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/belief_surface.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:35:42.923017+00:00"
+    },
+    "app/schemas/legacy_alignment_tracker.schema.json": {
+      "size_bytes": 2055,
+      "last_modified": "2025-05-06T02:59:26.243000+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/legacy_alignment_tracker.schema.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T02:59:26.243000+00:00"
+    },
+    "app/memory/legacy_alignment_tracker.json": {
+      "size_bytes": 482,
+      "last_modified": "2025-05-06T04:35:42.923017+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/legacy_alignment_tracker.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:35:42.923017+00:00"
+    },
+    "app/memory/loop_intent_loop_0023.json": {
+      "size_bytes": 361,
+      "last_modified": "2025-05-06T07:19:34+00:00",
+      "type": "file",
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0023.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:38:30.559830+00:00"
+    },
+    "app/memory/loop_intent_loop_0024.json": {
+      "size_bytes": 283,
+      "last_modified": "2025-05-06T07:19:34+00:00",
+      "type": "file",
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0024.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:38:30.559830+00:00"
+    },
+    "app/memory/loop_intent_loop_0025.json": {
+      "size_bytes": 333,
+      "last_modified": "2025-05-06T07:19:34+00:00",
+      "type": "file",
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0025.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:38:30.559830+00:00"
+    },
+    "app/memory/loop_intent_loop_0026.json": {
+      "size_bytes": 378,
+      "last_modified": "2025-05-06T03:41:20.955826+00:00",
+      "type": "file",
+      "description": "Loop intent file for Phase 21: loop_intent_loop_0026.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:41:20.955826+00:00"
+    },
+    "promethios_file_tree_plan.v21.2_introspection_update.json": {
+      "size_bytes": 3462549,
+      "last_modified": "2025-05-06T03:44:18.671576+00:00",
+      "type": "file",
+      "description": "Promethios plan for a Phase 21 batch: promethios_file_tree_plan.v21.2_introspection_update.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:44:18.671576+00:00"
+    },
+    "promethios_file_tree_plan.v21.3_belief_cost.json": {
+      "size_bytes": 3465426,
+      "last_modified": "2025-05-06T03:54:09.779245+00:00",
+      "type": "file",
+      "description": "Promethios plan for a Phase 21 batch: promethios_file_tree_plan.v21.3_belief_cost.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:54:09.779245+00:00"
+    },
+    "promethios_file_tree_plan.v21.4_budget_trust.json": {
+      "size_bytes": 9079,
+      "last_modified": "2025-05-06T04:19:57.384868+00:00",
+      "type": "file",
+      "description": "Promethios plan for a Phase 21 batch: promethios_file_tree_plan.v21.4_budget_trust.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:19:57.384868+00:00"
+    },
+    "promethios_file_tree_plan.v21.6_active_governance_validation.json": {
+      "size_bytes": 4979,
+      "last_modified": "2025-05-06T12:47:34.700350+00:00",
+      "type": "file",
+      "description": "Promethios plan for a Phase 21 batch: promethios_file_tree_plan.v21.6_active_governance_validation.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:47:34.700350+00:00"
+    },
+    "app/memory/belief_conflict_log.json": {
+      "size_bytes": 425,
+      "last_modified": "2025-05-06T03:42:58.929532+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/belief_conflict_log.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:42:58.929532+00:00"
+    },
+    "app/schemas/belief_conflict_log.schema.json": {
+      "size_bytes": 2131,
+      "last_modified": "2025-05-06T03:04:19.960099+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/belief_conflict_log.schema.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:04:19.960099+00:00"
+    },
+    "app/schemas/loop_justification_log.schema.json": {
+      "size_bytes": 1790,
+      "last_modified": "2025-05-06T03:04:00.694286+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/loop_justification_log.schema.json",
+      "permissions": "644",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:04:00.694286+00:00"
+    },
+    "app/core/agent_registry.py": {
+      "size_bytes": 4857,
+      "last_modified": "2025-05-06T03:39:05.255769+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/core/agent_registry.py",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T03:39:05.255769+00:00"
+    },
+    "app/memory/agent_trust_score.json": {
+      "size_bytes": 725,
+      "last_modified": "2025-05-06T01:36:53.361610+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/agent_trust_score.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T01:36:53.361610+00:00"
+    },
+    "app/schemas/core/agent_result.py": {
+      "size_bytes": 1500,
+      "last_modified": "2025-05-06T01:36:53.413620+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/schemas/core/agent_result.py",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T01:36:53.413620+00:00"
+    },
+    "app/core/base_agent.py": {
+      "size_bytes": 14618,
+      "last_modified": "2025-05-06T01:36:51.302456+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/core/base_agent.py",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T01:36:51.302456+00:00"
+    },
+    "app/memory/proposed_belief_changes/proposed_belief_change_loop_0029.json": {
+      "size_bytes": 536,
+      "last_modified": "2025-05-06T04:35:42.947022+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/proposed_belief_changes/proposed_belief_change_loop_0029.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:35:42.947022+00:00"
+    },
+    "app/memory/operator_override_log.json": {
+      "size_bytes": 809,
+      "last_modified": "2025-05-06T04:35:42.907014+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/app/memory/operator_override_log.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:35:42.907014+00:00"
+    },
+    "file_tree.json": {
+      "size_bytes": 8234,
+      "last_modified": "2025-05-06T12:47:15.378388+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/file_tree.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:47:15.378388+00:00"
+    },
+    "logs/wiring_manifest.json": {
+      "size_bytes": 3888,
+      "last_modified": "2025-05-06T12:48:03.707301+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/logs/wiring_manifest.json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:48:03.707301+00:00"
+    },
+    "batches/batch_21_execution_plan.locked (1).json": {
+      "size_bytes": 16229,
+      "last_modified": "2025-05-06T12:40:30.592699+00:00",
+      "type": "file",
+      "description": "File related to Phase 21 development. Path: /home/ubuntu/personal-ai-agent-phase21/batches/batch_21_execution_plan.locked (1).json",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T12:40:30.592699+00:00"
+    },
+    "logs/loop_0029_execution.log": {
+      "size_bytes": 8033,
+      "last_modified": "2025-05-06T04:35:43.019036+00:00",
+      "type": "file",
+      "description": "Execution log for a Phase 21 test loop: loop_0029_execution.log",
+      "permissions": "664",
+      "owner_uid": 1000,
+      "group_gid": 1000,
+      "created": "2025-05-06T04:35:43.019036+00:00"
+    }
+  },
+  "metadata": {
+    "last_updated": "2025-05-06T12:56:25.424121+00:00",
+    "description": "File tree structure and metadata for the personal-ai-agent project (Phase 21).",
+    "version": "Phase 21 PR Package"
+  },
+  "last_updated": "2025-05-06T12:56:25.424121+00:00"
 ]
