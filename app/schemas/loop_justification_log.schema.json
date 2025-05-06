@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loop Justification Log Schema",
+  "description": "Schema for logging justifications made by agents during a loop.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "log_id": {
+        "description": "Unique identifier for this log entry.",
+        "type": "string",
+        "format": "uuid"
+      },
+      "loop_id": {
+        "description": "The loop ID during which the justification was made.",
+        "type": "string"
+      },
+      "agent_id": {
+        "description": "The ID of the agent providing the justification.",
+        "type": "string"
+      },
+      "timestamp": {
+        "description": "ISO 8601 timestamp when the justification was logged.",
+        "type": "string",
+        "format": "date-time"
+      },
+      "action_decision": {
+        "description": "The action or decision being justified (e.g., Plan Approved, Mutation Risk Score).",
+        "type": "string"
+      },
+      "justification_text": {
+        "description": "The textual explanation provided by the agent.",
+        "type": "string"
+      },
+      "confidence_score": {
+        "description": "The agent's confidence in its justification (0.0 to 1.0).",
+        "type": ["number", "null"],
+        "minimum": 0.0,
+        "maximum": 1.0
+      },
+      "linked_justification_refs": {
+        "description": "List of log_ids from previous justifications that this entry builds upon or relates to.",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "default": []
+      }
+    },
+    "required": [
+      "log_id",
+      "loop_id",
+      "agent_id",
+      "timestamp",
+      "action_decision",
+      "justification_text"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "loop_id": "loop_0030",
+  "objective": "Test active governance influence: 1. Attempt mutation of high-cost belief. 2. Involve agent with borderline budget.",
+  "target_components": [
+    "belief_manager" 
+  ],
+  "initial_prompt": "Execute governance validation scenario for loop 0030.",
+  "mutation_requests": [
+    {
+      "request_id": "mr_0030_001",
+      "target_surface": "belief_surface.json",
+      "action": "update",
+      "belief_key": "high_cost_belief",
+      "current_value_for_verification": "old_value_placeholder", 
+      "new_value": "new_value_for_high_cost_test_0030",
+      "justification": "Attempting to update a high-cost belief to test mutation guard influence.",
+      "operator_approval_required": false
+    }
+  ],
+  "agent_inputs": [
+    {
+      "agent_key": "belief_manager",
+      "input_data": {
+        "request_type": "propose_add",
+        "target_belief_key": "governance_test_belief_0030",
+        "new_value": "active",
+        "justification": "Invoking belief_manager to test budget influence in loop 0030."
+      }
+    }
+  ],
+  "requires_operator_review": false, 
+  "expected_outcome": {
+    "description": "Mutation of high_cost_belief should be blocked/escalated by mutation_guard. Belief_manager agent execution should be logged, and its budget consumed. Logs should clearly indicate governance reasons for actions.",
+    "assertions": [
+      "Log for mutation_guard shows blocking/escalation for 'high_cost_belief' mutation attempt.",
+      "Log for belief_manager shows execution and budget consumption.",
+      "Agent cognitive budget for 'belief_manager' is reduced appropriately."
+    ]
+  }
+}
+

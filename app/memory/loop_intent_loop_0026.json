@@ -1,0 +1,9 @@
+{
+  "loop_id": "loop_0026",
+  "intent": "Introduce a contradictory belief into belief_surface.json to trigger a logged belief conflict.",
+  "target_components": [
+    "belief_introspection"
+  ],
+  "validation_surface": "belief_conflict_log.json",
+  "epistemic_anchor": "If a contradiction with existing belief ID is detected, a conflict must be logged with correct metadata."
+}

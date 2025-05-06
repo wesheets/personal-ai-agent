@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Belief Weight Index",
+  "description": "Schema for storing cognitive cost or weight associated with beliefs in the belief_surface.json.",
+  "type": "object",
+  "properties": {
+    "index": {
+      "description": "An object where keys are belief IDs (matching keys in belief_surface.json) and values are their weights.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "weight": {
+            "description": "A numerical value representing the cognitive cost or importance of the belief (e.g., 0.0 to 1.0). Higher values indicate higher cost to change.",
+            "type": "number",
+            "minimum": 0
+          },
+          "source": {
+            "description": "How the weight was determined (e.g., \"manual\", \"derived_from_creed\", \"frequency_based\").",
+            "type": "string"
+          },
+          "last_updated": {
+            "description": "Timestamp of when the weight was last calculated or updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "weight",
+          "source",
+          "last_updated"
+        ]
+      }
+    },
+    "calculation_metadata": {
+      "description": "Metadata about the last weight calculation process.",
+      "type": "object",
+      "properties": {
+        "last_run_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "method_used": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "last_run_timestamp",
+        "method_used"
+      ]
+    }
+  },
+  "required": [
+    "index",
+    "calculation_metadata"
+  ]
+}
+

@@ -1,32 +1,45 @@
 #!/usr/bin/env python3.11
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone # Batch 21.4: Added timezone
 from collections import defaultdict
 
 # Define paths
-BASE_MEMORY_PATH = "/home/ubuntu/personal-ai-agent/app/memory"
+# Batch 21.4: Use PROJECT_ROOT consistently
+PROJECT_ROOT = "/home/ubuntu/personal-ai-agent-phase21"
+BASE_MEMORY_PATH = os.path.join(PROJECT_ROOT, "app/memory")
 JUSTIFICATION_LOG_PATH = os.path.join(BASE_MEMORY_PATH, "loop_justification_log.json")
 REGRET_LOG_PATH = os.path.join(BASE_MEMORY_PATH, "loop_regret_score.json")
 BLAME_LOG_PATH = os.path.join(BASE_MEMORY_PATH, "agent_blame_log.json")
 TRUST_SCORE_PATH = os.path.join(BASE_MEMORY_PATH, "agent_trust_score.json")
 REHAB_PATHWAYS_PATH = os.path.join(BASE_MEMORY_PATH, "trust_rehabilitation_pathways.json")
 LOOP_SUMMARY_PATH = os.path.join(BASE_MEMORY_PATH, "loop_summary.json") # Added for loop status
+# Batch 21.4: Add budget path
+AGENT_BUDGET_PATH = os.path.join(BASE_MEMORY_PATH, "agent_cognitive_budget.json")
+
+# Batch 21.4: Define budget threshold for penalty
+LOW_BUDGET_THRESHOLD = 20.0
+BUDGET_PENALTY_FACTOR = 0.15 # Penalty applied if budget is below threshold
 
 def load_json_log(path):
-    """Loads a JSON log file, returning an empty list on error."""
+    """Loads a JSON log file, returning an empty list or dict on error."""
+    # Batch 21.4: Handle dict return for budget file
+    default_return = []
+    if os.path.basename(path) == "agent_cognitive_budget.json":
+        default_return = {"agents": {}, "metadata": {}}
+        
     try:
         with open(path, 'r') as f:
             content = f.read()
             if not content.strip():
-                return []
+                return default_return
             return json.loads(content)
     except FileNotFoundError:
-        print(f"Warning: Log file not found at {path}. Returning empty list.")
-        return []
+        print(f"Warning: Log file not found at {path}. Returning default.")
+        return default_return
     except json.JSONDecodeError as e:
-        print(f"Warning: Could not decode JSON from {path}: {e}. Returning empty list.")
-        return []
+        print(f"Warning: Could not decode JSON from {path}: {e}. Returning default.")
+        return default_return
 
 def save_json(data, path):
     """Saves data to a JSON file."""
@@ -69,13 +82,16 @@ def check_rehab_conditions(pathway, loop_data):
     return False
 
 def calculate_trust_scores():
-    """Calculates trust scores for agents based on available logs, including rehab pathways."""
+    """Calculates trust scores for agents based on available logs, including rehab pathways and budget adherence."""
     justification_log = load_json_log(JUSTIFICATION_LOG_PATH)
     regret_log = load_json_log(REGRET_LOG_PATH)
     blame_log = load_json_log(BLAME_LOG_PATH)
     trust_scores = load_json_log(TRUST_SCORE_PATH)
     rehab_pathways = load_json_log(REHAB_PATHWAYS_PATH)
     loop_summary = load_json_log(LOOP_SUMMARY_PATH)
+    # Batch 21.4: Load budget data
+    budget_data = load_json_log(AGENT_BUDGET_PATH)
+    agent_budgets = budget_data.get("agents", {})
 
     # --- Data Aggregation ---
     agent_data = defaultdict(lambda: {
@@ -154,13 +170,14 @@ def calculate_trust_scores():
 
     # Process Blame Log
     for entry in blame_log:
-        agent_id = entry.get('responsible_agent')
+        # Batch 20.3 used 'responsible_agent', check for 'suspected_agent_id' too
+        agent_id = entry.get('suspected_agent_id') or entry.get('responsible_agent') 
         if agent_id:
             agent_data[agent_id]['blame_count'] += 1
 
     # --- Calculate and Update Scores ---
     updated_trust_scores = {entry.get('agent_id'): entry for entry in trust_scores if entry.get('agent_id')}
-    current_time = datetime.utcnow().isoformat() + "Z"
+    current_time = datetime.now(timezone.utc).isoformat() # Batch 21.4: Use timezone aware
 
     for agent_id, data in agent_data.items():
         # Calculate Base Score (as before)
@@ -197,14 +214,30 @@ def calculate_trust_scores():
                         rehab_bonus += pathway.get("trust_bonus", 0.0)
                         completed_pathways.append(pathway.get("pathway_id"))
         
-        # Apply Rehab Bonus and Clamp Score
-        score = calculated_base_score + rehab_bonus
+        # Batch 21.4: Calculate Budget Penalty
+        budget_penalty = 0.0
+        current_budget = None
+        if agent_id in agent_budgets:
+            current_budget = agent_budgets[agent_id].get("current_budget")
+            if current_budget is not None and current_budget < LOW_BUDGET_THRESHOLD:
+                budget_penalty = BUDGET_PENALTY_FACTOR # Apply flat penalty if below threshold
+                print(f"Applying budget penalty ({budget_penalty:.2f}) to {agent_id} (Budget: {current_budget:.2f} < {LOW_BUDGET_THRESHOLD:.2f})")
+        
+        # Apply Rehab Bonus, Budget Penalty and Clamp Score
+        score = calculated_base_score + rehab_bonus - budget_penalty # Subtract budget penalty
         score = max(0.0, min(1.0, score))
 
         # Update Summary String
         factors_summary = f"Conf: {f'{avg_confidence:.2f}' if avg_confidence is not None else 'N/A'} (n={data['confidence_count']}) | Regret: {f'{avg_regret:.2f}' if avg_regret is not None else 'N/A'} (n={data['regret_count']}) | Blame: {data['blame_count']}"
         if rehab_bonus > 0:
             factors_summary += f" | Rehab: +{rehab_bonus:.2f} ({','.join(completed_pathways)})"
+        # Batch 21.4: Add budget info to summary
+        if current_budget is not None:
+             factors_summary += f" | Budget: {current_budget:.2f}"
+             if budget_penalty > 0:
+                 factors_summary += f" (Penalty: -{budget_penalty:.2f})"
+        else:
+             factors_summary += " | Budget: N/A"
 
         updated_trust_scores[agent_id] = {
             'agent_id': agent_id,
@@ -213,7 +246,7 @@ def calculate_trust_scores():
             'data_points_used': data_points, # Note: Doesn't include rehab pathway count yet
             'contributing_factors_summary': factors_summary
         }
-        print(f"Updated trust score for {agent_id}: {score:.3f} (Base: {calculated_base_score:.3f}, Rehab: {rehab_bonus:.3f})")
+        print(f"Updated trust score for {agent_id}: {score:.3f} (Base: {calculated_base_score:.3f}, Rehab: {rehab_bonus:.3f}, Budget Penalty: {budget_penalty:.3f})")
 
     # Save updated scores
     save_json(list(updated_trust_scores.values()), TRUST_SCORE_PATH)

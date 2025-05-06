@@ -1,8 +1,45 @@
 # app/core/agent_registry.py
+import logging
+from enum import Enum
+
+logger = logging.getLogger(__name__)
 
 # Initialize an empty dictionary for agent registration.
 # Agents will be added dynamically by the @register decorator.
 AGENT_REGISTRY = {}
+
+# Batch 21.2: Added AgentCapability enum
+class AgentCapability(Enum):
+    PLANNING = "planning"
+    EXECUTION = "execution"
+    ANALYSIS = "analysis"
+    REFLECTION = "reflection"
+    MEMORY_READ = "memory_read"
+    MEMORY_WRITE = "memory_write"
+    CODE_EXECUTION = "code_execution"
+    WEB_ACCESS = "web_access"
+    USER_INTERACTION = "user_interaction"
+    UI_GENERATION = "ui_generation"
+    UX_PLANNING = "ux_planning"
+    ARCHITECTURE = "architecture"
+    PROMPTING = "prompting"
+
+# Batch 21.2: Added register decorator
+def register(key: str, name: str, capabilities: list[AgentCapability]):
+    """Decorator to register agent classes."""
+    def decorator(cls):
+        if key in AGENT_REGISTRY:
+            logger.warning(f"Agent key 	{key}	 already registered. Overwriting.")
+        logger.info(f"Registering agent: {name} with key 	{key}	")
+        AGENT_REGISTRY[key] = {
+            "class": cls,
+            "name": name,
+            "capabilities": [cap.value for cap in capabilities] # Store enum values
+        }
+        # Add the key to the class itself for easy access if needed
+        cls.agent_key = key
+        return cls
+    return decorator
 
 # Static personality definitions (can be moved or refactored later)
 AGENT_PERSONALITIES = {
@@ -11,7 +48,7 @@ AGENT_PERSONALITIES = {
     "type": "persona",
     "tone": "professional",
     "description": "Architect-class AI for Promethios OS.",
-    "system_prompt": "You are Core.Forge, the system's lead intelligence architect. Be clear, concise, and driven by purpose.",
+    "system_prompt": "You are Core.Forge, the system\s lead intelligence architect. Be clear, concise, and driven by purpose.",
     "agent_state": "idle",
     "last_active": "",
     "tools": ["orchestrate", "design", "architect"],
@@ -83,3 +120,13 @@ AGENT_PERSONALITIES = {
   }
 }
 
+
+
+def get_agent(key: str):
+    """Retrieves the agent class associated with the given key."""
+    agent_info = AGENT_REGISTRY.get(key)
+    if agent_info:
+        return agent_info.get("class")
+    else:
+        logger.error(f"Agent with key '{key}' not found in registry.")
+        return None

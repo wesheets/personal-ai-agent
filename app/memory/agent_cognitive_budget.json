@@ -1,0 +1,197 @@
+{
+  "agents": {
+    "architect_agent": {
+      "agent_id": "architect_agent",
+      "current_budget": -65.0,
+      "max_budget": 100.0,
+      "usage_history": [
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:04:54.206664+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:04:54.230249+00:00",
+          "amount_used": 15.0,
+          "reason": "Architect invocation error penalty"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:05:19.282413+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:05:19.315307+00:00",
+          "amount_used": 15.0,
+          "reason": "Architect invocation error penalty"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:06:01.842156+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028b",
+          "timestamp": "2025-05-06T04:06:33.258565+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:07:02.407243+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028b",
+          "timestamp": "2025-05-06T04:07:15.043047+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:07:46.370446+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:08:14.314915+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:09:15.221232+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:09:56.927256+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:10:17.662168+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:11:24.926207+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:11:36.029339+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:12:11.786973+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:12:30.645935+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:12:52.489595+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:13:20.395597+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:13:43.806571+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:14:16.048260+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:14:40.303453+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:15:21.900050+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:15:53.964832+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:16:27.482195+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:16:55.883226+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:17:26.629658+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:17:56.265383+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        },
+        {
+          "loop_id": "loop_0028a",
+          "timestamp": "2025-05-06T04:18:29.805994+00:00",
+          "amount_used": 5.0,
+          "reason": "Architect execution"
+        }
+      ],
+      "last_updated": "2025-05-06T04:18:29.805994+00:00"
+    },
+    "belief_manager": {
+      "remaining_budget": 7.0, 
+      "total_spent": 93.0, 
+      "last_update_loop": "loop_0029"
+    }
+  },
+  "metadata": {
+    "last_calculation_timestamp": "2025-05-06T04:18:29.805994+00:00",
+    "calculation_method": null
+  },
+  "last_updated": "2025-05-06T04:35:42.814398+00:00"
+}
+

@@ -1,0 +1,16 @@
+{
+  "loop_id": "loop_0028b",
+  "intent_description": "Test inefficient agent budget usage. Run Architect, Critic, and Introspection agents for a complex task.",
+  "target_components": [
+    "architect_agent",
+    "critic_agent",
+    "belief_introspection"
+  ],
+  "intent_params": {
+    "architect_instruction": {
+      "task": "Generate a detailed multi-page plan for a complex data analysis pipeline, including error handling and reporting."
+    }
+  },
+  "requires_operator_review": false
+}
+

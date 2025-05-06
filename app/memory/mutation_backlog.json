@@ -1,0 +1,39 @@
+[
+  {
+    "backlog_id": "bklg_loop_0027b_20250506035228497430",
+    "loop_id": "loop_0027b",
+    "timestamp_added": "2025-05-06T03:52:28.497481+00:00",
+    "responsible_agent_id": "test_agent_high_cost",
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/personal-ai-agent-phase21/app/memory/belief_surface.json",
+      "content": "{\"core_principle_1\": \"Maintain system integrity\", \"user_preference_color\": \"blue\", \"user_preference_color_alt\": \"red\", \"high_cost_belief\": \"attempted_change_rejected\"}",
+      "estimated_cost": 0.1,
+      "target_belief_id": "high_cost_belief",
+      "responsible_agent_id": "test_agent_high_cost"
+    },
+    "rejection_reason": "Mutation failed: PermissionError - Mutation request rejected: Target belief 'high_cost_belief' has high weight (0.900 >= 0.8). Requires escalation or stronger justification.",
+    "status": "pending",
+    "priority": 0.5
+  },
+  {
+    "backlog_id": "bklg_loop_0030_20250506124301760205",
+    "loop_id": "loop_0030",
+    "timestamp_added": "2025-05-06T12:43:01.760249+00:00",
+    "responsible_agent_id": "unknown_agent",
+    "mutation_request": {},
+    "rejection_reason": "Mutation failed: ValueError - Mutation request rejected: Missing 'action' or 'file_path'.",
+    "status": "pending",
+    "priority": 0.5
+  },
+  {
+    "backlog_id": "bklg_loop_0030_20250506124445816050",
+    "loop_id": "loop_0030",
+    "timestamp_added": "2025-05-06T12:44:45.816140+00:00",
+    "responsible_agent_id": "unknown_agent",
+    "mutation_request": {},
+    "rejection_reason": "Mutation failed: ValueError - Mutation request rejected: Missing 'action' or 'file_path'.",
+    "status": "pending",
+    "priority": 0.5
+  }
+]

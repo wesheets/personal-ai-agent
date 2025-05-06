@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Belief Change Proposal Schema",
+  "description": "Schema for defining a proposed change to the belief surface, requiring justification and potentially operator review.",
+  "type": "object",
+  "properties": {
+    "proposal_id": {
+      "description": "Unique identifier for this proposal.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "description": "ISO 8601 timestamp when the proposal was created.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "loop_id": {
+      "description": "The loop ID during which the proposal was generated.",
+      "type": "string"
+    },
+    "proposing_agent_id": {
+      "description": "The agent ID that generated this proposal.",
+      "type": "string"
+    },
+    "target_belief_key": {
+      "description": "The key of the belief targeted for change in belief_surface.json.",
+      "type": "string"
+    },
+    "proposed_change_type": {
+      "description": "The type of change proposed.",
+      "type": "string",
+      "enum": ["added", "modified", "removed"]
+    },
+    "current_value": {
+        "description": "The current value of the belief (if it exists) at the time of proposal.",
+        "type": ["object", "string", "number", "boolean", "array", "null"]
+    },
+    "proposed_value": {
+      "description": "The proposed new value for the belief (required for 'added' and 'modified').",
+      "type": ["object", "string", "number", "boolean", "array", "null"]
+    },
+    "justification": {
+      "description": "Textual justification explaining the reason for the proposed change.",
+      "type": "string"
+    },
+    "status": {
+      "description": "The current status of the proposal.",
+      "type": "string",
+      "enum": ["pending_review", "approved", "rejected"],
+      "default": "pending_review"
+    },
+    "operator_review_ref": {
+      "description": "Reference to the operator review log or identifier, if applicable.",
+      "type": ["string", "null"]
+    },
+    "rejection_reason": {
+        "description": "Reason provided if the proposal was rejected.",
+        "type": ["string", "null"]
+    }
+  },
+  "required": [
+    "proposal_id",
+    "timestamp",
+    "loop_id",
+    "proposing_agent_id",
+    "target_belief_key",
+    "proposed_change_type",
+    "justification",
+    "status"
+  ],
+  "if": {
+    "properties": { "proposed_change_type": { "enum": ["added", "modified"] } }
+  },
+  "then": {
+    "required": ["proposed_value"]
+  }
+}
