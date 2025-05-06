@@ -33,6 +33,17 @@
     "loop_id": "loop_0015",
     "timestamp": "2025-05-05T06:25:10.000000Z",
     "reason": "Dummy Rejection: Plan deemed too risky by Critic (simulated)."
+  },
+  {
+    "loop_id": "0032a",
+    "timestamp": "2025-05-06T20:04:23.793441+00:00",
+    "rejection_reason": "Critic agent not found for summary evaluation. Drift logged. Summary pending manual review.",
+    "validator_agent_id": "LoopControllerInternal_CriticNotFound"
+  },
+  {
+    "loop_id": "0032b",
+    "timestamp": "2025-05-06T20:04:33.903771+00:00",
+    "rejection_reason": "Critic agent not found for summary evaluation. Drift logged. Summary pending manual review.",
+    "validator_agent_id": "LoopControllerInternal_CriticNotFound"
   }
 ]
-
