@@ -1,0 +1,19 @@
+{
+  "loop_id": "loop_0020c",
+  "intent_description": "Test mutation guard approval with high trust score and sufficient data.",
+  "target_components": [
+    "mutation_guard"
+  ],
+  "mutation_details": {
+    "responsible_agent_id": "test_agent_ok",
+    "intent_params": {
+      "mutation_request": {
+        "action": "write",
+        "file_path": "/home/ubuntu/test_mutation_success_20c.txt",
+        "content": "This mutation should be approved as all checks should pass.",
+        "estimated_cost": 0.1
+      }
+    }
+  }
+}
+

@@ -1,0 +1,10 @@
+{
+  "loop_id": "loop_0021d",
+  "intent_description": "Test Blame Logging: Target non-existent agent.",
+  "responsible_agent_id": "test_agent_ok",
+  "target_components": [
+    "non_existent_agent"
+  ],
+  "intent_params": {}
+}
+
