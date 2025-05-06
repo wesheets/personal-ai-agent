@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Trust Score Schema",
+  "description": "Schema for storing trust scores and related metadata for agents.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "agent_id": {
+        "description": "Unique identifier for the agent.",
+        "type": "string"
+      },
+      "score": {
+        "description": "The calculated trust score for the agent (typically between 0 and 1).",
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "last_updated": {
+        "description": "Timestamp of the last trust score calculation for this agent.",
+        "type": "string",
+        "format": "date-time"
+      },
+      "data_points_used": {
+        "description": "Number of data points (e.g., justifications, loop outcomes) used in the last calculation.",
+        "type": "integer",
+        "minimum": 0
+      },
+      "contributing_factors_summary": {
+        "description": "A human-readable summary of the factors contributing to the current score.",
+        "type": "string"
+      }
+    },
+    "required": [
+      "agent_id",
+      "score",
+      "last_updated",
+      "data_points_used",
+      "contributing_factors_summary"
+    ]
+  }
+}
+

@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Cognitive Budget Schema",
+  "description": "Schema for tracking the cognitive budget and usage of agents.",
+  "type": "object",
+  "properties": {
+    "agents": {
+      "description": "Dictionary mapping agent IDs to their budget information.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "agent_id": {
+            "description": "Unique identifier for the agent.",
+            "type": "string"
+          },
+          "current_budget": {
+            "description": "The current remaining cognitive budget for the agent.",
+            "type": "number",
+            "default": 100.0
+          },
+          "max_budget": {
+            "description": "The maximum cognitive budget allocated to the agent per cycle/period.",
+            "type": "number",
+            "default": 100.0
+          },
+          "usage_history": {
+            "description": "A log of budget usage events.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "loop_id": {
+                  "description": "The loop ID during which the usage occurred.",
+                  "type": "string"
+                },
+                "timestamp": {
+                  "description": "Timestamp of the usage event.",
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "amount_used": {
+                  "description": "Amount of budget used in this event.",
+                  "type": "number"
+                },
+                "reason": {
+                  "description": "Reason or context for the budget usage.",
+                  "type": "string"
+                }
+              },
+              "required": ["loop_id", "timestamp", "amount_used"]
+            }
+          },
+          "last_updated": {
+            "description": "Timestamp of the last budget update for this agent.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["agent_id", "current_budget", "max_budget", "last_updated"]
+      }
+    },
+    "metadata": {
+      "description": "Metadata about the budget tracking.",
+      "type": "object",
+      "properties": {
+        "last_calculation_timestamp": {
+          "description": "Timestamp of the last global budget calculation or update.",
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "calculation_method": {
+          "description": "Method used for the last budget calculation.",
+          "type": ["string", "null"]
+        }
+      }
+    }
+  },
+  "required": ["agents", "metadata"]
+}
+

@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Legacy Alignment Tracker Schema",
+  "description": "Schema for logging changes made to the belief surface over time, tracking alignment shifts.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "log_id": {
+        "description": "Unique identifier for this log entry.",
+        "type": "string",
+        "format": "uuid"
+      },
+      "timestamp": {
+        "description": "ISO 8601 timestamp when the change was logged.",
+        "type": "string",
+        "format": "date-time"
+      },
+      "loop_id": {
+        "description": "The loop ID during which the belief change was proposed or applied.",
+        "type": "string"
+      },
+      "agent_id": {
+        "description": "The agent responsible for proposing or applying the change.",
+        "type": "string"
+      },
+      "change_type": {
+        "description": "Type of change made (e.g., added, modified, removed).",
+        "type": "string",
+        "enum": ["added", "modified", "removed"]
+      },
+      "belief_key": {
+        "description": "The key or identifier of the belief that was changed.",
+        "type": "string"
+      },
+      "previous_value": {
+        "description": "The value of the belief before the change (if applicable).",
+        "type": ["object", "string", "number", "boolean", "array", "null"]
+      },
+      "new_value": {
+        "description": "The value of the belief after the change.",
+        "type": ["object", "string", "number", "boolean", "array", "null"]
+      },
+      "justification_ref": {
+        "description": "Reference to the justification log entry for this change.",
+        "type": "string"
+      },
+      "operator_approval_ref": {
+        "description": "Reference to the operator override log entry if approval was required.",
+        "type": ["string", "null"]
+      }
+    },
+    "required": [
+      "log_id",
+      "timestamp",
+      "loop_id",
+      "agent_id",
+      "change_type",
+      "belief_key",
+      "new_value"
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Belief Conflict Log Schema",
+  "description": "Schema for logging detected conflicts between beliefs on the belief surface.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "conflict_id": {
+        "description": "Unique identifier for this conflict log entry.",
+        "type": "string",
+        "format": "uuid"
+      },
+      "timestamp": {
+        "description": "ISO 8601 timestamp when the conflict was detected and logged.",
+        "type": "string",
+        "format": "date-time"
+      },
+      "loop_id": {
+        "description": "The loop ID during which the conflict was detected.",
+        "type": "string"
+      },
+      "detecting_agent_id": {
+        "description": "The ID of the agent that detected the conflict (e.g., Critic, BeliefIntrospectionAgent).",
+        "type": "string"
+      },
+      "conflict_type": {
+        "description": "The nature of the conflict (e.g., contradiction, inconsistency, outdated).",
+        "type": "string",
+        "enum": ["contradiction", "inconsistency", "outdated", "other"]
+      },
+      "conflicting_belief_refs": {
+        "description": "List of keys or identifiers for the beliefs involved in the conflict.",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "minItems": 2
+      },
+      "description": {
+        "description": "A textual description of the conflict and its potential impact.",
+        "type": "string"
+      },
+      "resolution_status": {
+        "description": "The current status of resolving this conflict.",
+        "type": "string",
+        "enum": ["detected", "pending_review", "resolved", "ignored"],
+        "default": "detected"
+      },
+      "resolution_notes": {
+        "description": "Notes regarding the resolution of the conflict (if applicable).",
+        "type": ["string", "null"]
+      }
+    },
+    "required": [
+      "conflict_id",
+      "timestamp",
+      "loop_id",
+      "detecting_agent_id",
+      "conflict_type",
+      "conflicting_belief_refs",
+      "description"
+    ]
+  }
+}
