@@ -1,0 +1,98 @@
+{
+  "phase_id": 33,
+  "batch_id": "33.0",
+  "title": "Phase 33.0: Integrated Cognitive Loop Activation & UI Integration",
+  "description": "Activates the core cognitive loop (Orchestrator -> Governance Pre-Check -> Build -> Governance Post-Check -> Package) using functional agents and *active* governance mechanisms validated in Phases 21-32. Integrates the audit-confirmed UI shell with core memory surfaces for real-time visualization. Enforces strict drift-lock alignment and integrated governance operation.",
+  "prompt": "Operator Directive: Execute Phase 33.0. Activate the core cognitive loop for SaaS vertical generation, leveraging functional agents and *active* governance mechanisms validated in Phases 21-32. Integrate the existing UI shell for real-time visualization. Strictly adhere to drift-lock: use only audit-confirmed assets. Ensure all Phase 16-32 governance mechanisms operate in an integrated fashion, actively influencing loop execution and logging their influence. Output a downloadable package containing the generated scaffold and essential logs. Goal: Demonstrate a functional, actively governed, traceable cognitive loop connected to a live UI.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `loop_context.json`, `loop_trace.json`, `agent_justification_log.json`, `vertical_manifest.md`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (33.0):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each distinct cognitive loop execution or significant sub-process (like UI backend start, artifact packaging) within this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"33.0\", `loop_id`: \"<loop_id_or_process_id_executed>\", `controller_invoked`: \"<controller_script_or_main_process_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/loop_context.json\", \"/home/ubuntu/personal-ai-agent/app/memory/loop_trace.json\", \"/home/ubuntu/personal-ai-agent/app/memory/agent_justification_log.json\", \"/home/ubuntu/personal-ai-agent/app/memory/vertical_manifest.md\", ...other_relevant_logs_or_outputs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for all files created/modified *by this batch* (33.0) (e.g., controller scripts, server scripts, UI components, memory surfaces, generated scaffold, packaged zip).\
+    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (33.0) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
+  "components": [
+    {
+      "id": "33.0.1",
+      "task": "Implement Core Loop Controller Logic",
+      "details": "Develop/update 'vertical_loop_controller.py' to orchestrate the agent sequence. Implement state management using 'loop_context.json'. Ensure controller integrates calls to *active* governance mechanisms (Trust, Emotion, Complexity Budget, Invariants, etc.) at appropriate stages, allowing them to influence flow (e.g., gating, parameter adjustment) and logs the checks and their influence.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+        "/home/ubuntu/personal-ai-agent/app/memory/loop_context.json"
+      ]
+    },
+    {
+      "id": "33.0.2",
+      "task": "Integrate Agent Execution & Active Governance Logging",
+      "details": "Wire the loop controller to call functional agents (Orchestrator, Forge, HAL, Critic, Pessimist, Sage) validated in Phases 21-25. Implement robust logging hooks to capture inputs, outputs, decisions, and associated governance metrics (Justification, Trust Score, Emotion State, Complexity Estimate/Actual) *and the specific influence of active governance* into 'loop_trace.json' and 'agent_justification_log.json'. Ensure mutation requests/checks are logged.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+        "/home/ubuntu/personal-ai-agent/app/memory/loop_trace.json",
+        "/home/ubuntu/personal-ai-agent/app/memory/agent_justification_log.json"
+      ]
+    },
+    {
+      "id": "33.0.3",
+      "task": "Implement UI-Backend Integration (API & WebSockets)",
+      "details": "Develop necessary API endpoints and WebSocket server to connect existing UI components to the backend loop controller and memory surfaces. Implement real-time updates for loop state, agent interactions, justification logs, and file tree changes.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
+        "/home/ubuntu/personal-ai-agent/app/server/websocket_server.py",
+        "/home/ubuntu/personal-ai-agent/src/utils/apiClient.js",
+        "/home/ubuntu/personal-ai-agent/src/utils/socketClient.js"
+      ]
+    },
+    {
+      "id": "33.0.4",
+      "task": "Connect UI Components to Live Data",
+      "details": "Update existing React components in '/src/' to fetch data from API endpoints and subscribe to WebSocket events. Ensure components display live loop status, agent interactions, justifications, governance metrics, and file tree changes.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/src/components/OperatorConsole.jsx",
+        "/home/ubuntu/personal-ai-agent/src/components/AgentChatPanel.jsx",
+        "/home/ubuntu/personal-ai-agent/src/components/LoopStatusPanel.jsx",
+        "/home/ubuntu/personal-ai-agent/src/components/FileTreePanel.jsx",
+        "/home/ubuntu/personal-ai-agent/src/components/GovernanceMonitor.jsx",
+        "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx"
+      ]
+    },
+    {
+      "id": "33.0.5",
+      "task": "Implement Artifact Packaging",
+      "details": "Create a script ('package_artifacts.py') triggered at the end of a successful loop. Gather generated scaffold code, 'loop_trace.json', 'agent_justification_log.json', and 'vertical_manifest.md' into a timestamped downloadable zip archive.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/tools/package_artifacts.py",
+        "/home/ubuntu/personal-ai-agent/app/memory/vertical_manifest.md"
+      ]
+    }
+  ],
+  "expected_artifacts": [
+    "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+    "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
+    "/home/ubuntu/personal-ai-agent/app/server/websocket_server.py",
+    "/home/ubuntu/personal-ai-agent/app/tools/package_artifacts.py",
+    "/home/ubuntu/personal-ai-agent/app/memory/loop_context.json",
+    "/home/ubuntu/personal-ai-agent/app/memory/loop_trace.json",
+    "/home/ubuntu/personal-ai-agent/app/memory/agent_justification_log.json",
+    "/home/ubuntu/personal-ai-agent/app/memory/vertical_manifest.md",
+    "Updated UI component files in /src/",
+    "Generated SaaS scaffold code (directory)",
+    "Generated artifact package (.zip)",
+    "/home/ubuntu/wiring_manifest.updated_phase22_36.json",
+    "/home/ubuntu/file_tree.updated_post_phase36.json",
+    "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json"
+  ],
+  "validation_criteria": [
+    "Cognitive loop executes end-to-end using functional agents and controller.",
+    "All Phase 16-32 governance mechanisms *actively influence* loop execution (gating, parameter changes, etc.) and their influence is logged.",
+    "UI components connect to backend and display real-time updates.",
+    "Orchestrator interacts via UI.",
+    "Forge/HAL generate a basic SaaS scaffold.",
+    "Final artifacts are correctly packaged.",
+    "Strict adherence to drift-lock.",
+    "Confirm `/home/ubuntu/wiring_manifest.updated_phase22_36.json` was updated for loop/process executions in this batch (ensure entire file was handled correctly).",
+    "Confirm `/home/ubuntu/file_tree.updated_post_phase36.json` was updated to reflect all changes from this batch (ensure entire file was handled correctly).",
+    "Confirm `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json` was updated/regenerated reflecting this batch and is consistent with the file tree (ensure entire file was handled correctly).",
+    "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `loop_context.json`, `loop_trace.json`, `agent_justification_log.json`, `vertical_manifest.md`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, and any other critical files listed in the main prompt) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED."
+  ],
+  "dependencies": [
+    "Completion of *modified* Phases 21-32 (incorporating early validation and active governance)",
+    "Audit-confirmed UI components in /src/",
+    "Functional agent implementations in /app/agents/ (validated in Phases 21-25)",
+    "Existing schemas and memory surfaces from Phases 16-32"
+  ]
+}
+

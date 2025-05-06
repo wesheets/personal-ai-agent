@@ -1,0 +1,87 @@
+{
+  "phase_id": 35,
+  "batch_id": "35.0",
+  "title": "Phase 35.0: Active Emotion-Aware Tone & Reasoning Integration",
+  "description": "Integrates the system's emotional state (validated in Phases 25/26) into the cognitive loop, actively influencing agent communication tone and reasoning parameters. Enhances the UI to visualize emotional context. Builds upon Phase 33/34.",
+  "prompt": "Operator Directive: Execute Phase 35.0. Make the system's emotional state an active factor in the cognitive loop. Influence agent communication tone based on current emotion. Influence reasoning parameters (e.g., risk tolerance). Visualize emotional context in the UI. Leverage validated emotion surfaces and governance. Integrate with Phase 33/34 components. Goal: Demonstrate that Promethios's cognition and interaction style are actively influenced by its internal emotional state.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `agent_emotion_state.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (35.0):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each distinct cognitive loop execution or significant sub-process within this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"35.0\", `loop_id`: \"<loop_id_or_process_id_executed>\", `controller_invoked`: \"<controller_script_or_main_process_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/agent_justification_log.json\" (if updated), \"/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json\" (if Phase 34 approved and updated), \"/home/ubuntu/personal-ai-agent/app/memory/agent_emotion_state.json\" (if updated), ...other_relevant_outputs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for all files created/modified *by this batch* (35.0) (e.g., controller scripts, agent logic, UI components, memory surfaces).\
+    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (35.0) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
+  "components": [
+    {
+      "id": "35.0.1",
+      "task": "Enhance Loop Controller to Read & Propagate Active Emotion State",
+      "details": "Modify 'vertical_loop_controller.py' to read relevant emotional metrics from validated surfaces (e.g., the *entire existing* 'agent_emotion_state.json', ensuring full load, merge, and save if updated). Pass this emotional context object to invoked agents.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py"
+      ]
+    },
+    {
+      "id": "35.0.2",
+      "task": "Implement Emotion-Aware Agent Communication Wrapper/Logic",
+      "details": "Modify agent wrappers or core logic for key interacting agents (Orchestrator, Sage, Critic, Pessimist) to adjust communication style/tone based on the emotional context received. Log the applied tone adjustment. Ensure any logs updated (e.g., `agent_justification_log.json`) follow the full file handling protocol.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/agents/orchestrator_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/sage_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/critic_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/pessimist_agent.py"
+      ]
+    },
+    {
+      "id": "35.0.3",
+      "task": "Implement Emotion Influence on Reasoning Parameters",
+      "details": "Modify the controller or specific agents (e.g., Orchestrator, Pessimist) to adjust internal parameters based on emotion (e.g., risk tolerance, plan exploration breadth). Log these adjustments clearly in justification logs, ensuring `agent_justification_log.json` is handled with the full file protocol.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/orchestrator_agent.py",
+        "/home/ubuntu/personal-ai-agent/app/agents/pessimist_agent.py"
+      ]
+    },
+    {
+      "id": "35.0.4",
+      "task": "Implement Emotion Visualization in UI",
+      "details": "Develop/adapt UI component ('/src/components/visualization/EmotionStateViewer.jsx') to fetch current system/agent emotional state from the backend API and display it graphically. Integrate into main UI view.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/src/components/visualization/EmotionStateViewer.jsx",
+        "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx",
+        "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py"
+      ]
+    },
+    {
+      "id": "35.0.5",
+      "task": "Integrate Emotion Data into Logs",
+      "details": "Ensure the specific emotional state influencing a decision or tone is explicitly logged in 'agent_justification_log.json'. If Phase 34 approved/implemented, summarize significant emotional shifts/influences in 'reflection_thread.json'. **CRITICAL:** Both `agent_justification_log.json` and `reflection_thread.json` (if used) MUST be handled by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.",
+      "artifacts": [
+        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+        "Updated agent wrappers/logic logging calls"
+      ]
+    }
+  ],
+  "expected_artifacts": [
+    "Updated /home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+    "Updated agent logic/wrappers in /app/agents/",
+    "/home/ubuntu/personal-ai-agent/src/components/visualization/EmotionStateViewer.jsx",
+    "Updated /home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx",
+    "Updated /home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
+    "Updated agent_justification_log.json entries reflecting emotional context (entire file updated)",
+    "Updated reflection_thread.json entries reflecting emotional context (if Phase 34 approved, entire file updated)",
+    "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
+    "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
+    "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
+  ],
+  "validation_criteria": [
+    "Agent communication tone demonstrably changes based on the active emotional state.",
+    "Adjustments to reasoning parameters based on emotion are logged and observable.",
+    "UI component accurately visualizes the current emotional state.",
+    "Emotional context is clearly logged alongside corresponding actions and justifications.",
+    "Integration with Phase 33/34 components is seamless.",
+    "Strict adherence to drift-lock: modifications use validated emotion surfaces.",
+    "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `agent_justification_log.json`, `reflection_thread.json` if used, `agent_emotion_state.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
+    "Confirm `/home/ubuntu/wiring_manifest.updated_phase22_36.json` was updated for loop/process executions in this batch.",
+    "Confirm `/home/ubuntu/file_tree.updated_post_phase36.json` was updated to reflect all changes from this batch.",
+    "Confirm `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json` was updated/regenerated reflecting this batch and is consistent with the file tree."
+  ],
+  "dependencies": [
+    "Completion of Phase 34.0",
+    "Validated emotion memory surfaces (e.g., 'agent_emotion_state.json') from modified Phases 25/26"
+  ]
+}
+
