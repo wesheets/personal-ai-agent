@@ -1,0 +1,65 @@
+[
+  {
+    "backlog_id": "bklg_loop_0021a_20250505222244260812",
+    "loop_id": "loop_0021a",
+    "timestamp_added": "2025-05-05T22:22:44.260833",
+    "responsible_agent_id": "test_agent_ok",
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/test_operator_approve_21a.txt",
+      "content": "This file should be created after operator approval.",
+      "estimated_cost": 0.1
+    },
+    "rejection_reason": "Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "status": "pending",
+    "priority": 0.5
+  },
+  {
+    "backlog_id": "bklg_loop_0022a_20250505234223082289",
+    "loop_id": "loop_0022a",
+    "timestamp_added": "2025-05-05T23:42:23.082323",
+    "responsible_agent_id": "test_agent_ok",
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/test_mutation_critic_approve.txt",
+      "content": "This mutation should pass (Critic approved).",
+      "estimated_cost": 0.1,
+      "responsible_agent_id": "test_agent_ok"
+    },
+    "rejection_reason": "Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "status": "pending",
+    "priority": 0.5
+  },
+  {
+    "backlog_id": "bklg_loop_0022b_20250505234253990705",
+    "loop_id": "loop_0022b",
+    "timestamp_added": "2025-05-05T23:42:53.990732",
+    "responsible_agent_id": "test_agent_ok",
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/test_mutation_critic_reject.txt",
+      "content": "This mutation should fail (Critic rejected).",
+      "estimated_cost": 0.1,
+      "responsible_agent_id": "test_agent_ok"
+    },
+    "rejection_reason": "Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "status": "pending",
+    "priority": 0.5
+  },
+  {
+    "backlog_id": "bklg_loop_0022c_20250506000724384439",
+    "loop_id": "loop_0022c",
+    "timestamp_added": "2025-05-06T00:07:24.384463",
+    "responsible_agent_id": "test_agent_ok",
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/test_mutation_operator_approve.txt",
+      "content": "This mutation should pass (Critic & Operator approved).",
+      "estimated_cost": 0.1,
+      "responsible_agent_id": "test_agent_ok"
+    },
+    "rejection_reason": "Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "status": "pending",
+    "priority": 0.5
+  }
+]

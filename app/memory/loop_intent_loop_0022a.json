@@ -1,0 +1,16 @@
+{
+  "loop_id": "loop_0022a",
+  "responsible_agent_id": "test_agent_ok",
+  "intent_name": "Test Mutation Guard - Critic Approval",
+  "intent_params": {
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/test_mutation_critic_approve.txt",
+      "content": "This mutation should pass (Critic approved).",
+      "estimated_cost": 0.1,
+      "responsible_agent_id": "test_agent_ok"
+    }
+  },
+  "requires_operator_review": false
+}
+

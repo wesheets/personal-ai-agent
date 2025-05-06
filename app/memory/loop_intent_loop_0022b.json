@@ -1,0 +1,16 @@
+{
+  "loop_id": "loop_0022b",
+  "responsible_agent_id": "test_agent_ok",
+  "intent_name": "Test Mutation Guard - Critic Rejection",
+  "intent_params": {
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/test_mutation_critic_reject.txt",
+      "content": "This mutation should fail (Critic rejected).",
+      "estimated_cost": 0.1,
+      "responsible_agent_id": "test_agent_ok"
+    }
+  },
+  "requires_operator_review": false
+}
+

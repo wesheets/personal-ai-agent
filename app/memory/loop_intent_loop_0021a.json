@@ -1,0 +1,15 @@
+{
+  "loop_id": "loop_0021a",
+  "intent_description": "Test Operator Approval: Write a simple file.",
+  "responsible_agent_id": "test_agent_ok",
+  "target_components": [],
+  "intent_params": {
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/test_operator_approve_21a.txt",
+      "content": "This file should be created after operator approval.",
+      "estimated_cost": 0.1
+    }
+  }
+}
+

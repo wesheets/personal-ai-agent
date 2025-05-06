@@ -1,0 +1,15 @@
+{
+  "loop_id": "loop_0021b",
+  "intent_description": "Test Operator Rejection: Write a simple file.",
+  "responsible_agent_id": "test_agent_ok",
+  "target_components": [],
+  "intent_params": {
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/test_operator_reject_21b.txt",
+      "content": "This file should NOT be created due to operator rejection.",
+      "estimated_cost": 0.1
+    }
+  }
+}
+

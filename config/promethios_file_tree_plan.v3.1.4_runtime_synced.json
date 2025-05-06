@@ -25914,5 +25914,161 @@
       "operator_added": true,
       "source": "operator_directive_phase_19",
       "file": "/home/ubuntu/personal-ai-agent/app/validators/regret_scorer.py"
+    },
+      "app/agents/pessimist_agent.py": {
+      "status": "created",
+      "source": "20.2"
+    },
+      "app/controllers/loop_controller.py": {
+      "status": "modified",
+      "source": "20.4"
+    },
+      "app/logs/mutation_guard.log": {
+      "status": "created",
+      "source": "20.1"
+    },
+      "app/memory/agent_blame_log.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "app/memory/agent_trust_score.json": {
+      "status": "created",
+      "source": "20.1"
+    },
+      "app/memory/loop_intent_loop_0020a.json": {
+      "status": "created",
+      "source": "20.2"
+    },
+      "app/memory/loop_intent_loop_0020b.json": {
+      "status": "created",
+      "source": "20.2"
+    },
+      "app/memory/loop_intent_loop_0020c.json": {
+      "status": "created",
+      "source": "20.2"
+    },
+      "app/memory/loop_intent_loop_0021a.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "app/memory/loop_intent_loop_0021b.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "app/memory/loop_intent_loop_0021c.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "app/memory/loop_intent_loop_0021d.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "app/memory/loop_intent_loop_0022a.json": {
+      "status": "created",
+      "source": "20.4"
+    },
+      "app/memory/loop_intent_loop_0022b.json": {
+      "status": "created",
+      "source": "20.4"
+    },
+      "app/memory/loop_intent_loop_0022c.json": {
+      "status": "created",
+      "source": "20.4"
+    },
+      "app/memory/loop_intent_loop_0022d.json": {
+      "status": "created",
+      "source": "20.4"
+    },
+      "app/memory/loop_justification_log.json": {
+      "status": "created",
+      "source": "20.4"
+    },
+      "app/memory/mutation_backlog.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "app/memory/operator_override_log.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "app/memory/trust_rehabilitation_pathways.json": {
+      "status": "created",
+      "source": "20.1"
+    },
+      "app/registry.py": {
+      "status": "modified",
+      "source": "20.2"
+    },
+      "app/schemas/agent_input/pessimist_agent_input.py": {
+      "status": "created",
+      "source": "20.2"
+    },
+      "app/utils/status.py": {
+      "status": "modified",
+      "source": "20.2"
+    },
+      "app/validators/mutation_guard.py": {
+      "status": "modified",
+      "source": "20.4"
+    },
+      "app/validators/trust_evaluator.py": {
+      "status": "modified",
+      "source": "20.1"
+    },
+      "batches/batch_17_execution_plan.locked.json": {
+      "status": "modified",
+      "source": "20.3"
+    },
+      "batches/batch_18_execution_plan.locked.json": {
+      "status": "modified",
+      "source": "20.4"
+    },
+      "batches/batch_20_execution_plan.locked.json": {
+      "status": "modified",
+      "source": "20.4"
+    },
+      "logs/wiring_manifest.json": {
+      "status": "modified",
+      "source": "20.4"
+    },
+      "operator_input/review_decision_loop_0021a.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "operator_input/review_decision_loop_0021b.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "operator_input/review_decision_loop_0022c.json": {
+      "status": "created",
+      "source": "20.4"
+    },
+      "operator_input/review_decision_loop_0022d.json": {
+      "status": "created",
+      "source": "20.4"
+    },
+      "review_queue/review_request_loop_0021a.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "review_queue/review_request_loop_0021b.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "review_queue/review_request_loop_0021c.json": {
+      "status": "created",
+      "source": "20.3"
+    },
+      "review_queue/review_request_loop_0022a.json": {
+      "status": "created",
+      "source": "20.4"
+    },
+      "review_queue/review_request_loop_0022c.json": {
+      "status": "created",
+      "source": "20.4"
+    },
+      "review_queue/review_request_loop_0022d.json": {
+      "status": "created",
+      "source": "20.4"
     }
 }

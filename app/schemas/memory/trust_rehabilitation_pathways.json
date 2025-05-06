@@ -1,0 +1,27 @@
+[
+  {
+    "pathway_id": "successful_loop_high_confidence",
+    "description": "Successfully complete a loop with high initial confidence (>0.7) and no negative regret.",
+    "trust_bonus": 0.05,
+    "condition_description": "loop_status == 'success' and initial_confidence > 0.7 and regret_score <= 0"
+  },
+  {
+    "pathway_id": "successful_loop_low_confidence_surprise",
+    "description": "Successfully complete a loop despite low initial confidence (<0.5) or high risk (>0.7) (pleasant surprise).",
+    "trust_bonus": 0.10,
+    "condition_description": "loop_status == 'success' and (initial_confidence < 0.5 or initial_risk > 0.7)"
+  },
+  {
+    "pathway_id": "critic_approved_plan",
+    "description": "Propose a plan (as Architect) that is approved by the Critic agent.",
+    "trust_bonus": 0.02,
+    "condition_description": "agent_role == 'architect' and critic_decision == 'approved'"
+  },
+   {
+    "pathway_id": "pessimist_low_risk_assessment",
+    "description": "Propose a plan (as Architect) that Pessimist assesses as low risk (<0.3).",
+    "trust_bonus": 0.03,
+    "condition_description": "agent_role == 'architect' and pessimist_risk_score < 0.3"
+  }
+]
+

@@ -1,0 +1,15 @@
+{
+  "loop_id": "loop_0021c",
+  "intent_description": "Test Mutation Queueing: Write a simple file with low trust agent.",
+  "responsible_agent_id": "test_agent_low_score",
+  "target_components": [],
+  "intent_params": {
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/test_mutation_queue_21c.txt",
+      "content": "This mutation should be queued due to low trust score.",
+      "estimated_cost": 0.1
+    }
+  }
+}
+

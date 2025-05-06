@@ -1,0 +1,19 @@
+{
+  "loop_id": "loop_0020a",
+  "intent_description": "Test mutation guard rejection due to low trust score.",
+  "target_components": [
+    "mutation_guard"
+  ],
+  "mutation_details": {
+    "responsible_agent_id": "test_agent_low_score",
+    "intent_params": {
+      "mutation_request": {
+        "action": "write",
+        "file_path": "/home/ubuntu/test_mutation_fail_trust_score_20a.txt",
+        "content": "This mutation should be rejected due to low trust score.",
+        "estimated_cost": 0.1
+      }
+    }
+  }
+}
+

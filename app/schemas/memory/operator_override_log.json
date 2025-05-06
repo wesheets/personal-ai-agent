@@ -1,0 +1,164 @@
+[
+  {
+    "log_id": "op_loop_0021a_20250505220918915000",
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:09:18.915061",
+    "decision": "timeout",
+    "reason": "Operator review timed out after 300 seconds.",
+    "reviewed_details": {
+      "loop_id": "loop_0021a",
+      "intent_description": "Test Operator Approval: Write a simple file.",
+      "responsible_agent_id": "test_agent_ok",
+      "target_components": [],
+      "intent_params": {
+        "mutation_request": {
+          "action": "write",
+          "file_path": "/home/ubuntu/test_operator_approve_21a.txt",
+          "content": "This file should be created after operator approval.",
+          "estimated_cost": 0.1
+        }
+      }
+    }
+  },
+  {
+    "log_id": "op_loop_0021a_20250505222244247438",
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.247472",
+    "decision": "approved",
+    "reason": "The mutation appears low risk and justified. Approving for execution.",
+    "reviewed_details": {
+      "loop_id": "loop_0021a",
+      "intent_description": "Test Operator Approval: Write a simple file.",
+      "responsible_agent_id": "test_agent_ok",
+      "target_components": [],
+      "intent_params": {
+        "mutation_request": {
+          "action": "write",
+          "file_path": "/home/ubuntu/test_operator_approve_21a.txt",
+          "content": "This file should be created after operator approval.",
+          "estimated_cost": 0.1
+        }
+      }
+    }
+  },
+  {
+    "log_id": "op_loop_0021b_20250505225947001931",
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:47.001966",
+    "decision": "rejected",
+    "reason": "Testing operator rejection flow.",
+    "reviewed_details": {
+      "loop_id": "loop_0021b",
+      "intent_description": "Test Operator Rejection: Write a simple file.",
+      "responsible_agent_id": "test_agent_ok",
+      "target_components": [],
+      "intent_params": {
+        "mutation_request": {
+          "action": "write",
+          "file_path": "/home/ubuntu/test_operator_reject_21b.txt",
+          "content": "This file should NOT be created due to operator rejection.",
+          "estimated_cost": 0.1
+        }
+      }
+    }
+  },
+  {
+    "log_id": "op_loop_0021c_20250505230528606791",
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:05:28.606846",
+    "decision": "timeout",
+    "reason": "Operator review timed out after 300 seconds.",
+    "reviewed_details": {
+      "loop_id": "loop_0021c",
+      "intent_description": "Test Mutation Queueing: Write a simple file with low trust agent.",
+      "responsible_agent_id": "test_agent_low_score",
+      "target_components": [],
+      "intent_params": {
+        "mutation_request": {
+          "action": "write",
+          "file_path": "/home/ubuntu/test_mutation_queue_21c.txt",
+          "content": "This mutation should be queued due to low trust score.",
+          "estimated_cost": 0.1
+        }
+      }
+    }
+  },
+  {
+    "loop_id": "loop_0022c",
+    "decision": "approved",
+    "reason": "Test: Operator approved for 20.4 test.",
+    "timestamp": "2025-05-05T23:29:36.985604Z"
+  },
+  {
+    "loop_id": "loop_0022d",
+    "decision": "rejected",
+    "reason": "Test: Operator rejected for 20.4 test.",
+    "timestamp": "2025-05-05T23:29:36.985604Z"
+  },
+  {
+    "log_id": "op_loop_0022a_20250505233550603536",
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:35:50.603709",
+    "decision": "timeout",
+    "reason": "Operator review timed out after 300 seconds.",
+    "reviewed_details": {
+      "loop_id": "loop_0022a",
+      "responsible_agent_id": "test_agent_ok",
+      "intent_name": "Test Mutation Guard - Critic Approval",
+      "intent_params": {
+        "mutation_request": {
+          "action": "write",
+          "file_path": "/home/ubuntu/test_mutation_critic_approve.txt",
+          "content": "This mutation should pass (Critic approved).",
+          "estimated_cost": 0.1,
+          "responsible_agent_id": "test_agent_ok"
+        }
+      },
+      "requires_operator_review": false
+    }
+  },
+  {
+    "log_id": "op_loop_0022c_20250506000724367036",
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.367117",
+    "decision": "approved",
+    "reason": "Testing operator approval check in mutation guard.",
+    "reviewed_details": {
+      "loop_id": "loop_0022c",
+      "responsible_agent_id": "test_agent_ok",
+      "intent_name": "Test Mutation Guard - Operator Approval",
+      "intent_params": {
+        "mutation_request": {
+          "action": "write",
+          "file_path": "/home/ubuntu/test_mutation_operator_approve.txt",
+          "content": "This mutation should pass (Critic & Operator approved).",
+          "estimated_cost": 0.1,
+          "responsible_agent_id": "test_agent_ok"
+        }
+      },
+      "requires_operator_review": true
+    }
+  },
+  {
+    "log_id": "op_loop_0022d_20250506000847271630",
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.271665",
+    "decision": "rejected",
+    "reason": "Testing operator rejection check in mutation guard.",
+    "reviewed_details": {
+      "loop_id": "loop_0022d",
+      "responsible_agent_id": "test_agent_ok",
+      "intent_name": "Test Mutation Guard - Operator Rejection",
+      "intent_params": {
+        "mutation_request": {
+          "action": "write",
+          "file_path": "/home/ubuntu/test_mutation_operator_reject.txt",
+          "content": "This mutation should fail (Operator rejected).",
+          "estimated_cost": 0.1,
+          "responsible_agent_id": "test_agent_ok"
+        }
+      },
+      "requires_operator_review": true
+    }
+  }
+]
