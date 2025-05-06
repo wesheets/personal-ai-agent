@@ -9232,5 +9232,86 @@
     "purpose": "File: schemas/weekly_drift_report.schema.json",
     "created_by": "operator",
     "schema_version": "v1.0"
+  },
+  {
+    "path": "app/validators/schema_updater.py",
+    "type": "validator",
+    "status": "verified",
+    "batch_id": "22.3",
+    "purpose": "Handles the application of schema changes to schema files (simulated).",
+    "created_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/schemas/schema_change_request.schema.json",
+    "type": "schema",
+    "status": "verified",
+    "batch_id": "22.3",
+    "purpose": "JSON schema for schema change proposals.",
+    "created_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/schema_change_request.json",
+    "type": "memory_surface",
+    "status": "verified",
+    "batch_id": "22.3",
+    "purpose": "Memory surface for storing schema change proposals.",
+    "created_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/loop_intent_loop_0032a.json",
+    "type": "unknown",
+    "status": "verified",
+    "batch_id": "22.3",
+    "purpose": "Test loop intent for Batch 22.3 (schema change approval scenario).",
+    "created_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/loop_intent_loop_0032b.json",
+    "type": "unknown",
+    "status": "verified",
+    "batch_id": "22.3",
+    "purpose": "Test loop intent for Batch 22.3 (schema change rejection scenario).",
+    "created_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/operator_override_log.json",
+    "type": "memory_surface",
+    "status": "verified",
+    "batch_id": "22.3",
+    "purpose": "Log of operator overrides/decisions, updated by Batch 22.3 schema review simulation.",
+    "created_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/complexity_budget.json",
+    "type": "memory_surface",
+    "status": "verified",
+    "batch_id": "22.3",
+    "purpose": "Complexity budget data, updated by Batch 22.3 test loops.",
+    "created_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/memory/agent_cognitive_budget.json",
+    "type": "memory_surface",
+    "status": "verified",
+    "batch_id": "22.3",
+    "purpose": "Agent cognitive budget data, potentially updated by Batch 22.3 test loops.",
+    "created_by": "Manus",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "phase22_batch22_3_schema_memory_requirements.md",
+    "type": "documentation",
+    "status": "verified",
+    "batch_id": "22.3",
+    "purpose": "Documentation for schema and memory requirements for Batch 22.3.",
+    "created_by": "Manus",
+    "schema_version": "v1.0"
   }
 ]
