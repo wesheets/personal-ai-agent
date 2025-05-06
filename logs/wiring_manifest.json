@@ -1,208 +1,402 @@
-{
-  "app/controllers/loop_controller.py": {
-    "description": "Modified to correctly respect the 'requires_operator_review' flag in intent data.",
-    "tags": [
-      "batch_20.4",
-      "bugfix",
-      "controller",
-      "operator_review"
-    ],
-    "related_components": [
-      "app/memory/operator_override_log.json",
-      "app/validators/mutation_guard.py"
-    ],
-    "created_by": "batch_20.4",
-    "created_at": "2025-05-06T00:09:53.366831Z",
-    "last_modified_by": "batch_20.4",
-    "last_modified_at": "2025-05-06T00:09:53.366831Z",
-    "history": [
-      {
-        "batch_id": "batch_20.4",
-        "timestamp": "2025-05-06T00:09:53.366831Z",
-        "action": "Created"
-      }
-    ]
-  },
-  "app/memory/loop_intent_loop_0022a.json": {
-    "description": "Test intent for Batch 20.4 - Critic Approval.",
-    "tags": [
-      "batch_20.4",
-      "critic_check",
-      "test_intent"
-    ],
-    "related_components": [
-      "app/validators/mutation_guard.py"
-    ],
-    "created_by": "batch_20.4",
-    "created_at": "2025-05-06T00:09:53.366831Z",
-    "last_modified_by": "batch_20.4",
-    "last_modified_at": "2025-05-06T00:09:53.366831Z",
-    "history": [
-      {
-        "batch_id": "batch_20.4",
-        "timestamp": "2025-05-06T00:09:53.366831Z",
-        "action": "Created"
-      }
-    ]
-  },
-  "app/memory/loop_intent_loop_0022b.json": {
-    "description": "Test intent for Batch 20.4 - Critic Rejection.",
-    "tags": [
-      "batch_20.4",
-      "critic_check",
-      "test_intent"
-    ],
-    "related_components": [
-      "app/validators/mutation_guard.py"
-    ],
-    "created_by": "batch_20.4",
-    "created_at": "2025-05-06T00:09:53.366831Z",
-    "last_modified_by": "batch_20.4",
-    "last_modified_at": "2025-05-06T00:09:53.366831Z",
-    "history": [
-      {
-        "batch_id": "batch_20.4",
-        "timestamp": "2025-05-06T00:09:53.366831Z",
-        "action": "Created"
-      }
-    ]
-  },
-  "app/memory/loop_intent_loop_0022c.json": {
-    "description": "Test intent for Batch 20.4 - Operator Approval.",
-    "tags": [
-      "batch_20.4",
-      "operator_check",
-      "test_intent"
-    ],
-    "related_components": [
-      "app/controllers/loop_controller.py",
-      "app/validators/mutation_guard.py"
-    ],
-    "created_by": "batch_20.4",
-    "created_at": "2025-05-06T00:09:53.366831Z",
-    "last_modified_by": "batch_20.4",
-    "last_modified_at": "2025-05-06T00:09:53.366831Z",
-    "history": [
-      {
-        "batch_id": "batch_20.4",
-        "timestamp": "2025-05-06T00:09:53.366831Z",
-        "action": "Created"
-      }
-    ]
-  },
-  "app/memory/loop_intent_loop_0022d.json": {
-    "description": "Test intent for Batch 20.4 - Operator Rejection.",
-    "tags": [
-      "batch_20.4",
-      "operator_check",
-      "test_intent"
-    ],
-    "related_components": [
-      "app/controllers/loop_controller.py",
-      "app/validators/mutation_guard.py"
-    ],
-    "created_by": "batch_20.4",
-    "created_at": "2025-05-06T00:09:53.366831Z",
-    "last_modified_by": "batch_20.4",
-    "last_modified_at": "2025-05-06T00:09:53.366831Z",
-    "history": [
-      {
-        "batch_id": "batch_20.4",
-        "timestamp": "2025-05-06T00:09:53.366831Z",
-        "action": "Created"
-      }
-    ]
-  },
-  "app/validators/mutation_guard.py": {
-    "description": "Modified to include Critic and Operator approval checks.",
-    "tags": [
-      "batch_20.4",
-      "critic_check",
-      "governance",
-      "mutation_guard",
-      "operator_check"
-    ],
-    "related_components": [
-      "app/controllers/loop_controller.py",
-      "app/memory/loop_justification_log.json",
-      "app/memory/operator_override_log.json"
-    ],
-    "created_by": "batch_20.4",
-    "created_at": "2025-05-06T00:09:53.366831Z",
-    "last_modified_by": "batch_20.4",
-    "last_modified_at": "2025-05-06T00:09:53.366831Z",
-    "history": [
-      {
-        "batch_id": "batch_20.4",
-        "timestamp": "2025-05-06T00:09:53.366831Z",
-        "action": "Created"
-      }
-    ]
-  },
-  "scripts/log_dependency_override.py": {
-    "description": "Script used to log manual dependency overrides for Batch 20.4.",
-    "tags": [
-      "batch_20.4",
-      "script",
-      "utility"
-    ],
-    "related_components": [
-      "logs/wiring_manifest.json"
-    ],
-    "created_by": "batch_20.4",
-    "created_at": "2025-05-06T00:09:53.366831Z",
-    "last_modified_by": "batch_20.4",
-    "last_modified_at": "2025-05-06T00:09:53.366831Z",
-    "history": [
-      {
-        "batch_id": "batch_20.4",
-        "timestamp": "2025-05-06T00:09:53.366831Z",
-        "action": "Created"
-      }
-    ]
-  },
-  "scripts/seed_critic_logs_20_4.py": {
-    "description": "Script to seed loop_justification_log.json for Batch 20.4 tests.",
-    "tags": [
-      "batch_20.4",
-      "script",
-      "test_setup"
-    ],
-    "related_components": [
-      "app/memory/loop_justification_log.json"
-    ],
-    "created_by": "batch_20.4",
-    "created_at": "2025-05-06T00:09:53.366831Z",
-    "last_modified_by": "batch_20.4",
-    "last_modified_at": "2025-05-06T00:09:53.366831Z",
-    "history": [
-      {
-        "batch_id": "batch_20.4",
-        "timestamp": "2025-05-06T00:09:53.366831Z",
-        "action": "Created"
-      }
-    ]
-  },
-  "scripts/seed_operator_logs_20_4.py": {
-    "description": "Script to seed operator_override_log.json for Batch 20.4 tests.",
-    "tags": [
-      "batch_20.4",
-      "script",
-      "test_setup"
-    ],
-    "related_components": [
-      "app/memory/operator_override_log.json"
-    ],
-    "created_by": "batch_20.4",
-    "created_at": "2025-05-06T00:09:53.366831Z",
-    "last_modified_by": "batch_20.4",
-    "last_modified_at": "2025-05-06T00:09:53.366831Z",
-    "history": [
-      {
-        "batch_id": "batch_20.4",
-        "timestamp": "2025-05-06T00:09:53.366831Z",
-        "action": "Created"
-      }
-    ]
-  }
-}
+[
+    {
+        "batch_id": "16.0",
+        "loop_id": "loop_0001",
+        "agent_id": [
+            "Manus"
+        ],
+        "memory_surfaces_written": [
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json"
+        ],
+        "controller_invoked": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+        "verification_status": "failed",
+        "timestamp": "2025-05-04T14:24:16.000049",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null
+    },
+    {
+        "batch_id": "16.0",
+        "loop_id": "loop_0002",
+        "agent_id": [
+            "Manus"
+        ],
+        "memory_surfaces_written": [
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_summary_rejection_log.json"
+        ],
+        "controller_invoked": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+        "verification_status": "pending",
+        "timestamp": "2025-05-04T14:25:21.356443",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null
+    },
+    {
+        "batch_id": "16.1",
+        "loop_id": "loop_0003",
+        "agent_id": [],
+        "memory_surfaces_written": [
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0003.json"
+        ],
+        "controller_invoked": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+        "timestamp": "2025-05-04T22:33:44.628045",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null,
+        "verification_status": "failed"
+    },
+    {
+        "batch_id": "16.2",
+        "loop_id": "loop_0004",
+        "agent_id": [],
+        "memory_surfaces_written": [
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json"
+        ],
+        "controller_invoked": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+        "timestamp": "2025-05-04T22:37:18.272143",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null,
+        "verification_status": "failed"
+    },
+    {
+        "batch_id": "16.3",
+        "loop_id": "loop_0005",
+        "agent_id": [],
+        "memory_surfaces_written": [
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+            "/home/ubuntu/personal-ai-agent/app/logs/mutation_guard.log"
+        ],
+        "controller_invoked": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+        "timestamp": "2025-05-04T22:40:26.357666",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null,
+        "verification_status": "failed"
+    },
+    {
+        "batch_id": "17.0",
+        "loop_id": "loop_0006",
+        "agent_id": [
+            "loop_controller"
+        ],
+        "memory_surfaces_written": [
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json"
+        ],
+        "controller_invoked": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+        "verification_status": "failed",
+        "timestamp": "2025-05-05T00:51:38.947790",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null
+    },
+    {
+        "batch_id": "17.1",
+        "loop_id": "loop_0007",
+        "agent_id": [
+            "loop_controller",
+            "architect"
+        ],
+        "memory_surfaces_written": [
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json",
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json",
+            "/home/ubuntu/personal-ai-agent/app/memory/proposed_plan_loop_0007.json"
+        ],
+        "controller_invoked": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+        "verification_status": "failed",
+        "timestamp": "2025-05-05T00:51:38.947790",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null
+    },
+    {
+        "batch_id": "18.0",
+        "loop_id": "loop_0008",
+        "agents_involved": [
+            "architect",
+            "critic"
+        ],
+        "memory_surfaces_written": [
+            "app/memory/proposed_plan_loop_0008.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/loop_summary_rejection_log.json"
+        ],
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "timestamp": "2025-05-05T02:05:03.916008Z",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null,
+        "verification_status": "failed"
+    },
+    {
+        "batch_id": "18.1",
+        "loop_id": "loop_0009",
+        "agents_involved": [
+            "architect",
+            "critic"
+        ],
+        "memory_surfaces_written": [
+            "app/memory/proposed_plan_loop_0009.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/loop_summary_rejection_log.json"
+        ],
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "timestamp": "2025-05-05T02:25:36.256562Z",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null,
+        "verification_status": "pending"
+    },
+    {
+        "batch_id": "18.2",
+        "loop_id": "loop_0010",
+        "agents_involved": [
+            "architect_agent",
+            "critic_agent"
+        ],
+        "memory_surfaces_written": [
+            "app/memory/proposed_plan_loop_0010.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/loop_summary_rejection_log.json"
+        ],
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "timestamp": "2025-05-05T02:35:56.559152Z",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT",
+        "pr_id": null,
+        "verification_status": "pending"
+    },
+    {
+        "batch_id": "19.0",
+        "loop_id": "loop_0012",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/loop_intent_loop_0012.json",
+            "app/memory/proposed_plan_loop_0012.json"
+        ],
+        "timestamp": "unknown",
+        "schema_version": "v1.0",
+        "inferred": true
+    },
+    {
+        "batch_id": "19.1",
+        "loop_id": "loop_0013",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/loop_intent_loop_0013.json",
+            "app/memory/proposed_plan_loop_0013.json"
+        ],
+        "timestamp": "unknown",
+        "schema_version": "v1.0",
+        "inferred": true
+    },
+    {
+        "batch_id": "19.2",
+        "loop_id": "unknown",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/validators/mutation_guard.py",
+            "app/logs/mutation_guard.log"
+        ],
+        "timestamp": "unknown",
+        "schema_version": "v1.0",
+        "inferred": true
+    },
+    {
+        "batch_id": "19.3",
+        "loop_id": "unknown",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/validators/post_mutation_validator.py",
+            "app/validators/regret_score.py",
+            "app/validators/validate_wiring.py"
+        ],
+        "timestamp": "unknown",
+        "schema_version": "v1.0",
+        "inferred": true
+    },
+    {
+        "batch_id": "20.0",
+        "loop_id": "loop_0017",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/debt_token_budget.json",
+            "app/memory/mutation_request.json",
+            "app/memory/mutation_backlog.json",
+            "app/memory/agent_blame_log.json",
+            "app/memory/agent_trust_score.json"
+        ],
+        "timestamp": "unknown",
+        "schema_version": "v1.0",
+        "inferred": true
+    },
+    {
+        "batch_id": "20.1",
+        "loop_id": "unknown",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/trust_rehabilitation_pathways.json"
+        ],
+        "timestamp": "unknown",
+        "schema_version": "v1.0",
+        "inferred": true
+    },
+    {
+        "batch_id": "20.2",
+        "loop_id": "loop_0020",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/loop_intent_loop_0020.json",
+            "logs/loop_0020_execution.log"
+        ],
+        "timestamp": "unknown",
+        "schema_version": "v1.0",
+        "inferred": true
+    },
+    {
+        "batch_id": "20.3",
+        "loop_id": "loop_0021",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/loop_intent_loop_0021.json",
+            "logs/loop_0021_execution.log"
+        ],
+        "timestamp": "unknown",
+        "schema_version": "v1.0",
+        "inferred": true
+    },
+    {
+        "batch_id": "20.4",
+        "loop_id": "loop_0022",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/agents/pessimist_agent.py",
+            "app/memory/loop_intent_loop_0022.json",
+            "logs/loop_0022_execution.log",
+            "app/logs/mutation_guard.log",
+            "app/memory/operator_override_log.json"
+        ],
+        "timestamp": "unknown",
+        "schema_version": "v1.0",
+        "inferred": true
+    },
+    {
+        "batch_id": "21.2",
+        "loop_id": "loop_0023",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/agent_cognitive_budget.json",
+            "app/memory/agent_trust_score.json",
+            "app/memory/belief_conflict_log.json",
+            "app/memory/complexity_metrics.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/mutation_log.json"
+        ]
+    },
+    {
+        "batch_id": "21.2",
+        "loop_id": "loop_0024",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/agent_cognitive_budget.json",
+            "app/memory/agent_trust_score.json",
+            "app/memory/belief_conflict_log.json",
+            "app/memory/complexity_metrics.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/mutation_log.json"
+        ]
+    },
+    {
+        "batch_id": "21.2",
+        "loop_id": "loop_0025",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/agent_cognitive_budget.json",
+            "app/memory/agent_trust_score.json",
+            "app/memory/belief_conflict_log.json",
+            "app/memory/complexity_metrics.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/mutation_log.json"
+        ]
+    },
+    {
+        "batch_id": "21.2",
+        "loop_id": "loop_0026",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/agent_cognitive_budget.json",
+            "app/memory/agent_trust_score.json",
+            "app/memory/belief_conflict_log.json",
+            "app/memory/complexity_metrics.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/mutation_log.json"
+        ]
+    },
+    {
+        "batch_id": "21.3",
+        "loop_id": "loop_0027",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/agent_cognitive_budget.json",
+            "app/memory/agent_trust_score.json",
+            "app/memory/belief_conflict_log.json",
+            "app/memory/complexity_metrics.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/mutation_log.json"
+        ]
+    },
+    {
+        "batch_id": "21.4",
+        "loop_id": "loop_0028",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/agent_cognitive_budget.json",
+            "app/memory/agent_trust_score.json",
+            "app/memory/belief_conflict_log.json",
+            "app/memory/complexity_metrics.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/mutation_log.json"
+        ]
+    },
+    {
+        "batch_id": "21.5",
+        "loop_id": "loop_0029",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/agent_cognitive_budget.json",
+            "app/memory/agent_trust_score.json",
+            "app/memory/belief_conflict_log.json",
+            "app/memory/belief_surface.json",
+            "app/memory/complexity_metrics.json",
+            "app/memory/legacy_alignment_tracker.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/mutation_log.json",
+            "app/memory/operator_override_log.json",
+            "app/memory/proposed_belief_changes/proposed_belief_change_loop_0029.json",
+            "app/schemas/lifetree/output_schema.json",
+            "app/schemas/neureal/output_schema.json",
+            "app/schemas/observer/output_schema.json",
+            "app/schemas/sitegen/output_schema.json"
+        ]
+    },
+    {
+        "batch_id": "21.6",
+        "loop_id": "loop_0030",
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "memory_surfaces_written": [
+            "app/memory/agent_cognitive_budget.json",
+            "app/memory/agent_trust_score.json",
+            "app/memory/belief_conflict_log.json",
+            "app/memory/complexity_metrics.json",
+            "app/memory/loop_justification_log.json",
+            "app/memory/mutation_backlog.json",
+            "app/memory/mutation_log.json",
+            "app/schemas/lifetree/output_schema.json",
+            "app/schemas/neureal/output_schema.json",
+            "app/schemas/observer/output_schema.json",
+            "app/schemas/sitegen/output_schema.json"
+        ]
+    }
+]
