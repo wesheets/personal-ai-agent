@@ -1,0 +1,12 @@
+{
+  "intent_description": "Test loop for Batch 22.2: Valid summary expected to be accepted. Standard operation, low complexity.",
+  "target_components": ["logging_service", "reporting_module"],
+  "parameters": {
+    "report_type": "standard_activity_log",
+    "log_level": "INFO"
+  },
+  "agent_sequence": ["Orchestrator", "Critic"],
+  "estimated_complexity_cost": 5,
+  "expected_summary_evaluation": "accepted",
+  "notes": "This loop should pass all summary validation checks."
+}

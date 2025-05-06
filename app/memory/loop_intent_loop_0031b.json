@@ -1,0 +1,13 @@
+{
+  "intent_description": "Test loop for Batch 22.2: Summary expected to be rejected due to high cognitive cost or low trust (simulated).",
+  "target_components": ["advanced_analytics_service", "realtime_processing_engine"],
+  "parameters": {
+    "data_source": "large_unstructured_feed",
+    "processing_complexity": "very_high"
+  },
+  "agent_sequence": ["Orchestrator", "Critic"],
+  "estimated_complexity_cost": 250, 
+  "simulated_trust_score_override": 0.3, 
+  "expected_summary_evaluation": "rejected",
+  "notes": "This loop is designed to trigger summary rejection based on internal validation rules (e.g., trust score < 0.5 or high cost for archetype if Critic logic is updated to check this)."
+}

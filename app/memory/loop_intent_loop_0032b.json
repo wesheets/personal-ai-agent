@@ -1,0 +1,10 @@
+{
+  "intent_description": "Test loop for Batch 22.3: Trigger review for a pre-existing schema change proposal (proposal_0032b_test) and expect operator rejection.",
+  "target_agent": "Orchestrator",
+  "agent_input": {
+    "task": "Perform a light analysis of recent activity. This loop will also check for pending schema change proposals.",
+    "context": "Testing schema change rejection workflow for proposal_0032b_test."
+  },
+  "domain": "system_analysis",
+  "is_mutation": false
+}
