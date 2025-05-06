@@ -1,0 +1,61 @@
+/usr/local/lib/python3.11/dist-packages/pydantic/_internal/_config.py:373: UserWarning: Valid config keys have changed in V2:
+* 'schema_extra' has been renamed to 'json_schema_extra'
+  warnings.warn(message, UserWarning)
+Error loading schema: Extra data: line 1 column 3 (char 2)
+⚠️ OpenAI client import failed
+ERROR:app.agents:An unexpected error occurred while importing critic_agent: VALIDATION
+ERROR:app.agents:An unexpected error occurred while importing cto_agent: VALIDATION
+ERROR:app.agents:An unexpected error occurred while importing debug_analyzer_agent: unexpected indent (task_supervisor.py, line 405)
+ERROR:app.agents:An unexpected error occurred while importing forge_agent: unexpected indent (task_supervisor.py, line 405)
+ERROR:agent_sdk:Error loading schema: Extra data: line 1 column 3 (char 2)
+INFO:agent_sdk:Registering agent: GUARDIAN
+INFO:guardian_agent:GUARDIAN agent initialized
+ERROR:app.agents:An unexpected error occurred while importing hal_agent: unexpected indent (task_supervisor.py, line 405)
+WARNING:agents.lifetree:⚠️ OpenAI provider import failed
+INFO:agent_sdk:Loaded schema from /home/ubuntu/personal-ai-agent/app/schemas/lifetree/output_schema.json
+INFO:agent_sdk:Registering agent: LifeTree
+ERROR:app.agents:Failed to import agent module memory_agent: cannot import name 'Agent' from 'agent_sdk' (unknown location)
+INFO:app.core.agent_registry:Registering agent: Minimal Test Agent with key 	minimal_test	
+WARNING:agents.neureal:⚠️ OpenAI provider import failed
+INFO:agent_sdk:Loaded schema from /home/ubuntu/personal-ai-agent/app/schemas/neureal/output_schema.json
+INFO:agent_sdk:Registering agent: Neureal
+ERROR:app.agents:An unexpected error occurred while importing nova: unexpected indent (task_supervisor.py, line 405)
+ERROR:app.agents:An unexpected error occurred while importing nova_agent: unexpected indent (task_supervisor.py, line 405)
+WARNING:agents.observer:⚠️ memory_agent import failed
+INFO:agent_sdk:Loaded schema from /home/ubuntu/personal-ai-agent/app/schemas/observer/output_schema.json
+INFO:agent_sdk:Registering agent: Observer
+ERROR:app.agents:Failed to import agent module ops_agent: cannot import name 'Agent' from 'agent_sdk' (unknown location)
+ERROR:app.agents:An unexpected error occurred while importing orchestrator_agent: unexpected indent (task_supervisor.py, line 405)
+ERROR:app.agents:Failed to import agent module reflection_chain_weaver_agent: No module named 'app.core.agent_base'
+WARNING:agents.sage:⚠️ Memory module not available, using mock implementation
+INFO:agent_sdk:Loaded schema from /home/ubuntu/personal-ai-agent/app/schemas/sage/output_schema.json
+INFO:agent_sdk:Registering agent: Sage
+ERROR:app.agents:An unexpected error occurred while importing sage_agent: unexpected indent (task_supervisor.py, line 405)
+WARNING:agents.sitegen:⚠️ openai_provider import failed
+INFO:agent_sdk:Loaded schema from /home/ubuntu/personal-ai-agent/app/schemas/sitegen/output_schema.json
+INFO:agent_sdk:Registering agent: SiteGen
+ERROR:app.agents:Failed to import agent module trainer_agent: cannot import name 'Agent' from 'agent_sdk' (unknown location)
+INFO:app.agents:Explicitly imported belief_manager_agent.
+INFO:app.agents:Agent module auto-import process completed.
+ERROR:app.core.agent_registry:Agent with key 	Orchestrator	 not found in registry.
+ERROR:app.core.agent_registry:Agent with key 	Critic	 not found in registry.
+🟢 Registered agent: ASH (role: Risk Analyst)
+🟢 Registered agent: CEO (role: Strategic Coordinator)
+🟢 Registered agent: GUARDIAN (role: Escalation Handler)
+🟢 Registered agent: LifeTree (role: Memory Preservation Specialist)
+🟢 Registered agent: Neureal (role: Immersive Experience Designer)
+🟢 Registered agent: Observer (role: System Behavior Journalist)
+Registered agent: Pessimist Agent with key 	'pessimist	'
+🟢 Registered agent: Sage (role: Belief Analyzer)
+🟢 Registered agent: SiteGen (role: Site Planning Specialist)
+Starting Loop ID: 0032a at 2025-05-06T20:04:23.763055+00:00
+Successfully logged justification for agent: loop_controller in loop: 0032a
+Loop 0032a: Classified archetype as 'Validate_Verify'.
+Warning: ArchetypeClassifier does not have 'estimate_cost' method. Using default cost 0 for archetype.
+Loop 0032a: Complexity budget check passed for archetype 'Validate_Verify'.
+Loop 0032a: Orchestrator: Agent not found. Drift logged. Details: Agent with key 	Orchestrator	 not found in registry.
+Loop 0032a: Logged agent registration drift for 'Orchestrator': Agent with key 	Orchestrator	 not found in registry.
+Loop 0032a: Evaluating loop summary.
+Loop 0032a: Calculated average trust score: 0.49666666666666665 from list of 3 agents.
+Loop 0032a: Logged agent registration drift for 'Critic': Agent with key 	Critic	 not found in registry.
+Loop 0032a: Logged summary rejection. Reason: Critic agent not found for summary evaluation. Drift logged. Summary pending manual review. by LoopControllerInternal_CriticNotFound
