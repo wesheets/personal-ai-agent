@@ -11,7 +11,7 @@ from datetime import datetime
 from app.agents.base_agent import BaseAgent
 from app.schemas.agent_input.architect_agent_input import ArchitectInstruction
 from app.schemas.agent_output.architect_agent_output import ArchitectPlanResult
-from app.registry import register, AgentCapability
+from app.core.agent_registry import register, AgentCapability
 # Removed toolkit_registry import as it wasn't used
 from app.utils.memory import read_memory, log_memory # Placeholder imports
 from app.utils.status import ResultStatus
@@ -122,7 +122,7 @@ class ArchitectAgent(BaseAgent):
                 tool_scaffold_plan=[],
                 memory_update={"plan_file": plan_file_path},
                 status=ResultStatus.SUCCESS
-            )
+            ).model_dump() # Batch 21.4: Return dict
         except Exception as e:
             # Log error appropriately
             error_message = f"Error generating/saving plan or logging justification for {loop_id}: {e}"
