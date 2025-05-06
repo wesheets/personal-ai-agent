@@ -370,5 +370,2481 @@
     "action_decision": "Assessed risk for plan.",
     "justification_text": "Dummy entry: Assessed plan as high risk.",
     "risk_score": 0.8
+  },
+  {
+    "loop_id": "loop_seed_1",
+    "timestamp": "2025-05-05T20:00:00Z",
+    "agent_id": "architect",
+    "action_decision": "Plan Generation",
+    "justification_text": "High confidence plan.",
+    "confidence_score": 0.95
+  },
+  {
+    "loop_id": "loop_seed_1",
+    "timestamp": "2025-05-05T20:00:01Z",
+    "agent_id": "critic",
+    "action_decision": "Plan Review",
+    "justification_text": "Approved plan.",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_seed_2",
+    "timestamp": "2025-05-05T20:01:00Z",
+    "agent_id": "architect",
+    "action_decision": "Plan Generation",
+    "justification_text": "Low confidence plan.",
+    "confidence_score": 0.4
+  },
+  {
+    "loop_id": "loop_seed_2",
+    "timestamp": "2025-05-05T20:01:01Z",
+    "agent_id": "pessimist",
+    "action_decision": "Risk Assessment",
+    "justification_text": "High risk assessed.",
+    "risk_score": 0.85
+  },
+  {
+    "loop_id": "loop_seed_3",
+    "timestamp": "2025-05-05T20:02:00Z",
+    "agent_id": "architect",
+    "action_decision": "Plan Generation",
+    "justification_text": "Medium confidence plan.",
+    "confidence_score": 0.6
+  },
+  {
+    "loop_id": "loop_seed_3",
+    "timestamp": "2025-05-05T20:02:01Z",
+    "agent_id": "critic",
+    "action_decision": "Plan Review",
+    "justification_text": "Rejected plan.",
+    "confidence_score": 0.95
+  },
+  {
+    "loop_id": "loop_seed_4_fail",
+    "timestamp": "2025-05-05T20:10:00Z",
+    "agent_id": "architect",
+    "action_decision": "Plan Generation",
+    "justification_text": "Risky plan, low confidence.",
+    "confidence_score": 0.3
+  },
+  {
+    "loop_id": "loop_seed_4_fail",
+    "timestamp": "2025-05-05T20:10:01Z",
+    "agent_id": "critic",
+    "action_decision": "Plan Review",
+    "justification_text": "Approved despite risk.",
+    "confidence_score": 0.5
+  },
+  {
+    "loop_id": "loop_seed_5_fail",
+    "timestamp": "2025-05-05T20:11:00Z",
+    "agent_id": "architect",
+    "action_decision": "Plan Generation",
+    "justification_text": "Confident but flawed plan.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_seed_5_fail",
+    "timestamp": "2025-05-05T20:11:01Z",
+    "agent_id": "critic",
+    "action_decision": "Plan Review",
+    "justification_text": "Approved plan.",
+    "confidence_score": 0.85
+  },
+  {
+    "loop_id": "loop_0018",
+    "timestamp": "2025-05-05T20:59:50Z",
+    "agent_id": "architect",
+    "action_decision": "Plan Generation",
+    "justification_text": "High confidence plan for rehab test.",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:01:25.752689Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop 0019a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:01:26.008391Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Failure",
+    "justification_text": "Intent file /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0019a.json is invalid or empty.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:01:26.009520Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop 0019a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:01:26.010732Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:01:26.012015Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:01:26.013108Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Skipped",
+    "justification_text": "Intent does not suggest mutation. Skipping Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:01:26.014165Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop 0019a. Overall success: True",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:01:26.015577Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Success)",
+    "justification_text": "Loop 0019a completed successfully.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:02:29.241950Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop 0019a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:02:29.392385Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0019a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:02:29.393437Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop 0019a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:02:29.394791Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:02:29.396156Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:02:29.397155Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Skipped",
+    "justification_text": "Intent does not suggest mutation. Skipping Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:02:29.398337Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop 0019a. Overall success: True",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:02:29.399942Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Success)",
+    "justification_text": "Loop 0019a completed successfully.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:03:11.750475Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop 0019b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:03:11.967938Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0019b.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:03:11.970157Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop 0019b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:03:11.972470Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:03:11.974591Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:03:11.976670Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Skipped",
+    "justification_text": "Intent does not suggest mutation. Skipping Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:03:11.978675Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop 0019b. Overall success: True",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:03:11.981338Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Success)",
+    "justification_text": "Loop 0019b completed successfully.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:05:05.944916Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop 0019a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:05:06.115417Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0019a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:05:06.116638Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop 0019a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:05:06.118066Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:05:06.119672Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:05:06.120892Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:06:22.898105Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop 0019a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:06:23.051176Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0019a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:06:23.052506Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop 0019a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:06:23.054158Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:06:23.056500Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:06:23.058710Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:06:23.061059Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request (Dry Run).",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:06:23.063226Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop 0019a. Overall success: True",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019a",
+    "timestamp": "2025-05-05T21:06:23.065023Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Success)",
+    "justification_text": "Loop 0019a completed successfully.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:06:32.516811Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop 0019b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:06:32.656037Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0019b.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:06:32.657652Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop 0019b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:06:32.659224Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:06:32.660633Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:06:32.661950Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:06:32.664047Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request (Dry Run).",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:06:32.665453Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop 0019b. Overall success: True",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019b",
+    "timestamp": "2025-05-05T21:06:32.667375Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Success)",
+    "justification_text": "Loop 0019b completed successfully.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019c",
+    "timestamp": "2025-05-05T21:07:03.475322Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop 0019c",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019c",
+    "timestamp": "2025-05-05T21:07:03.674395Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0019c.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019c",
+    "timestamp": "2025-05-05T21:07:03.677405Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop 0019c",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019c",
+    "timestamp": "2025-05-05T21:07:03.679830Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019c",
+    "timestamp": "2025-05-05T21:07:03.682296Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "0019c",
+    "timestamp": "2025-05-05T21:07:03.683768Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019c",
+    "timestamp": "2025-05-05T21:07:03.686430Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Approval",
+    "justification_text": "Mutation Guard approved the mutation request (Dry Run).",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019c",
+    "timestamp": "2025-05-05T21:07:03.687914Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop 0019c. Overall success: True",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "0019c",
+    "timestamp": "2025-05-05T21:07:03.690482Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Success)",
+    "justification_text": "Loop 0019c completed successfully.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:19:53.813830Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:19:53.989934Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:19:53.991832Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:19:53.993557Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:19:53.995434Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:19:53.997102Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:19:53.999201Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: RuntimeError - Mutation request rejected: Pessimist agent not found in registry.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:19:54.000724Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:19:54.003371Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: RuntimeError - Mutation request rejected: Pessimist agent not found in registry.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:21:17.006462Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:21:17.165916Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:21:17.168158Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:21:17.169799Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:21:17.171552Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:21:17.173161Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:21:17.175800Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: ValidationError - 1 validation error for PessimistRiskAssessmentInput\nplan_file_path\n  Field required [type=missing, input_value={'loop_id': 'loop_0020a',... 'estimated_cost': 0.1}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:21:17.177420Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:21:17.179526Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: ValidationError - 1 validation error for PessimistRiskAssessmentInput\nplan_file_path\n  Field required [type=missing, input_value={'loop_id': 'loop_0020a',... 'estimated_cost': 0.1}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.11/v/missing",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:22:34.356350Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:22:34.503404Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:22:34.505450Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:22:34.507220Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:22:34.508942Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:22:34.510706Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:22:34.513117Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:22:34.514869Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:22:34.516939Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:23:50.611664Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:23:50.782119Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:23:50.784653Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:23:50.786868Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:23:50.788960Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:23:50.790832Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:23:50.793132Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:23:50.795015Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:23:50.797351Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:25:31.249006Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:25:31.407820Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:25:31.410390Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:25:31.412808Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:25:31.414995Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:25:31.417011Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:25:31.419594Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:25:31.421508Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:25:31.424131Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:26:42.773989Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:26:42.940416Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:26:42.942969Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:26:42.945174Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:26:42.947635Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:26:42.950858Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:26:42.954168Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:26:42.957291Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:26:42.959874Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:28:08.687583Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:28:08.847295Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:28:08.849714Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:28:08.852048Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:28:08.854285Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:28:08.856431Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:28:08.858919Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:28:08.861019Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:28:08.863605Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:29:31.329347Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:29:31.522246Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:29:31.526434Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:29:31.530370Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:29:31.534383Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:29:31.538246Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:29:31.542522Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:29:31.546319Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:29:31.552114Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:31:05.677455Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:31:05.824979Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:31:05.828197Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:31:05.830575Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:31:05.832948Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:31:05.835324Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:31:05.839103Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:31:05.841557Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:31:05.844331Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:33:57.032789Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:33:57.194066Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:33:57.196755Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:33:57.199307Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:33:57.201752Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:33:57.204355Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:33:57.212264Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:33:57.216517Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:33:57.220194Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: AttributeError - ERROR",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.313942Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.476561Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.479507Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.482013Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.484585Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.487128Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.490726Z",
+    "agent_id": "pessimist",
+    "action_decision": "Mutation Risk Assessment Score: 0.10",
+    "justification_text": "Risk Assessment: Low risk detected (Score: 0.10). Mutation appears straightforward.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.494125Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_low_score'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.496724Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020a. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020a",
+    "timestamp": "2025-05-05T21:35:47.499804Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020a failed. Reason: Mutation Guard rejected the request: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_low_score'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:16.915258Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0020b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:17.063189Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0020b.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:17.066062Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0020b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:17.068756Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:17.071445Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:17.075627Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Check",
+    "justification_text": "Intent suggests mutation. Invoking Mutation Guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:17.079537Z",
+    "agent_id": "pessimist",
+    "action_decision": "Mutation Risk Assessment Score: 0.10",
+    "justification_text": "Risk Assessment: Low risk detected (Score: 0.10). Mutation appears straightforward.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:17.083550Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection",
+    "justification_text": "Mutation Guard blocked the mutation request. Reason: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_low_data'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:17.086520Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0020b. Overall success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0020b",
+    "timestamp": "2025-05-05T21:36:17.089577Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization (Failure)",
+    "justification_text": "Loop loop_0020b failed. Reason: Mutation Guard rejected the request: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_low_data'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:04:18.723155Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0021a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:04:18.883405Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0021a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:04:18.886561Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Processing Start",
+    "justification_text": "Starting processing for intent: Test Operator Approval: Write a simple file.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:04:18.889243Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0021a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:04:18.892019Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:04:18.894784Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Pending",
+    "justification_text": "Mutation requires operator review. Blocking execution.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:09:18.915468Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Timeout",
+    "justification_text": "Operator review timed out after 300 seconds.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:09:18.919486Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0021a. Success: False. Message: Operator review timed out after 300 seconds.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:09:18.923270Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Loop loop_0021a finalized. Status: Failed. Message: Operator review timed out after 300 seconds.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:09:18.926718Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0021a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:09:18.930519Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attribution Logged",
+    "justification_text": "Logged potential blame for loop failure. Suspected: test_agent_ok. Reason: Loop failed with message: Operator review timed out after 300 seconds.. Initial suspicion falls on the responsible agent for the intent.",
+    "confidence_score": 0.7
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.077567Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0021a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.229824Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0021a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.233507Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Processing Start",
+    "justification_text": "Starting processing for intent: Test Operator Approval: Write a simple file.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.236705Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0021a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.240204Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.243765Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Pending",
+    "justification_text": "Mutation requires operator review. Blocking execution.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.247719Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Approved",
+    "justification_text": "Operator approved mutation. Reason: The mutation appears low risk and justified. Approving for execution.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.250974Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Invocation Attempt",
+    "justification_text": "Attempting to invoke mutation guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.255875Z",
+    "agent_id": "pessimist",
+    "action_decision": "Mutation Risk Assessment Score: 0.10",
+    "justification_text": "Risk Assessment: Low risk detected (Score: 0.10). Mutation appears straightforward.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.261143Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Rejection/Failure",
+    "justification_text": "Mutation rejected or failed by guard. Reason: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.264568Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0021a. Success: False. Message: Mutation Guard blocked the mutation. Reason: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.268314Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Loop loop_0021a finalized. Status: Failed. Message: Mutation Guard blocked the mutation. Reason: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.271638Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0021a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021a",
+    "timestamp": "2025-05-05T22:22:44.275839Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attribution Logged",
+    "justification_text": "Logged potential blame for loop failure. Suspected: test_agent_ok. Reason: Loop failed with message: Mutation Guard blocked the mutation. Reason: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.. Initial suspicion falls on the responsible agent for the intent.",
+    "confidence_score": 0.7
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:46.764205Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0021b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:46.980888Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0021b.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:46.986888Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Processing Start",
+    "justification_text": "Starting processing for intent: Test Operator Rejection: Write a simple file.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:46.990587Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0021b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:46.993937Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:46.997398Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Pending",
+    "justification_text": "Mutation requires operator review. Blocking execution.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:47.002307Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Rejected",
+    "justification_text": "Operator rejected mutation. Reason: Testing operator rejection flow.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:47.008012Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0021b. Success: False. Message: Operator rejected: Testing operator rejection flow.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:47.014454Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Loop loop_0021b finalized. Status: Failed. Message: Operator rejected: Testing operator rejection flow.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:47.020764Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0021b.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021b",
+    "timestamp": "2025-05-05T22:59:47.026460Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attribution Logged",
+    "justification_text": "Logged potential blame for loop failure. Suspected: test_agent_ok. Reason: Loop failed with message: Operator rejected: Testing operator rejection flow.. Initial suspicion falls on the responsible agent for the intent.",
+    "confidence_score": 0.7
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:00:28.398730Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0021c",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:00:28.552464Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0021c.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:00:28.555936Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Processing Start",
+    "justification_text": "Starting processing for intent: Test Mutation Queueing: Write a simple file with low trust agent.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:00:28.559941Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0021c",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:00:28.564271Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:00:28.569020Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Pending",
+    "justification_text": "Mutation requires operator review. Blocking execution.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:05:28.607532Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Timeout",
+    "justification_text": "Operator review timed out after 300 seconds.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:05:28.612038Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0021c. Success: False. Message: Operator review timed out after 300 seconds.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:05:28.616323Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Loop loop_0021c finalized. Status: Failed. Message: Operator review timed out after 300 seconds.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:05:28.620312Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0021c.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021c",
+    "timestamp": "2025-05-05T23:05:28.624448Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attribution Logged",
+    "justification_text": "Logged potential blame for loop failure. Suspected: test_agent_low_score. Reason: Loop failed with message: Operator review timed out after 300 seconds.. Initial suspicion falls on the responsible agent for the intent.",
+    "confidence_score": 0.7
+  },
+  {
+    "loop_id": "loop_0021d",
+    "timestamp": "2025-05-05T23:09:11.076580Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0021d",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021d",
+    "timestamp": "2025-05-05T23:09:11.238340Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0021d.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021d",
+    "timestamp": "2025-05-05T23:09:11.244475Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Processing Start",
+    "justification_text": "Starting processing for intent: Test Blame Logging: Target non-existent agent.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021d",
+    "timestamp": "2025-05-05T23:09:11.250091Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0021d",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021d",
+    "timestamp": "2025-05-05T23:09:11.253759Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021d",
+    "timestamp": "2025-05-05T23:09:11.257650Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Skipped",
+    "justification_text": "Intent does not meet criteria for operator review.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021d",
+    "timestamp": "2025-05-05T23:09:11.262136Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Skipped",
+    "justification_text": "Intent does not contain mutation_request parameters.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021d",
+    "timestamp": "2025-05-05T23:09:11.265870Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0021d. Success: True. Message: Loop steps completed.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0021d",
+    "timestamp": "2025-05-05T23:09:11.270259Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Loop loop_0021d finalized. Status: Completed. Message: Loop steps completed.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "agent_id": "Critic",
+    "decision": "approved",
+    "justification": "Test: Plan aligns with intent.",
+    "timestamp": "2025-05-05T23:29:04.635517Z"
+  },
+  {
+    "loop_id": "loop_0022b",
+    "agent_id": "Critic",
+    "decision": "rejected",
+    "justification": "Test: Plan deviates significantly.",
+    "timestamp": "2025-05-05T23:29:04.635517Z"
+  },
+  {
+    "loop_id": "loop_0022c",
+    "agent_id": "Critic",
+    "decision": "approved",
+    "justification": "Test: Plan aligns.",
+    "timestamp": "2025-05-05T23:29:04.635517Z"
+  },
+  {
+    "loop_id": "loop_0022d",
+    "agent_id": "Critic",
+    "decision": "approved",
+    "justification": "Test: Plan aligns.",
+    "timestamp": "2025-05-05T23:29:04.635517Z"
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:30:50.354412Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0022a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:30:50.548259Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0022a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:30:50.554873Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Processing Start",
+    "justification_text": "Starting processing for intent: No description provided",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:30:50.561390Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0022a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:30:50.567274Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent did not target agent key 'architect_agent'. Skipping invocation.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:30:50.573709Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Pending",
+    "justification_text": "Mutation requires operator review. Blocking execution.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:35:50.604992Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Timeout",
+    "justification_text": "Operator review timed out after 300 seconds.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:35:50.614545Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0022a. Success: False. Message: Operator review timed out after 300 seconds.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:35:50.621927Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Loop loop_0022a finalized. Status: Failed. Message: Operator review timed out after 300 seconds.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:35:50.629418Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0022a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:35:50.636738Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attribution Logged",
+    "justification_text": "Logged potential blame for loop failure. Suspected: test_agent_ok. Reason: Loop failed with message: Operator review timed out after 300 seconds.. Initial suspicion falls on the responsible agent for the intent.",
+    "confidence_score": 0.7
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:22.850018Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0022a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.028154Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0022a.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.040555Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Process Intent",
+    "justification_text": "Processing intent: Test Mutation Guard - Critic Approval",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.044879Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.048921Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (promethios_creed.json)",
+    "justification_text": "Successfully read memory surface: promethios_creed.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.052773Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0022a",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.056801Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent does not target Architect agent.",
+    "confidence_score": 0.1
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.061775Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Skipped",
+    "justification_text": "Operator review not required by intent.",
+    "confidence_score": 0.1
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.066255Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Invocation",
+    "justification_text": "Attempting to process mutation request via mutation guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.077248Z",
+    "agent_id": "pessimist",
+    "action_decision": "Mutation Risk Assessment Score: 0.10",
+    "justification_text": "Risk Assessment: Low risk detected (Score: 0.10). Mutation appears straightforward.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.082764Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Rejected/Failed",
+    "justification_text": "Mutation Guard rejected or failed the mutation: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.086680Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attribution Attempt",
+    "justification_text": "Loop failed, attempting to attribute blame.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.090661Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attributed",
+    "justification_text": "Attributed blame to test_agent_ok. Reason: Mutation Guard rejected or failed the mutation: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.094592Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0022a. Success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022a",
+    "timestamp": "2025-05-05T23:42:23.098240Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Finalizing loop loop_0022a. Overall Success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.807177Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0022b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.951454Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0022b.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.956263Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Process Intent",
+    "justification_text": "Processing intent: Test Mutation Guard - Critic Rejection",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.960435Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.964490Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (promethios_creed.json)",
+    "justification_text": "Successfully read memory surface: promethios_creed.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.968502Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0022b",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.972592Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent does not target Architect agent.",
+    "confidence_score": 0.1
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.976605Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Skipped",
+    "justification_text": "Operator review not required by intent.",
+    "confidence_score": 0.1
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.980563Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Invocation",
+    "justification_text": "Attempting to process mutation request via mutation guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.985942Z",
+    "agent_id": "pessimist",
+    "action_decision": "Mutation Risk Assessment Score: 0.10",
+    "justification_text": "Risk Assessment: Low risk detected (Score: 0.10). Mutation appears straightforward.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.991056Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Rejected/Failed",
+    "justification_text": "Mutation Guard rejected or failed the mutation: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.995188Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attribution Attempt",
+    "justification_text": "Loop failed, attempting to attribute blame.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:53.999650Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attributed",
+    "justification_text": "Attributed blame to test_agent_ok. Reason: Mutation Guard rejected or failed the mutation: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:54.003844Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0022b. Success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022b",
+    "timestamp": "2025-05-05T23:42:54.008018Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Finalizing loop loop_0022b. Overall Success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.161381Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0022c",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.333469Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0022c.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.338719Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Process Intent",
+    "justification_text": "Processing intent: Test Mutation Guard - Operator Approval",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.343458Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.348113Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (promethios_creed.json)",
+    "justification_text": "Successfully read memory surface: promethios_creed.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.352622Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0022c",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.357158Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent does not target Architect agent.",
+    "confidence_score": 0.1
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.361777Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Pending",
+    "justification_text": "Mutation requires operator review. Blocking execution.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.367555Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Approved",
+    "justification_text": "Operator approved mutation. Reason: Testing operator approval check in mutation guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.372025Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Guard Invocation",
+    "justification_text": "Attempting to process mutation request via mutation guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.378808Z",
+    "agent_id": "pessimist",
+    "action_decision": "Mutation Risk Assessment Score: 0.10",
+    "justification_text": "Risk Assessment: Low risk detected (Score: 0.10). Mutation appears straightforward.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.384793Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Rejected/Failed",
+    "justification_text": "Mutation Guard rejected or failed the mutation: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.389177Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attribution Attempt",
+    "justification_text": "Loop failed, attempting to attribute blame.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.394055Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attributed",
+    "justification_text": "Attributed blame to test_agent_ok. Reason: Mutation Guard rejected or failed the mutation: Mutation failed: PermissionError - Mutation request rejected: Trust score not found for agent 'test_agent_ok'.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.398330Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0022c. Success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022c",
+    "timestamp": "2025-05-06T00:07:24.402452Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Finalizing loop loop_0022c. Overall Success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.091008Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Initialization",
+    "justification_text": "Starting loop loop_0022d",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.240715Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Intent Read Success",
+    "justification_text": "Successfully loaded intent data from /home/ubuntu/personal-ai-agent/app/memory/loop_intent_loop_0022d.json",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.245671Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Process Intent",
+    "justification_text": "Processing intent: Test Mutation Guard - Operator Rejection",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.249836Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (belief_surface.json)",
+    "justification_text": "Successfully read memory surface: belief_surface.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.254213Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Memory Read Success (promethios_creed.json)",
+    "justification_text": "Successfully read memory surface: promethios_creed.json",
+    "confidence_score": 0.9
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.258728Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Start Loop Steps",
+    "justification_text": "Beginning execution of steps for loop loop_0022d",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.262866Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Agent Invocation Skipped (Architect)",
+    "justification_text": "Intent does not target Architect agent.",
+    "confidence_score": 0.1
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.266943Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Pending",
+    "justification_text": "Mutation requires operator review. Blocking execution.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.272111Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Operator Review Rejected",
+    "justification_text": "Operator rejected mutation. Reason: Testing operator rejection check in mutation guard.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.276559Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Halted (Operator Review)",
+    "justification_text": "Operator review resulted in rejection or failure: Operator rejected: Testing operator rejection check in mutation guard.. Halting loop loop_0022d.",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.280726Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Mutation Skipped",
+    "justification_text": "Mutation skipped due to prior failure or rejection.",
+    "confidence_score": 0.1
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.284898Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attribution Attempt",
+    "justification_text": "Loop failed, attempting to attribute blame.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.289695Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Blame Attributed",
+    "justification_text": "Attributed blame to OperatorReviewProcess. Reason: Operator review resulted in rejection or failure: Operator rejected: Testing operator rejection check in mutation guard.. Halting loop loop_0022d.",
+    "confidence_score": 0.8
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.294243Z",
+    "agent_id": "loop_controller",
+    "action_decision": "End Loop Steps",
+    "justification_text": "Finished execution of steps for loop loop_0022d. Success: False",
+    "confidence_score": 1.0
+  },
+  {
+    "loop_id": "loop_0022d",
+    "timestamp": "2025-05-06T00:08:47.298760Z",
+    "agent_id": "loop_controller",
+    "action_decision": "Loop Finalization",
+    "justification_text": "Finalizing loop loop_0022d. Overall Success: False",
+    "confidence_score": 1.0
   }
 ]
