@@ -398,5 +398,96 @@
             "app/schemas/observer/output_schema.json",
             "app/schemas/sitegen/output_schema.json"
         ]
+    },
+    {
+        "batch_id": "22.1",
+        "loop_id": "0030a",
+        "agent_id": [],
+        "memory_surfaces_written": [
+            "app/validators/archetype_classifier.py",
+            "app/memory/loop_summary.json",
+            "app/schemas/loop_summary.schema.json",
+            "app/controllers/loop_controller.py",
+            "app/memory/complexity_budget.json",
+            "/home/ubuntu/logs/loop_0030a_execution.log",
+            "app/memory/agent_cognitive_budget.json"
+        ],
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "verification_status": "completed",
+        "timestamp": "2025-05-06T19:22:40.424367+00:00",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT_PHASE22",
+        "pr_id": null
+    },
+    {
+        "batch_id": "22.1",
+        "loop_id": "0030b",
+        "agent_id": [],
+        "memory_surfaces_written": [
+            "app/validators/archetype_classifier.py",
+            "app/memory/loop_summary.json",
+            "app/schemas/loop_summary.schema.json",
+            "app/memory/complexity_budget.json",
+            "app/controllers/loop_controller.py",
+            "app/memory/operator_override_log.json",
+            "/home/ubuntu/logs/loop_0030b_execution.log",
+            "app/memory/agent_cognitive_budget.json"
+        ],
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "verification_status": "completed",
+        "timestamp": "2025-05-06T19:22:40.424405+00:00",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT_PHASE22",
+        "pr_id": null
+    },
+    {
+        "batch_id": "22.2",
+        "loop_id": "0031a",
+        "agent_id": [],
+        "memory_surfaces_written": [
+            "app/memory/loop_intent_loop_0031a.json",
+            "/home/ubuntu/logs/loop_0031a_execution.log",
+            "app/memory/loop_summary.json"
+        ],
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "verification_status": "completed",
+        "timestamp": "2025-05-06T19:43:49.478690+00:00",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT_PHASE22",
+        "pr_id": null
+    },
+    {
+        "batch_id": "22.2",
+        "loop_id": "0031b",
+        "agent_id": [],
+        "memory_surfaces_written": [
+            "app/memory/loop_intent_loop_0031b.json",
+            "/home/ubuntu/logs/loop_0031b_execution.log",
+            "app/memory/loop_summary.json",
+            "app/memory/loop_summary_rejection_log.json"
+        ],
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "verification_status": "completed",
+        "timestamp": "2025-05-06T19:43:49.478767+00:00",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT_PHASE22",
+        "pr_id": null
+    },
+    {
+        "batch_id": "22.2",
+        "loop_id": "0031c",
+        "agent_id": [],
+        "memory_surfaces_written": [
+            "app/memory/loop_intent_loop_0031c.json",
+            "/home/ubuntu/logs/loop_0031c_execution.log",
+            "app/memory/loop_summary.json",
+            "/home/ubuntu/drift_violation_log.json"
+        ],
+        "controller_invoked": "app/controllers/loop_controller.py",
+        "verification_status": "completed",
+        "timestamp": "2025-05-06T19:43:49.478788+00:00",
+        "schema_version": "v1.0",
+        "git_commit_hash": "TBD_COMMIT_PHASE22",
+        "pr_id": null
     }
 ]

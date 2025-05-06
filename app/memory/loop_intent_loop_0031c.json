@@ -1,0 +1,12 @@
+{
+  "intent_description": "Test loop for Batch 22.2: Attempt to call a deliberately unregistered agent (historian) to trigger and test agent registration drift logging.",
+  "target_components": ["system_health_monitor", "audit_log_service"],
+  "parameters": {
+    "event_type": "critical_system_alert",
+    "log_target": "secure_archive"
+  },
+  "agent_sequence": ["Orchestrator", "historian", "Critic"],
+  "estimated_complexity_cost": 10,
+  "expected_summary_evaluation": "pending_review", 
+  "notes": "This loop should fail to load the 'historian' agent, triggering a drift log entry. The overall loop status will likely be 'failure'. The summary status might be 'pending_review' or 'rejected' depending on how the controller handles the agent load failure before summary generation."
+}

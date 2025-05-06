@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Complexity Budget",
+  "description": "Schema for tracking complexity budget allocations and spending across different domains and loop archetypes.",
+  "type": "object",
+  "properties": {
+    "global_budget": {
+      "description": "Overall complexity budget for the system.",
+      "type": "object",
+      "properties": {
+        "total_allocated": {
+          "type": "number",
+          "description": "Total complexity units allocated globally."
+        },
+        "total_spent": {
+          "type": "number",
+          "description": "Total complexity units spent globally."
+        },
+        "remaining_budget": {
+          "type": "number",
+          "description": "Remaining global complexity budget."
+        }
+      },
+      "required": ["total_allocated", "total_spent", "remaining_budget"]
+    },
+    "per_archetype_budget": {
+      "description": "Budget allocations and spending broken down by loop archetype.",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z_]+$": { 
+          "type": "object",
+          "description": "Budget for a specific loop archetype (e.g., Explore, Optimize).",
+          "properties": {
+            "allocated": {
+              "type": "number",
+              "description": "Complexity units allocated to this archetype."
+            },
+            "spent": {
+              "type": "number",
+              "description": "Complexity units spent by this archetype."
+            },
+            "remaining": {
+              "type": "number",
+              "description": "Remaining budget for this archetype."
+            }
+          },
+          "required": ["allocated", "spent", "remaining"]
+        }
+      }
+    },
+    "per_domain_budget": {
+      "description": "Budget allocations and spending broken down by operational domain (e.g., coding, research, planning).",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z_]+$": { 
+          "type": "object",
+          "description": "Budget for a specific operational domain.",
+          "properties": {
+            "allocated": {
+              "type": "number",
+              "description": "Complexity units allocated to this domain."
+            },
+            "spent": {
+              "type": "number",
+              "description": "Complexity units spent by this domain."
+            },
+            "remaining": {
+              "type": "number",
+              "description": "Remaining budget for this domain."
+            }
+          },
+          "required": ["allocated", "spent", "remaining"]
+        }
+      }
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the last update to the complexity budget."
+    }
+  },
+  "required": ["global_budget", "last_updated"]
+}

@@ -46,6 +46,104 @@
     "timestamp": "2025-05-05T06:25:15.000000",
     "intent": "Dummy Intent: Low confidence success test.",
     "status": "success"
+  },
+  {
+    "loop_id": "0030a",
+    "timestamp_start": "2025-05-06T19:19:32.297397+00:00",
+    "timestamp_end": "2025-05-06T19:19:32.430189+00:00",
+    "intent_description": "Implement a new feature to display user analytics on the dashboard.",
+    "archetype": "Implement",
+    "status": "failure",
+    "summary_status": "pending_review",
+    "summary_of_actions": "Archetype: Implement, Est. Cost: 10.; Budget Check Passed: Sufficient budget available.; Orchestrator agent not found. Drift logged.",
+    "key_artifacts_produced": [],
+    "errors_encountered": [
+      "Orchestrator: Agent not found. Drift logged."
+    ]
+  },
+  {
+    "loop_id": "0030b",
+    "timestamp_start": "2025-05-06T19:19:40.535349+00:00",
+    "timestamp_end": "2025-05-06T19:19:40.614603+00:00",
+    "intent_description": "Implement a very large and complex new AI model for advanced forecasting, requiring extensive resources.",
+    "archetype": "Implement",
+    "status": "failure",
+    "summary_status": "pending_review",
+    "summary_of_actions": "Archetype: Implement, Est. Cost: 350.; Budget Check Passed: Sufficient budget available.; Orchestrator agent not found. Drift logged.",
+    "key_artifacts_produced": [],
+    "errors_encountered": [
+      "Orchestrator: Agent not found. Drift logged."
+    ]
+  },
+  {
+    "loop_id": "0031a",
+    "timestamp_start": "2025-05-06T19:42:01.109904+00:00",
+    "timestamp_end": "2025-05-06T19:42:01.264107+00:00",
+    "intent_description": "Test loop for Batch 22.2: Valid summary expected to be accepted. Standard operation, low complexity.",
+    "archetype": "Implement",
+    "status": "failure",
+    "summary_status": "accepted",
+    "summary_of_actions": "Archetype: Implement, Est. Cost: 5.0.; Budget Check Passed: Sufficient budget available.; Orchestrator agent not found. Drift logged.",
+    "key_artifacts_produced": [],
+    "errors_encountered": [
+      "Orchestrator: Agent not found. Drift logged."
+    ]
+  },
+  {
+    "loop_id": "0031b",
+    "timestamp_start": "2025-05-06T19:42:15.342009+00:00",
+    "timestamp_end": "2025-05-06T19:42:15.489618+00:00",
+    "intent_description": "Test loop for Batch 22.2: Summary expected to be rejected due to high cognitive cost or low trust (simulated).",
+    "archetype": "Implement",
+    "status": "failure",
+    "summary_status": "rejected",
+    "summary_of_actions": "Archetype: Implement, Est. Cost: 250.0.; Budget Check Passed: Sufficient budget available.; Orchestrator agent not found. Drift logged.",
+    "key_artifacts_produced": [],
+    "errors_encountered": [
+      "Orchestrator: Agent not found. Drift logged."
+    ]
+  },
+  {
+    "loop_id": "0031c",
+    "timestamp_start": "2025-05-06T19:42:26.084440+00:00",
+    "timestamp_end": "2025-05-06T19:42:26.223690+00:00",
+    "intent_description": "Test loop for Batch 22.2: Attempt to call a deliberately unregistered agent (historian) to trigger and test agent registration drift logging.",
+    "archetype": "Implement",
+    "status": "failure",
+    "summary_status": "accepted",
+    "summary_of_actions": "Archetype: Implement, Est. Cost: 10.0.; Budget Check Passed: Sufficient budget available.; Orchestrator agent not found. Drift logged.; historian agent not found. Drift logged.",
+    "key_artifacts_produced": [],
+    "errors_encountered": [
+      "Orchestrator: Agent not found. Drift logged.",
+      "historian: Agent not found. Drift logged."
+    ]
+  },
+  {
+    "loop_id": "0032a",
+    "timestamp_start": "2025-05-06T20:04:23.763055+00:00",
+    "timestamp_end": "2025-05-06T20:04:23.793765+00:00",
+    "intent_description": "Test loop for Batch 22.3: Trigger review for a pre-existing schema change proposal (proposal_0032a_test) and expect operator approval.",
+    "archetype": "Validate_Verify",
+    "status": "failure",
+    "summary_status": "pending_review",
+    "summary_of_actions": "Archetype: Validate_Verify, Est. Cost: 0.; Budget Check Passed: Sufficient budget available.; Orchestrator: Agent not found. Drift logged.",
+    "key_artifacts_produced": [],
+    "errors_encountered": [
+      "Orchestrator: Agent not found. Drift logged."
+    ]
+  },
+  {
+    "loop_id": "0032b",
+    "timestamp_start": "2025-05-06T20:04:33.883350+00:00",
+    "timestamp_end": "2025-05-06T20:04:33.904121+00:00",
+    "intent_description": "Test loop for Batch 22.3: Trigger review for a pre-existing schema change proposal (proposal_0032b_test) and expect operator rejection.",
+    "archetype": "Validate_Verify",
+    "status": "failure",
+    "summary_status": "pending_review",
+    "summary_of_actions": "Archetype: Validate_Verify, Est. Cost: 0.; Budget Check Passed: Sufficient budget available.; Orchestrator: Agent not found. Drift logged.",
+    "key_artifacts_produced": [],
+    "errors_encountered": [
+      "Orchestrator: Agent not found. Drift logged."
+    ]
   }
 ]
-

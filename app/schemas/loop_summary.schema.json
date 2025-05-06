@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loop Summary",
+  "description": "Schema for summarizing the outcome and key details of an execution loop.",
+  "type": "object",
+  "properties": {
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier for the loop."
+    },
+    "timestamp_start": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the loop started."
+    },
+    "timestamp_end": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the loop ended."
+    },
+    "intent_description": {
+      "type": "string",
+      "description": "The original intent description for the loop."
+    },
+    "archetype": {
+      "type": "string",
+      "description": "The classified archetype of the loop (e.g., Explore, Optimize, Implement)."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "failure", "rejected", "in_progress", "pending_operator"],
+      "description": "Final overall status of the loop execution."
+    },
+    "summary_status": {
+      "type": "string",
+      "enum": ["accepted", "rejected", "pending_review"],
+      "description": "Status of the loop summary itself after validation."
+    },
+    "summary_of_actions": {
+      "type": "string",
+      "description": "A brief summary of actions taken during the loop."
+    },
+    "key_artifacts_produced": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of paths to key artifacts produced or modified."
+    },
+    "errors_encountered": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of error messages if any occurred."
+    },
+    "agent_invocations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "agent_id": {"type": "string"},
+          "status": {"type": "string"},
+          "summary": {"type": "string"}
+        },
+        "required": ["agent_id", "status"]
+      },
+      "description": "Details of agents invoked during the loop."
+    }
+  },
+  "required": [
+    "loop_id",
+    "timestamp_start",
+    "intent_description",
+    "archetype",
+    "status",
+    "summary_status"
+  ]
+}

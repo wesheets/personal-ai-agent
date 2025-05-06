@@ -1,0 +1,9 @@
+{
+  "intent_description": "Implement a very large and complex new AI model for advanced forecasting, requiring extensive resources.",
+  "target_components": ["ai_core_module", "data_pipeline_service", "reporting_dashboard"],
+  "parameters": {
+    "model_id": "ADV_FORECAST_V3_COMPLEX"
+  },
+  "agent_sequence": ["Orchestrator", "Critic", "Pessimist"],
+  "estimated_complexity_cost": 350
+}
