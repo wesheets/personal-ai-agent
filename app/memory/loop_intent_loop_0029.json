@@ -1,0 +1,27 @@
+{
+  "loop_id": "loop_0029",
+  "objective": "Test belief editing mechanism: Propose adding a new belief 'system_status' with value 'nominal' via Belief Manager, requiring Operator approval.",
+  "target_components": [
+    "belief_manager"
+  ],
+  "initial_prompt": "Propose adding a new belief 'system_status' with value 'nominal'.",
+  "agent_inputs": [
+    {
+      "agent_key": "belief_manager",
+      "input_data": {
+        "target_belief_key": "system_status_test_0029",
+        "proposed_change_type": "added",
+        "proposed_value": "nominal",
+        "justification": "Adding system status belief for operational monitoring as part of Batch 21.5 testing."
+      }
+    }
+  ],
+  "expected_outcome": {
+    "description": "A belief change proposal should be generated and saved, pending Operator review. After simulated approval, belief_surface.json should contain 'system_status_test_0029': 'nominal', and legacy_alignment_tracker.json should log the change.",
+    "memory_surfaces_to_check": [
+      "belief_surface.json",
+      "legacy_alignment_tracker.json",
+      "proposed_belief_change_loop_0029.json" 
+    ]
+  }
+}

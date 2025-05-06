@@ -1,0 +1,14 @@
+[
+  {
+    "log_id": "100303ac-966b-4b2e-8ead-87ad29cb7cae",
+    "timestamp": "2025-05-06T04:35:42.927536",
+    "loop_id": "loop_0029",
+    "agent_id": "belief_manager",
+    "change_type": "added",
+    "belief_key": "system_status_test_0029",
+    "previous_value": null,
+    "new_value": "nominal",
+    "justification_ref": "Adding system status belief for operational monitoring as part of Batch 21.5 testing.",
+    "operator_approval_ref": "op_loop_0029_20250506043542910317"
+  }
+]

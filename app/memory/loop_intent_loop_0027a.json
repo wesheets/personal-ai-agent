@@ -1,0 +1,20 @@
+{
+  "loop_id": "loop_0027a",
+  "intent": "Test overriding a low-cost belief. Expect success.",
+  "target_components": [
+    "mutation_guard" 
+  ],
+  "intent_params": {
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/personal-ai-agent-phase21/app/memory/belief_surface.json",
+      "content": "{\"core_principle_1\": \"Maintain system integrity\", \"user_preference_color\": \"blue\", \"user_preference_color_alt\": \"red\", \"low_cost_belief\": \"new_value_approved\"}",
+      "estimated_cost": 0.1,
+      "target_belief_id": "low_cost_belief",
+      "responsible_agent_id": "test_agent_ok"
+    }
+  },
+  "validation_surface": "mutation_log.json",
+  "epistemic_anchor": "Mutation guard should approve modification of low-cost belief."
+}
+

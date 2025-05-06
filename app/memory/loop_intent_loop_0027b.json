@@ -1,0 +1,20 @@
+{
+  "loop_id": "loop_0027b",
+  "intent": "Test overriding a high-cost belief. Expect rejection or escalation.",
+  "target_components": [
+    "mutation_guard"
+  ],
+  "intent_params": {
+    "mutation_request": {
+      "action": "write",
+      "file_path": "/home/ubuntu/personal-ai-agent-phase21/app/memory/belief_surface.json",
+      "content": "{\"core_principle_1\": \"Maintain system integrity\", \"user_preference_color\": \"blue\", \"user_preference_color_alt\": \"red\", \"high_cost_belief\": \"attempted_change_rejected\"}",
+      "estimated_cost": 0.1,
+      "target_belief_id": "high_cost_belief", 
+      "responsible_agent_id": "test_agent_high_cost"
+    }
+  },
+  "validation_surface": "mutation_backlog.json",
+  "epistemic_anchor": "Mutation guard should reject modification of high-cost belief due to weight threshold and log to backlog."
+}
+

@@ -1,0 +1,15 @@
+[
+  {
+    "conflict_id": "conf_loop_0026_c7d7615d",
+    "loop_id": "loop_0026",
+    "timestamp": "2025-05-06T03:42:58.932964+00:00",
+    "conflict_type": "contradiction",
+    "involved_belief_ids": [
+      "user_preference_color",
+      "user_preference_color_alt"
+    ],
+    "description": "Contradictory color preferences found ('blue' and 'red').",
+    "confidence_score": 0.9,
+    "resolution_status": "unresolved"
+  }
+]

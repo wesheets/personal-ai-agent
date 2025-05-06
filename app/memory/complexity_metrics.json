@@ -1,0 +1,9 @@
+{
+  "metrics": {
+    "average_loop_duration_sec": 0.11838531494140625,
+    "average_tokens_per_loop": null,
+    "average_agent_calls_per_loop": 0,
+    "mutation_request_complexity_score": null
+  },
+  "last_updated": "2025-05-06T12:44:45.906422+00:00"
+}

@@ -1,0 +1,6 @@
+{
+  "loop_id": "loop_0025",
+  "intent": "Link justification entries from this loop to a prior related justification using linked_justification_refs.",
+  "validation_surface": "loop_justification_log.json",
+  "epistemic_anchor": "This loop must include a justification link to loop_0023 or loop_0024 if relevant insights were used."
+}

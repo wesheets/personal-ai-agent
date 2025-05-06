@@ -1,0 +1,14 @@
+{
+  "loop_id": "loop_0028a",
+  "intent_description": "Test efficient agent budget usage. Run Architect agent for a simple task.",
+  "target_components": [
+    "architect_agent"
+  ],
+  "intent_params": {
+    "architect_instruction": {
+      "task": "Generate a basic plan outline for a simple web page."
+    }
+  },
+  "requires_operator_review": false
+}
+

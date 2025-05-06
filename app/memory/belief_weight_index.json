@@ -1,0 +1,19 @@
+{
+  "index": {
+    "low_cost_belief": {
+      "weight": 0.2,
+      "source": "manual_test_data",
+      "last_updated": "2025-05-06T03:52:00Z"
+    },
+    "high_cost_belief": {
+      "weight": 0.9,
+      "source": "manual_test_data",
+      "last_updated": "2025-05-06T03:52:00Z"
+    }
+  },
+  "calculation_metadata": {
+    "last_run_timestamp": "2025-05-06T03:52:00Z",
+    "method_used": "manual_test_data_population"
+  }
+}
+

@@ -1,0 +1,6 @@
+{
+  "loop_id": "loop_0024",
+  "intent": "Quantify plan complexity and log it to complexity_metrics.json.",
+  "validation_surface": "complexity_metrics.json",
+  "epistemic_anchor": "All planned operations must include runtime or step estimates; complexity score must be calculated."
+}
