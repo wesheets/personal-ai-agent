@@ -14,6 +14,7 @@ class AgentCapability(Enum):
     CODE_GENERATION = "code_generation"
     VALIDATION = "validation"
     FILE_READ = "file_read"
+    RISK_ASSESSMENT = "risk_assessment" # Added for Pessimist Agent
     # Add more capabilities as needed
 
 # Agent Registry
