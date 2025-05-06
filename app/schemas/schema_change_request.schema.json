@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Schema Change Request",
+  "description": "A proposal for changing a JSON schema within the system.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "proposal_id": {
+        "type": "string",
+        "description": "Unique identifier for the proposal (e.g., UUID)."
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "ISO 8601 timestamp of proposal creation."
+      },
+      "proposing_agent_id": {
+        "type": "string",
+        "description": "Identifier of the agent or entity making the proposal."
+      },
+      "target_schema_path": {
+        "type": "string",
+        "description": "Filesystem path to the schema file to be changed (e.g., app/schemas/belief_surface.schema.json)."
+      },
+      "proposed_change_description": {
+        "type": "string",
+        "description": "A clear, human-readable description of the change."
+      },
+      "proposed_change_details": {
+        "type": "object",
+        "description": "Optional structured details of the change, e.g., JSON Patch object or specific modification instructions.",
+        "additionalProperties": true
+      },
+      "justification": {
+        "type": "string",
+        "description": "Reason for the proposed change."
+      },
+      "potential_impact": {
+        "type": "string",
+        "description": "Analysis of the potential impact of the change."
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "pending_review",
+          "approved",
+          "rejected",
+          "applied_simulated",
+          "simulation_failed",
+          "applied_live",
+          "application_failed",
+          "review_timeout",
+          "superseded",
+          "aborted"
+        ],
+        "description": "Current status of the proposal."
+      },
+      "loop_id_proposed": {
+        "type": "string",
+        "description": "The loop ID in which this proposal was generated."
+      },
+      "loop_id_reviewed": {
+        "type": ["string", "null"],
+        "description": "The loop ID in which this proposal was reviewed by the operator."
+      },
+      "timestamp_reviewed": {
+        "type": ["string", "null"],
+        "format": "date-time",
+        "description": "ISO 8601 timestamp of when the proposal was reviewed."
+      },
+      "timestamp_simulated_application": {
+        "type": ["string", "null"],
+        "format": "date-time",
+        "description": "ISO 8601 timestamp of when the simulated application occurred."
+      },
+      "operator_decision_details": {
+        "type": ["object", "null"],
+        "properties": {
+          "operator_id": {"type": "string"},
+          "decision_justification": {"type": "string"}
+        },
+        "description": "Details about the operator's decision."
+      }
+    },
+    "required": [
+      "proposal_id",
+      "timestamp",
+      "proposing_agent_id",
+      "target_schema_path",
+      "proposed_change_description",
+      "justification",
+      "status",
+      "loop_id_proposed"
+    ]
+  }
+}
+
