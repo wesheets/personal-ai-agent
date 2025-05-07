@@ -1,0 +1,22 @@
+[
+  {
+    "step": 1,
+    "action": "create_file",
+    "details": "Create app/agents/example_agent.py with basic structure inheriting from BaseAgent."
+  },
+  {
+    "step": 2,
+    "action": "implement_capability",
+    "details": "Implement file reading capability within ExampleAgent."
+  },
+  {
+    "step": 3,
+    "action": "register_agent",
+    "details": "Register ExampleAgent in app/registry.py."
+  },
+  {
+    "step": 4,
+    "action": "update_schemas",
+    "details": "Create necessary input/output schemas for ExampleAgent."
+  }
+]

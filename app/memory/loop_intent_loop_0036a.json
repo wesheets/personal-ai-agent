@@ -1,0 +1,15 @@
+{
+  "loop_id": "loop_0036a",
+  "intent_description": "Architect, please propose a very simple plan for a small task. This loop is to test if system invariants are met under normal conditions.",
+  "target_agent": "architect",
+  "agent_input": {
+    "instruction_type": "propose_plan",
+    "context": "The user wants a plan for a very small, low-risk task.",
+    "requirements": [
+      "The plan should have 1-2 steps.",
+      "The plan should be extremely simple."
+    ]
+  },
+  "domain": "testing"
+}
+

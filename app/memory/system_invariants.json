@@ -1,0 +1,25 @@
+[
+    {
+        "invariant_id": "INV001",
+        "description": "Agent trust score must not drop below 0.3 without Operator review.",
+        "condition_type": "trust_score_threshold",
+        "parameters": {
+            "threshold_value": 0.3,
+            "comparison_operator": "<"
+        },
+        "severity": "critical",
+        "enforcement_action": "halt_loop_operator_review"
+    },
+    {
+        "invariant_id": "INV002",
+        "description": "Total loop cost must not exceed 100.0 units.",
+        "condition_type": "budget_limit",
+        "parameters": {
+            "threshold_value": 100.0,
+            "comparison_operator": ">"
+        },
+        "severity": "critical",
+        "enforcement_action": "halt_loop_operator_review"
+    }
+]
+
