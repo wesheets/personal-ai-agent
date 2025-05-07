@@ -12,6 +12,7 @@ from app.agents.base_agent import BaseAgent
 from app.schemas.agent_input.architect_agent_input import ArchitectInstruction
 from app.schemas.agent_output.architect_agent_output import ArchitectPlanResult
 from app.core.agent_registry import register, AgentCapability
+from app.schemas.core.agent_result import AgentResult # Cleanup Patch: Import AgentResult
 # Removed toolkit_registry import as it wasn't used
 from app.utils.memory import read_memory, log_memory # Placeholder imports
 from app.utils.status import ResultStatus
@@ -61,8 +62,9 @@ def log_justification(entry: dict):
     ]
 )
 class ArchitectAgent(BaseAgent):
+    input_schema = ArchitectInstruction # Added for consistent payload processing
     
-    async def run(self, payload: ArchitectInstruction) -> ArchitectPlanResult:
+    async def run(self, payload: ArchitectInstruction) -> AgentResult: # Cleanup Patch: Changed return type hint
         """
         Generates a plan based on intent and logs justification.
         """
@@ -117,12 +119,17 @@ class ArchitectAgent(BaseAgent):
             log_justification(justification_entry)
             # --- End Batch 17.1 --- 
             
-            return ArchitectPlanResult(
+            plan_output_dict = ArchitectPlanResult(
                 suggested_components=[],
                 tool_scaffold_plan=[],
                 memory_update={"plan_file": plan_file_path},
                 status=ResultStatus.SUCCESS
-            ).model_dump() # Batch 21.4: Return dict
+            ).model_dump()
+            
+            return AgentResult(
+                status="SUCCESS",  # Cleanup Patch: Use string value
+                output=plan_output_dict
+            )
         except Exception as e:
             # Log error appropriately
             error_message = f"Error generating/saving plan or logging justification for {loop_id}: {e}"
@@ -138,11 +145,8 @@ class ArchitectAgent(BaseAgent):
             }
             log_justification(failure_justification)
             
-            return ArchitectPlanResult(
-                suggested_components=[],
-                tool_scaffold_plan=[],
-                memory_update={},
-                status=ResultStatus.FAILURE,
-                error_message=str(e)
+            return AgentResult(
+                status="FAILURE",  # Cleanup Patch: Use string value
+                errors=[str(e)]
             )
 
