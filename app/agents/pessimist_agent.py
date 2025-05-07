@@ -8,7 +8,7 @@ from typing import Dict, Any, Optional
 
 # Corrected imports relative to project root
 from app.agents.base_agent import BaseAgent
-from app.registry import register, AgentCapability # Assuming registry handles capabilities
+from app.core.agent_registry import register, AgentCapability # Assuming registry handles capabilities
 from app.utils.status import ResultStatus
 from app.utils.justification_logger import log_justification
 

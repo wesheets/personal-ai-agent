@@ -45,5 +45,65 @@
     "timestamp": "2025-05-06T20:04:33.903771+00:00",
     "rejection_reason": "Critic agent not found for summary evaluation. Drift logged. Summary pending manual review.",
     "validator_agent_id": "LoopControllerInternal_CriticNotFound"
+  },
+  {
+    "loop_id": "loop_0036a",
+    "timestamp": "2025-05-07T02:28:20.520548+00:00",
+    "rejection_reason": "Critic agent not found for summary evaluation. Drift logged. Summary pending manual review.",
+    "validator_agent_id": "LoopControllerInternal_CriticNotFound"
+  },
+  {
+    "loop_id": "loop_0036a",
+    "timestamp": "2025-05-07T02:30:18.515118+00:00",
+    "rejection_reason": "Critic agent not found for summary evaluation. Drift logged. Summary pending manual review.",
+    "validator_agent_id": "LoopControllerInternal_CriticNotFound"
+  },
+  {
+    "loop_id": "loop_0036a",
+    "timestamp": "2025-05-07T02:37:11.323544+00:00",
+    "rejection_reason": "Critic agent not found for summary evaluation. Drift logged. Summary pending manual review.",
+    "validator_agent_id": "LoopControllerInternal_CriticNotFound"
+  },
+  {
+    "loop_id": "loop_0036a",
+    "timestamp": "2025-05-07T02:39:06.107518+00:00",
+    "rejection_reason": "Summary rejected due to low trust score at runtime (0.50).",
+    "validator_agent_id": "CriticAgent"
+  },
+  {
+    "loop_id": "loop_0037",
+    "timestamp": "2025-05-07T02:51:23.360094+00:00",
+    "rejection_reason": "Summary rejected due to low trust score at runtime (0.50).",
+    "validator_agent_id": "CriticAgent"
+  },
+  {
+    "loop_id": "loop_0037",
+    "timestamp": "2025-05-07T02:59:30.951680+00:00",
+    "rejection_reason": "Summary rejected due to low trust score at runtime (0.50).",
+    "validator_agent_id": "CriticAgent"
+  },
+  {
+    "loop_id": "loop_0037",
+    "timestamp": "2025-05-07T03:00:10.642353+00:00",
+    "rejection_reason": "Summary rejected due to low trust score at runtime (0.50).",
+    "validator_agent_id": "CriticAgent"
+  },
+  {
+    "loop_id": "loop_0037",
+    "timestamp": "2025-05-07T03:01:01.099899+00:00",
+    "rejection_reason": "Summary rejected due to low trust score at runtime (0.50).",
+    "validator_agent_id": "CriticAgent"
+  },
+  {
+    "loop_id": "loop_0037",
+    "timestamp": "2025-05-07T03:11:59.621494+00:00",
+    "rejection_reason": "Summary rejected due to low trust score at runtime (0.50).",
+    "validator_agent_id": "CriticAgent"
+  },
+  {
+    "loop_id": "loop_0037",
+    "timestamp": "2025-05-07T03:12:38.418638+00:00",
+    "rejection_reason": "Summary rejected due to low trust score at runtime (0.50).",
+    "validator_agent_id": "CriticAgent"
   }
 ]

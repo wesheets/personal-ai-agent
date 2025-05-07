@@ -28,6 +28,9 @@ class AgentCapability(Enum):
     UX_PLANNING = "ux_planning"
     ARCHITECTURE = "architecture"
     PROMPTING = "prompting"
+    VALIDATION = "validation"
+    REJECTION = "rejection"
+    RISK_ASSESSMENT = "risk_assessment"
 
 # Batch 21.2: Added register decorator
 def register(key: str, name: str, capabilities: list[AgentCapability]):

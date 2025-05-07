@@ -1,0 +1,17 @@
+{
+  "loop_id": "loop_0036b",
+  "intent_description": "Architect, please devise a comprehensive multi-stage strategy to solve a highly complex, novel problem involving advanced theoretical physics and large-scale data simulation. This loop is designed to test system invariant violations, specifically the budget limit.",
+  "target_agent": "architect",
+  "agent_input": {
+    "instruction_type": "propose_plan",
+    "context": "The user requires a detailed and resource-intensive plan for a hypothetical research project that pushes the boundaries of current knowledge. The goal is to see if the estimated and actual loop cost triggers the budget invariant.",
+    "requirements": [
+      "The plan must involve at least 10 distinct phases.",
+      "Each phase must detail multiple sub-tasks.",
+      "The plan should explicitly mention the need for significant computational resources and expert human review at multiple stages.",
+      "Consider potential failure points and contingency plans for at least three major phases."
+    ]
+  },
+  "domain": "advanced_research_simulation"
+}
+

@@ -9313,5 +9313,95 @@
     "purpose": "Documentation for schema and memory requirements for Batch 22.3.",
     "created_by": "Manus",
     "schema_version": "v1.0"
-  }
+  },
+  {
+  "path": "app/memory/simplification_incentives.json",
+  "type": "memory_surface",
+  "status": "verified",
+  "batch_id": "23.0",
+  "purpose": "Captures incentives or guidance that encourage simpler plans, agents, or architectural structures.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/simplification_incentives.schema.json",
+  "type": "schema",
+  "status": "verified",
+  "batch_id": "23.0",
+  "purpose": "Schema for simplification_incentives.json memory surface.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/memory/truth_manifesto.json",
+  "type": "memory_surface",
+  "status": "verified",
+  "batch_id": "23.0",
+  "purpose": "Central declaration of system truths and cognitive architecture principles.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/drift_violation_log.schema.json",
+  "type": "schema",
+  "status": "verified",
+  "batch_id": "23.0",
+  "purpose": "Schema for logging when agent or memory behavior deviates from expected truth structure.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/system_invariants.schema.json",
+  "type": "schema",
+  "status": "verified",
+  "batch_id": "23.3",
+  "purpose": "Defines system-wide behavioral invariants for audit, reflection, and downstream recovery.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/invariant_violation_log.schema.json",
+  "type": "schema",
+  "status": "verified",
+  "batch_id": "23.3",
+  "purpose": "Schema for logging violations of declared system invariants.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/memory/system_invariants.json",
+  "type": "memory_surface",
+  "status": "verified",
+  "batch_id": "23.3",
+  "purpose": "Holds declared rules and invariants that should be upheld across system behavior.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/memory/invariant_violation_log.json",
+  "type": "memory_surface",
+  "status": "verified",
+  "batch_id": "23.3",
+  "purpose": "Logs occurrences where a system invariant was violated during execution.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/memory/loop_identity_signature.json",
+  "type": "memory_surface",
+  "status": "verified",
+  "batch_id": "23.4",
+  "purpose": "Tracks and validates identity information for each loop, including agent, purpose, and confidence.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/loop_identity_signature.schema.json",
+  "type": "schema",
+  "status": "verified",
+  "batch_id": "23.4",
+  "purpose": "Schema for loop identity signature surface, which links memory and agent execution metadata.",
+  "created_by": "operator",
+  "schema_version": "v1.0"
+}
 ]
