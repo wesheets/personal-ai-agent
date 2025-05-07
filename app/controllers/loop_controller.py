@@ -39,6 +39,14 @@ from app.validators.belief_updater import apply_belief_update
 from app.validators.archetype_classifier import ArchetypeClassifier
 from app.validators.schema_updater import apply_schema_change # Batch 22.3: Import schema_updater
 
+# Batch 23.3 Imports for System Invariants and Violation Logging
+import uuid
+import hashlib # Batch 23.4: For loop identity signature
+from app.schemas.system_invariants_schema import SystemInvariant # Assuming schema will define this
+from app.schemas.invariant_violation_log_schema import InvariantViolationRecord # Assuming schema will define this
+from app.schemas.loop_identity_signature_schema import LoopIdentitySignatureRecord # Batch 23.4: For loop identity signature
+# End Batch 23.3 Importss
+
 # Define paths relative to PROJECT_ROOT
 LOOP_SUMMARY_PATH = os.path.join(PROJECT_ROOT, "app/memory/loop_summary.json")
 LOOP_SUMMARY_REJECTION_LOG_PATH = os.path.join(PROJECT_ROOT, "app/memory/loop_summary_rejection_log.json")
@@ -56,6 +64,102 @@ AGENT_TRUST_SCORE_PATH = os.path.join(MEMORY_DIR, "agent_trust_score.json")
 BELIEF_CONFLICT_LOG_PATH = os.path.join(MEMORY_DIR, "belief_conflict_log.json")
 # Batch 22.3: Path for schema change requests
 SCHEMA_CHANGE_REQUEST_PATH = os.path.join(MEMORY_DIR, "schema_change_request.json")
+
+# Batch 23.3: Paths for System Invariants and Violation Logging
+SYSTEM_INVARIANTS_PATH = os.path.join(MEMORY_DIR, "system_invariants.json")
+INVARIANT_VIOLATION_LOG_PATH = os.path.join(MEMORY_DIR, "invariant_violation_log.json")
+# End Batch 23.3 Paths
+
+# Batch 23.4: Path for Loop Identity Signature
+LOOP_IDENTITY_SIGNATURE_PATH = os.path.join(MEMORY_DIR, "loop_identity_signature.json")
+# End Batch 23.4 Paths
+
+# Batch 23.3: Function to load system invariants
+def load_system_invariants(loop_id: str) -> List[SystemInvariant]:
+    invariants_data = load_json(SYSTEM_INVARIANTS_PATH, is_list_default=True)
+    loaded_invariants = []
+    if isinstance(invariants_data, list):
+        for inv_dict in invariants_data:
+            try:
+                loaded_invariants.append(SystemInvariant(**inv_dict))
+            except Exception as e:
+                log_justification(loop_id, "loop_controller", "InvariantLoadError", f"Failed to parse invariant: {inv_dict}. Error: {e}", 1.0)
+                print(f"Loop {loop_id}: Error loading invariant {inv_dict.get('invariant_id', 'Unknown')}: {e}")
+    else:
+        log_justification(loop_id, "loop_controller", "InvariantLoadError", f"System invariants file {SYSTEM_INVARIANTS_PATH} is not a list.", 1.0)
+        print(f"Loop {loop_id}: Warning - {SYSTEM_INVARIANTS_PATH} did not contain a list of invariants.")
+    log_justification(loop_id, "loop_controller", "SystemInvariantsLoaded", f"Loaded {len(loaded_invariants)} system invariants.", 0.5)
+    return loaded_invariants
+
+# Batch 23.3: Function to log an invariant violation
+def log_invariant_violation(loop_id: str, invariant: SystemInvariant, checked_value: Any, agent_responsible: str | None = None):
+    violation_log_data = load_json(INVARIANT_VIOLATION_LOG_PATH, is_list_default=True)
+    if not isinstance(violation_log_data, list):
+        print(f"Warning: {INVARIANT_VIOLATION_LOG_PATH} is not a list. Reinitializing.")
+        violation_log_data = []
+
+    violation_details = ViolationDetails(
+        checked_value=checked_value,
+        invariant_condition=f"{invariant.description} (Condition: {invariant.condition_type}, Params: {invariant.parameters.dict()})",
+        agent_responsible=agent_responsible
+    )
+
+    violation_record = InvariantViolationRecord(
+        loop_id=loop_id,
+        invariant_id_violated=invariant.invariant_id,
+        details=violation_details,
+        severity_of_violation=invariant.severity,
+        action_taken=invariant.enforcement_action # This might be adjusted based on actual action taken
+    )
+    
+    violation_log_data.append(violation_record.dict(exclude_none=True))
+    save_json(violation_log_data, INVARIANT_VIOLATION_LOG_PATH)
+    log_justification(loop_id, "loop_controller", "InvariantViolationLogged", f"Logged violation for invariant '{invariant.invariant_id}'. Severity: {invariant.severity}. Action: {invariant.enforcement_action}", 2.0)
+    print(f"Loop {loop_id}: Logged violation for invariant \t'{invariant.invariant_id}'. Severity: {invariant.severity}. Action: {invariant.enforcement_action}")
+# End Batch 23.3 Functions
+
+# Batch 23.3: Function to check system invariants
+def check_system_invariants(loop_id: str, current_trust_score: float, current_loop_cost: float) -> bool:
+    """Checks all system invariants. Returns True if loop should continue, False if a critical invariant is violated and requires halt."""
+    system_invariants = load_system_invariants(loop_id)
+    halt_loop = False
+
+    for invariant in system_invariants:
+        violated = False
+        checked_value = None
+
+        if invariant.condition_type == "trust_score_threshold":
+            checked_value = current_trust_score
+            if invariant.parameters.comparison_operator == "<":
+                if current_trust_score < invariant.parameters.threshold_value:
+                    violated = True
+            elif invariant.parameters.comparison_operator == ">": # Should not happen for trust score usually, but for completeness
+                if current_trust_score > invariant.parameters.threshold_value:
+                    violated = True
+            # Add other operators as needed (<=, >=, ==, !=)
+            
+        elif invariant.condition_type == "budget_limit":
+            checked_value = current_loop_cost
+            if invariant.parameters.comparison_operator == ">":
+                if current_loop_cost > invariant.parameters.threshold_value:
+                    violated = True
+            # Add other operators as needed
+
+        # TODO: Implement "specific_memory_value" check if required by an invariant
+        # This would involve loading the specified memory surface and checking its value.
+        # For now, we will skip it if no such invariants are defined in system_invariants.json
+
+        if violated:
+            log_invariant_violation(loop_id, invariant, checked_value)
+            if invariant.enforcement_action == "halt_loop_operator_review":
+                halt_loop = True # A critical invariant violation that requires halting the loop
+                # Potentially, we could add more granular return to indicate specific halt reason or action
+    
+    if halt_loop:
+        log_justification(loop_id, "loop_controller", "CriticalInvariantViolation", "Critical system invariant violated. Loop execution will be halted.", 5.0)
+        return False # Signal to halt the loop
+    return True # All invariants passed or non-critical violations, loop can continue
+# End Batch 23.3 Check Function
 
 OPERATOR_REVIEW_TIMEOUT_SECONDS = 300 
 OPERATOR_REVIEW_POLL_INTERVAL_SECONDS = 5
@@ -198,7 +302,7 @@ async def evaluate_loop_summary(loop_id, loop_archetype, accumulated_complexity_
 
     critic_agent = None
     try:
-        critic_agent = get_agent("Critic")
+        critic_agent = get_agent("critic")
     except AgentNotFoundException as e:
         log_agent_registration_drift(loop_id, "Critic", "app.controllers.loop_controller.evaluate_loop_summary", str(e))
         rejection_reason = "Critic agent not found for summary evaluation. Drift logged. Summary pending manual review."
@@ -424,6 +528,47 @@ async def check_and_process_schema_change_proposals(loop_id, current_loop_summar
         print(f"Loop {loop_id}: No actionable pending schema change proposals found.")
 
 
+# Batch 23.4: Function to generate and log loop identity signature
+def generate_and_log_loop_identity_signature(loop_id: str, intent_data: Dict[str, Any], current_loop_summary_actions: List[str]):
+    """Generates a unique signature for the loop and logs it."""
+    try:
+        # Create a string from key intent data for hashing
+        # Ensure consistent order for hashing if using dict items
+        relevant_input_data = {
+            "loop_id": loop_id,
+            "intent_description": intent_data.get("intent_description", ""),
+            "target_agent": intent_data.get("target_agent", ""),
+            # Add other key parameters from intent_data if they define the loop's core identity
+            # For example, specific agent_input keys if they are stable and defining
+        }
+        input_string_for_hash = json.dumps(relevant_input_data, sort_keys=True)
+        
+        signature_hash = hashlib.sha256(input_string_for_hash.encode("utf-8")).hexdigest()
+        
+        signature_record = LoopIdentitySignatureRecord(
+            loop_id=loop_id,
+            signature_hash=signature_hash,
+            input_details_summary=f"Based on intent: {intent_data.get('intent_description', 'N/A')}, Target: {intent_data.get('target_agent', 'N/A')}"
+        )
+        
+        signature_log = load_json(LOOP_IDENTITY_SIGNATURE_PATH, is_list_default=True)
+        if not isinstance(signature_log, list):
+            print(f"Warning: {LOOP_IDENTITY_SIGNATURE_PATH} is not a list. Reinitializing.")
+            signature_log = []
+            
+        signature_log.append(signature_record.model_dump(mode="json", exclude_none=True))
+        save_json(signature_log, LOOP_IDENTITY_SIGNATURE_PATH)
+        print(f"Loop {loop_id}: Successfully generated and logged loop identity signature: {signature_hash}")
+        current_loop_summary_actions.append(f"Loop Identity Signature generated: {signature_hash}") # Ensure current_loop_summary_actions is accessible or passed
+
+    except Exception as e:
+        error_message = f"Error generating/logging loop identity signature for {loop_id}: {e}"
+        print(error_message)
+        # Decide if this error should be added to loop_errors or just logged
+        # For now, just printing and potentially logging via justification if needed elsewhere
+        log_justification(loop_id, "loop_controller", "LoopSignatureError", error_message, 3.0)
+# End Batch 23.4 Function
+
 async def run_loop(loop_id: str):
     timestamp_start_iso = datetime.now(timezone.utc).isoformat()
     print(f"Starting Loop ID: {loop_id} at {timestamp_start_iso}")
@@ -436,6 +581,10 @@ async def run_loop(loop_id: str):
     if not intent_data:
         log_loop_summary(loop_id, "Intent data not found or invalid", "failure", "Unknown", timestamp_start_iso, summary_status="rejected", summary_actions="Loop failed: Intent data not found or invalid.", errors=["Intent data not found or invalid"])
         return
+
+    # Batch 23.4: Generate and log loop identity signature
+    generate_and_log_loop_identity_signature(loop_id, intent_data, current_loop_summary_actions)
+    # End Batch 23.4
 
     intent_description = intent_data.get("intent_description", "No description provided.")
     target_agent_key = intent_data.get("target_agent", "Orchestrator") 
@@ -480,11 +629,10 @@ async def run_loop(loop_id: str):
         print(f"Loop {loop_id}: Complexity budget check passed for archetype '{loop_archetype}'.")
         current_loop_summary_actions.append(f"Budget Check Passed: Sufficient budget available.")
 
-    # --- Main Agent Execution Logic --- 
-    agent_to_run = None
+    # --- Main Agent Execution Logic --    agent_class_to_run = None # Batch 23.4 Precision Patch: Changed variable name
     try:
-        agent_to_run = get_agent(target_agent_key)
-        current_loop_summary_actions.append(f"Target agent '{target_agent_key}' loaded.")
+        agent_class_to_run = get_agent(target_agent_key) # Batch 23.4 Precision Patch: This returns a class
+        current_loop_summary_actions.append(f"Target agent class 	'{target_agent_key}' loaded.")
     except AgentNotFoundException as e:
         error_message = f"{target_agent_key}: Agent not found. Drift logged."
         print(f"Loop {loop_id}: {error_message} Details: {e}")
@@ -498,18 +646,30 @@ async def run_loop(loop_id: str):
         return
 
     agent_result: AgentResult = None
-    if agent_to_run:
+    if agent_class_to_run: # Batch 23.4 Precision Patch: Check class
         try:
-            print(f"Loop {loop_id}: Executing agent '{target_agent_key}' with input: {agent_input_data}")
+            agent_instance = agent_class_to_run() # Batch 23.4 Precision Patch: Instantiate the agent
+            print(f"Loop {loop_id}: Executing agent instance of '{target_agent_key}' with input: {agent_input_data}")
             if target_agent_key == "BeliefManager":
                 try:
                     belief_manager_input = BeliefManagerInput(**agent_input_data)
-                    agent_result = await agent_to_run.run(belief_manager_input)
+                    agent_result = await agent_instance.run(belief_manager_input) # Batch 23.4 Precision Patch: Use instance
                 except Exception as pydantic_error:
                     raise ValueError(f"Input validation failed for BeliefManager: {pydantic_error}") from pydantic_error
+            elif target_agent_key == "architect": # Batch 23.4 Precision Patch
+                try:
+                    # Ensure all required fields for ArchitectInstruction are present
+                    payload_data_for_architect = {
+                        "loop_id": loop_id,  # Add loop_id
+                        "intent_description": intent_description,  # Add intent_description
+                        **agent_input_data  # Spread the rest of the agent_input_data
+                    }
+                    architect_input = ArchitectInstruction(**payload_data_for_architect)
+                    agent_result = await agent_instance.run(payload=architect_input) # Batch 23.4 Precision Patch: Use instance, Pass as payload
+                except Exception as pydantic_error:
+                    raise ValueError(f"Input validation failed for ArchitectAgent: {pydantic_error}") from pydantic_error
             else:
-                 agent_result = await agent_to_run.run(agent_input_data) 
-            
+                 agent_result = await agent_instance.run(agent_input_data) # Batch 23.4 Precision Patch: Use instance         
             current_loop_summary_actions.append(f"Agent '{target_agent_key}' executed. Status: {agent_result.status.value if agent_result else 'Unknown'}.")
             if agent_result and agent_result.output:
                 key_artifacts.append(f"{target_agent_key}_output: {str(agent_result.output)[:200]}...") 
@@ -521,9 +681,38 @@ async def run_loop(loop_id: str):
             current_loop_summary_actions.append(error_message)
             accumulated_complexity_cost += AGENT_ERROR_PENALTY
             agent_result = AgentResult(status=ResultStatus.FAILURE, errors=[str(e)])
-
     # --- Post-Agent Execution Processing --- 
     final_status = "success" if agent_result and agent_result.status == ResultStatus.SUCCESS else "failure"
+
+    # Batch 23.3: Check system invariants before proceeding to summary
+    # First, get current trust score (adapted from evaluate_loop_summary)
+    trust_scores_data_for_invariant_check = load_json(AGENT_TRUST_SCORE_PATH, is_list_default=False)
+    current_trust_score_for_invariant_check = 0.75 # Default
+    if isinstance(trust_scores_data_for_invariant_check, dict):
+        current_trust_score_for_invariant_check = trust_scores_data_for_invariant_check.get("system_average_trust", 0.75)
+    elif isinstance(trust_scores_data_for_invariant_check, list) and trust_scores_data_for_invariant_check:
+        total_score_inv = 0
+        count_inv = 0
+        for agent_score_entry_inv in trust_scores_data_for_invariant_check:
+            if isinstance(agent_score_entry_inv, dict) and "score" in agent_score_entry_inv:
+                try:
+                    total_score_inv += float(agent_score_entry_inv["score"])
+                    count_inv += 1
+                except ValueError:
+                    pass # Ignore invalid scores for this check
+        if count_inv > 0:
+            current_trust_score_for_invariant_check = total_score_inv / count_inv
+    
+    if not check_system_invariants(loop_id, current_trust_score_for_invariant_check, accumulated_complexity_cost):
+        final_status = "halted_by_invariant"
+        current_loop_summary_actions.append(f"Loop halted due to critical system invariant violation.")
+        loop_errors.append("Critical system invariant violated.")
+        # Log summary with halted status and return
+        # Note: evaluate_loop_summary might still run, but its outcome might be overridden or it might also check this status
+        # For now, we set final_status and let the existing summary logic handle it.
+        # The summary_status from evaluate_loop_summary will be used by log_loop_summary.
+        # We should ensure that if final_status is 'halted_by_invariant', it's reflected appropriately.
+        pass # Allow flow to continue to summary logging, which will use this final_status
 
     # Belief Change Proposal Handling (Batch 21.5)
     if target_agent_key == "BeliefManager" and agent_result and agent_result.status == ResultStatus.SUCCESS and isinstance(agent_result.output, BeliefChangeProposal):
