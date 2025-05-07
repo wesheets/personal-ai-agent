@@ -61087,5 +61087,75 @@
     "type": "unknown",
     "added_by": "Manus",
     "schema_version": "v1.0"
-  }
+  },
+  {
+  "path": "app/memory/simplification_incentives.json",
+  "status": "verified",
+  "type": "memory_surface",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/simplification_incentives.schema.json",
+  "status": "verified",
+  "type": "schema",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/memory/truth_manifesto.json",
+  "status": "verified",
+  "type": "memory_surface",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/drift_violation_log.schema.json",
+  "status": "verified",
+  "type": "schema",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/system_invariants.schema.json",
+  "status": "verified",
+  "type": "schema",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/invariant_violation_log.schema.json",
+  "status": "verified",
+  "type": "schema",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/memory/system_invariants.json",
+  "status": "verified",
+  "type": "memory_surface",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/memory/invariant_violation_log.json",
+  "status": "verified",
+  "type": "memory_surface",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/memory/loop_identity_signature.json",
+  "status": "verified",
+  "type": "memory_surface",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+},
+{
+  "path": "app/schemas/loop_identity_signature.schema.json",
+  "status": "verified",
+  "type": "schema",
+  "added_by": "operator",
+  "schema_version": "v1.0"
+}
 ]
