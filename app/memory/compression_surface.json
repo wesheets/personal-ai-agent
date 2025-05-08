@@ -1,0 +1,16 @@
+{
+  "clusters": [
+    {
+      "cluster_id": "cluster_justification_feedback",
+      "loop_ids": [
+        "loop_0030a",
+        "loop_0031b",
+        "loop_0032a"
+      ],
+      "dominant_theme": "Feedback and belief alignment",
+      "compression_score": 0.92,
+      "compressed_summary": "Linked loops show progressive adaptation to feedback and escalating risk awareness."
+    }
+  ],
+  "last_updated": "2025-05-08T15:46:08.643783Z"
+}

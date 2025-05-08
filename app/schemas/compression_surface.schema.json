@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Justification Chain Compression Surface",
+  "description": "Summarized view of linked justifications across loops, used for reflection compression and audit.",
+  "type": "object",
+  "properties": {
+    "clusters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cluster_id": {
+            "type": "string"
+          },
+          "loop_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dominant_theme": {
+            "type": "string"
+          },
+          "compression_score": {
+            "type": "number"
+          },
+          "compressed_summary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "cluster_id",
+          "loop_ids",
+          "compression_score",
+          "compressed_summary"
+        ]
+      }
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "clusters"
+  ]
+}

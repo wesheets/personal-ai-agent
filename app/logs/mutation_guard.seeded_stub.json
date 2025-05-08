@@ -1,0 +1,18 @@
+[
+  {
+    "loop_id": "loop_0031c",
+    "agent": "PessimistAgent",
+    "action_blocked": "memory_write",
+    "reason": "Uncertainty score exceeded threshold",
+    "timestamp": "2025-05-08T13:03:17.675005Z",
+    "recovered_stub": true
+  },
+  {
+    "loop_id": "loop_0032b",
+    "agent": "CriticAgent",
+    "action_blocked": "belief_override",
+    "reason": "Conflict with belief_surface.json detected",
+    "timestamp": "2025-05-08T13:03:17.675016Z",
+    "recovered_stub": true
+  }
+]

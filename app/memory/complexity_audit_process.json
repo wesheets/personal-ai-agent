@@ -1,0 +1,14 @@
+{
+    "process_id": "audit_20250508_initial",
+    "timestamp_utc": "2025-05-08T10:00:00Z",
+    "audit_scope": "full_system",
+    "metrics_to_collect": [
+        "cyclomatic_complexity",
+        "dependency_count",
+        "cognitive_complexity"
+    ],
+    "thresholds": {
+        "cyclomatic_complexity_critical": 20,
+        "cognitive_complexity_warning": 15
+    }
+}

@@ -1,0 +1,91 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Phase 24 Governance Report Schema",
+    "description": "Schema for the phase_24_governance_report.json file.",
+    "type": "object",
+    "properties": {
+        "assessment_timestamp_utc": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC timestamp when the assessment was performed."
+        },
+        "phase_id": {
+            "type": "string",
+            "const": "24",
+            "description": "Identifier for the phase being assessed."
+        },
+        "metrics_calculated": {
+            "type": "object",
+            "properties": {
+                "mutation_refusals_by_reflex": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Number of times mutations were refused based on active reflex flags."
+                },
+                "loop_shaping_by_reflex": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Number of times loop intent was shaped based on triggered reflexes."
+                },
+                "loops_halted_by_self_opposition": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Number of loops halted by self-opposition checks before mutation."
+                },
+                "details": {
+                    "type": "object",
+                    "properties": {
+                        "mutation_refusal_reasons": {
+                            "type": "object",
+                            "additionalProperties": {"type": "integer", "minimum": 0},
+                            "description": "Counts of specific reasons for mutation refusals."
+                        },
+                        "loop_shaping_triggers": {
+                            "type": "object",
+                            "additionalProperties": {"type": "integer", "minimum": 0},
+                            "description": "Counts of specific triggers for loop shaping."
+                        },
+                        "self_opposition_halt_reasons": {
+                            "type": "object",
+                            "additionalProperties": {"type": "integer", "minimum": 0},
+                            "description": "Counts of specific reasons for self-opposition halts."
+                        }
+                    },
+                    "required": [
+                        "mutation_refusal_reasons",
+                        "loop_shaping_triggers",
+                        "self_opposition_halt_reasons"
+                    ]
+                }
+            },
+            "required": [
+                "mutation_refusals_by_reflex",
+                "loop_shaping_by_reflex",
+                "loops_halted_by_self_opposition",
+                "details"
+            ]
+        },
+        "data_sources_summary": {
+            "type": "object",
+            "properties": {
+                "mutation_guard_log_entries": {"type": "integer", "minimum": 0},
+                "reflex_trigger_log_entries": {"type": "integer", "minimum": 0},
+                "loop_shaping_log_entries": {"type": "integer", "minimum": 0},
+                "loop_summary_rejection_log_entries": {"type": "integer", "minimum": 0}
+            },
+            "required": [
+                "mutation_guard_log_entries",
+                "reflex_trigger_log_entries",
+                "loop_shaping_log_entries",
+                "loop_summary_rejection_log_entries"
+            ]
+        }
+    },
+    "required": [
+        "assessment_timestamp_utc",
+        "phase_id",
+        "metrics_calculated",
+        "data_sources_summary"
+    ]
+}
+
