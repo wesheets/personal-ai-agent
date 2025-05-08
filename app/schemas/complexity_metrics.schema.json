@@ -1,0 +1,34 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Complexity Metrics Report Schema",
+    "description": "Schema for the complexity_metrics.json file.",
+    "type": "object",
+    "properties": {
+        "report_id": {"type": "string"},
+        "timestamp_utc": {"type": "string", "format": "date-time"},
+        "audit_process_id": {"type": "string"},
+        "metrics": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string"},
+                    "cyclomatic_complexity": {"type": "integer"},
+                    "code_churn": {"type": "integer"},
+                    "dependency_count": {"type": "integer"},
+                    "cognitive_complexity": {"type": "integer"}
+                },
+                "required": ["module"]
+            }
+        },
+        "summary": {
+            "type": "object",
+            "properties": {
+                "total_modules_analyzed": {"type": "integer"},
+                "critical_cyclomatic_complexity_found": {"type": "integer"},
+                "warning_cognitive_complexity_found": {"type": "integer"}
+            }
+        }
+    },
+    "required": ["report_id", "timestamp_utc", "audit_process_id", "metrics"]
+}
