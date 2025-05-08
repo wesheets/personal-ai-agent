@@ -1,0 +1,20 @@
+{
+  "assessment_timestamp_utc": "2025-05-08T13:06:36.012397+00:00",
+  "phase_id": "24",
+  "metrics_calculated": {
+    "mutation_refusals_by_reflex": 0,
+    "loop_shaping_by_reflex": 0,
+    "loops_halted_by_self_opposition": 0,
+    "details": {
+      "mutation_refusal_reasons": {},
+      "loop_shaping_triggers": {},
+      "self_opposition_halt_reasons": {}
+    }
+  },
+  "data_sources_summary": {
+    "mutation_guard_log_entries": 18,
+    "reflex_trigger_log_entries": 2,
+    "loop_shaping_log_entries": 2,
+    "loop_summary_rejection_log_entries": 1
+  }
+}
