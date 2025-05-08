@@ -9403,5 +9403,107 @@
   "purpose": "Schema for loop identity signature surface, which links memory and agent execution metadata.",
   "created_by": "operator",
   "schema_version": "v1.0"
-}
+},
+  [
+  {
+    "path": "app/agents/reflector_agent.py",
+    "type": "agent_implementation",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22 (Batch 22.3a)",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/schemas/agent_input/reflector_agent_input.schema.json",
+    "type": "agent_input_schema",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22 (Batch 22.3a)",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/schemas/agent_output/reflector_agent_output.schema.json",
+    "type": "agent_output_schema",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22 (Batch 22.3a)",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/agents/critic_agent.py",
+    "type": "agent_implementation",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22 Recovery",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/agents/nova_agent.py",
+    "type": "agent_implementation",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22-24 Recovery",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/agents/pessimist_agent.py",
+    "type": "agent_implementation",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22-24 Recovery",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/agents/architect_agent.py",
+    "type": "agent_implementation",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22-24 Recovery",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/agents/orchestrator_agent.py",
+    "type": "agent_implementation",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22-24 Recovery",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/agents/ash_agent.py",
+    "type": "agent_implementation",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22-24 Recovery",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/agents/belief_manager_agent.py",
+    "type": "agent_implementation",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22-24 Recovery",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  },
+  {
+    "path": "app/agents/belief_introspection_agent.py",
+    "type": "agent_implementation",
+    "domain": "agent_framework_core",
+    "phase_attribution": "Phase 22-24 Recovery",
+    "status": "confirmed_present",
+    "last_updated_by": "Manus_PR_Packaging_Phase24_Closure",
+    "timestamp": "2025-05-08T00:18:47.932438+00:00"
+  }
+]
+
 ]

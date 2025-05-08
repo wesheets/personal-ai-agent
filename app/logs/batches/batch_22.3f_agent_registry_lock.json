@@ -1,0 +1,24 @@
+{
+  "batch_id": "22.3f",
+  "title": "Lock Core Agents into AGENT_PERSONALITIES Registry",
+  "prompt": "Register 9 validated core agents (Architect, Critic, Pessimist, Reflector, Nova, Orchestrator, Ash, Belief Manager, Belief Introspection) into AGENT_PERSONALITIES with truth-aligned schema, role, and capabilities.",
+  "agents_locked": [
+    "architect",
+    "critic",
+    "pessimist",
+    "reflector",
+    "nova",
+    "orchestrator",
+    "ash",
+    "belief_manager",
+    "belief_introspection"
+  ],
+  "registry_file": "agent_registry.full_lock_phase24.py",
+  "verification": {
+    "status": "LOCKED",
+    "schema_consistent": true,
+    "batch_alignment_confirmed": true,
+    "capabilities_declared": true
+  },
+  "timestamp": "2025-05-07T23:05:38.251347Z"
+}

@@ -1,0 +1,27 @@
+{
+  "batch_id": "22.3a",
+  "title": "Restore Reflector Agent (Pre-Audit Healing)",
+  "prompt": "Objective: Restore the missing `reflector_agent.py` file and supporting schemas as defined in Phase 22.3 plan. This batch is part of a controlled pre-audit restoration effort to complete known intended agent components before Phase 28.",
+  "components_to_build_or_verify": [
+    "app/agents/reflector_agent.py",
+    "app/schemas/agent_input/reflector_agent_input.schema.json",
+    "app/schemas/agent_output/reflector_agent_output.schema.json",
+    "app/core/agent_registry.json"
+  ],
+  "expected_artifacts": [
+    "app/agents/reflector_agent.py",
+    "app/schemas/agent_input/reflector_agent_input.schema.json",
+    "app/schemas/agent_output/reflector_agent_output.schema.json",
+    "app/core/agent_registry.json"
+  ],
+  "verification_steps": [
+    "Confirm that `reflector_agent.py` exists and conforms to expected base class and structure.",
+    "Confirm that schemas are valid and accessible by the system.",
+    "Confirm agent is registered (via decorator or agent_registry.json).",
+    "Confirm file_tree.json and wiring_manifest.json are updated after restoration."
+  ],
+  "dependencies": [
+    "22.3"
+  ],
+  "verified": false
+}
