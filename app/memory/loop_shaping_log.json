@@ -1,0 +1,16 @@
+[
+  {
+    "loop_id": "loop_0029c",
+    "shaped_by": "Operator",
+    "intervention_type": "batch_redirection",
+    "description": "Operator rewrote batch_22.3a after schema mismatch in agent_registry patch",
+    "timestamp": "2025-05-08T05:26:25.217893Z"
+  },
+  {
+    "loop_id": "loop_0030a",
+    "shaped_by": "Manus",
+    "intervention_type": "dependency_override",
+    "description": "Bypassed 21.1 check to initiate 24.2 after verification reconciliation",
+    "timestamp": "2025-05-08T05:26:25.217896Z"
+  }
+]

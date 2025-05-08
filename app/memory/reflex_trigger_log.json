@@ -1,0 +1,16 @@
+[
+  {
+    "loop_id": "loop_0031b",
+    "triggering_agent": "CriticAgent",
+    "reflex_type": "plan_rejection",
+    "reason": "Belief misalignment with loop_0030a",
+    "timestamp": "2025-05-08T05:26:25.217773Z"
+  },
+  {
+    "loop_id": "loop_0032a",
+    "triggering_agent": "PessimistAgent",
+    "reflex_type": "risk_escalation",
+    "reason": "Uncertainty index exceeded threshold",
+    "timestamp": "2025-05-08T05:26:25.217782Z"
+  }
+]
