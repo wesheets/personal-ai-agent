@@ -1,9 +1,24 @@
 {
-  "metrics": {
-    "average_loop_duration_sec": 0.11838531494140625,
-    "average_tokens_per_loop": null,
-    "average_agent_calls_per_loop": 0,
-    "mutation_request_complexity_score": null
-  },
-  "last_updated": "2025-05-06T12:44:45.906422+00:00"
+    "report_id": "metrics_20250508_initial",
+    "timestamp_utc": "2025-05-08T11:00:00Z",
+    "audit_process_id": "audit_20250508_initial",
+    "metrics": [
+        {
+            "module": "agent_core.py",
+            "cyclomatic_complexity": 18,
+            "dependency_count": 5,
+            "cognitive_complexity": 12
+        },
+        {
+            "module": "memory_manager.py",
+            "cyclomatic_complexity": 22,
+            "dependency_count": 3,
+            "cognitive_complexity": 18
+        }
+    ],
+    "summary": {
+        "total_modules_analyzed": 2,
+        "critical_cyclomatic_complexity_found": 1,
+        "warning_cognitive_complexity_found": 1
+    }
 }
