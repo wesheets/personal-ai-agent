@@ -1,0 +1,18 @@
+{
+  "created_or_recovered": [
+    "logs/loop_0030a_execution.log",
+    "logs/loop_0030b_execution.log",
+    "app/memory/file_tree.updated_post_phase36.json",
+    "app/memory/promethios_file_tree_plan.v3.1.5_runtime_synced.json",
+    "app/memory/wiring_manifest.updated_phase22_36.json",
+    "app/memory/schema_change_request.json",
+    "logs/loop_0031_execution.log",
+    "app/schemas/self_reflection_capture.schema.json",
+    "logs/loop_0032_execution.log"
+  ],
+  "logic_patched": [
+    "app/controllers/loop_controller.py",
+    "app/agents/orchestrator_agent.py",
+    "app/agents/architect_agent.py"
+  ]
+}
