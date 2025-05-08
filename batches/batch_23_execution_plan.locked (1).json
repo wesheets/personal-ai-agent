@@ -1,189 +1,192 @@
 {
-  "phase_id": 23,
-  "phase_title": "Phase 23: Uncertainty, Agent Output Enforcement, Simplification & Invariants",
-  "batches": [
+  "phases": [
     {
-      "batch_id": "23.0",
-      "title": "Implement Uncertainty Index, Simplification Incentives & Core Enforcement Surfaces",
-      "prompt": "Objective: Implement uncertainty calculation, initialize surfaces for simplification incentives, and create core surfaces for agent output enforcement.\n1. **Dependency Check:** Ensure Phase 22 is complete. Ensure `pessimist_agent.py` exists.\n2. **Define Uncertainty Factors:** Formalize calculation logic for `uncertainty_index`.\n3. **Implement Index Calculation:** Modify `pessimist_agent.py` (or `uncertainty_evaluator.py`) to calculate this index. Ensure output includes `uncertainty_index`. Ensure `loop_justification_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n4. **Build Simplification Incentive Surface:** Create `app/memory/simplification_incentives.json` and schema.\n5. **Build Enforcement Surfaces:** Create `app/memory/truth_manifesto.json` (with placeholder core constraints), `app/memory/drift_violation_log.json` and schema. The `wiring_manifest.updated_phase22_36.json` will be used for wiring, not a new `wiring_manifest.json`.\n6. **Integration & Test:** Run loops (`loop_0033a`, `loop_0033b`) triggering low/high uncertainty.\n7. **Functional Validation:** Verify `uncertainty_index` calculated/logged. Verify incentive surface/schema created. Verify enforcement surfaces/schemas created.\n8. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json` based on loop actions).*\n9. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug calculation or surface creation.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `drift_violation_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.0):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.0\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json\", \"/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.0).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.0) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
-      "components_to_build_or_verify": [
-        "app/agents/pessimist_agent.py",
-        "app/validators/uncertainty_evaluator.py",
-        "app/memory/simplification_incentives.json",
-        "app/schemas/simplification_incentives.schema.json",
-        "app/memory/truth_manifesto.json",
-        "app/memory/drift_violation_log.json",
-        "app/schemas/drift_violation_log.schema.json"
-      ],
-      "expected_artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json (entire file updated)",
-        "/home/ubuntu/personal-ai-agent/app/memory/simplification_incentives.json",
-        "/home/ubuntu/personal-ai-agent/app/schemas/simplification_incentives.schema.json",
-        "/home/ubuntu/personal-ai-agent/app/memory/truth_manifesto.json",
-        "/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json (entire file updated)",
-        "/home/ubuntu/personal-ai-agent/app/schemas/drift_violation_log.schema.json",
-        "/home/ubuntu/logs/loop_0033a_execution.log",
-        "/home/ubuntu/logs/loop_0033b_execution.log",
-        "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
-        "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
-        "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
-      ],
-      "verification_steps": [
-        "Confirm `uncertainty_index` calculated and logged.",
-        "Confirm simplification incentive surface/schema created.",
-        "Confirm enforcement surfaces/schemas created.",
-        "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
-        "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `loop_justification_log.json`, `drift_violation_log.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
-        "Update `verified` status for batch 23.0 to `true`."
-      ],
-      "dependencies": [
-        "22.x"
-      ],
-      "verified": false
-    },
-    {
-      "batch_id": "23.1",
-      "title": "Implement Uncertainty Assessor, Simplification Logic & Core Enforcement Checks",
-      "prompt": "Objective: Implement agent logic for assessing uncertainty, proposing simplifications, and integrate core agent output enforcement checks.\n1. **Dependency Check:** Ensure batch 23.0 is `verified: true`.\n2. **Implement Assessor Agent (Optional):** If needed, create/enhance `uncertainty_assessor_agent.py`.\n3. **Implement Simplification Incentive Logic:** Modify agents (e.g., Architect, Simplification Agent) to identify/propose simplifications. Implement logic to award tokens/budget based on `simplification_incentives.json`. *Ensure agent proposals include `\"designed_by\": \"<agent_id>\"`.* Ensure `agent_cognitive_budget.json` is updated by loading the full prior version, appending/merging changes schema-conformantly, and saving the entire updated file.\n4. **Integrate Enforcement Checks:** Modify `loop_controller.py` or add validation steps: a) **Truth Manifest Enforcement:** Validate agent proposals against `truth_manifesto.json`. Block/log violations. b) **Schema Conformance Enforcement:** Validate agent outputs against declared schemas. Reject/quarantine nonconforming output, log failures to `drift_violation_log.json`. Ensure `drift_violation_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n5. **Integration & Test:** Run loop (`loop_0034a`) proposing simplification (test enforcement checks). Run loop (`loop_0034b`) simulating success and budget update (test enforcement checks).\n6. **Functional Validation:** Verify proposals generated with `designed_by`. Verify budget updated. Verify enforcement checks function (block/log violations, reject non-conforming output). Verify `drift_violation_log.json` populated on schema failure.\n7. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json`).*\n8. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug proposal/incentive logic or enforcement check implementation.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `drift_violation_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.1):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.1\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/agent_cognitive_budget.json\", \"/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.1).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.1) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
-      "components_to_build_or_verify": [
-        "app/validators/uncertainty_evaluator.py",
-        "app/agents/uncertainty_assessor_agent.py",
-        "app/agents/architect_agent.py",
-        "app/controllers/loop_controller.py",
-        "app/memory/agent_cognitive_budget.json",
-        "app/memory/truth_manifesto.json",
-        "app/memory/drift_violation_log.json"
-      ],
-      "expected_artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/memory/agent_cognitive_budget.json (entire file updated)",
-        "/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json (entire file updated)",
-        "/home/ubuntu/logs/loop_0034a_execution.log",
-        "/home/ubuntu/logs/loop_0034b_execution.log",
-        "Logs demonstrating enforcement checks (truth manifest, schema conformance).",
-        "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
-        "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
-        "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
-      ],
-      "verification_steps": [
-        "Confirm simplification proposals generated with `designed_by`.",
-        "Confirm agent budget updated.",
-        "Confirm Truth Manifest and Schema Conformance checks are active and logging correctly.",
-        "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
-        "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `agent_cognitive_budget.json`, `drift_violation_log.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
-        "Update `verified` status for batch 23.1 to `true`."
-      ],
-      "dependencies": [
-        "23.0",
-        "21.1",
-        "21.4"
-      ],
-      "verified": false
-    },
-    {
-      "batch_id": "23.2",
-      "title": "Implement Schema Change Review, Uncertainty Escalation & Apply Enforcement Checks",
-      "prompt": "Objective: Integrate schema change review, activate high uncertainty escalation, and apply agent output enforcement checks.\n1. **Dependency Check:** Ensure batches 20.3, 22.2, 23.1 are `verified: true`.\n2. **Implement Schema Change Review:** Modify Critic/Pessimist/Controller to read proposals from `schema_change_request.json`. Implement review process. *Ensure proposals include `\"designed_by\": \"<agent_id>\"`.* Ensure `schema_change_request.json` is handled by loading the full prior version, appending/merging changes schema-conformantly, and saving the entire updated file.\n3. **Activate Uncertainty Escalation:** Modify `loop_controller.py`. After Pessimist reports uncertainty, check threshold. If high, *actively* halt loop, log to `uncertainty_escalation_log.json`, route to Operator Review Gate. Log halt/escalation action. Ensure `uncertainty_escalation_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n4. **Apply Enforcement Checks:** Ensure `loop_controller.py` applies Truth Manifest and Schema Conformance checks to schema change proposals and related agent outputs. Log violations to `drift_violation_log.json`. Ensure `drift_violation_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n5. **Integration & Test:** Run loop (`loop_0035a`) proposing schema change (test review & enforcement). Run loop (`loop_0035b`) triggering high uncertainty escalation (test enforcement during escalation flow).\n6. **Functional Validation:** Verify schema review functions with `designed_by`. Verify high uncertainty loop actively halted/logged/escalated. Verify enforcement checks applied during schema review and escalation flows.\n7. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json`).*\n8. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug schema review, escalation logic, or enforcement application.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `schema_change_request.json`, `uncertainty_escalation_log.json`, `drift_violation_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.2):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.2\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/schema_change_request.json\", \"/home/ubuntu/personal-ai-agent/app/memory/uncertainty_escalation_log.json\", \"/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.2).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.2) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
-      "components_to_build_or_verify": [
-        "app/agents/critic_agent.py",
-        "app/agents/pessimist_agent.py",
-        "app/controllers/loop_controller.py",
-        "app/memory/schema_change_request.json",
-        "app/memory/uncertainty_escalation_log.json",
-        "app/schemas/uncertainty_escalation_log.schema.json",
-        "app/memory/drift_violation_log.json"
-      ],
-      "expected_artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/memory/schema_change_request.json (entire file updated)",
-        "/home/ubuntu/personal-ai-agent/app/memory/uncertainty_escalation_log.json (entire file updated)",
-        "/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json (entire file updated)",
-        "Logs demonstrating active halt/escalation due to uncertainty.",
-        "Logs demonstrating enforcement checks during schema review/escalation.",
-        "/home/ubuntu/logs/loop_0035a_execution.log",
-        "/home/ubuntu/logs/loop_0035b_execution.log",
-        "/home/ubuntu/review_queue/plan_0035b.json",
-        "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
-        "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
-        "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
-      ],
-      "verification_steps": [
-        "Confirm schema change review process works with `designed_by`.",
-        "Confirm high uncertainty escalation actively halts, logs, and routes to Operator.",
-        "Confirm enforcement checks applied correctly in this batch\"s flows.",
-        "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
-        "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `schema_change_request.json`, `uncertainty_escalation_log.json`, `drift_violation_log.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
-        "Update `verified` status for batch 23.2 to `true`."
-      ],
-      "dependencies": [
-        "20.3",
-        "22.2",
-        "23.1"
-      ],
-      "verified": false
-    },
-    {
-      "batch_id": "23.3",
-      "title": "Implement System Invariants & Violation Logging",
-      "prompt": "Objective: Define system invariants and implement violation logging.\n1. **Dependency Check:** Ensure batch 23.2 is `verified: true`.\n2. **Define Invariants:** Define core system invariants (e.g., \"Trust score must not drop below X without Operator review\").\n3. **Build Invariant Surface:** Create `app/memory/system_invariants.json` and schema. Populate with defined invariants.\n4. **Build Violation Log:** Create `app/memory/invariant_violation_log.json` and schema.\n5. **Implement Invariant Checks:** Modify `loop_controller.py` or relevant validators to check invariants at critical points. Log violations to `invariant_violation_log.json`. Ensure `invariant_violation_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n6. **Integration & Test:** Run loop (`loop_0036a`) that respects invariants. Run loop (`loop_0036b`) that violates an invariant.\n7. **Functional Validation:** Verify `system_invariants.json` created/populated. Verify `invariant_violation_log.json` created/populated on violation.\n8. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json`).*\n9. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug invariant definitions, checks, or logging.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `invariant_violation_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.3):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.3\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/invariant_violation_log.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.3).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.3) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
-      "components_to_build_or_verify": [
-        "app/memory/system_invariants.json",
-        "app/schemas/system_invariants.schema.json",
-        "app/memory/invariant_violation_log.json",
-        "app/schemas/invariant_violation_log.schema.json",
-        "app/controllers/loop_controller.py"
-      ],
-      "expected_artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/memory/system_invariants.json",
-        "/home/ubuntu/personal-ai-agent/app/schemas/system_invariants.schema.json",
-        "/home/ubuntu/personal-ai-agent/app/memory/invariant_violation_log.json (entire file updated)",
-        "/home/ubuntu/personal-ai-agent/app/schemas/invariant_violation_log.schema.json",
-        "/home/ubuntu/logs/loop_0036a_execution.log",
-        "/home/ubuntu/logs/loop_0036b_execution.log",
-        "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
-        "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
-        "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
-      ],
-      "verification_steps": [
-        "Confirm `system_invariants.json` created and populated.",
-        "Confirm `invariant_violation_log.json` created and populated on violation.",
-        "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
-        "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `invariant_violation_log.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
-        "Update `verified` status for batch 23.3 to `true`."
-      ],
-      "dependencies": [
-        "23.2"
-      ],
-      "verified": false
-    },
-    {
-      "batch_id": "23.4",
-      "title": "Implement Loop Identity Signature & Finalize Enforcement",
-      "prompt": "Objective: Implement loop identity signature and finalize agent output enforcement mechanisms.\n1. **Dependency Check:** Ensure batch 23.3 is `verified: true`.\n2. **Implement Loop Identity Signature:** Create `app/memory/loop_identity_signature.json` and schema. Modify `loop_controller.py` to generate a unique signature (e.g., hash of key inputs/configs) at loop start and log it. Ensure `loop_identity_signature.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n3. **Finalize Enforcement:** Review and ensure all agent output enforcement checks (Truth Manifest, Schema Conformance, Auto-Wiring Reflection, Loop Identity Signature) are robustly integrated and logged across all relevant loop stages and agent interactions.\n4. **Integration & Test:** Run comprehensive loop (`loop_0037`) exercising all enforcement mechanisms.\n5. **Functional Validation:** Verify loop identity signature generated/logged. Verify all enforcement mechanisms function as expected and are logged.\n6. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json`).*\n7. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug signature generation or enforcement integration.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `loop_identity_signature.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.4):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.4\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/loop_identity_signature.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.4).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.4) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
-      "components_to_build_or_verify": [
-        "app/memory/loop_identity_signature.json",
-        "app/schemas/loop_identity_signature.schema.json",
-        "app/controllers/loop_controller.py"
-      ],
-      "expected_artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/memory/loop_identity_signature.json (entire file updated)",
-        "/home/ubuntu/personal-ai-agent/app/schemas/loop_identity_signature.schema.json",
-        "/home/ubuntu/logs/loop_0037_execution.log",
-        "Logs demonstrating all enforcement mechanisms active.",
-        "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
-        "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
-        "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
-      ],
-      "verification_steps": [
-        "Confirm loop identity signature generated and logged.",
-        "Confirm all enforcement mechanisms are active and logged.",
-        "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
-        "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `loop_identity_signature.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
-        "Update `verified` status for batch 23.4 to `true`."
-      ],
-      "dependencies": [
-        "23.3"
-      ],
-      "verified": false
+      "phase_id": 23,
+      "phase_title": "Phase 23: Uncertainty, Agent Output Enforcement, Simplification & Invariants",
+      "batches": [
+        {
+          "batch_id": "23.0",
+          "title": "Implement Uncertainty Index, Simplification Incentives & Core Enforcement Surfaces",
+          "prompt": "Objective: Implement uncertainty calculation, initialize surfaces for simplification incentives, and create core surfaces for agent output enforcement.\n1. **Dependency Check:** Ensure Phase 22 is complete. Ensure `pessimist_agent.py` exists.\n2. **Define Uncertainty Factors:** Formalize calculation logic for `uncertainty_index`.\n3. **Implement Index Calculation:** Modify `pessimist_agent.py` (or `uncertainty_evaluator.py`) to calculate this index. Ensure output includes `uncertainty_index`. Ensure `loop_justification_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n4. **Build Simplification Incentive Surface:** Create `app/memory/simplification_incentives.json` and schema.\n5. **Build Enforcement Surfaces:** Create `app/memory/truth_manifesto.json` (with placeholder core constraints), `app/memory/drift_violation_log.json` and schema. The `wiring_manifest.updated_phase22_36.json` will be used for wiring, not a new `wiring_manifest.json`.\n6. **Integration & Test:** Run loops (`loop_0033a`, `loop_0033b`) triggering low/high uncertainty.\n7. **Functional Validation:** Verify `uncertainty_index` calculated/logged. Verify incentive surface/schema created. Verify enforcement surfaces/schemas created.\n8. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json` based on loop actions).*\n9. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug calculation or surface creation.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `drift_violation_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.0):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.0\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json\", \"/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.0).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.0) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
+          "components_to_build_or_verify": [
+            "app/agents/pessimist_agent.py",
+            "app/validators/uncertainty_evaluator.py",
+            "app/memory/simplification_incentives.json",
+            "app/schemas/simplification_incentives.schema.json",
+            "app/memory/truth_manifesto.json",
+            "app/memory/drift_violation_log.json",
+            "app/schemas/drift_violation_log.schema.json"
+          ],
+          "expected_artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json (entire file updated)",
+            "/home/ubuntu/personal-ai-agent/app/memory/simplification_incentives.json",
+            "/home/ubuntu/personal-ai-agent/app/schemas/simplification_incentives.schema.json",
+            "/home/ubuntu/personal-ai-agent/app/memory/truth_manifesto.json",
+            "/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json (entire file updated)",
+            "/home/ubuntu/personal-ai-agent/app/schemas/drift_violation_log.schema.json",
+            "/home/ubuntu/logs/loop_0033a_execution.log",
+            "/home/ubuntu/logs/loop_0033b_execution.log",
+            "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
+            "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
+            "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
+          ],
+          "verification_steps": [
+            "Confirm `uncertainty_index` calculated and logged.",
+            "Confirm simplification incentive surface/schema created.",
+            "Confirm enforcement surfaces/schemas created.",
+            "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
+            "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `loop_justification_log.json`, `drift_violation_log.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
+            "Update `verified` status for batch 23.0 to `true`."
+          ],
+          "dependencies": [
+            "22.x"
+          ],
+          "verified": false
+        },
+        {
+          "batch_id": "23.1",
+          "title": "Implement Uncertainty Assessor, Simplification Logic & Core Enforcement Checks",
+          "prompt": "Objective: Implement agent logic for assessing uncertainty, proposing simplifications, and integrate core agent output enforcement checks.\n1. **Dependency Check:** Ensure batch 23.0 is `verified: true`.\n2. **Implement Assessor Agent (Optional):** If needed, create/enhance `uncertainty_assessor_agent.py`.\n3. **Implement Simplification Incentive Logic:** Modify agents (e.g., Architect, Simplification Agent) to identify/propose simplifications. Implement logic to award tokens/budget based on `simplification_incentives.json`. *Ensure agent proposals include `\"designed_by\": \"<agent_id>\"`.* Ensure `agent_cognitive_budget.json` is updated by loading the full prior version, appending/merging changes schema-conformantly, and saving the entire updated file.\n4. **Integrate Enforcement Checks:** Modify `loop_controller.py` or add validation steps: a) **Truth Manifest Enforcement:** Validate agent proposals against `truth_manifesto.json`. Block/log violations. b) **Schema Conformance Enforcement:** Validate agent outputs against declared schemas. Reject/quarantine nonconforming output, log failures to `drift_violation_log.json`. Ensure `drift_violation_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n5. **Integration & Test:** Run loop (`loop_0034a`) proposing simplification (test enforcement checks). Run loop (`loop_0034b`) simulating success and budget update (test enforcement checks).\n6. **Functional Validation:** Verify proposals generated with `designed_by`. Verify budget updated. Verify enforcement checks function (block/log violations, reject non-conforming output). Verify `drift_violation_log.json` populated on schema failure.\n7. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json`).*\n8. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug proposal/incentive logic or enforcement check implementation.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `drift_violation_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.1):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.1\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/agent_cognitive_budget.json\", \"/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.1).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.1) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
+          "components_to_build_or_verify": [
+            "app/validators/uncertainty_evaluator.py",
+            "app/agents/uncertainty_assessor_agent.py",
+            "app/agents/architect_agent.py",
+            "app/controllers/loop_controller.py",
+            "app/memory/agent_cognitive_budget.json",
+            "app/memory/truth_manifesto.json",
+            "app/memory/drift_violation_log.json"
+          ],
+          "expected_artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/memory/agent_cognitive_budget.json (entire file updated)",
+            "/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json (entire file updated)",
+            "/home/ubuntu/logs/loop_0034a_execution.log",
+            "/home/ubuntu/logs/loop_0034b_execution.log",
+            "Logs demonstrating enforcement checks (truth manifest, schema conformance).",
+            "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
+            "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
+            "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
+          ],
+          "verification_steps": [
+            "Confirm simplification proposals generated with `designed_by`.",
+            "Confirm agent budget updated.",
+            "Confirm Truth Manifest and Schema Conformance checks are active and logging correctly.",
+            "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
+            "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `agent_cognitive_budget.json`, `drift_violation_log.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
+            "Update `verified` status for batch 23.1 to `true`."
+          ],
+          "dependencies": [
+            "23.0",
+            "21.1",
+            "21.4"
+          ],
+          "verified": false
+        },
+        {
+          "batch_id": "23.2",
+          "title": "Implement Schema Change Review, Uncertainty Escalation & Apply Enforcement Checks",
+          "prompt": "Objective: Integrate schema change review, activate high uncertainty escalation, and apply agent output enforcement checks.\n1. **Dependency Check:** Ensure batches 20.3, 22.2, 23.1 are `verified: true`.\n2. **Implement Schema Change Review:** Modify Critic/Pessimist/Controller to read proposals from `schema_change_request.json`. Implement review process. *Ensure proposals include `\"designed_by\": \"<agent_id>\"`.* Ensure `schema_change_request.json` is handled by loading the full prior version, appending/merging changes schema-conformantly, and saving the entire updated file.\n3. **Activate Uncertainty Escalation:** Modify `loop_controller.py`. After Pessimist reports uncertainty, check threshold. If high, *actively* halt loop, log to `uncertainty_escalation_log.json`, route to Operator Review Gate. Log halt/escalation action. Ensure `uncertainty_escalation_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n4. **Apply Enforcement Checks:** Ensure `loop_controller.py` applies Truth Manifest and Schema Conformance checks to schema change proposals and related agent outputs. Log violations to `drift_violation_log.json`. Ensure `drift_violation_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n5. **Integration & Test:** Run loop (`loop_0035a`) proposing schema change (test review & enforcement). Run loop (`loop_0035b`) triggering high uncertainty escalation (test enforcement during escalation flow).\n6. **Functional Validation:** Verify schema review functions with `designed_by`. Verify high uncertainty loop actively halted/logged/escalated. Verify enforcement checks applied during schema review and escalation flows.\n7. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json`).*\n8. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug schema review, escalation logic, or enforcement application.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `schema_change_request.json`, `uncertainty_escalation_log.json`, `drift_violation_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.2):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.2\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/schema_change_request.json\", \"/home/ubuntu/personal-ai-agent/app/memory/uncertainty_escalation_log.json\", \"/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.2).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.2) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
+          "components_to_build_or_verify": [
+            "app/agents/critic_agent.py",
+            "app/agents/pessimist_agent.py",
+            "app/controllers/loop_controller.py",
+            "app/memory/schema_change_request.json",
+            "app/memory/uncertainty_escalation_log.json",
+            "app/schemas/uncertainty_escalation_log.schema.json",
+            "app/memory/drift_violation_log.json"
+          ],
+          "expected_artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/memory/schema_change_request.json (entire file updated)",
+            "/home/ubuntu/personal-ai-agent/app/memory/uncertainty_escalation_log.json (entire file updated)",
+            "/home/ubuntu/personal-ai-agent/app/memory/drift_violation_log.json (entire file updated)",
+            "Logs demonstrating active halt/escalation due to uncertainty.",
+            "Logs demonstrating enforcement checks during schema review/escalation.",
+            "/home/ubuntu/logs/loop_0035a_execution.log",
+            "/home/ubuntu/logs/loop_0035b_execution.log",
+            "/home/ubuntu/review_queue/plan_0035b.json",
+            "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
+            "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
+            "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
+          ],
+          "verification_steps": [
+            "Confirm schema change review process works with `designed_by`.",
+            "Confirm high uncertainty escalation actively halts, logs, and routes to Operator.",
+            "Confirm enforcement checks applied correctly in this batch\"s flows.",
+            "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
+            "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `schema_change_request.json`, `uncertainty_escalation_log.json`, `drift_violation_log.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
+            "Update `verified` status for batch 23.2 to `true`."
+          ],
+          "dependencies": [
+            "20.3",
+            "22.2",
+            "23.1"
+          ],
+          "verified": false
+        },
+        {
+          "batch_id": "23.3",
+          "title": "Implement System Invariants & Violation Logging",
+          "prompt": "Objective: Define system invariants and implement violation logging.\n1. **Dependency Check:** Ensure batch 23.2 is `verified: true`.\n2. **Define Invariants:** Define core system invariants (e.g., \"Trust score must not drop below X without Operator review\").\n3. **Build Invariant Surface:** Create `app/memory/system_invariants.json` and schema. Populate with defined invariants.\n4. **Build Violation Log:** Create `app/memory/invariant_violation_log.json` and schema.\n5. **Implement Invariant Checks:** Modify `loop_controller.py` or relevant validators to check invariants at critical points. Log violations to `invariant_violation_log.json`. Ensure `invariant_violation_log.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n6. **Integration & Test:** Run loop (`loop_0036a`) that respects invariants. Run loop (`loop_0036b`) that violates an invariant.\n7. **Functional Validation:** Verify `system_invariants.json` created/populated. Verify `invariant_violation_log.json` created/populated on violation.\n8. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json`).*\n9. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug invariant definitions, checks, or logging.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `invariant_violation_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.3):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.3\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/invariant_violation_log.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.3).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.3) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
+          "components_to_build_or_verify": [
+            "app/memory/system_invariants.json",
+            "app/schemas/system_invariants.schema.json",
+            "app/memory/invariant_violation_log.json",
+            "app/schemas/invariant_violation_log.schema.json",
+            "app/controllers/loop_controller.py"
+          ],
+          "expected_artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/memory/system_invariants.json",
+            "/home/ubuntu/personal-ai-agent/app/schemas/system_invariants.schema.json",
+            "/home/ubuntu/personal-ai-agent/app/memory/invariant_violation_log.json (entire file updated)",
+            "/home/ubuntu/personal-ai-agent/app/schemas/invariant_violation_log.schema.json",
+            "/home/ubuntu/logs/loop_0036a_execution.log",
+            "/home/ubuntu/logs/loop_0036b_execution.log",
+            "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
+            "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
+            "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
+          ],
+          "verification_steps": [
+            "Confirm `system_invariants.json` created and populated.",
+            "Confirm `invariant_violation_log.json` created and populated on violation.",
+            "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
+            "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `invariant_violation_log.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
+            "Update `verified` status for batch 23.3 to `true`."
+          ],
+          "dependencies": [
+            "23.2"
+          ],
+          "verified": false
+        },
+        {
+          "batch_id": "23.4",
+          "title": "Implement Loop Identity Signature & Finalize Enforcement",
+          "prompt": "Objective: Implement loop identity signature and finalize agent output enforcement mechanisms.\n1. **Dependency Check:** Ensure batch 23.3 is `verified: true`.\n2. **Implement Loop Identity Signature:** Create `app/memory/loop_identity_signature.json` and schema. Modify `loop_controller.py` to generate a unique signature (e.g., hash of key inputs/configs) at loop start and log it. Ensure `loop_identity_signature.json` is updated by loading the full prior version, appending new entries schema-conformantly, and saving the entire updated file.\n3. **Finalize Enforcement:** Review and ensure all agent output enforcement checks (Truth Manifest, Schema Conformance, Auto-Wiring Reflection, Loop Identity Signature) are robustly integrated and logged across all relevant loop stages and agent interactions.\n4. **Integration & Test:** Run comprehensive loop (`loop_0037`) exercising all enforcement mechanisms.\n5. **Functional Validation:** Verify loop identity signature generated/logged. Verify all enforcement mechanisms function as expected and are logged.\n6. **Log Wiring & Validate:** Follow standard procedures. *Add post-loop step: Auto-Wiring Reflection Logging (populate `wiring_manifest.updated_phase22_36.json`).*\n7. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug signature generation or enforcement integration.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `loop_identity_signature.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (23.4):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"23.4\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/loop_identity_signature.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (23.4).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (23.4) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
+          "components_to_build_or_verify": [
+            "app/memory/loop_identity_signature.json",
+            "app/schemas/loop_identity_signature.schema.json",
+            "app/controllers/loop_controller.py"
+          ],
+          "expected_artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_identity_signature.json (entire file updated)",
+            "/home/ubuntu/personal-ai-agent/app/schemas/loop_identity_signature.schema.json",
+            "/home/ubuntu/logs/loop_0037_execution.log",
+            "Logs demonstrating all enforcement mechanisms active.",
+            "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
+            "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
+            "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
+          ],
+          "verification_steps": [
+            "Confirm loop identity signature generated and logged.",
+            "Confirm all enforcement mechanisms are active and logged.",
+            "Confirm wiring validation passed, including population of `wiring_manifest.updated_phase22_36.json`.",
+            "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `loop_identity_signature.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
+            "Update `verified` status for batch 23.4 to `true`."
+          ],
+          "dependencies": [
+            "23.3"
+          ],
+          "verified": false
+        }
+      ]
     }
   ]
 }
-

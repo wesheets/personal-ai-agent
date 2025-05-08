@@ -1,88 +1,91 @@
 {
-  "phase_id": 36,
-  "batch_id": "36.1",
-  "title": "Phase 36.1: Live Integrated Cognitive Loop Execution & Showcase",
-  "description": "Executes the fully integrated cognitive loop with functional agents, confirmed LLM reasoning, active governance, comprehensive logging, and live UI visualization, as validated and integrated throughout Phases 21-36. Culminates in the generation of the SaaS vertical scaffold for investor demonstration.",
-  "prompt": "Operator Directive: Execute Phase 36.1. Run the complete, integrated Promethios cognitive loop live. Confirm readiness of functional agents, LLM integration, and active governance. Log reflections and justifications thoroughly. Visualize the process via the live UI. Output the final vertical scaffold and cognitive trace artifacts. Goal: Demonstrate a live, thinking, building, and reflecting AI co-founder operating within its actively governed framework.",
-  "components": [
+  "phases": [
     {
-      "id": "36.1.1",
-      "task": "Confirm Agent Readiness",
-      "details": "Perform a final check that core agents (Orchestrator, Forge, HAL, Nova, Sage, Critic, Pessimist) are functional as validated in Phases 21-25. Ensure `vertical_loop_controller.py` calls these implementations.",
-      "artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
-        "Agent readiness confirmation log entry"
-      ]
-    },
-    {
-      "id": "36.1.2",
-      "task": "Confirm LLM Integration",
-      "details": "Perform a final check that reasoning agents utilize the LLM interface validated in earlier phases. Confirm connectivity and basic functionality.",
-      "artifacts": [
-        "LLM integration confirmation log entry"
-      ]
-    },
-    {
-      "id": "36.1.3",
-      "task": "Confirm Active Governance Influence",
-      "details": "Perform a final check that governance mechanisms (Trust, Emotion, Complexity, Invariants, etc.) are actively influencing loop flow as integrated in Phases 21-35. Confirm logging of this influence.",
-      "artifacts": [
-        "Active governance confirmation log entry"
-      ]
-    },
-    {
-      "id": "36.1.4",
-      "task": "Enable Comprehensive Reflection & Justification Logging",
-      "details": "Ensure agents and controller write detailed, structured entries to `agent_justification_log.json`, `reflection_thread.json` (if exists), and `loop_summary.json` (if exists) throughout the live execution.",
-      "artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
-        "Agent implementation files with logging calls"
-      ]
-    },
-    {
-      "id": "36.1.5",
-      "task": "Finalize Memory Surface Population & Output Logging",
-      "details": "Confirm that `loop_trace.json`, `loop_context.json`, `loop_output.json` (or equivalent), and `vertical_manifest.json` are populated correctly during execution.",
-      "artifacts": [
-        "Populated memory surfaces during/after execution"
-      ]
-    },
-    {
-      "id": "36.1.6",
-      "task": "Confirm Full UI Integration",
-      "details": "Perform a final check that all relevant UI components display live, accurate data from the executing loop and memory surfaces via APIs/WebSockets.",
-      "artifacts": [
-        "UI integration confirmation log entry"
-      ]
-    },
-    {
-      "id": "36.1.7",
-      "task": "Execute Full End-to-End Vertical Build Loop (Showcase Run)",
-      "details": "Initiate a loop execution via the UI with an Operator prompt. Monitor the live execution through the UI. Ensure the loop runs to completion and triggers artifact packaging.",
-      "artifacts": [
-        "Live running cognitive loop process",
-        "Generated SaaS scaffold code (directory)",
-        "Final artifact package (.zip) created by package_artifacts.py"
+      "phase_id": 36,
+      "batch_id": "36.1",
+      "title": "Phase 36.1: Live Integrated Cognitive Loop Execution & Showcase",
+      "description": "Executes the fully integrated cognitive loop with functional agents, confirmed LLM reasoning, active governance, comprehensive logging, and live UI visualization, as validated and integrated throughout Phases 21-36. Culminates in the generation of the SaaS vertical scaffold for investor demonstration.",
+      "prompt": "Operator Directive: Execute Phase 36.1. Run the complete, integrated Promethios cognitive loop live. Confirm readiness of functional agents, LLM integration, and active governance. Log reflections and justifications thoroughly. Visualize the process via the live UI. Output the final vertical scaffold and cognitive trace artifacts. Goal: Demonstrate a live, thinking, building, and reflecting AI co-founder operating within its actively governed framework.",
+      "components": [
+        {
+          "id": "36.1.1",
+          "task": "Confirm Agent Readiness",
+          "details": "Perform a final check that core agents (Orchestrator, Forge, HAL, Nova, Sage, Critic, Pessimist) are functional as validated in Phases 21-25. Ensure `vertical_loop_controller.py` calls these implementations.",
+          "artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+            "Agent readiness confirmation log entry"
+          ]
+        },
+        {
+          "id": "36.1.2",
+          "task": "Confirm LLM Integration",
+          "details": "Perform a final check that reasoning agents utilize the LLM interface validated in earlier phases. Confirm connectivity and basic functionality.",
+          "artifacts": [
+            "LLM integration confirmation log entry"
+          ]
+        },
+        {
+          "id": "36.1.3",
+          "task": "Confirm Active Governance Influence",
+          "details": "Perform a final check that governance mechanisms (Trust, Emotion, Complexity, Invariants, etc.) are actively influencing loop flow as integrated in Phases 21-35. Confirm logging of this influence.",
+          "artifacts": [
+            "Active governance confirmation log entry"
+          ]
+        },
+        {
+          "id": "36.1.4",
+          "task": "Enable Comprehensive Reflection & Justification Logging",
+          "details": "Ensure agents and controller write detailed, structured entries to `agent_justification_log.json`, `reflection_thread.json` (if exists), and `loop_summary.json` (if exists) throughout the live execution.",
+          "artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+            "Agent implementation files with logging calls"
+          ]
+        },
+        {
+          "id": "36.1.5",
+          "task": "Finalize Memory Surface Population & Output Logging",
+          "details": "Confirm that `loop_trace.json`, `loop_context.json`, `loop_output.json` (or equivalent), and `vertical_manifest.json` are populated correctly during execution.",
+          "artifacts": [
+            "Populated memory surfaces during/after execution"
+          ]
+        },
+        {
+          "id": "36.1.6",
+          "task": "Confirm Full UI Integration",
+          "details": "Perform a final check that all relevant UI components display live, accurate data from the executing loop and memory surfaces via APIs/WebSockets.",
+          "artifacts": [
+            "UI integration confirmation log entry"
+          ]
+        },
+        {
+          "id": "36.1.7",
+          "task": "Execute Full End-to-End Vertical Build Loop (Showcase Run)",
+          "details": "Initiate a loop execution via the UI with an Operator prompt. Monitor the live execution through the UI. Ensure the loop runs to completion and triggers artifact packaging.",
+          "artifacts": [
+            "Live running cognitive loop process",
+            "Generated SaaS scaffold code (directory)",
+            "Final artifact package (.zip) created by package_artifacts.py"
+          ]
+        }
+      ],
+      "expected_artifacts": [
+        "Fully populated memory surfaces (loop_trace, loop_context, justification, manifest, output, reflection, summary)",
+        "Generated SaaS vertical scaffold code",
+        "Final downloadable artifact package (.zip)",
+        "Confirmation logs for agent readiness, LLM integration, active governance, UI integration"
+      ],
+      "validation_criteria": [
+        "Loop executes end-to-end using confirmed functional agents and LLM reasoning.",
+        "Governance mechanisms actively influence loop flow and this is logged.",
+        "Reflection and justification logs are comprehensively populated.",
+        "All specified memory surfaces are correctly populated.",
+        "UI displays live, accurate data reflecting the integrated system state.",
+        "A functional SaaS scaffold is generated.",
+        "Final artifact package is created successfully."
+      ],
+      "dependencies": [
+        "Completion of Phase 36.0"
       ]
     }
-  ],
-  "expected_artifacts": [
-    "Fully populated memory surfaces (loop_trace, loop_context, justification, manifest, output, reflection, summary)",
-    "Generated SaaS vertical scaffold code",
-    "Final downloadable artifact package (.zip)",
-    "Confirmation logs for agent readiness, LLM integration, active governance, UI integration"
-  ],
-  "validation_criteria": [
-    "Loop executes end-to-end using confirmed functional agents and LLM reasoning.",
-    "Governance mechanisms actively influence loop flow and this is logged.",
-    "Reflection and justification logs are comprehensively populated.",
-    "All specified memory surfaces are correctly populated.",
-    "UI displays live, accurate data reflecting the integrated system state.",
-    "A functional SaaS scaffold is generated.",
-    "Final artifact package is created successfully."
-  ],
-  "dependencies": [
-    "Completion of Phase 36.0"
   ]
 }
-

@@ -20,7 +20,7 @@
     "dependencies": [
       "17.1"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "18.1",
@@ -43,7 +43,7 @@
     "dependencies": [
       "18.0"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "18.2",
@@ -67,7 +67,7 @@
     "dependencies": [
       "18.0"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "18.3",
@@ -92,6 +92,6 @@
       "16.3",
       "18.1"
     ],
-    "verified": false
+    "verified": true
   }
 ]
