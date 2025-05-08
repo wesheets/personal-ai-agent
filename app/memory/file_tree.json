@@ -61157,5 +61157,85 @@
   "type": "schema",
   "added_by": "operator",
   "schema_version": "v1.0"
-}
+},
+  [
+  {
+    "path": "app/agents/reflector_agent.py",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/schemas/agent_input/reflector_agent_input.schema.json",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/schemas/agent_output/reflector_agent_output.schema.json",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/agents/critic_agent.py",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/agents/nova_agent.py",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/agents/pessimist_agent.py",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/agents/architect_agent.py",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/agents/orchestrator_agent.py",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/agents/ash_agent.py",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/agents/belief_manager_agent.py",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  },
+  {
+    "path": "app/agents/belief_introspection_agent.py",
+    "status": "confirmed_present_pre_pr_phase24",
+    "type": "file",
+    "added_by": "Manus_Pre_PR_Packaging_Phase24",
+    "timestamp": "2025-05-08T00:11:51.326494+00:00"
+  }
+]
+
 ]
