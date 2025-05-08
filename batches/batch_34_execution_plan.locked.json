@@ -1,86 +1,88 @@
 {
-  "phase_id": 34,
-  "batch_id": "34.0",
-  "title": "Phase 34.0: Justification Graph Visualization & Reflection Thread",
-  "description": "Enhances cognitive visibility by implementing a graphical representation of the justification chain derived from agent logs (reflecting active governance) and introducing a reflection thread for narrative synthesis. Builds upon Phase 33\'s activated and integrated loop.",
-  "prompt": "Operator Directive: Execute Phase 34.0. Enhance cognitive visibility by visualizing the justification chain and implementing a reflection thread. Leverage existing UI components and memory surfaces. Integrate with the Phase 33 loop controller and logging mechanisms. Goal: Make the system\'s reasoning process (including active governance influence) visually explicit and demonstrate self-reflection capabilities.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `agent_justification_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (34.0):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each distinct cognitive loop execution or significant sub-process (like graph generation, reflection thread update) within this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"34.0\", `loop_id`: \"<loop_id_or_process_id_executed>\", `controller_invoked`: \"<controller_script_or_main_process_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/agent_justification_log.json\" (if updated), \"/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json\" (if approved and updated), ...other_relevant_outputs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for all files created/modified *by this batch* (34.0) (e.g., controller scripts, utility scripts, UI components, memory surfaces).\
-    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (34.0) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
-  "components": [
+  "phases": [
     {
-      "id": "34.0.1",
-      "task": "Develop Justification Graph Data Generation",
-      "details": "Modify \'vertical_loop_controller.py\' or create a utility to process the *entire existing* \'agent_justification_log.json\'. Structure data for graph visualization (nodes: actions/decisions; edges: links; attributes: metrics like trust, complexity, emotion, *governance influence*). Ensure cross-loop links included. Create derived data structure/endpoint if needed. If \'agent_justification_log.json\' is appended to during this process, ensure the full file is loaded, appended to, and saved.",
-      "artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+      "phase_id": 34,
+      "batch_id": "34.0",
+      "title": "Phase 34.0: Justification Graph Visualization & Reflection Thread",
+      "description": "Enhances cognitive visibility by implementing a graphical representation of the justification chain derived from agent logs (reflecting active governance) and introducing a reflection thread for narrative synthesis. Builds upon Phase 33\\'s activated and integrated loop.",
+      "prompt": "Operator Directive: Execute Phase 34.0. Enhance cognitive visibility by visualizing the justification chain and implementing a reflection thread. Leverage existing UI components and memory surfaces. Integrate with the Phase 33 loop controller and logging mechanisms. Goal: Make the system\\'s reasoning process (including active governance influence) visually explicit and demonstrate self-reflection capabilities.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`, `agent_justification_log.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (34.0):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each distinct cognitive loop execution or significant sub-process (like graph generation, reflection thread update) within this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"34.0\", `loop_id`: \"<loop_id_or_process_id_executed>\", `controller_invoked`: \"<controller_script_or_main_process_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/agent_justification_log.json\" (if updated), \"/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json\" (if approved and updated), ...other_relevant_outputs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for all files created/modified *by this batch* (34.0) (e.g., controller scripts, utility scripts, UI components, memory surfaces).    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (34.0) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
+      "components": [
+        {
+          "id": "34.0.1",
+          "task": "Develop Justification Graph Data Generation",
+          "details": "Modify \\'vertical_loop_controller.py\\' or create a utility to process the *entire existing* \\'agent_justification_log.json\\'. Structure data for graph visualization (nodes: actions/decisions; edges: links; attributes: metrics like trust, complexity, emotion, *governance influence*). Ensure cross-loop links included. Create derived data structure/endpoint if needed. If \\'agent_justification_log.json\\' is appended to during this process, ensure the full file is loaded, appended to, and saved.",
+          "artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+            "/home/ubuntu/personal-ai-agent/app/utils/justification_graph_generator.py",
+            "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py"
+          ]
+        },
+        {
+          "id": "34.0.2",
+          "task": "Implement Justification Graph UI Component",
+          "details": "Develop/adapt UI component (\\u0008oldsymbol{\\'}/src/components/visualization/JustificationGraphViewer.jsx\\') using a library (e.g., react-flow, d3) to render graph data from the backend API. Implement basic interactions (zoom, pan, node inspection).",
+          "artifacts": [
+            "/home/ubuntu/personal-ai-agent/src/components/visualization/JustificationGraphViewer.jsx",
+            "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx"
+          ]
+        },
+        {
+          "id": "34.0.3",
+          "task": "Define reflection_thread.json Schema & Surface (*Requires Approval*)",
+          "details": "Define JSON schema for \\'reflection_thread.json\\' (capture narrative summaries: phase, decision, justification, context shift, outcome). Create memory surface file. *Requires explicit Operator approval before creating new schema/surface.*",
+          "artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/schemas/reflection_thread.schema.json",
+            "/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json"
+          ]
+        },
+        {
+          "id": "34.0.4",
+          "task": "Implement Reflection Thread Population (*Requires Approval*)",
+          "details": "Modify \\'vertical_loop_controller.py\\' to generate and append structured summary entries to the *entire existing* \\'reflection_thread.json\\' at significant loop points. Ensure the full file is loaded, appended to, and saved. *Depends on approval/creation in 34.0.3.*",
+          "artifacts": [
+            "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py"
+          ]
+        },
+        {
+          "id": "34.0.5",
+          "task": "Implement Reflection Thread UI Display (*Requires Approval*)",
+          "details": "Develop/adapt UI component (\\u0008oldsymbol{\\'}/src/components/narrative/ReflectionThreadViewer.jsx\\') to fetch and display \\'reflection_thread.json\\' content chronologically. Integrate into main UI. *Depends on approval/creation in 34.0.3.*",
+          "artifacts": [
+            "/home/ubuntu/personal-ai-agent/src/components/narrative/ReflectionThreadViewer.jsx",
+            "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx"
+          ]
+        }
+      ],
+      "expected_artifacts": [
+        "Updated /home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
         "/home/ubuntu/personal-ai-agent/app/utils/justification_graph_generator.py",
-        "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py"
-      ]
-    },
-    {
-      "id": "34.0.2",
-      "task": "Implement Justification Graph UI Component",
-      "details": "Develop/adapt UI component (oldsymbol{\'}/src/components/visualization/JustificationGraphViewer.jsx\') using a library (e.g., react-flow, d3) to render graph data from the backend API. Implement basic interactions (zoom, pan, node inspection).",
-      "artifacts": [
+        "Updated /home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
         "/home/ubuntu/personal-ai-agent/src/components/visualization/JustificationGraphViewer.jsx",
-        "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx"
-      ]
-    },
-    {
-      "id": "34.0.3",
-      "task": "Define reflection_thread.json Schema & Surface (*Requires Approval*)",
-      "details": "Define JSON schema for \'reflection_thread.json\' (capture narrative summaries: phase, decision, justification, context shift, outcome). Create memory surface file. *Requires explicit Operator approval before creating new schema/surface.*",
-      "artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/schemas/reflection_thread.schema.json",
-        "/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json"
-      ]
-    },
-    {
-      "id": "34.0.4",
-      "task": "Implement Reflection Thread Population (*Requires Approval*)",
-      "details": "Modify \'vertical_loop_controller.py\' to generate and append structured summary entries to the *entire existing* \'reflection_thread.json\' at significant loop points. Ensure the full file is loaded, appended to, and saved. *Depends on approval/creation in 34.0.3.*",
-      "artifacts": [
-        "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py"
-      ]
-    },
-    {
-      "id": "34.0.5",
-      "task": "Implement Reflection Thread UI Display (*Requires Approval*)",
-      "details": "Develop/adapt UI component (oldsymbol{\'}/src/components/narrative/ReflectionThreadViewer.jsx\') to fetch and display \'reflection_thread.json\' content chronologically. Integrate into main UI. *Depends on approval/creation in 34.0.3.*",
-      "artifacts": [
-        "/home/ubuntu/personal-ai-agent/src/components/narrative/ReflectionThreadViewer.jsx",
-        "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx"
+        "/home/ubuntu/personal-ai-agent/app/schemas/reflection_thread.schema.json (*if approved*)",
+        "/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json (*if approved*)",
+        "/home/ubuntu/personal-ai-agent/src/components/narrative/ReflectionThreadViewer.jsx (*if approved*)",
+        "Updated /home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx",
+        "/home/ubuntu/wiring_manifest.updated_phase22_36.json",
+        "/home/ubuntu/file_tree.updated_post_phase36.json",
+        "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json"
+      ],
+      "validation_criteria": [
+        "Justification graph accurately visualizes decision flow including governance influence.",
+        "UI component renders the justification graph interactively.",
+        "*If approved:* \\'reflection_thread.json\\' schema defined and surface created.",
+        "*If approved:* \\'reflection_thread.json\\' populated with structured narrative summaries, with the entire file being maintained and updated.",
+        "*If approved:* UI component displays the reflection thread clearly.",
+        "Components integrate with Phase 33 infrastructure.",
+        "Adherence to drift-lock; explicit approval sought for new schema/surface.",
+        "Confirm `/home/ubuntu/wiring_manifest.updated_phase22_36.json` was updated for loop/process executions in this batch (ensure entire file was handled correctly).",
+        "Confirm `/home/ubuntu/file_tree.updated_post_phase36.json` was updated to reflect all changes from this batch (ensure entire file was handled correctly).",
+        "Confirm `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json` was updated/regenerated reflecting this batch and is consistent with the file tree (ensure entire file was handled correctly).",
+        "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `agent_justification_log.json`, `reflection_thread.json` if approved, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, and any other critical files listed in the main prompt) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED."
+      ],
+      "dependencies": [
+        "Completion of Phase 33.0 (Integrated Loop Activation)",
+        "Operator approval for creation of \\'reflection_thread.json\\' schema and surface (for components 34.0.3, 34.0.4, 34.0.5)"
       ]
     }
-  ],
-  "expected_artifacts": [
-    "Updated /home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
-    "/home/ubuntu/personal-ai-agent/app/utils/justification_graph_generator.py",
-    "Updated /home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
-    "/home/ubuntu/personal-ai-agent/src/components/visualization/JustificationGraphViewer.jsx",
-    "/home/ubuntu/personal-ai-agent/app/schemas/reflection_thread.schema.json (*if approved*)",
-    "/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json (*if approved*)",
-    "/home/ubuntu/personal-ai-agent/src/components/narrative/ReflectionThreadViewer.jsx (*if approved*)",
-    "Updated /home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx",
-    "/home/ubuntu/wiring_manifest.updated_phase22_36.json",
-    "/home/ubuntu/file_tree.updated_post_phase36.json",
-    "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json"
-  ],
-  "validation_criteria": [
-    "Justification graph accurately visualizes decision flow including governance influence.",
-    "UI component renders the justification graph interactively.",
-    "*If approved:* \'reflection_thread.json\' schema defined and surface created.",
-    "*If approved:* \'reflection_thread.json\' populated with structured narrative summaries, with the entire file being maintained and updated.",
-    "*If approved:* UI component displays the reflection thread clearly.",
-    "Components integrate with Phase 33 infrastructure.",
-    "Adherence to drift-lock; explicit approval sought for new schema/surface.",
-    "Confirm `/home/ubuntu/wiring_manifest.updated_phase22_36.json` was updated for loop/process executions in this batch (ensure entire file was handled correctly).",
-    "Confirm `/home/ubuntu/file_tree.updated_post_phase36.json` was updated to reflect all changes from this batch (ensure entire file was handled correctly).",
-    "Confirm `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json` was updated/regenerated reflecting this batch and is consistent with the file tree (ensure entire file was handled correctly).",
-    "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `agent_justification_log.json`, `reflection_thread.json` if approved, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, and any other critical files listed in the main prompt) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED."
-  ],
-  "dependencies": [
-    "Completion of Phase 33.0 (Integrated Loop Activation)",
-    "Operator approval for creation of \'reflection_thread.json\' schema and surface (for components 34.0.3, 34.0.4, 34.0.5)"
   ]
 }
-
