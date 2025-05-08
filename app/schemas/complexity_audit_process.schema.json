@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Complexity Audit Process Schema",
+    "description": "Schema for the complexity_audit_process.json file, detailing the steps and parameters of the complexity audit.",
+    "type": "object",
+    "properties": {
+        "process_id": {
+            "type": "string",
+            "description": "Unique identifier for this audit process instance."
+        },
+        "timestamp_utc": {
+            "type": "string",
+            "format": "date-time",
+            "description": "UTC timestamp when the audit process was defined or initiated."
+        },
+        "audit_scope": {
+            "type": "string",
+            "enum": ["full_system", "specific_module", "recent_changes"],
+            "description": "Scope of the complexity audit."
+        },
+        "target_module": {
+            "type": "string",
+            "description": "Specific module to audit if scope is 'specific_module'."
+        },
+        "metrics_to_collect": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["cyclomatic_complexity", "code_churn", "dependency_count", "cognitive_complexity"]
+            },
+            "description": "List of complexity metrics to be collected."
+        },
+        "thresholds": {
+            "type": "object",
+            "properties": {
+                "cyclomatic_complexity_critical": {"type": "integer"},
+                "cognitive_complexity_warning": {"type": "integer"}
+            },
+            "description": "Thresholds for flagging complexity issues."
+        }
+    },
+    "required": ["process_id", "timestamp_utc", "audit_scope", "metrics_to_collect"]
+}
