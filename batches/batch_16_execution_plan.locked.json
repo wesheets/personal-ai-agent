@@ -22,7 +22,7 @@
       "Update `verified` status for batch 16.0 to `true`."
     ],
     "dependencies": [],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "16.1",
@@ -45,7 +45,7 @@
     "dependencies": [
       "16.0"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "16.2",
@@ -65,7 +65,7 @@
     "dependencies": [
       "16.1"
     ],
-    "verified": false
+    "verified": true
   },
   {
     "batch": "16.3",
@@ -90,6 +90,6 @@
     "dependencies": [
       "16.2"
     ],
-    "verified": false
+    "verified": true
   }
 ]
