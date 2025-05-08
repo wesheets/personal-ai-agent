@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "last_updated_utc": "2025-05-08T22:04:42.592460+00:00",
+  "invariants": [
+    {
+      "invariant_id": "MAX_COMPLEXITY_BUDGET",
+      "description": "Maximum complexity allowed for an action or mutation.",
+      "parameters": {
+        "threshold_value": 100.0,
+        "metric_source_key": "complexity_score"
+      },
+      "enabled": true,
+      "scope": [
+        "mutation_guard",
+        "loop_controller"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Simplification Agent Output Schema",
+  "type": "object",
+  "properties": {
+    "proposal_id": { "type": "string" },
+    "component": { "type": "string" },
+    "proposed_change": { "type": "string" },
+    "priority": { "type": "string", "enum": ["low", "medium", "high"] },
+    "emotion_trigger": { "type": "string" },
+    "complexity_score": { "type": "number" },
+    "loop_id": { "type": "string" },
+    "designed_by": { "type": "string" }
+  },
+  "required": [
+    "proposal_id",
+    "component",
+    "proposed_change",
+    "priority",
+    "complexity_score",
+    "loop_id"
+  ]
+}
