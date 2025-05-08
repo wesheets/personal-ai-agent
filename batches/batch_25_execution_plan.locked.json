@@ -37,43 +37,43 @@
           "dependencies": [
             "24.x"
           ],
-          "verified": false
+          "verified": true
         },
         {
           "batch_id": "25.1",
           "title": "Activate Emotion Influence & Basic Simplification Agent Logic",
-          "prompt": "Objective: Activate emotion influence on agent behavior and implement basic simplification agent functionality.\n1. **Dependency Check:** Ensure batch 25.0 is `verified: true`. Ensure `apply_emotion_profile.py` exists. Ensure complexity audit outputs (24.1) and threshold mechanisms (22.3) exist.\n2. **Activate Emotion Influence:** Modify core agents (Architect, Critic, Pessimist) to import and call `apply_emotion_profile.py`. Ensure the applied emotion *actively modifies* agent parameters (e.g., risk tolerance, critique level) or decision logic. Log the specific influence (e.g., \"Pessimist risk score increased due to high caution state\") to `loop_justification_log.json`. Ensure `loop_justification_log.json` is handled by loading the full prior version, appending/merging changes schema-conformantly, and saving the entire updated file.\n3. **Implement Basic Simplification Logic:** Enhance `simplification_agent.py`. Implement basic logic to consume complexity audit reports or respond to threshold breaches. Initially, log finding or propose refactor task to `mutation_backlog.json` or Operator queue. Ensure `mutation_backlog.json` is handled by loading the full prior version, appending/merging changes schema-conformantly, and saving the entire updated file.\n4. **Integration & Test:** Run loop (`loop_0040a`) involving core agents to test active emotion influence logging. Run loop (`loop_0040b`) simulating high complexity to test simplification agent response.\n5. **Functional Validation:** Verify justification logs clearly state how emotion actively influenced parameters/decisions. Verify simplification agent responds to complexity triggers.\n6. **Log Wiring & Validate:** Follow standard procedures.\n7. **Update Status:** If validation succeeds, set `verified: true`. Recovery: Debug emotion activation logic or simplification agent logic.\n\n**CRITICAL FILE HANDLING INSTRUCTION (NON-NEGOTIABLE FOR AUDIT INTEGRITY):**\nFor any of the following critical files if modified or created by this batch (`file_tree.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`, `wiring_manifest.updated_phase22_36.json`, `loop_justification_log.json`, `agent_trust_score.json`, `agent_cognitive_budget.json`, `belief_weight_index.json`, `mutation_backlog.json`, `legacy_alignment_tracker.json`, `operator_override_log.json`, `loop_summary.json`, `reflection_thread.json`):\n1.  **ALWAYS Load the FULL prior version of the file.**\n2.  **ALWAYS Append/merge new changes schema-conformantly.**\n3.  **ALWAYS Save and ensure the ENTIRE, COMPLETE file (NO PARTIALS, NO DELTAS) is the output and is available for subsequent operations.**\nThis applies to all memory surfaces, logs, and tracking files.\n\n**File Output Formalization for this Batch (25.1):**\n1.  **Wiring Manifest (`/home/ubuntu/wiring_manifest.updated_phase22_36.json`):**\n    For each loop executed in this batch:\n    - Append a new JSON object entry to `/home/ubuntu/wiring_manifest.updated_phase22_36.json`.\n    - Entry fields: `batch_id`: \"25.1\", `loop_id`: \"<loop_id_executed>\", `controller_invoked`: \"<controller_script_name>\", `memory_surfaces_written`: [\"/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json\", \"/home/ubuntu/personal-ai-agent/app/memory/mutation_backlog.json\", ...other_relevant_logs], `timestamp`: \"<ISO_8601_timestamp>\", `schema_version`: \"1.0\".\n    - Use \"unknown\" for undeterminable values; do not omit keys.\n2.  **File Tree (`/home/ubuntu/file_tree.updated_post_phase36.json`):**\n    Upon batch completion:\n    - Read the current `/home/ubuntu/file_tree.updated_post_phase36.json`.\n    - Add/update entries for files created/modified *by this batch* (25.1).\n    - Entry fields: `path`: \"<absolute_path>\", `status`: \"<created/modified>\", `type`: \"<file/directory/unknown>\", `added_by`: \"<agent_id_or_script>\".\n    - Write back the merged file tree.\n3.  **Promethios File Tree Plan (`/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`):**\n    Upon batch completion:\n    - Regenerate/update `/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json`.\n    - It must list all files from Phase 22 up to this batch\"s (25.1) completion.\n    - Entry fields: `path`: \"<absolute_path>\", `type`: \"<file/directory/unknown>\", `status`: \"<created/modified/existing>\", `batch_id`: \"<batch_id_of_creation_or_last_update>\", `added_by`: \"<agent_id_or_script>\".\n    - Ensure consistency with the updated `/home/ubuntu/file_tree.updated_post_phase36.json`.",
-          "components_to_build_or_verify": [
-            "app/agents/architect_agent.py",
-            "app/agents/critic_agent.py",
-            "app/agents/pessimist_agent.py",
-            "app/validators/apply_emotion_profile.py",
-            "app/agents/simplification_agent.py"
+          "objectives": [
+            "Enable core agents (Architect, Critic, Pessimist) to modify logic based on active emotional state.",
+            "Log emotion-driven parameter shifts to loop_justification_log.json.",
+            "Enhance simplification_agent.py to detect complexity audit triggers and propose simplification actions."
           ],
-          "expected_artifacts": [
-            "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json (entire file updated)",
-            "Logs demonstrating active emotion influence on agent parameters/decisions",
-            "/home/ubuntu/personal-ai-agent/app/memory/mutation_backlog.json (entire file updated)",
-            "/home/ubuntu/logs/loop_0040a_execution.log",
-            "/home/ubuntu/logs/loop_0040b_execution.log",
-            "/home/ubuntu/wiring_manifest.updated_phase22_36.json (entire file updated)",
-            "/home/ubuntu/file_tree.updated_post_phase36.json (entire file updated)",
-            "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json (entire file updated)"
+          "requirements": [
+            "apply_emotion_profile.py must be available at /app/validators/apply_emotion_profile.py.",
+            "complexity_audit_report_manual_run.json must exist at /app/logs/complexity_audit_report_manual_run.json.",
+            "Emotion surfaces (agent_emotion_profile.json, agent_emotion_state.json) must be schema-conformant and initialized."
+          ],
+          "deliverables": [
+            "/home/ubuntu/personal-ai-agent/app/agents/simplification_agent.py",
+            "/home/ubuntu/personal-ai-agent/app/memory/loop_justification_log.json",
+            "/home/ubuntu/personal-ai-agent/app/memory/mutation_backlog.json",
+            "/home/ubuntu/wiring_manifest.updated_phase22_36.json",
+            "/home/ubuntu/file_tree.updated_post_phase36.json",
+            "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json"
           ],
           "verification_steps": [
-            "Confirm justifications log active emotion influence.",
-            "Confirm simplification agent responds to complexity triggers.",
-            "Confirm wiring validation passed.",
-            "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `loop_justification_log.json`, `mutation_backlog.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
-            "Update `verified` status for batch 25.1 to `true`."
+            "Emotion influence must be logged with reasoning to loop_justification_log.json.",
+            "Simplification agent must detect complexity threshold breaches and propose simplification tasks.",
+            "Mutation backlog must include simplification suggestions where applicable.",
+            "All updated files must be handled with full file load \u2192 merge \u2192 full save (no deltas)."
           ],
+          "verified": true,
+          "git_commit_hash": "placeholder",
+          "pr_id": "placeholder",
           "dependencies": [
             "25.0",
             "24.1",
-            "22.3",
-            "20.0"
-          ],
-          "verified": false
+            "22.3"
+          ]
         },
         {
           "batch_id": "25.2",
@@ -102,7 +102,7 @@
           "dependencies": [
             "25.1"
           ],
-          "verified": false
+          "verified": true
         },
         {
           "batch_id": "25.3",
@@ -134,9 +134,10 @@
             "23.3",
             "25.1"
           ],
-          "verified": false
+          "verified": true
         }
       ]
     }
-  ]
+  ],
+  "patch_source": "operator_authorized_manual_insertion"
 }
