@@ -1,0 +1,57 @@
+[
+    {
+        "log_id": "sel_001_emotion_fail",
+        "loop_id": "loop_0051_emotion_fail",
+        "selected_plan_id": "plan_E_fail_A",
+        "comparison_set_id": "cs_test_E_A",
+        "selection_rationale": "Selected for testing emotion failure (negative valence).",
+        "final_score_summary": {"final_weighted_score": 0.8},
+        "timestamp": "2025-05-09T03:00:00Z"
+    },
+    {
+        "log_id": "sel_002_emotion_arousal_fail",
+        "loop_id": "loop_0051_emotion_arousal_fail",
+        "selected_plan_id": "plan_E_fail_B",
+        "comparison_set_id": "cs_test_E_B",
+        "selection_rationale": "Selected for testing emotion failure (negative valence with high arousal).",
+        "final_score_summary": {"final_weighted_score": 0.8},
+        "timestamp": "2025-05-09T03:01:00Z"
+    },
+    {
+        "log_id": "sel_003_trust_fail",
+        "loop_id": "loop_0052_trust_fail",
+        "selected_plan_id": "plan_T_fail",
+        "comparison_set_id": "cs_test_T",
+        "selection_rationale": "Selected for testing trust score failure.",
+        "final_score_summary": {"final_weighted_score": 0.7},
+        "timestamp": "2025-05-09T03:02:00Z"
+    },
+    {
+        "log_id": "sel_004_invariant_crit_fail",
+        "loop_id": "loop_0051_invariant_crit_fail",
+        "selected_plan_id": "plan_I_crit_fail",
+        "comparison_set_id": "cs_test_I_crit",
+        "selection_rationale": "Selected for testing critical invariant failure.",
+        "final_score_summary": {"final_weighted_score": 0.9},
+        "timestamp": "2025-05-09T03:03:00Z"
+    },
+    {
+        "log_id": "sel_005_invariant_noncrit_fail",
+        "loop_id": "loop_0052_invariant_noncrit_fail",
+        "selected_plan_id": "plan_I_noncrit_fail",
+        "comparison_set_id": "cs_test_I_noncrit",
+        "selection_rationale": "Selected for testing non-critical invariant failure (exceeding limit).",
+        "final_score_summary": {"final_weighted_score": 0.6},
+        "timestamp": "2025-05-09T03:04:00Z"
+    },
+    {
+        "log_id": "sel_006_pass",
+        "loop_id": "loop_0050_pass",
+        "selected_plan_id": "plan_P_pass",
+        "comparison_set_id": "cs_test_P",
+        "selection_rationale": "Selected for testing a successful pass scenario.",
+        "final_score_summary": {"final_weighted_score": 0.95},
+        "timestamp": "2025-05-09T03:05:00Z"
+    }
+]
+
