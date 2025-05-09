@@ -9576,7 +9576,150 @@
   "status": "created",
   "added_by": "batch_25.1_manual_patch",
   "timestamp": "2025-05-08T18:45:00Z"
-}
-]
+},
+    {
+    "path": "logs/emotion_drift_tracker.json",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: logs/emotion_drift_tracker.json",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "logs/loop_regret_score.json",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: logs/loop_regret_score.json",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "logs/refactor_suggestion_log.json",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: logs/refactor_suggestion_log.json",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "logs/multi_plan_comparison.json",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: logs/multi_plan_comparison.json",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "logs/loop_plan_selection_log.json",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: logs/loop_plan_selection_log.json",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "logs/plan_rejection_log.json",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: logs/plan_rejection_log.json",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "logs/plan_escalation_log.json",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: logs/plan_escalation_log.json",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "logs/governance_value_alignment_log.json",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: logs/governance_value_alignment_log.json",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "logs/governance_drift_response_log.json",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: logs/governance_drift_response_log.json",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/core/plan_selector.py",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: app/core/plan_selector.py",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/core/plan_rejector.py",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: app/core/plan_rejector.py",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/core/plan_escalation_detector.py",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: app/core/plan_escalation_detector.py",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "app/core/governance_reconciler.py",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: app/core/governance_reconciler.py",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "scripts/run_plan_selection.py",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: scripts/run_plan_selection.py",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "scripts/run_plan_rejection_check.py",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: scripts/run_plan_rejection_check.py",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "scripts/run_escalation_check.py",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: scripts/run_escalation_check.py",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "scripts/run_governance_reconciliation_test.py",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: scripts/run_governance_reconciliation_test.py",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  },
+  {
+    "path": "scripts/run_governance_drift_trigger.py",
+    "status": "verified",
+    "id": "28.x",
+    "purpose": "File: scripts/run_governance_drift_trigger.py",
+    "created_by": "operator",
+    "schema_version": "v1.0"
+  }
 
 ]
