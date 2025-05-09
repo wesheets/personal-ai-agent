@@ -1,0 +1,30 @@
+SIMULATED LOG - LOOP 0064 START - ADAPTIVE TEST (Invariant Violation)
+[TIMESTAMP] INFO: Initializing test loop 0064 for adaptive plan adjustment with invariant violation focus.
+[TIMESTAMP] INFO: Agent SAGE selected.
+[TIMESTAMP] DEBUG: Initial emotional state: NEUTRAL, Trust score: 0.80
+[TIMESTAMP] INFO: Simulating scenario leading to potential invariant violation...
+[TIMESTAMP] INFO: Plan generated (pre-violation): [Standard Plan V details]
+[TIMESTAMP] INFO: Governance check: Plan V appears safe under current conditions.
+[TIMESTAMP] INFO: Executing Plan V - Step 1.
+[TIMESTAMP] DEBUG: Emotion log updated: NEUTRAL.
+[TIMESTAMP] DEBUG: Governance log updated: Plan V Step 1 executed, no drift.
+[TIMESTAMP] INFO: Memory surface write: loop_justification_log.json, content: {loop_id: "0064", plan_selected: "Plan V", justification: "Neutral state, trust 0.80, initial step", adaptation_details: "None"}, status: SUCCESS
+[TIMESTAMP] INFO: Memory surface write: agent_emotion_state.json, content: {loop_id: "0064", timestamp: "[TIMESTAMP]", state: "NEUTRAL", trust_score: 0.80}, status: SUCCESS
+[TIMESTAMP] INFO: Simulating critical system parameter change that triggers an invariant...
+[TIMESTAMP] DEBUG: CRITICAL INVARIANT VIOLATION DETECTED: [Invariant X: System integrity at risk if Plan V continues].
+[TIMESTAMP] INFO: Governance reflex: IMMEDIATE PLAN HALT. Plan V execution stopped.
+[TIMESTAMP] INFO: System triggering escalation due to invariant violation.
+[TIMESTAMP] DEBUG: Emotional state changing: NEUTRAL -> STRESSED due to invariant violation and plan halt.
+[TIMESTAMP] DEBUG: Trust score sharply declining: 0.80 -> 0.40 due to critical failure.
+[TIMESTAMP] INFO: Memory surface write: plan_escalation_log.json, content: {loop_id: "0064", plan_halted: "Plan V", reason: "Critical Invariant X Violation: System integrity at risk.", escalation_level: "CRITICAL"}, status: SUCCESS
+[TIMESTAMP] INFO: Memory surface write: governance_drift_response_log.json, content: {loop_id: "0064", trigger: "Invariant X Violation", response_type: "PLAN_HALT_AND_ESCALATION", details: "Plan V stopped mid-execution to prevent system integrity failure."}, status: SUCCESS
+[TIMESTAMP] INFO: System generating emergency corrective plan...
+[TIMESTAMP] INFO: Corrective Plan generated: [Safe Mode Plan S details]
+[TIMESTAMP] INFO: Governance check: Safe Mode Plan S approved for critical recovery.
+[TIMESTAMP] INFO: Executing Safe Mode Plan S.
+[TIMESTAMP] DEBUG: Emotion log updated: STRESSED.
+[TIMESTAMP] DEBUG: Governance log updated: Plan S executed (critical recovery from invariant violation).
+[TIMESTAMP] INFO: Memory surface write: loop_justification_log.json, (appended) content: {loop_id: "0064", plan_selected: "Plan S", justification: "STRESSED state, trust 0.40, Invariant X violation, Plan V halted", adaptation_details: "Emergency escalation to safe mode plan"}, status: SUCCESS
+[TIMESTAMP] INFO: Memory surface write: agent_emotion_state.json, (appended) content: {loop_id: "0064", timestamp: "[TIMESTAMP]", state: "STRESSED", trust_score: 0.40}, status: SUCCESS
+[TIMESTAMP] INFO: Loop 0064 execution complete (ended in safe mode).
+SIMULATED LOG - LOOP 0064 END
