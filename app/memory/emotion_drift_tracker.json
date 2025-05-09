@@ -1,0 +1,28 @@
+[
+  {
+    "timestamp": "2025-05-09T01:10:34.420220Z",
+    "agent_id": "test_agent_standalone_success",
+    "loop_id": "test_loop_standalone_success",
+    "outcome": "success",
+    "regret_score": 0.1,
+    "justification_ref": "test_justification_standalone_success",
+    "updated_emotion_profile_snapshot": {
+      "happiness": 0.6,
+      "sadness": 0.4,
+      "last_updated_utc": "2025-05-09T01:10:34.420220Z"
+    }
+  },
+  {
+    "timestamp": "2025-05-09T01:10:34.420752Z",
+    "agent_id": "test_agent_standalone_failure",
+    "loop_id": "test_loop_standalone_failure",
+    "outcome": "failure",
+    "regret_score": 0.8,
+    "justification_ref": "test_justification_standalone_failure",
+    "updated_emotion_profile_snapshot": {
+      "happiness": 0.4,
+      "sadness": 0.6,
+      "last_updated_utc": "2025-05-09T01:10:34.420752Z"
+    }
+  }
+]

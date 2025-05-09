@@ -1,0 +1,7 @@
+{
+    "default": {"valence": 0.5, "arousal": 0.3},
+    "loop_0051_emotion_fail": {"valence": -0.8, "arousal": 0.5},
+    "loop_0051_emotion_arousal_fail": {"valence": -0.5, "arousal": 0.9},
+    "loop_0050_pass": {"valence": 0.6, "arousal": 0.4}
+}
+

@@ -1,0 +1,120 @@
+{
+    "components": [
+        {
+            "path": "app/validators/assess_drift_awareness.py",
+            "description": "Script to assess agent awareness of emotional drift.",
+            "type": "validator_script",
+            "batch_id": "26.1",
+            "last_modified_by_batch": "26.1",
+            "status": "implemented",
+            "dependencies": [
+                "app/memory/emotion_drift_alert_log.json"
+            ],
+            "verified_in_batch": "26.1"
+        },
+        {
+            "path": "app/memory/emotion_drift_alert_log.json",
+            "description": "Log for emotion drift alerts.",
+            "type": "data_log",
+            "batch_id": "26.1",
+            "last_modified_by_batch": "26.1",
+            "status": "created",
+            "dependencies": [],
+            "verified_in_batch": "26.1"
+        },
+        {
+            "path": "app/controllers/loop_controller.py",
+            "description": "Main loop controller, updated to integrate drift awareness assessment and alerting.",
+            "type": "controller_script",
+            "batch_id": "26.1",
+            "last_modified_by_batch": "26.1",
+            "status": "modified",
+            "dependencies": [
+                "app/validators/assess_drift_awareness.py",
+                "app/memory/emotion_drift_alert_log.json"
+            ],
+            "verified_in_batch": "26.1"
+        },
+        {
+            "path": "tests/standalone/batch_26_1_tests/test_assess_drift_awareness_standalone.py",
+            "description": "Standalone test script for assess_drift_awareness.py.",
+            "type": "test_script",
+            "batch_id": "26.1",
+            "last_modified_by_batch": "26.1",
+            "status": "implemented",
+            "dependencies": [
+                "app/validators/assess_drift_awareness.py"
+            ],
+            "verified_in_batch": "26.1"
+        },
+        {
+            "file_path": "/home/ubuntu/personal-ai-agent/app/memory/refactor_suggestion_log.json",
+            "description": "Log file for refactor suggestions.",
+            "type": "data_log",
+            "dependencies": [
+                "/home/ubuntu/personal-ai-agent/app/validators/refactor_monitor.py"
+            ],
+            "batch_id": "26.2",
+            "last_modified": "2025-05-09T01:36:20.491658Z",
+            "last_modified_by_batch": "26.2",
+            "status": "implemented",
+            "verified_in_batch": "26.2"
+        },
+        {
+            "file_path": "/home/ubuntu/personal-ai-agent/app/validators/refactor_monitor.py",
+            "description": "Script to monitor conditions and generate refactor suggestions.",
+            "type": "validator_script",
+            "dependencies": [
+                "/home/ubuntu/personal-ai-agent/app/memory/refactor_suggestion_log.json"
+            ],
+            "batch_id": "26.2",
+            "last_modified": "2025-05-09T01:36:20.491658Z",
+            "last_modified_by_batch": "26.2",
+            "status": "implemented",
+            "verified_in_batch": "26.2"
+        },
+        {
+            "file_path": "/home/ubuntu/personal-ai-agent/app/controllers/loop_controller.py",
+            "description": "Main loop controller, updated to integrate refactor suggestion logic.",
+            "type": "controller_script",
+            "dependencies": [
+                "/home/ubuntu/personal-ai-agent/app/validators/track_emotion_drift.py",
+                "/home/ubuntu/personal-ai-agent/app/validators/assess_drift_awareness.py",
+                "/home/ubuntu/personal-ai-agent/app/validators/refactor_monitor.py"
+            ],
+            "batch_id": "26.2",
+            "last_modified": "2025-05-09T01:36:20.491658Z",
+            "last_modified_by_batch": "26.2",
+            "status": "implemented",
+            "verified_in_batch": "26.2"
+        },
+        {
+            "file_path": "/home/ubuntu/personal-ai-agent/tests/test_refactor_suggestions.py",
+            "description": "Unit tests for refactor_monitor.py.",
+            "type": "test_script",
+            "dependencies": [
+                "/home/ubuntu/personal-ai-agent/app/validators/refactor_monitor.py"
+            ],
+            "batch_id": "26.2",
+            "last_modified": "2025-05-09T01:36:20.491658Z",
+            "last_modified_by_batch": "26.2",
+            "status": "implemented",
+            "verified_in_batch": "26.2"
+        },
+        {
+            "file_path": "/home/ubuntu/personal-ai-agent/tests/test_refactor_suggestions_standalone.py",
+            "description": "Standalone unit tests for refactor_monitor.py.",
+            "type": "test_script",
+            "dependencies": [
+                "/home/ubuntu/personal-ai-agent/app/validators/refactor_monitor.py"
+            ],
+            "batch_id": "26.2",
+            "last_modified": "2025-05-09T01:36:20.491658Z",
+            "last_modified_by_batch": "26.2",
+            "status": "implemented",
+            "verified_in_batch": "26.2"
+        }
+    ],
+    "last_updated": "2025-05-09T01:36:20.491658Z",
+    "last_updated_by_batch": "26.2"
+}

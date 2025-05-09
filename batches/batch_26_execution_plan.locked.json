@@ -33,7 +33,7 @@
           "dependencies": [
             "25.3"
           ],
-          "verified": false
+          "verified": true
         },
         {
           "batch_id": "26.1",
@@ -63,7 +63,7 @@
           "dependencies": [
             "26.0"
           ],
-          "verified": false
+          "verified": true
         },
         {
           "batch_id": "26.2",
@@ -94,7 +94,7 @@
             "21.1",
             "26.1"
           ],
-          "verified": false
+          "verified": true
         },
         {
           "batch_id": "26.3",
@@ -123,7 +123,7 @@
           "dependencies": [
             "24.3"
           ],
-          "verified": false
+          "verified": true
         }
       ]
     }

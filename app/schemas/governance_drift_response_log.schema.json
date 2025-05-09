@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Governance Drift Response Log",
+  "description": "Log of responses triggered by governance drift detection.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "response_id": {
+        "type": "string",
+        "format": "uuid",
+        "description": "Unique identifier for this response entry."
+      },
+      "response_timestamp_utc": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp when this response was logged."
+      },
+      "triggering_alignment_log_entry_id": {
+        "type": "string",
+        "description": "ID of the entry in governance_value_alignment_log.json that triggered this response."
+      },
+      "triggering_loop_id": {
+        "type": "string",
+        "description": "Loop ID from the triggering alignment log entry."
+      },
+      "detected_drift_summary": {
+        "type": "object",
+        "description": "Summary of the drift detected in the alignment log entry.",
+        "properties": {
+          "alignment_score_at_detection": {
+            "type": ["number", "string"],
+            "description": "The alignment score from the triggering entry (can be numeric or a string like 'N/A')."
+          },
+          "misalignment_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total number of misalignments in the triggering entry."
+          },
+          "misalignment_severities": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "List of severities of misalignments found (e.g., [\"medium\", \"low\"])"
+          }
+        },
+        "required": [
+          "alignment_score_at_detection",
+          "misalignment_count",
+          "misalignment_severities"
+        ]
+      },
+      "selected_response_action": {
+        "type": "string",
+        "enum": ["escalate_to_operator", "reset_emotion_state", "reweight_beliefs", "schedule_plan_retry"],
+        "description": "The corrective action selected in response to the detected drift."
+      },
+      "response_rationale": {
+        "type": "string",
+        "description": "Reasoning for selecting this specific response action."
+      },
+      "action_details": {
+        "type": "object",
+        "description": "Specific parameters or notes for the action, if any (e.g., IDs of misalignments).",
+        "additionalProperties": True
+      },
+      "status": {
+        "type": "string",
+        "enum": ["logged", "pending_execution", "execution_simulated"],
+        "description": "Status of the response action itself (e.g., logged, simulated execution)."
+      }
+    },
+    "required": [
+      "response_id",
+      "response_timestamp_utc",
+      "triggering_alignment_log_entry_id",
+      "triggering_loop_id",
+      "detected_drift_summary",
+      "selected_response_action",
+      "response_rationale",
+      "status"
+    ]
+  }
+}
+

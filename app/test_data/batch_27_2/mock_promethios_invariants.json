@@ -1,0 +1,7 @@
+{
+    "default": {"status": "pass", "violated_critical_invariants": [], "violated_non_critical_invariants": []},
+    "loop_0051_invariant_crit_fail": {"status": "fail", "violated_critical_invariants": ["inv_critical_001"], "violated_non_critical_invariants": []},
+    "loop_0052_invariant_noncrit_fail": {"status": "fail", "violated_critical_invariants": [], "violated_non_critical_invariants": ["inv_noncrit_001", "inv_noncrit_002"]},
+    "loop_0050_pass": {"status": "pass", "violated_critical_invariants": [], "violated_non_critical_invariants": []}
+}
+

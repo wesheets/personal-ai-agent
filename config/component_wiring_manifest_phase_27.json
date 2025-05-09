@@ -1,0 +1,45 @@
+{
+  "components": [
+    {
+      "component_id": "PlanRejector",
+      "module_path": "app.core.plan_rejector.PlanRejector",
+      "description": "Component responsible for evaluating a selected plan against emotional, trust, and invariant thresholds and logging rejections.",
+      "dependencies": [
+        "app.logs.loop_plan_selection_log.json",
+        "app.memory.agent_emotion_state.json",
+        "app.memory.agent_trust_score.json",
+        "app.memory.promethios_invariants.json"
+      ],
+      "outputs": [
+        "app.logs.plan_rejection_log.json"
+      ],
+      "schemas": [
+        "app.schemas.plan_rejection_log.schema.json"
+      ],
+      "version": "1.0",
+      "status": "active"
+    }
+  ],
+  "data_surfaces": [
+    {
+      "component_id": "plan_rejection_log.json",
+      "data_surface_path": "app/logs/plan_rejection_log.json",
+      "description": "Log file for recording plan rejections based on governance thresholds.",
+      "schema_path": "app.schemas.plan_rejection_log.schema.json",
+      "type": "log_file",
+      "version": "1.0",
+      "status": "active"
+    }
+  ],
+  "schemas": [
+    {
+      "component_id": "plan_rejection_log.schema.json",
+      "schema_path": "app.schemas.plan_rejection_log.schema.json",
+      "description": "JSON schema for the plan_rejection_log.json file.",
+      "type": "json_schema",
+      "version": "1.0",
+      "status": "active"
+    }
+  ],
+  "last_updated": "2025-05-09T03:17:03.204851+00:00Z"
+}
