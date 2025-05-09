@@ -1,0 +1,19 @@
+[
+    {
+        "log_id": "rej_log_001",
+        "loop_id": "loop_0050",
+        "comparison_set_id": "cs_loop0050_1",
+        "plan_id": "planC",
+        "rejection_reason": "Invariant violation: Exceeded complexity threshold.",
+        "triggering_metric": "complexity_score",
+        "metric_value": 7,
+        "threshold_value": 5,
+        "governance_context": {
+            "emotion_state": {"valence": 0.6, "arousal": 0.5},
+            "trust_score": 0.85,
+            "invariants_status": "violated"
+        },
+        "timestamp": "2025-05-09T01:05:00Z"
+    }
+]
+

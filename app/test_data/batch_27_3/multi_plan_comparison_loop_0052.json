@@ -1,0 +1,28 @@
+[
+    {
+        "comparison_set_id": "cs_loop0052_1",
+        "loop_id": "loop_0052",
+        "timestamp": "2025-05-09T02:00:00Z",
+        "candidate_plans": [
+            {
+                "plan_id": "planE_L0052",
+                "description": "Plan E for loop 0052 - expected to be rejected",
+                "estimated_complexity": 8,
+                "initial_score": 0.6
+            },
+            {
+                "plan_id": "planF_L0052",
+                "description": "Plan F for loop 0052 - also expected to be rejected",
+                "estimated_complexity": 7,
+                "initial_score": 0.5
+            }
+        ],
+        "evaluation_parameters": {
+            "emotion_weight": 0.2,
+            "trust_weight": 0.5,
+            "complexity_weight": 0.1,
+            "invariant_weight": 0.2
+        }
+    }
+]
+

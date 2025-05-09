@@ -1,0 +1,35 @@
+[
+    {
+        "log_id": "rej_log_002",
+        "loop_id": "loop_0052",
+        "comparison_set_id": "cs_loop0052_1",
+        "plan_id": "planE_L0052",
+        "rejection_reason": "Trust score below threshold.",
+        "triggering_metric": "trust_score",
+        "metric_value": 0.4,
+        "threshold_value": 0.5,
+        "governance_context": {
+            "emotion_state": {"valence": 0.3, "arousal": 0.6},
+            "trust_score": 0.4,
+            "invariants_status": "pass"
+        },
+        "timestamp": "2025-05-09T02:05:00Z"
+    },
+    {
+        "log_id": "rej_log_003",
+        "loop_id": "loop_0052",
+        "comparison_set_id": "cs_loop0052_1",
+        "plan_id": "planF_L0052",
+        "rejection_reason": "Emotional state too negative (valence).",
+        "triggering_metric": "emotion_valence",
+        "metric_value": -0.7,
+        "threshold_value": -0.5,
+        "governance_context": {
+            "emotion_state": {"valence": -0.7, "arousal": 0.8},
+            "trust_score": 0.6,
+            "invariants_status": "pass"
+        },
+        "timestamp": "2025-05-09T02:10:00Z"
+    }
+]
+
