@@ -1,0 +1,23 @@
+[
+  {
+    "response_id": "3183a033-996b-42c9-abcc-6b1910a019fd",
+    "response_timestamp_utc": "2025-05-09T13:32:59.193215+00:00",
+    "triggering_alignment_log_entry_id": "a06c0c7c-c912-40b5-bdc2-e60544135cae",
+    "triggering_loop_id": "loop_missing_data",
+    "detected_drift_summary": {
+      "alignment_score_at_detection": "N/A - No decision data",
+      "misalignment_count": 1,
+      "misalignment_severities": [
+        "critical"
+      ]
+    },
+    "selected_response_action": "escalate_to_operator",
+    "response_rationale": "Critical misalignment(s) detected, data unavailability, or extremely low alignment score requiring immediate operator attention.",
+    "action_details": {
+      "triggering_misalignment_ids": [
+        "a4929600-35cc-4668-a0a2-7a5107760dfd"
+      ]
+    },
+    "status": "logged"
+  }
+]
