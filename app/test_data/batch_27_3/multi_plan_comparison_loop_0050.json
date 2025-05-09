@@ -1,0 +1,28 @@
+[
+    {
+        "comparison_set_id": "cs_loop0050_1",
+        "loop_id": "loop_0050",
+        "timestamp": "2025-05-09T01:00:00Z",
+        "candidate_plans": [
+            {
+                "plan_id": "planC",
+                "description": "Plan C for loop 0050",
+                "estimated_complexity": 5,
+                "initial_score": 0.8
+            },
+            {
+                "plan_id": "planD",
+                "description": "Plan D for loop 0050",
+                "estimated_complexity": 3,
+                "initial_score": 0.9
+            }
+        ],
+        "evaluation_parameters": {
+            "emotion_weight": 0.3,
+            "trust_weight": 0.4,
+            "complexity_weight": 0.1,
+            "invariant_weight": 0.2
+        }
+    }
+]
+
