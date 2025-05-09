@@ -37,7 +37,7 @@
             "22.3",
             "23.1"
           ],
-          "verified": false
+          "verified": true
         },
         {
           "batch_id": "27.1",
@@ -67,7 +67,7 @@
             "27.0",
             "25.3"
           ],
-          "verified": false
+          "verified": true
         },
         {
           "batch_id": "27.2",
@@ -97,7 +97,7 @@
             "23.3",
             "25.3"
           ],
-          "verified": false
+          "verified": true
         },
         {
           "batch_id": "27.3",
@@ -129,7 +129,7 @@
             "20.0",
             "26.2"
           ],
-          "verified": false
+          "verified": true
         }
       ]
     }
