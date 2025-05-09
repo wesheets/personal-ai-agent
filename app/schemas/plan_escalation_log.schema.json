@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PlanEscalationLogEntry",
+  "description": "Schema for an entry in the plan_escalation_log.json file, recording instances where all plans for a loop were rejected.",
+  "type": "object",
+  "properties": {
+    "log_entry_id": {
+      "description": "Unique identifier for this log entry.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "loop_id": {
+      "description": "The identifier of the loop for which all plans were rejected.",
+      "type": "string"
+    },
+    "comparison_set_id": {
+      "description": "Identifier for the set of plans that were compared and subsequently all rejected for this loop.",
+      "type": ["string", "null"]
+    },
+    "escalation_reason": {
+      "description": "A human-readable reason for the escalation.",
+      "type": "string",
+      "examples": ["All candidate plans rejected by governance thresholds."]
+    },
+    "rejected_plan_ids": {
+      "description": "A list of all plan IDs that were considered and rejected for this loop.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "governance_summary": {
+        "description": "A summary of governance metrics or rejection reasons for the rejected plans (optional, could be detailed).",
+        "type": "object",
+        "properties": {
+            "total_plans_considered": {"type": "integer"},
+            "total_plans_rejected": {"type": "integer"}
+        }
+    },
+    "recommended_action": {
+      "description": "A system-recommended next action or status.",
+      "type": "string",
+      "enum": ["trigger_fallback_procedure", "operator_review_required", "no_further_action_defined"]
+    },
+    "operator_alert_flag": {
+      "description": "Boolean flag indicating if an operator alert is explicitly recommended.",
+      "type": "boolean",
+      "default": false
+    },
+    "fallback_triggered": {
+        "description": "Boolean flag indicating if fallback logic was triggered as a result of this escalation.",
+        "type": "boolean",
+        "default": false
+    },
+    "fallback_details": {
+        "description": "Details about the fallback action taken, if any.",
+        "type": ["string", "null"]
+    },
+    "timestamp": {
+      "description": "UTC timestamp of when the escalation was logged (ISO 8601 format).",
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "log_entry_id",
+    "loop_id",
+    "escalation_reason",
+    "rejected_plan_ids",
+    "recommended_action",
+    "timestamp"
+  ]
+}
+
