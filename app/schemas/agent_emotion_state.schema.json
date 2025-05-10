@@ -1,1 +1,35 @@
-{}
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Emotion State Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "loop_id",
+      "timestamp",
+      "state",
+      "trust_score"
+    ],
+    "properties": {
+      "loop_id": {
+        "type": "string",
+        "description": "ID of the loop for which this emotion state applies"
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp when this state was recorded"
+      },
+      "state": {
+        "type": "string",
+        "description": "Named emotional state (e.g., CALM, AGITATED, FOCUSED)"
+      },
+      "trust_score": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "description": "Trust level at the time of emotional state capture"
+      }
+    }
+  }
+}
