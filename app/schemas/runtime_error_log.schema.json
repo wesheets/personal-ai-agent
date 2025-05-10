@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Runtime Error Log Entry",
+  "description": "Schema for an entry in the runtime error log.",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "description": "ISO 8601 timestamp of when the error occurred.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "loop_id": {
+      "description": "Identifier of the loop during which the error occurred.",
+      "type": "string"
+    },
+    "batch_id": {
+      "description": "Identifier of the batch during which the error occurred.",
+      "type": "string"
+    },
+    "error_category": {
+      "description": "Category of the error.",
+      "type": "string",
+      "enum": [
+        "ToolFailure", 
+        "ValidationError", 
+        "MemoryAccessError", 
+        "SchemaMismatch", 
+        "ResourceUnavailable", 
+        "TimeoutError", 
+        "UncaughtException", 
+        "GovernanceViolation", 
+        "OperatorInterventionRequired", 
+        "UnknownError",
+        "CriticalInvariantViolation",
+        "UnhandledAgentException",
+        "UnknownRuntimeException"
+      ]
+    },
+    "error_message": {
+      "description": "Detailed error message.",
+      "type": "string"
+    },
+    "error_details": {
+      "description": "Additional details or context about the error (e.g., stack trace, failing component).",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "recovery_attempted": {
+      "description": "Overall strategy used for recovery, if any, or the final one if multiple were part of a sequence.",
+      "type": "string",
+      "enum": ["None", "SafeHalt", "Retry", "RetryWithModification", "EscalateToOperator"]
+    },
+    "recovery_outcome": {
+      "description": "Overall outcome of the recovery process.",
+      "type": "string",
+      "enum": ["NotAttempted", "Success", "Failure", "InProgress", "AwaitingOperator"]
+    },
+    "recovery_attempts": {
+      "description": "A list of individual recovery attempts made for this error.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "attempt_number": {
+            "description": "The sequence number of this recovery attempt (e.g., 1, 2, 3).",
+            "type": "integer",
+            "minimum": 1
+          },
+          "timestamp": {
+            "description": "ISO 8601 timestamp of when this recovery attempt was made.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "strategy_used": {
+            "description": "The specific recovery strategy employed for this attempt.",
+            "type": "string",
+            "enum": ["Retry", "SafeHalt", "RetryWithModification"]
+          },
+          "parameters": {
+            "description": "Parameters used for this specific recovery attempt (e.g., delay before retry, modification details).",
+            "type": "object",
+            "additionalProperties": true
+          },
+          "outcome": {
+            "description": "Outcome of this specific recovery attempt.",
+            "type": "string",
+            "enum": ["Success", "Failure", "InProgress"]
+          },
+          "details": {
+            "description": "Additional details or logs specific to this recovery attempt.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_number",
+          "timestamp",
+          "strategy_used",
+          "outcome"
+        ]
+      }
+    },
+    "severity": {
+      "description": "Severity of the error.",
+      "type": "string",
+      "enum": ["Critical", "Error", "Warning", "Info", "Debug"]
+    }
+  },
+  "required": [
+    "timestamp",
+    "loop_id",
+    "error_category",
+    "error_message",
+    "severity"
+  ]
+}
+
