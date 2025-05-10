@@ -9728,7 +9728,305 @@
   "purpose": "File: app/memory/loop_identity_signature.json",
   "created_by": "operator",
   "schema_version": "v1.0"
-}
-
-
+ },
+    {
+      "path": "personal-ai-agent/app/tools/performance_profiler.py",
+      "size": 4447,
+      "last_modified_os": "2025-05-09T20:15:21.076399+00:00",
+      "last_checked_by_script": "2025-05-09T20:21:56.923561+00:00",
+      "status_in_batch": "creation",
+      "batch_id": "31.0",
+      "phase_id": "31",
+      "description": "Creation in Batch 31.0 for Phase 31."
+    },
+    {
+      "path": "personal-ai-agent/app/schemas/performance_profile_log.schema.json",
+      "size": 1611,
+      "last_modified_os": "2025-05-09T20:15:34.724869+00:00",
+      "last_checked_by_script": "2025-05-09T20:21:56.923607+00:00",
+      "status_in_batch": "creation",
+      "batch_id": "31.0",
+      "phase_id": "31",
+      "description": "Creation in Batch 31.0 for Phase 31."
+    },
+    {
+      "path": "personal-ai-agent/app/memory/performance_profile_log.json",
+      "size": 6768,
+      "last_modified_os": "2025-05-09T20:18:49.199877+00:00",
+      "last_checked_by_script": "2025-05-09T20:21:56.923629+00:00",
+      "status_in_batch": "creation_population",
+      "batch_id": "31.0",
+      "phase_id": "31",
+      "description": "Creation_population in Batch 31.0 for Phase 31."
+    },
+    {
+      "path": "personal-ai-agent/app/logs/loop_0078_execution.log",
+      "size": 132,
+      "last_modified_os": "2025-05-09T20:18:47.183229+00:00",
+      "last_checked_by_script": "2025-05-09T20:21:56.923648+00:00",
+      "status_in_batch": "creation_population",
+      "batch_id": "31.0",
+      "phase_id": "31",
+      "description": "Creation_population in Batch 31.0 for Phase 31."
+    },
+    {
+      "path": "personal-ai-agent/app/logs/loop_0079_execution.log",
+      "size": 855,
+      "last_modified_os": "2025-05-09T20:18:49.195876+00:00",
+      "last_checked_by_script": "2025-05-09T20:21:56.923699+00:00",
+      "status_in_batch": "creation_population",
+      "batch_id": "31.0",
+      "phase_id": "31",
+      "description": "Creation_population in Batch 31.0 for Phase 31."
+    },
+    {
+      "path": "personal-ai-agent/app/loop_controller.py",
+      "size": 24273,
+      "last_modified_os": "2025-05-09T22:59:53.538082+00:00",
+      "last_checked_by_script": "2025-05-09T22:59:53.538082+00:00",
+      "status_in_batch": "modification",
+      "batch_id": "32.3",
+      "phase_id": "31",
+      "description": "Main loop controller, modified for intervention logging.",
+      "status": "modified",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "update_wiring_manifest_31_0.py",
+      "size": 5933,
+      "last_modified_os": "2025-05-09T20:21:05.319247+00:00",
+      "last_checked_by_script": "2025-05-09T20:21:56.923744+00:00",
+      "status_in_batch": "creation",
+      "batch_id": "31.0",
+      "phase_id": "31",
+      "description": "Creation in Batch 31.0 for Phase 31."
+    },
+    {
+      "path": "validate_performance_schema.py",
+      "size": 2199,
+      "last_modified_os": "2025-05-09T20:19:48.982483+00:00",
+      "last_checked_by_script": "2025-05-09T20:21:56.923767+00:00",
+      "status_in_batch": "creation",
+      "batch_id": "31.0",
+      "phase_id": "31",
+      "description": "Creation in Batch 31.0 for Phase 31."
+    },
+    {
+      "path": "todo_batch_31_0.md",
+      "size": 6409,
+      "last_modified_os": "2025-05-09T20:21:24.667958+00:00",
+      "last_checked_by_script": "2025-05-09T20:21:56.923787+00:00",
+      "status_in_batch": "creation_modification",
+      "batch_id": "31.0",
+      "phase_id": "31",
+      "description": "Creation_modification in Batch 31.0 for Phase 31."
+    },
+    {
+      "path": "personal-ai-agent/app/schemas/operator_input.schema.json",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.0",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/memory/operator_input.json",
+      "type": "file",
+      "status": "modified",
+      "batch_id": "32.1",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/tools/submit_operator_input.py",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.0",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/tools/operator_input_log_viewer.py",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.0",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/logs/loop_0080_execution.log",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.0",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "wiring_manifest.updated_phase22_36.json",
+      "type": "file",
+      "status": "modified",
+      "batch_id": "32.2",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/memory/runtime_error_log.json",
+      "type": "file",
+      "status": "modified",
+      "batch_id": "32.2",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/memory/operator_escalation_queue.json",
+      "type": "file",
+      "status": "modified",
+      "batch_id": "32.2",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/schemas/operator_intervention_log.schema.json",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.1",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/memory/operator_intervention_log.json",
+      "type": "file",
+      "status": "modified",
+      "batch_id": "32.3",
+      "added_by": "Manus_Agent_001",
+      "last_modified_os": "2025-05-09T22:59:53.538082+00:00",
+      "last_checked_by_script": "2025-05-09T22:59:53.538082+00:00",
+      "description": "Log for operator interventions."
+    },
+    {
+      "path": "personal-ai-agent/app/schemas/operator_dashboard_config.schema.json",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.2",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/memory/operator_dashboard_config.json",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.2",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/tools/log_aggregator_tool.py",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.2",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/memory/loop_summary.json",
+      "type": "file",
+      "status": "modified",
+      "batch_id": "32.2",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/memory/agent_trust_score.json",
+      "type": "file",
+      "status": "modified",
+      "batch_id": "32.2",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/memory/legacy_alignment_tracker.json",
+      "type": "file",
+      "status": "modified",
+      "batch_id": "32.2",
+      "added_by": "Manus_Agent_001"
+    },
+    {
+      "path": "personal-ai-agent/app/tools/operator_intervention_tool.py",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.3",
+      "added_by": "Manus_Agent_001",
+      "description": "Operator intervention tool script.",
+      "last_modified_os": "2025-05-09T22:59:53.538082+00:00",
+      "last_checked_by_script": "2025-05-09T22:59:53.538082+00:00",
+      "phase_id": "32"
+    },
+    {
+      "path": "personal-ai-agent/app/schemas/intervention_command.schema.json",
+      "type": "file",
+      "status": "created",
+      "batch_id": "32.3",
+      "added_by": "Manus_Agent_001",
+      "description": "Schema for intervention commands.",
+      "last_modified_os": "2025-05-09T22:59:53.538082+00:00",
+      "last_checked_by_script": "2025-05-09T22:59:53.538082+00:00",
+      "phase_id": "32"
+    }
+  ],
+  "metadata": {
+    "last_updated_by_batch": "32.3",
+    "last_script_run": "2025-05-09T22:59:53.538082+00:00",
+    "last_updated": "2025-05-09T20:41:58.489184+00:00",
+    "last_updated_timestamp": "2025-05-09T22:59:53.538082+00:00"
+  },
+  "phases": [
+    {
+      "id": "phase_31",
+      "name": "Performance Profiling and Optimization",
+      "batches": [
+        {
+          "id": "batch_31.1",
+          "name": "Bottleneck Analysis",
+          "artifacts": [
+            {
+              "path": "analyze_performance_logs.py",
+              "type": "script",
+              "role": "output_artifact",
+              "description": "Python script to analyze performance_profile_log.json and identify bottlenecks.",
+              "added_at": "2025-05-09T20:41:58.489059+00:00"
+            },
+            {
+              "path": "generate_performance_visuals.py",
+              "type": "script",
+              "role": "output_artifact",
+              "description": "Python script to generate charts and tables from performance analysis results.",
+              "added_at": "2025-05-09T20:41:58.489089+00:00"
+            },
+            {
+              "path": "performance_analysis_results.json",
+              "type": "data_file",
+              "role": "output_artifact",
+              "description": "JSON output from analyze_performance_logs.py containing aggregated performance data.",
+              "added_at": "2025-05-09T20:41:58.489112+00:00"
+            },
+            {
+              "path": "reports/performance_bottleneck_report.md",
+              "type": "report",
+              "role": "output_artifact",
+              "description": "Markdown report detailing findings of performance bottleneck analysis for Batch 31.1.",
+              "added_at": "2025-05-09T20:41:58.489131+00:00"
+            },
+            {
+              "path": "reports/charts/slowest_components_avg_time.png",
+              "type": "image",
+              "role": "output_artifact",
+              "description": "PNG image visualizing the top 3 slowest components by average execution time.",
+              "added_at": "2025-05-09T20:41:58.489148+00:00"
+            },
+            {
+              "path": "todo_batch_31_1.md",
+              "type": "documentation",
+              "role": "output_artifact",
+              "description": "Todo list for managing tasks in Batch 31.1.",
+              "added_at": "2025-05-09T20:41:58.489162+00:00"
+            },
+            {
+              "path": "update_wiring_manifest_31_1.py",
+              "type": "script",
+              "role": "output_artifact",
+              "description": "Python script to update the wiring manifest for Batch 31.1.",
+              "added_at": "2025-05-09T20:41:58.489178+00:00"
+            }
+          ],
+          "description": "Analyze baseline performance data from Batch 31.0 to identify bottlenecks and performance concerns. Generate a report with findings and recommendations."
+        }
+      ],
+      "description": "Phase focused on integrating performance profiling tools, analyzing baseline metrics, identifying bottlenecks, and implementing optimizations."
+    }
 ]
