@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loop Justification Log Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "loop_id",
+      "plan_selected",
+      "justification",
+      "adaptation_details"
+    ],
+    "properties": {
+      "loop_id": {
+        "type": "string",
+        "description": "ID of the loop associated with this justification"
+      },
+      "plan_selected": {
+        "type": "string",
+        "description": "Name or identifier of the selected plan"
+      },
+      "justification": {
+        "type": "string",
+        "description": "Narrative description of why the plan was selected, including emotional and trust context"
+      },
+      "adaptation_details": {
+        "type": "string",
+        "description": "Summary of plan adaptation based on critiques, reflections, or alignment logic"
+      }
+    }
+  }
+}
