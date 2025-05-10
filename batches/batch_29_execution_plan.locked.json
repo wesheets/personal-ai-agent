@@ -18,7 +18,7 @@
             "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `functional_test_scenarios.json`, `functional_test_results.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
             "Update `verified` status for batch 29.0 to `true`."
           ],
-          "verified": false,
+          "verified": true,
           "git_commit_hash": "placeholder",
           "pr_id": "placeholder",
           "dependencies": [
@@ -38,7 +38,7 @@
             "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `functional_test_results.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
             "Update `verified` status for batch 29.1 to `true`."
           ],
-          "verified": false,
+          "verified": true,
           "git_commit_hash": "placeholder",
           "pr_id": "placeholder",
           "dependencies": [
@@ -58,7 +58,7 @@
             "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `functional_test_results.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
             "Update `verified` status for batch 29.2 to `true`."
           ],
-          "verified": false,
+          "verified": true,
           "git_commit_hash": "placeholder",
           "pr_id": "placeholder",
           "dependencies": [
@@ -79,7 +79,7 @@
             "**CRITICAL VERIFICATION:** Confirm that ALL critical files modified/created in this batch (including `functional_test_results.json`, `wiring_manifest.updated_phase22_36.json`, `file_tree.updated_post_phase36.json`, `promethios_file_tree_plan.v3.1.5_runtime_synced.json`) were handled by: 1. Loading the FULL prior version. 2. Appending/merging new changes schema-conformantly. 3. Saving the ENTIRE, COMPLETE file. NO PARTIALS OR DELTAS ACCEPTED.",
             "Update `verified` status for batch 29.3 to `true`."
           ],
-          "verified": false,
+          "verified": true,
           "git_commit_hash": "placeholder",
           "pr_id": "placeholder",
           "dependencies": [
