@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Operator Dashboard Configuration",
+  "description": "Schema for operator dashboard configuration, version 1.0. Defines which logs and metrics to display.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Version of this schema."
+    },
+    "log_aggregation_settings": {
+      "type": "object",
+      "description": "Settings for aggregating general logs.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "log_files_to_monitor": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Absolute path to the log file."
+              },
+              "display_name": {
+                "type": "string",
+                "description": "How this log should be named in the dashboard."
+              },
+              "max_lines_to_show": {
+                "type": "integer",
+                "default": 100
+              }
+            },
+            "required": ["path", "display_name"]
+          }
+        }
+      }
+    },
+    "system_status_metrics": {
+      "type": "object",
+      "description": "Configuration for displaying key system status metrics.",
+      "properties": {
+        "active_loops": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": true},
+            "source_file": {"type": "string", "default": "/home/ubuntu/personal-ai-agent/app/memory/loop_summary.json"}
+          }
+        },
+        "trust_scores": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": true},
+            "source_file": {"type": "string", "default": "/home/ubuntu/personal-ai-agent/app/memory/agent_trust_score.json"}
+          }
+        },
+        "error_counts": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": true},
+            "source_file": {"type": "string", "default": "/home/ubuntu/personal-ai-agent/app/memory/runtime_error_log.json"}
+          }
+        },
+        "escalation_counts": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": true},
+            "source_file": {"type": "string", "default": "/home/ubuntu/personal-ai-agent/app/memory/operator_escalation_queue.json"}
+          }
+        },
+        "drift_metrics": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": true},
+            "source_file": {"type": "string", "default": "/home/ubuntu/personal-ai-agent/app/memory/legacy_alignment_tracker.json"} 
+          }
+        }
+      }
+    },
+    "display_refresh_interval_seconds": {
+        "type": "integer",
+        "default": 5,
+        "description": "How often the dashboard display should refresh (for CLI)."
+    }
+  },
+  "required": [
+    "schema_version",
+    "system_status_metrics"
+  ]
+}
