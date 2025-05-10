@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Operator Input Log",
+  "description": "Schema for operator input entries, version 1.0.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "loop_id": {
+        "type": "string",
+        "description": "The identifier of the loop for which the input is provided."
+      },
+      "decision_point": {
+        "type": "string",
+        "description": "Specific point or reason in the loop requiring operator input."
+      },
+      "operator_response_type": {
+        "type": "string",
+        "enum": ["approve", "reject", "escalate", "override", "comment"],
+        "description": "The type of response provided by the operator."
+      },
+      "rationale": {
+        "type": "string",
+        "description": "The operator's rationale for their decision."
+      },
+      "confidence_score": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1,
+        "description": "The operator's confidence in their response (0-1 scale)."
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "ISO 8601 timestamp of when the operator input was recorded."
+      }
+    },
+    "required": [
+      "loop_id",
+      "decision_point",
+      "operator_response_type",
+      "rationale",
+      "timestamp"
+    ]
+  }
+}

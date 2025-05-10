@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Operator Intervention Log",
+  "description": "Schema for operator intervention log entries, version 1.0.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "intervention_id": {
+        "type": "string",
+        "format": "uuid",
+        "description": "Unique identifier for the intervention event."
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "ISO 8601 timestamp of when the intervention was logged."
+      },
+      "loop_id": {
+        "type": "string",
+        "description": "The identifier of the loop related to this intervention."
+      },
+      "batch_id": {
+        "type": "string",
+        "description": "The batch identifier during which this intervention occurred."
+      },
+      "operator_id": {
+        "type": "string",
+        "description": "Identifier for the operator who performed the action (placeholder)."
+      },
+      "input_ref_id": {
+        "type": "string",
+        "description": "Reference to an entry in operator_input.json, if applicable (e.g., timestamp or unique ID of the input)."
+      },
+      "action_taken": {
+        "type": "string",
+        "enum": ["approved_continuation", "rejected_action", "provided_override_data", "manual_halt", "parameter_update", "other"],
+        "description": "The type of action taken by the operator or logged as an intervention."
+      },
+      "details": {
+        "type": "string",
+        "description": "Detailed description of the intervention or action taken."
+      },
+      "logged_by": {
+        "type": "string",
+        "description": "The component or process that logged this intervention (e.g., 'loop_controller', 'operator_tool')."
+      }
+    },
+    "required": [
+      "intervention_id",
+      "timestamp",
+      "loop_id",
+      "batch_id",
+      "action_taken",
+      "details",
+      "logged_by"
+    ]
+  }
+}

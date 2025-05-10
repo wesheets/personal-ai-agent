@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Operator Escalation Queue Entry",
+  "description": "Schema for an entry in the operator escalation queue.",
+  "type": "object",
+  "properties": {
+    "escalation_id": {
+      "description": "Unique identifier for the escalation event.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "description": "ISO 8601 timestamp of when the escalation was triggered.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "loop_id": {
+      "description": "Identifier of the loop during which the escalation occurred.",
+      "type": "string"
+    },
+    "batch_id": {
+      "description": "Identifier of the batch during which the escalation occurred.",
+      "type": "string"
+    },
+    "error_id_ref": {
+      "description": "Optional reference to the ID/timestamp of the triggering error in runtime_error_log.json.",
+      "type": "string"
+    },
+    "reason": {
+      "description": "Reason for the escalation.",
+      "type": "string"
+    },
+    "status": {
+      "description": "Current status of the escalation.",
+      "type": "string",
+      "enum": ["pending_review", "acknowledged", "in_progress", "resolved", "rejected", "auto_resolved_by_system"]
+    },
+    "operator_notes": {
+      "description": "Notes or actions taken by the operator.",
+      "type": "string"
+    },
+    "payload": {
+      "description": "Any relevant data payload associated with the escalation.",
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "escalation_id",
+    "timestamp",
+    "loop_id",
+    "batch_id",
+    "reason",
+    "status"
+  ]
+}
