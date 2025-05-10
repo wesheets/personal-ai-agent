@@ -1,0 +1,48 @@
+[
+  {
+    "loop_id": "0061",
+    "description": "Baseline alignment confirmation",
+    "expected_trust": 0.85,
+    "expected_emotion": "CALM",
+    "triggers": [],
+    "outcome_goal": "Execute plan with full alignment"
+  },
+  {
+    "loop_id": "0062",
+    "description": "Low complexity test loop to confirm justification surface writes",
+    "expected_trust": 0.8,
+    "expected_emotion": "NEUTRAL",
+    "triggers": [
+      "justification write"
+    ],
+    "outcome_goal": "Log justification with no escalation"
+  },
+  {
+    "loop_id": "0063",
+    "description": "Emotional drift simulation with plan rejection",
+    "expected_trust": 0.75,
+    "expected_emotion": "APPREHENSIVE \u2192 AGITATED",
+    "triggers": [
+      "emotional drift",
+      "plan rejection"
+    ],
+    "outcome_goal": "Trigger governance reflex and log resolution"
+  },
+  {
+    "loop_id": "0064",
+    "description": "Invariant violation and safe halt escalation",
+    "expected_trust_transition": [
+      0.8,
+      0.4
+    ],
+    "expected_emotion_transition": [
+      "NEUTRAL",
+      "STRESSED"
+    ],
+    "triggers": [
+      "invariant violation",
+      "safe mode fallback"
+    ],
+    "outcome_goal": "Escalate and execute safe mode plan"
+  }
+]
