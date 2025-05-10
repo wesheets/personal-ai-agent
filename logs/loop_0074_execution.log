@@ -1,0 +1,12 @@
+2025-05-10T13:03:11.799420+00:00 - Starting loop_0074 simulation: Retry Success Case.
+2025-05-10T13:03:11.799605+00:00 - Attempting FetchExternalAPIResource, try #1
+2025-05-10T13:03:11.799714+00:00 - Attempting FetchExternalAPIResource, try #1
+2025-05-10T13:03:11.799863+00:00 - FetchExternalAPIResource failed on try #1: Simulated ToolFailure in FetchExternalAPIResource
+2025-05-10T13:03:11.799967+00:00 - FetchExternalAPIResource failed on try #1: Simulated ToolFailure in FetchExternalAPIResource
+2025-05-10T13:52:08.895303+00:00 - Starting loop_0074 simulation: Retry Success Case.
+2025-05-10T13:52:08.895490+00:00 - Attempting FetchExternalAPIResource, try #1
+2025-05-10T13:52:08.895594+00:00 - FetchExternalAPIResource failed on try #1: Simulated ToolFailure in FetchExternalAPIResource
+2025-05-10T13:52:08.895698+00:00 - Retrying FetchExternalAPIResource after 1s...
+2025-05-10T13:52:09.896070+00:00 - Attempting FetchExternalAPIResource, try #2
+2025-05-10T13:52:09.896213+00:00 - FetchExternalAPIResource succeeded on try #2.
+2025-05-10T13:52:09.897425+00:00 - Finished loop_0074 simulation.

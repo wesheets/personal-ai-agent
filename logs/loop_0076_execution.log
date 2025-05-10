@@ -1,0 +1,5 @@
+2025-05-10T13:54:26.325589+00:00 - Starting loop_0076 simulation: Critical Failure -> Escalation Case.
+2025-05-10T13:54:26.325764+00:00 - Attempting critical operation: CoreAgentIntegrityCheck
+2025-05-10T13:54:26.325857+00:00 - Critical error caught in loop_0076: Simulated critical UnhandledAgentException in CoreAgentIntegrityCheck.
+2025-05-10T13:54:26.327646+00:00 - CRITICAL: Loop loop_0076 halted due to UnhandledAgentException. Escalation logged. Awaiting Operator review (simulation)...
+2025-05-10T13:54:26.327784+00:00 - Finished loop_0076 simulation.

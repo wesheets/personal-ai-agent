@@ -1,0 +1,12 @@
+2025-05-10T13:53:38.409128+00:00 - Starting loop_0075 simulation: Retry Fail -> Safe Halt Case.
+2025-05-10T13:53:38.409334+00:00 - Attempting CriticalDataValidation, try #1
+2025-05-10T13:53:38.409488+00:00 - CriticalDataValidation failed on try #1: Simulated ValidationError in CriticalDataValidation
+2025-05-10T13:53:38.409585+00:00 - Retrying CriticalDataValidation after 1s...
+2025-05-10T13:53:39.409935+00:00 - Attempting CriticalDataValidation, try #2
+2025-05-10T13:53:39.410087+00:00 - CriticalDataValidation failed on try #2: Simulated ValidationError in CriticalDataValidation
+2025-05-10T13:53:39.410198+00:00 - Retrying CriticalDataValidation after 1s...
+2025-05-10T13:53:40.410629+00:00 - Attempting CriticalDataValidation, try #3
+2025-05-10T13:53:40.410806+00:00 - CriticalDataValidation failed on try #3: Simulated ValidationError in CriticalDataValidation
+2025-05-10T13:53:40.410885+00:00 - CriticalDataValidation failed after 3 retries. Initiating Safe Halt.
+2025-05-10T13:53:40.412048+00:00 - SAFE HALT simulated for loop_0075 due to CriticalDataValidation (ValidationError) failure.
+2025-05-10T13:53:40.412151+00:00 - Finished loop_0075 simulation.

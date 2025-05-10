@@ -1,0 +1,15 @@
+2025-05-10T13:55:12.077360+00:00 - Starting loop_0077 simulation: Compound Failure Case.
+2025-05-10T13:55:12.077545+00:00 - Stage 1: Attempting PrimaryDatabaseQuery with potential MemoryAccessError
+2025-05-10T13:55:12.077695+00:00 - Attempting PrimaryDatabaseQuery, try #1
+2025-05-10T13:55:12.077813+00:00 - PrimaryDatabaseQuery failed on try #1: Simulated MemoryAccessError in PrimaryDatabaseQuery
+2025-05-10T13:55:12.077909+00:00 - Retrying PrimaryDatabaseQuery after 1s...
+2025-05-10T13:55:13.078283+00:00 - Attempting PrimaryDatabaseQuery, try #2
+2025-05-10T13:55:13.078496+00:00 - PrimaryDatabaseQuery failed on try #2: Simulated MemoryAccessError in PrimaryDatabaseQuery
+2025-05-10T13:55:13.078584+00:00 - Retrying PrimaryDatabaseQuery after 1s...
+2025-05-10T13:55:14.079019+00:00 - Attempting PrimaryDatabaseQuery, try #3
+2025-05-10T13:55:14.079183+00:00 - PrimaryDatabaseQuery failed on try #3: Simulated MemoryAccessError in PrimaryDatabaseQuery
+2025-05-10T13:55:14.079291+00:00 - PrimaryDatabaseQuery failed all 3 retries.
+2025-05-10T13:55:14.080727+00:00 - Stage 2: PrimaryDatabaseQuery failed. Attempting fallback operation FallbackCacheGeneration.
+2025-05-10T13:55:14.080848+00:00 - Critical error during fallback FallbackCacheGeneration in loop_0077: Critical CriticalInvariantViolation during fallback operation FallbackCacheGeneration after PrimaryDatabaseQuery failure.
+2025-05-10T13:55:14.082378+00:00 - CRITICAL: Loop loop_0077 halted due to compound failure CriticalInvariantViolation. Escalation logged. Awaiting Operator review (simulation)...
+2025-05-10T13:55:14.082543+00:00 - Finished loop_0077 simulation.

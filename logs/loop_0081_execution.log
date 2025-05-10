@@ -1,0 +1,4 @@
+2025-05-10T13:01:27.653489+00:00 - Starting loop_0081 simulation: Optimization Test B.
+2025-05-10T13:01:27.653741+00:00 - ComplexOptimizedOp_L81 failed once as expected: Simulated TimeoutError in ComplexOptimizedOp_L81
+2025-05-10T13:01:27.653816+00:00 - ComplexOptimizedOp_L81 proceeding with fallback after minor issue.
+2025-05-10T13:01:27.654746+00:00 - Finished loop_0081 simulation.

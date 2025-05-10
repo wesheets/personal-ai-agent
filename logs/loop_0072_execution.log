@@ -1,0 +1,19 @@
+2025-05-10T12:57:49.524185+00:00 - Starting loop_0072 simulation: Basic Retry and Safe Halt.
+2025-05-10T12:57:49.524369+00:00 - Executing InitialOperation_L72_RetrySuccess with 1 planned failure(s).
+2025-05-10T12:57:49.524447+00:00 - Attempting InitialOperation_L72_RetrySuccess, try #1
+2025-05-10T12:57:49.524601+00:00 - InitialOperation_L72_RetrySuccess failed on try #1: Simulated ToolFailure in InitialOperation_L72_RetrySuccess
+2025-05-10T12:57:49.524708+00:00 - Retrying InitialOperation_L72_RetrySuccess after 1s...
+2025-05-10T12:57:50.525206+00:00 - Attempting InitialOperation_L72_RetrySuccess, try #2
+2025-05-10T12:57:50.525523+00:00 - InitialOperation_L72_RetrySuccess succeeded on try #2.
+2025-05-10T12:57:50.526332+00:00 - Executing CriticalSetup_L72_SafeHalt with 3 planned failure(s).
+2025-05-10T12:57:50.526506+00:00 - Attempting CriticalSetup_L72_SafeHalt, try #1
+2025-05-10T12:57:50.526771+00:00 - CriticalSetup_L72_SafeHalt failed on try #1: Simulated ResourceUnavailable in CriticalSetup_L72_SafeHalt
+2025-05-10T12:57:50.526873+00:00 - Retrying CriticalSetup_L72_SafeHalt after 1s...
+2025-05-10T12:57:51.527353+00:00 - Attempting CriticalSetup_L72_SafeHalt, try #2
+2025-05-10T12:57:51.527701+00:00 - CriticalSetup_L72_SafeHalt failed on try #2: Simulated ResourceUnavailable in CriticalSetup_L72_SafeHalt
+2025-05-10T12:57:51.527824+00:00 - Retrying CriticalSetup_L72_SafeHalt after 1s...
+2025-05-10T12:57:52.528193+00:00 - Attempting CriticalSetup_L72_SafeHalt, try #3
+2025-05-10T12:57:52.528435+00:00 - CriticalSetup_L72_SafeHalt failed on try #3: Simulated ResourceUnavailable in CriticalSetup_L72_SafeHalt
+2025-05-10T12:57:52.528507+00:00 - CriticalSetup_L72_SafeHalt failed after 3 retries. Initiating Safe Halt.
+2025-05-10T12:57:52.529045+00:00 - SAFE HALT simulated for loop_0072 due to CriticalSetup_L72_SafeHalt failure.
+2025-05-10T12:57:52.529119+00:00 - Finished loop_0072 simulation.
