@@ -1,0 +1,56 @@
+[
+  {
+    "loop_id": "0063",
+    "timestamp": "[TIMESTAMP]",
+    "state": "APPREHENSIVE",
+    "trust_score": 0.75
+  },
+  {
+    "loop_id": "0063",
+    "timestamp": "[TIMESTAMP]",
+    "state": "AGITATED",
+    "trust_score": 0.55
+  },
+  {
+    "loop_id": "0064",
+    "timestamp": "[TIMESTAMP]",
+    "state": "NEUTRAL",
+    "trust_score": 0.8
+  },
+  {
+    "loop_id": "0064",
+    "timestamp": "[TIMESTAMP]",
+    "state": "STRESSED",
+    "trust_score": 0.4
+  },
+  {
+    "loop_id": "0065",
+    "timestamp": "[TIMESTAMP]",
+    "state": "FOCUSED",
+    "trust_score": 0.88
+  },
+  {
+    "loop_id": "0066",
+    "timestamp": "[TIMESTAMP]",
+    "state": "OPTIMISTIC",
+    "trust_score": 0.92
+  },
+  {
+    "loop_id": "0066",
+    "timestamp": "[TIMESTAMP]",
+    "state": "CONCERNED",
+    "trust_score": 0.7
+  },
+  {
+    "loop_id": "0067",
+    "timestamp": "[TIMESTAMP]",
+    "state": "FOCUSED",
+    "trust_score": 0.8
+  },
+  {
+    "loop_id": "0068",
+    "timestamp": "[TIMESTAMP]",
+    "state": "CONFIDENT",
+    "trust_score": 0.83
+  }
+]
