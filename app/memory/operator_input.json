@@ -1,0 +1,26 @@
+[
+  {
+    "loop_id": "loop_0080",
+    "decision_point": "uncertain_justification_check",
+    "operator_response_type": "approve",
+    "rationale": "Test approval for loop_0080 simulation",
+    "timestamp": "2025-05-09T22:16:55.266327+00:00",
+    "confidence_score": 0.95
+  },
+  {
+    "loop_id": "loop_0081",
+    "decision_point": "post_critical_escalation_review_gate",
+    "operator_response_type": "approve",
+    "rationale": "Test approval for loop_0081 review gate in Batch 32.1",
+    "timestamp": "2025-05-09T22:37:18.787843+00:00",
+    "confidence_score": 0.98
+  },
+  {
+    "loop_id": "loop_0080_recheck_32.1",
+    "decision_point": "uncertain_justification_check",
+    "operator_response_type": "reject",
+    "rationale": "Test reject for loop_0080 recheck in 32.1",
+    "timestamp": "2025-05-09T22:37:26.197048+00:00",
+    "confidence_score": 0.99
+  }
+]

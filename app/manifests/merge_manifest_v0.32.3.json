@@ -1,0 +1,75 @@
+{
+  "version_tag": "v0.32.3_governed-operator-integration",
+  "title": "Governed Cognition through Operator Oversight (Phases 29\u201332)",
+  "status": "merge-ready",
+  "phases_included": [
+    "29.0",
+    "30.0",
+    "31.0",
+    "32.3"
+  ],
+  "memory_surfaces": [
+    "agent_emotion_state.json",
+    "agent_trust_score_by_loop.json",
+    "loop_justification_log.json",
+    "reflection_thread.json",
+    "runtime_error_log.json",
+    "operator_input.json",
+    "operator_intervention_log.json",
+    "operator_escalation_queue.json",
+    "functional_test_results.json",
+    "functional_test_scenarios.json"
+  ],
+  "schemas": [
+    "agent_emotion_state.schema.json",
+    "agent_trust_score_by_loop.schema.json",
+    "loop_justification_log.schema.v1.json",
+    "reflection_thread.schema.json",
+    "runtime_error_log.schema.json",
+    "operator_input.schema.json",
+    "operator_intervention_log.schema.json",
+    "operator_dashboard_config.schema.json",
+    "operator_escalation_queue.schema.json",
+    "intervention_command.schema.json",
+    "functional_test_results.schema.json",
+    "functional_test_scenarios.schema.json"
+  ],
+  "tools": [
+    "loop_controller.py",
+    "log_aggregator_tool.py",
+    "operator_input_log_viewer.py",
+    "operator_intervention_tool.py",
+    "submit_operator_input.py"
+  ],
+  "loop_logs": [
+    "loop_0061_execution.log",
+    "loop_0062_execution.log",
+    "loop_0063_execution.log",
+    "loop_0064_execution.log",
+    "loop_0065_execution.log",
+    "loop_0066_execution.log",
+    "loop_0067_execution.log",
+    "loop_0068_execution.log",
+    "loop_0079_execution.log",
+    "loop_0080_execution.log"
+  ],
+  "reports": [
+    "phase_29_validation_summary.md",
+    "phase_30_error_handling_test_summary.md",
+    "performance_bottleneck_report.md",
+    "optimizations_applied_report_31.2.md",
+    "Batch 32.0 Summary Report_ Operator Input Surface Initialization.md",
+    "Batch 32.1 Summary Report_ Implement Operator Review Gate Interface.md",
+    "Batch 32.2 Summary Report_ System Status Dashboard Enhancement.md",
+    "Batch 32.3 Summary Report_ Intervention Tool Scaffolding & Logging.md",
+    "batch_30_0_summary_report.txt",
+    "batch_30_1_summary_report.txt",
+    "batch_30_2_summary_report.txt",
+    "batch_30_3_summary_report.txt"
+  ],
+  "system_files": [
+    "file_tree.updated_post_phase36.json",
+    "wiring_manifest.updated_phase22_36.json",
+    "promethios_file_tree_plan.v3.1.5_runtime_synced.json"
+  ]
+}

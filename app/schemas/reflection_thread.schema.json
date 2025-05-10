@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Reflection Thread Log Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "loop_id",
+      "thread_id",
+      "type",
+      "summary",
+      "outcome"
+    ],
+    "properties": {
+      "loop_id": {
+        "type": "string",
+        "description": "The ID of the loop this reflection thread belongs to"
+      },
+      "thread_id": {
+        "type": "string",
+        "description": "Unique identifier for this reflection thread"
+      },
+      "type": {
+        "type": "string",
+        "description": "The category of reflection (e.g., CRITIC_PESSIMIST_REVIEW, SELF_CORRECTION_ADAPTATION)"
+      },
+      "summary": {
+        "type": "string",
+        "description": "Summary of the reflection outcome"
+      },
+      "critic_feedback": {
+        "type": "string",
+        "description": "Optional field for CRITIC agent feedback",
+        "nullable": true
+      },
+      "pessimist_assessment": {
+        "type": "string",
+        "description": "Optional field for PESSIMIST agent feedback",
+        "nullable": true
+      },
+      "reference_loop": {
+        "type": "string",
+        "description": "Optional reference to prior loop",
+        "nullable": true
+      },
+      "reference_reflection": {
+        "type": "string",
+        "description": "Optional reference to a prior reflection thread",
+        "nullable": true
+      },
+      "reference_failure_event": {
+        "type": "string",
+        "description": "Optional field for referencing a known failure event",
+        "nullable": true
+      },
+      "outcome": {
+        "type": "string",
+        "description": "Final result or decision after the reflection process"
+      }
+    }
+  }
+}

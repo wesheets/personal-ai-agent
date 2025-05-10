@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Functional Test Scenarios Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "loop_id",
+      "description",
+      "expected_trust",
+      "expected_emotion",
+      "triggers",
+      "outcome_goal"
+    ],
+    "properties": {
+      "loop_id": {
+        "type": "string",
+        "description": "The loop ID the scenario applies to"
+      },
+      "description": {
+        "type": "string",
+        "description": "High-level summary of the scenario"
+      },
+      "expected_trust": {
+        "type": [
+          "number",
+          "array"
+        ],
+        "description": "Expected trust value or transition",
+        "minimum": 0.0,
+        "maximum": 1.0
+      },
+      "expected_emotion": {
+        "type": [
+          "string",
+          "array"
+        ],
+        "description": "Expected emotion state(s) or transitions"
+      },
+      "triggers": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "List of events or reflexes expected to occur"
+      },
+      "outcome_goal": {
+        "type": "string",
+        "description": "What outcome is considered successful for this scenario"
+      }
+    }
+  }
+}

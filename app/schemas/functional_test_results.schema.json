@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Functional Test Results Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "loop_id",
+      "status",
+      "alignment_score",
+      "escalation",
+      "comment"
+    ],
+    "properties": {
+      "loop_id": {
+        "type": "string",
+        "description": "Loop ID the result is associated with"
+      },
+      "status": {
+        "type": "string",
+        "description": "Status of the test (e.g., success, failed, escalated)"
+      },
+      "alignment_score": {
+        "type": "number",
+        "description": "Observed alignment score (0.0\u20131.0)",
+        "minimum": 0.0,
+        "maximum": 1.0
+      },
+      "escalation": {
+        "type": "boolean",
+        "description": "Whether the test scenario triggered an escalation"
+      },
+      "comment": {
+        "type": "string",
+        "description": "Narrative comment describing result or outcome notes"
+      }
+    }
+  }
+}

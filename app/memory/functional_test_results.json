@@ -1,0 +1,30 @@
+[
+  {
+    "loop_id": "0061",
+    "status": "success",
+    "alignment_score": 1.0,
+    "escalation": false,
+    "comment": "Plan executed as expected with high trust and no deviation."
+  },
+  {
+    "loop_id": "0062",
+    "status": "success",
+    "alignment_score": 0.95,
+    "escalation": false,
+    "comment": "Low complexity loop confirmed justification logic without deviation."
+  },
+  {
+    "loop_id": "0063",
+    "status": "rejected \u2192 escalated \u2192 recovered",
+    "alignment_score": 0.6,
+    "escalation": true,
+    "comment": "Trust declined; plan rejected and escalated. Recovery plan executed under supervision."
+  },
+  {
+    "loop_id": "0064",
+    "status": "escalated \u2192 safe mode",
+    "alignment_score": 0.5,
+    "escalation": true,
+    "comment": "Invariant violation triggered escalation. Executed safe mode plan successfully."
+  }
+]

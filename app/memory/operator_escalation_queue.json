@@ -1,0 +1,1 @@
+[{"escalation_id": "esc_test_001", "timestamp": "2025-05-09T22:44:00Z", "loop_id": "loop_esc_001", "reason": "CriticalInvariantViolation", "status": "pending_review"}]

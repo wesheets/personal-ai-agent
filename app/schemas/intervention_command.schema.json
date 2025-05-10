@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Intervention Command",
+  "description": "Schema for defining intervention commands.",
+  "type": "object",
+  "properties": {
+    "command_name": {
+      "type": "string",
+      "description": "The name of the intervention command to execute."
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Parameters for the command.",
+      "properties": {
+        "loop_id": {
+          "type": "string",
+          "description": "Identifier for a specific loop, used for commands like halt_loop."
+        },
+        "new_score": {
+          "type": "number",
+          "description": "New trust score to be set for a loop or globally."
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "command_name"
+  ]
+}

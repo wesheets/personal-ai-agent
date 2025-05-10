@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Trust Score Log Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "loop_id",
+      "timestamp",
+      "score",
+      "reason"
+    ],
+    "properties": {
+      "loop_id": {
+        "type": "string",
+        "description": "ID of the loop where this trust score was recorded"
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp of the trust score entry"
+      },
+      "score": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "description": "The agent's trust score at this loop"
+      },
+      "reason": {
+        "type": "string",
+        "description": "Description of why the score changed or remained stable"
+      }
+    }
+  }
+}
