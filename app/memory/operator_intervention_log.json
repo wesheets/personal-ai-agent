@@ -1,0 +1,30 @@
+[
+  {
+    "intervention_id": "df4f7b05-32a0-4ee5-9bfb-ed94778c9f51",
+    "timestamp": "2025-05-09T22:37:35.519647+00:00",
+    "loop_id": "loop_0081",
+    "batch_id": "32.1",
+    "operator_id": "simulated_operator_001",
+    "input_ref_id": "2025-05-09T22:37:18.787843+00:00",
+    "action_taken": "operator_review_gate_response_approve",
+    "details": "Operator responded with 'approve'. Rationale: Test approval for loop_0081 review gate in Batch 32.1",
+    "logged_by": "loop_controller"
+  },
+  {
+    "intervention_id": "c37df885-0049-4b5a-bc0b-9f3968ae40f1",
+    "timestamp": "2025-05-09T22:56:13.416622+00:00",
+    "loop_id": "sim_loop_001",
+    "batch_id": "32.3_test_run",
+    "intervention_type": "command_execution_update_trust_score",
+    "source": "operator_intervention_tool",
+    "details": {
+      "command_executed": "update_trust_score",
+      "parameters": {
+        "loop_id": "sim_loop_001",
+        "new_score": 0.95,
+        "justification": "Operator observed consistent high-quality output."
+      }
+    },
+    "outcome": "Processed_Placeholder"
+  }
+]
