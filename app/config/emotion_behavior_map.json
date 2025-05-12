@@ -1,0 +1,31 @@
+{
+  "curious": {
+    "exploration_bias": 0.3,
+    "invoke_agents": ["explorer_agent"],
+    "risk_tolerance": "medium"
+  },
+  "anxious": {
+    "risk_penalty": 0.5,
+    "trust_threshold": 0.9,
+    "invoke_agents": ["risk_manager_agent"],
+    "override_actions": ["avoid_risky_moves"]
+  },
+  "frustrated": {
+    "retry_last_plan": true,
+    "invoke_agents": ["problem_solver_agent"],
+    "escalation_threshold": 3
+  },
+  "optimistic": {
+    "delegation_speed": "fast",
+    "validation_relaxation": true,
+    "invoke_agents": ["opportunistic_agent"]
+  },
+  "reflective": {
+    "invoke_agents": ["planner_agent", "evaluator_agent"],
+    "allow_longer_processing_time": true
+  },
+  "conflicted": {
+    "invoke_agents": ["arbitration_agent"],
+    "requires_dissent_resolution": true
+  }
+}
