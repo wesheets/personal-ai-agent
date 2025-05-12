@@ -10028,5 +10028,159 @@
         }
       ],
       "description": "Phase focused on integrating performance profiling tools, analyzing baseline metrics, identifying bottlenecks, and implementing optimizations."
-    }
+    },
+    {
+    "path": "/home/ubuntu/personal-ai-agent/app/controllers/vertical_loop_controller.py",
+    "type": "file",
+    "status": "modified",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/memory/loop_context.json",
+    "type": "file",
+    "status": "created",
+    "batch_id": "33.0",
+    "added_by": "batch_33.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/memory/loop_trace.json",
+    "type": "file",
+    "status": "created",
+    "batch_id": "33.0",
+    "added_by": "batch_33.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/memory/agent_justification_log.json",
+    "type": "file",
+    "status": "created",
+    "batch_id": "33.0",
+    "added_by": "batch_33.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/server/api_endpoints.py",
+    "type": "file",
+    "status": "modified",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/server/websocket_server.py",
+    "type": "file",
+    "status": "created",
+    "batch_id": "33.0",
+    "added_by": "batch_33.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/tools/package_artifacts.py",
+    "type": "file",
+    "status": "created",
+    "batch_id": "33.0",
+    "added_by": "batch_33.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/memory/vertical_manifest.md",
+    "type": "file",
+    "status": "created",
+    "batch_id": "33.0",
+    "added_by": "batch_33.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/generated_scaffold",
+    "type": "directory",
+    "status": "created",
+    "batch_id": "33.0",
+    "added_by": "batch_33.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/generated_scaffold/placeholder.txt",
+    "type": "file",
+    "status": "created",
+    "batch_id": "33.0",
+    "added_by": "batch_33.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/batch_33_0_artifacts_20250510_111626.zip",
+    "type": "file",
+    "status": "created",
+    "batch_id": "33.0",
+    "added_by": "package_artifacts.py"
+  },
+  {
+    "path": "/home/ubuntu/wiring_manifest.updated_phase22_36.json",
+    "type": "file",
+    "status": "modified",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/file_tree.updated_post_phase36.json",
+    "type": "file",
+    "status": "modified",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/todo.md",
+    "type": "file",
+    "status": "modified",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/utils/justification_graph_generator.py",
+    "type": "file",
+    "status": "created",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/memory/justification_graph_data.json",
+    "type": "file",
+    "status": "created",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/src/components/visualization/JustificationGraphViewer.jsx",
+    "type": "file",
+    "status": "created",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/src/pages/LiveCognitionView.jsx",
+    "type": "file",
+    "status": "created",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/schemas/reflection_thread.schema.json",
+    "type": "file",
+    "status": "created",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/app/memory/reflection_thread.json",
+    "type": "file",
+    "status": "created",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/personal-ai-agent/src/components/narrative/ReflectionThreadViewer.jsx",
+    "type": "file",
+    "status": "created",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  },
+  {
+    "path": "/home/ubuntu/promethios_file_tree_plan.v3.1.5_runtime_synced.json",
+    "type": "file",
+    "status": "modified",
+    "batch_id": "34.0",
+    "added_by": "batch_34.0"
+  }
 ]

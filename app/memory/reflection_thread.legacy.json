@@ -1,25 +1,5 @@
 [
   {
-    "reflection_id": "066e9a34-1e4b-4c23-a301-8dce19c03df9",
-    "loop_id": "test_loop_for_explanation_123",
-    "timestamp": "2025-05-12T15:43:52.694639Z",
-    "agent_name": "SageAgent",
-    "reflection_type": "loop_summary",
-    "content": {
-      "summary": "",
-      "key_agents": [
-        "Critic",
-        "Orchestrator",
-        "SageAgent"
-      ],
-      "decisions": [
-        "Recovered decision path for loop test_loop_for_explanation_123"
-      ],
-      "outcome": ""
-    },
-    "related_justification_log_ids": []
-  },
-  {
     "loop_id": "0065",
     "thread_id": "critique_001",
     "type": "CRITIC_PESSIMIST_REVIEW",
